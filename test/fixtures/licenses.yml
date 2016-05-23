@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  key: MyString
+  expiry: 2016-05-21 15:37:49
+  activations: 1
+  active_machines: 
+  policy: 
+
+two:
+  key: MyString
+  expiry: 2016-05-21 15:37:49
+  activations: 1
+  active_machines: 
+  policy: 
