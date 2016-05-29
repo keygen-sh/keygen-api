@@ -1,4 +1,4 @@
-class LicensesController < ApplicationController
+class V1::LicensesController < V1::ApiController
   before_action :set_license, only: [:show, :update, :destroy]
 
   # GET /licenses
