@@ -1,7 +1,8 @@
 class User < ApplicationRecord
-  include Tokenable
+  include AuthToken
 
   has_secure_password
+
   belongs_to :account
   has_one :license
 

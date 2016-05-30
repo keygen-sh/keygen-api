@@ -1,4 +1,4 @@
-module Tokenable
+module AuthToken
   extend ActiveSupport::Concern
 
   included do
@@ -15,7 +15,7 @@ module Tokenable
   def generate_token(token_name)
     loop do
       token = SecureRandom.hex
-      break token unless self.class.exists? "#{token_name}": token
+      break token unless User.exists? "#{token_name}": token
     end
   end
 
