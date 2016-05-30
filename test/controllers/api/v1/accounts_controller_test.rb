@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class V1::AccountsControllerTest < ActionDispatch::IntegrationTest
+class AccountsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @account = accounts(:one)
   end
@@ -12,7 +12,7 @@ class V1::AccountsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create account" do
     assert_difference('Account.count') do
-      post v1_accounts_url, params: { account: { email: @account.email, name: @account.name, subdomain: @account.subdomain } }
+      post v1_accounts_url, params: { account: { email: @account.email, name: @account.name, subdomain: @account.subdomain, planId: @account.plan } }
     end
 
     assert_response 201

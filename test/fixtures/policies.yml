@@ -8,7 +8,9 @@ one:
   recurring: false
   floating: false
   use_pool: false
-  pool: 
+  pool:
+    - key1
+  account: one (Account)
 
 two:
   name: MyString
@@ -18,4 +20,6 @@ two:
   recurring: false
   floating: false
   use_pool: false
-  pool: 
+  pool:
+    - key1
+  account: two (Account)

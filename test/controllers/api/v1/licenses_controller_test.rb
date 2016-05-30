@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class V1::LicensesControllerTest < ActionDispatch::IntegrationTest
+class LicensesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @license = licenses(:one)
   end
@@ -24,7 +24,7 @@ class V1::LicensesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update license" do
-    patch v1_license_url(@license), params: { license: { activations: @license.activations, active_machines: @license.active_machines, expiry: @license.expiry, key: @license.key, policy: @license.policy } }
+    patch v1_license_url(@license), params: { license: { activations: @license.activations, active_machines: @license.active_machines, expiry: @license.expiry, key: @license.key } }
     assert_response 200
   end
 
