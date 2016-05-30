@@ -62,10 +62,10 @@ ActiveRecord::Schema.define(version: 20160530040830) do
     t.string   "name"
     t.string   "email"
     t.string   "password_digest"
-    t.string   "role"
+    t.string   "role",                   default: "user"
     t.integer  "account_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
     t.integer  "license_id"
     t.string   "auth_token"
     t.string   "reset_auth_token"
