@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160523144935) do
+ActiveRecord::Schema.define(version: 20160530024204) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -64,9 +64,11 @@ ActiveRecord::Schema.define(version: 20160523144935) do
     t.string   "password_digest"
     t.string   "role"
     t.integer  "account_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.integer  "license_id"
+    t.string   "auth_token"
+    t.string   "reset_auth_token"
   end
 
 end

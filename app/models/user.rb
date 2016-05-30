@@ -1,11 +1,10 @@
 class User < ApplicationRecord
+  include Tokenable
+
   has_secure_password
   belongs_to :account
   has_one :license
 
-  has_secure_password
-
-  # before_create -> { self.auth_token = Token.new }
   before_save -> { self.email = email.downcase }
 
   validates :name, presence: true
