@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class V1::UsersControllerTest < ActionDispatch::IntegrationTest
+class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
   end
@@ -12,7 +12,7 @@ class V1::UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "should create user" do
     assert_difference('User.count') do
-      post v1_users_url, params: { user: { email: @user.email, name: @user.name, password: 'secret', password_confirmation: 'secret', role: @user.role } }
+      post v1_users_url, params: { user: { email: "three@keygin.io", name: "three", password: 'secret', role: "user", account: @user.account } }
     end
 
     assert_response 201
@@ -24,7 +24,7 @@ class V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update user" do
-    patch v1_user_url(@user), params: { user: { email: @user.email, name: @user.name, password: 'secret', password_confirmation: 'secret', role: @user.role } }
+    patch v1_user_url(@user), params: { user: { email: @user.email, name: @user.name, password: 'secret', role: @user.role, account: @user.account } }
     assert_response 200
   end
 

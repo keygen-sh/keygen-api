@@ -4,8 +4,10 @@ one:
   name: MyString
   email: MyString
   subdomain: MyString
+  plan: basic (Plan)
 
 two:
   name: MyString
   email: MyString
   subdomain: MyString
+  plan: basic (Plan)

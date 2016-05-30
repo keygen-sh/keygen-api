@@ -4,12 +4,13 @@ one:
   key: MyString
   expiry: 2016-05-21 15:37:49
   activations: 1
-  active_machines: 
-  policy: 
+  active_machines:
+  policy: one (Policy)
 
 two:
   key: MyString
   expiry: 2016-05-21 15:37:49
   activations: 1
-  active_machines: 
-  policy: 
+  active_machines:
+    - machine1
+  policy: one (Policy)

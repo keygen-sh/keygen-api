@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class V1::PlansControllerTest < ActionDispatch::IntegrationTest
+class PlansControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @plan = plans(:one)
+    @plan = plans(:basic)
   end
 
   test "should get index" do
@@ -12,7 +12,8 @@ class V1::PlansControllerTest < ActionDispatch::IntegrationTest
 
   test "should create plan" do
     assert_difference('Plan.count') do
-      post v1_plans_url, params: { plan: { max_licenses: @plan.max_licenses, max_policies: @plan.max_policies, max_users: @plan.max_users, name: @plan.name, price: @plan.price } }
+      post v1_plans_url, headers: { "Content-Type": "application/json" },
+        params: { plan: { maxLicenses: @plan.max_licenses, maxPolicies: @plan.max_policies, maxUsers: @plan.max_users, name: @plan.name, price: @plan.price } }.to_json
     end
 
     assert_response 201
@@ -24,7 +25,7 @@ class V1::PlansControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update plan" do
-    patch v1_plan_url(@plan), params: { plan: { max_licenses: @plan.max_licenses, max_policies: @plan.max_policies, max_users: @plan.max_users, name: @plan.name, price: @plan.price } }
+    patch v1_plan_url(@plan), params: { plan: { maxLicenses: @plan.max_licenses, maxPolicies: @plan.max_policies, maxUsers: @plan.max_users, name: @plan.name, price: @plan.price } }
     assert_response 200
   end
 
