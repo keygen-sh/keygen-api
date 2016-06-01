@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   belongs_to :account
   has_one :license
+  has_one :billing, as: :customer
 
   before_save -> { self.email = email.downcase }
 
