@@ -42,7 +42,7 @@ module Api::V1
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_account
-        @account = Account.find(params[:id])
+        @account = Account.find_by_hashid(params[:id])
       end
 
       # Only allow a trusted parameter "white list" through.

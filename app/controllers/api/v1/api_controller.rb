@@ -6,7 +6,7 @@ module Api::V1
     #
     # private
     #
-    # def set_account
+    # def set_current_account
     #   @current_account = Account.find_by_subdomain! request.subdomains.first
     # end
   end
