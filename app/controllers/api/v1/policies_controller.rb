@@ -21,7 +21,7 @@ module Api::V1
       if @policy.save
         render json: @policy, status: :created, location: v1_policy_url(@policy)
       else
-        render json: @policy.errors, status: :unprocessable_entity
+        render json: @policy, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
       end
     end
 
@@ -30,7 +30,7 @@ module Api::V1
       if @policy.update(policy_params)
         render json: @policy
       else
-        render json: @policy.errors, status: :unprocessable_entity
+        render json: @policy, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
       end
     end
 

@@ -21,7 +21,7 @@ module Api::V1
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
       else
-        render json: @account.errors, status: :unprocessable_entity
+        render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
       end
     end
 
@@ -30,7 +30,7 @@ module Api::V1
       if @account.update(account_params)
         render json: @account
       else
-        render json: @account.errors, status: :unprocessable_entity
+        render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
       end
     end
 
