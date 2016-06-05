@@ -19,7 +19,7 @@ module Api::V1
       @plan = Plan.new(plan_params)
 
       if @plan.save
-        render json: @plan, status: :created#, location: @plan
+        render json: @plan, status: :created, location: v1_plan_url(@plan)
       else
         render json: @plan.errors, status: :unprocessable_entity
       end

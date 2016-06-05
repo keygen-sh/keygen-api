@@ -19,7 +19,7 @@ module Api::V1
       @policy = Policy.new(policy_params)
 
       if @policy.save
-        render json: @policy, status: :created#, location: @policy
+        render json: @policy, status: :created, location: v1_policy_url(@policy)
       else
         render json: @policy.errors, status: :unprocessable_entity
       end
