@@ -3,6 +3,7 @@ class PolicySerializer < BaseSerializer
              :use_pool, :pool
 
   belongs_to :account
+  belongs_to :product
   has_many :licenses
 
   def id
