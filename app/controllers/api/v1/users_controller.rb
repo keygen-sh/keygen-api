@@ -41,14 +41,15 @@ module Api::V1
     end
 
     private
-      # Use callbacks to share common setup or constraints between actions.
-      def set_user
-        @user = @current_account.users.find_by_hashid(params[:id])
-      end
 
-      # Only allow a trusted parameter "white list" through.
-      def user_params
-        params.require(:user).permit(:name, :email, :password, :role, :account)
-      end
+    # Use callbacks to share common setup or constraints between actions.
+    def set_user
+      @user = @current_account.users.find_by_hashid params[:id]
+    end
+
+    # Only allow a trusted parameter "white list" through.
+    def user_params
+      params.require(:user).permit :name, :email, :password, :role, :account
+    end
   end
 end
