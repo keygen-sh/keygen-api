@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get  :token, to: "tokens#login"
       post :token, to: "tokens#reset"
+      resources :accounts
       resources :products
       resources :users
       resources :policies

@@ -2,6 +2,7 @@ module Api::V1
   class ProductsController < ApiController
     before_action :set_product, only: [:show, :update, :destroy]
 
+    scope_by_subdomain
     accessible_by_admin :index, :show, :create, :update, :destroy
 
     # GET /products

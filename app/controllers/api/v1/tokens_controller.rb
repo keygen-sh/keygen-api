@@ -3,6 +3,8 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
+    scope_by_subdomain
+
     def login
       authenticate_with_http_basic do |email, password|
         user = @current_account.users.find_by email: email

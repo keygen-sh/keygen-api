@@ -9,6 +9,12 @@ module AccessControl
 
   class_methods do
 
+    def accessible_by_architect(*actions)
+      before_action -> {
+        @current_user.architect? || render_unauthorized
+      }, only: actions
+    end
+
     def accessible_by_admin(*actions)
       before_action -> {
         @current_user.admin? || render_unauthorized
