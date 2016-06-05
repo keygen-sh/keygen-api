@@ -19,7 +19,7 @@ module Api::V1
       @license = License.new(license_params)
 
       if @license.save
-        render json: @license, status: :created#, location: @license
+        render json: @license, status: :created, location: v1_license_url(@license)
       else
         render json: @license.errors, status: :unprocessable_entity
       end
