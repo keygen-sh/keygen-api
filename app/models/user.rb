@@ -15,7 +15,7 @@ class User < ApplicationRecord
     presence: true,
     length: { maximum: 255 },
     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
-    uniqueness: { case_sensitive: false }
+    uniqueness: { case_sensitive: false, scope: :account_id }
 
   def architect?
     self.role == "architect"
