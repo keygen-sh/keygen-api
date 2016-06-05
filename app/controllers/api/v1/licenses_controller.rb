@@ -1,7 +1,9 @@
 module Api::V1
   class LicensesController < ApiController
-    before_action :set_current_account
     before_action :set_license, only: [:show, :update, :destroy]
+
+    accessible_by_admin_or_owner :show
+    accessible_by_admin :index, :update, :destroy
 
     # GET /licenses
     def index
