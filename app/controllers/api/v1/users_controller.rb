@@ -1,7 +1,9 @@
 module Api::V1
   class UsersController < ApiController
-    before_action :set_current_account
     before_action :set_user, only: [:show, :update, :destroy]
+
+    accessible_by_admin_or_owner :show, :update
+    accessible_by_admin :index, :destroy
 
     # GET /users
     def index

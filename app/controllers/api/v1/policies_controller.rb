@@ -1,7 +1,8 @@
 module Api::V1
   class PoliciesController < ApiController
-    before_action :set_current_account
     before_action :set_policy, only: [:show, :update, :destroy]
+
+    accessible_by_admin :index, :show, :create, :update, :destroy
 
     # GET /policies
     def index
