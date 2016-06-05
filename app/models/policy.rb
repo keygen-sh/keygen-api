@@ -1,5 +1,6 @@
 class Policy < ApplicationRecord
   belongs_to :account
+  belongs_to :product
   has_many :licenses
   serialize :pool, Array
 

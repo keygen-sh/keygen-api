@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160604225908) do
+ActiveRecord::Schema.define(version: 20160605004207) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20160604225908) do
     t.datetime "updated_at",      null: false
     t.integer  "policy_id"
     t.string   "active_machines"
+    t.integer  "product_id"
     t.index ["user_id"], name: "index_licenses_on_user_id"
   end
 
@@ -50,6 +51,7 @@ ActiveRecord::Schema.define(version: 20160604225908) do
     t.integer  "max_licenses"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.integer  "max_products"
   end
 
   create_table "policies", force: :cascade do |t|
@@ -65,6 +67,15 @@ ActiveRecord::Schema.define(version: 20160604225908) do
     t.integer  "account_id"
     t.string   "pool"
     t.integer  "lock_version", default: 0,     null: false
+    t.integer  "product_id"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string   "name"
+    t.string   "platforms"
+    t.integer  "account_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -75,11 +86,11 @@ ActiveRecord::Schema.define(version: 20160604225908) do
     t.integer  "account_id"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
-    t.integer  "license_id"
     t.string   "auth_token"
     t.string   "reset_auth_token"
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
+    t.integer  "product_id"
   end
 
 end
