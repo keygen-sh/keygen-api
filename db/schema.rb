@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160605004207) do
+ActiveRecord::Schema.define(version: 20160605011458) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -64,7 +64,6 @@ ActiveRecord::Schema.define(version: 20160605004207) do
     t.boolean  "use_pool",     default: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
-    t.integer  "account_id"
     t.string   "pool"
     t.integer  "lock_version", default: 0,     null: false
     t.integer  "product_id"
