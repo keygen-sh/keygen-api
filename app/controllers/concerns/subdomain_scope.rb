@@ -1,8 +1,10 @@
 module SubdomainScope
   extend ActiveSupport::Concern
 
-  included do
-    before_action :set_current_account
+  class_methods do
+    def scope_by_subdomain
+      before_action :set_current_account
+    end
   end
 
   private

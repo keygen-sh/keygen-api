@@ -2,6 +2,7 @@ module Api::V1
   class LicensesController < ApiController
     before_action :set_license, only: [:show, :update, :destroy]
 
+    scope_by_subdomain
     accessible_by_admin_or_owner :show
     accessible_by_admin :index, :update, :destroy
 

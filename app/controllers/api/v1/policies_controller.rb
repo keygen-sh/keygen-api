@@ -2,6 +2,7 @@ module Api::V1
   class PoliciesController < ApiController
     before_action :set_policy, only: [:show, :update, :destroy]
 
+    scope_by_subdomain
     accessible_by_admin :index, :show, :create, :update, :destroy
 
     # GET /policies
