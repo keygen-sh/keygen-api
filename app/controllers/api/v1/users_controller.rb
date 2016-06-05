@@ -1,10 +1,12 @@
 module Api::V1
   class UsersController < ApiController
+    before_filter :set_current_account
+
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
     def index
-      @users = User.all
+      @users = @current_account.users.all
 
       render json: @users
     end
@@ -16,7 +18,7 @@ module Api::V1
 
     # POST /users
     def create
-      @user = User.new(user_params)
+      @user = User.new user_params.merge(account_id: @current_account.id)
 
       if @user.save
         render json: @user, status: :created, location: v1_user_url(@user)
@@ -42,7 +44,7 @@ module Api::V1
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_user
-        @user = User.find_by_hashid(params[:id])
+        @user = @current_account.users.find_by_hashid(params[:id])
       end
 
       # Only allow a trusted parameter "white list" through.
