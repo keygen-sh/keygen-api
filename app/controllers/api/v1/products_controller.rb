@@ -1,10 +1,12 @@
 module Api::V1
   class ProductsController < ApplicationController
+    before_filter :set_current_account
+
     before_action :set_product, only: [:show, :update, :destroy]
 
     # GET /products
     def index
-      @products = Product.all
+      @products = @current_account.products.all
 
       render json: @products
     end
@@ -16,7 +18,7 @@ module Api::V1
 
     # POST /products
     def create
-      @product = Product.new(product_params)
+      @product = Product.new product_params.merge(account_id: @current_account.id)
 
       if @product.save
         render json: @product, status: :created, location: v1_product_url(@product)
@@ -42,7 +44,7 @@ module Api::V1
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_product
-        @product = Product.find_by_hashid(params[:id])
+        @product = @current_account.products.find_by_hashid(params[:id])
       end
 
       # Only allow a trusted parameter "white list" through.

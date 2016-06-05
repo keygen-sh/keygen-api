@@ -1,5 +1,7 @@
 class Account < ApplicationRecord
   belongs_to :plan
+  has_many :licenses
+  has_many :policies
   has_many :products
   has_many :users
   has_one :billing, as: :customer

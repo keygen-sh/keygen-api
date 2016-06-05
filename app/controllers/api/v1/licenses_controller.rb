@@ -1,10 +1,12 @@
 module Api::V1
   class LicensesController < ApiController
+    before_filter :set_current_account
+
     before_action :set_license, only: [:show, :update, :destroy]
 
     # GET /licenses
     def index
-      @licenses = License.all
+      @licenses = @current_account.licenses.all
 
       render json: @licenses
     end
@@ -16,7 +18,7 @@ module Api::V1
 
     # POST /licenses
     def create
-      @license = License.new(license_params)
+      @license = License.new license_params.merge(account_id: @current_account.id)
 
       if @license.save
         render json: @license, status: :created, location: v1_license_url(@license)
@@ -42,7 +44,7 @@ module Api::V1
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_license
-        @license = License.find_by_hashid(params[:id])
+        @license = @current_account.licenses.find_by_hashid(params[:id])
       end
 
       # Only allow a trusted parameter "white list" through.
