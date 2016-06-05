@@ -1,7 +1,6 @@
 module Api::V1
   class PoliciesController < ApiController
-    before_filter :set_current_account
-
+    before_action :set_current_account
     before_action :set_policy, only: [:show, :update, :destroy]
 
     # GET /policies
