@@ -20,8 +20,9 @@ module Api::V1
 
     # POST /policies
     def create
-      product = @current_account.products.find_by_hashid policy_params.delete(:product_id)
-      @policy = product.policies.new policy_params
+      product = @current_account.products.find_by_hashid(policy_params[:product])
+
+      @policy = @current_account.policies.new policy_params.merge(product: product)
 
       if @policy.save
         render json: @policy, status: :created, location: v1_policy_url(@policy)
@@ -53,10 +54,9 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def policy_params
-      params.require(:policy).require :product_id
       params.require(:policy).permit :name, :price, :duration, :strict,
                                      :recurring, :floating, :use_pool,
-                                     :account, :pool => []
+                                     :product, :pool => []
     end
   end
 end

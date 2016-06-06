@@ -2,12 +2,9 @@ class Account < ApplicationRecord
   belongs_to :plan
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy
-  has_many :policies, through: :products
-  has_many :licenses, through: :policies
+  has_many :policies, dependent: :destroy
+  has_many :licenses, dependent: :destroy
   has_one :billing, as: :customer, dependent: :destroy
-
-  accepts_nested_attributes_for :policies
-  accepts_nested_attributes_for :licenses
 
   before_save -> { self.subdomain = subdomain.downcase }
 

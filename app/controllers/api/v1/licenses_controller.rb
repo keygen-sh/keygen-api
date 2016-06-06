@@ -21,8 +21,10 @@ module Api::V1
 
     # POST /licenses
     def create
-      policy = @current_account.policies.find_by_hashid license_params.delete(:policy_id)
-      @license = policy.licenses.new license_params
+      policy = @current_account.policies.find_by_hashid(license_params[:policy])
+      user = @current_account.users.find_by_hashid(license_params[:user])
+
+      @license = @current_account.licenses.new license_params.merge(policy: policy, user: user)
 
       if @license.save
         render json: @license, status: :created, location: v1_license_url(@license)
@@ -54,7 +56,6 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def license_params
-      params.require(:license).require :policy_id
       params.require(:license).permit :key, :expiry, :activations, :policy,
                                       :user, :active_machines => []
     end
