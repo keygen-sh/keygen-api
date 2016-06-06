@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160605023504) do
+ActiveRecord::Schema.define(version: 20160606161858) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -39,8 +39,6 @@ ActiveRecord::Schema.define(version: 20160605023504) do
     t.datetime "updated_at",      null: false
     t.integer  "policy_id"
     t.string   "active_machines"
-    t.integer  "product_id"
-    t.integer  "account_id"
     t.index ["user_id"], name: "index_licenses_on_user_id"
   end
 
@@ -68,7 +66,6 @@ ActiveRecord::Schema.define(version: 20160605023504) do
     t.string   "pool"
     t.integer  "lock_version", default: 0,     null: false
     t.integer  "product_id"
-    t.integer  "account_id"
   end
 
   create_table "products", force: :cascade do |t|
