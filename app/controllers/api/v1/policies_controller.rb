@@ -19,7 +19,7 @@ module Api::V1
 
     # POST /policies
     def create
-      @policy = Policy.new policy_params.merge(account_id: @current_account.id)
+      @policy = @current_account.policies.new policy_params
 
       if @policy.save
         render json: @policy, status: :created, location: v1_policy_url(@policy)

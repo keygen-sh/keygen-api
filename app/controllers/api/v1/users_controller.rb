@@ -20,7 +20,7 @@ module Api::V1
 
     # POST /users
     def create
-      @user = User.new user_params.merge(account_id: @current_account.id)
+      @user = @current_account.users.new user_params
 
       if @user.save
         render json: @user, status: :created, location: v1_user_url(@user)
