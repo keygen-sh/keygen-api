@@ -11,7 +11,7 @@ class User < ApplicationRecord
 
   before_save -> { self.email = email.downcase }
 
-  validates :account, presence: true
+  validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :email,
     presence: true,

@@ -1,10 +1,12 @@
 class Policy < ApplicationRecord
+  belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
 
   serialize :pool, Array
 
-  validates :product, presence: true
+  validates :account, presence: { message: "must exist" }
+  validates :product, presence: { message: "must exist" }
 
   def pop
     begin

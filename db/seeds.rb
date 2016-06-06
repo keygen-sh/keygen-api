@@ -49,9 +49,10 @@ Account.first.products.new({
   name: "App 2"
 }).save!
 
-Account.first.products.first.policies.new({
+Account.first.policies.new({
   name: "Premium Add-On",
-  price: 199
+  price: 199,
+  product: Account.first.products.first
 }).save!
 
 Account.first.users.new({
@@ -61,7 +62,14 @@ Account.first.users.new({
   products: [Account.first.products.first]
 }).save!
 
-Account.first.policies.first.licenses.new({
+Account.first.users.new({
+  name: "Admin",
+  email: "admin@keygin.io",
+  password: "password",
+  role: "admin"
+}).save!
+
+Account.first.licenses.new({
   key: SecureRandom.hex,
   user: Account.first.users.first,
   policy: Account.first.products.first.policies.first
