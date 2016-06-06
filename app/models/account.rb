@@ -6,6 +6,9 @@ class Account < ApplicationRecord
   has_many :licenses, through: :policies
   has_one :billing, as: :customer, dependent: :destroy
 
+  accepts_nested_attributes_for :policies
+  accepts_nested_attributes_for :licenses
+
   before_save -> { self.subdomain = subdomain.downcase }
 
   validates :name, presence: true

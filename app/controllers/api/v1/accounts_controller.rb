@@ -2,7 +2,9 @@ module Api::V1
   class AccountsController < BaseController
     before_action :set_account, only: [:show, :update, :destroy]
 
-    accessible_by_architect :index, :show, :update, :destroy
+    accessible_by_nobody :index
+    accessible_by_public :create
+    accessible_by_account_admin :show, :update, :destroy
 
     # GET /accounts
     def index
@@ -18,7 +20,7 @@ module Api::V1
 
     # POST /accounts
     def create
-      @account = Account.new(account_params)
+      @account = Account.new account_params
 
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
@@ -42,14 +44,15 @@ module Api::V1
     end
 
     private
-      # Use callbacks to share common setup or constraints between actions.
-      def set_account
-        @account = Account.find_by_hashid(params[:id])
-      end
 
-      # Only allow a trusted parameter "white list" through.
-      def account_params
-        params.require(:account).permit(:name, :email, :subdomain, :plan)
-      end
+    # Use callbacks to share common setup or constraints between actions.
+    def set_account
+      @account = Account.find_by_hashid params[:id]
+    end
+
+    # Only allow a trusted parameter "white list" through.
+    def account_params
+      params.require(:account).permit :name, :email, :subdomain, :plan
+    end
   end
 end

@@ -4,6 +4,8 @@ class Policy < ApplicationRecord
 
   serialize :pool, Array
 
+  validates :product, presence: true
+
   def pop
     begin
       return nil if pool.empty?
