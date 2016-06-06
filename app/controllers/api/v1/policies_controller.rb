@@ -1,8 +1,9 @@
 module Api::V1
   class PoliciesController < BaseController
+    scope_by_subdomain
+
     before_action :set_policy, only: [:show, :update, :destroy]
 
-    scope_by_subdomain
     accessible_by_admin :index, :show, :create, :update, :destroy
 
     # GET /policies
@@ -19,7 +20,8 @@ module Api::V1
 
     # POST /policies
     def create
-      @policy = @current_account.policies.new policy_params
+      product = @current_account.products.find_by_hashid policy_params.delete(:product_id)
+      @policy = product.policies.new policy_params
 
       if @policy.save
         render json: @policy, status: :created, location: v1_policy_url(@policy)
@@ -51,7 +53,10 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def policy_params
-      params.require(:policy).permit :name, :price, :duration, :strict, :recurring, :floating, :use_pool, :account, :pool => []
+      params.require(:policy).require :product_id
+      params.require(:policy).permit :name, :price, :duration, :strict,
+                                     :recurring, :floating, :use_pool,
+                                     :account, :pool => []
     end
   end
 end

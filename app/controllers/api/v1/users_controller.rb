@@ -1,10 +1,11 @@
 module Api::V1
   class UsersController < BaseController
+    scope_by_subdomain
+
     before_action :set_user, only: [:show, :update, :destroy]
 
-    scope_by_subdomain
-    accessible_by_admin_or_owner :show, :update
-    accessible_by_admin :index, :destroy
+    accessible_by_admin_or_resource_owner :show, :update
+    accessible_by_admin :index, :create, :destroy
 
     # GET /users
     def index

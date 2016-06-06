@@ -19,30 +19,11 @@ class User < ApplicationRecord
     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
     uniqueness: { case_sensitive: false, scope: :account_id }
 
-  def architect?
-    self.role == "architect"
-  end
-
   def admin?
     self.role == "admin"
   end
 
   def user?
     self.role == "user"
-  end
-
-  def atleast?(role)
-    roles = [
-      "architect",
-      "admin",
-      "user"
-    ]
-
-    a = roles.index self.role.to_s
-    b = roles.index role.to_s
-
-    return false if a.nil? || b.nil?
-
-    a <= b
   end
 end

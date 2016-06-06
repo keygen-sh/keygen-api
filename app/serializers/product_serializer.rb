@@ -3,8 +3,8 @@ class ProductSerializer < BaseSerializer
 
   belongs_to :account
   has_many :users
-  has_many :policies
-  has_many :licenses
+  has_many :policies, dependent: :destroy
+  has_many :licenses, through: :policies
 
   def id
     object.hashid

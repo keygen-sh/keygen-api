@@ -3,5 +3,9 @@ module Api::V1
     include ActionController::Serialization
     include SubdomainScope
     include AccessControl
+
+    def render_unauthorized
+      render json: { errors: [{ slug: "unauthorized" }] }, status: :unauthorized
+    end
   end
 end
