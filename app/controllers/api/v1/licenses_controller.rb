@@ -20,7 +20,7 @@ module Api::V1
 
     # POST /licenses
     def create
-      @license = License.new license_params.merge(account_id: @current_account.id)
+      @license = @current_account.licenses.new license_params
 
       if @license.save
         render json: @license, status: :created, location: v1_license_url(@license)
