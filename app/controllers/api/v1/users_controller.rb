@@ -1,5 +1,5 @@
 module Api::V1
-  class UsersController < ApiController
+  class UsersController < BaseController
     before_action :set_user, only: [:show, :update, :destroy]
 
     scope_by_subdomain

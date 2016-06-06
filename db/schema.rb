@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160606161858) do
+ActiveRecord::Schema.define(version: 20160606173406) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -76,6 +76,14 @@ ActiveRecord::Schema.define(version: 20160606161858) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "products_users", force: :cascade do |t|
+    t.integer "product_id"
+    t.integer "user_id"
+    t.index ["product_id"], name: "index_products_users_on_product_id"
+    t.index ["user_id", "product_id"], name: "index_products_users_on_user_id_and_product_id"
+    t.index ["user_id"], name: "index_products_users_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string   "name"
     t.string   "email"
@@ -88,7 +96,6 @@ ActiveRecord::Schema.define(version: 20160606161858) do
     t.string   "reset_auth_token"
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
-    t.integer  "product_id"
   end
 
 end

@@ -1,7 +1,7 @@
 class Policy < ApplicationRecord
-  belongs_to :account
   belongs_to :product
-  has_many :licenses
+  has_many :licenses, dependent: :destroy
+
   serialize :pool, Array
 
   def pop

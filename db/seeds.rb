@@ -6,7 +6,7 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-# Plan.create [
+# Plan.create([
 #   {
 #     name: "Weekender",
 #     pitch: "Generous limits for hobbyists",
@@ -34,4 +34,34 @@
 #     max_licenses: 25000,
 #     max_policies: 25
 #   }
-# ]
+# ])
+
+Account.create({
+  name: "Keygin",
+  subdomain: "keygin"
+})
+
+Account.first.products.create([
+  {
+    name: "App 1"
+  },
+  {
+    name: "App 2"
+  }
+])
+
+Account.first.products.first.policies.create({
+  name: "Premium Add-On",
+  price: 199
+})
+
+Account.first.products.first.policies.first.licenses.create({
+  key: SecureRandom.hex
+})
+
+Account.first.users.create({
+  name: "User",
+  email: "user@keygin.io",
+  password: "password",
+  products: [Account.first.products.first]
+})

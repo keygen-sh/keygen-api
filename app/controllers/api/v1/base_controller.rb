@@ -1,5 +1,5 @@
 module Api::V1
-  class ApiController < ApplicationController
+  class BaseController < ApplicationController
     include ActionController::Serialization
     include SubdomainScope
     include AccessControl

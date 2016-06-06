@@ -1,10 +1,10 @@
 class Account < ApplicationRecord
   belongs_to :plan
-  has_many :products
+  has_many :users, dependent: :destroy
+  has_many :products, dependent: :destroy
   has_many :policies, through: :products
   has_many :licenses, through: :policies
-  has_many :users
-  has_one :billing, as: :customer
+  has_one :billing, as: :customer, dependent: :destroy
 
   before_save -> { self.subdomain = subdomain.downcase }
 
