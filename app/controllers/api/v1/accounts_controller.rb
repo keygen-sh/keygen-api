@@ -1,5 +1,5 @@
 module Api::V1
-  class AccountsController < ApiController
+  class AccountsController < BaseController
     before_action :set_account, only: [:show, :update, :destroy]
 
     accessible_by_architect :index, :show, :update, :destroy

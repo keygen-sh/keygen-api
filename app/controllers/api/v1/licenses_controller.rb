@@ -1,5 +1,5 @@
 module Api::V1
-  class LicensesController < ApiController
+  class LicensesController < BaseController
     before_action :set_license, only: [:show, :update, :destroy]
 
     scope_by_subdomain
