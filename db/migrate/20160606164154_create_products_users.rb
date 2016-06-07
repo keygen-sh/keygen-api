@@ -4,6 +4,6 @@ class CreateProductsUsers < ActiveRecord::Migration[5.0]
       t.references :product
       t.references :user
     end
-    add_index :products_users, [:user_id, :product_id]
+    add_index :products_users, [:user_id, :product_id], unique: true
   end
 end
