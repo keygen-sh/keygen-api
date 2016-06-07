@@ -4,8 +4,8 @@ module Api::V1
 
     before_action :set_user, only: [:show, :update, :destroy]
 
-    accessible_by_admin_or_resource_owner :show, :update
-    accessible_by_admin :index, :create, :destroy
+    # accessible_by_admin_or_resource_owner :show, :update
+    # accessible_by_admin :index, :create, :destroy
 
     # GET /users
     def index
