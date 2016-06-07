@@ -4,8 +4,8 @@ module Api::V1
 
     before_action :set_license, only: [:show, :update, :destroy]
 
-    accessible_by_admin_or_resource_owner :show
-    accessible_by_admin :index, :create, :update, :destroy
+    # accessible_by_admin_or_resource_owner :show
+    # accessible_by_admin :index, :create, :update, :destroy
 
     # GET /licenses
     def index

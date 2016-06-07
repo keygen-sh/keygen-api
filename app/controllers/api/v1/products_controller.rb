@@ -4,7 +4,7 @@ module Api::V1
 
     before_action :set_product, only: [:show, :update, :destroy]
 
-    accessible_by_admin :index, :show, :create, :update, :destroy
+    # accessible_by_admin :index, :show, :create, :update, :destroy
 
     # GET /products
     def index
