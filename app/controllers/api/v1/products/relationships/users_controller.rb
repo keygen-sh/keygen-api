@@ -9,6 +9,8 @@ module Api::V1::Products::Relationships
 
     # POST /products/1/users
     def create
+      render status: :not_found and return unless @product
+
       @user = @current_account.users.find_by_hashid user_params
 
       if @user
@@ -23,6 +25,9 @@ module Api::V1::Products::Relationships
 
     # DELETE /products/1/users/2
     def destroy
+      render status: :unprocessable_entity and return unless @user
+      render status: :not_found and return unless @product
+
       @product.users.delete @user if @product.users.include? @user
     end
 
