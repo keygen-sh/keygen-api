@@ -82,7 +82,7 @@ ActiveRecord::Schema.define(version: 20160606200844) do
     t.integer "product_id"
     t.integer "user_id"
     t.index ["product_id"], name: "index_products_users_on_product_id"
-    t.index ["user_id", "product_id"], name: "index_products_users_on_user_id_and_product_id"
+    t.index ["user_id", "product_id"], name: "index_products_users_on_user_id_and_product_id", unique: true
     t.index ["user_id"], name: "index_products_users_on_user_id"
   end
 
