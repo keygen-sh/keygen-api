@@ -5,12 +5,10 @@ module Api::V1::Products::Relationships
     before_action :set_product, only: [:create, :destroy]
     before_action :set_user, only: [:destroy]
 
-    # accessible_by_admin :index, :create, :destroy
+    # accessible_by_admin :create, :destroy
 
-    # POST /products/1/users
+    # POST /products/1/relationships/users
     def create
-      render status: :not_found and return unless @product
-
       @user = @current_account.users.find_by_hashid user_params
 
       if @user
@@ -23,11 +21,8 @@ module Api::V1::Products::Relationships
       render status: :conflict
     end
 
-    # DELETE /products/1/users/2
+    # DELETE /products/1/relationships/users/2
     def destroy
-      render status: :unprocessable_entity and return unless @user
-      render status: :not_found and return unless @product
-
       @product.users.delete @user if @product.users.include? @user
     end
 
