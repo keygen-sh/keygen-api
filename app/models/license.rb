@@ -11,4 +11,9 @@ class License < ApplicationRecord
   validates :key,
     presence: true,
     uniqueness: { scope: :policy_id }
+
+  def license_valid?
+    (expiry.nil? || expiry > DateTime.now) &&
+      (!activations.nil? && activations > 0)
+  end
 end
