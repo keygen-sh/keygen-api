@@ -13,6 +13,7 @@ module Api::V1::Products::Relationships
 
       if @user
         @product.users << @user
+        render status: :created
       else
         render status: :unprocessable_entity
       end
