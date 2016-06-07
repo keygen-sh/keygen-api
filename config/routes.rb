@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   scope module: "api" do
     rel = -> r1, r2 { "/api/v1/#{r1}/relationships/#{r2}" }
+    act = -> r, a { "/api/v1/#{r}/actions/#{a}" }
 
     namespace :v1 do
       get  :token, to: "tokens#login"
