@@ -19,6 +19,16 @@ Rails.application.routes.draw do
       post :token, to: "tokens#reset"
 
       resources :accounts do
+
+        namespace :relationships do
+          relationship :plans, only: [:create]
+        end
+
+        namespace :actions do
+          action :post, :pause, to: "status#pause"
+          action :post, :resume, to: "status#resume"
+          action :post, :cancel, to: "status#cancel"
+        end
       end
 
       resources :users do
