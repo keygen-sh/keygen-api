@@ -1,5 +1,5 @@
 module Api::V1
-  class TokensController < BaseController
+  class TokensController < Api::V1::BaseController
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 

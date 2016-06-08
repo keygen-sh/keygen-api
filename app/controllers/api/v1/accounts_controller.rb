@@ -1,5 +1,5 @@
 module Api::V1
-  class AccountsController < BaseController
+  class AccountsController < Api::V1::BaseController
     before_action :set_account, only: [:show, :update, :destroy]
 
     # accessible_by_nobody :index

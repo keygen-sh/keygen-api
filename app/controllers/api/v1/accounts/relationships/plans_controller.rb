@@ -1,5 +1,5 @@
 module Api::V1::Accounts::Relationships
-  class PlansController < BaseController
+  class PlansController < Api::V1::BaseController
     before_action :set_account, only: [:create]
 
     # accessible_by_admin :create

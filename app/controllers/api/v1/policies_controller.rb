@@ -1,5 +1,5 @@
 module Api::V1
-  class PoliciesController < BaseController
+  class PoliciesController < Api::V1::BaseController
     scope_by_subdomain
 
     before_action :set_policy, only: [:show, :update, :destroy]

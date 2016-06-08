@@ -1,5 +1,5 @@
 module Api::V1::Licenses::Relationships
-  class MachinesController < BaseController
+  class MachinesController < Api::V1::BaseController
     scope_by_subdomain
 
     before_action :set_license, only: [:create, :destroy]

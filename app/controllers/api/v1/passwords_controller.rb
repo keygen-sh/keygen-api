@@ -1,5 +1,5 @@
 module Api::V1
-  class PasswordsController < BaseController
+  class PasswordsController < Api::V1::BaseController
     scope_by_subdomain
 
     before_action :set_user, only: [:reset]

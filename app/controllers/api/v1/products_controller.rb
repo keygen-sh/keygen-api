@@ -1,5 +1,5 @@
 module Api::V1
-  class ProductsController < BaseController
+  class ProductsController < Api::V1::BaseController
     scope_by_subdomain
 
     before_action :set_product, only: [:show, :update, :destroy]
