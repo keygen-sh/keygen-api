@@ -15,8 +15,8 @@ Rails.application.routes.draw do
         })
       end
 
-      get  :token, to: "tokens#login"
-      post :token, to: "tokens#reset"
+      get  :tokens, to: "tokens#login"
+      post :tokens, to: "tokens#reset"
 
       post :passwords, to: "passwords#reset"
 
