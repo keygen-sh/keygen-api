@@ -1,9 +1,7 @@
 module Api::V1
   class PlansController < Api::V1::BaseController
+    before_action :authenticate_with_token!
     before_action :set_plan, only: [:show, :update, :destroy]
-
-    # accessible_by_nobody :create, :update, :destroy
-    # accessible_by_public :index, :show
 
     # GET /plans
     def index

@@ -1,8 +1,7 @@
 module Api::V1::Accounts::Actions
   class StatusController < Api::V1::BaseController
+    before_action :authenticate_with_token!
     before_action :set_account, only: [:pause, :resume, :cancel]
-
-    # accessible_by_admin :pause, :resume, :cancel
 
     # POST /accounts/1/actions/pause
     def pause

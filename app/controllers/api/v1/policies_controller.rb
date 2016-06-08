@@ -4,8 +4,6 @@ module Api::V1
 
     before_action :set_policy, only: [:show, :update, :destroy]
 
-    # accessible_by_admin :index, :show, :create, :update, :destroy
-
     # GET /policies
     def index
       @policies = @current_account.policies.all
