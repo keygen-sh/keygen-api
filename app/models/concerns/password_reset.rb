@@ -2,7 +2,7 @@ module PasswordReset
   extend ActiveSupport::Concern
 
   included do
-    before_create :create_password_reset_token!
+    before_create :create_password_reset_token
   end
 
   def send_password_reset
@@ -13,8 +13,8 @@ module PasswordReset
     UserMailer.password_reset(self).deliver
   end
 
-  def regenerate_password_reset_token!
-    self.password_reset_token = generate_token :password_reset_token
+  def reset_password_reset_token!
+    create_password_reset_token
     save
   end
 
@@ -29,7 +29,7 @@ module PasswordReset
 
   private
 
-  def create_password_reset_token!
+  def create_password_reset_token
     self.password_reset_token = generate_token :password_reset_token
   end
 end

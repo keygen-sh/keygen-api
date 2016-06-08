@@ -24,9 +24,9 @@ module Api::V1::Users::Actions
     # POST /accounts/1/actions/reset-password
     def reset
       if @user.password_reset_token == params[:password_reset_token]
-        @user.regenerate_password_reset_token!
+        @user.reset_password_reset_token!
 
-        if @user.password_reset_sent_at < 1.minute.ago
+        if @user.password_reset_sent_at < 24.hours.ago
           # TODO: Make a custom errors serializer
           render json: { errors: [{
             source: { pointer: "/data/attributes/passwordResetToken" },
