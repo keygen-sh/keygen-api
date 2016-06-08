@@ -1,5 +1,5 @@
 module Api::V1::Accounts::Actions
-  class StatusController < BaseController
+  class StatusController < Api::V1::BaseController
     before_action :set_account, only: [:pause, :resume, :cancel]
 
     # accessible_by_admin :pause, :resume, :cancel

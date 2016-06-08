@@ -1,5 +1,5 @@
 module Api::V1::Licenses::Actions
-  class VerifyController < BaseController
+  class VerifyController < Api::V1::BaseController
     scope_by_subdomain
 
     before_action :set_license, only: [:verify]

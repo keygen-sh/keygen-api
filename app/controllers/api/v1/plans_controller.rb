@@ -1,5 +1,5 @@
 module Api::V1
-  class PlansController < BaseController
+  class PlansController < Api::V1::BaseController
     before_action :set_plan, only: [:show, :update, :destroy]
 
     # accessible_by_nobody :create, :update, :destroy
