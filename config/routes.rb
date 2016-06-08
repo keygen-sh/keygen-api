@@ -3,13 +3,13 @@ Rails.application.routes.draw do
     namespace :v1 do
 
       def relationship(resource, opts = {})
-        resources(resource, {
+        resources(resource.to_s.dasherize, {
           controller: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
         }.merge(opts))
       end
 
       def action(verb, action, opts = {})
-        send(verb, action, {
+        send(verb, action.to_s.dasherize, {
           controller: "/api/v1/#{parent_resource.name}/actions/actions",
           to: "/api/v1/#{parent_resource.name}/actions/#{opts[:to]}"
         })
@@ -34,6 +34,11 @@ Rails.application.routes.draw do
       end
 
       resources :users do
+
+        namespace :actions do
+          action :post, :update_password, to: "passwords#update"
+          action :post, :reset_password, to: "passwords#reset"
+        end
       end
 
       resources :policies do
