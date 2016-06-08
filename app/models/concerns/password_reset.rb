@@ -7,7 +7,7 @@ module PasswordReset
 
   def send_password_reset
     self.password_reset_sent_at = Time.zone.now
-    create_password_reset_token!
+    create_password_reset_token
     save
 
     UserMailer.password_reset(self).deliver
