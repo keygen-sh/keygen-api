@@ -1,8 +1,7 @@
 module Api::V1::Accounts::Relationships
   class PlansController < Api::V1::BaseController
+    before_action :authenticate_with_token!
     before_action :set_account, only: [:create]
-
-    # accessible_by_admin :create
 
     # POST /accounts/1/relationships/plans
     def create

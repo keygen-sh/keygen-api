@@ -16,9 +16,9 @@ Rails.application.routes.draw do
       end
 
       get  :tokens, to: "tokens#login"
-      post :tokens, to: "tokens#reset"
+      post :tokens, to: "tokens#reset_tokens"
 
-      post :passwords, to: "passwords#reset"
+      post :passwords, to: "passwords#reset_password"
 
       resources :accounts do
 
@@ -36,8 +36,8 @@ Rails.application.routes.draw do
       resources :users do
 
         namespace :actions do
-          action :post, :update_password, to: "passwords#update"
-          action :post, :reset_password, to: "passwords#reset"
+          action :post, :update_password, to: "password#update_password"
+          action :post, :reset_password, to: "password#reset_password"
         end
       end
 

@@ -1,10 +1,7 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
+    before_action :authenticate_with_token!
     before_action :set_account, only: [:show, :update, :destroy]
-
-    # accessible_by_nobody :index
-    # accessible_by_public :create
-    # accessible_by_account_admin :show, :update, :destroy
 
     # GET /accounts
     def index

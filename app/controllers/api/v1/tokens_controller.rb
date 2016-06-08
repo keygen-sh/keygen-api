@@ -3,21 +3,25 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
-    scope_by_subdomain
+    before_action :scope_by_subdomain!
 
     def login
+      skip_authorization
+
       authenticate_with_http_basic do |email, password|
         user = @current_account.users.find_by email: email
 
         if user && user.authenticate(password)
           render json: user, serializer: ActiveModel::Serializer::TokenSerializer
         else
-          render status: :unauthorized
+          render_unauthorized "Invalid credentials given for email or password"
         end
       end
     end
 
-    def reset
+    def reset_tokens
+      skip_authorization
+
       authenticate_with_http_token do |token, options|
         user = @current_account.users.find_by reset_auth_token: token
         user.reset_auth_tokens! unless user.nil?
@@ -25,7 +29,8 @@ module Api::V1
         if user
           render json: user, serializer: ActiveModel::Serializer::TokenSerializer
         else
-          render status: :unauthorized
+          render_unauthorized "must be a valid reset token", source: {
+            pointer: "/data/attributes/resetAuthToken" }
         end
       end
     end

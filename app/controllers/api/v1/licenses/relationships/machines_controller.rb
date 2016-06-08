@@ -1,11 +1,9 @@
 module Api::V1::Licenses::Relationships
   class MachinesController < Api::V1::BaseController
-    scope_by_subdomain
-
+    before_action :scope_by_subdomain!
+    before_action :authenticate_with_token!
     before_action :set_license, only: [:create, :destroy]
     before_action :set_machine, only: [:destroy]
-
-    # accessible_by_admin :create, :destroy
 
     # POST /licenses/1/relationships/machines
     def create

@@ -1,10 +1,11 @@
 module Api::V1
   class PasswordsController < Api::V1::BaseController
-    scope_by_subdomain
+    before_action :scope_by_subdomain!
+    before_action :set_user, only: [:reset_password]
 
-    before_action :set_user, only: [:reset]
+    def reset_password
+      skip_authorization
 
-    def reset
       @user.send_password_reset if @user
     end
 

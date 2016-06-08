@@ -1,11 +1,9 @@
 module Api::V1::Products::Relationships
   class UsersController < Api::V1::BaseController
-    scope_by_subdomain
-
+    before_action :scope_by_subdomain!
+    before_action :authenticate_with_token!
     before_action :set_product, only: [:create, :destroy]
     before_action :set_user, only: [:destroy]
-
-    # accessible_by_admin :create, :destroy
 
     # POST /products/1/relationships/users
     def create
