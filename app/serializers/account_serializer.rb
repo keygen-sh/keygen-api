@@ -1,5 +1,5 @@
 class AccountSerializer < BaseSerializer
-  attributes :id, :name, :subdomain
+  attributes :id, :name, :subdomain, :status
 
   belongs_to :plan
   has_many :users
