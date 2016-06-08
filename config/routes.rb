@@ -18,6 +18,8 @@ Rails.application.routes.draw do
       get  :token, to: "tokens#login"
       post :token, to: "tokens#reset"
 
+      post :passwords, to: "passwords#reset"
+
       resources :accounts do
 
         namespace :relationships do
