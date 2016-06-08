@@ -8,9 +8,7 @@ module Api::V1::Users::Actions
 
     # POST /accounts/1/actions/update-password
     def update
-      password = BCrypt::Password.new @user.password_digest
-
-      if password == params[:old_password]
+      if @user.try(:authenticate, params[:old_password])
         if @user.update(password: params[:new_password])
           render json: @user
         else
