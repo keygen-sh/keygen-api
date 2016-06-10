@@ -1,14 +1,14 @@
 module Api::V1::Licenses::Actions
-  class VerifyController < Api::V1::BaseController
+  class RevokeController < Api::V1::BaseController
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!
-    before_action :set_license, only: [:verify_license]
+    before_action :set_license, only: [:revoke_license]
 
-    # GET /licenses/1/actions/verify
-    def verify_license
+    # POST /licenses/1/actions/revoke
+    def revoke_license
       authorize @license
 
-      render json: @license, serializer: LicenseValiditySerializer
+      @license.destroy
     end
 
     private

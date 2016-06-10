@@ -9,6 +9,7 @@ module Api::V1::Licenses::Relationships
     def create
       @machine = machine_params.to_h
 
+      # TODO: Make sure they don't go over the policy's max_activations
       if @license.active_machines.include? @machine
         render status: :conflict
       else
