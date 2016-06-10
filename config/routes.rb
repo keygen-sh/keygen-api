@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       resources :accounts do
 
         namespace :relationships do
-          relationship :plans, only: [:create]
+          relationship :plan, only: [:create]
         end
 
         namespace :actions do
