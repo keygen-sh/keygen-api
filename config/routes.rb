@@ -42,6 +42,10 @@ Rails.application.routes.draw do
       end
 
       resources :policies do
+
+        namespace :relationships do
+          relationship :pool, only: [:create, :destroy]
+        end
       end
 
       resources :licenses do
