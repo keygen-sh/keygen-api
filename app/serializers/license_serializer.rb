@@ -1,5 +1,5 @@
 class LicenseSerializer < BaseSerializer
-  attributes :id, :key, :expiry, :activations, :active_machines
+  attributes :id, :key, :expiry, :active_machines
 
   belongs_to :user
   belongs_to :policy
