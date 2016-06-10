@@ -10,6 +10,10 @@ class ApplicationController < ActionController::API
 
   protected
 
+  def render_meta(meta)
+    render json: ActiveModelSerializers::KeyTransform.camel_lower(meta: meta).to_json
+  end
+
   def render_unauthorized(message = nil, info = {})
     message = nil unless message.is_a? String
     render json: {
