@@ -61,8 +61,8 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def license_params
-      params.require(:license).permit :key, :expiry, :activations, :policy,
-                                      :user, :active_machines => []
+      params.require(:license).permit :key, :expiry, :policy, :user,
+                                      :active_machines => []
     end
   end
 end

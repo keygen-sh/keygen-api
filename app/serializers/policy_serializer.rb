@@ -1,6 +1,6 @@
 class PolicySerializer < BaseSerializer
   attributes :id, :name, :price, :duration, :strict, :recurring, :floating,
-             :use_pool, :pool
+             :max_activations, :use_pool, :pool
 
   belongs_to :product
   has_many :licenses

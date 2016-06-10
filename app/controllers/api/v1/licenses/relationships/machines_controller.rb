@@ -7,6 +7,8 @@ module Api::V1::Licenses::Relationships
 
     # POST /licenses/1/relationships/machines
     def create
+      authorize @license
+
       @machine = machine_params.to_h
 
       # TODO: Make sure they don't go over the policy's max_activations
@@ -15,9 +17,14 @@ module Api::V1::Licenses::Relationships
       else
         @license.active_machines << @machine
 
-        if @license.save
-          render status: :created
+        if @license.policy.max_activations.nil? || @license.active_machines.length <= @license.policy.max_activations
+          if @license.save
+            render status: :created
+          else
+            render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+          end
         else
+          @license.errors.add :active_machines, "too many activations"
           render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
         end
       end
@@ -25,7 +32,7 @@ module Api::V1::Licenses::Relationships
 
     # DELETE /licenses/1/relationships/machines/2
     def destroy
-      @machine = params[:id]
+      authorize @license
 
       @license.active_machines.reject! { |m| m[:fingerprint] == @machine }
       @license.save
@@ -42,7 +49,9 @@ module Api::V1::Licenses::Relationships
     end
 
     def machine_params
-      params.require(:machine).permit :fingerprint, :meta => {}
+      params.require(:machine).permit :fingerprint, {
+        meta: [:ip, :hostname, :platform]
+      }
     end
   end
 end
