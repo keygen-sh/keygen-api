@@ -13,7 +13,6 @@ class License < ApplicationRecord
     uniqueness: { scope: :policy_id }
 
   def license_valid?
-    (expiry.nil? || expiry > DateTime.now) &&
-      (!activations.nil? && activations > 0)
+    (expiry.nil? || expiry > DateTime.now) && active_machines.length
   end
 end

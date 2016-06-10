@@ -51,7 +51,9 @@ Rails.application.routes.draw do
         end
 
         namespace :actions do
-          action :get, :verify, to: "verify#verify"
+          action :get, :verify, to: "verify#verify_license"
+          action :post, :revoke, to: "revoke#revoke_license"
+          action :post, :renew, to: "renew#renew_license"
         end
       end
 
