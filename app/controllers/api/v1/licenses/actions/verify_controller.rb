@@ -8,7 +8,7 @@ module Api::V1::Licenses::Actions
     def verify_license
       authorize @license
 
-      render json: @license, serializer: LicenseValiditySerializer
+      render_meta is_valid: @license.license_valid?
     end
 
     private
