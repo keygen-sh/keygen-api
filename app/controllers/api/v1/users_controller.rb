@@ -1,7 +1,7 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
     before_action :scope_by_subdomain!
-    before_action :authenticate_with_token!
+    before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
@@ -21,8 +21,9 @@ module Api::V1
 
     # POST /users
     def create
+      skip_authorization
+
       @user = @current_account.users.new user_params
-      authorize @user
 
       if @user.save
         render json: @user, status: :created, location: v1_user_url(@user)
