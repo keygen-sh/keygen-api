@@ -5,7 +5,7 @@ class ApplicationController < ActionController::API
 
   after_action :verify_authorized
 
-  rescue_from Pundit::NotAuthorizedError, with: :render_unauthorized
+  rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
   rescue_from Pundit::NotDefinedError, with: :render_not_found
 
   protected
@@ -14,12 +14,23 @@ class ApplicationController < ActionController::API
     render json: ActiveModelSerializers::KeyTransform.camel_lower(meta: meta).to_json
   end
 
-  def render_unauthorized(message = nil, info = {})
+  def render_forbidden(message = nil, info = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Access denied",
         detail: message || "You do not have permission to view this resource"
+      }.merge(info)]
+    }, status: :forbidden
+  end
+
+  def render_unauthorized(message = nil, info = {}, realm = "Application")
+    self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+    message = nil unless message.is_a? String
+    render json: {
+      errors: [{
+        title: "Unauthenticated",
+        detail: message || "You must be authenticated to view this resource"
       }.merge(info)]
     }, status: :unauthorized
   end
