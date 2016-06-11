@@ -54,4 +54,24 @@ class ApplicationController < ActionController::API
       }.merge(info)]
     }, status: :not_found
   end
+
+  def render_internal_server_error(message = nil, info = {})
+    message = nil unless message.is_a? String
+    render json: {
+      errors: [{
+        title: "Internal server error",
+        detail: message || "Looks like something went wrong!"
+      }.merge(info)]
+    }, status: :internal_server_error
+  end
+
+  def render_service_unavailable(message = nil, info = {})
+    message = nil unless message.is_a? String
+    render json: {
+      errors: [{
+        title: "Service unavailable",
+        detail: message || "We're having a really bad day"
+      }.merge(info)]
+    }, status: :service_unavailable
+  end
 end
