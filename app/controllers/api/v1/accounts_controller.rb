@@ -1,6 +1,6 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
-    before_action :authenticate_with_token!
+    before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
     before_action :set_account, only: [:show, :update, :destroy]
 
     # GET /accounts
@@ -20,8 +20,9 @@ module Api::V1
 
     # POST /accounts
     def create
+      skip_authorization
+
       @account = Account.new account_params
-      authorize @account
 
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
