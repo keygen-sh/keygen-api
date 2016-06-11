@@ -1,7 +1,7 @@
 module Api::V1
   class PoliciesController < Api::V1::BaseController
-    scope_by_subdomain
-
+    before_action :scope_by_subdomain!
+    before_action :authenticate_with_token!
     before_action :set_policy, only: [:show, :update, :destroy]
 
     # GET /policies
