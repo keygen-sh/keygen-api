@@ -7,6 +7,8 @@ module Api::V1::Products::Relationships
 
     # POST /products/1/relationships/users
     def create
+      authorize @product
+
       @user = @current_account.users.find_by_hashid user_params
 
       if @user
@@ -21,6 +23,8 @@ module Api::V1::Products::Relationships
 
     # DELETE /products/1/relationships/users/2
     def destroy
+      authorize @product
+
       @product.users.delete @user if @product.users.include? @user
     end
 
