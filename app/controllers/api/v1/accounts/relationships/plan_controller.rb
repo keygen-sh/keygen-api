@@ -5,6 +5,8 @@ module Api::V1::Accounts::Relationships
 
     # POST /accounts/1/relationships/plan
     def create
+      authorize @account
+
       @plan = Plan.find_by_hashid plan_params
 
       if @account.update(plan: @plan)

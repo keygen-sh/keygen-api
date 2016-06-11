@@ -7,12 +7,15 @@ module Api::V1
     # GET /policies
     def index
       @policies = @current_account.policies.all
+      authorize @policies
 
       render json: @policies
     end
 
     # GET /policies/1
     def show
+      authorize @policy
+
       render json: @policy
     end
 
@@ -21,6 +24,7 @@ module Api::V1
       product = @current_account.products.find_by_hashid(policy_params[:product])
 
       @policy = @current_account.policies.new policy_params.merge(product: product)
+      authorize @policy
 
       if @policy.save
         render json: @policy, status: :created, location: v1_policy_url(@policy)
@@ -31,6 +35,8 @@ module Api::V1
 
     # PATCH/PUT /policies/1
     def update
+      authorize @policy
+
       if @policy.update(policy_params)
         render json: @policy
       else
@@ -40,6 +46,8 @@ module Api::V1
 
     # DELETE /policies/1
     def destroy
+      authorize @policy
+
       @policy.destroy
     end
 

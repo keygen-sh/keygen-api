@@ -5,6 +5,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/pause
     def pause
+      authorize @account
+
       if @account.update(status: "paused")
         render json: @account
       else
@@ -14,6 +16,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/resume
     def resume
+      authorize @account
+
       if @account.update(status: "active")
         render json: @account
       else
@@ -23,6 +27,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/cancel
     def cancel
+      authorize @account
+
       if @account.update(status: "cancelled")
         render json: @account
       else

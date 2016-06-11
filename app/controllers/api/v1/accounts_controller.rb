@@ -6,18 +6,22 @@ module Api::V1
     # GET /accounts
     def index
       @accounts = Account.all
+      authorize @accounts
 
       render json: @accounts
     end
 
     # GET /accounts/1
     def show
+      authorize @account
+
       render json: @account
     end
 
     # POST /accounts
     def create
       @account = Account.new account_params
+      authorize @account
 
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
@@ -28,6 +32,8 @@ module Api::V1
 
     # PATCH/PUT /accounts/1
     def update
+      authorize @account
+
       if @account.update(account_params)
         render json: @account
       else
@@ -37,6 +43,8 @@ module Api::V1
 
     # DELETE /accounts/1
     def destroy
+      authorize @account
+
       @account.destroy
     end
 

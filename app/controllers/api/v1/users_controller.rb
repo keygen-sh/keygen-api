@@ -7,18 +7,22 @@ module Api::V1
     # GET /users
     def index
       @users = @current_account.users.all
+      authorize @users
 
       render json: @users
     end
 
     # GET /users/1
     def show
+      authorize @user
+
       render json: @user
     end
 
     # POST /users
     def create
       @user = @current_account.users.new user_params
+      authorize @user
 
       if @user.save
         render json: @user, status: :created, location: v1_user_url(@user)
@@ -29,6 +33,8 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
+      authorize @user
+
       if @user.update(user_params)
         render json: @user
       else
@@ -38,6 +44,8 @@ module Api::V1
 
     # DELETE /users/1
     def destroy
+      authorize @user
+
       @user.destroy
     end
 
