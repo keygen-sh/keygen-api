@@ -15,56 +15,49 @@ Rails.application.routes.draw do
         })
       end
 
-      get  :tokens, to: "tokens#login"
-      post :tokens, to: "tokens#reset_tokens"
-
-      post :passwords, to: "passwords#reset_password"
-
-      resources :accounts do
-
-        namespace :relationships do
-          relationship :plan, only: [:create]
-        end
-
-        namespace :actions do
-          action :post, :pause, to: "status#pause"
-          action :post, :resume, to: "status#resume"
-          action :post, :cancel, to: "status#cancel"
+      constraints lambda { |r| r.subdomain.empty? } do
+        resources :plans
+        resources :accounts do
+          namespace :relationships do
+            relationship :plan, only: [:create]
+          end
+          namespace :actions do
+            action :post, :pause, to: "status#pause"
+            action :post, :resume, to: "status#resume"
+            action :post, :cancel, to: "status#cancel"
+          end
         end
       end
 
-      resources :users do
-
-        namespace :actions do
-          action :post, :update_password, to: "password#update_password"
-          action :post, :reset_password, to: "password#reset_password"
+      constraints lambda { |r| r.subdomain.present? } do
+        get  :tokens, to: "tokens#login"
+        post :tokens, to: "tokens#reset_tokens"
+        post :passwords, to: "passwords#reset_password"
+        resources :users do
+          namespace :actions do
+            action :post, :update_password, to: "password#update_password"
+            action :post, :reset_password, to: "password#reset_password"
+          end
         end
-      end
-
-      resources :policies do
-
-        namespace :relationships do
-          relationship :pool, only: [:create, :destroy]
+        resources :policies do
+          namespace :relationships do
+            relationship :pool, only: [:create, :destroy]
+          end
         end
-      end
-
-      resources :licenses do
-
-        namespace :relationships do
-          relationship :machines, only: [:create, :destroy]
+        resources :licenses do
+          namespace :relationships do
+            relationship :machines, only: [:create, :destroy]
+          end
+          namespace :actions do
+            action :get, :verify, to: "verify#verify_license"
+            action :post, :revoke, to: "revoke#revoke_license"
+            action :post, :renew, to: "renew#renew_license"
+          end
         end
-
-        namespace :actions do
-          action :get, :verify, to: "verify#verify_license"
-          action :post, :revoke, to: "revoke#revoke_license"
-          action :post, :renew, to: "renew#renew_license"
-        end
-      end
-
-      resources :products do |r|
-
-        namespace :relationships do
-          relationship :users, only: [:create, :destroy]
+        resources :products do |r|
+          namespace :relationships do
+            relationship :users, only: [:create, :destroy]
+          end
         end
       end
     end
