@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  include ReservedSubdomains
+
   belongs_to :plan
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy
@@ -11,7 +13,7 @@ class Account < ApplicationRecord
   validates :name, presence: true
   validates :subdomain,
     presence: true,
-    exclusion: { in: %w(www api), message: "%{value} is reserved." },
+    exclusion: { in: RESERVED_SUBDOMAINS, message: "%{value} is reserved." },
     uniqueness: { case_sensitive: false },
     format: { with: /\A[\w_]+\Z/i },
     length: { maximum: 255 }
