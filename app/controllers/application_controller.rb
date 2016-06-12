@@ -15,7 +15,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_forbidden(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Access denied",
@@ -26,7 +26,7 @@ class ApplicationController < ActionController::API
 
   def render_unauthorized(opts = {}, realm = "Application")
     self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Unauthorized",
@@ -36,7 +36,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_unprocessable_entity(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Unprocessable entity",
@@ -46,7 +46,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_not_found(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Not found",
@@ -56,7 +56,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_conflict(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Conflict",
@@ -66,7 +66,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_internal_server_error(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Internal server error",
@@ -76,7 +76,7 @@ class ApplicationController < ActionController::API
   end
 
   def render_service_unavailable(opts = {})
-    message = nil unless message.is_a? String
+    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Service unavailable",
