@@ -20,6 +20,7 @@ module Api::V1::Accounts::Relationships
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
+      @account || render_not_found
     end
 
     def plan_params

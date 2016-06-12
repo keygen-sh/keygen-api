@@ -57,6 +57,7 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_license
       @license = @current_account.licenses.find_by_hashid params[:id]
+      @license || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.

@@ -53,6 +53,7 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_plan
       @plan = Plan.find_by_hashid params[:id]
+      @plan || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.
