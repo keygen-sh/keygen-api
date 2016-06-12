@@ -9,9 +9,10 @@ class User < ApplicationRecord
   has_many :licenses, dependent: :destroy
   # has_one :billing, as: :customer
 
-  before_save -> { self.email = email.downcase }
+  before_create -> { self.email = email.downcase }
 
-  validates :account, presence: { message: "must exist" }
+  validates_associated :account, message: lambda { |_, obj| obj[:value].errors.full_messages.first }
+  # validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :email,
     presence: true,

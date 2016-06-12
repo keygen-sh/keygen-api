@@ -5,6 +5,7 @@ class License < ApplicationRecord
 
   serialize :active_machines, Array
 
+  validates_associated :account, message: lambda { |_, obj| obj[:value].errors.full_messages.first }
   validates :account, presence: { message: "must exist" }
   validates :user, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }

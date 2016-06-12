@@ -22,7 +22,9 @@ module Api::V1
     def create
       skip_authorization
 
-      @account = Account.new account_params
+      plan = Plan.find_by_hashid(account_params[:plan])
+
+      @account = Account.new account_params.merge(plan: plan)
 
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
@@ -54,11 +56,13 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_account
       @account = Account.find_by_hashid params[:id]
+      @account || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.
     def account_params
-      params.require(:account).permit :name, :email, :subdomain, :plan
+      params.require(:account).permit :name, :email, :subdomain, :plan,
+        users_attributes: [[:name, :email, :password]]
     end
   end
 end

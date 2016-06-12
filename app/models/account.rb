@@ -1,5 +1,7 @@
 class Account < ApplicationRecord
+  include ActiveModel::Validations
   include ReservedSubdomains
+  include Activation
 
   belongs_to :plan
   has_many :users, dependent: :destroy
@@ -8,7 +10,19 @@ class Account < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_one :billing, as: :customer, dependent: :destroy
 
-  before_save -> { self.subdomain = subdomain.downcase }
+  accepts_nested_attributes_for :users
+
+  before_create -> { self.subdomain = subdomain.downcase }
+  after_create :set_founding_users_to_admins
+  after_create :send_activation
+
+  validates :plan, presence: { message: "must exist" }
+  validates :users, length: { minimum: 1, message: "must have at least one admin user" }
+
+  validates_each :users, :products, :policies, :licenses, if: :activated? do |account, record|
+    next unless account.send(record).size > account.plan.send("max_#{record}")
+    account.errors.add record, "count has reached maximum allowed by current plan"
+  end
 
   validates :name, presence: true
   validates :subdomain,
@@ -20,5 +34,15 @@ class Account < ApplicationRecord
 
   def admins
     self.users.select &:admin?
+  end
+
+  def activated?
+    self.activated
+  end
+
+  private
+
+  def set_founding_users_to_admins
+    users.update_all role: "admin"
   end
 end
