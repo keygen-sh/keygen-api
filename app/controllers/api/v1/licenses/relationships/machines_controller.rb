@@ -17,14 +17,9 @@ module Api::V1::Licenses::Relationships
       else
         @license.active_machines << @machine
 
-        if @license.policy.max_activations.nil? || @license.active_machines.length <= @license.policy.max_activations
-          if @license.save
-            render status: :created
-          else
-            render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
-          end
+        if @license.save
+          render status: :created
         else
-          @license.errors.add :active_machines, "too many activations"
           render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
         end
       end

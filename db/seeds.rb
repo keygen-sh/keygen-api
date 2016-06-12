@@ -51,7 +51,9 @@ product = account.products.create!({
 policy = account.policies.create!({
   name: "Premium Add-On",
   price: 199,
-  product: product
+  product: product,
+  max_activations: 5,
+  floating: true
 })
 
 user = account.users.create!({
