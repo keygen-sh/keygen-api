@@ -6,71 +6,63 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-Plan.new({
-    name: "Weekender",
-    # pitch: "Generous limits for hobbyists",
-    price: 0,
-    max_products: 1,
-    max_users: 250,
-    max_licenses: 250,
-    max_policies: 1
-}).save!
+Plan.create!({
+  name: "Weekender",
+  price: 0,
+  max_products: 1,
+  max_users: 250,
+  max_licenses: 250,
+  max_policies: 1
+})
 
-Plan.new({
+Plan.create!({
   name: "Startup",
-  # pitch: "Affordable pricing for growing apps",
   price: 2400,
   max_products: 5,
   max_users: 1000,
   max_licenses: 5000,
   max_policies: 5
-}).save!
+})
 
-Plan.new({
+Plan.create!({
   name: "Business",
-  # pitch: "Predictable pricing for apps at scale",
   price: 4900,
   max_products: 25,
   max_users: 5000,
   max_licenses: 25000,
   max_policies: 25
-}).save!
+})
 
-Account.new({
-  name: "Keygin",
-  subdomain: "keygin"
-}).save!
+account = Account.create!({
+  name: "Apptacular",
+  subdomain: "apptacular",
+  plan: Plan.first,
+  users_attributes: [{
+    name: "Admin",
+    email: "admin@keygin.io",
+    password: "password"
+  }]
+})
 
-Account.first.products.new({
-  name: "App 1"
-}).save!
+product = account.products.create!({
+  name: "Apptastic"
+})
 
-Account.first.products.new({
-  name: "App 2"
-}).save!
-
-Account.first.policies.new({
+policy = account.policies.create!({
   name: "Premium Add-On",
   price: 199,
-  product: Account.first.products.first
-}).save!
+  product: product
+})
 
-Account.first.users.new({
+user = account.users.create!({
   name: "User",
   email: "user@keygin.io",
   password: "password",
-  products: [Account.first.products.first]
-}).save!
+  products: [product]
+})
 
-Account.first.users.new({
-  name: "Admin",
-  email: "admin@keygin.io",
-  password: "password",
-  role: "admin"
-}).save!
-
-Account.first.licenses.new({
+account.licenses.create!({
   key: SecureRandom.hex,
-  user: Account.first.users.first,
-  policy: Account.first.products.first.policies.first
-}).save!
+  user: user,
+  policy: policy
+})
