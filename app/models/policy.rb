@@ -9,21 +9,35 @@ class Policy < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 
-  def pop
+  def pool?
+    use_pool
+  end
+
+  def pool_pop
     begin
       return nil if pool.empty?
-      v = pool.pop
+      key = pool.pop
       self.save!
-      return v
+      return key
     rescue ActiveRecord::StaleObjectError
       self.reload
       retry
     end
   end
 
-  def <<(license_key)
+  def pool_delete(key)
     begin
-      pool << license_key
+      pool.delete key
+      self.save!
+    rescue ActiveRecord::StaleObjectError
+      self.reload
+      retry
+    end
+  end
+
+  def pool_push(key)
+    begin
+      pool << key
       self.save!
     rescue ActiveRecord::StaleObjectError
       self.reload

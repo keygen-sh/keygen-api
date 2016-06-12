@@ -20,18 +20,9 @@ module Activation
     save
   end
 
-  protected
-
-  def generate_token(token_name)
-    loop do
-      token = SecureRandom.hex
-      break token unless Account.exists? "#{token_name}": token
-    end
-  end
-
   private
 
   def create_activation_token
-    self.activation_token = generate_token :activation_token
+    self.activation_token = generate_token_for :account, :activation_token
   end
 end

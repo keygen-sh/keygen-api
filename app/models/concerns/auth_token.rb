@@ -10,19 +10,10 @@ module AuthToken
     save
   end
 
-  protected
-
-  def generate_token(token_name)
-    loop do
-      token = SecureRandom.hex
-      break token unless User.exists? "#{token_name}": token
-    end
-  end
-
   private
 
   def create_auth_tokens
-    self.auth_token       = generate_token :auth_token
-    self.reset_auth_token = generate_token :reset_auth_token
+    self.auth_token       = generate_token_for :user, :auth_token
+    self.reset_auth_token = generate_token_for :user, :reset_auth_token
   end
 end

@@ -1,6 +1,6 @@
 Account Activation
 
-To activate your account, use the token #{@user.account.activation_token} within 24 hours of recieving this email (#{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}).
+To activate your account, use the token #{@user.account.activation_token} within 72 hours of recieving this email (#{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}).
 
 curl -X POST -d '{"activationToken": "#{@user.account.activation_token}"}' https://keygin.io/v1/accounts/#{@user.account.hashid}/actions/activate
 
