@@ -13,13 +13,9 @@ module Api::V1::Policies::Relationships
       if @policy.pool.include? @license
         render status: :conflict
       else
-        @policy.pool << @license
+        @policy.pool_push << @license
 
-        if @policy.save
-          render status: :created
-        else
-          render json: @policy, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
-        end
+        render status: :created
       end
     end
 
@@ -27,16 +23,12 @@ module Api::V1::Policies::Relationships
     def destroy
       authorize @policy
 
-      if !@policy.pool.include? @license
-        render_not_found
-      else
-        key = @policy.pool.delete @license
+      if @policy.pool.include? @license
+        key = @policy.pool_delete @license
 
-        if @policy.save
-          render_meta key: key
-        else
-          render json: @policy, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
-        end
+        render_meta key: key
+      else
+        render_not_found
       end
     end
 

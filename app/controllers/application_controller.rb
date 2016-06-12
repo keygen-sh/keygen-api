@@ -73,7 +73,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Conflict",
-        detail: "The request could not be completed on this resource"
+        detail: "The request could not be completed because the resource already exists"
       }.merge(opts)]
     }, status: :conflict
   end

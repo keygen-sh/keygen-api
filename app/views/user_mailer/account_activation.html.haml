@@ -1,6 +1,6 @@
 %h1 Account Activation
 %p
-  To activate your account, use the token <code>#{@user.account.activation_token}</code> within 24 hours of recieving this email (#{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}).
+  To activate your account, use the token <code>#{@user.account.activation_token}</code> within 72 hours of recieving this email (#{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}).
   %br
   %pre
     %code

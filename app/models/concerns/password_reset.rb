@@ -18,18 +18,9 @@ module PasswordReset
     save
   end
 
-  protected
-
-  def generate_token(token_name)
-    loop do
-      token = SecureRandom.hex
-      break token unless User.exists? "#{token_name}": token
-    end
-  end
-
   private
 
   def create_password_reset_token
-    self.password_reset_token = generate_token :password_reset_token
+    self.password_reset_token = generate_token_for :user, :password_reset_token
   end
 end
