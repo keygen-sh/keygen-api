@@ -5,6 +5,9 @@ class ApplicationController < ActionController::API
 
   after_action :verify_authorized
 
+  rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
+
   rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
   rescue_from Pundit::NotDefinedError, with: :render_not_found
 
@@ -53,6 +56,16 @@ class ApplicationController < ActionController::API
         detail: "The requested resource was not found"
       }.merge(opts)]
     }, status: :not_found
+  end
+
+  def render_bad_request(opts = {})
+    opts = {} unless opts.is_a? Hash
+    render json: {
+      errors: [{
+        title: "Bad request",
+        detail: "The request could not be completed"
+      }.merge(opts)]
+    }, status: :bad_request
   end
 
   def render_conflict(opts = {})
