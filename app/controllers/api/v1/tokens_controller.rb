@@ -14,7 +14,7 @@ module Api::V1
         if user && user.authenticate(password)
           render json: user, serializer: ActiveModel::Serializer::TokenSerializer
         else
-          render_unauthorized "Invalid credentials given for email or password"
+          render_unauthorized detail: "Invalid credentials given for email or password"
         end
       end
     end
@@ -29,7 +29,7 @@ module Api::V1
         if user
           render json: user, serializer: ActiveModel::Serializer::TokenSerializer
         else
-          render_unauthorized "must be a valid reset token", source: {
+          render_unauthorized detail: "must be a valid reset token", source: {
             pointer: "/data/attributes/resetAuthToken" }
         end
       end

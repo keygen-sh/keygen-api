@@ -15,7 +15,7 @@ module TokenAuth
 
   def request_http_token_authentication(realm = "Application", message = nil)
     self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
-    render_unauthorized "must be a valid token", source: {
+    render_unauthorized detail: "must be a valid token", source: {
       pointer: "/data/attributes/authToken" }
   end
 end
