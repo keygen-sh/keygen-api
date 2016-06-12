@@ -13,6 +13,7 @@ gem 'stripe'
 gem 'stripe-ruby-mock', '~> 2.2.2', require: 'stripe_mock'
 gem 'haml-rails', '~> 0.9'
 gem 'pundit'
+gem 'has_scope'
 # gem 'jbuilder', '~> 2.0'
 # gem 'redis', '~> 3.0'
 

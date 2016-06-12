@@ -61,6 +61,9 @@ GEM
       haml (>= 4.0.6, < 5.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
+    has_scope (0.7.0)
+      actionpack (>= 4.1, < 5.1)
+      activesupport (>= 4.1, < 5.1)
     hashid-rails (0.3.2)
       activerecord (>= 4.0)
       hashids (~> 1.0)
@@ -175,6 +178,7 @@ DEPENDENCIES
   bcrypt (~> 3.1.7)
   byebug
   haml-rails (~> 0.9)
+  has_scope
   hashid-rails
   listen (~> 3.0.5)
   puma (~> 3.0)
