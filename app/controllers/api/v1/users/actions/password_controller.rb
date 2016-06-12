@@ -15,7 +15,7 @@ module Api::V1::Users::Actions
           render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
         end
       else
-        render_unauthorized "is not valid", source: {
+        render_unauthorized detail: "is not valid", source: {
           pointer: "/data/attributes/oldPassword" }
       end
     end
@@ -28,7 +28,7 @@ module Api::V1::Users::Actions
         @user.reset_password_reset_token!
 
         if @user.password_reset_sent_at < 24.hours.ago
-          render_unauthorized "is expired", source: {
+          render_unauthorized detail: "is expired", source: {
             pointer: "/data/attributes/passwordResetToken" }
         elsif @user.update(password: params[:new_password])
           render json: @user
@@ -36,7 +36,7 @@ module Api::V1::Users::Actions
           render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
         end
       else
-        render_unauthorized "is not valid", source: {
+        render_unauthorized detail: "is not valid", source: {
           pointer: "/data/attributes/passwordResetToken" }
       end
     end

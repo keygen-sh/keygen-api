@@ -14,64 +14,74 @@ class ApplicationController < ActionController::API
     render json: ActiveModelSerializers::KeyTransform.camel_lower(meta: meta).to_json
   end
 
-  def render_forbidden(message = nil, info = {})
+  def render_forbidden(opts = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Access denied",
-        detail: message || "You do not have permission to view this resource"
-      }.merge(info)]
+        detail: "You do not have permission to view this resource"
+      }.merge(opts)]
     }, status: :forbidden
   end
 
-  def render_unauthorized(message = nil, info = {}, realm = "Application")
+  def render_unauthorized(opts = {}, realm = "Application")
     self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
     message = nil unless message.is_a? String
     render json: {
       errors: [{
-        title: "Unauthenticated",
-        detail: message || "You must be authenticated to view this resource"
-      }.merge(info)]
+        title: "Unauthorized",
+        detail: "You must be authenticated to view this resource"
+      }.merge(opts)]
     }, status: :unauthorized
   end
 
-  def render_unprocessable_entity(message = nil, info = {})
+  def render_unprocessable_entity(opts = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Unprocessable entity",
-        detail: message || "The request could not be completed on this resouce"
-      }.merge(info)]
+        detail: "The request could not be completed on this resouce"
+      }.merge(opts)]
     }, status: :unprocessable_entity
   end
 
-  def render_not_found(message = nil, info = {})
+  def render_not_found(opts = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Not found",
-        detail: message || "The requested resource was not found"
-      }.merge(info)]
+        detail: "The requested resource was not found"
+      }.merge(opts)]
     }, status: :not_found
   end
 
-  def render_internal_server_error(message = nil, info = {})
+  def render_conflict(opts = {})
+    message = nil unless message.is_a? String
+    render json: {
+      errors: [{
+        title: "Conflict",
+        detail: "The request could not be completed on this resource"
+      }.merge(opts)]
+    }, status: :conflict
+  end
+
+  def render_internal_server_error(opts = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Internal server error",
-        detail: message || "Looks like something went wrong!"
-      }.merge(info)]
+        detail: "Looks like something went wrong!"
+      }.merge(opts)]
     }, status: :internal_server_error
   end
 
-  def render_service_unavailable(message = nil, info = {})
+  def render_service_unavailable(opts = {})
     message = nil unless message.is_a? String
     render json: {
       errors: [{
         title: "Service unavailable",
-        detail: message || "We're having a really bad day"
-      }.merge(info)]
+        detail: "We're having a really bad day"
+      }.merge(opts)]
     }, status: :service_unavailable
   end
 end
