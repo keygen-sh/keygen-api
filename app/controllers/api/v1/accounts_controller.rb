@@ -1,6 +1,6 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
-    before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
+    before_action :authenticate_with_token!, only: [:show, :update, :destroy]
     before_action :set_account, only: [:show, :update, :destroy]
 
     # GET /accounts

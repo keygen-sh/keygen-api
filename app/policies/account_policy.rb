@@ -9,7 +9,7 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def create?
-    false
+    true
   end
 
   def update?
@@ -17,6 +17,6 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def destroy?
-    false
+    user.admin?
   end
 end
