@@ -9,6 +9,11 @@ class License < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :user, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
+
+  validate do
+    errors.add :active_machines, "count has reached maximum allowed by policy" if active_machines.size > policy.max_activations
+  end
+
   validates :key,
     presence: true,
     uniqueness: { scope: :policy_id }
