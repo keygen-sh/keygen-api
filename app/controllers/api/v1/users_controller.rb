@@ -1,12 +1,14 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
+    has_scope :products, type: :array
+
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
     def index
-      @users = @current_account.users.all
+      @users = apply_scopes(@current_account.users).all
       authorize @users
 
       render json: @users
