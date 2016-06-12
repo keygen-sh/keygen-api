@@ -5,6 +5,7 @@ class Policy < ApplicationRecord
 
   serialize :pool, Array
 
+  validates_associated :account, message: lambda { |_, obj| obj[:value].errors.full_messages.first }
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 

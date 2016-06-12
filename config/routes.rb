@@ -22,6 +22,7 @@ Rails.application.routes.draw do
             relationship :plan, only: [:create]
           end
           namespace :actions do
+            action :post, :activate, to: "activation#activate"
             action :post, :pause, to: "status#pause"
             action :post, :resume, to: "status#resume"
             action :post, :cancel, to: "status#cancel"

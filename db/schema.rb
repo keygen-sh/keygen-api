@@ -11,15 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160610225535) do
+ActiveRecord::Schema.define(version: 20160611212320) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
     t.string   "subdomain"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.integer  "plan_id"
-    t.string   "status",     default: "active"
+    t.string   "status",             default: "active"
+    t.string   "activation_token"
+    t.datetime "activation_sent_at"
+    t.boolean  "activated",          default: false
   end
 
   create_table "billings", force: :cascade do |t|
