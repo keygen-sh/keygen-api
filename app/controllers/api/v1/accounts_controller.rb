@@ -20,11 +20,10 @@ module Api::V1
 
     # POST /accounts
     def create
-      skip_authorization
-
       plan = Plan.find_by_hashid(account_params[:plan])
 
       @account = Account.new account_params.merge(plan: plan)
+      authorize @account
 
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
