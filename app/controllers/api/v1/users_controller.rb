@@ -21,7 +21,7 @@ module Api::V1
 
     # POST /users
     def create
-      skip_authorization
+      authorize @user
 
       @user = @current_account.users.new user_params
 
