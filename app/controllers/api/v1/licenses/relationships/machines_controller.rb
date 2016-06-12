@@ -42,6 +42,7 @@ module Api::V1::Licenses::Relationships
 
     def set_license
       @license = @current_account.licenses.find_by_hashid params[:license_id]
+      @license || render_not_found
     end
 
     def set_machine

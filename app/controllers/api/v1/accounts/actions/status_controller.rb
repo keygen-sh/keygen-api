@@ -40,6 +40,7 @@ module Api::V1::Accounts::Actions
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
+      @account || render_not_found
     end
   end
 end

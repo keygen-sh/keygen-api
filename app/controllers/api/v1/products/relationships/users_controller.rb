@@ -32,6 +32,7 @@ module Api::V1::Products::Relationships
 
     def set_product
       @product = @current_account.products.find_by_hashid params[:product_id]
+      @product || render_not_found
     end
 
     def set_user
