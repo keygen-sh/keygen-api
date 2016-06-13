@@ -1,6 +1,6 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
-    has_scope :products, type: :array
+    has_scope :product
     has_scope :page, type: :hash
 
     before_action :scope_by_subdomain!

@@ -20,8 +20,8 @@ class User < ApplicationRecord
     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
     uniqueness: { case_sensitive: false, scope: :account_id }
 
-  scope :products, -> (ids) {
-    includes(:products).where products: { id: ids.map { |id| Product.decode_id(id) || "" } }
+  scope :product, -> (id) {
+    includes(:products).where products: { id: Product.decode_id(id) || 0 }
   }
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
