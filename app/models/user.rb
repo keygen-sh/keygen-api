@@ -9,6 +9,8 @@ class User < ApplicationRecord
   has_many :licenses, dependent: :destroy
   # has_one :billing, as: :customer
 
+  serialize :meta, Hash
+
   before_create -> { self.email = email.downcase }
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
