@@ -40,7 +40,7 @@ class Account < ApplicationRecord
   }
 
   def admins
-    self.users.select &:admin?
+    self.users.where role: "admin"
   end
 
   def activated?
