@@ -7,7 +7,7 @@ module Api::V1
 
     # GET /plans
     def index
-      @plans = Plan.all
+      @plans = apply_scopes(Plan).all
       authorize @plans
 
       render json: @plans
