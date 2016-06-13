@@ -30,4 +30,10 @@ group :development do
   # gem 'capistrano-rails'
 end
 
+group :test do
+  gem 'cucumber-rails', require: false
+  gem 'cucumber-api-steps', require: false
+  gem 'database_cleaner'
+end
+
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
