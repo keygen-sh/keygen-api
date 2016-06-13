@@ -53,7 +53,8 @@ policy = account.policies.create!({
   price: 199,
   product: product,
   max_activations: 5,
-  floating: true
+  floating: true,
+  duration: 2.weeks
 })
 
 user = account.users.create!({
