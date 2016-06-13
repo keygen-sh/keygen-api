@@ -34,6 +34,7 @@ Rails.application.routes.draw do
         get  :tokens, to: "tokens#login"
         post :tokens, to: "tokens#reset_tokens"
         post :passwords, to: "passwords#reset_password"
+        get  :profile, to: "profiles#show"
         resources :users do
           namespace :actions do
             action :post, :update_password, to: "password#update_password"
