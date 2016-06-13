@@ -5,7 +5,8 @@ class License < ApplicationRecord
 
   serialize :active_machines, Array
 
-  before_validation :generate_license_key
+  before_validation :set_license_key, on: :create
+  before_validation :set_expiry, on: :create
 
   # validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   # validates_associated :policy, message: -> (_, obj) { obj[:value].errors.full_messages.first }
@@ -43,7 +44,7 @@ class License < ApplicationRecord
 
   private
 
-  def generate_license_key
+  def set_license_key
     if policy.pool?
       license_key = policy.pop
 
@@ -54,6 +55,14 @@ class License < ApplicationRecord
       end
     else
       self.key = generate_token_for :license, :key
+    end
+  end
+
+  def set_expiry
+    if policy.duration.nil?
+      self.expiry = nil
+    else
+      self.expiry = Time.now + policy.duration
     end
   end
 end
