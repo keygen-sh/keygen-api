@@ -8,14 +8,14 @@ module Api::V1::Licenses::Actions
     def renew_license
       authorize @license
 
-      new_expiry =
-        if @license.policy.duration.nil?
-          nil
-        else
-          Time.now + @license.policy.duration
-        end
-
-      if @license.update(expiry: new_expiry)
+      if @license.policy.duration.nil?
+        render_unprocessable_entity({
+          detail: "cannot be renewed because it does not expire",
+          source: {
+            pointer: "/data/attributes/expiry"
+          }
+        })
+      elsif @license.update(expiry: Time.now + @license.policy.duration)
         render json: @license
       else
         render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
