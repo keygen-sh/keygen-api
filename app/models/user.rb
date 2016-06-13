@@ -23,6 +23,9 @@ class User < ApplicationRecord
   scope :products, -> (ids) {
     includes(:products).where products: { id: ids.map { |id| Product.decode_id(id) || "" } }
   }
+  scope :page, -> (page = {}) {
+    paginate(page[:number]).per page[:size]
+  }
 
   def admin?
     self.role == "admin"
