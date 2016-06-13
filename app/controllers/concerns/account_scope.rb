@@ -19,7 +19,10 @@ module AccountScope
     else
       render_forbidden({
         title: "Account is not activated",
-        detail: "You must activate your account before accessing this resource"
+        detail: "must be activated to access this resource",
+        source: {
+          pointer: "/data/attributes/activated"
+        }
       })
     end
   rescue ActiveRecord::RecordNotFound
