@@ -1,6 +1,7 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
     has_scope :products, type: :array
+    has_scope :page, type: :hash
 
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
@@ -62,6 +63,7 @@ module Api::V1
     # Only allow a trusted parameter "white list" through.
     def user_params
       params.require(:user).permit :name, :email, :password
+      params.permit page: [:number, :size]
     end
   end
 end
