@@ -17,7 +17,15 @@ class License < ApplicationRecord
     errors.add :active_machines, "count has reached maximum allowed by policy" if active_machines.size > policy.max_activations
   end
 
-  validates :key, presence: true, blank: false, uniqueness: { scope: :policy_id }
+  validates :key, presence: true, blank: false,
+    uniqueness: { scope: :policy_id }
+
+  scope :policy, -> (id) {
+    where policy: Policy.find_by_hashid(id)
+  }
+  scope :user, -> (id) {
+    where user: User.find_by_hashid(id)
+  }
 
   def license_valid?
     # Check if license is expired

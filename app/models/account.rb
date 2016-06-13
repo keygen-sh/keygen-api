@@ -32,6 +32,10 @@ class Account < ApplicationRecord
     format: { with: /\A[\w_]+\Z/i },
     length: { maximum: 255 }
 
+  scope :plan, -> (id) {
+    where plan: Plan.find_by_hashid(id)
+  }
+
   def admins
     self.users.select &:admin?
   end

@@ -1,11 +1,13 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
+    has_scope :plan
+
     before_action :authenticate_with_token!, only: [:show, :update, :destroy]
     before_action :set_account, only: [:show, :update, :destroy]
 
     # GET /accounts
     def index
-      @accounts = Account.all
+      @accounts = apply_scopes(Account).all
       authorize @accounts
 
       render json: @accounts
