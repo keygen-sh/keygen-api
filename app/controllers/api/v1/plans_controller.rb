@@ -1,5 +1,7 @@
 module Api::V1
   class PlansController < Api::V1::BaseController
+    has_scope :page, type: :hash
+
     before_action :authenticate_with_token!, only: [:create, :update, :destroy]
     before_action :set_plan, only: [:show, :update, :destroy]
 

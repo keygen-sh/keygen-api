@@ -35,6 +35,9 @@ class Account < ApplicationRecord
   scope :plan, -> (id) {
     where plan: Plan.find_by_hashid(id)
   }
+  scope :page, -> (page = {}) {
+    paginate(page[:number]).per page[:size]
+  }
 
   def admins
     self.users.select &:admin?

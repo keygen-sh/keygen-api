@@ -26,6 +26,9 @@ class License < ApplicationRecord
   scope :user, -> (id) {
     where user: User.find_by_hashid(id)
   }
+  scope :page, -> (page = {}) {
+    paginate(page[:number]).per page[:size]
+  }
 
   def license_valid?
     # Check if license is expired
