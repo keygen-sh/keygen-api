@@ -5,10 +5,20 @@ module AccountScope
     @current_account = Account.find_by_subdomain! request.subdomains.first
 
     if @current_account.activated?
-      @current_account
+      if @current_account.status == "active"
+        @current_account
+      else
+        render_forbidden({
+          title: "Account has been #{@current_account.status}",
+          detail: "must be active",
+          source: {
+            pointer: "/data/attributes/status"
+          }
+        })
+      end
     else
       render_forbidden({
-        title: "Current account is not activated",
+        title: "Account is not activated",
         detail: "You must activate your account before accessing this resource"
       })
     end

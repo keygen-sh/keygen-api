@@ -19,4 +19,16 @@ class AccountPolicy < ApplicationPolicy
   def destroy?
     user.admin?
   end
+
+  def pause?
+    user.admin?
+  end
+
+  def resume?
+    user.admin?
+  end
+
+  def cancel?
+    user.admin?
+  end
 end
