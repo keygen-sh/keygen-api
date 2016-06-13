@@ -1,12 +1,15 @@
 module Api::V1
   class LicensesController < Api::V1::BaseController
+    has_scope :policy
+    has_scope :user
+
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!
     before_action :set_license, only: [:show, :update, :destroy]
 
     # GET /licenses
     def index
-      @licenses = @current_account.licenses.all
+      @licenses = apply_scopes(@current_account.licenses).all
       authorize @licenses
 
       render json: @licenses
