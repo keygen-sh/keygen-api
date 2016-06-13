@@ -1,5 +1,7 @@
 module Api::V1
   class ProductsController < Api::V1::BaseController
+    has_scope :page, type: :hash
+
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!
     before_action :set_product, only: [:show, :update, :destroy]

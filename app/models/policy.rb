@@ -12,6 +12,9 @@ class Policy < ApplicationRecord
   scope :product, -> (id) {
     where product: Product.find_by_hashid(id)
   }
+  scope :page, -> (page = {}) {
+    paginate(page[:number]).per page[:size]
+  }
 
   def pool?
     use_pool

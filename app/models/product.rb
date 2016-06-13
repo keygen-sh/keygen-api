@@ -8,4 +8,8 @@ class Product < ApplicationRecord
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   validates :account, presence: { message: "must exist" }
+
+  scope :page, -> (page = {}) {
+    paginate(page[:number]).per page[:size]
+  }
 end
