@@ -6,6 +6,6 @@ class Product < ApplicationRecord
 
   serialize :platforms, Array
 
-  validates_associated :account, message: lambda { |_, obj| obj[:value].errors.full_messages.first }
+  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   validates :account, presence: { message: "must exist" }
 end

@@ -11,7 +11,7 @@ class User < ApplicationRecord
 
   before_create -> { self.email = email.downcase }
 
-  validates_associated :account, message: lambda { |_, obj| obj[:value].errors.full_messages.first }
+  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   # validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :email,
