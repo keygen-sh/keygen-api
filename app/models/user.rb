@@ -11,7 +11,7 @@ class User < ApplicationRecord
 
   serialize :meta, Hash
 
-  before_create -> { self.email = email.downcase }
+  before_save -> { self.email = email.downcase }
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   # validates :account, presence: { message: "must exist" }
