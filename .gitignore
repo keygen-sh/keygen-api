@@ -20,5 +20,8 @@
 # Ignore Byebug command history file.
 .byebug_history
 
+# Ignore environment files
+/.env*
+
 # Other
 .DS_Store

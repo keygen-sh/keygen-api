@@ -10,7 +10,6 @@ gem 'rack-cors'
 gem 'active_model_serializers'
 gem 'rack-attack'
 gem 'stripe'
-gem 'stripe-ruby-mock', '~> 2.2.2', require: 'stripe_mock'
 gem 'haml-rails', '~> 0.9'
 gem 'pundit'
 gem 'has_scope'
@@ -20,6 +19,7 @@ gem 'kaminari'
 
 group :development, :test do
   gem 'byebug', platform: :mri
+  gem 'dotenv-rails'
   gem 'timecop'
 end
 
@@ -31,6 +31,7 @@ group :development do
 end
 
 group :test do
+  # gem 'stripe-ruby-mock', '~> 2.2.2', require: 'stripe_mock'
   gem 'cucumber-rails', require: false
   gem 'cucumber-api-steps', require: false
   gem 'database_cleaner'

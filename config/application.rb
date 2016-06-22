@@ -37,5 +37,8 @@ module Api
         resource '*', headers: :any, methods: [:get, :post, :options]
       end
     end
+
+    # Add services to autoload path
+    config.autoload_paths += %W(#{config.root}/app/services)
   end
 end
