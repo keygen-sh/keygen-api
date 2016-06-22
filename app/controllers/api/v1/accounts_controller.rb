@@ -55,6 +55,17 @@ module Api::V1
 
     private
 
+    def register_with_credit_card_service
+      SubscriptionService.new({
+        card: params[:stripe_token],
+        email: params[:user][:email]
+      }).create_customer
+    end
+
+    def add_customer_id_to_user(id)
+      @user.update external_customer_id: id
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_account
       @account = Account.find_by_hashid params[:id]
