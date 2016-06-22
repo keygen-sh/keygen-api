@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::API
+class ApplicationController < ActionController::Base
   include Pundit
 
   attr_accessor :current_user
@@ -10,6 +10,12 @@ class ApplicationController < ActionController::API
 
   rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
   rescue_from Pundit::NotDefinedError, with: :render_not_found
+
+  def index
+    skip_authorization
+
+    render template: "/templates/index.html.haml", layout: false
+  end
 
   protected
 
