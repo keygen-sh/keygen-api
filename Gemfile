@@ -33,8 +33,9 @@ end
 group :test do
   # gem 'stripe-ruby-mock', '~> 2.2.2', require: 'stripe_mock'
   gem 'cucumber-rails', require: false
-  gem 'cucumber-api-steps', require: false
+  gem 'factory_girl_rails'
   gem 'database_cleaner'
+  gem 'faker', '~> 1.6.3'
 end
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
