@@ -9,7 +9,7 @@ Feature: List users
     And I use my auth token
     And I have 3 "users"
     When I send a GET request to "/v1/users"
-    Then the response should be "200"
+    Then the response status should be "200"
     And the JSON response should be an array with 3 "users"
 
   Scenario: Admin attempts to retreives all users for another account
@@ -20,5 +20,5 @@ Feature: List users
     And I send and accept JSON
     And I use my auth token
     When I send a GET request to "/v1/users"
-    Then the response should be "401"
+    Then the response status should be "401"
     And the JSON response should be an array of 1 error
