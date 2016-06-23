@@ -56,7 +56,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   delete path
 end
 
-Then /^the response should be "([^\"]*)"$/ do |status|
+Then /^the response status should be "([^\"]*)"$/ do |status|
   assert last_response.status == status.to_i
 end
 
