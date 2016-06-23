@@ -22,6 +22,9 @@ class User < ApplicationRecord
     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
     uniqueness: { case_sensitive: false, scope: :account_id }
 
+  scope :roles, -> (*roles) {
+    where role: roles
+  }
   scope :product, -> (id) {
     includes(:products).where products: { id: Product.decode_id(id) || 0 }
   }

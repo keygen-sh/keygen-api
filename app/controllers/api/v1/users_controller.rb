@@ -1,5 +1,6 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
+    has_scope :roles, type: :array, default: [:user]
     has_scope :product
     has_scope :page, type: :hash
 
