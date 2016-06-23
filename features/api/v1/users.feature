@@ -3,7 +3,7 @@ Feature: List users
 
   Scenario: Admin retreives all users for their account
     Given there exists an account "bungie"
-    Given I am an admin of account "bungie"
+    And I am an admin of account "bungie"
     And I am on the subdomain "bungie"
     And I send and accept JSON
     And I use my auth token
