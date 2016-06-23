@@ -1,4 +1,4 @@
-@api
+@api/v1
 Feature: List plans
 
   Scenario: Retreive all plans as JSON
