@@ -1,7 +1,9 @@
 require 'cucumber/rails'
-require 'cucumber/api_steps'
+require 'faker'
 
 ActionController::Base.allow_rescue = false
+
+World FactoryGirl::Syntax::Methods
 
 begin
   DatabaseCleaner.strategy = :transaction
