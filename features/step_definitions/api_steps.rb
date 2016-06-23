@@ -1,8 +1,11 @@
 World Rack::Test::Methods
 
+Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
+  create :account, subdomain: subdomain
+end
+
 Given /^I am an? (user|admin) of account "([^\"]*)"$/ do |role, subdomain|
-  account = create :account, subdomain: subdomain
-  @user = account.users.find_by role: "admin"
+  @user = Account.find_by(subdomain: subdomain).users.find_by role: "admin"
 end
 
 Given /^I send and accept HTML$/ do
@@ -62,4 +65,9 @@ Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, n
   assert json["data"].select { |d|
     d["type"] == name.pluralize
   }.length == count.to_i
+end
+
+Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
+  json = JSON.parse last_response.body
+  assert json["errors"].length == count.to_i
 end
