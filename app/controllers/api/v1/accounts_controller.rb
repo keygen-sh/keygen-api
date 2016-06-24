@@ -70,6 +70,7 @@ module Api::V1
         billing_params.merge(account: @account)
       ).create
 
+      # TODO: Break up customer and subscription creation
       if customer
         billing.external_customer_id = customer.id
         billing.external_subscription_id = customer.subscriptions.data.first.id
