@@ -4,6 +4,7 @@ FactoryGirl.define do
     subdomain { Faker::Internet.domain_word }
     activated true
     users { |a| [association(:admin, account_id: a.id)] }
+    billing
     plan
   end
 end

@@ -6,7 +6,7 @@ class Product < ApplicationRecord
 
   serialize :platforms, Array
 
-  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
+  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
 
   scope :page, -> (page = {}) {

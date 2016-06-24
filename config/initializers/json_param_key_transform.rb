@@ -1,3 +1,5 @@
+require "active_model_serializers/key_transform"
+
 # Transform JSON request param keys from JSON-conventional camelCase to
 # Rails-conventional snake_case
 ActionDispatch::Request.parameter_parsers[:json] = lambda { |raw_post|

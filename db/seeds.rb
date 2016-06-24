@@ -8,13 +8,15 @@
 
 Plan.create!([{
   name: "Weekender",
-  price: 0,
+  external_plan_id: "weekender",
+  price: 900,
   max_products: 1,
   max_users: 250,
   max_licenses: 250,
   max_policies: 1
 }, {
   name: "Startup",
+  external_plan_id: "startup",
   price: 2400,
   max_products: 5,
   max_users: 1000,
@@ -22,6 +24,7 @@ Plan.create!([{
   max_policies: 5
 }, {
   name: "Business",
+  external_plan_id: "business",
   price: 4900,
   max_products: 25,
   max_users: 5000,
@@ -29,10 +32,16 @@ Plan.create!([{
   max_policies: 25
 }])
 
+billing = Billing.create!({
+  external_customer_id: "cust_id",
+  status: "active"
+})
+
 account = Account.create!({
   name: "Apptacular",
   subdomain: "apptacular",
   plan: Plan.first,
+  billing: billing,
   users_attributes: [{
     name: "Admin",
     email: "admin@keygin.io",

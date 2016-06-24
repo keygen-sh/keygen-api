@@ -11,6 +11,7 @@ class Account < ApplicationRecord
   has_one :billing, as: :customer, dependent: :destroy
 
   accepts_nested_attributes_for :users
+  accepts_nested_attributes_for :billing
 
   before_create -> { self.subdomain = subdomain.downcase }
   after_create :set_founding_users_to_admins
@@ -18,6 +19,7 @@ class Account < ApplicationRecord
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
+  validates_associated :billing, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
 
   validates_each :users, :products, :policies, :licenses, if: :activated? do |account, record|
     next unless account.send(record).size > account.plan.send("max_#{record}")
