@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
       elsif @license.update(expiry: Time.now + @license.policy.duration)
         render json: @license
       else
-        render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @license
       end
     end
 
