@@ -1,5 +1,5 @@
 class BillingSerializer < BaseSerializer
-  attributes :id, :stripe_id, :status
+  attributes :id, :external_customer_id, :status
 
   belongs_to :customer, polymorphic: true
 

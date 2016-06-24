@@ -19,13 +19,13 @@ Rails.application.routes.draw do
         resources :plans
         resources :accounts do
           namespace :relationships do
-            relationship :plan, only: [:create]
+            relationship :plan, only: [:update]
           end
           namespace :actions do
             action :post, :activate, to: "activation#activate"
-            action :post, :pause, to: "status#pause"
-            action :post, :resume, to: "status#resume"
-            action :post, :cancel, to: "status#cancel"
+            action :post, :pause, to: "subscription#pause"
+            action :post, :resume, to: "subscription#resume"
+            action :post, :cancel, to: "subscription#cancel"
           end
         end
       end

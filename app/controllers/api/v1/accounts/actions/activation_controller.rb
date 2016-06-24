@@ -10,13 +10,13 @@ module Api::V1::Accounts::Actions
         if @account.activated
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }
-        elsif @account.activation_sent_at < 72.hours.ago
-          render_unauthorized detail: "is expired", source: {
-            pointer: "/data/attributes/activationToken" }
+        elsif @account.billing.nil? || @account.billing.status != "active"
+          render_unauthorized detail: "is not valid", source: {
+            pointer: "/data/attributes/billing" }
         elsif @account.update(activated: true)
           render json: @account
         else
-          render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+          render_unprocessable_resource @account
         end
       else
         render_unauthorized detail: "is not valid", source: {

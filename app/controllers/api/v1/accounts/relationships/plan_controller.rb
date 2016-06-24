@@ -1,10 +1,10 @@
 module Api::V1::Accounts::Relationships
   class PlanController < Api::V1::BaseController
     before_action :authenticate_with_token!
-    before_action :set_account, only: [:create]
+    before_action :set_account, only: [:update]
 
-    # POST /accounts/1/relationships/plan
-    def create
+    # PATCH/PUT /accounts/1/relationships/plan
+    def update
       authorize @account
 
       @plan = Plan.find_by_hashid plan_params
@@ -12,7 +12,7 @@ module Api::V1::Accounts::Relationships
       if @account.update(plan: @plan)
         render json: @account
       else
-        render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @account
       end
     end
 

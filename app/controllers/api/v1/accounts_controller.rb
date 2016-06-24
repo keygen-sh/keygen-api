@@ -28,10 +28,19 @@ module Api::V1
       @account = Account.new account_params.merge(plan: plan)
       authorize @account
 
+      # Check if account is valid thus far before billing customer
+      unless @account.valid?
+        render_unprocessable_resource @account and return
+      end
+
+      # Subscribes and charges customer if successful
+      billing = create_billing_with_external_service
+      @account.billing = billing
+
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
       else
-        render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @account
       end
     end
 
@@ -42,7 +51,7 @@ module Api::V1
       if @account.update(account_params)
         render json: @account
       else
-        render json: @account, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @account
       end
     end
 
@@ -55,15 +64,19 @@ module Api::V1
 
     private
 
-    def register_with_credit_card_service
-      SubscriptionService.new({
-        card: params[:stripe_token],
-        email: params[:user][:email]
-      }).create_customer
-    end
+    def create_billing_with_external_service
+      billing = Billing.new
+      customer = CustomerService.new(
+        billing_params.merge(account: @account)
+      ).create
 
-    def add_customer_id_to_user(id)
-      @user.update external_customer_id: id
+      if customer
+        billing.external_customer_id = customer.id
+        billing.external_subscription_id = customer.subscriptions.data.first.id
+        billing.status = customer.subscriptions.data.first.status
+      end
+
+      billing
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -74,8 +87,12 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def account_params
-      params.require(:account).permit :name, :email, :subdomain, :plan,
+      params.require(:account).permit :name, :subdomain, :plan,
         users_attributes: [[:name, :email, :password]]
+    end
+
+    def billing_params
+      params.require(:billing).permit :token
     end
   end
 end

@@ -103,4 +103,8 @@ class ApplicationController < ActionController::Base
       }.merge(opts)]
     }, status: :service_unavailable
   end
+
+  def render_unprocessable_resource(resource)
+    render json: resource, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+  end
 end
