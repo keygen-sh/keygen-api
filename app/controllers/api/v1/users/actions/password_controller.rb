@@ -12,7 +12,7 @@ module Api::V1::Users::Actions
         if @user.update(password: params[:new_password])
           render json: @user
         else
-          render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+          render_unprocessable_resource @user
         end
       else
         render_unauthorized detail: "is not valid", source: {
@@ -33,7 +33,7 @@ module Api::V1::Users::Actions
         elsif @user.update(password: params[:new_password])
           render json: @user
         else
-          render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+          render_unprocessable_resource @user
         end
       else
         render_unauthorized detail: "is not valid", source: {

@@ -31,7 +31,7 @@ module Api::V1
       if @product.save
         render json: @product, status: :created, location: v1_product_url(@product)
       else
-        render json: @product, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @product
       end
     end
 
@@ -42,7 +42,7 @@ module Api::V1
       if @product.update(product_params)
         render json: @product
       else
-        render json: @product, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @product
       end
     end
 

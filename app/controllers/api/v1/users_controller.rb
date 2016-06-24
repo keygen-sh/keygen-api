@@ -31,7 +31,7 @@ module Api::V1
       if @user.save
         render json: @user, status: :created, location: v1_user_url(@user)
       else
-        render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @user
       end
     end
 
@@ -42,7 +42,7 @@ module Api::V1
       if @user.update(user_params)
         render json: @user
       else
-        render json: @user, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @user
       end
     end
 

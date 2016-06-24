@@ -20,7 +20,7 @@ module Api::V1::Licenses::Relationships
         if @license.save
           render status: :created
         else
-          render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+          render_unprocessable_resource @license
         end
       end
     end

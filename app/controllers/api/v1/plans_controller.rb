@@ -28,7 +28,7 @@ module Api::V1
       if @plan.save
         render json: @plan, status: :created, location: v1_plan_url(@plan)
       else
-        render json: @plan, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @plan
       end
     end
 
@@ -39,7 +39,7 @@ module Api::V1
       if @plan.update(plan_params)
         render json: @plan
       else
-        render json: @plan, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @plan
       end
     end
 

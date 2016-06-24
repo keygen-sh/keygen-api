@@ -34,7 +34,7 @@ module Api::V1
       if @license.save
         render json: @license, status: :created, location: v1_license_url(@license)
       else
-        render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @license
       end
     end
 
@@ -45,7 +45,7 @@ module Api::V1
       if @license.update(license_params)
         render json: @license
       else
-        render json: @license, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+        render_unprocessable_resource @license
       end
     end
 
