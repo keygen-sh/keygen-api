@@ -13,12 +13,12 @@ module Api::V1::Products::Relationships
 
       if @user
         @product.users << @user
-        render status: :created
+        head :created
       else
-        render status: :unprocessable_entity
+        render_unprocessable_entity detail: "User must exist"
       end
     rescue ActiveRecord::RecordNotUnique
-      render status: :conflict
+      render_unprocessable_resource @product
     end
 
     # DELETE /products/1/relationships/users/2
