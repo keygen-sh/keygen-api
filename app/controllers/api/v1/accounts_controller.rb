@@ -28,13 +28,23 @@ module Api::V1
       @account = Account.new account_params.merge(plan: plan)
       authorize @account
 
-      # Check if account is valid thus far before billing customer
-      unless @account.valid?
-        render_unprocessable_resource @account and return
+      # Check if account is valid thus far before creating customer
+      render_unprocessable_resource @account and return unless @account.valid?
+
+      # Create a new customer and partial billing model
+      billing = Billing.new
+
+      if customer = create_customer_with_external_service
+        billing.external_customer_id = customer.id
+
+        # We expect to recieve a 'customer.created' webhook, and from there we
+        # will subscribe the customer to their chosen plan and charge them;
+        # setting the statuses to pending lets the customer use the API
+        # until we recieve the status of the charge.
+        billing.external_status = "pending"
+        @account.status = "pending"
       end
 
-      # Subscribes and charges customer if successful
-      billing = create_billing_with_external_service
       @account.billing = billing
 
       if @account.save
@@ -64,20 +74,8 @@ module Api::V1
 
     private
 
-    def create_billing_with_external_service
-      billing = Billing.new
-      customer = CustomerService.new(
-        billing_params.merge(account: @account)
-      ).create
-
-      # TODO: Break up customer and subscription creation
-      if customer
-        billing.external_customer_id = customer.id
-        billing.external_subscription_id = customer.subscriptions.data.first.id
-        billing.status = customer.subscriptions.data.first.status
-      end
-
-      billing
+    def create_customer_with_external_service
+      CustomerService.new(billing_params.merge(account: @account)).create
     end
 
     # Use callbacks to share common setup or constraints between actions.

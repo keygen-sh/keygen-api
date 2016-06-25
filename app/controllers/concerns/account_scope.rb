@@ -5,7 +5,7 @@ module AccountScope
     @current_account = Account.find_by_subdomain! request.subdomains.first
 
     if @current_account.activated?
-      if @current_account.status == "active"
+      if %w[active pending].include? @current_account.status
         @current_account
       else
         render_forbidden({

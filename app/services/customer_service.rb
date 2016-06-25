@@ -12,7 +12,6 @@ class CustomerService
     begin
       external_customer_service.create({
         description: "#{account.name} (#{account.subdomain}.keygin.io)",
-        plan: account.plan.external_plan_id,
         card: token
       })
     rescue external_service_error

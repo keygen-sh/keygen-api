@@ -5,6 +5,7 @@ class SubscriptionService
   def initialize(params)
     @id = params[:id]
     @customer = params[:customer]
+    @trial = params[:trial]
     @plan = params[:plan]
   end
 
@@ -12,6 +13,7 @@ class SubscriptionService
     begin
       external_subscription_service.create({
         customer: customer,
+        trial_end: trial,
         plan: plan
       })
     rescue external_service_error
@@ -31,7 +33,7 @@ class SubscriptionService
   def delete
     begin
       c = external_subscription_service.retrieve id
-      c.delete
+      c.delete at_period_end: true
     rescue external_service_error
       false
     end
@@ -39,7 +41,7 @@ class SubscriptionService
 
   private
 
-  attr_reader :id, :customer, :plan
+  attr_reader :id, :customer, :plan, :trial
 
   def external_subscription_service
     Stripe::Subscription
