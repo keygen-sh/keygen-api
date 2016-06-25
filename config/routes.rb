@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v1, constraints: lambda { |r| json_request?(r) } do
-      resources :webhooks, only: [:create]
+      resources :stripe, only: [:create]
 
       def relationship(resource, opts = {})
         resources(resource.to_s.dasherize, {
