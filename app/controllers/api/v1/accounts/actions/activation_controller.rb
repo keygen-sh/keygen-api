@@ -10,8 +10,8 @@ module Api::V1::Accounts::Actions
         if @account.activated?
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }
-        elsif !@account.active? && !@account.trialing?
-          render_unauthorized detail: "is not active", source: {
+        elsif !@account.pending? && !@account.active? && !@account.trialing?
+          render_unauthorized detail: "is #{@account.status}", source: {
             pointer: "/data/attributes/status" }
         elsif @account.update(activated: true)
           render json: @account

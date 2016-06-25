@@ -53,8 +53,20 @@ class Account < ApplicationRecord
     self.billing && self.billing.external_status == "active"
   end
 
+  def pending?
+    self.billing && self.billing.external_status == "pending"
+  end
+
   def trialing?
     self.billing && self.billing.external_status == "trialing"
+  end
+
+  def paused?
+    self.billing && self.billing.external_status == "paused"
+  end
+
+  def canceled?
+    self.billing && self.billing.external_status == "canceled"
   end
 
   private

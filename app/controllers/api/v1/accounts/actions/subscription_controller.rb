@@ -44,10 +44,9 @@ module Api::V1::Accounts::Actions
 
       # Setting a trial allows us to continue to use the previously 'paused'
       # subscription's billing cycle
-      previous_billing_cycle_end = @account.billing.external_subscription_period_end.to_i || nil
       subscription = SubscriptionService.new({
         customer: @account.billing.external_customer_id,
-        trial: previous_billing_cycle_end,
+        trial: @account.billing.external_subscription_period_end,
         plan: @account.plan.external_plan_id
       }).create
 
