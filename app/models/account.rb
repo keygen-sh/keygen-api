@@ -49,6 +49,14 @@ class Account < ApplicationRecord
     self.activated
   end
 
+  def active?
+    self.billing && self.billing.external_status == "active"
+  end
+
+  def trialing?
+    self.billing && self.billing.external_status == "trialing"
+  end
+
   private
 
   def set_founding_users_to_admins

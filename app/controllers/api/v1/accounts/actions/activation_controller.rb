@@ -7,12 +7,12 @@ module Api::V1::Accounts::Actions
       skip_authorization
 
       if @account.activation_token == params[:activation_token]
-        if @account.activated
+        if @account.activated?
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }
-        elsif @account.billing.nil? || @account.billing.status != "active"
-          render_unauthorized detail: "is not valid", source: {
-            pointer: "/data/attributes/billing" }
+        elsif !@account.active? && !@account.trialing?
+          render_unauthorized detail: "is not active", source: {
+            pointer: "/data/attributes/status" }
         elsif @account.update(activated: true)
           render json: @account
         else

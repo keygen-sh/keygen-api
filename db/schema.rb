@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160624225008) do
+ActiveRecord::Schema.define(version: 20160625172108) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -26,12 +26,14 @@ ActiveRecord::Schema.define(version: 20160624225008) do
 
   create_table "billings", force: :cascade do |t|
     t.string   "external_customer_id"
-    t.string   "status"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.string   "external_status"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.integer  "customer_id"
     t.string   "customer_type"
     t.string   "external_subscription_id"
+    t.datetime "external_subscription_period_start"
+    t.datetime "external_subscription_period_end"
   end
 
   create_table "licenses", force: :cascade do |t|

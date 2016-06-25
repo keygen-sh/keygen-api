@@ -12,17 +12,12 @@ module Api::V1::Accounts::Actions
           pointer: "/data/attributes/status" } and return
       end
 
-      # TODO: Save last billed date for resuming subscription with current billing cycle
       subscription = SubscriptionService.new({
         id: @account.billing.external_subscription_id
       }).delete
 
       if subscription
-        @account.billing.external_subscription_id = nil
-        @account.billing.status = subscription.status
-        @account.status = "paused"
-
-        if @account.save
+        if @account.update(status: "paused")
           render_meta status: "paused"
         else
           render_unprocessable_resource @account
@@ -42,18 +37,22 @@ module Api::V1::Accounts::Actions
           pointer: "/data/attributes/status" } and return
       end
 
-      # TODO: Use last billed date to resume subscription with previous billing cycle
+      if @account.status != "paused"
+        render_unprocessable_entity detail: "is not paused", source: {
+          pointer: "/data/attributes/status" } and return
+      end
+
+      # Setting a trial allows us to continue to use the previously 'paused'
+      # subscription's billing cycle
+      previous_billing_cycle_end = @account.billing.external_subscription_period_end.to_i || nil
       subscription = SubscriptionService.new({
         customer: @account.billing.external_customer_id,
+        trial: previous_billing_cycle_end,
         plan: @account.plan.external_plan_id
       }).create
 
       if subscription
-        @account.billing.external_subscription_id = subscription.id
-        @account.billing.status = subscription.status
-        @account.status = "active"
-
-        if @account.save
+        if @account.update(status: "active")
           render_meta status: "active"
         else
           render_unprocessable_resource @account
@@ -78,11 +77,7 @@ module Api::V1::Accounts::Actions
       }).delete
 
       if subscription
-        @account.billing.external_subscription_id = nil
-        @account.billing.status = subscription.status
-        @account.status = "canceled"
-
-        if @account.save
+        if @account.update(status: "canceled")
           render_meta status: "canceled"
         else
           render_unprocessable_resource @account
