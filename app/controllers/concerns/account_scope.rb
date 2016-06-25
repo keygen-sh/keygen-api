@@ -9,7 +9,7 @@ module AccountScope
         @current_account
       else
         render_forbidden({
-          title: "Account is #{@current_account.status}",
+          title: "Account is not active",
           detail: "must be active",
           source: {
             pointer: "/data/attributes/status"
