@@ -20,15 +20,15 @@ class LicensePolicy < ApplicationPolicy
     user.admin?
   end
 
-  def verify_license?
+  def verify?
     user.admin? or record.user == user
   end
 
-  def revoke_license?
+  def revoke?
     user.admin?
   end
 
-  def renew_license?
+  def renew?
     user.admin?
   end
 end
