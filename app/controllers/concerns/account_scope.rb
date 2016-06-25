@@ -5,11 +5,11 @@ module AccountScope
     @current_account = Account.find_by_subdomain! request.subdomains.first
 
     if @current_account.activated?
-      if %w[active pending].include? @current_account.status
+      if @current_account.active? || @current_account.pending?
         @current_account
       else
         render_forbidden({
-          title: "Account has been #{@current_account.status}",
+          title: "Account is #{@current_account.status}",
           detail: "must be active",
           source: {
             pointer: "/data/attributes/status"
