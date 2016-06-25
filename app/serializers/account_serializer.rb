@@ -1,5 +1,5 @@
 class AccountSerializer < BaseSerializer
-  attributes :id, :name, :subdomain, :status
+  attributes :id, :name, :subdomain, :status, :created, :updated
 
   belongs_to :plan
   has_many :users
@@ -10,5 +10,13 @@ class AccountSerializer < BaseSerializer
 
   def id
     object.hashid
+  end
+
+  def created
+    object.created_at
+  end
+
+  def updated
+    object.updated_at
   end
 end

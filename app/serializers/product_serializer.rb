@@ -1,5 +1,5 @@
 class ProductSerializer < BaseSerializer
-  attributes :id, :name, :platforms
+  attributes :id, :name, :platforms, :created, :updated
 
   belongs_to :account
   has_many :users
@@ -8,5 +8,13 @@ class ProductSerializer < BaseSerializer
 
   def id
     object.hashid
+  end
+
+  def created
+    object.created_at
+  end
+
+  def updated
+    object.updated_at
   end
 end
