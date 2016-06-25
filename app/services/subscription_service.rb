@@ -13,9 +13,10 @@ class SubscriptionService
     begin
       external_subscription_service.create({
         customer: customer,
-        trial_end: trial,
         plan: plan
-      })
+      }.merge(
+        trial.to_i > 0 ? { trial_end: trial } : {}
+      ))
     rescue external_service_error
       false
     end
