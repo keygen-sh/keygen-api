@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
   scope module: "api" do
-    namespace :v1, constraints: lambda { |r| r.headers["Content-Type"] == "application/json" } do
+
+    def json_request?(r)
+      !(/json/ =~ r.content_type).nil?
+    end
+
+    namespace :v1, constraints: lambda { |r| json_request?(r) } do
+      resources :webhooks, only: [:create]
 
       def relationship(resource, opts = {})
         resources(resource.to_s.dasherize, {
@@ -65,14 +71,14 @@ Rails.application.routes.draw do
     end
   end
 
-  constraints lambda { |r| r.subdomain.present? || r.headers["Content-Type"] == "application/json" } do
+  constraints lambda { |r| r.subdomain.present? || json_request?(r) } do
     %w[404 422 500].each do |code|
       match code, to: "errors#show", code: code, via: :all
     end
     root to: "errors#show", code: 404
   end
 
-  constraints lambda { |r| r.subdomain.empty? && r.headers["Content-Type"] != "application/json" } do
+  constraints lambda { |r| r.subdomain.empty? && !json_request?(r) } do
     match "*all", to: "application#index", via: [:get]
     root to: "application#index"
   end
