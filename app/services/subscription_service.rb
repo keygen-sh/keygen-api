@@ -15,6 +15,7 @@ class SubscriptionService
         customer: customer,
         plan: plan
       }.merge(
+        # Trial periods are used to keep billing cycles between pausing/resuming
         trial.to_i > 0 ? { trial_end: trial } : {}
       ))
     rescue external_service_error
@@ -25,7 +26,8 @@ class SubscriptionService
   def update
     begin
       c = external_subscription_service.retrieve id
-      c.update plan: plan
+      c.plan = plan
+      c.save
     rescue external_service_error
       false
     end

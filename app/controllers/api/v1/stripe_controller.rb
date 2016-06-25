@@ -39,7 +39,7 @@ module Api::V1
       when "customer.created"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id
-        return unless billing
+        return unless billing && billing.external_subscription_id.nil?
 
         SubscriptionService.new({
           customer: billing.external_customer_id,
