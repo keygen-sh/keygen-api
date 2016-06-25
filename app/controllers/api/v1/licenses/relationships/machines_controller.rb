@@ -13,12 +13,12 @@ module Api::V1::Licenses::Relationships
 
       # TODO: Make sure they don't go over the policy's max_activations
       if @license.active_machines.include? @machine
-        render status: :conflict
+        render_conflict
       else
         @license.active_machines << @machine
 
         if @license.save
-          render status: :created
+          head :created
         else
           render_unprocessable_resource @license
         end
