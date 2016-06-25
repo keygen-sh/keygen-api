@@ -1,11 +1,11 @@
 module Api::V1::Licenses::Actions
-  class RenewController < Api::V1::BaseController
+  class PermitController < Api::V1::BaseController
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!
-    before_action :set_license, only: [:renew_license]
+    before_action :set_license, only: [:renew, :revoke, :verify]
 
     # POST /licenses/1/actions/renew
-    def renew_license
+    def renew
       authorize @license
 
       if @license.policy.duration.nil?
@@ -20,6 +20,20 @@ module Api::V1::Licenses::Actions
       else
         render_unprocessable_resource @license
       end
+    end
+
+    # POST /licenses/1/actions/revoke
+    def revoke
+      authorize @license
+
+      @license.destroy
+    end
+
+    # GET /licenses/1/actions/verify
+    def verify
+      authorize @license
+
+      render_meta is_valid: @license.license_valid?
     end
 
     private
