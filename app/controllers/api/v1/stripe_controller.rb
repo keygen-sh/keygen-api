@@ -1,5 +1,5 @@
 module Api::V1
-  class WebhooksController < Api::V1::BaseController
+  class StripeController < Api::V1::BaseController
 
     # POST /webhooks
     def create
@@ -34,6 +34,8 @@ module Api::V1
           external_subscription_id: nil,
           external_status: subscription.status
         })
+
+        billing.customer.update status: "canceled"
       when "customer.created"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id
@@ -43,6 +45,8 @@ module Api::V1
           customer: billing.external_customer_id,
           plan: billing.customer.plan.external_plan_id
         }).create
+
+        billing.customer.update status: "active"
       when "customer.deleted"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id
