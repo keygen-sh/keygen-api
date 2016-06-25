@@ -11,11 +11,10 @@ module Api::V1::Policies::Relationships
       @license = license_params.to_h
 
       if @policy.pool.include? @license
-        render status: :conflict
+        render_conflict
       else
         @policy.pool_push << @license
-
-        render status: :created
+        head :created
       end
     end
 
