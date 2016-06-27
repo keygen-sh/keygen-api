@@ -33,8 +33,8 @@ class ApplicationController < ActionController::Base
     }, status: :forbidden
   end
 
-  def render_unauthorized(opts = {}, realm = "Application")
-    self.headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+  def render_unauthorized(opts = {}, auth = "Token")
+    self.headers["WWW-Authenticate"] = %(#{auth} realm="Application")
     opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
