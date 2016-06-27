@@ -1,7 +1,7 @@
 @api/v1
 Feature: List users
 
-  Scenario: Admin retreives all users for their account
+  Scenario: Admin retrieves all users for their account
     Given there exists an account "bungie"
     And I am an admin of account "bungie"
     And I am on the subdomain "bungie"
@@ -12,7 +12,7 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 3 "users"
 
-  Scenario: Admin attempts to retreives all users for another account
+  Scenario: Admin attempts to retrieve all users for another account
     Given there exists an account "bungie"
     And there exists another account "blizzard"
     And I am an admin of account "blizzard"
