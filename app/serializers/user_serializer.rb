@@ -1,5 +1,5 @@
 class UserSerializer < BaseSerializer
-  attributes :id, :name, :email, :meta, :created, :updated
+  attributes :id, :name, :email, :role, :meta, :created, :updated
 
   belongs_to :account
   has_many :products

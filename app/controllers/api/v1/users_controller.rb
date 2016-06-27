@@ -6,6 +6,7 @@ module Api::V1
 
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
+    before_action :authenticate_with_token?, only: [:create]
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
@@ -63,9 +64,15 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit :name, :email, :password,
+      params.require(:user).permit [:name, :email, :password, (:role if current_user_is_admin?)].compact,
         # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
         meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
+    end
+
+    private
+
+    def current_user_is_admin?
+      @current_user && @current_user.admin?
     end
   end
 end
