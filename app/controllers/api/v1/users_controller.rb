@@ -63,7 +63,7 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit :name, :email,
+      params.require(:user).permit :name, :email, :password,
         # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
         meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
     end

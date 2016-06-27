@@ -45,15 +45,15 @@ Feature: Update user
       { "customerId": "cust_gV4dW9jrc" }
       """
 
-  Scenario: Admin attempts to update a users password
-    Given there exists an account "bungie"
-    And I am an admin of account "bungie"
-    And I am on the subdomain "bungie"
-    And I send and accept JSON
-    And I use my auth token
-    And I have 3 "users"
-    When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
-      """
-      { "user": { "password": "h4ck3d!" } }
-      """
-    Then the response status should be "400"
+  # Scenario: Admin attempts to update a users password
+  #  Given there exists an account "bungie"
+  #  And I am an admin of account "bungie"
+  #  And I am on the subdomain "bungie"
+  #  And I send and accept JSON
+  #  And I use my auth token
+  #  And I have 3 "users"
+  #  When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
+  #    """
+  #    { "user": { "password": "h4ck3d!" } }
+  #    """
+  #  Then the response status should be "400"
