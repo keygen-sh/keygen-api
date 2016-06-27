@@ -45,29 +45,56 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
-  post path, body
+  if @account
+    post "//#{@account.subdomain}.keygin.io#{path}", body
+  else
+    post "//keygin.io#{path}", body
+  end
 end
 
-When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
-  put path, body
+When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |path, body|
+  if @account
+    put "//#{@account.subdomain}.keygin.io#{path}", body
+  else
+    put "//keygin.io#{path}", body
+  end
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
-  delete path
+  if @account
+    delete "//#{@account.subdomain}.keygin.io#{path}"
+  else
+    delete "//keygin.io#{path}"
+  end
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
-  assert last_response.status == status.to_i
+  assert_equal status.to_i, last_response.status
 end
 
 Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
-  assert json["data"].select { |d|
-    d["type"] == name.pluralize
-  }.length == count.to_i
+  assert_equal count.to_i, json["data"].select { |d| d["type"] == name.pluralize }.length
+end
+
+Then /^the JSON response should be a "([^\"]*)"$/ do |name|
+  json = JSON.parse last_response.body
+  assert_equal name.pluralize, json["data"]["type"]
+end
+
+Then /^the JSON response should be a "([^\"]*)" with (\w+) "([^\"]*)"$/ do |name, attribute, value|
+  json = JSON.parse last_response.body
+  assert_equal name.pluralize, json["data"]["type"]
+  assert_equal value, json["data"]["attributes"][attribute]
+end
+
+Then /^the JSON response should be a "([^\"]*)" with the following (\w+):$/ do |name, attribute, body|
+  json = JSON.parse last_response.body
+  assert_equal name.pluralize, json["data"]["type"]
+  assert_equal JSON.parse(body), json["data"]["attributes"][attribute]
 end
 
 Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
-  assert json["errors"].length == count.to_i
+  assert_equal count.to_i, json["errors"].length
 end
