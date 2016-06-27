@@ -69,8 +69,6 @@ module Api::V1
         meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
     end
 
-    private
-
     def current_user_is_admin?
       @current_user && @current_user.admin?
     end
