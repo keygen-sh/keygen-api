@@ -102,3 +102,15 @@ Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
   assert_equal count.to_i, json["errors"].length
 end
+
+Then /^I should have (\d+) "([^\"]*)"$/ do |count, resource|
+  if @account
+    user = Account.find_by(subdomain: @account.subdomain).users.find_by role: "admin"
+    header "Authorization", "Bearer \"#{user.auth_token}\""
+    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize}"
+  else
+    get "//keygin.io/#{@api_version}/#{resource.pluralize}"
+  end
+  json = JSON.parse last_response.body
+  assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
+end
