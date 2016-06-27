@@ -12,11 +12,13 @@ module Api::V1
         user = @current_account.users.find_by email: email
 
         if user && user.authenticate(password)
-          render json: user, serializer: ActiveModel::Serializer::TokenSerializer
-        else
-          render_unauthorized detail: "Invalid credentials given for email or password"
+          render json: user, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
+
+      render_unauthorized({
+        detail: "Invalid credentials given for email or password"
+      }, "Basic")
     end
 
     def reset_tokens
@@ -27,12 +29,12 @@ module Api::V1
         user.reset_auth_tokens! unless user.nil?
 
         if user
-          render json: user, serializer: ActiveModel::Serializer::TokenSerializer
-        else
-          render_unauthorized detail: "must be a valid reset token", source: {
-            pointer: "/data/attributes/resetAuthToken" }
+          render json: user, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
+
+      render_unauthorized detail: "must be a valid reset token", source: {
+        pointer: "/data/attributes/resetAuthToken" }
     end
   end
 end
