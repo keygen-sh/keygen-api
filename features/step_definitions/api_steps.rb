@@ -86,7 +86,7 @@ Then /^the JSON response should be a "([^\"]*)"$/ do |name|
   assert_equal name.pluralize, json["data"]["type"]
 end
 
-Then /^the JSON response should be a "([^\"]*)" with (\w+) "([^\"]*)"$/ do |name, attribute, value|
+Then /^the JSON response should be a "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |name, attribute, value|
   json = JSON.parse last_response.body
   assert_equal name.pluralize, json["data"]["type"]
   assert_equal value, json["data"]["attributes"][attribute]
