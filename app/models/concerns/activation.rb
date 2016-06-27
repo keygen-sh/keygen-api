@@ -11,7 +11,7 @@ module Activation
     save
 
     self.users.where(role: "admin").each do |admin|
-      UserMailer.account_activation(admin).deliver
+      UserMailer.account_activation(admin).deliver_later
     end
   end
 

@@ -10,7 +10,7 @@ module PasswordReset
     create_password_reset_token
     save
 
-    UserMailer.password_reset(self).deliver
+    UserMailer.password_reset(self).deliver_later
   end
 
   def reset_password_reset_token!
