@@ -9,7 +9,7 @@ Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
 end
 
 Given /^I am an? (user|admin) of account "([^\"]*)"$/ do |role, subdomain|
-  @user = Account.find_by(subdomain: subdomain).users.find_by role: "admin"
+  @user = Account.find_by(subdomain: subdomain).users.find_by role: role
 end
 
 Given /^I send and accept HTML$/ do

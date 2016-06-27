@@ -28,6 +28,21 @@ Feature: Update user
       """
     Then the response status should be "401"
 
+  Scenario: Admin promotes a user to admin for their account
+    Given there exists an account "bungie"
+    And I am an admin of account "bungie"
+    And I am on the subdomain "bungie"
+    And I send and accept JSON
+    And I use my auth token
+    And I have 2 "users"
+    When I send a PATCH request to "/users/dgKGxar7" with the following:
+      """
+      { "user": { "role": "admin" } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the role "admin"
+    And I should have 1 "user"
+
   Scenario: Admin updates a users meta data
     Given there exists an account "bungie"
     And I am an admin of account "bungie"
