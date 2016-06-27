@@ -1,5 +1,9 @@
 World Rack::Test::Methods
 
+Before "@api/v1" do
+  @api_version = "v1"
+end
+
 Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
   create :account, subdomain: subdomain
 end
@@ -38,33 +42,33 @@ end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   if @account
-    get "//#{@account.subdomain}.keygin.io#{path}"
+    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   else
-    get "//keygin.io#{path}"
+    get "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   end
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   if @account
-    post "//#{@account.subdomain}.keygin.io#{path}", body
+    post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
-    post "//keygin.io#{path}", body
+    post "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   end
 end
 
 When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |path, body|
   if @account
-    put "//#{@account.subdomain}.keygin.io#{path}", body
+    put "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
-    put "//keygin.io#{path}", body
+    put "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   end
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   if @account
-    delete "//#{@account.subdomain}.keygin.io#{path}"
+    delete "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   else
-    delete "//keygin.io#{path}"
+    delete "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   end
 end
 

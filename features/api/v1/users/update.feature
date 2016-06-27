@@ -8,7 +8,7 @@ Feature: Update user
     And I send and accept JSON
     And I use my auth token
     And I have 1 "user"
-    When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/dgKGxar7" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -22,7 +22,7 @@ Feature: Update user
     But I am on the subdomain "bungie"
     And I send and accept JSON
     And I use my auth token
-    When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/dgKGxar7" with the following:
       """
       { "user": { "name": "Updated name" } }
       """
@@ -35,7 +35,7 @@ Feature: Update user
     And I send and accept JSON
     And I use my auth token
     And I have 1 "user"
-    When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/dgKGxar7" with the following:
       """
       { "user": { "meta": { "customerId": "cust_gV4dW9jrc" } } }
       """
@@ -52,7 +52,7 @@ Feature: Update user
   #  And I send and accept JSON
   #  And I use my auth token
   #  And I have 3 "users"
-  #  When I send a PATCH request to "/v1/users/dgKGxar7" with the following:
+  #  When I send a PATCH request to "/users/dgKGxar7" with the following:
   #    """
   #    { "user": { "password": "h4ck3d!" } }
   #    """
