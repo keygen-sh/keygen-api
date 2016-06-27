@@ -13,7 +13,7 @@ Feature: Update user
       { "user": { "name": "Mr. Robot" } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with name "Mr. Robot"
+    And the JSON response should be a "user" with the name "Mr. Robot"
 
   Scenario: Admin attempts to update a user for another account
     Given there exists an account "bungie"
