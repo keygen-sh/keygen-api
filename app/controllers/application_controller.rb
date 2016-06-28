@@ -105,6 +105,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_unprocessable_resource(resource)
-    render json: resource, status: :unprocessable_entity, adapter: :json_api, serializer: ActiveModel::Serializer::ErrorSerializer
+    render json: resource, status: :unprocessable_entity, adapter: :json_api,
+      serializer: ActiveModel::Serializer::ErrorSerializer
   end
 end

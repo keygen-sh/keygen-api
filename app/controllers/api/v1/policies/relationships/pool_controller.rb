@@ -11,7 +11,8 @@ module Api::V1::Policies::Relationships
       @license = license_params.to_h
 
       if @policy.pool.include? @license
-        render_conflict
+        render_conflict detail: "already exists", source: {
+          pointer: "/data/relationships/pool" }
       else
         @policy.pool_push << @license
         head :created
