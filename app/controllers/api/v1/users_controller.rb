@@ -64,13 +64,10 @@ module Api::V1
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit [:name, :email, :password, (:role if current_user_is_admin?)].compact,
+      params.require(:user).permit [:name, :email, :password, (:role if @current_user&.admin?)].compact, {
         # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
         meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
-    end
-
-    def current_user_is_admin?
-      @current_user && @current_user.admin?
+      }
     end
   end
 end
