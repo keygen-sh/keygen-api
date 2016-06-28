@@ -26,7 +26,7 @@ module Api::V1
       when "customer.subscription.deleted"
         subscription = event.data.object
         billing = Billing.find_by external_customer_id: subscription.customer
-        return unless billing && billing.external_subscription_id == subscription.id
+        return unless billing&.external_subscription_id == subscription.id
 
         billing.update({
           external_subscription_period_start: nil,

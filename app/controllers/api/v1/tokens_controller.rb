@@ -11,7 +11,7 @@ module Api::V1
       authenticate_with_http_basic do |email, password|
         user = @current_account.users.find_by email: email
 
-        if user && user.authenticate(password)
+        if user&.authenticate(password)
           render json: user, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
