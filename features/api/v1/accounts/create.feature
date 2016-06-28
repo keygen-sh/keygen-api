@@ -14,10 +14,10 @@ Feature: Create account
           "plan": "ElZw7Zko",
           "users": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
-          ]
-        },
-        "billing": {
-          "token": "some_token"
+          ],
+          "billing": {
+            "token": "some_token"
+          }
         }
       }
       """
@@ -37,10 +37,10 @@ Feature: Create account
           "plan": "ElZw7Zko",
           "users": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
-          ]
-        },
-        "billing": {
-          "token": "some_token"
+          ],
+          "billing": {
+            "token": "some_token"
+          }
         }
       }
       """
@@ -60,10 +60,10 @@ Feature: Create account
           "plan": "ElZw7Zko",
           "users": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
-          ]
-        },
-        "billing": {
-          "token": "some_token"
+          ],
+          "billing": {
+            "token": "some_token"
+          }
         }
       }
       """
@@ -81,10 +81,10 @@ Feature: Create account
           "name": "Google",
           "users": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
-          ]
-        },
-        "billing": {
-          "token": "some_token"
+          ],
+          "billing": {
+            "token": "some_token"
+          }
         }
       }
       """
@@ -107,8 +107,8 @@ Feature: Create account
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 error
+    Then the response status should be "422"
+    And the JSON response should be an array of 2 errors
 
   Scenario: Anonymous attempts to create an account without any admin users
     Given I send and accept JSON
@@ -119,10 +119,10 @@ Feature: Create account
         "account": {
           "subdomain": "google",
           "name": "Google",
-          "plan": "ElZw7Zko"
-        },
-        "billing": {
-          "token": "some_token"
+          "plan": "ElZw7Zko",
+          "billing": {
+            "token": "some_token"
+          }
         }
       }
       """

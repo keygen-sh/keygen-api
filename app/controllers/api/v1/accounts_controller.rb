@@ -23,12 +23,9 @@ module Api::V1
 
     # POST /accounts
     def create
-      params = account_params
-      params[:users_attributes] = params.delete :users if params[:users]
+      plan = Plan.find_by_hashid(account_params[:plan])
 
-      plan = Plan.find_by_hashid(params[:plan])
-
-      @account = Account.new params.merge(plan: plan)
+      @account = Account.new account_params.merge(plan: plan)
       authorize @account
 
       # Check if account is valid thus far before creating customer
@@ -77,26 +74,46 @@ module Api::V1
 
     private
 
+    # TODO: Clean this up
+    attr_reader :_raw_params, :_account_params, :_billing_params
+
     def create_customer_with_external_service
+      return false unless billing_params
       CustomerService.new(
         billing_params.merge account: @account
       ).create
     end
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_account
       @account = Account.find_by_hashid params[:id]
       @account || render_not_found
     end
 
-    # Only allow a trusted parameter "white list" through.
+    def _params
+      @_raw_params ||= params.require(:account).permit :name, :subdomain, :plan, {
+        users: [[:name, :email, :password]],
+      }.merge(
+        action_name == "create" ? { billing: [:token] } : {}
+      )
+    end
+
+    def _split_params!
+      return unless @_billing_params.nil? && @_account_params.nil?
+
+      # Rename users params
+      _params[:users_attributes] = _params.delete :users if _params[:users]
+
+      # Split up billing and account params
+      @_billing_params ||= _params.delete :billing if _params[:billing]
+      @_account_params ||= _params
+    end
+
     def account_params
-      params.require(:account).permit :name, :subdomain, :plan,
-        users: [[:name, :email, :password]]
+      _split_params!; @_account_params
     end
 
     def billing_params
-      params.require(:billing).permit :token
+      _split_params!; @_billing_params
     end
   end
 end
