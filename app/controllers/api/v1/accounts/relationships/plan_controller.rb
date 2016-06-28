@@ -10,7 +10,7 @@ module Api::V1::Accounts::Relationships
       @plan = Plan.find_by_hashid plan_params
       subscription = update_plan_with_external_service
 
-      if @plan && subscription
+      if subscription
         if @account.update(plan: @plan)
           render json: @account
         else
@@ -18,7 +18,7 @@ module Api::V1::Accounts::Relationships
         end
       else
         render_unprocessable_entity detail: "must exist", source: {
-          pointer: "/data/attributes/plan" }
+          pointer: "/data/relationships/billing" }
       end
     end
 
