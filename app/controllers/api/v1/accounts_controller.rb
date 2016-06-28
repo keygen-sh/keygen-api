@@ -23,9 +23,12 @@ module Api::V1
 
     # POST /accounts
     def create
-      plan = Plan.find_by_hashid(account_params[:plan])
+      params = account_params
+      params[:users_attributes] = params.delete :users if params[:users]
 
-      @account = Account.new account_params.merge(plan: plan)
+      plan = Plan.find_by_hashid(params[:plan])
+
+      @account = Account.new params.merge(plan: plan)
       authorize @account
 
       # Check if account is valid thus far before creating customer
@@ -75,7 +78,9 @@ module Api::V1
     private
 
     def create_customer_with_external_service
-      CustomerService.new(billing_params.merge(account: @account)).create
+      CustomerService.new(
+        billing_params.merge account: @account
+      ).create
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -87,7 +92,7 @@ module Api::V1
     # Only allow a trusted parameter "white list" through.
     def account_params
       params.require(:account).permit :name, :subdomain, :plan,
-        users_attributes: [[:name, :email, :password]]
+        users: [[:name, :email, :password]]
     end
 
     def billing_params
