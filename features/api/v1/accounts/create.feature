@@ -70,6 +70,27 @@ Feature: Create account
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
 
+  Scenario: Anonymous attempts to create an account without a plan
+    Given I send and accept JSON
+    And there exists 1 "plan"
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "account": {
+          "subdomain": "google",
+          "name": "Google",
+          "users": [
+            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+          ]
+        },
+        "billing": {
+          "token": "some_token"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+
   Scenario: Anonymous attempts to create an account without billing info
     Given I send and accept JSON
     And there exists 1 "plan"
