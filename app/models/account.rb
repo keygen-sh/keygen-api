@@ -31,7 +31,7 @@ class Account < ApplicationRecord
     presence: true,
     exclusion: { in: RESERVED_SUBDOMAINS, message: "%{value} is reserved." },
     uniqueness: { case_sensitive: false },
-    format: { with: /\A[\w]+\Z/i },
+    format: { with: /\A[-A-za-z0-9]+\Z/i },
     length: { maximum: 255 }
 
   scope :plan, -> (id) {
