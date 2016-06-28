@@ -5,9 +5,9 @@ Feature: List users
     Given there exists an account "bungie"
     And I am an admin of account "bungie"
     And I am on the subdomain "bungie"
+    And the current account has 3 "users"
     And I send and accept JSON
     And I use my auth token
-    And I have 3 "users"
     When I send a GET request to "/users"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "users"

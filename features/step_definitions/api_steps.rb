@@ -13,13 +13,13 @@ Given /^I am an? (user|admin) of account "([^\"]*)"$/ do |role, subdomain|
 end
 
 Given /^I send and accept HTML$/ do
-  header "Accept", "text/html"
   header "Content-Type", "text/html"
+  header "Accept", "text/html"
 end
 
 Given /^I send and accept JSON$/ do
-  header "Accept", "application/json"
-  header "Content-Type", "application/json"
+  header "Content-Type", "application/vnd.api+json"
+  header "Accept", "application/vnd.api+json"
 end
 
 Given /^I use my auth token$/ do
@@ -30,14 +30,14 @@ Given /^I am on the subdomain "([^\"]*)"$/ do |subdomain|
   @account = Account.find_by subdomain: subdomain
 end
 
-Given /^I have (\d+) "([^\"]*)"$/ do |count, resource|
-  if @account
-    count.to_i.times {
-      create resource.singularize, account_id: @account.id
-    }
-  else
-    create_list resource.singularize, count.to_i
-  end
+Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
+  create_list resource.singularize, count.to_i
+end
+
+Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
+  count.to_i.times {
+    create resource.singularize, account_id: @account.id
+  }
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
@@ -103,7 +103,7 @@ Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
   assert_equal count.to_i, json["errors"].length
 end
 
-Then /^I should have (\d+) "([^\"]*)"$/ do |count, resource|
+Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
     user = Account.find_by(subdomain: @account.subdomain).users.find_by role: "admin"
     header "Authorization", "Bearer \"#{user.auth_token}\""
