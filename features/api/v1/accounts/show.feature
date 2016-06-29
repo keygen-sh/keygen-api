@@ -19,3 +19,12 @@ Feature: Show account
     When I send a GET request to "/accounts/eQ6Xobga"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: User attempts to retrieve an account
+    Given there exists an account "bungie"
+    And the account "bungie" has 1 "user"
+    And I am a user of account "bungie"
+    And I send and accept JSON
+    And I use my auth token
+    When I send a GET request to "/accounts/eQ6Xobga"
+    Then the response status should be "403"
