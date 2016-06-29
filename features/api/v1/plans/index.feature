@@ -1,7 +1,7 @@
 @api/v1
 Feature: List plans
 
-  Scenario: Retrieve all plans
+  Scenario: Anonymous retrieves all plans
     Given there exists 3 "plans"
     And I send and accept JSON
     When I send a GET request to "/plans"
