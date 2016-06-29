@@ -16,7 +16,7 @@ module Api::V1::Products::Relationships
         head :created
       else
         render_unprocessable_entity detail: "must exist", source: {
-          pointer: "/data/relationships/users/user" }
+          pointer: "/data/relationships/users.user" }
       end
     rescue ActiveRecord::RecordNotUnique
       render_unprocessable_resource @product
