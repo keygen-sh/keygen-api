@@ -108,6 +108,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
+  puts last_response.body
   assert_equal status.to_i, last_response.status
 end
 
