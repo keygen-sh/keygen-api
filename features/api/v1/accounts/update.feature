@@ -36,3 +36,15 @@ Feature: Update account
       { "account": { "name": "New Company Name" } }
       """
     Then the response status should be "401"
+
+  Scenario: User attempts to update an account
+    Given there exists an account "bungie"
+    And the account "bungie" has 1 "user"
+    And I am a user of account "bungie"
+    And I send and accept JSON
+    And I use my auth token
+    When I send a PATCH request to "/accounts/eQ6Xobga" with the following:
+      """
+      { "account": { "name": "New Company Name" } }
+      """
+    Then the response status should be "403"
