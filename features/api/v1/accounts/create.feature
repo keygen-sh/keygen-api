@@ -12,7 +12,7 @@ Feature: Create account
           "subdomain": "google",
           "name": "Google",
           "plan": "ElZw7Zko",
-          "users": [
+          "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ],
           "billing": {
@@ -35,7 +35,7 @@ Feature: Create account
           "subdomain": "google",
           "name": "Google",
           "plan": "ElZw7Zko",
-          "users": [
+          "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ],
           "billing": {
@@ -58,7 +58,7 @@ Feature: Create account
           "subdomain": "google",
           "name": "Google",
           "plan": "ElZw7Zko",
-          "users": [
+          "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ],
           "billing": {
@@ -79,7 +79,7 @@ Feature: Create account
         "account": {
           "subdomain": "google",
           "name": "Google",
-          "users": [
+          "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ],
           "billing": {
@@ -101,7 +101,7 @@ Feature: Create account
           "subdomain": "google",
           "name": "Google",
           "plan": "ElZw7Zko",
-          "users": [
+          "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ]
         }

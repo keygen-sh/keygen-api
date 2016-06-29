@@ -90,10 +90,8 @@ module Api::V1
     end
 
     def _params
-      @_raw_params ||= params.require(:account).permit :name, :subdomain, :plan, {
-        users: [[:name, :email, :password]],
-      }.merge(
-        action_name == "create" ? { billing: [:token] } : {}
+      @_raw_params ||= params.require(:account).permit :name, :subdomain, :plan, (
+        action_name == "create" ? { admins: [[:name, :email, :password]], billing: [:token] } : {}
       )
     end
 
@@ -101,7 +99,7 @@ module Api::V1
       return unless @_billing_params.nil? && @_account_params.nil?
 
       # Rename users params
-      _params[:users_attributes] = _params.delete :users if _params[:users]
+      _params[:users_attributes] = _params.delete :admins if _params[:admins]
 
       # Split up billing and account params
       @_billing_params ||= _params.delete :billing if _params[:billing]
