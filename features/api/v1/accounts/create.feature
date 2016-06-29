@@ -24,7 +24,7 @@ Feature: Create account
     Then the response status should be "201"
     And the JSON response should be a "account" with the name "Google"
 
-  Scenario: Anonymous creates an account with a card declined payment token error
+  Scenario: Anonymous creates an account with a "card declined" token error
     Given I send and accept JSON
     And there exists 1 "plan"
     And I have a payment token with a "card declined" error
@@ -47,7 +47,7 @@ Feature: Create account
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
 
-  Scenario: Anonymous creates an account with missing payment token error
+  Scenario: Anonymous creates an account with a "missing" token error
     Given I send and accept JSON
     And there exists 1 "plan"
     And I have a payment token with a "missing" error
