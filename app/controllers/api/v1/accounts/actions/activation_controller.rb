@@ -11,7 +11,7 @@ module Api::V1::Accounts::Actions
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }
         elsif !@account.pending? && !@account.active? && !@account.trialing?
-          render_unauthorized detail: "is #{@account.status}", source: {
+          render_forbidden detail: "is #{@account.status}", source: {
             pointer: "/data/attributes/status" }
         elsif @account.update(activated: true)
           render json: @account
@@ -19,7 +19,7 @@ module Api::V1::Accounts::Actions
           render_unprocessable_resource @account
         end
       else
-        render_unauthorized detail: "is not valid", source: {
+        render_unprocessable_entity detail: "is not valid", source: {
           pointer: "/data/attributes/activationToken" }
       end
     end
