@@ -1,5 +1,19 @@
 World Rack::Test::Methods
 
+def parse_placeholders(str)
+  str.dup.scan /(\$\{([\.\w]+)\})/ do |pattern, match|
+    resource, attribute = match.to_s.split "."
+    value = resource.singularize
+              .underscore
+              .classify
+              .constantize
+              .first
+              .send attribute.underscore
+
+    str.sub! pattern.to_s, value
+  end
+end
+
 Before "@api/v1" do
   @api_version = "v1"
 end
@@ -43,6 +57,14 @@ Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   create_list resource.singularize, count.to_i
 end
 
+Given /^the account "([^\"]*)" is not (\w+)$/ do |subdomain, attribute|
+  Account.find_by(subdomain: subdomain).update "#{attribute}": false
+end
+
+Given /^the account "([^\"]*)" is (\w+)$/ do |subdomain, attribute|
+  Account.find_by(subdomain: subdomain).update "#{attribute}": true
+end
+
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
   count.to_i.times {
     create resource.singularize, account_id: Account.find_by(subdomain: subdomain).id
@@ -84,6 +106,7 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_placeholders body
   if @account
     post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
@@ -92,6 +115,7 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
 end
 
 When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_placeholders body
   if @account
     put "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
@@ -125,6 +149,18 @@ Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"
   json = JSON.parse last_response.body
   assert_equal name.pluralize, json["data"]["type"]
   assert_equal value, json["data"]["attributes"][attribute]
+end
+
+Then /^the JSON response should be an? "([^\"]*)" that is (\w+)$/ do |name, attribute|
+  json = JSON.parse last_response.body
+  assert_equal name.pluralize, json["data"]["type"]
+  assert_equal true, json["data"]["attributes"][attribute]
+end
+
+Then /^the JSON response should be an? "([^\"]*)" that is not (\w+)$/ do |name, attribute|
+  json = JSON.parse last_response.body
+  assert_equal name.pluralize, json["data"]["type"]
+  assert_equal false, json["data"]["attributes"][attribute]
 end
 
 Then /^the JSON response should be an? "([^\"]*)" with the following (\w+):$/ do |name, attribute, body|
