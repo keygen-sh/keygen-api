@@ -27,7 +27,7 @@ module Api::V1::Users::Actions
       if @user.password_reset_token == params[:password_reset_token]
         @user.reset_password_reset_token!
 
-        if @user.password_reset_sent_at < 24.hours.ago
+        if @user.password_reset_sent_at > 24.hours.ago
           render_unauthorized detail: "is expired", source: {
             pointer: "/data/attributes/passwordResetToken" }
         elsif @user.update(password: params[:new_password])
