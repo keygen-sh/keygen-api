@@ -18,7 +18,7 @@ module Api::V1
 
       render_unauthorized({
         detail: "Invalid credentials given for email or password"
-      }, "Basic")
+      })
     end
 
     def reset_tokens
