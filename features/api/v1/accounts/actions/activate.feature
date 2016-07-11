@@ -1,5 +1,5 @@
 @api/v1
-Feature: Activate account
+Feature: Account activation
 
   Scenario: Anonymous activates an account
     Given there exists an account "bungie"
