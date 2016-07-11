@@ -1,6 +1,6 @@
 require 'stripe'
 
-class EventService
+class ExternalEventService
 
   def initialize(params)
     @id = params[:id]

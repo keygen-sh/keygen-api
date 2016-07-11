@@ -1,6 +1,6 @@
 require 'stripe'
 
-class CustomerService
+class ExternalCustomerService
 
   def initialize(params)
     @id = params[:id]
