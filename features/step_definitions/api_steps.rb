@@ -19,12 +19,17 @@ Before "@api/v1" do
 end
 
 Before do
-  Stripe.api_key = "sX}x6fY^i=oAv6o{6hudzs7YC"
+  @stripe_helper = StripeMock.create_test_helper
+
+  Stripe.api_key = "stripe_key"
   StripeMock.start
 end
 
-After do
+After do |s|
   StripeMock.stop
+
+  # Tell Cucumber to quit if a scenario fails
+  Cucumber.wants_to_quit = true if s.failed?
 end
 
 Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
@@ -47,6 +52,35 @@ end
 
 Given /^I use my auth token$/ do
   header "Authorization", "Bearer \"#{@user.auth_token}\""
+end
+
+Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
+  plan = @stripe_helper.create_plan id: "plan", amount: 1500
+  customer = Stripe::Customer.create(
+    email: "johnny@appleseed.com",
+    source: @stripe_helper.generate_card_token
+  )
+  subscription = customer.subscriptions.create(
+    plan: plan.id
+  )
+
+  Plan.first.update external_plan_id: plan.id
+  Account.find_by(subdomain: subdomain).update plan: Plan.first
+  Account.find_by(subdomain: subdomain).billing.update(
+    external_customer_id: customer.id,
+    external_subscription_id: subscription.id,
+    external_status: "active"
+  )
+end
+
+Given /^the account "([^\"]*)" has the following attributes:$/ do |subdomain, body|
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+  Account.find_by(subdomain: subdomain).update attributes
+end
+
+Given /^I have the following attributes:$/ do |body|
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+  @user.update attributes
 end
 
 Given /^I am on the subdomain "([^\"]*)"$/ do |subdomain|
@@ -105,6 +139,14 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
   end
 end
 
+When /^I send a POST request to "([^\"]*)"$/ do |path|
+  if @account
+    post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    post "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
+end
+
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   parse_placeholders body
   if @account
@@ -132,6 +174,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
+  # puts last_response.status, last_response.body
   assert_equal status.to_i, last_response.status
 end
 
@@ -167,6 +210,11 @@ Then /^the JSON response should be an? "([^\"]*)" with the following (\w+):$/ do
   json = JSON.parse last_response.body
   assert_equal name.pluralize, json["data"]["type"]
   assert_equal JSON.parse(body), json["data"]["attributes"][attribute]
+end
+
+Then /^the JSON response should be meta with the following:$/ do |body|
+  json = JSON.parse last_response.body
+  assert_equal JSON.parse(body), json["meta"]
 end
 
 Then /^the JSON response should be an array of (\d+) errors?$/ do |count|

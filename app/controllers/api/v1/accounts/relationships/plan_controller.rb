@@ -8,7 +8,7 @@ module Api::V1::Accounts::Relationships
       authorize @account
 
       @plan = Plan.find_by_hashid plan_params
-      subscription = update_plan_with_external_service
+      subscription = update_plan_with_external_service if @plan
 
       if subscription
         if @account.update(plan: @plan)
