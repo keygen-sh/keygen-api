@@ -1,6 +1,6 @@
 require 'stripe'
 
-class SubscriptionService
+class ExternalSubscriptionService
 
   def initialize(params)
     @id = params[:id]

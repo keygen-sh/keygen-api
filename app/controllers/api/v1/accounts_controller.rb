@@ -79,7 +79,7 @@ module Api::V1
 
     def create_customer_with_external_service
       return false unless billing_params
-      CustomerService.new(
+      ExternalCustomerService.new(
         billing_params.merge account: @account
       ).create
     end

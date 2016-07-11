@@ -8,7 +8,7 @@ module Api::V1
       # Let external service know that we recieved the webhook
       head :accepted
 
-      event = EventService.new(id: webhooks_params[:id]).retrieve
+      event = ExternalEventService.new(id: webhooks_params[:id]).retrieve
       return unless event
 
       case event.type
@@ -41,7 +41,7 @@ module Api::V1
         billing = Billing.find_by external_customer_id: customer.id
         return unless billing && billing.external_subscription_id.nil?
 
-        SubscriptionService.new({
+        ExternalSubscriptionService.new({
           customer: billing.external_customer_id,
           plan: billing.customer.plan.external_plan_id
         }).create
