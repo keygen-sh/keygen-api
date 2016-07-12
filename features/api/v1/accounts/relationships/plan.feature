@@ -1,39 +1,39 @@
 @api/v1
 Feature: Account plan
 
-  Scenario: Admin changes their plan
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And I am an admin of account "bungie"
-    And I use my auth token
+  Background:
+    Given the following accounts exist:
+      | Name  | Subdomain |
+      | Test1 | test1     |
+      | Test2 | test2     |
     And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/relationships/plan" with the following:
+
+  Scenario: Admin changes their plan
+    Given the account "test1" has valid billing details
+    And I am an admin of account "test1"
+    And I use my auth token
+    When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
-      { "plan": "ElZw7Zko" }
+      { "plan": "$plan[0]" }
       """
     Then the response status should be "200"
 
   Scenario: Admin attempts to change to an invalid plan
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And I am an admin of account "bungie"
+    Given the account "test1" has valid billing details
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/relationships/plan" with the following:
+    When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
       { "plan": "invalid" }
       """
     Then the response status should be "422"
 
   Scenario: Admin attempts to change plan for another account
-    Given there exists an account "bungie"
-    And there exists another account "blizzard"
-    And the account "bungie" has valid billing details
-    And I am an admin of account "blizzard"
+    Given the account "test1" has valid billing details
+    And I am an admin of account "test2"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/relationships/plan" with the following:
+    When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
-      { "plan": "ElZw7Zko" }
+      { "plan": "$plan[0]" }
       """
     Then the response status should be "401"

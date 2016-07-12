@@ -1,14 +1,30 @@
 @api/v1
 Feature: Update user
 
-  Scenario: Admin updates a user for their account
-    Given there exists an account "bungie"
-    And I am an admin of account "bungie"
-    And I am on the subdomain "bungie"
-    And the current account has 1 "user"
+  Background:
+    Given the following accounts exist:
+      | Name  | Subdomain |
+      | Test1 | test1     |
+      | Test2 | test2     |
     And I send and accept JSON
+
+  Scenario: Admin updates themself
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
     And I use my auth token
-    When I send a PATCH request to "/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/$current" with the following:
+      """
+      { "user": { "name": "Mr. Robot" } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the name "Mr. Robot"
+
+  Scenario: Admin updates a user for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I use my auth token
+    When I send a PATCH request to "/users/$1" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -16,26 +32,21 @@ Feature: Update user
     And the JSON response should be a "user" with the name "Mr. Robot"
 
   Scenario: Admin attempts to update a user for another account
-    Given there exists an account "bungie"
-    And there exists another account "blizzard"
-    And I am an admin of account "blizzard"
-    But I am on the subdomain "bungie"
-    And I send and accept JSON
+    Given I am an admin of account "test2"
+    But I am on the subdomain "test1"
     And I use my auth token
-    When I send a PATCH request to "/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/$0" with the following:
       """
       { "user": { "name": "Updated name" } }
       """
     Then the response status should be "401"
 
   Scenario: Admin promotes a user to admin for their account
-    Given there exists an account "bungie"
-    And I am an admin of account "bungie"
-    And I am on the subdomain "bungie"
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
     And the current account has 2 "users"
-    And I send and accept JSON
     And I use my auth token
-    When I send a PATCH request to "/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/$2" with the following:
       """
       { "user": { "role": "admin" } }
       """
@@ -44,13 +55,11 @@ Feature: Update user
     And the current account should have 1 "user"
 
   Scenario: Admin updates a users meta data
-    Given there exists an account "bungie"
-    And I am an admin of account "bungie"
-    And I am on the subdomain "bungie"
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
     And the current account has 1 "user"
-    And I send and accept JSON
     And I use my auth token
-    When I send a PATCH request to "/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/$1" with the following:
       """
       { "user": { "meta": { "customerId": "cust_gV4dW9jrc" } } }
       """
@@ -61,26 +70,22 @@ Feature: Update user
       """
 
   Scenario: User attempts to update their password
-   Given there exists an account "bungie"
-   And I am on the subdomain "bungie"
+   Given I am on the subdomain "test1"
    And the current account has 3 "users"
-   And I am a user of account "bungie"
-   And I send and accept JSON
+   And I am a user of account "test1"
    And I use my auth token
-   When I send a PATCH request to "/users/dgKGxar7" with the following:
+   When I send a PATCH request to "/users/$current" with the following:
      """
      { "user": { "password": "newPassword" } }
      """
    Then the response status should be "400"
 
   Scenario: Admin attempts to update a users password
-    Given there exists an account "bungie"
-    And I am an admin of account "bungie"
-    And I am on the subdomain "bungie"
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
     And the current account has 3 "users"
-    And I send and accept JSON
     And I use my auth token
-    When I send a PATCH request to "/users/dgKGxar7" with the following:
+    When I send a PATCH request to "/users/$2" with the following:
       """
       { "user": { "password": "h4ck3d!" } }
       """
