@@ -1,19 +1,43 @@
 @api/v1
 Feature: Account subscription
 
+  Background:
+    Given the following accounts exist:
+      | Name  | Subdomain |
+      | Test1 | test1     |
+      | Test2 | test2     |
+    And I send and accept JSON
+
   Scenario: Admin pauses their active account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "active"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/pause"
+    When I send a POST request to "/accounts/$0/actions/pause"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      {
+        "status": "paused"
+      }
+      """
+
+  Scenario: Admin pauses their active account
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
+      """
+      {
+        "status": "active"
+      }
+      """
+    And I am an admin of account "test1"
+    And I use my auth token
+    When I send a POST request to "/accounts/$0/actions/pause"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -23,33 +47,29 @@ Feature: Account subscription
       """
 
   Scenario: Admin attempts to pause their paused account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "paused"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/pause"
+    When I send a POST request to "/accounts/$0/actions/pause"
     Then the response status should be "422"
 
   Scenario: Admin resumes their paused account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "paused"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/resume"
+    When I send a POST request to "/accounts/$0/actions/resume"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -59,33 +79,29 @@ Feature: Account subscription
       """
 
   Scenario: Admin attempts to resume their active account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "active"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/resume"
+    When I send a POST request to "/accounts/$0/actions/resume"
     Then the response status should be "422"
 
   Scenario: Admin cancels their account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "active"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/cancel"
+    When I send a POST request to "/accounts/$0/actions/cancel"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -95,64 +111,53 @@ Feature: Account subscription
       """
 
   Scenario: Admin attempts to cancel their canceled account
-    Given there exists an account "bungie"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "canceled"
       }
       """
-    And I am an admin of account "bungie"
+    And I am an admin of account "test1"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/cancel"
+    When I send a POST request to "/accounts/$0/actions/cancel"
     Then the response status should be "422"
 
   Scenario: Admin attempts to pause another account
-    Given there exists an account "bungie"
-    And there exists another account "blizzard"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "active"
       }
       """
-    And I am an admin of account "blizzard"
+    And I am an admin of account "test2"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/pause"
+    When I send a POST request to "/accounts/$0/actions/pause"
     Then the response status should be "401"
 
   Scenario: Admin attempts to resume another account
-    Given there exists an account "bungie"
-    And there exists another account "blizzard"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "paused"
       }
       """
-    And I am an admin of account "blizzard"
+    And I am an admin of account "test2"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/resume"
+    When I send a POST request to "/accounts/$0/actions/resume"
     Then the response status should be "401"
 
   Scenario: Admin attempts to cancel another account
-    Given there exists an account "bungie"
-    And there exists another account "blizzard"
-    And the account "bungie" has valid billing details
-    And the account "bungie" has the following attributes:
+    Given the account "test1" has valid billing details
+    And the account "test1" has the following attributes:
       """
       {
         "status": "active"
       }
       """
-    And I am an admin of account "blizzard"
+    And I am an admin of account "test2"
     And I use my auth token
-    And I send and accept JSON
-    When I send a POST request to "/accounts/eQ6Xobga/actions/cancel"
+    When I send a POST request to "/accounts/$0/actions/cancel"
     Then the response status should be "401"

@@ -1,14 +1,67 @@
 World Rack::Test::Methods
 
+# Matches:
+# $resource[0].attribute (where 0 is an index)
+# $resource.attribute (random resource)
 def parse_placeholders(str)
-  str.dup.scan /(\$\{([\.\w]+)\})/ do |pattern, match|
-    resource, attribute = match.to_s.split "."
-    value = resource.singularize
-              .underscore
-              .classify
-              .constantize
-              .first
-              .send attribute.underscore
+  str.dup.scan /(\$(\w+)(?:\[(\w+)\])?(?:\.(\w+))?)/ do |pattern, *matches|
+    resource, index, attribute = matches
+
+    attribute =
+      case attribute&.underscore
+      when nil
+        :hashid
+      when "hashid"
+        :id
+      else
+        attribute.underscore
+      end
+
+    value =
+      if @account
+        @account.send(resource)
+          .all
+          .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+          .send attribute
+      else
+        resource.singularize
+          .underscore
+          .classify
+          .constantize
+          .all
+          .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+          .send attribute
+      end
+
+    str.sub! pattern.to_s, value
+  end
+end
+
+# Matches:
+# resource/$current (current user or account)
+# resource/$0 (where 0 is a resource ID)
+def parse_path_placeholders(str)
+  str.dup.scan /(\w+)\/(\$(\w+))/ do |resource, pattern, index|
+    value =
+      case index
+      when "current"
+        instance_variable_get("@#{resource.singularize}").hashid
+      else
+        if @account
+          @account.send(resource)
+            .all
+            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            .hashid
+        else
+          resource.singularize
+            .underscore
+            .classify
+            .constantize
+            .all
+            .send(:[], index.to_i)
+            .hashid
+        end
+      end
 
     str.sub! pattern.to_s, value
   end
@@ -30,6 +83,11 @@ After do |s|
 
   # Tell Cucumber to quit if a scenario fails
   Cucumber.wants_to_quit = true if s.failed?
+end
+
+Given(/^the following (\w+) exist:$/) do |resource, table|
+  data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
+  data.each { |d| create resource.singularize, d }
 end
 
 Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
@@ -132,6 +190,7 @@ Given /^I have a payment token with an? "([^\"]*)" error$/ do |error|
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
+  parse_path_placeholders path
   if @account
     get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   else
@@ -140,6 +199,7 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
+  parse_path_placeholders path
   if @account
     post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   else
@@ -148,6 +208,7 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_path_placeholders path
   parse_placeholders body
   if @account
     post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
@@ -157,6 +218,7 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
 end
 
 When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_path_placeholders path
   parse_placeholders body
   if @account
     put "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
@@ -166,6 +228,7 @@ When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |pa
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
+  parse_path_placeholders path
   if @account
     delete "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
   else
