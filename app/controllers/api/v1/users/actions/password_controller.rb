@@ -8,6 +8,9 @@ module Api::V1::Users::Actions
     def update_password
       authorize @user
 
+      params.require :old_password
+      params.require :new_password
+
       if @user.try(:authenticate, params[:old_password])
         if @user.update(password: params[:new_password])
           render json: @user
@@ -24,13 +27,17 @@ module Api::V1::Users::Actions
     def reset_password
       skip_authorization
 
-      if @user.password_reset_token == params[:password_reset_token]
-        @user.reset_password_reset_token!
+      params.require :password_reset_token
+      params.require :new_password
 
-        if @user.password_reset_sent_at > 24.hours.ago
+      if @user.password_reset_token == params[:password_reset_token]
+
+        if @user.password_reset_sent_at < 24.hours.ago
           render_unauthorized detail: "is expired", source: {
-            pointer: "/data/attributes/passwordResetToken" }
-        elsif @user.update(password: params[:new_password])
+            pointer: "/data/attributes/passwordResetToken" } and return
+        end
+
+        if @user.update(password: params[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
           render json: @user
         else
           render_unprocessable_resource @user
