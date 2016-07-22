@@ -21,10 +21,10 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update_password?
-    user.admin? or record == user
+    record == user
   end
 
   def reset_password?
-    user.admin? or record == user
+    record == user
   end
 end
