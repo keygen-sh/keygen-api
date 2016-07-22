@@ -3,8 +3,9 @@ World Rack::Test::Methods
 # Matches:
 # $resource[0].attribute (where 0 is an index)
 # $resource.attribute (random resource)
+# $current.attribute (current user)
 def parse_placeholders(str)
-  str.dup.scan /(\$(\w+)(?:\[(\w+)\])?(?:\.(\w+))?)/ do |pattern, *matches|
+  str.dup.scan /(\$(\w+)(?:\[(\w+)\])?(?:\.([\w\.]+))?)/ do |pattern, *matches|
     resource, index, attribute = matches
 
     attribute =
@@ -18,22 +19,34 @@ def parse_placeholders(str)
       end
 
     value =
-      if @account
-        @account.send(resource)
-          .all
-          .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-          .send attribute
+      case resource
+      when "current"
+        @user.send attribute
+      when "time"
+        case attribute
+        when /(\d+)\.(\w+)\.(\w+)/
+          $1.to_i.send($2).send $3
+        when /now/, /current/
+          Time.current
+        end
       else
-        resource.singularize
-          .underscore
-          .classify
-          .constantize
-          .all
-          .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-          .send attribute
+        if @account
+          @account.send(resource)
+            .all
+            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            .send attribute
+        else
+          resource.singularize
+            .underscore
+            .classify
+            .constantize
+            .all
+            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            .send attribute
+        end
       end
 
-    str.sub! pattern.to_s, value
+    str.sub! pattern.to_s, value.to_s
   end
 end
 
@@ -132,11 +145,13 @@ Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
 end
 
 Given /^the account "([^\"]*)" has the following attributes:$/ do |subdomain, body|
+  parse_placeholders body
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
   Account.find_by(subdomain: subdomain).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
+  parse_placeholders body
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
   @user.update attributes
 end
