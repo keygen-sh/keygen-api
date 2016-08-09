@@ -311,3 +311,13 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   json = JSON.parse last_response.body
   assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
 end
+
+Then /^the account should be charged$/ do
+  json = JSON.parse last_response.body
+  assert !json["data"]["relationships"]["billing"]["data"].empty? rescue nil
+end
+
+Then /^the account should not be charged$/ do
+  json = JSON.parse last_response.body
+  assert json["data"]["relationships"]["billing"]["data"].empty? rescue nil
+end
