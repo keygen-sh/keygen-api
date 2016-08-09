@@ -45,6 +45,7 @@ module ReservedSubdomains
       key
       keys
       keygin
+      keygen
       log
       logs
       login
