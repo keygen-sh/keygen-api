@@ -13,7 +13,7 @@ Feature: Create account
         "account": {
           "subdomain": "google",
           "name": "Google",
-          "plan": "ElZw7Zko",
+          "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
           ],
@@ -25,6 +25,7 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the JSON response should be a "account" with the name "Google"
+    And the account should be charged
 
   Scenario: Anonymous creates an account with a "card declined" token error
     Given there exists 1 "plan"
@@ -47,6 +48,7 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
+    And the account should not be charged
 
   Scenario: Anonymous creates an account with a "missing" token error
     Given there exists 1 "plan"
@@ -69,6 +71,7 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
+    And the account should not be charged
 
   Scenario: Anonymous attempts to create an account without a plan
     Given there exists 1 "plan"
@@ -89,6 +92,7 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 error
+    And the account should not be charged
 
   Scenario: Anonymous attempts to create an account without billing info
     Given there exists 1 "plan"
@@ -107,6 +111,7 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
+    And the account should not be charged
 
   Scenario: Anonymous attempts to create an account without any admin users
     Given there exists 1 "plan"
@@ -125,6 +130,7 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 errors
+    And the account should not be charged
 
   Scenario: Anonymous attempts to create a duplicate account
     Given there exists an account "test1"
@@ -147,3 +153,4 @@ Feature: Create account
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 errors
+    And the account should not be charged
