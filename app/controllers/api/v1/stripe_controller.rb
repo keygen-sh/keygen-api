@@ -1,14 +1,14 @@
 module Api::V1
   class StripeController < Api::V1::BaseController
 
-    # POST /webhooks
+    # POST /stripe
     def create
       skip_authorization
 
       # Let external service know that we recieved the webhook
       head :accepted
 
-      event = ExternalEventService.new(id: webhooks_params[:id]).retrieve
+      event = ExternalEventService.new(id: stripe_params[:id]).retrieve
       return unless event
 
       case event.type
@@ -59,7 +59,7 @@ module Api::V1
 
     private
 
-    def webhooks_params
+    def stripe_params
       params
     end
   end
