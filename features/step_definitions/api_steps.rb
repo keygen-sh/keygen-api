@@ -33,6 +33,7 @@ def parse_placeholders(str)
         if @account
           @account.send(resource)
             .all
+            .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             .send attribute
         else
@@ -41,6 +42,7 @@ def parse_placeholders(str)
             .classify
             .constantize
             .all
+            .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             .send attribute
         end
@@ -63,6 +65,7 @@ def parse_path_placeholders(str)
         if @account
           @account.send(resource)
             .all
+            .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             .hashid
         else
@@ -71,6 +74,7 @@ def parse_path_placeholders(str)
             .classify
             .constantize
             .all
+            .sort
             .send(:[], index.to_i)
             .hashid
         end
@@ -252,7 +256,6 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
-  # puts last_response.status, last_response.body
   assert_equal status.to_i, last_response.status
 end
 
