@@ -1,5 +1,15 @@
 class AccountSerializer < BaseSerializer
-  attributes :id, :name, :subdomain, :status, :activated, :created, :updated
+  type "accounts"
+
+  attributes [
+    :id,
+    :name,
+    :subdomain,
+    :status,
+    :activated,
+    :created,
+    :updated
+  ]
 
   belongs_to :plan
   has_many :users
@@ -7,16 +17,4 @@ class AccountSerializer < BaseSerializer
   has_many :policies, through: :products
   has_many :licenses, through: :policies
   has_one :billing, as: :customer
-
-  def id
-    object.hashid
-  end
-
-  def created
-    object.created_at
-  end
-
-  def updated
-    object.updated_at
-  end
 end
