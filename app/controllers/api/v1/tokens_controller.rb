@@ -5,7 +5,7 @@ module Api::V1
 
     before_action :scope_by_subdomain!
 
-    def login
+    def request_tokens
       skip_authorization
 
       authenticate_with_http_basic do |email, password|
