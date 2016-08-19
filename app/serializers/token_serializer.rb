@@ -1,7 +1,8 @@
 class TokenSerializer < BaseSerializer
-  attributes :auth_token, :reset_auth_token
+  type "tokens"
 
-  def id
-    object.hashid
-  end
+  attributes [
+    :auth_token,
+    :reset_auth_token
+  ]
 end
