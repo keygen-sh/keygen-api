@@ -26,7 +26,7 @@ module Api::V1
 
     # POST /policies
     def create
-      product = @current_account.products.find_by_hashid(policy_params[:product])
+      product = @current_account.products.find_by_hashid policy_params[:product]
 
       @policy = @current_account.policies.new policy_params.merge(product: product)
       authorize @policy
