@@ -154,3 +154,26 @@ Feature: Create account
     Then the response status should be "422"
     And the JSON response should be an array of 1 errors
     And the account should not be charged
+
+  Scenario: Anonymous attempts to use a reserved subdomain
+    Given there exists an account "test1"
+    And there exists 1 "plan"
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "account": {
+          "subdomain": "test",
+          "name": "Facebook",
+          "plan": "$plan[0]",
+          "admins": [
+            { "name": "Mark Zuckerburg", "email": "mzuckerberk@keygin.io", "password": "facebook" }
+          ],
+          "billing": {
+            "token": "some_token"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the account should not be charged
