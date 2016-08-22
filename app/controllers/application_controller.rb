@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
 
-  rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
-  rescue_from Pundit::NotDefinedError, with: :render_not_found
+  rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
+  rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }
 
   def index
     skip_authorization
@@ -24,7 +24,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_forbidden(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Access denied",
@@ -35,7 +34,6 @@ class ApplicationController < ActionController::Base
 
   def render_unauthorized(opts = {})
     self.headers["WWW-Authenticate"] = %(Token realm="Application")
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Unauthorized",
@@ -45,7 +43,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_unprocessable_entity(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Unprocessable entity",
@@ -55,7 +52,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_not_found(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Not found",
@@ -65,7 +61,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_bad_request(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Bad request",
@@ -75,7 +70,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_conflict(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Conflict",
@@ -85,7 +79,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_internal_server_error(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Internal server error",
@@ -95,7 +88,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_service_unavailable(opts = {})
-    opts = {} unless opts.is_a? Hash
     render json: {
       errors: [{
         title: "Service unavailable",
