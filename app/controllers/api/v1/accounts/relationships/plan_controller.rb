@@ -5,6 +5,8 @@ module Api::V1::Accounts::Relationships
 
     # POST /accounts/1/relationships/plan
     def create
+      render_not_found and return unless @account
+
       authorize @account
 
       @plan = Plan.find_by_hashid plan_params
@@ -33,7 +35,6 @@ module Api::V1::Accounts::Relationships
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
-      @account || render_not_found
     end
 
     def plan_params

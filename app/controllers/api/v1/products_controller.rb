@@ -18,6 +18,8 @@ module Api::V1
 
     # GET /products/1
     def show
+      render_not_found and return unless @product
+
       authorize @product
 
       render json: @product
@@ -37,6 +39,8 @@ module Api::V1
 
     # PATCH/PUT /products/1
     def update
+      render_not_found and return unless @product
+
       authorize @product
 
       if @product.update(product_params)
@@ -48,6 +52,8 @@ module Api::V1
 
     # DELETE /products/1
     def destroy
+      render_not_found and return unless @product
+
       authorize @product
 
       @product.destroy
@@ -58,7 +64,6 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_product
       @product = @current_account.products.find_by_hashid params[:id]
-      @product || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.

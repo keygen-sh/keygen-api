@@ -4,6 +4,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/activate
     def activate
+      render_not_found and return unless @account
+
       skip_authorization
 
       if @account.activation_token == params[:activation_token]
@@ -28,7 +30,6 @@ module Api::V1::Accounts::Actions
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
-      @account || render_not_found
     end
   end
 end

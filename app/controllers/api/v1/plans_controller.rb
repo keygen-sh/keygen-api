@@ -15,6 +15,8 @@ module Api::V1
 
     # GET /plans/1
     def show
+      render_not_found and return unless @plan
+
       authorize @plan
 
       render json: @plan
@@ -34,6 +36,8 @@ module Api::V1
 
     # PATCH/PUT /plans/1
     def update
+      render_not_found and return unless @plan
+
       authorize @plan
 
       if @plan.update(plan_params)
@@ -45,6 +49,8 @@ module Api::V1
 
     # DELETE /plans/1
     def destroy
+      render_not_found and return unless @plan
+
       authorize @plan
 
       @plan.destroy
@@ -55,7 +61,6 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_plan
       @plan = Plan.find_by_hashid params[:id]
-      @plan || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.

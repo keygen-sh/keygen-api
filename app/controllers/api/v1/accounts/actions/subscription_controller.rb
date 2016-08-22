@@ -5,6 +5,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/pause
     def pause
+      render_not_found and return unless @account
+
       authorize @account
 
       if @account.status == "paused"
@@ -30,6 +32,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/resume
     def resume
+      render_not_found and return unless @account
+
       authorize @account
 
       if @account.status == "active"
@@ -64,6 +68,8 @@ module Api::V1::Accounts::Actions
 
     # POST /accounts/1/actions/cancel
     def cancel
+      render_not_found and return unless @account
+
       authorize @account
 
       if @account.status == "canceled"
@@ -91,7 +97,6 @@ module Api::V1::Accounts::Actions
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
-      @account || render_not_found
     end
   end
 end
