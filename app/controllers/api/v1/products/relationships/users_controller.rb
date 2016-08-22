@@ -7,6 +7,8 @@ module Api::V1::Products::Relationships
 
     # POST /products/1/relationships/users
     def create
+      render_not_found and return unless @product
+
       authorize @product
 
       @user = @current_account.users.find_by_hashid user_params
@@ -24,6 +26,8 @@ module Api::V1::Products::Relationships
 
     # DELETE /products/1/relationships/users/2
     def destroy
+      render_not_found and return unless @product
+
       authorize @product
 
       @product.users.delete @user if @product.users.include? @user
@@ -33,7 +37,6 @@ module Api::V1::Products::Relationships
 
     def set_product
       @product = @current_account.products.find_by_hashid params[:product_id]
-      @product || render_not_found
     end
 
     def set_user

@@ -7,6 +7,8 @@ module Api::V1::Licenses::Relationships
 
     # POST /licenses/1/relationships/machines
     def create
+      render_not_found and return unless @license
+
       authorize @license
 
       @machine = machine_params.to_h
@@ -28,6 +30,8 @@ module Api::V1::Licenses::Relationships
 
     # DELETE /licenses/1/relationships/machines/2
     def destroy
+      render_not_found and return unless @license
+
       authorize @license
 
       @license.active_machines.reject! { |m| m[:fingerprint] == @machine }
@@ -38,7 +42,6 @@ module Api::V1::Licenses::Relationships
 
     def set_license
       @license = @current_account.licenses.find_by_hashid params[:license_id]
-      @license || render_not_found
     end
 
     def set_machine

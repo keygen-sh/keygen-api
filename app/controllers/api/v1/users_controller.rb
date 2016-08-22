@@ -19,6 +19,8 @@ module Api::V1
 
     # GET /users/1
     def show
+      render_not_found and return unless @user
+
       authorize @user
 
       render json: @user
@@ -38,6 +40,8 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
+      render_not_found and return unless @user
+
       authorize @user
 
       if @user.update(user_params)
@@ -49,6 +53,8 @@ module Api::V1
 
     # DELETE /users/1
     def destroy
+      render_not_found and return unless @user
+
       authorize @user
 
       @user.destroy
@@ -59,7 +65,6 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = @current_account.users.find_by_hashid params[:id]
-      @user || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.

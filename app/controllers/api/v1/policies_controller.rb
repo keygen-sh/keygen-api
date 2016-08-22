@@ -17,6 +17,8 @@ module Api::V1
 
     # GET /policies/1
     def show
+      render_not_found and return unless @policy
+
       authorize @policy
 
       render json: @policy
@@ -38,6 +40,8 @@ module Api::V1
 
     # PATCH/PUT /policies/1
     def update
+      render_not_found and return unless @policy
+
       authorize @policy
 
       if @policy.update(policy_params)
@@ -49,6 +53,8 @@ module Api::V1
 
     # DELETE /policies/1
     def destroy
+      render_not_found and return unless @policy
+
       authorize @policy
 
       @policy.destroy
@@ -59,7 +65,6 @@ module Api::V1
     # Use callbacks to share common setup or constraints between actions.
     def set_policy
       @policy = @current_account.policies.find_by_hashid params[:id]
-      @policy || render_not_found
     end
 
     # Only allow a trusted parameter "white list" through.

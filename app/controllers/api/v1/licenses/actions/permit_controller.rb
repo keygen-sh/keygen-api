@@ -6,6 +6,8 @@ module Api::V1::Licenses::Actions
 
     # POST /licenses/1/actions/renew
     def renew
+      render_not_found and return unless @license
+
       authorize @license
 
       if @license.policy.duration.nil?
@@ -24,6 +26,8 @@ module Api::V1::Licenses::Actions
 
     # POST /licenses/1/actions/revoke
     def revoke
+      render_not_found and return unless @license
+
       authorize @license
 
       @license.destroy
@@ -31,6 +35,8 @@ module Api::V1::Licenses::Actions
 
     # GET /licenses/1/actions/verify
     def verify
+      render_not_found and return unless @license
+
       authorize @license
 
       render_meta is_valid: @license.license_valid?
@@ -40,7 +46,6 @@ module Api::V1::Licenses::Actions
 
     def set_license
       @license = @current_account.licenses.find_by_hashid params[:license_id]
-      @license || render_not_found
     end
   end
 end

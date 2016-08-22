@@ -7,6 +7,8 @@ module Api::V1::Policies::Relationships
 
     # POST /policies/1/relationships/pool
     def create
+      render_not_found and return unless @policy
+
       authorize @policy
       @license = license_params.to_h
 
@@ -21,6 +23,8 @@ module Api::V1::Policies::Relationships
 
     # DELETE /policies/1/relationships/pool/2
     def destroy
+      render_not_found and return unless @policy
+
       authorize @policy
 
       if @policy.pool.include? @license
@@ -36,7 +40,6 @@ module Api::V1::Policies::Relationships
 
     def set_policy
       @policy = @current_account.policies.find_by_hashid params[:policy_id]
-      @policy || render_not_found
     end
 
     def set_license
