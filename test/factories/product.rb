@@ -8,5 +8,6 @@ FactoryGirl.define do
         Faker::Hacker.abbreviation
       ]
     }
+    account
   end
 end
