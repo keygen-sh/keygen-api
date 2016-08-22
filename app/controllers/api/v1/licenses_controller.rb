@@ -27,8 +27,8 @@ module Api::V1
 
     # POST /licenses
     def create
-      policy = @current_account.policies.find_by_hashid(license_params[:policy])
-      user = @current_account.users.find_by_hashid(license_params[:user])
+      policy = @current_account.policies.find_by_hashid license_params[:policy]
+      user = @current_account.users.find_by_hashid license_params[:user]
 
       @license = @current_account.licenses.new license_params.merge(policy: policy, user: user)
       authorize @license
