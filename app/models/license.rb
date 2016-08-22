@@ -46,7 +46,7 @@ class License < ApplicationRecord
 
   def set_license_key
     if policy.pool?
-      license_key = policy.pop
+      license_key = policy.pool_pop
 
       if license_key
         self.key = license_key
