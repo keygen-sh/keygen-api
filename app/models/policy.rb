@@ -21,34 +21,28 @@ class Policy < ApplicationRecord
   end
 
   def pool_pop
-    begin
-      return nil if pool.empty?
-      key = pool.pop
-      self.save!
-      return key
-    rescue ActiveRecord::StaleObjectError
-      self.reload
-      retry
-    end
+    return nil if pool.empty?
+    key = pool.pop
+    self.save!
+    return key
+  rescue ActiveRecord::StaleObjectError
+    self.reload
+    retry
   end
 
   def pool_delete(key)
-    begin
-      pool.delete key
-      self.save!
-    rescue ActiveRecord::StaleObjectError
-      self.reload
-      retry
-    end
+    pool.delete key
+    self.save!
+  rescue ActiveRecord::StaleObjectError
+    self.reload
+    retry
   end
 
   def pool_push(key)
-    begin
-      pool << key
-      self.save!
-    rescue ActiveRecord::StaleObjectError
-      self.reload
-      retry
-    end
+    pool << key
+    self.save!
+  rescue ActiveRecord::StaleObjectError
+    self.reload
+    retry
   end
 end
