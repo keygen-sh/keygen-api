@@ -84,6 +84,17 @@ def parse_path_placeholders(str)
   end
 end
 
+# def association_plurality(resource, association)
+#   case resource.reflect_on_all_associations.select { |a| a.name.to_s.singularize == association.singularize }.first
+#   when ActiveRecord::Reflection::BelongsToReflection
+#     association.singularize
+#   when ActiveRecord::Reflection::HasOneReflection
+#     association.singularize
+#   when ActiveRecord::Reflection::HasManyReflection
+#     association.pluralize
+#   end
+# end
+
 Before "@api/v1" do
   @api_version = "v1"
 end
@@ -188,6 +199,12 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   }
 end
 
+Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
+  @account.send(resource).update_all(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
+end
+
 Given /^I have a valid payment token/ do
 end
 
@@ -256,6 +273,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
+  # puts last_response.status, last_response.body
   assert_equal status.to_i, last_response.status
 end
 
