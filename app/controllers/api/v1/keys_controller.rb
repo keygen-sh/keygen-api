@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /keys
     def index
-      @keys = apply_scopes(Keys).all
+      @keys = apply_scopes(Key).all
       authorize @keys
 
       render json: @keys
