@@ -1,5 +1,5 @@
 class BillingSerializer < BaseSerializer
-  type "billings"
+  type :billings
 
   attributes [
     :id,

@@ -1,6 +1,6 @@
 class ProductSerializer < BaseSerializer
-  type "products"
-  
+  type :products
+
   attributes [
     :id,
     :name,
