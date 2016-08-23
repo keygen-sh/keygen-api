@@ -2,8 +2,7 @@ class Policy < ApplicationRecord
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
-
-  serialize :pool, Array
+  has_many :pools, dependent: :destroy
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
@@ -20,27 +19,11 @@ class Policy < ApplicationRecord
     use_pool
   end
 
-  def pool_pop
-    return nil if pool.empty?
-    key = pool.pop
+  def pop!
+    return nil if pools.empty?
+    key = pools.first.destroy
     self.save!
     return key
-  rescue ActiveRecord::StaleObjectError
-    self.reload
-    retry
-  end
-
-  def pool_delete(key)
-    pool.delete key
-    self.save!
-  rescue ActiveRecord::StaleObjectError
-    self.reload
-    retry
-  end
-
-  def pool_push(key)
-    pool << key
-    self.save!
   rescue ActiveRecord::StaleObjectError
     self.reload
     retry

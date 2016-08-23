@@ -8,15 +8,21 @@ Rails.application.routes.draw do
     namespace :v1, constraints: lambda { |r| json_request?(r) } do
       resources :stripe, only: [:create]
 
-      def relationship(resource, opts = {})
-        resources(resource.to_s.dasherize, {
-          controller: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
-        }.merge(opts))
+      def relationship(verb, resource, opts = {})
+        case verb
+        when :resource
+          resources(resource.to_s.dasherize, {
+            to: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
+          }.merge(opts))
+        else
+          send(verb, resource.to_s.dasherize, {
+            to: "/api/v1/#{parent_resource.name}/relationships/#{opts[:to]}"
+          })
+        end
       end
 
       def action(verb, action, opts = {})
         send(verb, action.to_s.dasherize, {
-          controller: "/api/v1/#{parent_resource.name}/actions/actions",
           to: "/api/v1/#{parent_resource.name}/actions/#{opts[:to]}"
         })
       end
@@ -25,7 +31,7 @@ Rails.application.routes.draw do
         resources :plans
         resources :accounts do
           namespace :relationships do
-            relationship :plan, only: [:create]
+            relationship :resource, :plan, only: [:create]
           end
           namespace :actions do
             action :post, :activate, to: "activation#activate"
@@ -49,22 +55,21 @@ Rails.application.routes.draw do
         end
         resources :policies do
           namespace :relationships do
-            relationship :pool, only: [:create, :destroy]
+            relationship :delete, :pool, to: "pool#pop"
           end
         end
+        resources :pools
         resources :licenses do
-          namespace :relationships do
-            relationship :machines, only: [:create, :destroy]
-          end
           namespace :actions do
             action :get, :verify, to: "permits#verify"
             action :post, :revoke, to: "permits#revoke"
             action :post, :renew, to: "permits#renew"
           end
         end
+        resources :machines
         resources :products do |r|
           namespace :relationships do
-            relationship :users, only: [:create, :destroy]
+            relationship :resource, :users, only: [:create, :destroy]
           end
         end
       end

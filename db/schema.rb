@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160625172108) do
+ActiveRecord::Schema.define(version: 20160823150843) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
@@ -90,6 +93,14 @@ ActiveRecord::Schema.define(version: 20160625172108) do
     t.integer  "max_activations"
   end
 
+  create_table "pools", force: :cascade do |t|
+    t.string   "key"
+    t.integer  "policy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "account_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string   "name"
     t.string   "platforms"
@@ -101,9 +112,9 @@ ActiveRecord::Schema.define(version: 20160625172108) do
   create_table "products_users", force: :cascade do |t|
     t.integer "product_id"
     t.integer "user_id"
-    t.index ["product_id"], name: "index_products_users_on_product_id"
-    t.index ["user_id", "product_id"], name: "index_products_users_on_user_id_and_product_id", unique: true
-    t.index ["user_id"], name: "index_products_users_on_user_id"
+    t.index ["product_id"], name: "index_products_users_on_product_id", using: :btree
+    t.index ["user_id", "product_id"], name: "index_products_users_on_user_id_and_product_id", unique: true, using: :btree
+    t.index ["user_id"], name: "index_products_users_on_user_id", using: :btree
   end
 
   create_table "users", force: :cascade do |t|
