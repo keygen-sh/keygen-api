@@ -45,7 +45,20 @@ ActiveRecord::Schema.define(version: 20160625172108) do
     t.integer  "policy_id"
     t.string   "active_machines"
     t.integer  "account_id"
-    t.index ["user_id"], name: "index_licenses_on_user_id"
+    t.index ["user_id"], name: "index_licenses_on_user_id", using: :btree
+  end
+
+  create_table "machines", force: :cascade do |t|
+    t.string   "fingerprint"
+    t.string   "ip"
+    t.string   "hostname"
+    t.string   "platform"
+    t.integer  "account_id"
+    t.integer  "license_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.string   "name"
+    t.integer  "user_id"
   end
 
   create_table "plans", force: :cascade do |t|

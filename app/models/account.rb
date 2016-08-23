@@ -8,6 +8,7 @@ class Account < ApplicationRecord
   has_many :products, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :licenses, dependent: :destroy
+  has_many :machines, dependent: :destroy
   has_one :billing, as: :customer, dependent: :destroy
 
   accepts_nested_attributes_for :users
