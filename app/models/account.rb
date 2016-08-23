@@ -4,6 +4,7 @@ class Account < ApplicationRecord
   include Activation
 
   belongs_to :plan
+  has_many :tokens, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy
   has_many :policies, dependent: :destroy

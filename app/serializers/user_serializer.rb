@@ -14,5 +14,5 @@ class UserSerializer < BaseSerializer
   belongs_to :account
   has_many :products
   has_many :licenses
-  # has_one :billing
+  has_one :token
 end

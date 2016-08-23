@@ -1,20 +1,20 @@
 class User < ApplicationRecord
   include PasswordReset
-  include AuthToken
+  # include AuthToken
 
   has_secure_password
 
   belongs_to :account
   has_and_belongs_to_many :products
   has_many :licenses, dependent: :destroy
-  # has_one :billing, as: :customer
+  has_one :token, as: :bearer, dependent: :destroy
 
   serialize :meta, Hash
 
+  before_create -> { self.token = Token.new(account: self.account, bearer: self) }
   before_save -> { self.email = email.downcase }
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
-  # validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :email,
     presence: true,
