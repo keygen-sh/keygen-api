@@ -103,6 +103,40 @@ Feature: License permits
     And I am on the subdomain "test1"
     And the current account has 1 "product"
     And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "strict": false
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And I use my auth token
+    When I send a GET request to "/licenses/$0/actions/verify"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "isValid": true }
+      """
+
+  Scenario: Admin verifies a strict license that has not been used
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "strict": true
+      }
+      """
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
