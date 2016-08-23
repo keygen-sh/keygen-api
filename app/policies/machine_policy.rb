@@ -9,7 +9,7 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
-    user.admin?
+    user.admin? or record.user == user
   end
 
   def update?
