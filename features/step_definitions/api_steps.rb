@@ -26,6 +26,8 @@ def parse_placeholders(str)
         case attribute
         when /(\d+)\.(\w+)\.(\w+)/
           $1.to_i.send($2).send $3
+        when /(\d+)\.(\w+)/
+          $1.to_i.send $2
         when /now/, /current/
           Time.current
         end
