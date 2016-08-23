@@ -20,7 +20,7 @@ module Api::V1::Accounts::Relationships
         end
       else
         render_unprocessable_entity detail: "must exist", source: {
-          pointer: "/data/relationships/billing" }
+          pointer: "/data/attributes/billing" }
       end
     end
 

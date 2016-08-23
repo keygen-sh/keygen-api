@@ -26,7 +26,7 @@ module Api::V1::Accounts::Actions
         end
       else
         render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/relationships/billing" }
+          pointer: "/data/attributes/billing" }
       end
     end
 
@@ -62,7 +62,7 @@ module Api::V1::Accounts::Actions
         end
       else
         render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/relationships/billing" }
+          pointer: "/data/attributes/billing" }
       end
     end
 
@@ -89,7 +89,7 @@ module Api::V1::Accounts::Actions
         end
       else
         render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/relationships/billing" }
+          pointer: "/data/attributes/billing" }
       end
     end
 

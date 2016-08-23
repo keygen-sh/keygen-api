@@ -16,7 +16,7 @@ module Api::V1::Licenses::Relationships
       # TODO: Make sure they don't go over the policy's max_activations
       if @license.active_machines.include? @machine
         render_conflict detail: "already exists", source: {
-          pointer: "/data/relationships/machines" }
+          pointer: "/data/attributes/machines" }
       else
         @license.active_machines << @machine
 
