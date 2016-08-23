@@ -106,13 +106,16 @@ module Api::V1
         schema = params.require(:account).tap do |param|
           additional = {}
           permits = []
+
           permits << :name
           permits << :subdomain
+
           if action_name == "create"
             permits << :plan
             additional.merge! admins: [[:name, :email, :password]]
             additional.merge! billing: [:token]
           end
+
           param.permit *permits, additional
         end.to_unsafe_hash
 
