@@ -1,4 +1,4 @@
-class PolicyPolicy < ApplicationPolicy
+class PoolPolicy < ApplicationPolicy
 
   def index?
     user.admin?
@@ -17,10 +17,6 @@ class PolicyPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.admin?
-  end
-
-  def pop?
     user.admin?
   end
 end

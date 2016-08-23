@@ -31,3 +31,75 @@ Plan.create!([{
   max_licenses: 25000,
   max_policies: 25
 }])
+
+billing = Billing.create!({
+  external_customer_id: "cust_id",
+  external_status: "active"
+})
+
+account = Account.create!({
+  name: "Apptacular",
+  subdomain: "apptacular",
+  plan: Plan.first,
+  billing: billing,
+  users_attributes: [{
+    name: "Admin",
+    email: "admin@keygin.io",
+    password: "password"
+  }]
+})
+
+product = account.products.create!({
+  name: "Apptastic"
+})
+
+policy = account.policies.create!({
+  name: "Premium Add-On",
+  price: 199,
+  product: product,
+  max_activations: 5,
+  floating: true,
+  duration: 2.weeks
+})
+
+account.pools.create!({
+  key: SecureRandom.hex.scan(/.{4}/).join("-"),
+  policy: policy
+})
+account.pools.create!({
+  key: SecureRandom.hex.scan(/.{4}/).join("-"),
+  policy: policy
+})
+account.pools.create!({
+  key: SecureRandom.hex.scan(/.{4}/).join("-"),
+  policy: policy
+})
+
+user = account.users.create!({
+  name: "User",
+  email: "user@keygin.io",
+  password: "password",
+  products: [product]
+})
+
+license = account.licenses.create!({
+  key: SecureRandom.hex,
+  user: user,
+  policy: policy
+})
+
+account.machines.create!({
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
+  license: license,
+  user: user
+})
+account.machines.create!({
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
+  license: license,
+  user: user
+})
+account.machines.create!({
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
+  license: license,
+  user: user
+})
