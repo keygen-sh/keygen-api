@@ -17,7 +17,7 @@ module Api::V1::Licenses::Actions
             pointer: "/data/attributes/expiry"
           }
         })
-      elsif @license.update(expiry: Time.now + @license.policy.duration)
+      elsif @license.update(expiry: @license.expiry + @license.policy.duration)
         render json: @license
       else
         render_unprocessable_resource @license
