@@ -9,7 +9,7 @@ class PolicySerializer < BaseSerializer
     :strict,
     :recurring,
     :floating,
-    :max_activations,
+    :max_machines,
     :use_pool,
     :created,
     :updated

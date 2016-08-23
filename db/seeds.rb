@@ -57,7 +57,7 @@ policy = account.policies.create!({
   name: "Premium Add-On",
   price: 199,
   product: product,
-  max_activations: 5,
+  max_machines: 5,
   floating: true,
   duration: 2.weeks
 })

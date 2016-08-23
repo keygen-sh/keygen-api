@@ -77,7 +77,7 @@ Feature: License permits
     And all "policies" have the following attributes:
       """
       {
-        "maxActivations": 1,
+        "maxMachines": 1,
         "strict": true
       }
       """
@@ -113,7 +113,7 @@ Feature: License permits
     And all "policies" have the following attributes:
       """
       {
-        "maxActivations": 5,
+        "maxMachines": 5,
         "strict": true
       }
       """
@@ -149,7 +149,7 @@ Feature: License permits
     And all "policies" have the following attributes:
       """
       {
-        "maxActivations": 1,
+        "maxMachines": 1,
         "strict": false
       }
       """
