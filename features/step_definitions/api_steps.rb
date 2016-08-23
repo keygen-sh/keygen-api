@@ -110,7 +110,10 @@ After do |s|
   StripeMock.stop
 
   # Tell Cucumber to quit if a scenario fails
-  Cucumber.wants_to_quit = true if s.failed?
+  if s.failed?
+    puts last_response.status, last_response.body
+    Cucumber.wants_to_quit = true
+  end
 end
 
 Given(/^the following (\w+) exist:$/) do |resource, table|
@@ -273,7 +276,6 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
-  # puts last_response.status, last_response.body
   assert_equal status.to_i, last_response.status
 end
 
