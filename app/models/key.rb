@@ -1,4 +1,4 @@
-class Pool < ApplicationRecord
+class Key < ApplicationRecord
   belongs_to :account
   belongs_to :policy
 

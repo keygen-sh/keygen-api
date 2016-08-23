@@ -1,4 +1,4 @@
-class PoolPolicy < ApplicationPolicy
+class KeyPolicy < ApplicationPolicy
 
   def index?
     user.admin?

@@ -45,10 +45,10 @@ class License < ApplicationRecord
 
   def set_license_key
     if policy.pool?
-      if license_key = policy.pool_pop
-        self.key = license_key
+      if item = policy.pop!
+        self.key = item.key
       else
-        errors.add :policy, "license pool is empty"
+        errors.add :policy, "pool is empty"
       end
     else
       self.key = generate_token_for(:license, :key).scan(/.{4}/).join "-"

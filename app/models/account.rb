@@ -7,7 +7,7 @@ class Account < ApplicationRecord
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy
   has_many :policies, dependent: :destroy
-  has_many :pools, dependent: :destroy
+  has_many :keys, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :machines, dependent: :destroy
   has_one :billing, as: :customer, dependent: :destroy

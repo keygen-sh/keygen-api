@@ -62,15 +62,15 @@ policy = account.policies.create!({
   duration: 2.weeks
 })
 
-account.pools.create!({
+account.keys.create!({
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
 })
-account.pools.create!({
+account.keys.create!({
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
 })
-account.pools.create!({
+account.keys.create!({
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
 })
