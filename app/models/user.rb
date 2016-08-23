@@ -1,6 +1,5 @@
 class User < ApplicationRecord
   include PasswordReset
-  # include AuthToken
 
   has_secure_password
 
