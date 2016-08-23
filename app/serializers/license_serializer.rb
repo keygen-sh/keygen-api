@@ -1,15 +1,15 @@
 class LicenseSerializer < BaseSerializer
-  type "licenses"
+  type :licenses
 
   attributes [
     :id,
     :key,
     :expiry,
-    :active_machines,
     :created,
     :updated
   ]
 
   belongs_to :user
   belongs_to :policy
+  has_many :machines
 end

@@ -2,8 +2,7 @@ class License < ApplicationRecord
   belongs_to :account
   belongs_to :user
   belongs_to :policy
-
-  serialize :active_machines, Array
+  has_many :machines, dependent: :destroy
 
   before_validation :set_license_key, on: :create
   before_validation :set_expiry, on: :create
@@ -15,11 +14,11 @@ class License < ApplicationRecord
   validates :policy, presence: { message: "must exist" }, uniqueness: { scope: :user_id, message: "user already has a license with this policy" }
 
   validate do
-    errors.add :active_machines, "count has reached maximum allowed by policy" if active_machines.size > policy.max_activations
+    errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_activations
   end
 
   validates :key, presence: true, blank: false,
-    uniqueness: { scope: :policy_id }
+    uniqueness: { case_sensitive: false }
 
   scope :policy, -> (id) {
     where policy: Policy.find_by_hashid(id)
