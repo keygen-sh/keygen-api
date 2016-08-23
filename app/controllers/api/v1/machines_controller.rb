@@ -5,6 +5,7 @@ module Api::V1
     has_scope :page, type: :hash
 
     before_action :scope_by_subdomain!
+    before_action :authenticate_with_token!
     before_action :set_machine, only: [:show, :update, :destroy]
 
     # GET /machines
