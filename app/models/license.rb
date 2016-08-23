@@ -14,7 +14,7 @@ class License < ApplicationRecord
   validates :policy, presence: { message: "must exist" }, uniqueness: { scope: :user_id, message: "user already has a license with this policy" }
 
   validate do
-    errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_activations
+    errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_machines
   end
 
   validates :key, presence: true, blank: false,
@@ -38,7 +38,7 @@ class License < ApplicationRecord
     # Check if license policy allows floating and if not, should have single activation
     return true if !policy.floating && machines.count == 1
     # Assume floating, should have at least 1 activation but no more than policy allows
-    return true if policy.floating && machines.count >= 1 && machines.count <= policy.max_activations
+    return true if policy.floating && machines.count >= 1 && machines.count <= policy.max_machines
     # Otherwise, assume invalid
     return false
   end
