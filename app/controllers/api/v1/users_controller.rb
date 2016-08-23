@@ -62,22 +62,43 @@ module Api::V1
 
     private
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_user
       @user = @current_account.users.find_by_hashid params[:id]
     end
 
-    # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit [
-        :name,
-        :email,
-        (:password if action_name == "create"),
-        (:role if @current_user&.admin?)
-      ].compact, {
-        # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
-        meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
-      }
+      permitted_params
+    end
+
+    attr_accessor :permitted_params
+
+    def permitted_params
+      @permitted_params ||= Proc.new do
+        schema = params.require(:user).tap do |param|
+          additional = {}
+          permits = []
+
+          permits << :name
+          permits << :email
+
+          if action_name == "create"
+            permits << :password
+          end
+
+          if @current_user&.admin?
+            permits << :role
+          end
+
+          # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
+          additional.merge!({
+            meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
+          })
+
+          param.permit *permits, additional
+        end.to_unsafe_hash
+
+        schema
+      end.call
     end
   end
 end
