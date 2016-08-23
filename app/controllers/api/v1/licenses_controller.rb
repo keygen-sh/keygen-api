@@ -64,14 +64,35 @@ module Api::V1
 
     private
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_license
       @license = @current_account.licenses.find_by_hashid params[:id]
     end
 
-    # Only allow a trusted parameter "white list" through.
     def license_params
-      params.require(:license).permit :policy, :user, :active_machines => []
+      permitted_params
+    end
+
+    attr_accessor :permitted_params
+
+    def permitted_params
+      @permitted_params ||= Proc.new do
+        schema = params.require(:license).tap do |param|
+          permits = []
+
+          case action_name
+          when "create"
+            permits << :user
+            permits << :policy
+          when "update"
+            permits << :expiry
+            permits << :key
+          end
+
+          param.permit *permits
+        end.to_unsafe_hash
+
+        schema
+      end.call
     end
   end
 end
