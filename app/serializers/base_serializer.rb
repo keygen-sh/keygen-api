@@ -18,6 +18,6 @@ class BaseSerializer < ActiveModel::Serializer
   attr_writer :type
 
   def type(t)
-    @type = t
+    @type = t.to_s
   end
 end

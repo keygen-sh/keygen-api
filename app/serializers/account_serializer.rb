@@ -1,5 +1,5 @@
 class AccountSerializer < BaseSerializer
-  type "accounts"
+  type :accounts
 
   attributes [
     :id,

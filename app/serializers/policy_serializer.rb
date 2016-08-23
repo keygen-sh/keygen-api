@@ -1,5 +1,5 @@
 class PolicySerializer < BaseSerializer
-  type "policies"
+  type :policies
 
   attributes [
     :id,

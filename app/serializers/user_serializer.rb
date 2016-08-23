@@ -1,5 +1,5 @@
 class UserSerializer < BaseSerializer
-  type "users"
+  type :users
 
   attributes [
     :id,

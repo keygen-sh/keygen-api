@@ -1,5 +1,5 @@
 class TokenSerializer < BaseSerializer
-  type "tokens"
+  type :tokens
 
   attributes [
     :auth_token,

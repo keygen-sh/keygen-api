@@ -1,5 +1,5 @@
 class PlanSerializer < BaseSerializer
-  type "plans"
+  type :plans
 
   attributes [
     :id,
