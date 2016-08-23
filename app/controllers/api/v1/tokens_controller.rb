@@ -12,7 +12,7 @@ module Api::V1
         user = @current_account.users.find_by email: email
 
         if user&.authenticate(password)
-          render json: user, serializer: ActiveModel::Serializer::TokenSerializer and return
+          render json: user.token, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
 
@@ -25,16 +25,16 @@ module Api::V1
       skip_authorization
 
       authenticate_with_http_token do |token, options|
-        user = @current_account.users.find_by reset_auth_token: token
-        user.reset_auth_tokens! unless user.nil?
+        bearer = @current_account.tokens.find_by(reset_token: token)&.bearer
+        bearer.token.reset! unless bearer.nil?
 
-        if user
-          render json: user, serializer: ActiveModel::Serializer::TokenSerializer and return
+        if bearer.token
+          render json: bearer.token, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
 
       render_unauthorized detail: "must be a valid reset token", source: {
-        pointer: "/data/attributes/resetAuthToken" }
+        pointer: "/data/attributes/token.resetToken" }
     end
   end
 end

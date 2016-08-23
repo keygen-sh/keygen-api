@@ -35,7 +35,7 @@ Feature: User password
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use my auth token
-    When I send a POST request to "/users/$3/actions/update-password" with the following:
+    When I send a POST request to "/users/$2/actions/update-password" with the following:
       """
       { "oldPassword": "password", "newPassword": "pass" }
       """

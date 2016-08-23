@@ -3,6 +3,8 @@ class TokenSerializer < BaseSerializer
 
   attributes [
     :auth_token,
-    :reset_auth_token
+    :reset_token
   ]
+
+  belongs_to :bearer, polymorphic: true
 end

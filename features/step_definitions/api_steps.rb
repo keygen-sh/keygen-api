@@ -140,7 +140,8 @@ Given /^I send and accept JSON$/ do
 end
 
 Given /^I use my auth token$/ do
-  header "Authorization", "Bearer \"#{@user.auth_token}\""
+  @user.token.update account: @user.account # FIXME ???
+  header "Authorization", "Bearer \"#{@user.token.auth_token}\""
 end
 
 Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
@@ -327,7 +328,8 @@ end
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
     user = Account.find_by(subdomain: @account.subdomain).users.find_by role: "admin"
-    header "Authorization", "Bearer \"#{user.auth_token}\""
+    user.token.update account: @account # FIXME ???
+    header "Authorization", "Bearer \"#{user.token.auth_token}\""
     get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize}"
   else
     get "//keygin.io/#{@api_version}/#{resource.pluralize}"
