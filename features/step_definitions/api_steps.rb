@@ -203,6 +203,7 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
+  parse_placeholders body
   @account.send(resource).update_all(
     JSON.parse(body).deep_transform_keys! &:underscore
   )

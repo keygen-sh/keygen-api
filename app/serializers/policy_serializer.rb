@@ -11,11 +11,11 @@ class PolicySerializer < BaseSerializer
     :floating,
     :max_activations,
     :use_pool,
-    :pool,
     :created,
     :updated
   ]
 
   belongs_to :product
   has_many :licenses
+  has_many :keys, as: :pool
 end

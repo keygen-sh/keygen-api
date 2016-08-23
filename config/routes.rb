@@ -12,7 +12,7 @@ Rails.application.routes.draw do
         case verb
         when :resource
           resources(resource.to_s.dasherize, {
-            to: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
+            controller: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
           }.merge(opts))
         else
           send(verb, resource.to_s.dasherize, {
@@ -58,7 +58,7 @@ Rails.application.routes.draw do
             relationship :delete, :pool, to: "pool#pop"
           end
         end
-        resources :pools
+        resources :keys
         resources :licenses do
           namespace :actions do
             action :get, :verify, to: "permits#verify"

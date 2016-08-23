@@ -1,5 +1,5 @@
-class PoolSerializer < BaseSerializer
-  type :pools
+class KeySerializer < BaseSerializer
+  type :keys
 
   attributes [
     :id,
