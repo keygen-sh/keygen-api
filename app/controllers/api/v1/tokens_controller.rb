@@ -28,7 +28,7 @@ module Api::V1
         bearer = @current_account.tokens.find_by(reset_token: token)&.bearer
         bearer.token.reset! unless bearer.nil?
 
-        if bearer.token
+        if bearer&.token
           render json: bearer.token, serializer: ActiveModel::Serializer::TokenSerializer and return
         end
       end
