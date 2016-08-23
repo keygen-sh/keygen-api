@@ -69,13 +69,20 @@ Feature: License permits
     Then the response status should be "401"
     And the current account should have 3 "licenses"
 
-  Scenario: Admin verifies a license that is valid
+  Scenario: Admin verifies a strict license that is valid
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "product"
     And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxActivations": 1,
+        "strict": true
+      }
+      """
     And the current account has 1 "user"
-    And the current account has 3 "licenses"
+    And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
@@ -84,6 +91,78 @@ Feature: License permits
       }
       """
     And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": $licenses[0].id
+      }
+      """
+    And I use my auth token
+    When I send a GET request to "/licenses/$0/actions/verify"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "isValid": true }
+      """
+
+  Scenario: Admin verifies a strict license that has too many machines
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxActivations": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 6 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": $licenses[0].id
+      }
+      """
+    And I use my auth token
+    When I send a GET request to "/licenses/$0/actions/verify"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "isValid": false }
+      """
+
+  Scenario: Admin verifies a non-strict license that has too many machines
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxActivations": 1,
+        "strict": false
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
     And all "machines" have the following attributes:
       """
       {
@@ -110,7 +189,7 @@ Feature: License permits
       }
       """
     And the current account has 1 "user"
-    And the current account has 3 "licenses"
+    And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
@@ -138,7 +217,7 @@ Feature: License permits
       }
       """
     And the current account has 1 "user"
-    And the current account has 3 "licenses"
+    And the current account has 2 "licenses"
     And all "licenses" have the following attributes:
       """
       {
