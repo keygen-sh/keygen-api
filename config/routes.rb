@@ -57,9 +57,9 @@ Rails.application.routes.draw do
             relationship :machines, only: [:create, :destroy]
           end
           namespace :actions do
-            action :get, :verify, to: "permit#verify"
-            action :post, :revoke, to: "permit#revoke"
-            action :post, :renew, to: "permit#renew"
+            action :get, :verify, to: "permits#verify"
+            action :post, :revoke, to: "permits#revoke"
+            action :post, :renew, to: "permits#renew"
           end
         end
         resources :products do |r|
