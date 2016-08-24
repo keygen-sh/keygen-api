@@ -6,6 +6,7 @@ class User < ApplicationRecord
   belongs_to :account
   has_and_belongs_to_many :products
   has_many :licenses, dependent: :destroy
+  has_many :machines, through: :licenses
   has_one :token, as: :bearer, dependent: :destroy
 
   serialize :meta, Hash

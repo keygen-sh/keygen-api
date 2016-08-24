@@ -29,7 +29,7 @@ module Api::V1
     def create
       license = @current_account.licenses.find_by_hashid machine_params[:license]
 
-      @machine = @current_account.machines.new machine_params.merge(license: license, user: license&.user)
+      @machine = @current_account.machines.new machine_params.merge(license: license)
       authorize @machine
 
       if @machine.save
