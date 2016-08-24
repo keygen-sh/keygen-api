@@ -62,16 +62,46 @@ module Api::V1
 
     private
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_policy
       @policy = @current_account.policies.find_by_hashid params[:id]
     end
 
-    # Only allow a trusted parameter "white list" through.
     def policy_params
-      params.require(:policy).permit :name, :price, :duration, :strict,
-                                     :recurring, :floating, :use_pool,
-                                     :product, :pool => []
+      permitted_params
     end
+
+    attr_accessor :permitted_params
+
+    def permitted_params
+      @permitted_params ||= Proc.new do
+        schema = params.require(:policy).tap do |param|
+          permits = []
+
+          if action_name == "create"
+            permits << :product
+          end
+
+          permits << :name
+          permits << :price
+          permits << :duration
+          permits << :strict
+          permits << :recurring
+          permits << :floating
+          permits << :use_pool
+          permits << :max_machines
+
+          param.permit *permits
+        end.to_unsafe_hash
+
+        schema
+      end.call
+    end
+
+    # # Only allow a trusted parameter "white list" through.
+    # def policy_params
+    #   params.require(:policy).permit :name, :price, :duration, :strict,
+    #                                  :recurring, :floating, :use_pool,
+    #                                  :product
+    # end
   end
 end

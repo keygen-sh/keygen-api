@@ -17,5 +17,5 @@ class PolicySerializer < BaseSerializer
 
   belongs_to :product
   has_many :licenses
-  has_many :keys, as: :pool
+  has_many :pool, class_name: "Key"
 end
