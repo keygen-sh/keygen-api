@@ -90,16 +90,13 @@ license = account.licenses.create!({
 
 account.machines.create!({
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
-  license: license,
-  user: user
+  license: license
 })
 account.machines.create!({
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
-  license: license,
-  user: user
+  license: license
 })
 account.machines.create!({
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
-  license: license,
-  user: user
+  license: license
 })

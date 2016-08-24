@@ -1,11 +1,10 @@
 class Machine < ApplicationRecord
   belongs_to :account
   belongs_to :license
-  belongs_to :user
+  has_one :user, through: :license
 
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
-  validates :user, presence: { message: "must exist" }
 
   validates :fingerprint, presence: true, blank: false,
     uniqueness: { scope: :license_id }
