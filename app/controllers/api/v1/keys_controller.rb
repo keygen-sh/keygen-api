@@ -26,7 +26,7 @@ module Api::V1
 
     # POST /keys
     def create
-      policy = @current_account.licenses.find_by_hashid key_params[:policy]
+      policy = @current_account.policies.find_by_hashid key_params[:policy]
 
       @key = @current_account.keys.new key_params.merge(policy: policy)
       authorize @key

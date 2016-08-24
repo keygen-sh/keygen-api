@@ -10,10 +10,16 @@ module Api::V1::Policies::Relationships
 
       authorize @policy
 
+      unless @policy.use_pool
+        render_unprocessable_entity detail: "policy does not use a pool",
+          source: { pointer: "/data/attributes/usePool" } and return
+      end
+
       if key = @policy.pop!
         render json: key
       else
-        render_unprocessable_entity detail: "pool is empty"
+        render_unprocessable_entity detail: "pool is empty",
+          source: { pointer: "/data/attributes/pool" }
       end
     end
 
