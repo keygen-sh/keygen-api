@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160823222717) do
+ActiveRecord::Schema.define(version: 20160824140927) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,10 +51,9 @@ ActiveRecord::Schema.define(version: 20160823222717) do
     t.string   "key"
     t.datetime "expiry"
     t.integer  "user_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer  "policy_id"
-    t.string   "active_machines"
     t.integer  "account_id"
     t.index ["user_id"], name: "index_licenses_on_user_id", using: :btree
   end
