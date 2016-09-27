@@ -1,12 +1,10 @@
 class Token < ApplicationRecord
-  rolify strict: true
+  include Rolifiable
 
   belongs_to :account
   belongs_to :bearer, polymorphic: true
 
   before_create :generate_tokens
-
-  alias_method :can?, :has_role?
 
   def reset!
     generate_tokens

@@ -1,7 +1,6 @@
 class Product < ApplicationRecord
   include TokenAuthenticatable
-
-  resourcify
+  include Resourcifiable
 
   belongs_to :account
   has_and_belongs_to_many :users

@@ -3,7 +3,6 @@ class User < ApplicationRecord
   include PasswordResetable
 
   has_secure_password
-  resourcify
 
   belongs_to :account
   has_and_belongs_to_many :products
