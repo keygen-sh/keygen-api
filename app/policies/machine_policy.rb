@@ -1,22 +1,22 @@
 class MachinePolicy < ApplicationPolicy
 
   def index?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def show?
-    user.admin? or record.user == user
+    bearer.token.can? :admin, resource or resource.bearer == bearer
   end
 
   def create?
-    user.admin? or record.user == user
+    bearer.token.can? :admin, resource or resource.bearer == bearer
   end
 
   def update?
-    user.admin? or record.user == user
+    bearer.token.can? :admin, resource or resource.bearer == bearer
   end
 
   def destroy?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 end

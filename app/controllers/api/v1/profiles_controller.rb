@@ -5,9 +5,9 @@ module Api::V1
 
     # GET /profile
     def show
-      authorize @current_user
+      authorize @current_bearer
 
-      render json: @current_user
+      render json: @current_bearer
     end
   end
 end

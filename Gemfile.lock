@@ -188,6 +188,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    rolify (5.1.0)
     ruby_parser (3.8.2)
       sexp_processor (~> 4.1)
     sexp_processor (4.7.0)
@@ -247,6 +248,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 5.0)
   rails_12factor
+  rolify
   spring
   spring-watcher-listen (~> 2.0.0)
   stripe

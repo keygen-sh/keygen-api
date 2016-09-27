@@ -1,8 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pundit
 
-  attr_accessor :current_user
-
   after_action :verify_authorized
 
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
@@ -10,6 +8,11 @@ class ApplicationController < ActionController::Base
 
   rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
   rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }
+
+  attr_accessor :current_bearer
+  def pundit_user
+    @current_bearer
+  end
 
   def index
     skip_authorization

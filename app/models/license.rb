@@ -53,7 +53,7 @@ class License < ApplicationRecord
         errors.add :policy, "pool is empty"
       end
     else
-      self.key = generate_token_for(:license, :key).scan(/.{4}/).join "-"
+      self.key = generate_token :key
     end
   end
 

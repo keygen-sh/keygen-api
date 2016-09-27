@@ -1,4 +1,4 @@
-module TokenAuth
+module TokenAuthentication
   extend ActiveSupport::Concern
 
   include ActionController::HttpAuthentication::Token::ControllerMethods
@@ -7,7 +7,7 @@ module TokenAuth
     account = @current_account || Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_or_request_with_http_token do |token, options|
-      @current_user = account.tokens.find_by(auth_token: token)&.bearer if account
+      @current_bearer = account.tokens.find_by(auth_token: token)&.bearer if account
     end
   end
 
@@ -15,7 +15,7 @@ module TokenAuth
     account = @current_account || Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_with_http_token do |token, options|
-      @current_user = account.tokens.find_by(auth_token: token)&.bearer if account
+      @current_bearer = account.tokens.find_by(auth_token: token)&.bearer if account
     end
   end
 

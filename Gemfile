@@ -15,6 +15,7 @@ gem 'haml-rails', '~> 0.9'
 gem 'pundit'
 gem 'has_scope'
 gem 'kaminari'
+gem 'rolify'
 
 group :development, :test do
   gem 'byebug', platform: :mri

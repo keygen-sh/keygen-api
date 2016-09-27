@@ -1,8 +1,13 @@
 class Product < ApplicationRecord
+  include TokenAuthenticatable
+
+  resourcify
+
   belongs_to :account
   has_and_belongs_to_many :users
   has_many :policies, dependent: :destroy
   has_many :licenses, through: :policies
+  has_one :token, as: :bearer, dependent: :destroy
 
   serialize :platforms, Array
 

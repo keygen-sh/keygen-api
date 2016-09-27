@@ -1,7 +1,7 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
   include ReservedSubdomains
-  include Activation
+  include Activatable
 
   belongs_to :plan
   has_many :tokens, dependent: :destroy
