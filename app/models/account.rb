@@ -1,6 +1,7 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
   include ReservedSubdomains
+  include Resourcifiable
   include Activatable
 
   belongs_to :plan
