@@ -1,7 +1,9 @@
 class User < ApplicationRecord
-  include PasswordReset
+  include TokenAuthenticatable
+  include PasswordResetable
 
   has_secure_password
+  resourcify
 
   belongs_to :account
   has_and_belongs_to_many :products
@@ -11,7 +13,6 @@ class User < ApplicationRecord
 
   serialize :meta, Hash
 
-  before_create -> { self.token = Token.new(account: self.account, bearer: self) }
   before_save -> { self.email = email.downcase }
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
@@ -31,8 +32,4 @@ class User < ApplicationRecord
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
   }
-
-  def admin?
-    self.role == "admin"
-  end
 end

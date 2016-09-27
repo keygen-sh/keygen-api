@@ -1,34 +1,34 @@
 class LicensePolicy < ApplicationPolicy
 
   def index?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def show?
-    user.admin? or record.user == user
+    bearer.token.can? :admin, resource or resource.bearer == bearer
   end
 
   def create?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def update?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def destroy?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def verify?
-    user.admin? or record.user == user
+    bearer.token.can? :admin, resource or resource.bearer == bearer
   end
 
   def revoke?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def renew?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 end

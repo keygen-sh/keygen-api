@@ -1,5 +1,5 @@
 class ApplicationRecord < ActiveRecord::Base
-  include GenerateToken
+  include Tokenable
 
   self.abstract_class = true
 end

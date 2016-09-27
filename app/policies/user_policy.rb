@@ -1,11 +1,11 @@
 class UserPolicy < ApplicationPolicy
 
   def index?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def show?
-    user.admin? or record == user
+    bearer.token.can? :admin, resource or resource == bearer
   end
 
   def create?
@@ -13,18 +13,18 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? or record == user
+    bearer.token.can? :admin, resource or resource == bearer
   end
 
   def destroy?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def update_password?
-    record == user
+    resource == bearer
   end
 
   def reset_password?
-    record == user
+    resource == bearer
   end
 end

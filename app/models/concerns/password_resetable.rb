@@ -1,4 +1,4 @@
-module PasswordReset
+module PasswordResetable
   extend ActiveSupport::Concern
 
   included do
@@ -16,6 +16,6 @@ module PasswordReset
   private
 
   def create_password_reset_token
-    self.password_reset_token = generate_token_for :user, :password_reset_token
+    self.password_reset_token = generate_token :password_reset_token
   end
 end

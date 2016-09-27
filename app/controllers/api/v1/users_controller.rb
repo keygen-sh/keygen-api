@@ -85,7 +85,7 @@ module Api::V1
             permits << :password
           end
 
-          if @current_user&.admin?
+          if @current_bearer&.admin?
             permits << :role
           end
 

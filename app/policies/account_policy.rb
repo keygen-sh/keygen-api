@@ -5,7 +5,7 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def show?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def create?
@@ -13,22 +13,22 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def destroy?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def pause?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def resume?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def cancel?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 end

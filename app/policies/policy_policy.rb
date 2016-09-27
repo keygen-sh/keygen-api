@@ -1,26 +1,26 @@
 class PolicyPolicy < ApplicationPolicy
 
   def index?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def show?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def create?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def update?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def destroy?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 
   def pop?
-    user.admin?
+    bearer.token.can? :admin, resource
   end
 end

@@ -1,4 +1,4 @@
-module Activation
+module Activatable
   extend ActiveSupport::Concern
 
   included do
@@ -23,6 +23,6 @@ module Activation
   private
 
   def create_activation_token
-    self.activation_token = generate_token_for :account, :activation_token
+    self.activation_token = generate_token :activation_token
   end
 end
