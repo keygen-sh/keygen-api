@@ -46,31 +46,31 @@ class Account < ApplicationRecord
   }
 
   def admins
-    self.users.where role: "admin"
+    users.where role: "admin"
   end
 
   def activated?
-    self.activated
+    activated
   end
 
   def active?
-    self.billing&.external_status == "active"
+    billing&.external_status == "active"
   end
 
   def pending?
-    self.billing&.external_status == "pending"
+    billing&.external_status == "pending"
   end
 
   def trialing?
-    self.billing&.external_status == "trialing"
+    billing&.external_status == "trialing"
   end
 
   def paused?
-    self.billing&.external_status == "paused"
+    billing&.external_status == "paused"
   end
 
   def canceled?
-    self.billing&.external_status == "canceled"
+    billing&.external_status == "canceled"
   end
 
   private
