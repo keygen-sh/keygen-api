@@ -22,10 +22,9 @@ class Policy < ApplicationRecord
   def pop!
     return nil if pool.empty?
     key = pool.first.destroy
-    self.save!
     return key
   rescue ActiveRecord::StaleObjectError
-    self.reload
+    reload
     retry
   end
 end

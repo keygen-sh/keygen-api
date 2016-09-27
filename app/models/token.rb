@@ -8,7 +8,7 @@ class Token < ApplicationRecord
 
   def reset!
     generate_tokens
-    self.save
+    save
   end
 
   private
