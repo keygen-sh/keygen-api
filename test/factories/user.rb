@@ -4,15 +4,21 @@ FactoryGirl.define do
     name { Faker::Name.name }
     email { Faker::Internet.safe_email }
     password "password"
-    role "user"
+    token nil
     account
+    before :create do |user|
+      user.token = build :user_token, account: user.account, bearer: user
+    end
   end
 
   factory :admin, class: User do
     name { Faker::Name.name }
     email { Faker::Internet.safe_email }
     password "password"
-    role "admin"
+    token nil
     account
+    before :create do |user|
+      user.token = build :admin_token, account: user.account, bearer: user
+    end
   end
 end

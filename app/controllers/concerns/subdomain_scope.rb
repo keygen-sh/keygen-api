@@ -1,4 +1,4 @@
-module AccountScope
+module SubdomainScope
   extend ActiveSupport::Concern
 
   def scope_by_subdomain!

@@ -1,22 +1,22 @@
 class KeyPolicy < ApplicationPolicy
 
   def index?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin
   end
 
   def show?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin or resource.product == bearer
   end
 
   def create?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin or resource.product == bearer
   end
 
   def update?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin or resource.product == bearer
   end
 
   def destroy?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin or resource.product == bearer
   end
 end

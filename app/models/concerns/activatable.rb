@@ -10,7 +10,7 @@ module Activatable
     create_activation_token
     save
 
-    self.users.where(role: "admin").each do |admin|
+    users.select { |u| u.has_role? :admin }.each do |admin|
       UserMailer.account_activation(admin).deliver_later
     end
   end
@@ -18,6 +18,10 @@ module Activatable
   def reset_activation_token!
     create_activation_token
     save
+  end
+
+  def activated?
+    activated
   end
 
   private
