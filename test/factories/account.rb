@@ -3,8 +3,11 @@ FactoryGirl.define do
     name { Faker::Company.name }
     subdomain { [Faker::Internet.domain_word, Faker::Internet.domain_word].join }
     activated true
-    users { |a| [association(:admin, account_id: a.id)] }
+    users []
     billing
     plan
+    before :create do |account|
+      account.users << build(:admin, account: account)
+    end
   end
 end

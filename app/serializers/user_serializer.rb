@@ -5,7 +5,6 @@ class UserSerializer < BaseSerializer
     :id,
     :name,
     :email,
-    :role,
     :meta,
     :created,
     :updated

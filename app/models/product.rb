@@ -10,6 +10,8 @@ class Product < ApplicationRecord
 
   serialize :platforms, Array
 
+  before_create :set_roles
+
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
   validates :name, presence: true
@@ -17,4 +19,10 @@ class Product < ApplicationRecord
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
   }
+
+  private
+
+  def set_roles
+    add_role :product
+  end
 end

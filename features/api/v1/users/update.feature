@@ -48,11 +48,31 @@ Feature: Update user
     And I use my auth token
     When I send a PATCH request to "/users/$2" with the following:
       """
-      { "user": { "role": "admin" } }
+      {
+        "user": {
+          "roles": [{
+            "resourceType": "account",
+            "resourceId": "$account[0]",
+            "name": "create"
+          }, {
+            "resourceType": "account",
+            "resourceId": "$account[0]",
+            "name": "read"
+          }, {
+            "resourceType": "account",
+            "resourceId": "$account[0]",
+            "name": "update"
+          }, {
+            "resourceType": "account",
+            "resourceId": "$account[0]",
+            "name": "delete"
+          }]
+        }
+      }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the role "admin"
-    And the current account should have 1 "user"
+    And the JSON response should be a "user"
+    And the current account should have 3 "users"
 
   Scenario: Admin updates a users meta data
     Given I am an admin of account "test1"

@@ -3,6 +3,7 @@ class Account < ApplicationRecord
   include ReservedSubdomains
   include Resourcifiable
   include Activatable
+  include Billable
 
   belongs_to :plan
   has_many :tokens, dependent: :destroy
@@ -18,7 +19,7 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :billing
 
   before_create -> { self.subdomain = subdomain.downcase }
-  after_create :set_founding_users_to_admins
+  after_create :set_founding_users_roles
   after_create :send_activation
 
   validates :plan, presence: { message: "must exist" }
@@ -45,37 +46,12 @@ class Account < ApplicationRecord
     paginate(page[:number]).per page[:size]
   }
 
-  def admins
-    users.where role: "admin"
-  end
-
-  def activated?
-    activated
-  end
-
-  def active?
-    billing&.external_status == "active"
-  end
-
-  def pending?
-    billing&.external_status == "pending"
-  end
-
-  def trialing?
-    billing&.external_status == "trialing"
-  end
-
-  def paused?
-    billing&.external_status == "paused"
-  end
-
-  def canceled?
-    billing&.external_status == "canceled"
-  end
-
   private
 
-  def set_founding_users_to_admins
-    users.update_all role: "admin"
+  def set_founding_users_roles
+    users.each do |user|
+      user.remove_role :user
+      user.add_role :admin
+    end
   end
 end

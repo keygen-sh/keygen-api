@@ -5,18 +5,18 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin
   end
 
   def create?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin
   end
 
   def update?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin
   end
 
   def destroy?
-    bearer.token.can? :admin, resource
+    bearer.has_role? :admin
   end
 end

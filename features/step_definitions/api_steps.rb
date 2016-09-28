@@ -21,7 +21,7 @@ def parse_placeholders(str)
     value =
       case resource
       when "current"
-        @user.send attribute
+        @bearer.send attribute
       when "time"
         case attribute
         when /(\d+)\.(\w+)\.(\w+)/
@@ -127,8 +127,17 @@ Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
   create :account, subdomain: subdomain
 end
 
-Given /^I am an? (user|admin) of account "([^\"]*)"$/ do |role, subdomain|
-  @user = Account.find_by(subdomain: subdomain).users.find_by role: role
+Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, subdomain|
+  account = Account.find_by subdomain: subdomain
+  @bearer =
+    case role
+    when "admin"
+      account.users.select { |u| u.has_role? :admin }.first
+    when "user"
+      account.users.select { |u| u.has_role? :user }.first
+    when "product"
+      account.products.first
+    end
 end
 
 Given /^I send and accept HTML$/ do
@@ -142,8 +151,8 @@ Given /^I send and accept JSON$/ do
 end
 
 Given /^I use my auth token$/ do
-  @user.token.update account: @user.account # FIXME ???
-  header "Authorization", "Bearer \"#{@user.token.auth_token}\""
+  @bearer.token.update account: @bearer.account # FIXME ???
+  header "Authorization", "Bearer \"#{@bearer.token.auth_token}\""
 end
 
 Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
@@ -174,7 +183,7 @@ end
 Given /^I have the following attributes:$/ do |body|
   parse_placeholders body
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  @user.update attributes
+  @bearer.update attributes
 end
 
 Given /^I am on the subdomain "([^\"]*)"$/ do |subdomain|
@@ -329,7 +338,7 @@ end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
-    user = Account.find_by(subdomain: @account.subdomain).users.find_by role: "admin"
+    user = @account.users.select { |u| u.has_role? :admin }.first
     user.token.update account: @account # FIXME ???
     header "Authorization", "Bearer \"#{user.token.auth_token}\""
     get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize}"
