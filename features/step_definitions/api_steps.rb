@@ -321,7 +321,7 @@ end
 Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |name, attribute, value|
   json = JSON.parse last_response.body
   assert_equal name.pluralize, json["data"]["type"]
-  assert_equal value, json["data"]["attributes"][attribute]
+  assert_equal value.to_s, json["data"]["attributes"][attribute].to_s
 end
 
 Then /^the JSON response should be an? "([^\"]*)" that is (\w+)$/ do |name, attribute|

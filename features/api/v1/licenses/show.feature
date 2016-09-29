@@ -17,6 +17,26 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
+  Scenario: Product retrieves a license for their product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "license"
+    And the current product has 1 "license"
+    When I send a GET request to "/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
+  Scenario: Product attempts to retrieve a license for another product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "license"
+    When I send a GET request to "/licenses/$0"
+    Then the response status should be "403"
+
   Scenario: Admin attempts to retrieve a license for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
