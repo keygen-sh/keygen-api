@@ -30,3 +30,29 @@ Feature: Update policy
       { "policy": { "price": 0 } }
       """
     Then the response status should be "401"
+
+  Scenario: Product updates a policy for their product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "policy"
+    And the current product has 1 "policy"
+    When I send a PATCH request to "/policies/$0" with the following:
+      """
+      { "policy": { "price": 1000 } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with the price "1000"
+
+  Scenario: Product attempts to update a policy for another product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "policy"
+    When I send a PATCH request to "/policies/$0" with the following:
+      """
+      { "policy": { "price": 1000 } }
+      """
+    Then the response status should be "403"

@@ -51,3 +51,29 @@ Feature: Update license
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the key "a"
+
+  Scenario: Product updates a license for their product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "license"
+    And the current product has 1 "license"
+    When I send a PATCH request to "/licenses/$0" with the following:
+      """
+      { "license": { "key": "b" } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the key "b"
+
+  Scenario: Product attempts to update a license for another product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "license"
+    When I send a PATCH request to "/licenses/$0" with the following:
+      """
+      { "license": { "key": "c" } }
+      """
+    Then the response status should be "403"

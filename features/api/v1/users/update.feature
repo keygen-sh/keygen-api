@@ -75,6 +75,32 @@ Feature: Update user
       { "customerId": "cust_gV4dW9jrc" }
       """
 
+  Scenario: Product updates a user for their product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "user"
+    And the current product has 1 "user"
+    When I send a PATCH request to "/users/$1" with the following:
+      """
+      { "user": { "name": "Mr. Robot" } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the name "Mr. Robot"
+
+  Scenario: Product attempts to update a user for another product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "user"
+    When I send a PATCH request to "/users/$1" with the following:
+      """
+      { "user": { "name": "Mr. Robot" } }
+      """
+    Then the response status should be "403"
+
   Scenario: User attempts to update their password
    Given I am on the subdomain "test1"
    And the current account has 3 "users"
