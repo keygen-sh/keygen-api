@@ -26,15 +26,10 @@ class User < ApplicationRecord
     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
     uniqueness: { case_sensitive: false, scope: :account_id }
 
-  scope :roles, -> (*roles) {
-    account.tokens.with_any_role(*roles).map &:bearer
-  }
-  scope :product, -> (id) {
-    includes(:products).where products: { id: Product.decode_id(id) || 0 }
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
-  }
+  scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
+  scope :product, -> (id) { includes(:products).where products: { id: Product.decode_id(id) || 0 } }
+  scope :page, -> (page = {}) { paginate(page[:number]).per page[:size] }
+  scope :admins, -> { roles :admin }
 
   private
 
