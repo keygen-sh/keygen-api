@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /policies
     def index
-      @policies = apply_scopes(@current_account.policies).all
+      @policies = apply_scopes(policy_scope(@current_account.policies)).all
       authorize @policies
 
       render json: @policies

@@ -11,7 +11,7 @@ module Api::V1
 
     # GET /users
     def index
-      @users = apply_scopes(@current_account.users).all
+      @users = apply_scopes(policy_scope(@current_account.users)).all
       authorize @users
 
       render json: @users

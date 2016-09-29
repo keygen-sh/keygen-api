@@ -17,6 +17,17 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 3 "licenses"
 
+  Scenario: Product retrieves all licenses for their product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 3 "licenses"
+    And the current product has 1 "license"
+    When I send a GET request to "/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
   Scenario: Admin attempts to retrieve all licenses for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
