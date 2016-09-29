@@ -62,7 +62,12 @@ def parse_path_placeholders(str)
     value =
       case index
       when "current"
-        instance_variable_get("@#{resource.singularize}").hashid
+        case resource
+        when "users", "products"
+          @bearer.hashid
+        else
+          instance_variable_get("@#{resource.singularize}").hashid
+        end
       else
         if @account
           @account.send(resource)

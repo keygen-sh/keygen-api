@@ -3,6 +3,7 @@ class License < ApplicationRecord
   belongs_to :user
   belongs_to :policy
   has_many :machines, dependent: :destroy
+  has_one :product, through: :policy
 
   before_validation :set_license_key, on: :create
   before_validation :set_expiry, on: :create

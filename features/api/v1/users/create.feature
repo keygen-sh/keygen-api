@@ -16,7 +16,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And the JSON response should be a "user" with the name "Superman"
-    And the current account should have 3 "users"
+    And the current account should have 2 "users"
 
   Scenario: Anonymous attempts to create an incomplete user for an account
     Given I am on the subdomain "test1"
@@ -48,8 +48,9 @@ Feature: Create user
     Then the response status should be "201"
 
   Scenario: User attempts to create an admin for their account
-    Given I am a user of account "test1"
-    And I am on the subdomain "test1"
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
     And I use my auth token
     When I send a POST request to "/users" with the following:
       """

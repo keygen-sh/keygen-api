@@ -85,8 +85,8 @@ module Api::V1
             permits << :password
           end
 
-          if @current_bearer&.is? :admin
-            permits << :roles
+          if @current_bearer&.has_role? :admin
+            additional.merge! roles: [[:name]]
           end
 
           # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
@@ -98,16 +98,7 @@ module Api::V1
         end.to_unsafe_hash
 
         # Swap `roles` key with `roles_attributes`
-        if schema[:roles]&.is_a? Array
-          schema[:roles].map do |role|
-            resource = role[:resource_type]&.classify&.constantize&.find_by_hashid(
-              role[:resource_id]
-            )
-            {
-              resource: resource,
-              name: role[:name]
-            }
-          end
+        if schema[:roles]
           schema[:roles_attributes] = schema.delete :roles
         end
 
