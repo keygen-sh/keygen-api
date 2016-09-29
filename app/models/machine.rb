@@ -21,4 +21,7 @@ class Machine < ApplicationRecord
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
   }
+  scope :product, -> (id) {
+    joins(license: [:policy]).where policies: { product_id: Product.find_by_hashid(id) }
+  }
 end

@@ -219,6 +219,17 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   }
 end
 
+Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
+  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+    begin
+      r.products << @bearer
+    rescue => e
+      r.product = @bearer
+    end
+    r.save
+  end
+end
+
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   parse_placeholders body
   @account.send(resource).update_all(

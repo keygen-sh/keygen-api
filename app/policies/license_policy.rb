@@ -1,7 +1,7 @@
 class LicensePolicy < ApplicationPolicy
 
   def index?
-    bearer.has_role? :admin
+    bearer.has_role? :admin or bearer.has_role? :product
   end
 
   def show?

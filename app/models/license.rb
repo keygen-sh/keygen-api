@@ -30,6 +30,9 @@ class License < ApplicationRecord
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
   }
+  scope :product, -> (id) {
+    joins(:policy).where policies: { product_id: Product.find_by_hashid(id) }
+  }
 
   def license_valid?
     # Check if license is expired
