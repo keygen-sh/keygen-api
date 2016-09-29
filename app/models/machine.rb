@@ -1,6 +1,7 @@
 class Machine < ApplicationRecord
   belongs_to :account
   belongs_to :license
+  has_one :product, through: :license
   has_one :user, through: :license
 
   validates :account, presence: { message: "must exist" }

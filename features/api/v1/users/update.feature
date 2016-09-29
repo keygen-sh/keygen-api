@@ -51,28 +51,14 @@ Feature: Update user
       {
         "user": {
           "roles": [{
-            "resourceType": "account",
-            "resourceId": "$account[0]",
-            "name": "create"
-          }, {
-            "resourceType": "account",
-            "resourceId": "$account[0]",
-            "name": "read"
-          }, {
-            "resourceType": "account",
-            "resourceId": "$account[0]",
-            "name": "update"
-          }, {
-            "resourceType": "account",
-            "resourceId": "$account[0]",
-            "name": "delete"
+            "name": "admin"
           }]
         }
       }
       """
     Then the response status should be "200"
     And the JSON response should be a "user"
-    And the current account should have 3 "users"
+    And the current account should have 2 "users"
 
   Scenario: Admin updates a users meta data
     Given I am an admin of account "test1"
