@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160927225336) do
+ActiveRecord::Schema.define(version: 20160929143658) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.string   "activation_token"
     t.datetime "activation_sent_at"
     t.boolean  "activated",          default: false
+    t.index ["subdomain"], name: "index_accounts_on_subdomain", using: :btree
   end
 
   create_table "billings", force: :cascade do |t|
@@ -37,6 +38,9 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.string   "external_subscription_id"
     t.datetime "external_subscription_period_start"
     t.datetime "external_subscription_period_end"
+    t.index ["customer_id", "customer_type"], name: "index_billings_on_customer_id_and_customer_type", using: :btree
+    t.index ["external_customer_id"], name: "index_billings_on_external_customer_id", using: :btree
+    t.index ["external_subscription_id"], name: "index_billings_on_external_subscription_id", using: :btree
   end
 
   create_table "keys", force: :cascade do |t|
@@ -45,6 +49,8 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "account_id"
+    t.index ["account_id"], name: "index_keys_on_account_id", using: :btree
+    t.index ["policy_id"], name: "index_keys_on_policy_id", using: :btree
   end
 
   create_table "licenses", force: :cascade do |t|
@@ -55,6 +61,8 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.datetime "updated_at", null: false
     t.integer  "policy_id"
     t.integer  "account_id"
+    t.index ["account_id"], name: "index_licenses_on_account_id", using: :btree
+    t.index ["policy_id"], name: "index_licenses_on_policy_id", using: :btree
     t.index ["user_id"], name: "index_licenses_on_user_id", using: :btree
   end
 
@@ -69,6 +77,9 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.datetime "updated_at",  null: false
     t.string   "name"
     t.integer  "user_id"
+    t.index ["account_id"], name: "index_machines_on_account_id", using: :btree
+    t.index ["license_id"], name: "index_machines_on_license_id", using: :btree
+    t.index ["user_id"], name: "index_machines_on_user_id", using: :btree
   end
 
   create_table "plans", force: :cascade do |t|
@@ -81,6 +92,7 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.datetime "updated_at",       null: false
     t.integer  "max_products"
     t.string   "external_plan_id"
+    t.index ["external_plan_id"], name: "index_plans_on_external_plan_id", using: :btree
   end
 
   create_table "policies", force: :cascade do |t|
@@ -97,6 +109,8 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.integer  "product_id"
     t.integer  "account_id"
     t.integer  "max_machines"
+    t.index ["account_id"], name: "index_policies_on_account_id", using: :btree
+    t.index ["product_id"], name: "index_policies_on_product_id", using: :btree
   end
 
   create_table "products", force: :cascade do |t|
@@ -105,6 +119,7 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.integer  "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_products_on_account_id", using: :btree
   end
 
   create_table "products_users", force: :cascade do |t|
@@ -133,6 +148,10 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.integer  "account_id"
+    t.index ["account_id"], name: "index_tokens_on_account_id", using: :btree
+    t.index ["auth_token"], name: "index_tokens_on_auth_token", using: :btree
+    t.index ["bearer_id", "bearer_type"], name: "index_tokens_on_bearer_id_and_bearer_type", using: :btree
+    t.index ["reset_token"], name: "index_tokens_on_reset_token", using: :btree
   end
 
   create_table "tokens_roles", id: false, force: :cascade do |t|
@@ -151,6 +170,9 @@ ActiveRecord::Schema.define(version: 20160927225336) do
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
     t.string   "meta"
+    t.index ["account_id"], name: "index_users_on_account_id", using: :btree
+    t.index ["email"], name: "index_users_on_email", using: :btree
+    t.index ["password_reset_token"], name: "index_users_on_password_reset_token", using: :btree
   end
 
 end
