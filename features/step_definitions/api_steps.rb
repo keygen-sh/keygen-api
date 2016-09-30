@@ -136,10 +136,8 @@ Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, subdomai
   account = Account.find_by subdomain: subdomain
   @bearer =
     case role
-    when "admin"
-      account.users.select { |u| u.has_role? :admin }.first
-    when "user"
-      account.users.select { |u| u.has_role? :user }.first
+    when "admin", "user"
+      account.users.roles(role).first
     when "product"
       account.products.first
     end
@@ -365,7 +363,7 @@ end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
-    user = @account.users.select { |u| u.has_role? :admin }.first
+    user = @account.users.roles(:admin).first
     user.token.update account: @account # FIXME ???
     header "Authorization", "Bearer \"#{user.token.auth_token}\""
     get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize}"
