@@ -153,9 +153,30 @@ Given /^I send and accept JSON$/ do
   header "Accept", "application/vnd.api+json"
 end
 
+Given /^I send the following headers:$/ do |body|
+  parse_placeholders body
+  headers = JSON.parse body
+
+  # Base64 encode basic credentials
+  if headers.key? "Authorization"
+    /Basic "([.@\w\d]+):(.+)"/ =~ headers["Authorization"]
+    credentials = Base64.encode64 "#{$1}:#{$2}"
+    headers["Authorization"] = "Basic \"#{credentials}\""
+  end
+
+  headers.each do |name, value|
+    header name, value
+  end
+end
+
 Given /^I use my auth token$/ do
   @bearer.token.update account: @bearer.account # FIXME ???
   header "Authorization", "Bearer \"#{@bearer.token.auth_token}\""
+end
+
+Given /^I use my reset token$/ do
+  @bearer.token.update account: @bearer.account
+  header "Authorization", "Bearer \"#{@bearer.token.reset_token}\""
 end
 
 Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
