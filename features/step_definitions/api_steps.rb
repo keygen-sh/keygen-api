@@ -221,11 +221,22 @@ end
 
 Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
   @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
-    begin
+    begin # FIXME: This is all pretty dirty, but it gets the job done
       r.products << @bearer
-    rescue => e
-      r.product = @bearer
+    rescue
+      begin
+        r.product = @bearer
+      rescue
+        r.license.product = @bearer
+      end
     end
+    r.save
+  end
+end
+
+Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
+  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+    r.user = @bearer
     r.save
   end
 end

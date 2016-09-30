@@ -46,7 +46,7 @@ Feature: Update key
     Then the response status should be "200"
     And the JSON response should be a "key" with the key "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
 
-  Scenario: Product attempts to update a license for another product
+  Scenario: Product attempts to update a key for another product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"

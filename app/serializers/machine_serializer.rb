@@ -4,6 +4,7 @@ class MachineSerializer < BaseSerializer
   attributes [
     :id,
     :fingerprint,
+    :name,
     :ip,
     :hostname,
     :platform,
