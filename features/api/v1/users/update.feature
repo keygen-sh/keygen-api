@@ -58,7 +58,41 @@ Feature: Update user
       """
     Then the response status should be "200"
     And the JSON response should be a "user"
-    And the current account should have 2 "users"
+
+  Scenario: Admin promotes a user with an invalid role name for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "users"
+    And I use my auth token
+    When I send a PATCH request to "/users/$2" with the following:
+      """
+      {
+        "user": {
+          "roles": [{
+            "name": "moderator"
+          }]
+        }
+      }
+      """
+    Then the response status should be "422"
+
+  Scenario: User updates attempts to promote themself to admin
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my auth token
+    When I send a PATCH request to "/users/$1" with the following:
+      """
+      {
+        "user": {
+          "roles": [{
+            "name": "admin"
+          }]
+        }
+      }
+      """
+    Then the response status should be "400"
 
   Scenario: Admin updates a users meta data
     Given I am an admin of account "test1"
