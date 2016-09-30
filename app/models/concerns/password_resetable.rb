@@ -1,5 +1,6 @@
 module PasswordResetable
   extend ActiveSupport::Concern
+  include Tokenable
 
   included do
     before_create :create_password_reset_token
