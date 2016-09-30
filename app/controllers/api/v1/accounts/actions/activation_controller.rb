@@ -8,7 +8,7 @@ module Api::V1::Accounts::Actions
 
       skip_authorization
 
-      if @account.activation_token == params[:activation_token]
+      if @account.activation_token == activation_params
         if @account.activated?
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }
@@ -30,6 +30,10 @@ module Api::V1::Accounts::Actions
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]
+    end
+
+    def activation_params
+      params.require :activation_token
     end
   end
 end

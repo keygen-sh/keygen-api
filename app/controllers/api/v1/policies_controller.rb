@@ -96,12 +96,5 @@ module Api::V1
         schema
       end.call
     end
-
-    # # Only allow a trusted parameter "white list" through.
-    # def policy_params
-    #   params.require(:policy).permit :name, :price, :duration, :strict,
-    #                                  :recurring, :floating, :use_pool,
-    #                                  :product
-    # end
   end
 end

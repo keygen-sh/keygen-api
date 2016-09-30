@@ -12,7 +12,7 @@ module Api::V1
         user = @current_account.users.find_by email: email
 
         if user&.authenticate(password)
-          render json: user.token, serializer: ActiveModel::Serializer::TokenSerializer and return
+          render json: user.token and return
         end
       end
 
@@ -29,7 +29,7 @@ module Api::V1
         bearer.token.reset! unless bearer.nil?
 
         if bearer&.token
-          render json: bearer.token, serializer: ActiveModel::Serializer::TokenSerializer and return
+          render json: bearer.token and return
         end
       end
 

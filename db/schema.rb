@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160929143658) do
+ActiveRecord::Schema.define(version: 20160930210412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 20160929143658) do
 
   create_table "billings", force: :cascade do |t|
     t.string   "external_customer_id"
-    t.string   "external_status"
+    t.string   "external_subscription_status"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "customer_id"
@@ -38,6 +38,9 @@ ActiveRecord::Schema.define(version: 20160929143658) do
     t.string   "external_subscription_id"
     t.datetime "external_subscription_period_start"
     t.datetime "external_subscription_period_end"
+    t.datetime "card_expiry"
+    t.string   "card_brand"
+    t.string   "card_last4"
     t.index ["customer_id", "customer_type"], name: "index_billings_on_customer_id_and_customer_type", using: :btree
     t.index ["external_customer_id"], name: "index_billings_on_external_customer_id", using: :btree
     t.index ["external_subscription_id"], name: "index_billings_on_external_subscription_id", using: :btree

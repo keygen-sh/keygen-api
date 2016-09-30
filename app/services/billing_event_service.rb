@@ -1,17 +1,15 @@
 require 'stripe'
 
-class ExternalEventService
+class BillingEventService
 
   def initialize(params)
     @id = params[:id]
   end
 
   def retrieve
-    begin
-      external_event_service.retrieve id
-    rescue external_service_error
-      false
-    end
+    external_event_service.retrieve id
+  rescue external_service_error
+    nil
   end
 
   private
