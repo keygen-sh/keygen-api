@@ -57,7 +57,9 @@ class License < ApplicationRecord
         errors.add :policy, "pool is empty"
       end
     else
-      self.key = generate_token :key
+      self.key = generate_token :key do |token|
+        token.scan(/.{4}/).join "-"
+      end
     end
   end
 
