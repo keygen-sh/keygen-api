@@ -43,7 +43,7 @@ module Api::V1
         # will subscribe the customer to their chosen plan and charge them;
         # setting the statuses to pending lets the customer use the API
         # until we recieve the status of the charge.
-        billing.external_status = "pending"
+        billing.external_subscription_status = "pending"
         @account.status = "pending"
       end
 
@@ -82,7 +82,7 @@ module Api::V1
 
     def create_customer_with_external_service
       return false unless billing_params
-      ExternalCustomerService.new(
+      BillingCustomerService.new(
         billing_params.merge account: @account
       ).create
     end

@@ -43,10 +43,12 @@ Rails.application.routes.draw do
       end
 
       constraints lambda { |r| r.subdomain.present? } do
-        get  :tokens, to: "tokens#request_tokens"
-        post :tokens, to: "tokens#reset_tokens"
+        get  :billing,   to: "billings#show"
+        post :billing,   to: "billings#update"
+        get  :tokens,    to: "tokens#request_tokens"
+        post :tokens,    to: "tokens#reset_tokens"
         post :passwords, to: "passwords#reset_password"
-        get  :profile, to: "profiles#show"
+        get  :profile,   to: "profiles#show"
         resources :users do
           namespace :actions do
             action :post, :update_password, to: "password#update_password"

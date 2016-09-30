@@ -5,7 +5,12 @@ class BillingSerializer < BaseSerializer
     :id,
     :external_customer_id,
     :external_subscription_id,
-    :external_status,
+    :external_subscription_period_start,
+    :external_subscription_period_end,
+    :external_subscription_status,
+    :card_expiry,
+    :card_brand,
+    :card_last4,
     :created,
     :updated
   ]

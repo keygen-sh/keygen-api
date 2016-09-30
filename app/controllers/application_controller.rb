@@ -27,6 +27,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_forbidden(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Access denied",
@@ -36,6 +38,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_unauthorized(opts = {})
+    skip_authorization
+
     self.headers["WWW-Authenticate"] = %(Token realm="Application")
     render json: {
       errors: [{
@@ -46,6 +50,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_unprocessable_entity(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Unprocessable entity",
@@ -55,6 +61,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_not_found(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Not found",
@@ -64,6 +72,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_bad_request(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Bad request",
@@ -73,6 +83,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_conflict(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Conflict",
@@ -82,6 +94,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_internal_server_error(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Internal server error",
@@ -91,6 +105,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_service_unavailable(opts = {})
+    skip_authorization
+
     render json: {
       errors: [{
         title: "Service unavailable",
@@ -100,6 +116,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_unprocessable_resource(resource)
+    skip_authorization
+
     render json: resource, status: :unprocessable_entity, adapter: :json_api,
       serializer: ActiveModel::Serializer::ErrorSerializer
   end

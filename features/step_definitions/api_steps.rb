@@ -70,11 +70,16 @@ def parse_path_placeholders(str)
         end
       else
         if @account
-          @account.send(resource)
-            .all
-            .sort
-            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-            .hashid
+          case resource
+          when "billing"
+            @account.send(resource).hashid
+          else
+            @account.send(resource)
+              .all
+              .sort
+              .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              .hashid
+          end
         else
           resource.singularize
             .underscore
@@ -194,7 +199,7 @@ Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
   Account.find_by(subdomain: subdomain).billing.update(
     external_customer_id: customer.id,
     external_subscription_id: subscription.id,
-    external_status: "active"
+    external_subscription_status: "active"
   )
 end
 

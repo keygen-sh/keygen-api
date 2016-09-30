@@ -14,7 +14,7 @@ module Api::V1::Accounts::Actions
           pointer: "/data/attributes/status" } and return
       end
 
-      subscription = ExternalSubscriptionService.new({
+      subscription = BillingSubscriptionService.new({
         id: @account.billing.external_subscription_id
       }).delete
 
@@ -48,7 +48,7 @@ module Api::V1::Accounts::Actions
 
       # Setting a trial allows us to continue to use the previously 'paused'
       # subscription's billing cycle
-      subscription = ExternalSubscriptionService.new({
+      subscription = BillingSubscriptionService.new({
         customer: @account.billing.external_customer_id,
         trial: @account.billing.external_subscription_period_end,
         plan: @account.plan.external_plan_id
@@ -77,7 +77,7 @@ module Api::V1::Accounts::Actions
           pointer: "/data/attributes/status" } and return
       end
 
-      subscription = ExternalSubscriptionService.new({
+      subscription = BillingSubscriptionService.new({
         id: @account.billing.external_subscription_id
       }).delete
 

@@ -27,7 +27,7 @@ module Api::V1::Accounts::Relationships
     private
 
     def update_plan_with_external_service
-      ExternalSubscriptionService.new({
+      BillingSubscriptionService.new({
         id: @account.billing.external_subscription_id,
         plan: @plan.external_plan_id
       }).update

@@ -8,7 +8,7 @@ module Api::V1
       # Let external service know that we recieved the webhook
       head :accepted
 
-      event = ExternalEventService.new(id: stripe_params[:id]).retrieve
+      event = BillingEventService.new(id: stripe_params[:id]).retrieve
       return unless event
 
       case event.type
@@ -21,7 +21,7 @@ module Api::V1
           external_subscription_period_start: Time.at(subscription.current_period_start),
           external_subscription_period_end: Time.at(subscription.current_period_end),
           external_subscription_id: subscription.id,
-          external_status: subscription.status
+          external_subscription_status: subscription.status
         })
       when "customer.subscription.deleted"
         subscription = event.data.object
@@ -32,7 +32,7 @@ module Api::V1
           external_subscription_period_start: nil,
           external_subscription_period_end: nil,
           external_subscription_id: nil,
-          external_status: subscription.status
+          external_subscription_status: subscription.status
         })
 
         billing.customer.update status: "canceled"
@@ -41,12 +41,25 @@ module Api::V1
         billing = Billing.find_by external_customer_id: customer.id
         return unless billing && billing.external_subscription_id.nil?
 
-        ExternalSubscriptionService.new({
+        BillingSubscriptionService.new({
           customer: billing.external_customer_id,
           plan: billing.customer.plan.external_plan_id
         }).create
 
         billing.customer.update status: "active"
+      when "customer.updated"
+        customer = event.data.object
+        billing = Billing.find_by external_customer_id: customer.id
+        return unless billing
+
+        card = customer.sources.retrieve customer.default_source
+        return unless card
+
+        billing.update({
+          card_expiry: DateTime.new(card.exp_year.to_i, card.exp_month.to_i),
+          card_brand: card.brand,
+          card_last4: card.last4
+        })
       when "customer.deleted"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id

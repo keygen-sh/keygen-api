@@ -9,7 +9,7 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def create?
-    bearer.has_role? :admin
+    false
   end
 
   def update?
