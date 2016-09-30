@@ -77,3 +77,35 @@ Feature: Update license
       { "license": { "key": "c" } }
       """
     Then the response status should be "403"
+
+  Scenario: User attempts to update a license for their account
+    Given I am on the subdomain "test1"
+    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my auth token
+    When I send a PATCH request to "/licenses/$0" with the following:
+      """
+      { "license": { "key": "x" } }
+      """
+    Then the response status should be "403"
+
+  Scenario: Anonymous user attempts to update a license for their account
+    Given I am on the subdomain "test1"
+    And the current account has 3 "licenses"
+    When I send a PATCH request to "/licenses/$0" with the following:
+      """
+      { "license": { "key": "y" } }
+      """
+    Then the response status should be "401"
+
+  Scenario: Admin attempts to update a license for another account
+    Given I am an admin of account "test2"
+    But I am on the subdomain "test1"
+    And the current account has 3 "licenses"
+    And I use my auth token
+    When I send a PATCH request to "/licenses/$0" with the following:
+      """
+      { "license": { "key": "z" } }
+      """
+    Then the response status should be "401"
