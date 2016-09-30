@@ -1,5 +1,6 @@
 module Activatable
   extend ActiveSupport::Concern
+  include Tokenable
 
   included do
     before_create :create_activation_token

@@ -1,5 +1,6 @@
 class Token < ApplicationRecord
   include Rolifiable
+  include Tokenable
 
   belongs_to :account
   belongs_to :bearer, polymorphic: true
