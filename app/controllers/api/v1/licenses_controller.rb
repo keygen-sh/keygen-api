@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /licenses
     def index
-      @licenses = apply_scopes(policy_scope(@current_account.licenses)).all
+      @licenses = policy_scope apply_scopes(@current_account.licenses).all
       authorize @licenses
 
       render json: @licenses
