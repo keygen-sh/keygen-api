@@ -45,12 +45,26 @@ Feature: Create machine
   Scenario: User creates a machine for their license
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "license"
+    And the current user has 1 "license"
+    And I use my auth token
+    When I send a POST request to "/machines" with the following:
+      """
+      { "machine": { "license": "$licenses[0]", "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE" } }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+
+  Scenario: User creates a machine for another user's license
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
     And the current account has 1 "license"
     And I am a user of account "test1"
     And I use my auth token
     When I send a POST request to "/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE" } }
+      { "machine": { "license": "$licenses[0]", "fingerprint": "oD:aP:3o:GD:vi:H3:Zw:up:h8:3a:hC:MD:2e:4d:cr" } }
       """
     Then the response status should be "403"
 

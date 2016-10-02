@@ -43,6 +43,19 @@ Feature: Create license
     And I use my auth token
     When I send a POST request to "/licenses" with the following:
       """
+      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      """
+    Then the response status should be "201"
+
+  Scenario: User attempts to create a license for another user
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my auth token
+    When I send a POST request to "/licenses" with the following:
+      """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
       """
     Then the response status should be "403"

@@ -35,3 +35,12 @@ Feature: List machines
     When I send a GET request to "/machines"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: User attempts to retrieve all machines for their account
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my auth token
+    When I send a GET request to "/machines"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
