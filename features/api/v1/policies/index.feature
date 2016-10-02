@@ -35,3 +35,13 @@ Feature: List policies
     When I send a GET request to "/policies"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: User attempts to retrieve all policies for their account
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my auth token
+    And the current account has 3 "policies"
+    When I send a GET request to "/policies"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
