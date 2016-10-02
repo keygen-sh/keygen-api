@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /products
     def index
-      @products = apply_scopes(@current_account.products).all
+      @products = policy_scope apply_scopes(@current_account.products).all
       authorize @products
 
       render json: @products

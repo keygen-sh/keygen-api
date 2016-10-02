@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /machines
     def index
-      @machines = apply_scopes(policy_scope(@current_account.machines)).all
+      @machines = policy_scope apply_scopes(@current_account.machines).all
       authorize @machines
 
       render json: @machines
