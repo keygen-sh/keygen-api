@@ -267,9 +267,16 @@ end
 
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   parse_placeholders body
-  @account.send(resource).update_all(
+  @account.send(resource.pluralize).update_all(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
+end
+
+Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
+  parse_placeholders body
+  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+    r.update JSON.parse(body).deep_transform_keys! &:underscore
+  end
 end
 
 Given /^I have a valid payment token/ do

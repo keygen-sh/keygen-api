@@ -48,15 +48,13 @@ class ApplicationPolicy
 
     def resolve
       case
-      when @bearer.has_role?(:admin)
+      when bearer.has_role?(:admin)
         scope.all
-      when @bearer.has_role?(:user)
-        scope
-      when @bearer.has_role?(:product)
-        scope.product @bearer.hashid
+      when bearer.has_role?(:product)
+        scope.product bearer.hashid
+      when bearer.has_role?(:user)
+        scope.user bearer.hashid
       end
-    # rescue
-    #   scope
     end
   end
 end

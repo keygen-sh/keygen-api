@@ -16,7 +16,7 @@ class Machine < ApplicationRecord
     where license: License.find_by_hashid(id)
   }
   scope :user, -> (id) {
-    where user: User.find_by_hashid(id)
+    joins(:license).where licenses: { user_id: User.find_by_hashid(id) }
   }
   scope :page, -> (page = {}) {
     paginate(page[:number]).per page[:size]
