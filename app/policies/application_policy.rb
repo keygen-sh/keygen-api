@@ -55,6 +55,8 @@ class ApplicationPolicy
       when bearer.has_role?(:user)
         scope.user bearer.hashid
       end
+    rescue NoMethodError
+      scope
     end
   end
 end
