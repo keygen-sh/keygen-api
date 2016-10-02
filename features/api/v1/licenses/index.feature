@@ -41,6 +41,8 @@ Feature: List license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use my auth token
+    And the current account has 3 "licenses"
+    And the current user has 1 "license"
     When I send a GET request to "/licenses"
-    Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
