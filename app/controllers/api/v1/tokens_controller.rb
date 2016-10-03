@@ -8,6 +8,7 @@ module Api::V1
     def request_tokens
       skip_authorization
 
+      # Attempt to authenticate via email and password
       authenticate_with_http_basic do |email, password|
         user = @current_account.users.find_by email: email
 
@@ -16,9 +17,13 @@ module Api::V1
         end
       end
 
-      render_unauthorized({
-        detail: "Invalid credentials given for email or password"
-      })
+      # Attempt to authenticate via token
+      authenticate_with_http_token do |token, options|
+        token = @current_account.tokens.find_by auth_token: token
+        render json: token and return if token
+      end
+
+      render_unauthorized detail: "Invalid credentials"
     end
 
     def reset_tokens
