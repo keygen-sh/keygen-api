@@ -6,7 +6,8 @@ class Account < ApplicationRecord
   include Billable
 
   belongs_to :plan
-  has_many :webhooks, dependent: :destroy
+  has_many :webhook_endpoints, dependent: :destroy
+  has_many :webhook_events, dependent: :destroy
   has_many :tokens, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy
@@ -35,7 +36,7 @@ class Account < ApplicationRecord
   validates :name, presence: true
   validates :subdomain,
     presence: true,
-    exclusion: { in: RESERVED_SUBDOMAINS, message: "%{value} is reserved." },
+    exclusion: { in: RESERVED_SUBDOMAINS, message: "%{value} is reserved" },
     uniqueness: { case_sensitive: false },
     format: { with: /\A[-A-za-z0-9]+\Z/i },
     length: { maximum: 255 }

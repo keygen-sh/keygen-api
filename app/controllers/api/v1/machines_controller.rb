@@ -33,6 +33,11 @@ module Api::V1
       authorize @machine
 
       if @machine.save
+        WebhookEventService.new("machine.created", {
+          account: @current_account,
+          resource: @machine
+        }).fire
+
         render json: @machine, status: :created, location: v1_machine_url(@machine)
       else
         render_unprocessable_resource @machine
@@ -46,6 +51,11 @@ module Api::V1
       authorize @machine
 
       if @machine.update(machine_params)
+        WebhookEventService.new("machine.updated", {
+          account: @current_account,
+          resource: @machine
+        }).fire
+
         render json: @machine
       else
         render_unprocessable_resource @machine
@@ -57,6 +67,11 @@ module Api::V1
       render_not_found and return unless @machine
 
       authorize @machine
+
+      WebhookEventService.new("machine.deleted", {
+        account: @current_account,
+        resource: @machine
+      }).fire
 
       @machine.destroy
     end

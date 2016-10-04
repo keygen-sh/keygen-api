@@ -1,0 +1,4 @@
+:queues:
+  - [default, 1]
+  - [webhooks, 2]
+  - [mailers, 3]

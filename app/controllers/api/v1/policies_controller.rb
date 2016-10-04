@@ -32,6 +32,11 @@ module Api::V1
       authorize @policy
 
       if @policy.save
+        WebhookEventService.new("policy.created", {
+          account: @current_account,
+          resource: @policy
+        }).fire
+
         render json: @policy, status: :created, location: v1_policy_url(@policy)
       else
         render_unprocessable_resource @policy
@@ -45,6 +50,11 @@ module Api::V1
       authorize @policy
 
       if @policy.update(policy_params)
+        WebhookEventService.new("policy.updated", {
+          account: @current_account,
+          resource: @policy
+        }).fire
+
         render json: @policy
       else
         render_unprocessable_resource @policy
@@ -56,6 +66,11 @@ module Api::V1
       render_not_found and return unless @policy
 
       authorize @policy
+
+      WebhookEventService.new("policy.deleted", {
+        account: @current_account,
+        resource: @policy
+      }).fire
 
       @policy.destroy
     end

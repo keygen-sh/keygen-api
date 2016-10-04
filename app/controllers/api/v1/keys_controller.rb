@@ -32,6 +32,11 @@ module Api::V1
       authorize @key
 
       if @key.save
+        WebhookEventService.new("key.created", {
+          account: @current_account,
+          resource: @key
+        }).fire
+
         render json: @key, status: :created, location: v1_key_url(@key)
       else
         render_unprocessable_resource @key
@@ -45,6 +50,11 @@ module Api::V1
       authorize @key
 
       if @key.update(key_params)
+        WebhookEventService.new("key.updated", {
+          account: @current_account,
+          resource: @key
+        }).fire
+
         render json: @key
       else
         render_unprocessable_resource @key
@@ -56,6 +66,11 @@ module Api::V1
       render_not_found and return unless @key
 
       authorize @key
+
+      WebhookEventService.new("key.deleted", {
+        account: @current_account,
+        resource: @key
+      }).fire
 
       @key.destroy
     end

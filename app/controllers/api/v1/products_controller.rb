@@ -31,6 +31,11 @@ module Api::V1
       authorize @product
 
       if @product.save
+        WebhookEventService.new("product.created", {
+          account: @current_account,
+          resource: @product
+        }).fire
+
         render json: @product, status: :created, location: v1_product_url(@product)
       else
         render_unprocessable_resource @product
@@ -44,6 +49,11 @@ module Api::V1
       authorize @product
 
       if @product.update(product_params)
+        WebhookEventService.new("product.updated", {
+          account: @current_account,
+          resource: @product
+        }).fire
+
         render json: @product
       else
         render_unprocessable_resource @product
@@ -55,6 +65,11 @@ module Api::V1
       render_not_found and return unless @product
 
       authorize @product
+
+      WebhookEventService.new("product.deleted", {
+        account: @current_account,
+        resource: @product
+      }).fire
 
       @product.destroy
     end
