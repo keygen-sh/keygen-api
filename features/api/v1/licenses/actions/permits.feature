@@ -11,7 +11,6 @@ Feature: License permits
   Scenario: Admin renews a license
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -19,7 +18,6 @@ Feature: License permits
         "duration": $time.1.month
       }
       """
-    And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
@@ -36,10 +34,18 @@ Feature: License permits
   Scenario: Admin revokes a license
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policies"
+    And the current account has 3 "licenses"
+    And I use my auth token
+    When I send a POST request to "/licenses/$0/actions/revoke"
+    Then the response status should be "204"
+    And the current account should have 2 "licenses"
+
+  Scenario: User revokes their own license
+    Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
+    And I am a user of account "test1"
+    And the current user has 2 "licenses"
     And I use my auth token
     When I send a POST request to "/licenses/$0/actions/revoke"
     Then the response status should be "204"
@@ -47,8 +53,6 @@ Feature: License permits
 
   Scenario: User tries to revoke another user's license
     Given I am on the subdomain "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policies"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I am a user of account "test1"
@@ -60,9 +64,6 @@ Feature: License permits
   Scenario: Admin tries to revoke a license for another account
     Given I am an admin of account "test1"
     And I am on the subdomain "test2"
-    And the current account has 1 "product"
-    And the current account has 1 "policies"
-    And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I use my auth token
     When I send a POST request to "/licenses/$0/actions/revoke"
@@ -72,7 +73,6 @@ Feature: License permits
   Scenario: Admin verifies a strict license that is valid
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -81,7 +81,6 @@ Feature: License permits
         "strict": true
       }
       """
-    And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
@@ -108,7 +107,6 @@ Feature: License permits
   Scenario: Admin verifies a strict license that has too many machines
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -117,7 +115,6 @@ Feature: License permits
         "strict": true
       }
       """
-    And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
@@ -144,7 +141,6 @@ Feature: License permits
   Scenario: Admin verifies a non-strict license that has too many machines
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -153,7 +149,6 @@ Feature: License permits
         "strict": false
       }
       """
-    And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
@@ -180,7 +175,6 @@ Feature: License permits
   Scenario: Admin verifies a license that has not been used
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -188,7 +182,6 @@ Feature: License permits
         "strict": false
       }
       """
-    And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
@@ -208,7 +201,6 @@ Feature: License permits
   Scenario: Admin verifies a strict license that has not been used
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -216,7 +208,6 @@ Feature: License permits
         "strict": true
       }
       """
-    And the current account has 1 "user"
     And the current account has 2 "licenses"
     And all "licenses" have the following attributes:
       """
@@ -236,9 +227,7 @@ Feature: License permits
   Scenario: Admin verifies a license that is expired
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And the current account has 1 "product"
     And the current account has 1 "policies"
-    And the current account has 1 "user"
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
       """

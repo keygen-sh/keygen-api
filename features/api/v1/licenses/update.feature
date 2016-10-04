@@ -83,6 +83,7 @@ Feature: Update license
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
+    And the current user has 3 "licenses"
     And I use my auth token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
