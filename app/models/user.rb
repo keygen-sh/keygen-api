@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include TokenAuthenticatable
   include PasswordResetable
   include Resourcifiable
+  include Paginatable
 
   has_secure_password
 
@@ -28,7 +29,6 @@ class User < ApplicationRecord
 
   scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
   scope :product, -> (id) { includes(:products).where products: { id: Product.decode_id(id) || 0 } }
-  scope :page, -> (page = {}) { paginate(page[:number]).per page[:size] }
   scope :admins, -> { roles :admin }
 
   private

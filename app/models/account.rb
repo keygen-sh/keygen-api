@@ -2,6 +2,7 @@ class Account < ApplicationRecord
   include ActiveModel::Validations
   include ReservedSubdomains
   include Resourcifiable
+  include Paginatable
   include Activatable
   include Billable
 
@@ -43,9 +44,6 @@ class Account < ApplicationRecord
 
   scope :plan, -> (id) {
     where plan: Plan.find_by_hashid(id)
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
   }
 
   private

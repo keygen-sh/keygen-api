@@ -1,4 +1,6 @@
 class Machine < ApplicationRecord
+  include Paginatable
+
   belongs_to :account
   belongs_to :license
   has_one :product, through: :license
@@ -17,9 +19,6 @@ class Machine < ApplicationRecord
   }
   scope :user, -> (id) {
     joins(:license).where licenses: { user_id: User.find_by_hashid(id) }
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
   }
   scope :product, -> (id) {
     joins(license: [:policy]).where policies: { product_id: Product.find_by_hashid(id) }
