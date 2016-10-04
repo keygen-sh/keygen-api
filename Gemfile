@@ -16,6 +16,9 @@ gem 'pundit'
 gem 'has_scope'
 gem 'kaminari'
 gem 'rolify'
+gem 'sidekiq'
+gem 'sidekiq-status'
+gem 'httparty'
 
 group :development, :test do
   gem 'byebug', platform: :mri

@@ -34,6 +34,11 @@ module Api::V1
       authorize @license
 
       if @license.save
+        WebhookEventService.new("license.created", {
+          account: @current_account,
+          resource: @license
+        }).fire
+
         render json: @license, status: :created, location: v1_license_url(@license)
       else
         render_unprocessable_resource @license
@@ -47,6 +52,11 @@ module Api::V1
       authorize @license
 
       if @license.update(license_params)
+        WebhookEventService.new("license.updated", {
+          account: @current_account,
+          resource: @license
+        }).fire
+
         render json: @license
       else
         render_unprocessable_resource @license
@@ -58,6 +68,11 @@ module Api::V1
       render_not_found and return unless @license
 
       authorize @license
+
+      WebhookEventService.new("license.deleted", {
+        account: @current_account,
+        resource: @license
+      }).fire
 
       @license.destroy
     end
