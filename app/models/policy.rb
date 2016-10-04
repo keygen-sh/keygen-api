@@ -1,4 +1,6 @@
 class Policy < ApplicationRecord
+  include Paginatable
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -10,9 +12,6 @@ class Policy < ApplicationRecord
 
   scope :product, -> (id) {
     where product: Product.find_by_hashid(id)
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
   }
 
   def pool?

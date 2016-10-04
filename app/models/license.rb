@@ -1,4 +1,5 @@
 class License < ApplicationRecord
+  include Paginatable
   include Tokenable
 
   belongs_to :account
@@ -28,9 +29,6 @@ class License < ApplicationRecord
   }
   scope :user, -> (id) {
     where user: User.find_by_hashid(id)
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
   }
   scope :product, -> (id) {
     joins(:policy).where policies: { product_id: Product.find_by_hashid(id) }

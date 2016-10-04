@@ -1,7 +1,5 @@
 class Plan < ApplicationRecord
-  has_many :accounts
+  include Paginatable
 
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
-  }
+  has_many :accounts
 end

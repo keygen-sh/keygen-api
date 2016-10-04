@@ -1,4 +1,6 @@
 class Key < ApplicationRecord
+  include Paginatable
+
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
@@ -11,9 +13,6 @@ class Key < ApplicationRecord
 
   scope :policy, -> (id) {
     where policy: Policy.find_by_hashid(id)
-  }
-  scope :page, -> (page = {}) {
-    paginate(page[:number]).per page[:size]
   }
   scope :product, -> (id) {
     joins(:policy).where policies: { product_id: Product.find_by_hashid(id) }
