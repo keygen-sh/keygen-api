@@ -32,6 +32,11 @@ module Api::V1
       authorize @user
 
       if @user.save
+        WebhookEventService.new("user.created", {
+          account: @current_account,
+          resource: @user
+        }).fire
+
         render json: @user, status: :created, location: v1_user_url(@user)
       else
         render_unprocessable_resource @user
@@ -45,6 +50,11 @@ module Api::V1
       authorize @user
 
       if @user.update(user_params)
+        WebhookEventService.new("user.updated", {
+          account: @current_account,
+          resource: @user
+        }).fire
+
         render json: @user
       else
         render_unprocessable_resource @user
@@ -56,6 +66,11 @@ module Api::V1
       render_not_found and return unless @user
 
       authorize @user
+
+      WebhookEventService.new("user.deleted", {
+        account: @current_account,
+        resource: @user
+      }).fire
 
       @user.destroy
     end

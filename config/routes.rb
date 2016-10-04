@@ -6,7 +6,11 @@ Rails.application.routes.draw do
     end
 
     namespace :v1, constraints: lambda { |r| json_request?(r) } do
-      resources :stripe, only: [:create]
+      def resource(name, opts = {}, &block)
+        resources(name, {
+          path: name.to_s.dasherize
+        }.merge(opts), &block)
+      end
 
       def relationship(verb, resource, opts = {})
         case verb
@@ -27,9 +31,11 @@ Rails.application.routes.draw do
         })
       end
 
+
       constraints lambda { |r| r.subdomain.empty? } do
-        resources :plans
-        resources :accounts do
+        resource :stripe, only: [:create]
+        resource :plans
+        resource :accounts do
           namespace :relationships do
             relationship :resource, :plan, only: [:create]
           end
@@ -49,32 +55,33 @@ Rails.application.routes.draw do
         post :tokens,    to: "tokens#reset_tokens"
         post :passwords, to: "passwords#reset_password"
         get  :profile,   to: "profiles#show"
-        resources :users do
+        resource :users do
           namespace :actions do
             action :post, :update_password, to: "password#update_password"
             action :post, :reset_password, to: "password#reset_password"
           end
         end
-        resources :policies do
+        resource :policies do
           namespace :relationships do
             relationship :delete, :pool, to: "pool#pop"
           end
         end
-        resources :keys
-        resources :licenses do
+        resource :keys
+        resource :licenses do
           namespace :actions do
             action :get, :verify, to: "permits#verify"
             action :post, :revoke, to: "permits#revoke"
             action :post, :renew, to: "permits#renew"
           end
         end
-        resources :machines
-        resources :products do |r|
+        resource :machines
+        resource :products do |r|
           namespace :relationships do
             relationship :resource, :users, only: [:create, :destroy]
           end
         end
-        resources :webhooks
+        resource :webhook_endpoints
+        resource :webhook_events, only: [:index, :show]
       end
     end
   end

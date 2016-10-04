@@ -18,6 +18,7 @@ gem 'kaminari'
 gem 'rolify'
 gem 'sidekiq'
 gem 'sidekiq-status'
+gem 'sidetiq'
 gem 'httparty'
 
 group :development, :test do

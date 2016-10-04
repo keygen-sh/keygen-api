@@ -7,13 +7,21 @@ class WebhookEventService
   end
 
   def fire
-    account&.webhooks.each do |webhook|
-      WebhookWorker.perform_async(
-        webhook.endpoint,
-        ActiveModelSerializers::SerializableResource.new(resource).serializable_hash.merge({
-          event: event
-        }).to_json
+    account&.webhook_endpoints.find_each do |endpoint|
+      payload = ActiveModelSerializers::SerializableResource.new(resource).serializable_hash.merge({
+        event: event
+      }).to_json
+
+      jid = WebhookWorker.perform_async(
+        account.id,
+        endpoint.url,
+        payload
       )
+
+      account.webhook_events << account.webhook_events.new({
+        payload: payload,
+        jid: jid
+      })
     end
   rescue
     false

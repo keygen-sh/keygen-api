@@ -30,6 +30,9 @@ module Api
     # Protect against DDOS
     config.middleware.use Rack::Attack
 
+    # Use Sidekiq for background jobs
+    config.active_job.queue_adapter = :sidekiq
+
     # Allow CORS
     config.middleware.insert_before 0, Rack::Cors do
       allow do

@@ -1,4 +1,4 @@
-class WebhookPolicy < ApplicationPolicy
+class WebhookEndpointPolicy < ApplicationPolicy
 
   def index?
     bearer.has_role? :admin
