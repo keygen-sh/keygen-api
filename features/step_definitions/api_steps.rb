@@ -5,7 +5,7 @@ World Rack::Test::Methods
 # $resource.attribute (random resource)
 # $current.attribute (current user)
 def parse_placeholders(str)
-  str.dup.scan /(\$(\w+)(?:\[(\w+)\])?(?:\.([\w\.]+))?)/ do |pattern, *matches|
+  str.dup.scan /(\$([-\w]+)(?:\[(\w+)\])?(?:\.([-\w\.]+))?)/ do |pattern, *matches|
     resource, index, attribute = matches
 
     attribute =
@@ -19,7 +19,7 @@ def parse_placeholders(str)
       end
 
     value =
-      case resource
+      case resource.underscore
       when "current"
         @bearer.send attribute
       when "time"
@@ -33,7 +33,7 @@ def parse_placeholders(str)
         end
       else
         if @account
-          @account.send(resource)
+          @account.send(resource.underscore)
             .all
             .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
@@ -58,7 +58,7 @@ end
 # resource/$current (current user or account)
 # resource/$0 (where 0 is a resource ID)
 def parse_path_placeholders(str)
-  str.dup.scan /(\w+)\/(\$(\w+))/ do |resource, pattern, index|
+  str.dup.scan /([-\w]+)\/(\$(\w+))/ do |resource, pattern, index|
     value =
       case index
       when "current"
@@ -70,11 +70,11 @@ def parse_path_placeholders(str)
         end
       else
         if @account
-          case resource
+          case resource.underscore
           when "billing"
-            @account.send(resource).hashid
+            @account.send(resource.underscore).hashid
           else
-            @account.send(resource)
+            @account.send(resource.underscore)
               .all
               .sort
               .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
@@ -233,18 +233,18 @@ end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
   count.to_i.times {
-    create resource.singularize, account_id: Account.find_by(subdomain: subdomain).id
+    create resource.singularize.underscore, account_id: Account.find_by(subdomain: subdomain).id
   }
 end
 
 Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times {
-    create resource.singularize, account_id: @account.id
+    create resource.singularize.underscore, account_id: @account.id
   }
 end
 
 Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
-  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     begin # FIXME: This is all pretty dirty, but it gets the job done
       r.products << @bearer
     rescue
@@ -259,7 +259,7 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
-  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     r.user = @bearer
     r.save
   end
@@ -399,9 +399,9 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     user = @account.users.roles(:admin).first
     user.token.update account: @account # FIXME ???
     header "Authorization", "Bearer \"#{user.token.auth_token}\""
-    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize}"
+    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   else
-    get "//keygin.io/#{@api_version}/#{resource.pluralize}"
+    get "//keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   end
   json = JSON.parse last_response.body
   assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
