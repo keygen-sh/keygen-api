@@ -6,6 +6,7 @@ class Account < ApplicationRecord
   include Billable
 
   belongs_to :plan
+  has_many :webhooks, dependent: :destroy
   has_many :tokens, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :products, dependent: :destroy

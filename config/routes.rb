@@ -74,6 +74,7 @@ Rails.application.routes.draw do
             relationship :resource, :users, only: [:create, :destroy]
           end
         end
+        resources :webhooks
       end
     end
   end

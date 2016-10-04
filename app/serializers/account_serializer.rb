@@ -12,6 +12,7 @@ class AccountSerializer < BaseSerializer
   ]
 
   belongs_to :plan
+  has_many :webhooks
   has_many :users
   has_many :products
   has_many :policies, through: :products
