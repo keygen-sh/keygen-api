@@ -19,6 +19,7 @@ class WebhookEventService
       )
 
       account.webhook_events << account.webhook_events.new({
+        endpoint: endpoint.url,
         payload: payload,
         jid: jid
       })
