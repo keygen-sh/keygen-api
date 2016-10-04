@@ -13,7 +13,7 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def update?
-    bearer.has_role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.has_role? :admin or resource.product == bearer
   end
 
   def destroy?
@@ -25,10 +25,10 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def revoke?
-    bearer.has_role? :admin
+    bearer.has_role? :admin or resource.user == bearer or resource.product == bearer
   end
 
   def renew?
-    bearer.has_role? :admin
+    bearer.has_role? :admin or resource.user == bearer or resource.product == bearer
   end
 end
