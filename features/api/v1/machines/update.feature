@@ -11,6 +11,7 @@ Feature: Update machine
   Scenario: Admin updates a machine
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use my auth token
     When I send a PATCH request to "/machines/$0" with the following:
@@ -19,10 +20,12 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Home iMac"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: Admin attempts to update a machine's fingerprint
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use my auth token
     When I send a PATCH request to "/machines/$0" with the following:
@@ -30,9 +33,11 @@ Feature: Update machine
       { "machine": { "fingerprint": "b7:WE:YV:oR:jU:Bc:d6:Wk:Yo:Po:Mu:oN:4Q:bC:pi" } }
       """
     Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Product updates a machine for their product
     Given I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use my auth token
@@ -44,9 +49,11 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Work MacBook Pro"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: Product attempts to update a machine for another product
     Given I am on the subdomain "test1"
+    And the current account has 3 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use my auth token
@@ -56,9 +63,11 @@ Feature: Update machine
       { "machine": { "name": "Office PC" } }
       """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: User updates a machine's name for their license
     Given I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
@@ -78,6 +87,7 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Office Mac"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: User updates a machine's fingerprint for their license
     Given I am on the subdomain "test1"
@@ -100,8 +110,9 @@ Feature: Update machine
       """
     Then the response status should be "400"
 
-  Scenario: User attempts to update a machine for their account
+  Scenario: User attempts to update a machine for another user
     Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -111,19 +122,23 @@ Feature: Update machine
       { "machine": { "name": "Office Mac" } }
       """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Anonymous user attempts to update a machine for their account
     Given I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "name": "iPad 4" } }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin attempts to update a machine for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
     And I use my auth token
     When I send a PATCH request to "/machines/$0" with the following:
@@ -131,3 +146,4 @@ Feature: Update machine
       { "machine": { "name": "PC" } }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
