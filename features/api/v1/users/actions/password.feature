@@ -70,12 +70,12 @@ Feature: User password
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "token", "passwordResetSentAt": "$time.23.hours.ago" }
+      { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     And I use my auth token
     When I send a POST request to "/users/$current/actions/reset-password" with the following:
       """
-      { "passwordResetToken": "$current.password_reset_token", "newPassword": "pass" }
+      { "passwordResetToken": "password", "newPassword": "pass" }
       """
     Then the response status should be "200"
 
@@ -85,7 +85,7 @@ Feature: User password
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "token", "passwordResetSentAt": "$time.23.hours.ago" }
+      { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     And I use my auth token
     When I send a POST request to "/users/$current/actions/reset-password" with the following:
@@ -100,11 +100,11 @@ Feature: User password
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "token", "passwordResetSentAt": "$time.25.hours.ago" }
+      { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.25.hours.ago" }
       """
     And I use my auth token
     When I send a POST request to "/users/$current/actions/reset-password" with the following:
       """
-      { "passwordResetToken": "$current.password_reset_token", "newPassword": "pass" }
+      { "passwordResetToken": "password", "newPassword": "pass" }
       """
     Then the response status should be "401"

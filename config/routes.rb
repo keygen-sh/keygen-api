@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v1, constraints: lambda { |r| json_request?(r) } do
+
       def resource(name, opts = {}, &block)
         resources(name, {
           path: name.to_s.dasherize
@@ -30,7 +31,6 @@ Rails.application.routes.draw do
           to: "/api/v1/#{parent_resource.name}/actions/#{opts[:to]}"
         })
       end
-
 
       constraints lambda { |r| r.subdomain.empty? } do
         resource :stripe, only: [:create]

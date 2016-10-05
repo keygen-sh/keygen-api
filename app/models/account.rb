@@ -23,7 +23,6 @@ class Account < ApplicationRecord
 
   before_create -> { self.subdomain = subdomain.downcase }
   after_create :set_founding_users_roles
-  after_create :send_activation
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }

@@ -1,7 +1,0 @@
-Account Activation
-
-To activate your account, use the token #{@user.account.activation_token} within 72 hours of recieving this email (#{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}).
-
-curl -X POST -d '{"activationToken": "#{@user.account.activation_token}"}' https://keygin.io/v1/accounts/#{@user.account.hashid}/actions/activate
-
-You are receiving this email becase you are listed as an admin of a new account. If you did not sign up for a new account, simply ignore this email.
