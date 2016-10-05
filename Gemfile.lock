@@ -55,23 +55,6 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    celluloid (0.17.3)
-      celluloid-essentials
-      celluloid-extras
-      celluloid-fsm
-      celluloid-pool
-      celluloid-supervision
-      timers (>= 4.1.1)
-    celluloid-essentials (0.20.5)
-      timers (>= 4.1.1)
-    celluloid-extras (0.20.5)
-      timers (>= 4.1.1)
-    celluloid-fsm (0.20.5)
-      timers (>= 4.1.1)
-    celluloid-pool (0.20.5)
-      timers (>= 4.1.1)
-    celluloid-supervision (0.20.6)
-      timers (>= 4.1.1)
     concurrent-ruby (1.0.2)
     connection_pool (2.2.0)
     cucumber (2.4.0)
@@ -127,7 +110,6 @@ GEM
       activerecord (>= 4.0)
       hashids (~> 1.0)
     hashids (1.0.2)
-    hitimes (1.2.4)
     html2haml (2.0.0)
       erubis (~> 2.7.0)
       haml (~> 4.0.0)
@@ -138,7 +120,6 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
-    ice_cube (0.14.0)
     json (1.8.3)
     jsonapi (0.1.1.beta2)
       json (~> 1.8)
@@ -227,10 +208,6 @@ GEM
       redis (~> 3.2, >= 3.2.1)
     sidekiq-status (0.6.0)
       sidekiq (>= 2.7)
-    sidetiq (0.7.2)
-      celluloid (>= 0.17.3)
-      ice_cube (~> 0.14.0)
-      sidekiq (>= 4.1.0)
     spring (1.7.2)
     spring-watcher-listen (2.0.0)
       listen (>= 2.7, < 4.0)
@@ -252,8 +229,6 @@ GEM
     thread_safe (0.3.5)
     tilt (2.0.5)
     timecop (0.8.1)
-    timers (4.1.1)
-      hitimes
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -293,7 +268,6 @@ DEPENDENCIES
   rolify
   sidekiq
   sidekiq-status
-  sidetiq
   spring
   spring-watcher-listen (~> 2.0.0)
   stripe
