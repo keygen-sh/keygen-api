@@ -18,6 +18,11 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.update(expiry: @license.expiry + @license.policy.duration)
+        WebhookEventService.new("license.renewed", {
+          account: @current_account,
+          resource: @license
+        }).fire
+
         render json: @license
       else
         render_unprocessable_resource @license
@@ -29,6 +34,11 @@ module Api::V1::Licenses::Actions
       render_not_found and return unless @license
 
       authorize @license
+
+      WebhookEventService.new("license.revoked", {
+        account: @current_account,
+        resource: @license
+      }).fire
 
       @license.destroy
     end

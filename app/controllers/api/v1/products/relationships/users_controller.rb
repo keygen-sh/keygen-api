@@ -15,6 +15,12 @@ module Api::V1::Products::Relationships
 
       if @user
         @product.users << @user
+
+        WebhookEventService.new("product.user.added", {
+          account: @current_account,
+          resource: @product.users
+        }).fire
+
         head :created
       else
         render_unprocessable_entity detail: "must exist", source: {
@@ -30,7 +36,14 @@ module Api::V1::Products::Relationships
 
       authorize @product
 
-      @product.users.delete @user if @product.users.include? @user
+      if @product.users.include?(@user)
+        @product.users.delete @user
+
+        WebhookEventService.new("product.user.removed", {
+          account: @current_account,
+          resource: @product.users
+        }).fire
+      end
     end
 
     private
