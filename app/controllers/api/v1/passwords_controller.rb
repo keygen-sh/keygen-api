@@ -6,7 +6,7 @@ module Api::V1
     def reset_password
       skip_authorization
 
-      @user.send_password_reset if @user
+      @user.send_password_reset_email if @user
     end
 
     private

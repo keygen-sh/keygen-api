@@ -5,7 +5,7 @@ World Rack::Test::Methods
 # $resource.attribute (random resource)
 # $current.attribute (current user)
 def parse_placeholders(str)
-  str.dup.scan /(\$([-\w]+)(?:\[(\w+)\])?(?:\.([-\w\.]+))?)/ do |pattern, *matches|
+  str.dup.scan /((?<!\\)\$([-\w]+)(?:\[(\w+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
     resource, index, attribute = matches
 
     attribute =
@@ -58,7 +58,7 @@ end
 # resource/$current (current user or account)
 # resource/$0 (where 0 is a resource ID)
 def parse_path_placeholders(str)
-  str.dup.scan /([-\w]+)\/(\$(\w+))/ do |resource, pattern, index|
+  str.dup.scan /([-\w]+)\/((?<!\\)\$(\w+))/ do |resource, pattern, index|
     value =
       case index
       when "current"

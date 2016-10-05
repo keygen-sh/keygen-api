@@ -3,31 +3,22 @@ module Activatable
   include Tokenable
 
   included do
-    before_create :create_activation_token
+    after_create :send_activation_email
   end
 
-  def send_activation
+  def send_activation_email
+    token, enc = generate_encrypted_token :activation_token
+
     self.activation_sent_at = Time.zone.now
-    create_activation_token
+    self.activation_token   = enc
     save
 
     users.roles(:admin).each do |admin|
-      UserMailer.account_activation(admin).deliver_later
+      UserMailer.account_activation(admin, token).deliver_later
     end
-  end
-
-  def reset_activation_token!
-    create_activation_token
-    save
   end
 
   def activated?
     activated
-  end
-
-  private
-
-  def create_activation_token
-    self.activation_token = generate_token :activation_token
   end
 end
