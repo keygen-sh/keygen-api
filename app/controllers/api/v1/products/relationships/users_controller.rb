@@ -18,7 +18,7 @@ module Api::V1::Products::Relationships
 
         WebhookEventService.new("product.user.added", {
           account: @current_account,
-          resource: @product.users
+          resource: @user
         }).fire
 
         head :created
@@ -41,7 +41,7 @@ module Api::V1::Products::Relationships
 
         WebhookEventService.new("product.user.removed", {
           account: @current_account,
-          resource: @product.users
+          resource: @user
         }).fire
       end
     end
