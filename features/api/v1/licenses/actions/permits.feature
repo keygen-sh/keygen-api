@@ -33,6 +33,45 @@ Feature: License permits
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
 
+  Scenario: User renews their license
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "2016-12-01T22:53:37.000Z"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use my auth token
+    When I send a POST request to "/licenses/$0/actions/renew"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Admin attempts to renew a license for another account
+    Given I am an admin of account "test2"
+    And I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "license"
+    And I use my auth token
+    When I send a POST request to "/licenses/$0/actions/renew"
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: Admin revokes a license
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
