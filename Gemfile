@@ -3,7 +3,6 @@ ruby '2.3.0'
 
 gem 'rails', '~> 5.0'
 gem 'pg'
-gem 'rails_12factor', group: :production
 gem 'puma', '~> 3.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'hashid-rails'
