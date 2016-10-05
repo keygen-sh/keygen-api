@@ -119,6 +119,7 @@ Before do
 end
 
 After do |s|
+  Sidekiq::Worker.clear_all
   StripeMock.stop
 
   # Tell Cucumber to quit if a scenario fails
@@ -128,7 +129,7 @@ After do |s|
   end
 end
 
-Given(/^the following (\w+) exist:$/) do |resource, table|
+Given /^the following (\w+) exist:$/ do |resource, table|
   data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
   data.each { |d| create resource.singularize, d }
 end
@@ -262,6 +263,29 @@ Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
   @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     r.user = @bearer
     r.save
+  end
+end
+
+Given /^the (\w+) "([^\"]*)" is associated with the (\w+) "([^\"]*)"$/ do |i, a, j, b|
+  numbers = {
+    "first"   => 1,
+    "second"  => 2,
+    "third"   => 3,
+    "fourth"  => 4,
+    "fifth"   => 5,
+    "sixth"   => 6,
+    "seventh" => 7,
+    "eigth"   => 8,
+    "ninth"   => 9
+  }
+
+  resource = @account.send(a.pluralize.underscore).limit(numbers[i]).last
+  association = @account.send(b.pluralize.underscore).limit(numbers[j]).last
+
+  begin
+    association.send(a.singularize.underscore) << resource
+  rescue
+    association.send(a.pluralize.underscore) << resource
   end
 end
 
@@ -405,6 +429,11 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   end
   json = JSON.parse last_response.body
   assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
+end
+
+Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
+  worker = "#{resource.singularize.underscore}_worker".classify.constantize
+  assert_equal count.to_i, worker.jobs.size
 end
 
 Then /^the account should be charged$/ do

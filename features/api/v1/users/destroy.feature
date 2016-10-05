@@ -11,11 +11,13 @@ Feature: Delete user
   Scenario: Admin deletes one of their users
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 3 "users"
     And I use my auth token
     When I send a DELETE request to "/users/$3"
     Then the response status should be "204"
     And the current account should have 2 "users"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: Admin attempts to delete a user for another account
     Given I am an admin of account "test2"
@@ -30,6 +32,7 @@ Feature: Delete user
   Scenario: User attempts to delete themself
     Given I am on the subdomain "test1"
     And the current account has 3 "users"
+    And the current account has 1 "webhookEndpoint"
     And I am a user of account "test1"
     And I send and accept JSON
     And I use my auth token
@@ -37,3 +40,4 @@ Feature: Delete user
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "users"
+    And sidekiq should have 0 "webhook" jobs

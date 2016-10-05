@@ -8,12 +8,15 @@ World FactoryGirl::Syntax::Methods
 
 DatabaseCleaner.strategy = :transaction
 
+Sidekiq::Testing.fake!
+
 # Monkey patch sidekiq-status
 module Sidekiq::Status
   module Testing
     class << self
+
       def statii(jid)
-        @statii ||= {}
+        @statii      ||= {}
         @statii[jid] ||= []
       end
 
@@ -30,7 +33,7 @@ module Sidekiq::Status
       end
 
       def disable!
-        @fake = false
+        @fake   = false
         @statii = nil
       end
 
@@ -39,7 +42,9 @@ module Sidekiq::Status
       end
     end
   end
+
   class ClientMiddleware
+
     def store_for_id(id, status_updates, expiration = nil, redis_pool = nil)
       if Sidekiq::Testing.fake?
         Sidekiq::Status::Testing.fake! unless Sidekiq::Status::Testing.fake?

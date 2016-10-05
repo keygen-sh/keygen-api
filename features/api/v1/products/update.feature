@@ -11,6 +11,7 @@ Feature: Update product
   Scenario: Admin updates a product for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I use my auth token
     When I send a PATCH request to "/products/$0" with the following:
@@ -19,10 +20,12 @@ Feature: Update product
       """
     Then the response status should be "200"
     And the JSON response should be a "product" with the name "New App"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: Admin attempts to update a product for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "product"
     And I use my auth token
     When I send a PATCH request to "/products/$0" with the following:
@@ -30,10 +33,12 @@ Feature: Update product
       { "product": { "name": "Updated App" } }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin updates a product's platforms for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
+    And the current account has 3 "webhookEndpoints"
     And the current account has 2 "products"
     And I use my auth token
     When I send a PATCH request to "/products/$1" with the following:
@@ -49,3 +54,4 @@ Feature: Update product
         "Windows"
       ]
       """
+    And sidekiq should have 3 "webhook" jobs
