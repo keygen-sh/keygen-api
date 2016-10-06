@@ -6,14 +6,12 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_product, only: [:show, :update, :destroy]
 
-    # accessible_by_admin :index, :show, :create, :update, :destroy
-
     # GET /products
     def index
       @products = policy_scope apply_scopes(@current_account.products).all
       authorize @products
 
-      render json: @products
+      render json: @products, include: [:token]
     end
 
     # GET /products/1
@@ -22,7 +20,7 @@ module Api::V1
 
       authorize @product
 
-      render json: @product
+      render json: @product, include: [:token]
     end
 
     # POST /products
@@ -36,7 +34,7 @@ module Api::V1
           resource: @product
         }).fire
 
-        render json: @product, status: :created, location: v1_product_url(@product)
+        render json: @product, include: [:token], status: :created, location: v1_product_url(@product)
       else
         render_unprocessable_resource @product
       end
@@ -54,7 +52,7 @@ module Api::V1
           resource: @product
         }).fire
 
-        render json: @product
+        render json: @product, include: [:token]
       else
         render_unprocessable_resource @product
       end
