@@ -43,3 +43,16 @@ Feature: Create product
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Product attempts to create a product for their account
+    Given I am on the subdomain "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use my auth token
+    And the current account has 1 "webhookEndpoint"
+    When I send a POST request to "/products" with the following:
+      """
+      { "product": { "name": "Hello World App", "platforms": ["PC"] } }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs

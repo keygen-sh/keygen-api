@@ -55,3 +55,33 @@ Feature: Update product
       ]
       """
     And sidekiq should have 3 "webhook" jobs
+
+  Scenario: Product updates the platforms for itself
+    Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And I use my auth token
+    When I send a PATCH request to "/products/$0" with the following:
+      """
+      { "product": { "platforms": ["Nintendo"] } }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "product" with the following platforms:
+      """
+      ["Nintendo"]
+      """
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Product attempts to update the platforms for another product
+    Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And I use my auth token
+    When I send a PATCH request to "/products/$1" with the following:
+      """
+      { "product": { "platforms": ["PC"] } }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
