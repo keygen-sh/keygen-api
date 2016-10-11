@@ -41,5 +41,5 @@ Feature: List products
     And I am a product of account "test1"
     And I use my auth token
     When I send a GET request to "/products"
-    Then the response status should be "401"
+    Then the response status should be "403"
     And the JSON response should be an array of 1 error
