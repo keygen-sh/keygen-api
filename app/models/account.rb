@@ -33,12 +33,7 @@ class Account < ApplicationRecord
   end
 
   validates :name, presence: true
-  validates :subdomain,
-    subdomain: true,
-    presence: true,
-    uniqueness: { case_sensitive: false },
-    format: { with: /\A[-A-za-z0-9]+\Z/i },
-    length: { maximum: 255 }
+  validates :subdomain, subdomain: true, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
 
   scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
