@@ -1,5 +1,3 @@
-require "uri"
-
 class WebhookEndpoint < ApplicationRecord
   include Paginatable
 
