@@ -25,19 +25,6 @@ class License < ApplicationRecord
   scope :user, -> (id) { where user: User.decode_id(id) }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: Product.decode_id(id) } }
 
-  def license_valid?
-    # Check if license is expired
-    return false unless expiry.nil? || expiry > DateTime.now
-    # Check if license policy is strict, e.g. enforces reporting of machine usage
-    return true unless policy.strict
-    # Check if license policy allows floating and if not, should have single activation
-    return true if !policy.floating && machines.count == 1
-    # Assume floating, should have at least 1 activation but no more than policy allows
-    return true if policy.floating && machines.count >= 1 && machines.count <= policy.max_machines
-    # Otherwise, assume invalid
-    return false
-  end
-
   private
 
   def set_license_key
