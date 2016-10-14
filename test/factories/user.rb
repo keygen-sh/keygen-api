@@ -8,6 +8,7 @@ FactoryGirl.define do
     account
     before :create do |user|
       user.token = build :user_token, account: user.account, bearer: user
+      user.licenses << build(:license, user: user)
     end
   end
 

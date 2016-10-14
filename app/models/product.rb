@@ -4,9 +4,10 @@ class Product < ApplicationRecord
   include Paginatable
 
   belongs_to :account
-  has_and_belongs_to_many :users
   has_many :policies, dependent: :destroy
   has_many :licenses, through: :policies
+  has_many :keys, through: :policies, source: :pool
+  has_many :users, through: :licenses
   has_one :token, as: :bearer, dependent: :destroy
 
   serialize :platforms, Array

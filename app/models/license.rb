@@ -19,8 +19,7 @@ class License < ApplicationRecord
     errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_machines
   end
 
-  validates :key, presence: true, blank: false,
-    uniqueness: { case_sensitive: false }
+  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: false }
 
   scope :policy, -> (id) { where policy: Policy.decode_id(id) }
   scope :user, -> (id) { where user: User.decode_id(id) }

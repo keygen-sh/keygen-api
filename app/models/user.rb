@@ -7,8 +7,8 @@ class User < ApplicationRecord
   has_secure_password
 
   belongs_to :account
-  has_and_belongs_to_many :products
   has_many :licenses, dependent: :destroy
+  has_many :products, through: :licenses
   has_many :machines, through: :licenses
   has_one :token, as: :bearer, dependent: :destroy
 
@@ -24,7 +24,7 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
 
   scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
-  scope :product, -> (id) { joins(:products).where products_users: { product_id: Product.decode_id(id) } }
+  scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: Product.decode_id(id) } }
   scope :admins, -> { roles :admin }
 
   private

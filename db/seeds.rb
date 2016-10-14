@@ -78,8 +78,7 @@ account.keys.create!({
 user = account.users.create!({
   name: "User",
   email: "user@keygin.io",
-  password: "password",
-  products: [product]
+  password: "password"
 })
 
 license = account.licenses.create!({
