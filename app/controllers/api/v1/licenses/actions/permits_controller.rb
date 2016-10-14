@@ -49,7 +49,7 @@ module Api::V1::Licenses::Actions
 
       authorize @license
 
-      render_meta is_valid: @license.license_valid?
+      render_meta is_valid: LicenseValidationService.new(@license).validate
     end
 
     private
