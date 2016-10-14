@@ -15,12 +15,12 @@ class Machine < ApplicationRecord
     uniqueness: { scope: :license_id }
 
   scope :license, -> (id) {
-    where license: License.find_by_hashid(id)
+    where license: License.decode_id(id)
   }
   scope :user, -> (id) {
-    joins(:license).where licenses: { user_id: User.find_by_hashid(id) }
+    joins(:license).where licenses: { user_id: User.decode_id(id) }
   }
   scope :product, -> (id) {
-    joins(license: [:policy]).where policies: { product_id: Product.find_by_hashid(id) }
+    joins(license: [:policy]).where policies: { product_id: Product.decode_id(id) }
   }
 end

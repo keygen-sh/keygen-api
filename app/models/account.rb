@@ -40,9 +40,7 @@ class Account < ApplicationRecord
     format: { with: /\A[-A-za-z0-9]+\Z/i },
     length: { maximum: 255 }
 
-  scope :plan, -> (id) {
-    where plan: Plan.find_by_hashid(id)
-  }
+  scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
   private
 
