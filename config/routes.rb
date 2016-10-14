@@ -69,7 +69,7 @@ Rails.application.routes.draw do
         resource :keys
         resource :licenses do
           namespace :actions do
-            action :get, :verify, to: "permits#verify"
+            action :get, :validate, to: "permits#validate"
             action :post, :revoke, to: "permits#revoke"
             action :post, :renew, to: "permits#renew"
           end

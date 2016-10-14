@@ -20,7 +20,7 @@ class LicensePolicy < ApplicationPolicy
     bearer.has_role? :admin or resource.user == bearer or resource.product == bearer
   end
 
-  def verify?
+  def validate?
     bearer.has_role? :admin or resource.user == bearer or resource.product == bearer
   end
 

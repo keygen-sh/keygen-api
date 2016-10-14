@@ -146,7 +146,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -180,7 +180,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -214,7 +214,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -240,7 +240,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -266,7 +266,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -286,7 +286,7 @@ Feature: License permits
       }
       """
     And I use my auth token
-    When I send a GET request to "/licenses/$0/actions/verify"
+    When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
