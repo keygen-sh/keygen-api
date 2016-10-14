@@ -78,7 +78,7 @@ class SubdomainValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
     if reserved?(value)
-      record.errors.add attribute, "#{value} is a reserved name"
+      record.errors.add attribute, "#{value} is a reserved subdomain"
     end
   end
 
