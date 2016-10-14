@@ -21,11 +21,7 @@ class User < ApplicationRecord
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :name, presence: true
-  validates :email,
-    presence: true,
-    length: { maximum: 255 },
-    format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
-    uniqueness: { case_sensitive: false, scope: :account_id }
+  validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
 
   scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
   scope :product, -> (id) { joins(:products).where products_users: { product_id: Product.decode_id(id) } }
