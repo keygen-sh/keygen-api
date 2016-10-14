@@ -11,8 +11,6 @@ class License < ApplicationRecord
   before_validation :set_license_key, on: :create
   before_validation :set_expiry, on: :create
 
-  # validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first }
-  # validates_associated :policy, message: -> (_, obj) { obj[:value].errors.full_messages.first }
   validates :account, presence: { message: "must exist" }
   validates :user, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }, uniqueness: { scope: :user_id, message: "user already has a license with this policy" }
