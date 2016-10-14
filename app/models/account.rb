@@ -1,6 +1,5 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
-  include ReservedSubdomains
   include Resourcifiable
   include Paginatable
   include Activatable
@@ -35,8 +34,8 @@ class Account < ApplicationRecord
 
   validates :name, presence: true
   validates :subdomain,
+    subdomain: true,
     presence: true,
-    exclusion: { in: RESERVED_SUBDOMAINS, message: "%{value} is reserved" },
     uniqueness: { case_sensitive: false },
     format: { with: /\A[-A-za-z0-9]+\Z/i },
     length: { maximum: 255 }
