@@ -34,7 +34,7 @@ Plan.create!([{
 
 billing = Billing.create!({
   external_customer_id: "cust_id",
-  external_status: "active"
+  external_subscription_status: "active"
 })
 
 account = Account.create!({
