@@ -24,15 +24,9 @@ class License < ApplicationRecord
   validates :key, presence: true, blank: false,
     uniqueness: { case_sensitive: false }
 
-  scope :policy, -> (id) {
-    where policy: Policy.find_by_hashid(id)
-  }
-  scope :user, -> (id) {
-    where user: User.find_by_hashid(id)
-  }
-  scope :product, -> (id) {
-    joins(:policy).where policies: { product_id: Product.find_by_hashid(id) }
-  }
+  scope :policy, -> (id) { where policy: Policy.decode_id(id) }
+  scope :user, -> (id) { where user: User.decode_id(id) }
+  scope :product, -> (id) { joins(:policy).where policies: { product_id: Product.decode_id(id) } }
 
   def license_valid?
     # Check if license is expired

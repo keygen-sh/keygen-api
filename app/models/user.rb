@@ -28,7 +28,7 @@ class User < ApplicationRecord
     uniqueness: { case_sensitive: false, scope: :account_id }
 
   scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
-  scope :product, -> (id) { includes(:products).where products: { id: Product.decode_id(id) || 0 } }
+  scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: Product.decode_id(id) } }
   scope :admins, -> { roles :admin }
 
   private

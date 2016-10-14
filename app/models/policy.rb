@@ -10,9 +10,7 @@ class Policy < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 
-  scope :product, -> (id) {
-    where product: Product.find_by_hashid(id)
-  }
+  scope :product, -> (id) { where product: Product.decode_id(id) }
 
   def pool?
     use_pool
