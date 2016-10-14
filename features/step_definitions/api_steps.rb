@@ -245,16 +245,36 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
-  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
-    begin # FIXME: This is all pretty dirty, but it gets the job done
-      r.products << @bearer
-    rescue
-      begin
+  finders  = %w[first second third fourth fifth]
+  resource = resource.pluralize.underscore
+
+  model =
+    if resource == "users"
+      @account.send(resource).roles :user
+    else
+      @account.send resource
+    end
+
+  model.limit(count.to_i).all.each_with_index do |r, i|
+    ref = (r.class.reflect_on_association(:products) rescue false) ||
+          (r.class.reflect_on_association(:product) rescue false)
+
+    begin
+      case
+      when ref.name.to_s.pluralize == ref.name.to_s
+        r.products << @bearer
+      when ref.name.to_s.singularize == ref.name.to_s
         r.product = @bearer
-      rescue
-        r.license.product = @bearer
+      end
+    rescue
+      case
+      when ref&.options[:through] && ref.options[:through].to_s.pluralize == ref.options[:through].to_s
+        r.send(ref.options[:through]).send(finders[i])&.product = @bearer
+      when ref&.options[:through] && ref.options[:through].to_s.singularize == ref.options[:through].to_s
+        r.send(ref.options[:through])&.product = @bearer
       end
     end
+
     r.save
   end
 end
@@ -266,7 +286,7 @@ Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Given /^the (\w+) "([^\"]*)" is associated with the (\w+) "([^\"]*)"$/ do |i, a, j, b|
+Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do |i, a, j, b|
   numbers = {
     "first"   => 1,
     "second"  => 2,

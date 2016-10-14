@@ -3,9 +3,7 @@ class Billing < ApplicationRecord
 
   before_destroy :close_external_customer_account!
 
-  validates :external_customer_id, presence: {
-    message: "billing details are invalid"
-  }
+  validates :external_customer_id, presence: { message: "billing details are invalid" }
 
   private
 

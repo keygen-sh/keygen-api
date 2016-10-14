@@ -22,7 +22,10 @@ Feature: List users
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use my auth token
+    # And the current account has 3 "licenses"
     And the current account has 3 "users"
+    # And the first "license" is associated to the first "user"
+    # And the current product has 1 "license"
     And the current product has 1 "user"
     When I send a GET request to "/users"
     Then the response status should be "200"
