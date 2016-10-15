@@ -10,8 +10,8 @@ class ProductSerializer < BaseSerializer
   ]
 
   belongs_to :account
-  has_many :users
   has_many :policies, dependent: :destroy
   has_many :licenses, through: :policies
+  has_many :users, through: :licenses
   has_one :token
 end

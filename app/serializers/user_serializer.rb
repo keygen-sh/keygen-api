@@ -11,7 +11,8 @@ class UserSerializer < BaseSerializer
   ]
 
   belongs_to :account
-  has_many :products
   has_many :licenses
+  has_many :products, through: :licenses
+  has_many :machines, through: :licenses
   has_one :token
 end
