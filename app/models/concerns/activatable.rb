@@ -13,7 +13,7 @@ module Activatable
     self.activation_token   = enc
     save
 
-    users.roles(:admin).each do |admin|
+    users.admins.each do |admin|
       UserMailer.account_activation(admin, token).deliver_later
     end
   end

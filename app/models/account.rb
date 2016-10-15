@@ -21,7 +21,7 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :billing
 
   before_create -> { self.subdomain = subdomain.downcase }
-  after_create :set_founding_users_roles
+  after_create :set_founding_users_to_admin_roles
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -39,7 +39,7 @@ class Account < ApplicationRecord
 
   private
 
-  def set_founding_users_roles
+  def set_founding_users_to_admin_roles
     users.each do |user|
       user.remove_role :user
       user.add_role :admin
