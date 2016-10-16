@@ -8,7 +8,7 @@ module TokenAuthentication
       Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_or_request_with_http_token do |token, options|
-      break if account.nil?
+      next if account.nil?
 
       @current_bearer = TokenAuthenticationService.new(
         account: account,
@@ -22,7 +22,7 @@ module TokenAuthentication
       Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_with_http_token do |token, options|
-      break if account.nil?
+      next if account.nil?
 
       @current_bearer = TokenAuthenticationService.new(
         account: account,
