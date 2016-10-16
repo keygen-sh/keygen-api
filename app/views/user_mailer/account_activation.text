@@ -1,5 +1,3 @@
-Account Activation
-
 To activate your account, use the token '#{@token}' within 72 hours of the
 following date: #{@user.account.activation_sent_at.to_formatted_s(:long_ordinal)}.
 
