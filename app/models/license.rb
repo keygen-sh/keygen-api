@@ -44,7 +44,7 @@ class License < ApplicationRecord
     if policy.duration.nil?
       self.expiry = nil
     else
-      self.expiry = Time.now + policy.duration
+      self.expiry = Time.current + policy.duration
     end
   end
 end

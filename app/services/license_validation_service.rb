@@ -7,7 +7,7 @@ class LicenseValidationService
   def validate
     return false if license.nil?
     # Check if license is expired (move along if it has no expiry)
-    return false if !license.expiry.nil? && license.expiry < DateTime.now
+    return false if !license.expiry.nil? && license.expiry < Time.current
     # Check if license policy is strict, e.g. enforces reporting of machine usage
     return true if !license.policy.strict
     # Check if license policy allows floating and if not, should have single activation
