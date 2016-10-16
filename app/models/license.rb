@@ -8,14 +8,13 @@ class License < ApplicationRecord
   has_many :machines, dependent: :destroy
   has_one :product, through: :policy
 
-  before_validation :set_license_key, on: :create
-  before_validation :set_expiry, on: :create
+  before_validation :set_license_key, on: :create, unless: -> { policy.nil? }
+  before_validation :set_expiry, on: :create, unless: -> { policy.nil? }
 
   validates :account, presence: { message: "must exist" }
-  validates :user, presence: { message: "must exist" }
-  validates :policy, presence: { message: "must exist" }, uniqueness: { scope: :user_id, message: "user already has a license with this policy" }
+  validates :policy, presence: { message: "must exist" }
 
-  validate do
+  validate unless: -> { policy.nil? } do
     errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_machines
   end
 
