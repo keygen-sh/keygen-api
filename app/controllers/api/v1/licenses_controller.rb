@@ -30,7 +30,10 @@ module Api::V1
       policy = @current_account.policies.find_by_hashid license_params[:policy]
       user = @current_account.users.find_by_hashid license_params[:user]
 
-      @license = @current_account.licenses.new license_params.merge(policy: policy, user: user)
+      @license = @current_account.licenses.new license_params.merge(
+        policy: policy,
+        user: user
+      ).compact
       authorize @license
 
       if @license.save
@@ -96,8 +99,8 @@ module Api::V1
 
           case action_name
           when "create"
-            permits << :user
             permits << :policy
+            permits << :user
           when "update"
             permits << :expiry
             permits << :key
