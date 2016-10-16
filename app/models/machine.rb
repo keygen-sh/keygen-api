@@ -9,10 +9,8 @@ class Machine < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
-  validates :fingerprint, presence: true, blank: false,
-    uniqueness: { scope: :license_id }
-  validates :name, presence: true, allow_nil: true,
-    uniqueness: { scope: :license_id }
+  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
+  validates :name, presence: true, allow_nil: true, uniqueness: { scope: :license_id }
 
   scope :license, -> (id) { where license: License.decode_id(id) }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: User.decode_id(id) } }
