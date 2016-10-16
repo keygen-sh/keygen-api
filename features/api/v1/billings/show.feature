@@ -11,7 +11,7 @@ Feature: Show billing info
   Scenario: Admin retrieves the billing info for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/billing"
     Then the response status should be "200"
     And the JSON response should be a "billing"
@@ -20,13 +20,13 @@ Feature: Show billing info
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/billing"
     Then the response status should be "403"
 
   Scenario: Admin attempts to retrieve the billing info for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/billing"
     Then the response status should be "401"

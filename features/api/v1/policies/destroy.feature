@@ -13,7 +13,7 @@ Feature: Delete policy
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "policies"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/policies/$2"
     Then the response status should be "204"
     And the current account should have 2 "policies"
@@ -24,7 +24,7 @@ Feature: Delete policy
     But I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "policies"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/policies/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

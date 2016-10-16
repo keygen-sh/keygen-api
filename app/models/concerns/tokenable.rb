@@ -12,12 +12,13 @@ module Tokenable
   def generate_encrypted_token(attribute)
     loop do
       raw = SecureRandom.hex 32
+      raw = yield raw if block_given?
       enc = BCrypt::Password.create raw
       break [raw, enc] unless self.class.exists? attribute => enc
     end
   end
 
-  def authenticate_with_token(attribute, token)
+  def compare_encrypted_token(attribute, token)
     enc = BCrypt::Password.new self.send(attribute)
     enc == token
   rescue

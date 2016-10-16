@@ -1,5 +1,5 @@
 @api/v1
-Feature: Request tokens
+Feature: Generate authentication token
 
   Background:
     Given the following accounts exist:
@@ -28,5 +28,12 @@ Feature: Request tokens
       """
       { "Authorization": "Basic \"$users[1].email:someBadPassword\"" }
       """
+    When I send a GET request to "/tokens"
+    Then the response status should be "401"
+
+  Scenario: User attempts to retrieve their tokens without authentication
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
     When I send a GET request to "/tokens"
     Then the response status should be "401"

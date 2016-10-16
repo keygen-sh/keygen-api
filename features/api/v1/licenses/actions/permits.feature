@@ -27,7 +27,7 @@ Feature: License permits
         "expiry": "2016-09-05T22:53:37.000Z"
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
@@ -55,7 +55,7 @@ Feature: License permits
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
@@ -67,7 +67,7 @@ Feature: License permits
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "license"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/renew"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -77,7 +77,7 @@ Feature: License permits
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "licenses"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
@@ -90,7 +90,7 @@ Feature: License permits
     And the current account has 3 "licenses"
     And I am a user of account "test1"
     And the current user has 2 "licenses"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
@@ -102,7 +102,7 @@ Feature: License permits
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/revoke"
     Then the response status should be "403"
     And the current account should have 3 "licenses"
@@ -113,7 +113,7 @@ Feature: License permits
     And I am on the subdomain "test2"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "licenses"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses/$0/actions/revoke"
     Then the response status should be "401"
     And the current account should have 3 "licenses"
@@ -145,7 +145,7 @@ Feature: License permits
         "licenseId": $licenses[0].id
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -179,7 +179,7 @@ Feature: License permits
         "licenseId": $licenses[0].id
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -213,7 +213,7 @@ Feature: License permits
         "licenseId": $licenses[0].id
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -239,7 +239,7 @@ Feature: License permits
         "expiry": "$time.1.day.from_now"
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -265,7 +265,7 @@ Feature: License permits
         "expiry": "$time.1.day.from_now"
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -285,7 +285,7 @@ Feature: License permits
         "expiry": "$time.1.day.ago"
       }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:

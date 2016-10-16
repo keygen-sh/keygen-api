@@ -5,17 +5,16 @@ class Token < ApplicationRecord
   belongs_to :account
   belongs_to :bearer, polymorphic: true
 
-  before_create :generate_tokens
+  attr_reader :raw
 
-  def reset!
-    generate_tokens
+  def generate!
+    @raw, enc = generate_encrypted_token :digest do |token|
+      "#{hashid}_#{token}"
+    end
+
+    self.digest = enc
     save
-  end
 
-  private
-
-  def generate_tokens
-    self.auth_token  = generate_token :auth_token
-    self.reset_token = generate_token :reset_token
+    raw
   end
 end

@@ -12,7 +12,7 @@ Feature: Update billing info
     Given the account "test1" has valid billing details
     And I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/billing" with the following:
       """
@@ -25,7 +25,7 @@ Feature: Update billing info
     And I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/billing" with the following:
       """
@@ -37,7 +37,7 @@ Feature: Update billing info
     Given the account "test1" has valid billing details
     And I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/billing" with the following:
       """

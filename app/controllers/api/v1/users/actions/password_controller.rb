@@ -30,7 +30,7 @@ module Api::V1::Users::Actions
       params.require :password_reset_token
       params.require :new_password
 
-      if @user.authenticate_with_token(:password_reset_token, params[:password_reset_token])
+      if @user.compare_encrypted_token(:password_reset_token, params[:password_reset_token])
 
         if @user.password_reset_sent_at < 24.hours.ago
           render_unauthorized detail: "is expired", source: {

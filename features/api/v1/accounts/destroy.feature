@@ -10,19 +10,19 @@ Feature: Delete account
 
   Scenario: Admin deletes their account
     Given I am an admin of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/accounts/$0"
     Then the response status should be "204"
 
   Scenario: Admin attempts to delete another account
     Given I am an admin of account "test2"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/accounts/$0"
     Then the response status should be "401"
 
   Scenario: User attempts to delete an account
     Given the account "test1" has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/accounts/$0"
     Then the response status should be "403"

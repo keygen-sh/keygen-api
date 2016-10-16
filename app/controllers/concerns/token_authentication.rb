@@ -4,18 +4,30 @@ module TokenAuthentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
   def authenticate_with_token!
-    account = @current_account || Account.find_by_hashid(params[:id] || params[:account_id])
+    account = @current_account ||
+      Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_or_request_with_http_token do |token, options|
-      @current_bearer = account.tokens.find_by(auth_token: token)&.bearer if account
+      break if account.nil?
+
+      @current_bearer = TokenAuthenticationService.new(
+        account: account,
+        token: token
+      ).authenticate
     end
   end
 
-  def authenticate_with_token?
-    account = @current_account || Account.find_by_hashid(params[:id] || params[:account_id])
+  def authenticate_with_token
+    account = @current_account ||
+      Account.find_by_hashid(params[:id] || params[:account_id])
 
     authenticate_with_http_token do |token, options|
-      @current_bearer = account.tokens.find_by(auth_token: token)&.bearer if account
+      break if account.nil?
+
+      @current_bearer = TokenAuthenticationService.new(
+        account: account,
+        token: token
+      ).authenticate
     end
   end
 
@@ -25,7 +37,7 @@ module TokenAuthentication
     render_unauthorized({
       detail: "must be a valid token",
       source: {
-        pointer: "/data/attributes/token.authToken"
+        pointer: "/data/relationships/token"
       }
     })
   end

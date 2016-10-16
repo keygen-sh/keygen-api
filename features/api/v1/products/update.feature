@@ -13,7 +13,7 @@ Feature: Update product
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
       { "product": { "name": "New App" } }
@@ -27,7 +27,7 @@ Feature: Update product
     But I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "product"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
       { "product": { "name": "Updated App" } }
@@ -40,7 +40,7 @@ Feature: Update product
     And I am on the subdomain "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 2 "products"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/products/$1" with the following:
       """
       { "product": { "platforms": ["iOS", "Android", "Windows"] } }
@@ -61,7 +61,7 @@ Feature: Update product
     And the current account has 1 "webhookEndpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
       { "product": { "platforms": ["Nintendo"] } }
@@ -78,7 +78,7 @@ Feature: Update product
     And the current account has 1 "webhookEndpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/products/$1" with the following:
       """
       { "product": { "platforms": ["PC"] } }

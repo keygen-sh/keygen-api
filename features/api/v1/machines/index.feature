@@ -12,7 +12,7 @@ Feature: List machines
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 3 "machines"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
@@ -21,7 +21,7 @@ Feature: List machines
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 3 "machines"
     And the current product has 1 "machine"
     When I send a GET request to "/machines"
@@ -31,7 +31,7 @@ Feature: List machines
   Scenario: Admin attempts to retrieve all machines for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/machines"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
@@ -50,7 +50,7 @@ Feature: List machines
       """
       { "licenseId": $licenses[0].id }
       """
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"

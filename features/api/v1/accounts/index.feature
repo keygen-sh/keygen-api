@@ -10,7 +10,7 @@ Feature: List accounts
 
   Scenario: Admin attempts to retrieve all accounts
     Given I am an admin of account "test2"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/accounts"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
@@ -18,7 +18,7 @@ Feature: List accounts
   Scenario: User attempts to retrieve all accounts
     Given the account "test2" has 3 "users"
     And I am a user of account "test2"
-    And I use my auth token
+    And I use my authentication token
     When I send a GET request to "/accounts"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error

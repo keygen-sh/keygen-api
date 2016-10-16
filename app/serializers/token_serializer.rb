@@ -2,11 +2,14 @@ class TokenSerializer < BaseSerializer
   type :tokens
 
   attributes [
-    :auth_token,
-    :reset_token,
+    :token,
     :created,
     :updated
   ]
 
   belongs_to :bearer, polymorphic: true
+
+  def token
+    object.raw
+  end
 end

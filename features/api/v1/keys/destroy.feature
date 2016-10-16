@@ -13,7 +13,7 @@ Feature: Delete key
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/keys/$2"
     Then the response status should be "204"
     And the current account should have 2 "keys"
@@ -25,7 +25,7 @@ Feature: Delete key
     And the current account has 3 "keys"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/keys/$1"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
@@ -47,7 +47,7 @@ Feature: Delete key
     But I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
-    And I use my auth token
+    And I use my authentication token
     When I send a DELETE request to "/keys/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

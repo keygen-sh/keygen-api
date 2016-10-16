@@ -13,7 +13,7 @@ Feature: Update license
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-09-05T22:53:37.000Z" } }
@@ -28,7 +28,7 @@ Feature: Update license
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "policies"
     And the current account has 1 "license"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
       { "license": { "policy": "$policies[1]" } }
@@ -41,7 +41,7 @@ Feature: Update license
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
       { "license": { "key": "a" } }
@@ -55,7 +55,7 @@ Feature: Update license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "license"
     And the current product has 1 "license"
     When I send a PATCH request to "/licenses/$0" with the following:
@@ -71,7 +71,7 @@ Feature: Update license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "license"
     When I send a PATCH request to "/licenses/$0" with the following:
       """
@@ -87,7 +87,7 @@ Feature: Update license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 3 "licenses"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
       { "license": { "key": "x" } }
@@ -111,7 +111,7 @@ Feature: Update license
     But I am on the subdomain "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 3 "licenses"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/licenses/$0" with the following:
       """
       { "license": { "key": "z" } }

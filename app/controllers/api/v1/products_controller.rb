@@ -11,7 +11,7 @@ module Api::V1
       @products = policy_scope apply_scopes(@current_account.products).all
       authorize @products
 
-      render json: @products, include: [:token]
+      render json: @products
     end
 
     # GET /products/1
@@ -20,7 +20,7 @@ module Api::V1
 
       authorize @product
 
-      render json: @product, include: [:token]
+      render json: @product
     end
 
     # POST /products
@@ -34,7 +34,7 @@ module Api::V1
           resource: @product
         }).fire
 
-        render json: @product, include: [:token], status: :created, location: v1_product_url(@product)
+        render json: @product, status: :created, location: v1_product_url(@product)
       else
         render_unprocessable_resource @product
       end
@@ -52,7 +52,7 @@ module Api::V1
           resource: @product
         }).fire
 
-        render json: @product, include: [:token]
+        render json: @product
       else
         render_unprocessable_resource @product
       end
