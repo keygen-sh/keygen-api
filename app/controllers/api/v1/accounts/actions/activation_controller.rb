@@ -10,7 +10,7 @@ module Api::V1::Accounts::Actions
 
       params.require :activation_token
 
-      if @account.authenticate_with_token(:activation_token, params[:activation_token])
+      if @account.compare_encrypted_token(:activation_token, params[:activation_token])
         if @account.activated?
           render_conflict detail: "has already been used", source: {
             pointer: "/data/attributes/activationToken" }

@@ -11,7 +11,7 @@ Feature: Update user
   Scenario: Admin updates themself
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$current" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
@@ -24,7 +24,7 @@ Feature: Update user
     And I am on the subdomain "test1"
     And the current account has 1 "user"
     And the current account has 2 "webhookEndpoints"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$1" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
@@ -36,7 +36,7 @@ Feature: Update user
   Scenario: Admin attempts to update a user for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$0" with the following:
       """
       { "user": { "name": "Updated name" } }
@@ -47,7 +47,7 @@ Feature: Update user
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 2 "users"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$2" with the following:
       """
       {
@@ -66,7 +66,7 @@ Feature: Update user
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "users"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$2" with the following:
       """
       {
@@ -86,7 +86,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$1" with the following:
       """
       {
@@ -105,7 +105,7 @@ Feature: Update user
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$1" with the following:
       """
       { "user": { "meta": { "customerId": "cust_gV4dW9jrc" } } }
@@ -121,7 +121,7 @@ Feature: Update user
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current product has 1 "user"
@@ -138,7 +138,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "user"
     When I send a PATCH request to "/users/$1" with the following:
       """
@@ -152,7 +152,7 @@ Feature: Update user
    And the current account has 2 "webhookEndpoints"
    And the current account has 3 "users"
    And I am a user of account "test1"
-   And I use my auth token
+   And I use my authentication token
    When I send a PATCH request to "/users/$current" with the following:
      """
      { "user": { "password": "newPassword" } }
@@ -165,7 +165,7 @@ Feature: Update user
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "users"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/users/$2" with the following:
       """
       { "user": { "password": "h4ck3d!" } }

@@ -12,7 +12,7 @@ Feature: Update webhook endpoint
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
@@ -25,7 +25,7 @@ Feature: Update webhook endpoint
     And the current account has 3 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
@@ -45,7 +45,7 @@ Feature: Update webhook endpoint
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
     And the current account has 3 "webhookEndpoints"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }

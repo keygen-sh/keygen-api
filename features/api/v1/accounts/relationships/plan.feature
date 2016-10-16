@@ -11,7 +11,7 @@ Feature: Account plan
   Scenario: Admin changes their plan
     Given the account "test1" has valid billing details
     And I am an admin of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
       { "plan": "$plan[0]" }
@@ -21,7 +21,7 @@ Feature: Account plan
   Scenario: Admin attempts to change to an invalid plan
     Given the account "test1" has valid billing details
     And I am an admin of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
       { "plan": "invalid" }
@@ -31,7 +31,7 @@ Feature: Account plan
   Scenario: Admin attempts to change plan for another account
     Given the account "test1" has valid billing details
     And I am an admin of account "test2"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/accounts/$0/relationships/plan" with the following:
       """
       { "plan": "$plan[0]" }

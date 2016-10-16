@@ -175,14 +175,11 @@ Given /^I send the following headers:$/ do |body|
   end
 end
 
-Given /^I use my auth token$/ do
+Given /^I use my authentication token$/ do
   @bearer.token.update account: @bearer.account # FIXME ???
-  header "Authorization", "Bearer \"#{@bearer.token.auth_token}\""
-end
+  token = @bearer.token.generate!
 
-Given /^I use my reset token$/ do
-  @bearer.token.update account: @bearer.account
-  header "Authorization", "Bearer \"#{@bearer.token.reset_token}\""
+  header "Authorization", "Bearer \"#{token}\""
 end
 
 Given /^the account "([^\"]*)" has valid billing details$/ do |subdomain|
@@ -442,7 +439,10 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
     user = @account.users.roles(:admin).first
     user.token.update account: @account # FIXME ???
-    header "Authorization", "Bearer \"#{user.token.auth_token}\""
+
+    token = user.token.generate!
+    header "Authorization", "Bearer \"#{token}\""
+
     get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   else
     get "//keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"

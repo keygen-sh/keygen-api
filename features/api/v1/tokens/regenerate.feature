@@ -1,5 +1,5 @@
 @api/v1
-Feature: Reset tokens
+Feature: Regenerate authentication token
 
   Background:
     Given the following accounts exist:
@@ -12,7 +12,7 @@ Feature: Reset tokens
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my reset token
+    And I use my authentication token
     When I send a POST request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
@@ -21,7 +21,10 @@ Feature: Reset tokens
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I send the following headers:
+      """
+      { "Authorization": "Bearer someBadToken" }
+      """
     When I send a POST request to "/tokens"
     Then the response status should be "401"
 
@@ -29,7 +32,7 @@ Feature: Reset tokens
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my reset token
+    And I use my authentication token
     When I send a POST request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"

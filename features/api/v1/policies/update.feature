@@ -13,7 +13,7 @@ Feature: Update policy
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/policies/$0" with the following:
       """
       { "policy": { "name": "Trial" } }
@@ -27,7 +27,7 @@ Feature: Update policy
     But I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "policy"
-    And I use my auth token
+    And I use my authentication token
     When I send a PATCH request to "/policies/$0" with the following:
       """
       { "policy": { "price": 0 } }
@@ -40,7 +40,7 @@ Feature: Update policy
     And the current account has 3 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "policy"
     And the current product has 1 "policy"
     When I send a PATCH request to "/policies/$0" with the following:
@@ -56,7 +56,7 @@ Feature: Update policy
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "policy"
     When I send a PATCH request to "/policies/$0" with the following:
       """

@@ -14,7 +14,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
@@ -28,7 +28,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]", "key": "a" } }
@@ -42,7 +42,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -56,7 +56,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
@@ -83,7 +83,7 @@ Feature: Create license
       }
       """
     And the current account has 3 "users"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -104,7 +104,7 @@ Feature: Create license
       }
       """
     And the current account has 1 "user"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
@@ -119,7 +119,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my auth token
+    And I use my authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }

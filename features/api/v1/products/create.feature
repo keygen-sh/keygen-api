@@ -11,7 +11,7 @@ Feature: Create product
   Scenario: Admin creates a product for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 4 "webhookEndpoints"
     When I send a POST request to "/products" with the following:
       """
@@ -23,7 +23,7 @@ Feature: Create product
   Scenario: Admin attempts to create an incomplete product for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 2 "webhookEndpoints"
     When I send a POST request to "/products" with the following:
       """
@@ -35,7 +35,7 @@ Feature: Create product
   Scenario: Admin attempts to create a product for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/products" with the following:
       """
@@ -48,7 +48,7 @@ Feature: Create product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my auth token
+    And I use my authentication token
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/products" with the following:
       """

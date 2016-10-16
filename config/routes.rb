@@ -51,8 +51,8 @@ Rails.application.routes.draw do
       constraints lambda { |r| r.subdomain.present? } do
         get  :billing,   to: "billings#show"
         post :billing,   to: "billings#update"
-        get  :tokens,    to: "tokens#request_tokens"
-        post :tokens,    to: "tokens#reset_tokens"
+        get  :tokens,    to: "tokens#generate"
+        post :tokens,    to: "tokens#regenerate"
         post :passwords, to: "passwords#reset_password"
         get  :profile,   to: "profiles#show"
         resource :users do
@@ -77,7 +77,7 @@ Rails.application.routes.draw do
         resource :machines
         resource :products do |r|
           namespace :relationships do
-            relationship :resource, :users, only: [:create, :destroy]
+            relationship :get, :tokens, to: "tokens#generate"
           end
         end
         resource :webhook_endpoints
