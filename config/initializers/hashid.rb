@@ -1,6 +1,6 @@
 Hashid::Rails.configure do |config|
   config.secret = 'qLW2ZgYbW4ndzmGfHmfqffC7d2cTVJ'
-  config.length = 8
+  config.length = 16
 end
 
 module Hashid
@@ -8,11 +8,11 @@ module Hashid
     module ClassMethods
 
       def find_by_hashid(hashid)
-        find_by(id: hashid_decode(hashid))
+        find_by id: hashid_decode(hashid)
       end
 
       def find_by_hashid!(hashid)
-        find_by!(id: hashid_decode(hashid))
+        find_by! id: hashid_decode(hashid)
       end
     end
   end
