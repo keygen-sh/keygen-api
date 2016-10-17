@@ -41,7 +41,7 @@ module Api
       end
     end
 
-    # Add services to autoload path
+    # Add services/validators to autoload path
     config.autoload_paths += %W[
       #{config.root}/app/validators
       #{config.root}/app/services

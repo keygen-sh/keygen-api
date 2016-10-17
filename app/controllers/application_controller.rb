@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::Base
+class ApplicationController < ActionController::API
   include Pundit
 
   after_action :verify_authorized
@@ -12,12 +12,6 @@ class ApplicationController < ActionController::Base
   attr_accessor :current_bearer
   def pundit_user
     @current_bearer
-  end
-
-  def index
-    skip_authorization
-
-    render template: "/templates/index.html.haml", layout: false
   end
 
   protected
