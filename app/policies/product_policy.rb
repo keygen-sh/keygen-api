@@ -19,4 +19,8 @@ class ProductPolicy < ApplicationPolicy
   def destroy?
     bearer.has_role? :admin or resource == bearer
   end
+
+  def generate?
+    bearer.has_role? :admin
+  end
 end

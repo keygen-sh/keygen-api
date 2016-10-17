@@ -4,26 +4,15 @@ module Api::V1::Products::Relationships
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
     before_action :scope_by_subdomain!
+    before_action :authenticate_with_token!
     before_action :set_product
 
     def generate
-      skip_authorization
+      authorize @product
 
-      authenticate_with_http_token do |token, options|
-        bearer = TokenAuthenticationService.new(
-          account: @current_account,
-          token: token
-        ).authenticate
+      @product.token.generate!
 
-        if !bearer.nil? && bearer.has_role?(:admin)
-          @product.token.generate!
-
-          render json: @product.token and return
-        end
-      end
-
-      render_unauthorized detail: "must be a valid admin token", source: {
-        pointer: "/data/relationships/token" }
+      render json: @product.token
     end
 
     private
