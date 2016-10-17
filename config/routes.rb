@@ -1,36 +1,8 @@
+require_dependency Rails.root.join "lib/routes_helper"
+
 Rails.application.routes.draw do
   scope module: "api" do
-
-    def json_request?(r)
-      !(/json/ =~ r.content_type).nil?
-    end
-
-    namespace :v1, constraints: lambda { |r| json_request?(r) } do
-
-      def resource(name, opts = {}, &block)
-        resources(name, {
-          path: name.to_s.dasherize
-        }.merge(opts), &block)
-      end
-
-      def relationship(verb, resource, opts = {})
-        case verb
-        when :resource
-          resources(resource.to_s.dasherize, {
-            controller: "/api/v1/#{parent_resource.name}/relationships/#{resource}"
-          }.merge(opts))
-        else
-          send(verb, resource.to_s.dasherize, {
-            to: "/api/v1/#{parent_resource.name}/relationships/#{opts[:to]}"
-          })
-        end
-      end
-
-      def action(verb, action, opts = {})
-        send(verb, action.to_s.dasherize, {
-          to: "/api/v1/#{parent_resource.name}/actions/#{opts[:to]}"
-        })
-      end
+    namespace :v1, constraints: { format: "json" } do
 
       constraints lambda { |r| r.subdomain.empty? } do
         resource :stripe, only: [:create]
@@ -75,7 +47,7 @@ Rails.application.routes.draw do
           end
         end
         resource :machines
-        resource :products do |r|
+        resource :products do
           namespace :relationships do
             relationship :get, :tokens, to: "tokens#generate"
           end
@@ -86,15 +58,9 @@ Rails.application.routes.draw do
     end
   end
 
-  constraints lambda { |r| r.subdomain.present? || json_request?(r) } do
-    %w[404 422 500].each do |code|
-      match code, to: "errors#show", code: code, via: :all
-    end
-    root to: "errors#show", code: 404
+  %w[404 422 500].each do |code|
+    match code, to: "errors#show", code: code.to_i, via: :all
   end
 
-  constraints lambda { |r| r.subdomain.empty? && !json_request?(r) } do
-    match "*all", to: "application#index", via: [:get]
-    root to: "application#index"
-  end
+  root to: "errors#show", code: 404
 end
