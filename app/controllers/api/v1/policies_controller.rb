@@ -32,10 +32,11 @@ module Api::V1
       authorize @policy
 
       if @policy.save
-        WebhookEventService.new("policy.created", {
+        WebhookEventService.new(
+          event: "policy.created",
           account: @current_account,
           resource: @policy
-        }).fire
+        ).execute
 
         render json: @policy, status: :created, location: v1_policy_url(@policy)
       else
@@ -50,10 +51,11 @@ module Api::V1
       authorize @policy
 
       if @policy.update(policy_params)
-        WebhookEventService.new("policy.updated", {
+        WebhookEventService.new(
+          event: "policy.updated",
           account: @current_account,
           resource: @policy
-        }).fire
+        ).execute
 
         render json: @policy
       else
@@ -67,10 +69,11 @@ module Api::V1
 
       authorize @policy
 
-      WebhookEventService.new("policy.deleted", {
+      WebhookEventService.new(
+        event: "policy.deleted",
         account: @current_account,
         resource: @policy
-      }).fire
+      ).execute
 
       @policy.destroy
     end

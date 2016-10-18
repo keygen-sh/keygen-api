@@ -13,7 +13,7 @@ module TokenAuthentication
       @current_bearer = TokenAuthenticationService.new(
         account: account,
         token: token
-      ).authenticate
+      ).execute
     end
   end
 
@@ -27,7 +27,7 @@ module TokenAuthentication
       @current_bearer = TokenAuthenticationService.new(
         account: account,
         token: token
-      ).authenticate
+      ).execute
     end
   end
 

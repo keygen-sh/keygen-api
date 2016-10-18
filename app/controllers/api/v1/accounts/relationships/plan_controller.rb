@@ -10,7 +10,13 @@ module Api::V1::Accounts::Relationships
       authorize @account
 
       @plan = Plan.find_by_hashid plan_params
-      subscription = update_plan_with_external_service if @plan
+
+      if @plan
+        subscription = ::Billings::UpdateSubscriptionService.new(
+          id: @account.billing.external_subscription_id,
+          plan: @plan.external_plan_id
+        ).execute
+      end
 
       if subscription
         if @account.update(plan: @plan)
@@ -25,13 +31,6 @@ module Api::V1::Accounts::Relationships
     end
 
     private
-
-    def update_plan_with_external_service
-      BillingSubscriptionService.new({
-        id: @account.billing.external_subscription_id,
-        plan: @plan.external_plan_id
-      }).update
-    end
 
     def set_account
       @account = Account.find_by_hashid params[:account_id]

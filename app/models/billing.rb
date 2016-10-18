@@ -8,6 +8,6 @@ class Billing < ApplicationRecord
   private
 
   def close_external_customer_account!
-    BillingCustomerService.new(id: external_customer_id).delete
+    ::Billings::DeleteCustomerService.new(id: external_customer_id).execute
   end
 end

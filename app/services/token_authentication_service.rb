@@ -1,4 +1,4 @@
-class TokenAuthenticationService
+class TokenAuthenticationService < BaseService
   TOKEN_ID_REGEX = /\A([^_]+)/
 
   def initialize(account:, token:)
@@ -6,7 +6,7 @@ class TokenAuthenticationService
     @token   = token
   end
 
-  def authenticate
+  def execute
     return nil unless account
 
     token =~ TOKEN_ID_REGEX

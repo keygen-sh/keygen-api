@@ -18,10 +18,11 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.update(expiry: @license.expiry + @license.policy.duration)
-        WebhookEventService.new("license.renewed", {
+        WebhookEventService.new(
+          event: "license.renewed",
           account: @current_account,
           resource: @license
-        }).fire
+        ).execute
 
         render json: @license
       else
@@ -35,10 +36,11 @@ module Api::V1::Licenses::Actions
 
       authorize @license
 
-      WebhookEventService.new("license.revoked", {
+      WebhookEventService.new(
+        event: "license.revoked",
         account: @current_account,
         resource: @license
-      }).fire
+      ).execute
 
       @license.destroy
     end
@@ -49,7 +51,7 @@ module Api::V1::Licenses::Actions
 
       authorize @license
 
-      render_meta is_valid: LicenseValidationService.new(@license).validate
+      render_meta is_valid: LicenseValidationService.new(license: @license).execute
     end
 
     private

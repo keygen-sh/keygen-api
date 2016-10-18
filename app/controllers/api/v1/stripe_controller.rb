@@ -8,7 +8,7 @@ module Api::V1
       # Let external service know that we recieved the webhook
       head :accepted
 
-      event = BillingEventService.new(id: stripe_params[:id]).retrieve
+      event = ::Billings::RetrieveEventService.new(id: stripe_params[:id]).execute
       return unless event
 
       case event.type
@@ -41,12 +41,12 @@ module Api::V1
         billing = Billing.find_by external_customer_id: customer.id
         return unless billing && billing.external_subscription_id.nil?
 
-        BillingSubscriptionService.new({
+        subscription = ::Billings::CreateSubscriptionService.new(
           customer: billing.external_customer_id,
           plan: billing.customer.plan.external_plan_id
-        }).create
+        ).execute
 
-        billing.customer.update status: "active"
+        billing.customer.update status: subscription.status
       when "customer.updated"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id
