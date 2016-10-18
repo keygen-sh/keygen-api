@@ -1,7 +1,7 @@
 module Billings
   class CreateSubscriptionService < BaseService
 
-    def initialize(customer:, plan:, trial:)
+    def initialize(customer:, plan:, trial: nil)
       @customer = customer
       @plan     = plan
       @trial    = trial
