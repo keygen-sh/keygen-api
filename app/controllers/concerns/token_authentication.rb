@@ -5,7 +5,7 @@ module TokenAuthentication
 
   def authenticate_with_token!
     account = @current_account ||
-      Account.find_by_hashid(params[:id] || params[:account_id])
+      Account.find_by_hashid(params[:account_id] || params[:id])
 
     authenticate_or_request_with_http_token do |token, options|
       next if account.nil?
@@ -19,7 +19,7 @@ module TokenAuthentication
 
   def authenticate_with_token
     account = @current_account ||
-      Account.find_by_hashid(params[:id] || params[:account_id])
+      Account.find_by_hashid(params[:account_id] || params[:id])
 
     authenticate_with_http_token do |token, options|
       next if account.nil?

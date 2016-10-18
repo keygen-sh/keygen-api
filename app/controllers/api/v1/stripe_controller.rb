@@ -2,7 +2,7 @@ module Api::V1
   class StripeController < Api::V1::BaseController
 
     # POST /stripe
-    def create
+    def receive_webhook
       skip_authorization
 
       # Let external service know that we recieved the webhook
