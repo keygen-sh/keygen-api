@@ -1,59 +1,77 @@
-require_dependency Rails.root.join "lib/routes_helper"
+# require_dependency Rails.root.join "lib/routes_helper"
 
 Rails.application.routes.draw do
   scope module: "api" do
-    namespace :v1, constraints: { format: "json" } do
+    namespace "v1", constraints: { format: "json" } do
 
       constraints lambda { |r| r.subdomain.empty? } do
-        resource :stripe, only: [:create]
-        resource :plans
-        resource :accounts do
-          namespace :relationships do
-            relationship :resource, :plan, only: [:create]
-          end
-          namespace :actions do
-            action :post, :activate, to: "activation#activate"
-            action :post, :pause, to: "subscription#pause"
-            action :post, :resume, to: "subscription#resume"
-            action :post, :cancel, to: "subscription#cancel"
+        post "stripe", to: "stripe#receive_webhook"
+
+        resources "plans", only: [:index, :show]
+
+        resources "accounts" do
+          scope module: "accounts" do
+            namespace "relationships" do
+              get "billing", to: "billing#show"
+              post "billing", to: "billing#update"
+              post "plan", to: "plan#update"
+            end
+            namespace "actions" do
+              post "activate", to: "activation#activate"
+              post "pause", to: "subscription#pause"
+              post "resume", to: "subscription#resume"
+              post "cancel", to: "subscription#cancel"
+            end
           end
         end
       end
 
       constraints lambda { |r| r.subdomain.present? } do
-        get  :billing,   to: "billings#show"
-        post :billing,   to: "billings#update"
-        get  :tokens,    to: "tokens#generate"
-        post :tokens,    to: "tokens#regenerate"
-        post :passwords, to: "passwords#reset_password"
-        get  :profile,   to: "profiles#show"
-        resource :users do
-          namespace :actions do
-            action :post, :update_password, to: "password#update_password"
-            action :post, :reset_password, to: "password#reset_password"
+        get  "tokens", to: "tokens#generate"
+        post "tokens", to: "tokens#regenerate"
+
+        post "passwords", to: "passwords#reset_password"
+        get  "profile", to: "profiles#show"
+
+        resources "keys"
+        resources "machines"
+        resources "webhook_endpoints", path: "webhook-endpoints"
+        resources "webhook_events", path: "webhook-events", only: [:index, :show]
+
+        resources "users" do
+          scope module: "users" do
+            namespace "actions" do
+              post "update-password", to: "password#update_password"
+              post "reset-password", to: "password#reset_password"
+            end
           end
         end
-        resource :policies do
-          namespace :relationships do
-            relationship :delete, :pool, to: "pool#pop"
+
+        resources "licenses" do
+          scope module: "licenses" do
+            namespace "actions" do
+              get "validate", to: "permits#validate"
+              post "revoke", to: "permits#revoke"
+              post "renew", to: "permits#renew"
+            end
           end
         end
-        resource :keys
-        resource :licenses do
-          namespace :actions do
-            action :get, :validate, to: "permits#validate"
-            action :post, :revoke, to: "permits#revoke"
-            action :post, :renew, to: "permits#renew"
+
+        resources "policies" do
+          scope module: "policies" do
+            namespace "relationships" do
+              delete "pool", to: "pool#pop"
+            end
           end
         end
-        resource :machines
-        resource :products do
-          namespace :relationships do
-            relationship :get, :tokens, to: "tokens#generate"
+
+        resources "products" do
+          scope module: "products" do
+            namespace "relationships" do
+              get "tokens", to: "tokens#generate"
+            end
           end
         end
-        resource :webhook_endpoints
-        resource :webhook_events, only: [:index, :show]
       end
     end
   end

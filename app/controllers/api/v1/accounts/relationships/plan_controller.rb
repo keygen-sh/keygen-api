@@ -1,10 +1,10 @@
 module Api::V1::Accounts::Relationships
   class PlanController < Api::V1::BaseController
     before_action :authenticate_with_token!
-    before_action :set_account, only: [:create]
+    before_action :set_account
 
     # POST /accounts/1/relationships/plan
-    def create
+    def update
       render_not_found and return unless @account
 
       authorize @account
