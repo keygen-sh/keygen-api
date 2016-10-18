@@ -33,10 +33,11 @@ module Api::V1
       authorize @machine
 
       if @machine.save
-        WebhookEventService.new("machine.created", {
+        WebhookEventService.new(
+          event: "machine.created",
           account: @current_account,
           resource: @machine
-        }).fire
+        ).execute
 
         render json: @machine, status: :created, location: v1_machine_url(@machine)
       else
@@ -51,10 +52,11 @@ module Api::V1
       authorize @machine
 
       if @machine.update(machine_params)
-        WebhookEventService.new("machine.updated", {
+        WebhookEventService.new(
+          event: "machine.updated",
           account: @current_account,
           resource: @machine
-        }).fire
+        ).execute
 
         render json: @machine
       else
@@ -68,10 +70,11 @@ module Api::V1
 
       authorize @machine
 
-      WebhookEventService.new("machine.deleted", {
+      WebhookEventService.new(
+        event: "machine.deleted",
         account: @current_account,
         resource: @machine
-      }).fire
+      ).execute
 
       @machine.destroy
     end

@@ -29,10 +29,11 @@ module Api::V1
       authorize @product
 
       if @product.save
-        WebhookEventService.new("product.created", {
+        WebhookEventService.new(
+          event: "product.created",
           account: @current_account,
           resource: @product
-        }).fire
+        ).execute
 
         render json: @product, status: :created, location: v1_product_url(@product)
       else
@@ -47,10 +48,11 @@ module Api::V1
       authorize @product
 
       if @product.update(product_params)
-        WebhookEventService.new("product.updated", {
+        WebhookEventService.new(
+          event: "product.updated",
           account: @current_account,
           resource: @product
-        }).fire
+        ).execute
 
         render json: @product
       else
@@ -64,10 +66,11 @@ module Api::V1
 
       authorize @product
 
-      WebhookEventService.new("product.deleted", {
+      WebhookEventService.new(
+        event: "product.deleted",
         account: @current_account,
         resource: @product
-      }).fire
+      ).execute
 
       @product.destroy
     end

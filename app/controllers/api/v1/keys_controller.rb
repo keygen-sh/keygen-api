@@ -32,10 +32,11 @@ module Api::V1
       authorize @key
 
       if @key.save
-        WebhookEventService.new("key.created", {
+        WebhookEventService.new(
+          event: "key.created",
           account: @current_account,
           resource: @key
-        }).fire
+        ).execute
 
         render json: @key, status: :created, location: v1_key_url(@key)
       else
@@ -50,10 +51,11 @@ module Api::V1
       authorize @key
 
       if @key.update(key_params)
-        WebhookEventService.new("key.updated", {
+        WebhookEventService.new(
+          event: "key.updated",
           account: @current_account,
           resource: @key
-        }).fire
+        ).execute
 
         render json: @key
       else
@@ -67,10 +69,11 @@ module Api::V1
 
       authorize @key
 
-      WebhookEventService.new("key.deleted", {
+      WebhookEventService.new(
+        event: "key.deleted",
         account: @current_account,
         resource: @key
-      }).fire
+      ).execute
 
       @key.destroy
     end

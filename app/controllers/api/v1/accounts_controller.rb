@@ -36,15 +36,22 @@ module Api::V1
       # Create a new customer and partial billing model
       billing = Billing.new
 
-      if customer = create_customer_with_external_service
-        billing.external_customer_id = customer.id
+      if !billing_params.nil?
+        customer = ::Billings::CreateCustomerService.new(
+          account: @account,
+          token: billing_params[:token]
+        ).execute
 
-        # We expect to recieve a 'customer.created' webhook, and from there we
-        # will subscribe the customer to their chosen plan and charge them;
-        # setting the statuses to pending lets the customer use the API
-        # until we recieve the status of the charge.
-        billing.external_subscription_status = "pending"
-        @account.status = "pending"
+        if !customer.nil?
+          billing.external_customer_id = customer.id
+
+          # We expect to recieve a 'customer.created' webhook, and from there we
+          # will subscribe the customer to their chosen plan and charge them;
+          # setting the statuses to pending lets the customer use the API
+          # until we recieve the status of the charge.
+          billing.external_subscription_status = "pending"
+          @account.status = "pending"
+        end
       end
 
       @account.billing = billing
@@ -79,13 +86,6 @@ module Api::V1
     end
 
     private
-
-    def create_customer_with_external_service
-      return false unless billing_params
-      BillingCustomerService.new(
-        billing_params.merge account: @account
-      ).create
-    end
 
     def set_account
       @account = Account.find_by_hashid params[:id]

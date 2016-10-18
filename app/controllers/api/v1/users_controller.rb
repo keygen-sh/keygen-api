@@ -32,10 +32,11 @@ module Api::V1
       authorize @user
 
       if @user.save
-        WebhookEventService.new("user.created", {
+        WebhookEventService.new(
+          event: "user.created",
           account: @current_account,
           resource: @user
-        }).fire
+        ).execute
 
         render json: @user, status: :created, location: v1_user_url(@user)
       else
@@ -50,10 +51,11 @@ module Api::V1
       authorize @user
 
       if @user.update(user_params)
-        WebhookEventService.new("user.updated", {
+        WebhookEventService.new(
+          event: "user.updated",
           account: @current_account,
           resource: @user
-        }).fire
+        ).execute
 
         render json: @user
       else
@@ -67,10 +69,11 @@ module Api::V1
 
       authorize @user
 
-      WebhookEventService.new("user.deleted", {
+      WebhookEventService.new(
+        event: "user.deleted",
         account: @current_account,
         resource: @user
-      }).fire
+      ).execute
 
       @user.destroy
     end

@@ -28,7 +28,7 @@ module Api::V1
         bearer = TokenAuthenticationService.new(
           account: @current_account,
           token: token
-        ).authenticate
+        ).execute
 
         if !bearer.nil?
           bearer.token.generate!

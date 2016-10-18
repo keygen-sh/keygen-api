@@ -19,9 +19,10 @@ module Api::V1
 
       authorize @billing
 
-      status = BillingCustomerService.new(
-        billing_params.merge id: @billing.external_customer_id
-      ).update
+      status = ::Billings::UpdateCustomerService.new(
+        id: @billing.external_customer_id,
+        token: billing_params[:token]
+      ).execute
 
       if status
         head :accepted

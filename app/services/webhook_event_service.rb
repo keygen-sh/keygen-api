@@ -1,12 +1,12 @@
-class WebhookEventService
+class WebhookEventService < BaseService
 
-  def initialize(event, params)
-    @event = event
-    @account = params[:account]
-    @resource = params[:resource]
+  def initialize(event:, account:, resource:)
+    @event    = event
+    @account  = account
+    @resource = resource
   end
 
-  def fire
+  def execute
     account&.webhook_endpoints.find_each do |endpoint|
       payload = ActiveModelSerializers::SerializableResource.new(resource).serializable_hash.merge({
         event: event

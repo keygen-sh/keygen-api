@@ -37,10 +37,11 @@ module Api::V1
       authorize @license
 
       if @license.save
-        WebhookEventService.new("license.created", {
+        WebhookEventService.new(
+          event: "license.created",
           account: @current_account,
           resource: @license
-        }).fire
+        ).execute
 
         render json: @license, status: :created, location: v1_license_url(@license)
       else
@@ -55,10 +56,11 @@ module Api::V1
       authorize @license
 
       if @license.update(license_params)
-        WebhookEventService.new("license.updated", {
+        WebhookEventService.new(
+          event: "license.updated",
           account: @current_account,
           resource: @license
-        }).fire
+        ).execute
 
         render json: @license
       else
@@ -72,10 +74,11 @@ module Api::V1
 
       authorize @license
 
-      WebhookEventService.new("license.deleted", {
+      WebhookEventService.new(
+        event: "license.deleted",
         account: @current_account,
         resource: @license
-      }).fire
+      ).execute
 
       @license.destroy
     end
