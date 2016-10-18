@@ -1,7 +1,7 @@
 module Tokenable
   extend ActiveSupport::Concern
 
-  def generate_token(attribute, &block)
+  def generate_token(attribute)
     loop do
       token = SecureRandom.hex 32
       token = yield token if block_given?
