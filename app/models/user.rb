@@ -1,8 +1,8 @@
 class User < ApplicationRecord
   include TokenAuthenticatable
   include PasswordResetable
-  include Resourcifiable
   include Paginatable
+  include Roleable
 
   has_secure_password
 
@@ -10,26 +10,27 @@ class User < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :products, through: :licenses
   has_many :machines, through: :licenses
+  has_many :roles, as: :resource, dependent: :destroy
   has_one :token, as: :bearer, dependent: :destroy
-
-  serialize :meta, Hash
 
   accepts_nested_attributes_for :roles
 
+  serialize :meta, Hash
+
   before_save -> { self.email = email.downcase }
-  before_create :set_roles
+  after_create :set_roles, unless: -> { role? :admin }
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :name, presence: true
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
 
-  scope :roles, -> (*roles) { joins(token: [:roles]).where roles: { name: roles } }
+  scope :roles, -> (*roles) { joins(:roles).where roles: { name: roles } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: Product.decode_id(id) } }
   scope :admins, -> { roles :admin }
 
   private
 
   def set_roles
-    add_role :user
+    grant :user
   end
 end

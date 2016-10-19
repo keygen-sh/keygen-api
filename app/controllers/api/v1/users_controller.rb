@@ -103,7 +103,7 @@ module Api::V1
             permits << :password
           end
 
-          if @current_bearer&.has_role? :admin
+          if @current_bearer&.role? :admin
             additional.merge! roles: [[:name]]
           end
 

@@ -48,11 +48,11 @@ class ApplicationPolicy
 
     def resolve
       case
-      when bearer.has_role?(:admin)
+      when bearer.role?(:admin)
         scope.all
-      when bearer.has_role?(:product)
+      when bearer.role?(:product)
         scope.product bearer.hashid
-      when bearer.has_role?(:user)
+      when bearer.role?(:user)
         scope.user bearer.hashid
       end
     rescue NoMethodError

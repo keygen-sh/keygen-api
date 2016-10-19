@@ -5,7 +5,7 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def create?
@@ -13,10 +13,10 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def update?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def destroy?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 end

@@ -60,6 +60,7 @@ Feature: Update user
       """
     Then the response status should be "200"
     And the JSON response should be a "user"
+    And the account "test1" should have 2 "admins"
 
   Scenario: Admin promotes a user with an invalid role name for their account
     Given I am an admin of account "test1"
@@ -99,6 +100,7 @@ Feature: Update user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And the account "test1" should have 1 "admin"
 
   Scenario: Admin updates a users meta data
     Given I am an admin of account "test1"

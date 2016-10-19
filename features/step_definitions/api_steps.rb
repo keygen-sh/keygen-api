@@ -96,17 +96,6 @@ def parse_path_placeholders(str)
   end
 end
 
-# def association_plurality(resource, association)
-#   case resource.reflect_on_all_associations.select { |a| a.name.to_s.singularize == association.singularize }.first
-#   when ActiveRecord::Reflection::BelongsToReflection
-#     association.singularize
-#   when ActiveRecord::Reflection::HasOneReflection
-#     association.singularize
-#   when ActiveRecord::Reflection::HasManyReflection
-#     association.pluralize
-#   end
-# end
-
 Before "@api/v1" do
   @api_version = "v1"
 end

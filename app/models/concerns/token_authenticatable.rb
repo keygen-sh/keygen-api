@@ -3,11 +3,6 @@ module TokenAuthenticatable
 
   included do
     before_create :create_token
-
-    delegate :add_role, to: :token
-    delegate :remove_role, to: :token
-    delegate :has_role?, to: :token
-    delegate :roles, to: :token
   end
 
   private

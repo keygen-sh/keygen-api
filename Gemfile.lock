@@ -192,7 +192,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rolify (5.1.0)
     ruby_parser (3.8.2)
       sexp_processor (~> 4.1)
     sexp_processor (4.7.0)
@@ -259,7 +258,6 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rails (~> 5.0)
-  rolify
   sidekiq
   sidekiq-status
   spring
