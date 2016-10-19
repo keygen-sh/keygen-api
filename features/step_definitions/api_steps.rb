@@ -343,18 +343,18 @@ end
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   parse_path_placeholders path
   if @account
-    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    get "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   else
-    get "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    get "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   end
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
   parse_path_placeholders path
   if @account
-    post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    post "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   else
-    post "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    post "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   end
 end
 
@@ -362,9 +362,9 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders path
   parse_placeholders body
   if @account
-    post "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
+    post "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
-    post "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
+    post "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
   end
 end
 
@@ -372,18 +372,18 @@ When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |pa
   parse_path_placeholders path
   parse_placeholders body
   if @account
-    put "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
+    put "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
   else
-    put "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}", body
+    put "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
   end
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   parse_path_placeholders path
   if @account
-    delete "//#{@account.subdomain}.keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    delete "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   else
-    delete "//keygin.io/#{@api_version}/#{path.sub(/^\//, '')}"
+    delete "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
   end
 end
 
@@ -443,9 +443,9 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     token = user.token.generate!
     header "Authorization", "Bearer \"#{token}\""
 
-    get "//#{@account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+    get "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   else
-    get "//keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+    get "//keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   end
   json = JSON.parse last_response.body
   assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
@@ -464,7 +464,7 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, coun
   when /^admins?$/
     assert_equal count.to_i, account.users.admins.count
   else
-    get "//#{account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+    get "//#{account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
 
     json = JSON.parse last_response.body
     assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length

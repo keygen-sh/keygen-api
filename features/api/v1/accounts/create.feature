@@ -15,7 +15,7 @@ Feature: Create account
           "name": "Google",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -39,9 +39,9 @@ Feature: Create account
           "name": "Google",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" },
-            { "name": "Sergey Brin", "email": "sbrin@keygin.io", "password": "goog" },
-            { "name": "Sundar Pichai", "email": "spichai@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
+            { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
+            { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -64,7 +64,7 @@ Feature: Create account
           "name": "Google",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -87,7 +87,7 @@ Feature: Create account
           "name": "Google",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -108,7 +108,7 @@ Feature: Create account
           "subdomain": "google",
           "name": "Google",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -130,7 +130,7 @@ Feature: Create account
           "name": "Google",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ]
         }
       }
@@ -169,7 +169,7 @@ Feature: Create account
           "name": "Test1",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" }
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ],
           "billing": {
             "token": "some_token"
@@ -192,7 +192,7 @@ Feature: Create account
           "name": "Facebook",
           "plan": "$plan[0]",
           "admins": [
-            { "name": "Mark Zuckerburg", "email": "mzuckerberk@keygin.io", "password": "facebook" }
+            { "name": "Mark Zuckerburg", "email": "mzuckerberk@keygen.sh", "password": "facebook" }
           ],
           "billing": {
             "token": "some_token"
