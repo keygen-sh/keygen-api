@@ -4,10 +4,8 @@ FactoryGirl.define do
     name { Faker::Name.name }
     email { Faker::Internet.safe_email }
     password "password"
-    token nil
     account
     before :create do |user|
-      user.token = build :user_token, account: user.account, bearer: user
       user.licenses << build(:license, user: user)
     end
   end
@@ -16,10 +14,9 @@ FactoryGirl.define do
     name { Faker::Name.name }
     email { Faker::Internet.safe_email }
     password "password"
-    token nil
     account
-    before :create do |user|
-      user.token = build :admin_token, account: user.account, bearer: user
+    after :create do |user|
+      user.roles = [build(:admin_role, resource: user)]
     end
   end
 end

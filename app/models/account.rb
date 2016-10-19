@@ -1,6 +1,5 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
-  include Resourcifiable
   include Paginatable
   include Activatable
   include Billable
@@ -21,7 +20,7 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :billing
 
   before_create -> { self.subdomain = subdomain.downcase }
-  after_create :set_founding_users_to_admin_roles
+  before_create :set_founding_users_to_admin_roles
   after_create :send_activation_email
 
   validates :plan, presence: { message: "must exist" }
@@ -41,9 +40,6 @@ class Account < ApplicationRecord
   private
 
   def set_founding_users_to_admin_roles
-    users.each do |user|
-      user.remove_role :user
-      user.add_role :admin
-    end
+    users.each { |user| user.grant :admin }
   end
 end

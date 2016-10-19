@@ -1,5 +1,4 @@
 class Token < ApplicationRecord
-  include Rolifiable
   include Tokenable
 
   belongs_to :account

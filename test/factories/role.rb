@@ -1,18 +1,14 @@
 FactoryGirl.define do
 
-  factory :create_role, class: Role do |role|
-    name :create
+  factory :user_role, class: Role do |role|
+    name :user
   end
 
-  factory :read_role, class: Role do |role|
-    name :read
+  factory :admin_role, class: Role do |role|
+    name :admin
   end
 
-  factory :update_role, class: Role do |role|
-    name :update
-  end
-
-  factory :delete_role, class: Role do |role|
-    name :delete
+  factory :product_role, class: Role do |role|
+    name :product
   end
 end

@@ -5,7 +5,7 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def create?
@@ -13,22 +13,22 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def update?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def destroy?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def pause?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def resume?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 
   def cancel?
-    bearer.has_role? :admin
+    bearer.role? :admin
   end
 end
