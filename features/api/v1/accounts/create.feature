@@ -51,6 +51,7 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the account "google" should have 3 "admins"
+    And the account should be charged
 
   Scenario: Anonymous creates an account with a "card declined" token error
     Given there exists 1 "plan"
