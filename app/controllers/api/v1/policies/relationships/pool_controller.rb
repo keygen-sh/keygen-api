@@ -19,7 +19,7 @@ module Api::V1::Policies::Relationships
         render json: key
       else
         render_unprocessable_entity detail: "pool is empty",
-          source: { pointer: "/data/attributes/pool" }
+          source: { pointer: "/data/relationships/pool" }
       end
     end
 
