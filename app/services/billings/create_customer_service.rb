@@ -8,7 +8,7 @@ module Billings
 
     def execute
       ::Billings::BaseService::Customer.create(
-        description: "#{account.name} (#{account.subdomain}.keygin.io)",
+        description: "#{account.name} (#{account.subdomain}.keygen.sh)",
         token: token
       )
     rescue ::Billings::BaseService::Error

@@ -13,7 +13,7 @@ Feature: Create user
     And the current account has 1 "user"
     When I send a POST request to "/users" with the following:
       """
-      { "user": { "name": "Superman", "email": "superman@keygin.io", "password": "lois" } }
+      { "user": { "name": "Superman", "email": "superman@keygen.sh", "password": "lois" } }
       """
     Then the response status should be "201"
     And the JSON response should be a "user" with the name "Superman"
@@ -25,7 +25,7 @@ Feature: Create user
     And the current account has 1 "user"
     When I send a POST request to "/users" with the following:
       """
-      { "user": { "name": "Superman", "email": "superman@keygin.io" } }
+      { "user": { "name": "Superman", "email": "superman@keygen.sh" } }
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 error
@@ -40,7 +40,7 @@ Feature: Create user
       {
         "user": {
           "name": "Ironman",
-          "email": "ironman@keygin.io",
+          "email": "ironman@keygen.sh",
           "password": "jarvis",
           "roles": [{
             "name": "admin"
@@ -62,7 +62,7 @@ Feature: Create user
       {
         "user": {
           "name": "Superman",
-          "email": "superman@keygin.io",
+          "email": "superman@keygen.sh",
           "password": "sunlight",
           "roles": [{
             "name": "admin"
@@ -81,7 +81,7 @@ Feature: Create user
       {
         "user": {
           "name": "Thor",
-          "email": "thor@keygin.io",
+          "email": "thor@keygen.sh",
           "password": "mjolnir",
           "roles": [{
             "name": "admin"

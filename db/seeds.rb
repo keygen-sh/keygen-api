@@ -44,7 +44,7 @@ account = Account.create!({
   billing: billing,
   users_attributes: [{
     name: "Admin",
-    email: "admin@keygin.io",
+    email: "admin@keygen.sh",
     password: "password"
   }]
 })
@@ -77,7 +77,7 @@ account.keys.create!({
 
 user = account.users.create!({
   name: "User",
-  email: "user@keygin.io",
+  email: "user@keygen.sh",
   password: "password"
 })
 
