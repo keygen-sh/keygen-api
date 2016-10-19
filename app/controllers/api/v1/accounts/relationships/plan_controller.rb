@@ -11,15 +11,13 @@ module Api::V1::Accounts::Relationships
 
       @plan = Plan.find_by_hashid plan_params
 
-      if @plan
-        subscription = ::Billings::UpdateSubscriptionService.new(
-          id: @account.billing.external_subscription_id,
-          plan: @plan.external_plan_id
-        ).execute
-      else
-        render_unprocessable_entity detail: "must be a valid plan", source: {
-          pointer: "/data/relationships/plan" } and return
-      end
+      render_unprocessable_entity detail: "must be a valid plan", source: {
+        pointer: "/data/relationships/plan" } and return if @plan.nil?
+
+      subscription = ::Billings::UpdateSubscriptionService.new(
+        id: @account.billing.external_subscription_id,
+        plan: @plan.external_plan_id
+      ).execute
 
       if subscription
         if @account.update(plan: @plan)
