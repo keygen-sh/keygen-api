@@ -84,7 +84,7 @@ Feature: Create machine
     And the current account has 1 "license"
     When I send a POST request to "/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "key": "fw:8v:uU:bm:Wt:Zf:rL:e7:Xg:mg:8x:NV:hT:Ej:jK" } }
+      { "machine": { "license": "$licenses[0]", "fingerprint": "fw:8v:uU:bm:Wt:Zf:rL:e7:Xg:mg:8x:NV:hT:Ej:jK" } }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -97,7 +97,7 @@ Feature: Create machine
     And I use my authentication token
     When I send a POST request to "/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "key": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw" } }
+      { "machine": { "license": "$licenses[0]", "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw" } }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
