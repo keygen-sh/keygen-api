@@ -28,14 +28,22 @@ module Api::V1
         billing = Billing.find_by external_customer_id: subscription.customer
         return unless billing&.external_subscription_id == subscription.id
 
-        billing.update({
-          external_subscription_period_start: nil,
-          external_subscription_period_end: nil,
-          external_subscription_id: nil,
-          external_subscription_status: subscription.status
-        })
-
-        billing.customer.update status: "canceled"
+        # When the customer account has been paused, we need to keep track of
+        # their subscription period start/end dates, as we'll use that when
+        # resuming a subscription.
+        if billing.customer.status == "paused"
+          billing.update({
+            external_subscription_id: nil,
+            external_subscription_status: subscription.status
+          })
+        else
+          billing.update({
+            external_subscription_period_start: nil,
+            external_subscription_period_end: nil,
+            external_subscription_id: nil,
+            external_subscription_status: subscription.status
+          })
+        end
       when "customer.created"
         customer = event.data.object
         billing = Billing.find_by external_customer_id: customer.id
@@ -65,7 +73,6 @@ module Api::V1
         billing = Billing.find_by external_customer_id: customer.id
         return unless billing
 
-        billing.customer.update status: "canceled"
         billing.destroy
       end
     end
