@@ -451,6 +451,26 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
 end
 
+Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
+  account = Account.find_by subdomain: subdomain
+
+  user = account.users.roles(:admin).first
+  user.token.update account: account # FIXME ???
+
+  token = user.token.generate!
+  header "Authorization", "Bearer \"#{token}\""
+
+  case resource
+  when /^admins?$/
+    assert_equal count.to_i, account.users.admins.count
+  else
+    get "//#{account.subdomain}.keygin.io/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+
+    json = JSON.parse last_response.body
+    assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
+  end
+end
+
 Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
   worker = "#{resource.singularize.underscore}_worker".classify.constantize
   assert_equal count.to_i, worker.jobs.size
