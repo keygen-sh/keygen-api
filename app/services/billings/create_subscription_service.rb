@@ -15,9 +15,7 @@ module Billings
 
       params[:trial_end] = trial if !trial.nil? && trial.to_i > 0
 
-      subscription = ::Billings::BaseService::Subscription.create params
-
-      subscription
+      ::Billings::BaseService::Subscription.create params
     rescue ::Billings::BaseService::Error
       nil
     end
