@@ -76,6 +76,20 @@ Feature: Create license
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
 
+  Scenario: User attempts to create a license without a user
+    Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use my authentication token
+    When I send a POST request to "/licenses" with the following:
+      """
+      { "license": { "policy": "$policies[0]" } }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User attempts to create a license for another user
     Given I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
