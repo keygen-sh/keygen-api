@@ -16,6 +16,9 @@ module Api::V1::Accounts::Relationships
           id: @account.billing.external_subscription_id,
           plan: @plan.external_plan_id
         ).execute
+      else
+        render_unprocessable_entity detail: "must be a valid plan", source: {
+          pointer: "/data/relationships/plan" } and return
       end
 
       if subscription
@@ -26,7 +29,7 @@ module Api::V1::Accounts::Relationships
         end
       else
         render_unprocessable_entity detail: "must exist", source: {
-          pointer: "/data/attributes/billing" }
+          pointer: "/data/relationships/billing" }
       end
     end
 
