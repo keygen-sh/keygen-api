@@ -2,10 +2,6 @@ module Activatable
   extend ActiveSupport::Concern
   include Tokenable
 
-  included do
-    after_create :send_activation_email
-  end
-
   def send_activation_email
     token, enc = generate_encrypted_token :activation_token
 

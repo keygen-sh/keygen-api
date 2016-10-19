@@ -25,7 +25,32 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the JSON response should be a "account" with the name "Google"
+    And the account "google" should have 1 "admin"
     And the account should be charged
+
+  Scenario: Anonymous creates an account with multiple admins
+    Given there exists 1 "plan"
+    And I have a valid payment token
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "account": {
+          "subdomain": "google",
+          "name": "Google",
+          "plan": "$plan[0]",
+          "admins": [
+            { "name": "Larry Page", "email": "lpage@keygin.io", "password": "goog" },
+            { "name": "Sergey Brin", "email": "sbrin@keygin.io", "password": "goog" },
+            { "name": "Sundar Pichai", "email": "spichai@keygin.io", "password": "goog" }
+          ],
+          "billing": {
+            "token": "some_token"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the account "google" should have 3 "admins"
 
   Scenario: Anonymous creates an account with a "card declined" token error
     Given there exists 1 "plan"
