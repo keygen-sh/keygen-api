@@ -18,7 +18,10 @@ module Tokenable
     end
   end
 
+  # See: https://github.com/plataformatec/devise/blob/88724e10adaf9ffd1d8dbfbaadda2b9d40de756a/lib/devise/encryptor.rb?ts=2#L12
   def compare_encrypted_token(attribute, token)
+    return false if token.blank?
+
     hashed_token = self.send attribute
     bcrypt = ::BCrypt::Password.new hashed_token
     token = ::BCrypt::Engine.hash_secret token, bcrypt.salt
@@ -31,8 +34,7 @@ module Tokenable
   private
 
   # Constant-time comparison algorithm to prevent timing attacks
-  # @see https://github.com/plataformatec/devise/blob/88724e10adaf9ffd1d8dbfbaadda2b9d40de756a/lib/devise/encryptor.rb?ts=2#L12
-  # @see https://github.com/plataformatec/devise/blob/7b000390a066d89b9cc474b22aa8afff6f5c85b7/lib/devise.rb?ts=2#L485
+  # See: https://github.com/plataformatec/devise/blob/7b000390a066d89b9cc474b22aa8afff6f5c85b7/lib/devise.rb?ts=2#L485
   def secure_compare(a, b)
     return false if a.blank? || b.blank? || a.bytesize != b.bytesize
     l = a.unpack "C#{a.bytesize}"
