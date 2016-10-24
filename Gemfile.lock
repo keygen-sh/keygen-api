@@ -265,10 +265,9 @@ DEPENDENCIES
   stripe
   stripe-ruby-mock (~> 2.3.1)
   timecop
-  tzinfo-data
 
 RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.13.5
+   1.13.6
