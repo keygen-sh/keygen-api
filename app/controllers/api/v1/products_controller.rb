@@ -8,7 +8,7 @@ module Api::V1
 
     # GET /products
     def index
-      @products = policy_scope apply_scopes(@current_account.products).all
+      @products = policy_scope apply_scopes(current_account.products).all
       authorize @products
 
       render json: @products
@@ -25,13 +25,13 @@ module Api::V1
 
     # POST /products
     def create
-      @product = @current_account.products.new product_params
+      @product = current_account.products.new product_params
       authorize @product
 
       if @product.save
         WebhookEventService.new(
           event: "product.created",
-          account: @current_account,
+          account: current_account,
           resource: @product
         ).execute
 
@@ -50,7 +50,7 @@ module Api::V1
       if @product.update(product_params)
         WebhookEventService.new(
           event: "product.updated",
-          account: @current_account,
+          account: current_account,
           resource: @product
         ).execute
 
@@ -68,7 +68,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "product.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @product
       ).execute
 
@@ -79,7 +79,7 @@ module Api::V1
 
     # Use callbacks to share common setup or constraints between actions.
     def set_product
-      @product = @current_account.products.find_by_hashid params[:id]
+      @product = current_account.products.find_by_hashid params[:id]
     end
 
     # Only allow a trusted parameter "white list" through.

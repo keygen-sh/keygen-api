@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /licenses
     def index
-      @licenses = policy_scope apply_scopes(@current_account.licenses).all
+      @licenses = policy_scope apply_scopes(current_account.licenses).all
       authorize @licenses
 
       render json: @licenses
@@ -27,10 +27,10 @@ module Api::V1
 
     # POST /licenses
     def create
-      policy = @current_account.policies.find_by_hashid license_params[:policy]
-      user = @current_account.users.find_by_hashid license_params[:user]
+      policy = current_account.policies.find_by_hashid license_params[:policy]
+      user = current_account.users.find_by_hashid license_params[:user]
 
-      @license = @current_account.licenses.new license_params.merge(
+      @license = current_account.licenses.new license_params.merge(
         policy: policy,
         user: user
       ).compact
@@ -39,7 +39,7 @@ module Api::V1
       if @license.save
         WebhookEventService.new(
           event: "license.created",
-          account: @current_account,
+          account: current_account,
           resource: @license
         ).execute
 
@@ -58,7 +58,7 @@ module Api::V1
       if @license.update(license_params)
         WebhookEventService.new(
           event: "license.updated",
-          account: @current_account,
+          account: current_account,
           resource: @license
         ).execute
 
@@ -76,7 +76,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "license.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @license
       ).execute
 
@@ -86,7 +86,7 @@ module Api::V1
     private
 
     def set_license
-      @license = @current_account.licenses.find_by_hashid params[:id]
+      @license = current_account.licenses.find_by_hashid params[:id]
     end
 
     def license_params

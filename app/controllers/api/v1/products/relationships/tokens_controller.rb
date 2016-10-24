@@ -15,7 +15,7 @@ module Api::V1::Products::Relationships
     private
 
     def set_product
-      @product = @current_account.products.find_by_hashid params[:product_id]
+      @product = current_account.products.find_by_hashid params[:product_id]
     end
   end
 end

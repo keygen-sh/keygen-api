@@ -26,7 +26,7 @@ module Api::V1::Policies::Relationships
     private
 
     def set_policy
-      @policy = @current_account.policies.find_by_hashid params[:policy_id]
+      @policy = current_account.policies.find_by_hashid params[:policy_id]
     end
   end
 end

@@ -8,7 +8,7 @@ module Api::V1
 
     # GET /webhook-endpoints
     def index
-      @endpoints = policy_scope apply_scopes(@current_account.webhook_endpoints).all
+      @endpoints = policy_scope apply_scopes(current_account.webhook_endpoints).all
       authorize @endpoints
 
       render json: @endpoints
@@ -25,7 +25,7 @@ module Api::V1
 
     # POST /webhook-endpoints
     def create
-      @endpoint = @current_account.webhook_endpoints.new endpoint_params
+      @endpoint = current_account.webhook_endpoints.new endpoint_params
       authorize @endpoint
 
       if @endpoint.save

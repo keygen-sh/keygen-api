@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /keys
     def index
-      @keys = policy_scope apply_scopes(@current_account.keys).all
+      @keys = policy_scope apply_scopes(current_account.keys).all
       authorize @keys
 
       render json: @keys
@@ -26,15 +26,15 @@ module Api::V1
 
     # POST /keys
     def create
-      policy = @current_account.policies.find_by_hashid key_params[:policy]
+      policy = current_account.policies.find_by_hashid key_params[:policy]
 
-      @key = @current_account.keys.new key_params.merge(policy: policy)
+      @key = current_account.keys.new key_params.merge(policy: policy)
       authorize @key
 
       if @key.save
         WebhookEventService.new(
           event: "key.created",
-          account: @current_account,
+          account: current_account,
           resource: @key
         ).execute
 
@@ -53,7 +53,7 @@ module Api::V1
       if @key.update(key_params)
         WebhookEventService.new(
           event: "key.updated",
-          account: @current_account,
+          account: current_account,
           resource: @key
         ).execute
 
@@ -71,7 +71,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "key.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @key
       ).execute
 

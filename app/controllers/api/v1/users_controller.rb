@@ -11,7 +11,7 @@ module Api::V1
 
     # GET /users
     def index
-      @users = policy_scope apply_scopes(@current_account.users).all
+      @users = policy_scope apply_scopes(current_account.users).all
       authorize @users
 
       render json: @users
@@ -28,13 +28,13 @@ module Api::V1
 
     # POST /users
     def create
-      @user = @current_account.users.new user_params
+      @user = current_account.users.new user_params
       authorize @user
 
       if @user.save
         WebhookEventService.new(
           event: "user.created",
-          account: @current_account,
+          account: current_account,
           resource: @user
         ).execute
 
@@ -53,7 +53,7 @@ module Api::V1
       if @user.update(user_params)
         WebhookEventService.new(
           event: "user.updated",
-          account: @current_account,
+          account: current_account,
           resource: @user
         ).execute
 
@@ -71,7 +71,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "user.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @user
       ).execute
 
@@ -81,7 +81,7 @@ module Api::V1
     private
 
     def set_user
-      @user = @current_account.users.find_by_hashid params[:id]
+      @user = current_account.users.find_by_hashid params[:id]
     end
 
     def user_params
@@ -103,7 +103,7 @@ module Api::V1
             permits << :password
           end
 
-          if @current_bearer&.role? :admin
+          if current_bearer&.role? :admin
             additional.merge! roles: [[:name]]
           end
 

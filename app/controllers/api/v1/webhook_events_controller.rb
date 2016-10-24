@@ -8,7 +8,7 @@ module Api::V1
 
     # GET /webhook-events
     def index
-      @events = policy_scope apply_scopes(@current_account.webhook_events).all
+      @events = policy_scope apply_scopes(current_account.webhook_events).all
       authorize @events
 
       render json: @events
