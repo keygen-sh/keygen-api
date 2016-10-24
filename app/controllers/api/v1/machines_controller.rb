@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /machines
     def index
-      @machines = policy_scope apply_scopes(@current_account.machines).all
+      @machines = policy_scope apply_scopes(current_account.machines).all
       authorize @machines
 
       render json: @machines
@@ -27,15 +27,15 @@ module Api::V1
 
     # POST /machines
     def create
-      license = @current_account.licenses.find_by_hashid machine_params[:license]
+      license = current_account.licenses.find_by_hashid machine_params[:license]
 
-      @machine = @current_account.machines.new machine_params.merge(license: license)
+      @machine = current_account.machines.new machine_params.merge(license: license)
       authorize @machine
 
       if @machine.save
         WebhookEventService.new(
           event: "machine.created",
-          account: @current_account,
+          account: current_account,
           resource: @machine
         ).execute
 
@@ -54,7 +54,7 @@ module Api::V1
       if @machine.update(machine_params)
         WebhookEventService.new(
           event: "machine.updated",
-          account: @current_account,
+          account: current_account,
           resource: @machine
         ).execute
 
@@ -72,7 +72,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "machine.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @machine
       ).execute
 

@@ -9,9 +9,11 @@ class ApplicationController < ActionController::API
   rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
   rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }
 
+  attr_accessor :current_account
   attr_accessor :current_bearer
+
   def pundit_user
-    @current_bearer
+    current_bearer
   end
 
   protected

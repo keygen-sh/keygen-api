@@ -4,9 +4,9 @@ module SubdomainScope
   def scope_by_subdomain!
     @current_account = Account.find_by_subdomain! request.subdomains.first
 
-    if @current_account.activated?
-      if @current_account.active? || @current_account.pending?
-        @current_account
+    if current_account.activated?
+      if current_account.active? || current_account.pending?
+        current_account
       else
         render_forbidden({
           title: "Account is not active",

@@ -9,7 +9,7 @@ module Api::V1
       skip_authorization
 
       authenticate_with_http_basic do |email, password|
-        user = @current_account.users.find_by email: email
+        user = current_account.users.find_by email: email
 
         if user&.authenticate(password)
           user.token.generate!
@@ -26,7 +26,7 @@ module Api::V1
 
       authenticate_with_http_token do |token, options|
         bearer = TokenAuthenticationService.new(
-          account: @current_account,
+          account: current_account,
           token: token
         ).execute
 

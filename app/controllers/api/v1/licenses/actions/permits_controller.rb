@@ -20,7 +20,7 @@ module Api::V1::Licenses::Actions
       elsif @license.update(expiry: @license.expiry + @license.policy.duration)
         WebhookEventService.new(
           event: "license.renewed",
-          account: @current_account,
+          account: current_account,
           resource: @license
         ).execute
 
@@ -38,7 +38,7 @@ module Api::V1::Licenses::Actions
 
       WebhookEventService.new(
         event: "license.revoked",
-        account: @current_account,
+        account: current_account,
         resource: @license
       ).execute
 
@@ -57,7 +57,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = @current_account.licenses.find_by_hashid params[:license_id]
+      @license = current_account.licenses.find_by_hashid params[:license_id]
     end
   end
 end

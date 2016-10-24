@@ -12,7 +12,7 @@ module Api::V1
     private
 
     def set_user
-      @user = @current_account.users.find_by_email email_params
+      @user = current_account.users.find_by_email email_params
     end
 
     def email_params

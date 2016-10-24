@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /policies
     def index
-      @policies = policy_scope apply_scopes(@current_account.policies).all
+      @policies = policy_scope apply_scopes(current_account.policies).all
       authorize @policies
 
       render json: @policies
@@ -26,15 +26,15 @@ module Api::V1
 
     # POST /policies
     def create
-      product = @current_account.products.find_by_hashid policy_params[:product]
+      product = current_account.products.find_by_hashid policy_params[:product]
 
-      @policy = @current_account.policies.new policy_params.merge(product: product)
+      @policy = current_account.policies.new policy_params.merge(product: product)
       authorize @policy
 
       if @policy.save
         WebhookEventService.new(
           event: "policy.created",
-          account: @current_account,
+          account: current_account,
           resource: @policy
         ).execute
 
@@ -53,7 +53,7 @@ module Api::V1
       if @policy.update(policy_params)
         WebhookEventService.new(
           event: "policy.updated",
-          account: @current_account,
+          account: current_account,
           resource: @policy
         ).execute
 
@@ -71,7 +71,7 @@ module Api::V1
 
       WebhookEventService.new(
         event: "policy.deleted",
-        account: @current_account,
+        account: current_account,
         resource: @policy
       ).execute
 
@@ -81,7 +81,7 @@ module Api::V1
     private
 
     def set_policy
-      @policy = @current_account.policies.find_by_hashid params[:id]
+      @policy = current_account.policies.find_by_hashid params[:id]
     end
 
     def policy_params

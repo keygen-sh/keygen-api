@@ -51,7 +51,7 @@ module Api::V1::Users::Actions
     private
 
     def set_user
-      @user = @current_account.users.find_by_hashid params[:user_id]
+      @user = current_account.users.find_by_hashid params[:user_id]
     end
   end
 end
