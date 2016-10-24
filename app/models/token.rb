@@ -8,7 +8,7 @@ class Token < ApplicationRecord
 
   def generate!
     @raw, enc = generate_encrypted_token :digest do |token|
-      "#{hashid}_#{token}"
+      "#{hashid}.#{token}"
     end
 
     self.digest = enc
