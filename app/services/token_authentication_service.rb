@@ -1,5 +1,5 @@
 class TokenAuthenticationService < BaseService
-  TOKEN_ID_REGEX = /\A([^_]+)/
+  TOKEN_ID_REGEX = /\A([^\.]+)/
 
   def initialize(account:, token:)
     @account = account
