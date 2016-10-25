@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161019163352) do
+ActiveRecord::Schema.define(version: 20161025195849) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,32 +18,29 @@ ActiveRecord::Schema.define(version: 20161019163352) do
   create_table "accounts", force: :cascade do |t|
     t.string   "name"
     t.string   "subdomain"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
     t.integer  "plan_id"
-    t.string   "status",             default: "active"
     t.string   "activation_token"
     t.datetime "activation_sent_at"
-    t.boolean  "activated",          default: false
     t.index ["subdomain"], name: "index_accounts_on_subdomain", using: :btree
   end
 
   create_table "billings", force: :cascade do |t|
-    t.string   "external_customer_id"
-    t.string   "external_subscription_status"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-    t.integer  "customer_id"
-    t.string   "customer_type"
-    t.string   "external_subscription_id"
-    t.datetime "external_subscription_period_start"
-    t.datetime "external_subscription_period_end"
+    t.string   "customer_id"
+    t.string   "subscription_status"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "account_id"
+    t.string   "subscription_id"
+    t.datetime "subscription_period_start"
+    t.datetime "subscription_period_end"
     t.datetime "card_expiry"
     t.string   "card_brand"
     t.string   "card_last4"
-    t.index ["customer_id", "customer_type"], name: "index_billings_on_customer_id_and_customer_type", using: :btree
-    t.index ["external_customer_id"], name: "index_billings_on_external_customer_id", using: :btree
-    t.index ["external_subscription_id"], name: "index_billings_on_external_subscription_id", using: :btree
+    t.string   "state"
+    t.index ["customer_id"], name: "index_billings_on_customer_id", using: :btree
+    t.index ["subscription_id"], name: "index_billings_on_subscription_id", using: :btree
   end
 
   create_table "keys", force: :cascade do |t|
@@ -89,11 +86,11 @@ ActiveRecord::Schema.define(version: 20161019163352) do
     t.integer  "max_users"
     t.integer  "max_policies"
     t.integer  "max_licenses"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
     t.integer  "max_products"
-    t.string   "external_plan_id"
-    t.index ["external_plan_id"], name: "index_plans_on_external_plan_id", using: :btree
+    t.string   "plan_id"
+    t.index ["plan_id"], name: "index_plans_on_plan_id", using: :btree
   end
 
   create_table "policies", force: :cascade do |t|
@@ -121,6 +118,15 @@ ActiveRecord::Schema.define(version: 20161019163352) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_products_on_account_id", using: :btree
+  end
+
+  create_table "receipts", force: :cascade do |t|
+    t.integer  "billing_id"
+    t.string   "invoice_id"
+    t.integer  "amount"
+    t.boolean  "paid"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|

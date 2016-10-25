@@ -30,32 +30,6 @@ module Api::V1
       @account = Account.new account_params.merge(plan: plan)
       authorize @account
 
-      # Check if account is valid thus far before creating customer
-      render_unprocessable_resource @account and return unless @account.valid?
-
-      # Create a new customer and partial billing model
-      billing = Billing.new
-
-      if !billing_params.nil?
-        customer = ::Billings::CreateCustomerService.new(
-          account: @account,
-          token: billing_params[:token]
-        ).execute
-
-        if !customer.nil?
-          billing.external_customer_id = customer.id
-
-          # We expect to recieve a 'customer.created' webhook, and from there we
-          # will subscribe the customer to their chosen plan and charge them;
-          # setting the statuses to pending lets the customer use the API
-          # until we recieve the status of the charge.
-          billing.external_subscription_status = "pending"
-          @account.status = "pending"
-        end
-      end
-
-      @account.billing = billing
-
       if @account.save
         render json: @account, status: :created, location: v1_account_url(@account)
       else
@@ -92,11 +66,7 @@ module Api::V1
     end
 
     def account_params
-      permitted_params[:account]
-    end
-
-    def billing_params
-      permitted_params[:billing]
+      permitted_params
     end
 
     attr_accessor :permitted_params
@@ -104,7 +74,6 @@ module Api::V1
     def permitted_params
       @permitted_params ||= Proc.new do
         schema = params.require(:account).tap do |param|
-          additional = {}
           permits = []
 
           permits << :name
@@ -112,25 +81,25 @@ module Api::V1
 
           if action_name == "create"
             permits << :plan
-            additional.merge! admins: [[:name, :email, :password]]
-            additional.merge! billing: [:token]
+            permits << { admins: [[:name, :email, :password]] }
           end
 
-          param.permit *permits, additional
-        end.to_unsafe_hash
+          param.permit *permits
+        end.transform_keys! { |key|
+          case key
+          when "admins"
+            "users_attributes"
+          else
+            key
+          end
+        }.to_unsafe_h
 
-        permitted = {}
-
-        # Split up params
-        permitted[:billing] = schema.delete :billing
-        permitted[:account] = schema
-
-        # Swap `admins` key with `users_attributes`
-        if permitted[:account].key? :admins
-          permitted[:account][:users_attributes] = permitted[:account].delete :admins
+        # Ensure all founding users are admins
+        schema[:users_attributes]&.map! do |user|
+          user.merge! roles_attributes: [{ name: "admin" }]
         end
 
-        permitted
+        schema
       end.call
     end
   end

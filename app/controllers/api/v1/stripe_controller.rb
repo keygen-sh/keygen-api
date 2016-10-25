@@ -5,82 +5,104 @@ module Api::V1
     def receive_webhook
       skip_authorization
 
-      # Let external service know that we recieved the webhook
+      # Let external service know that we received the webhook
       head :accepted
 
-      event = ::Billings::RetrieveEventService.new(id: stripe_params[:id]).execute
+      event = ::Billings::RetrieveEventService.new(id: params[:id]).execute
       return unless event
 
       case event.type
       when "customer.subscription.created", "customer.subscription.updated"
         subscription = event.data.object
-        billing = Billing.find_by external_customer_id: subscription.customer
+        billing = Billing.find_by customer_id: subscription.customer
         return unless billing
 
         billing.update({
-          external_subscription_period_start: Time.at(subscription.current_period_start),
-          external_subscription_period_end: Time.at(subscription.current_period_end),
-          external_subscription_id: subscription.id,
-          external_subscription_status: subscription.status
+          subscription_period_start: Time.at(subscription.current_period_start),
+          subscription_period_end: Time.at(subscription.current_period_end),
+          subscription_id: subscription.id,
+          subscription_status: subscription.status
         })
+
+        case subscription.status
+        when "active"
+          billing.activate_subscription unless billing.active?
+        when "trialing"
+          billing.activate_trial unless billing.trialing?
+        when "canceled"
+          billing.cancel_subscription unless billing.canceled?
+        end
       when "customer.subscription.deleted"
         subscription = event.data.object
-        billing = Billing.find_by external_customer_id: subscription.customer
-        return unless billing&.external_subscription_id == subscription.id
+        billing = Billing.find_by customer_id: subscription.customer
+        return unless billing&.subscription_id == subscription.id
 
-        # When the customer account has been paused, we need to keep track of
-        # their subscription period start/end dates, as we'll use that when
-        # resuming a subscription.
-        if billing.customer.status == "paused"
-          billing.update({
-            external_subscription_id: nil,
-            external_subscription_status: subscription.status
-          })
-        else
-          billing.update({
-            external_subscription_period_start: nil,
-            external_subscription_period_end: nil,
-            external_subscription_id: nil,
-            external_subscription_status: subscription.status
-          })
-        end
-      when "customer.created"
-        customer = event.data.object
-        billing = Billing.find_by external_customer_id: customer.id
-        return unless billing && billing.external_subscription_id.nil?
-
-        subscription = ::Billings::CreateSubscriptionService.new(
-          customer: billing.external_customer_id,
-          plan: billing.customer.plan.external_plan_id
-        ).execute
-
-        billing.customer.update status: subscription.status
-      when "customer.updated"
-        customer = event.data.object
-        billing = Billing.find_by external_customer_id: customer.id
+        billing.update({
+          subscription_id: nil,
+          subscription_status: subscription.status
+        })
+      when "customer.source.created", "customer.source.updated"
+        card = event.data.object
+        billing = Billing.find_by customer_id: customer
         return unless billing
-
-        card = customer.sources.retrieve customer.default_source
-        return unless card
 
         billing.update({
           card_expiry: DateTime.new(card.exp_year.to_i, card.exp_month.to_i),
           card_brand: card.brand,
           card_last4: card.last4
         })
-      when "customer.deleted"
-        customer = event.data.object
-        billing = Billing.find_by external_customer_id: customer.id
+      when "customer.subscription.trial_will_end"
+        subscription = event.data.object
+        billing = Billing.find_by customer_id: subscription.customer
         return unless billing
 
-        billing.destroy
+        # Make sure our customer knows that they need to add a card to their
+        # account within the next few days
+        if billing.card.nil?
+          AccountMailer.payment_method_missing(billing.account).deliver_later
+        end
+      when "invoice.payment_successful"
+        invoice = event.data.object
+        billing = Billing.find_by customer_id: invoice.customer
+        return unless billing
+
+        # Ask for feedback after first successful payment
+        if billing.receipts.paid.empty?
+          AccountMailer.first_payment_successful(billing.account).deliver_later
+        end
+
+        billing.receipts.create(
+          invoice_id: invoice.id,
+          total: invoice.total,
+          paid: invoice.paid
+        )
+      when "invoice.payment_failed"
+        invoice = event.data.object
+        billing = Billing.find_by customer_id: invoice.customer
+        return unless billing
+
+        if billing.card.nil?
+          AccountMailer.payment_method_missing(billing.account).deliver_later
+        else
+          AccountMailer.payment_failed(billing.account).deliver_later
+        end
+
+        billing.receipts.create(
+          invoice_id: invoice.id,
+          total: invoice.total,
+          paid: invoice.paid
+        )
+      when "customer.created"
+        customer = event.data.object
+        billing = Billing.find_by customer_id: customer.id
+        return unless billing && billing.subscription_id.nil?
+
+        # Create a trial subscription (possibly without a payment method)
+        ::Billings::CreateSubscriptionService.new(
+          customer: billing.customer_id,
+          plan: billing.plan.plan_id
+        ).execute
       end
-    end
-
-    private
-
-    def stripe_params
-      params
     end
   end
 end

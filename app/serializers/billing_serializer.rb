@@ -3,11 +3,11 @@ class BillingSerializer < BaseSerializer
 
   attributes [
     :id,
-    :external_customer_id,
-    :external_subscription_id,
-    :external_subscription_period_start,
-    :external_subscription_period_end,
-    :external_subscription_status,
+    :customer_id,
+    :subscription_id,
+    :subscription_period_start,
+    :subscription_period_end,
+    :subscription_status,
     :card_expiry,
     :card_brand,
     :card_last4,
@@ -15,5 +15,5 @@ class BillingSerializer < BaseSerializer
     :updated
   ]
 
-  belongs_to :customer, polymorphic: true
+  belongs_to :account
 end

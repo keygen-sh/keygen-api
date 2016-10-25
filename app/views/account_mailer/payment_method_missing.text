@@ -1,0 +1,6 @@
+It looks like your account, #{@account.name}, is missing a payment method. Please
+sign into your account at: https://app.keygen.sh and add a payment method. If you
+don't add a payment method soon, your subscription will be canceled after the
+current period ends.
+
+Please let me know if you have any questions. I'd love to help out!

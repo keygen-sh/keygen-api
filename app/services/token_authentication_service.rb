@@ -1,5 +1,5 @@
 class TokenAuthenticationService < BaseService
-  TOKEN_ID_REGEX = /\A([^\.]+)/
+  TOKEN_ID_REGEX = /\A([^\.]+)\.([^\.]+)/ # Form: {account}.{bearer}.xxx
 
   def initialize(account:, token:)
     @account = account
@@ -7,10 +7,11 @@ class TokenAuthenticationService < BaseService
   end
 
   def execute
-    return nil unless account
+    token =~ TOKEN_ID_REGEX # Run regex against token
 
-    token =~ TOKEN_ID_REGEX
-    tok = account.tokens.find_by_hashid $1
+    return nil unless account&.hashid == $1
+
+    tok = account.tokens.find_by_hashid $2
 
     if tok&.compare_encrypted_token(:digest, token)
       tok.bearer

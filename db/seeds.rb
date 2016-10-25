@@ -7,24 +7,24 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 Plan.create!([{
+  plan_id: "weekender",
   name: "Weekender",
-  external_plan_id: "weekender",
   price: 900,
   max_products: 1,
   max_users: 250,
   max_licenses: 250,
   max_policies: 1
 }, {
+  plan_id: "startup",
   name: "Startup",
-  external_plan_id: "startup",
   price: 2400,
   max_products: 5,
   max_users: 1000,
   max_licenses: 5000,
   max_policies: 5
 }, {
+  plan_id: "business",
   name: "Business",
-  external_plan_id: "business",
   price: 4900,
   max_products: 25,
   max_users: 5000,
@@ -32,20 +32,17 @@ Plan.create!([{
   max_policies: 25
 }])
 
-billing = Billing.create!({
-  external_customer_id: "cust_id",
-  external_subscription_status: "active"
-})
-
 account = Account.create!({
   name: "Apptacular",
   subdomain: "apptacular",
   plan: Plan.first,
-  billing: billing,
   users_attributes: [{
     name: "Admin",
     email: "admin@keygen.sh",
-    password: "password"
+    password: "password",
+    roles_attributes: [{
+      name: "admin"
+    }]
   }]
 })
 

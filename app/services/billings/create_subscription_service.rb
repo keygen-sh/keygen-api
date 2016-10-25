@@ -10,10 +10,9 @@ module Billings
     def execute
       params = {
         customer: customer,
+        trial_end: trial,
         plan: plan
       }
-
-      params[:trial_end] = trial if !trial.nil? && trial.to_i > 0
 
       ::Billings::BaseService::Subscription.create params
     rescue ::Billings::BaseService::Error

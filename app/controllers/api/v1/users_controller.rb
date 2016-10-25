@@ -93,7 +93,6 @@ module Api::V1
     def permitted_params
       @permitted_params ||= Proc.new do
         schema = params.require(:user).tap do |param|
-          additional = {}
           permits = []
 
           permits << :name
@@ -104,21 +103,23 @@ module Api::V1
           end
 
           if current_bearer&.role? :admin
-            additional.merge! roles: [[:name]]
+            permits << { roles: [[:name]] }
           end
 
           # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
-          additional.merge!({
+          permits << {
             meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
-          })
+          }
 
-          param.permit *permits, additional
-        end.to_unsafe_hash
-
-        # Swap `roles` key with `roles_attributes`
-        if schema[:roles]
-          schema[:roles_attributes] = schema.delete :roles
-        end
+          param.permit *permits
+        end.transform_keys! { |key|
+          case key
+          when "roles"
+            "roles_attributes"
+          else
+            key
+          end
+        }.to_unsafe_h
 
         schema
       end.call

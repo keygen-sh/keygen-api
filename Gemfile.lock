@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (4.11.1)
     actioncable (5.0.0.1)
       actionpack (= 5.0.0.1)
       nio4r (~> 1.2)
@@ -84,25 +85,12 @@ GEM
       dotenv (= 2.1.1)
       railties (>= 4.0, < 5.1)
     erubis (2.7.0)
-    factory_girl (4.7.0)
-      activesupport (>= 3.0.0)
-    factory_girl_rails (4.7.0)
-      factory_girl (~> 4.7.0)
-      railties (>= 3.0.0)
     faker (1.6.6)
       i18n (~> 0.5)
     ffi (1.9.14)
     gherkin (4.0.0)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
-    haml (4.0.7)
-      tilt
-    haml-rails (0.9.0)
-      actionpack (>= 4.0.1)
-      activesupport (>= 4.0.1)
-      haml (>= 4.0.6, < 5.0)
-      html2haml (>= 1.0.1)
-      railties (>= 4.0.1)
     has_scope (0.7.0)
       actionpack (>= 4.1, < 5.1)
       activesupport (>= 4.1, < 5.1)
@@ -110,11 +98,6 @@ GEM
       activerecord (>= 4.0)
       hashids (~> 1.0)
     hashids (1.0.2)
-    html2haml (2.0.0)
-      erubis (~> 2.7.0)
-      haml (~> 4.0.0)
-      nokogiri (~> 1.6.0)
-      ruby_parser (~> 3.5)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httparty (0.14.0)
@@ -192,9 +175,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    ruby_parser (3.8.2)
-      sexp_processor (~> 4.1)
-    sexp_processor (4.7.0)
     sidekiq (4.2.2)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
@@ -221,7 +201,6 @@ GEM
       stripe (~> 1.31)
     thor (0.19.1)
     thread_safe (0.3.5)
-    tilt (2.0.5)
     timecop (0.8.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
@@ -238,15 +217,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aasm
   active_model_serializers
   bcrypt (~> 3.1.7)
   byebug
   cucumber-rails
   database_cleaner
   dotenv-rails
-  factory_girl_rails
   faker (~> 1.6.3)
-  haml-rails (~> 0.9)
   has_scope
   hashid-rails
   httparty

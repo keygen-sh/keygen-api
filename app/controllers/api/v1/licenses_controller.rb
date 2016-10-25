@@ -110,7 +110,7 @@ module Api::V1
           end
 
           param.permit *permits
-        end.to_unsafe_hash
+        end.to_unsafe_h
 
         schema
       end.call
