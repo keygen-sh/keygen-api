@@ -1,1 +1,5 @@
+Hey #{@user.name}
+
 = yield
+
+– Zeke Gabrielse, Founder of Keygen

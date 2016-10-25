@@ -1,15 +1,14 @@
 module Billings
   class CreateCustomerService < BaseService
 
-    def initialize(account:, token:)
+    def initialize(account:)
       @account = account
-      @token   = token
     end
 
     def execute
       ::Billings::BaseService::Customer.create(
         description: "#{account.name} (#{account.subdomain}.keygen.sh)",
-        token: token
+        email: account.admins.first.email
       )
     rescue ::Billings::BaseService::Error
       nil
@@ -17,6 +16,6 @@ module Billings
 
     private
 
-    attr_reader :account, :token
+    attr_reader :account
   end
 end

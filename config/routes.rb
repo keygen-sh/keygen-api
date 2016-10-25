@@ -1,5 +1,3 @@
-# require_dependency Rails.root.join "lib/routes_helper"
-
 Rails.application.routes.draw do
   scope module: "api" do
     namespace "v1", constraints: { format: "json" } do
@@ -17,10 +15,10 @@ Rails.application.routes.draw do
               post "plan", to: "plan#update"
             end
             namespace "actions" do
-              post "activate", to: "activation#activate"
               post "pause", to: "subscription#pause"
               post "resume", to: "subscription#resume"
               post "cancel", to: "subscription#cancel"
+              post "renew", to: "subscription#renew"
             end
           end
         end

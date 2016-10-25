@@ -1,7 +1,7 @@
 module Api::V1::Accounts::Actions
   class SubscriptionController < Api::V1::BaseController
     before_action :authenticate_with_token!
-    before_action :set_account, only: [:pause, :resume, :cancel]
+    before_action :set_account
 
     # POST /accounts/1/actions/pause
     def pause
@@ -9,24 +9,10 @@ module Api::V1::Accounts::Actions
 
       authorize @account
 
-      if @account.status == "paused"
-        render_unprocessable_entity detail: "is already paused", source: {
-          pointer: "/data/attributes/status" } and return
-      end
-
-      subscription = ::Billings::DeleteSubscriptionService.new(
-        id: @account.billing.external_subscription_id
-      ).execute
-
-      if subscription
-        if @account.update(status: "paused")
-          render_meta status: "paused"
-        else
-          render_unprocessable_resource @account
-        end
+      if @account.pause_subscription
+        render_meta status: "paused"
       else
-        render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/attributes/billing" }
+        render_unprocessable_resource @account
       end
     end
 
@@ -36,33 +22,10 @@ module Api::V1::Accounts::Actions
 
       authorize @account
 
-      if @account.status == "active"
-        render_unprocessable_entity detail: "is already active", source: {
-          pointer: "/data/attributes/status" } and return
-      end
-
-      if @account.status != "paused"
-        render_unprocessable_entity detail: "is not paused", source: {
-          pointer: "/data/attributes/status" } and return
-      end
-
-      # Setting a trial allows us to continue to use the previously 'paused'
-      # subscription's billing cycle
-      subscription = ::Billings::CreateSubscriptionService.new(
-        customer: @account.billing.external_customer_id,
-        trial: @account.billing.external_subscription_period_end,
-        plan: @account.plan.external_plan_id
-      ).execute
-
-      if subscription
-        if @account.update(status: "active")
-          render_meta status: "active"
-        else
-          render_unprocessable_resource @account
-        end
+      if @account.resume_subscription
+        render_meta status: "resumed"
       else
-        render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/attributes/billing" }
+        render_unprocessable_resource @account
       end
     end
 
@@ -72,24 +35,23 @@ module Api::V1::Accounts::Actions
 
       authorize @account
 
-      if @account.status == "canceled"
-        render_unprocessable_entity detail: "is already canceled", source: {
-          pointer: "/data/attributes/status" } and return
-      end
-
-      subscription = ::Billings::DeleteSubscriptionService.new(
-        id: @account.billing.external_subscription_id
-      ).execute
-
-      if subscription
-        if @account.update(status: "canceled")
-          render_meta status: "canceled"
-        else
-          render_unprocessable_resource @account
-        end
+      if @account.cancel_subscription
+        render_meta status: "canceled"
       else
-        render_unprocessable_entity detail: "subscription is invalid", source: {
-          pointer: "/data/attributes/billing" }
+        render_unprocessable_resource @account
+      end
+    end
+
+    # POST /accounts/1/actions/renew
+    def renew
+      render_not_found and return unless @account
+
+      authorize @account
+
+      if @account.renew_subscription
+        render_meta status: "renewed"
+      else
+        render_unprocessable_resource @account
       end
     end
 

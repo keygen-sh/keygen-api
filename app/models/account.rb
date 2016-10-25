@@ -1,7 +1,6 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
   include Paginatable
-  include Activatable
   include Billable
 
   belongs_to :plan
@@ -14,20 +13,18 @@ class Account < ApplicationRecord
   has_many :keys, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :machines, dependent: :destroy
-  has_one :billing, as: :customer, dependent: :destroy
+  has_one :billing, dependent: :destroy
 
   accepts_nested_attributes_for :users
-  accepts_nested_attributes_for :billing
 
   before_create -> { self.subdomain = subdomain.downcase }
-  before_create :set_founding_users_to_admin_roles
-  after_create :send_activation_email
+  after_create -> { InitializeBillingWorker.perform_async(id) }
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
   validates_associated :billing, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
 
-  validates_each :users, :products, :policies, :licenses, if: :activated? do |account, record|
+  validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
     next unless account.send(record).size > account.plan.send("max_#{record}")
     account.errors.add record, "count has reached maximum allowed by current plan"
   end
@@ -37,9 +34,7 @@ class Account < ApplicationRecord
 
   scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
-  private
-
-  def set_founding_users_to_admin_roles
-    users.each { |user| user.grant :admin }
+  def admins
+    users.admins
   end
 end

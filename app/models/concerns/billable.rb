@@ -1,23 +1,17 @@
 module Billable
   extend ActiveSupport::Concern
 
-  def active?
-    billing&.external_subscription_status == "active"
-  end
+  included do
 
-  def pending?
-    billing&.external_subscription_status == "pending"
-  end
+    Billing::AVAILABLE_EVENTS.each do |event|
+      delegate "#{event}", to: :billing, allow_nil: true
+    end
 
-  def trialing?
-    billing&.external_subscription_status == "trialing"
-  end
+    Billing::AVAILABLE_STATES.each do |state|
+      delegate "#{state}?", to: :billing, allow_nil: true
+      delegate "#{state}", to: :billing, allow_nil: true
+    end
 
-  def paused?
-    billing&.external_subscription_status == "paused"
-  end
-
-  def canceled?
-    billing&.external_subscription_status == "canceled"
+    delegate "active?", to: :billing, allow_nil: true
   end
 end

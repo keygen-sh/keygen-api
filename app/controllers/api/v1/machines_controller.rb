@@ -107,7 +107,7 @@ module Api::V1
           permits << :name
 
           param.permit *permits
-        end.to_unsafe_hash
+        end.to_unsafe_h
 
         schema
       end.call

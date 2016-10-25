@@ -14,19 +14,19 @@ module Api::V1::Accounts::Relationships
       render_unprocessable_entity detail: "must be a valid plan", source: {
         pointer: "/data/relationships/plan" } and return if @plan.nil?
 
-      subscription = ::Billings::UpdateSubscriptionService.new(
-        id: @account.billing.external_subscription_id,
-        plan: @plan.external_plan_id
+      status = ::Billings::UpdateSubscriptionService.new(
+        id: @account.billing.subscription_id,
+        plan: @plan.plan_id
       ).execute
 
-      if subscription
+      if status
         if @account.update(plan: @plan)
           render json: @account
         else
           render_unprocessable_resource @account
         end
       else
-        render_unprocessable_entity detail: "must exist", source: {
+        render_unprocessable_entity detail: "must have a valid subscription", source: {
           pointer: "/data/relationships/billing" }
       end
     end

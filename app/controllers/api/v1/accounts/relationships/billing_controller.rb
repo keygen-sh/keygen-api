@@ -19,8 +19,8 @@ module Api::V1::Accounts::Relationships
       authorize @billing
 
       status = ::Billings::UpdateCustomerService.new(
-        id: @billing.external_customer_id,
-        token: billing_params[:token]
+        id: @billing.customer_id,
+        token: token_params
       ).execute
 
       if status
@@ -36,8 +36,8 @@ module Api::V1::Accounts::Relationships
       @billing = Account.find_by_hashid(params[:account_id])&.billing
     end
 
-    def billing_params
-      params.require(:billing).permit :token
+    def token_params
+      params.require :token
     end
   end
 end
