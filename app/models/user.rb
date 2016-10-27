@@ -1,6 +1,4 @@
 class User < ApplicationRecord
-  ALLOWED_ROLES = %w[admin user].freeze
-
   include TokenAuthenticatable
   include PasswordResetable
   include Paginatable
@@ -15,7 +13,7 @@ class User < ApplicationRecord
   has_one :role, as: :resource, dependent: :destroy
   has_one :token, as: :bearer, dependent: :destroy
 
-  accepts_nested_attributes_for :role, reject_if: -> (attrs) { ALLOWED_ROLES.include? attrs[:name] }
+  accepts_nested_attributes_for :role
 
   serialize :meta, Hash
 
