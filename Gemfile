@@ -49,6 +49,7 @@ end
 group :test do
   gem 'stripe-ruby-mock', '~> 2.3.1', require: 'stripe_mock'
   gem 'cucumber-rails', require: false
+  gem 'factory_girl_rails'
   gem 'database_cleaner'
   gem 'faker', '~> 1.6.3'
 end

@@ -2,7 +2,7 @@
 Feature: Generate authentication token for product
 
   Background:
-    Given the following accounts exist:
+    Given the following "accounts" exist:
       | Name  | Subdomain |
       | Test1 | test1     |
       | Test2 | test2     |

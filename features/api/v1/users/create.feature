@@ -2,7 +2,7 @@
 Feature: Create user
 
   Background:
-    Given the following accounts exist:
+    Given the following "accounts" exist:
       | Name  | Subdomain |
       | Test1 | test1     |
     And I send and accept JSON
@@ -42,9 +42,9 @@ Feature: Create user
           "name": "Ironman",
           "email": "ironman@keygen.sh",
           "password": "jarvis",
-          "roles": [{
+          "role": {
             "name": "admin"
-          }]
+          }
         }
       }
       """
@@ -64,9 +64,9 @@ Feature: Create user
           "name": "Superman",
           "email": "superman@keygen.sh",
           "password": "sunlight",
-          "roles": [{
+          "role": {
             "name": "admin"
-          }]
+          }
         }
       }
       """
@@ -83,9 +83,9 @@ Feature: Create user
           "name": "Thor",
           "email": "thor@keygen.sh",
           "password": "mjolnir",
-          "roles": [{
+          "role": {
             "name": "admin"
-          }]
+          }
         }
       }
       """
