@@ -103,7 +103,7 @@ module Api::V1
           end
 
           if current_bearer&.role? :admin
-            permits << { roles: [[:name]] }
+            permits << { role: [:name] }
           end
 
           # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
@@ -114,8 +114,8 @@ module Api::V1
           param.permit *permits
         end.transform_keys! { |key|
           case key
-          when "roles"
-            "roles_attributes"
+          when "role"
+            "role_attributes"
           else
             key
           end

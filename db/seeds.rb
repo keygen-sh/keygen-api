@@ -39,10 +39,7 @@ account = Account.create!({
   users_attributes: [{
     name: "Admin",
     email: "admin@keygen.sh",
-    password: "password",
-    roles_attributes: [{
-      name: "admin"
-    }]
+    password: "password"
   }]
 })
 

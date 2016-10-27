@@ -9,12 +9,12 @@ class Product < ApplicationRecord
   has_many :licenses, through: :policies
   has_many :machines, through: :licenses
   has_many :users, through: :licenses
-  has_many :roles, as: :resource, dependent: :destroy
+  has_one :role, as: :resource, dependent: :destroy
   has_one :token, as: :bearer, dependent: :destroy
 
   serialize :platforms, Array
 
-  after_create :set_roles
+  after_create :set_role
 
   validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
@@ -22,7 +22,7 @@ class Product < ApplicationRecord
 
   private
 
-  def set_roles
+  def set_role
     grant :product
   end
 end

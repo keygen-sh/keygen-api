@@ -94,11 +94,6 @@ module Api::V1
           end
         }.to_unsafe_h
 
-        # Ensure all founding users are admins
-        schema[:users_attributes]&.map! do |user|
-          user.merge! roles_attributes: [{ name: "admin" }]
-        end
-
         schema
       end.call
     end
