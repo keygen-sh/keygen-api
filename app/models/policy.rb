@@ -6,7 +6,6 @@ class Policy < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
 
-  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 

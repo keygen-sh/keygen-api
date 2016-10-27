@@ -23,7 +23,6 @@ class Account < ApplicationRecord
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
-  validates_associated :billing, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
 
   validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
     next unless account.send(record).size > account.plan.send("max_#{record}")
