@@ -1,9 +1,7 @@
 class UrlValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
-    unless valid_url?(value)
-      record.errors.add(attribute, "must be a valid URL")
-    end
+    record.errors.add attribute, "must be a valid URL" unless valid_url?(value)
   end
 
   private

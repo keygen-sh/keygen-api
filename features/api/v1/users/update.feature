@@ -81,6 +81,25 @@ Feature: Update user
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
 
+  Scenario: Admin promotes a user to a product role for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "users"
+    And I use my authentication token
+    When I send a PATCH request to "/users/$2" with the following:
+      """
+      {
+        "user": {
+          "role": {
+            "name": "product"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User updates attempts to promote themself to admin
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
