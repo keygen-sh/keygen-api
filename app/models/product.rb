@@ -1,4 +1,6 @@
 class Product < ApplicationRecord
+  ALLOWED_ROLES = %w[product].freeze
+
   include TokenAuthenticatable
   include Paginatable
   include Roleable

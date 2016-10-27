@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  ALLOWED_ROLES = %w[admin user].freeze
+
   include TokenAuthenticatable
   include PasswordResetable
   include Paginatable
