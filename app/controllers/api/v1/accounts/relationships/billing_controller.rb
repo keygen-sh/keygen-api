@@ -19,7 +19,7 @@ module Api::V1::Accounts::Relationships
       authorize @billing
 
       status = ::Billings::UpdateCustomerService.new(
-        id: @billing.customer_id,
+        customer: @billing.customer_id,
         token: token_params
       ).execute
 

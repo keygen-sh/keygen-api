@@ -8,7 +8,7 @@ module Api::V1
       # Let external service know that we received the webhook
       head :accepted
 
-      event = ::Billings::RetrieveEventService.new(id: params[:id]).execute
+      event = ::Billings::RetrieveEventService.new(event: params[:id]).execute
       return unless event
 
       case event.type

@@ -1,12 +1,12 @@
 module Billings
   class DeleteCustomerService < BaseService
 
-    def initialize(id:)
-      @id = id
+    def initialize(customer:)
+      @customer = customer
     end
 
     def execute
-      c = ::Billings::BaseService::Customer.retrieve id
+      c = ::Billings::BaseService::Customer.retrieve customer
       c.delete
     rescue ::Billings::BaseService::Error
       nil
@@ -14,6 +14,6 @@ module Billings
 
     private
 
-    attr_reader :id
+    attr_reader :customer
   end
 end

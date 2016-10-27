@@ -1,18 +1,18 @@
 module Billings
   class RetrieveEventService < BaseService
 
-    def initialize(id:)
-      @id = id
+    def initialize(event:)
+      @event = event
     end
 
     def execute
-      ::Billings::BaseService::Event.retrieve id
+      ::Billings::BaseService::Event.retrieve event
     rescue ::Billings::BaseService::Error
       nil
     end
 
     private
 
-    attr_reader :id
+    attr_reader :event
   end
 end
