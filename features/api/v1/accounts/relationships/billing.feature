@@ -2,62 +2,65 @@
 Feature: Account billing info
 
   Background:
-    Given the following accounts exist:
+    Given the following "accounts" exist:
       | Name  | Subdomain |
       | Test1 | test1     |
       | Test2 | test2     |
     And I send and accept JSON
 
   Scenario: Admin retrieves the billing info for their account
-    Given I am an admin of account "test1"
+    Given the account "test1" is subscribed
+    And I am an admin of account "test1"
     And I use my authentication token
     When I send a GET request to "/accounts/$0/relationships/billing"
     Then the response status should be "200"
     And the JSON response should be a "billing"
 
   Scenario: Product attempts to retrieve the billing info for their account
-    Given the account "test1" has 1 "product"
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 "product"
     And I am a product of account "test1"
     And I use my authentication token
     When I send a GET request to "/accounts/$0/relationships/billing"
     Then the response status should be "403"
 
   Scenario: Admin attempts to retrieve the billing info for another account
-    Given I am an admin of account "test2"
+    Given the account "test1" is subscribed
+    And I am an admin of account "test2"
     And I use my authentication token
     When I send a GET request to "/accounts/$0/relationships/billing"
     Then the response status should be "401"
 
   Scenario: Admin updates the billing info for their account
-    Given the account "test1" has valid billing details
+    Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/accounts/$0/relationships/billing" with the following:
       """
-      { "billing": { "token": "some_token" } }
+      { "token": "some_token" }
       """
     Then the response status should be "202"
 
   Scenario: Product attempts to update the billing info for their account
-    Given the account "test1" has valid billing details
+    Given the account "test1" is subscribed
     And the account "test1" has 1 "product"
     And I am a product of account "test1"
     And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/accounts/$0/relationships/billing" with the following:
       """
-      { "billing": { "token": "some_token" } }
+      { "token": "some_token" }
       """
     Then the response status should be "403"
 
   Scenario: Admin attempts to update the billing info for another account
-    Given the account "test1" has valid billing details
+    Given the account "test1" is subscribed
     And I am an admin of account "test2"
     And I use my authentication token
     And I have a valid payment token
     When I send a POST request to "/accounts/$0/relationships/billing" with the following:
       """
-      { "billing": { "token": "some_token" } }
+      { "token": "some_token" }
       """
     Then the response status should be "401"

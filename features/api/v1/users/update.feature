@@ -2,7 +2,7 @@
 Feature: Update user
 
   Background:
-    Given the following accounts exist:
+    Given the following "accounts" exist:
       | Name  | Subdomain |
       | Test1 | test1     |
       | Test2 | test2     |
@@ -52,9 +52,9 @@ Feature: Update user
       """
       {
         "user": {
-          "roles": [{
+          "role": {
             "name": "admin"
-          }]
+          }
         }
       }
       """
@@ -72,9 +72,9 @@ Feature: Update user
       """
       {
         "user": {
-          "roles": [{
+          "role": {
             "name": "moderator"
-          }]
+          }
         }
       }
       """
@@ -92,9 +92,9 @@ Feature: Update user
       """
       {
         "user": {
-          "roles": [{
+          "role": {
             "name": "admin"
-          }]
+          }
         }
       }
       """

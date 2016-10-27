@@ -31,4 +31,8 @@ class AccountPolicy < ApplicationPolicy
   def cancel?
     bearer.role? :admin
   end
+
+  def renew?
+    bearer.role? :admin
+  end
 end

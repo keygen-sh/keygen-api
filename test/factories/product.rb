@@ -8,6 +8,11 @@ FactoryGirl.define do
         Faker::Hacker.abbreviation
       ]
     }
+
     account
+
+    after :create do |product|
+      create :token, bearer: product
+    end
   end
 end

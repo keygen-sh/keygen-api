@@ -1,14 +1,18 @@
 FactoryGirl.define do
+  factory :role do
+    association :resource, factory: :user
 
-  factory :user_role, class: Role do |role|
-    name :user
-  end
+    trait :user do
+      name :user
+    end
 
-  factory :admin_role, class: Role do |role|
-    name :admin
-  end
+    trait :admin do
+      name :admin
+    end
 
-  factory :product_role, class: Role do |role|
-    name :product
+    trait :product do
+      association :resource, factory: :product
+      name :product
+    end
   end
 end
