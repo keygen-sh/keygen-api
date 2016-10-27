@@ -1,12 +1,6 @@
 module Roleable
   extend ActiveSupport::Concern
 
-  included do
-    def allowed_roles
-      self.class::ALLOWED_ROLES
-    end
-  end
-
   def grant(name)
     self.role = Role.create name: name
   rescue ActiveRecord::RecordNotSaved
