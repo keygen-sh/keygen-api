@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :role do
-    association :resource, factory: :user
+    resource nil
 
     trait :user do
       name :user
@@ -11,7 +11,6 @@ FactoryGirl.define do
     end
 
     trait :product do
-      association :resource, factory: :product
       name :product
     end
   end

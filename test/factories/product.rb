@@ -12,6 +12,7 @@ FactoryGirl.define do
     account
 
     after :create do |product|
+      create :role, :product, resource: product
       create :token, bearer: product
     end
   end

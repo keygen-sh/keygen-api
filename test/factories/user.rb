@@ -8,16 +8,14 @@ FactoryGirl.define do
 
     after :create do |user|
       create_list :license, 1, user: user
+      create :role, :user, resource: user
       create :token, bearer: user
-
-      user.save
     end
 
     factory :admin do
       after :create do |admin|
+        create :role, :admin, resource: admin
         create :token, bearer: admin
-
-        user.save
       end
     end
   end
