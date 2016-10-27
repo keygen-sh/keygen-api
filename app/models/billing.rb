@@ -6,7 +6,7 @@ class Billing < ApplicationRecord
   include AASM
 
   belongs_to :account
-  has_many :receipts
+  has_many :receipts, dependent: :destroy
   has_one :plan, through: :account
 
   validates :customer_id, presence: true
