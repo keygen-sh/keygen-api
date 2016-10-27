@@ -1,12 +1,12 @@
 module Billings
   class DeleteSubscriptionService < BaseService
 
-    def initialize(id:)
-      @id = id
+    def initialize(subscription:)
+      @subscription = subscription
     end
 
     def execute
-      c = ::Billings::BaseService::Subscription.retrieve id
+      c = ::Billings::BaseService::Subscription.retrieve subscription
       c.delete at_period_end: true
     rescue ::Billings::BaseService::Error
       nil
@@ -14,6 +14,6 @@ module Billings
 
     private
 
-    attr_reader :id
+    attr_reader :subscription
   end
 end

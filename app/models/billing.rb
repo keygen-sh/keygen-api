@@ -36,8 +36,7 @@ class Billing < ApplicationRecord
     event :pause_subscription do
       transitions from: :subscribed, to: :paused, after: -> {
         ::Billings::DeleteSubscriptionService.new(
-          customer: customer_id,
-          plan: plan.plan_id
+          subscription: subscription_id
         ).execute
       }
     end
@@ -59,8 +58,7 @@ class Billing < ApplicationRecord
         AccountMailer.subscription_canceled(account).deliver_later
 
         ::Billings::DeleteSubscriptionService.new(
-          customer: customer_id,
-          plan: plan.plan_id
+          subscription: subscription_id
         ).execute
       }
     end
@@ -94,6 +92,8 @@ class Billing < ApplicationRecord
   private
 
   def close_customer_account
-    ::Billings::DeleteCustomerService.new(id: customer_id).execute
+    ::Billings::DeleteCustomerService.new(
+      customer: customer_id
+    ).execute
   end
 end

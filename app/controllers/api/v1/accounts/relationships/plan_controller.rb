@@ -15,7 +15,7 @@ module Api::V1::Accounts::Relationships
         pointer: "/data/relationships/plan" } and return if @plan.nil?
 
       status = ::Billings::UpdateSubscriptionService.new(
-        id: @account.billing.subscription_id,
+        subscription: @account.billing.subscription_id,
         plan: @plan.plan_id
       ).execute
 

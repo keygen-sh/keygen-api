@@ -1,13 +1,13 @@
 module Billings
   class UpdateSubscriptionService < BaseService
 
-    def initialize(id:, plan:)
-      @id   = id
-      @plan = plan
+    def initialize(subscription:, plan:)
+      @subscription = subscription
+      @plan         = plan
     end
 
     def execute
-      c = ::Billings::BaseService::Subscription.retrieve id
+      c = ::Billings::BaseService::Subscription.retrieve subscription
       c.plan = plan
       c.save
     rescue ::Billings::BaseService::Error
@@ -16,6 +16,6 @@ module Billings
 
     private
 
-    attr_reader :id, :plan
+    attr_reader :subscription, :plan
   end
 end
