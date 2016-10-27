@@ -4,7 +4,7 @@ Feature: Create account
   Background:
     And I send and accept JSON
 
-  Scenario: Anonymous creates an account with a valid payment token
+  Scenario: Anonymous creates an account
     Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
