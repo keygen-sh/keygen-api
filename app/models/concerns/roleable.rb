@@ -1,17 +1,17 @@
 module Roleable
   extend ActiveSupport::Concern
 
-  def grant(role)
-    roles.create name: role
+  def grant(name)
+    self.role = Role.create name: name
   rescue ActiveRecord::RecordNotSaved
-    roles.new name: role
+    self.role = Role.new name: name
   end
 
-  def revoke(role)
-    roles.find_by(name: role).destroy
+  def revoke(name)
+    role.destroy if role.name == name.to_s
   end
 
-  def role?(role)
-    roles.exists? name: role
+  def role?(name)
+    role.name == name.to_s
   end
 end

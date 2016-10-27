@@ -18,7 +18,8 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users
 
   before_create -> { self.subdomain = subdomain.downcase }
-  after_create -> { InitializeBillingWorker.perform_async(id) }
+  after_create :set_founding_users_roles
+  after_create :initialize_billing
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -36,5 +37,15 @@ class Account < ApplicationRecord
 
   def admins
     users.admins
+  end
+
+  private
+
+  def set_founding_users_roles
+    users.each { |u| u.grant :admin }
+  end
+
+  def initialize_billing
+    InitializeBillingWorker.perform_async id
   end
 end

@@ -3,7 +3,7 @@ class AccountMailer < ApplicationMailer
   def card_needed_reminder(account)
     @account = account
 
-    account.admins do |admin|
+    account.admins.each do |admin|
       @user = admin
 
       mail to: admin.email, subject: "Your trial is ending soon: payment details needed"
@@ -13,7 +13,7 @@ class AccountMailer < ApplicationMailer
   def payment_failed(account)
     @account = account
 
-    account.admins do |admin|
+    account.admins.each do |admin|
       @user = admin
 
       mail to: admin.email, subject: "Your payment failed"
@@ -23,10 +23,20 @@ class AccountMailer < ApplicationMailer
   def failed_payment(account)
     @account = account
 
-    account.admins do |admin|
+    account.admins.each do |admin|
       @user = admin
 
       mail to: admin.email, subject: "Your payment failed"
+    end
+  end
+
+  def subscription_canceled(account)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "Your subscription has been canceled"
     end
   end
 end
