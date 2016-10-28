@@ -23,7 +23,5 @@ class WebhookWorker
   class FailedRequestError < StandardError; end
   class Request
     include HTTParty
-
-    default_timeout 30
   end
 end
