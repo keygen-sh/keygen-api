@@ -5,6 +5,7 @@ Before "@api/v1" do
 end
 
 Before do
+  ActionMailer::Base.deliveries.clear
   StripeHelper.start
 end
 

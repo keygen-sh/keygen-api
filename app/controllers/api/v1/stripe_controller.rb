@@ -8,7 +8,7 @@ module Api::V1
       # Let external service know that we received the webhook
       head :accepted
 
-      event = ::Billings::RetrieveEventService.new(event: params[:id]).execute
+      event = Billings::RetrieveEventService.new(event: params[:id]).execute
       return unless event
 
       case event.type
@@ -26,12 +26,14 @@ module Api::V1
 
         case subscription.status
         when "active"
-          billing.activate_subscription unless billing.active?
+          billing.activate_subscription unless billing.subscribed?
         when "trialing"
           billing.activate_trial unless billing.trialing?
         when "canceled"
           billing.cancel_subscription unless billing.canceled?
         end
+
+        billing.save
       when "customer.subscription.deleted"
         subscription = event.data.object
         billing = Billing.find_by customer_id: subscription.customer
@@ -43,7 +45,7 @@ module Api::V1
         })
       when "customer.source.created", "customer.source.updated"
         card = event.data.object
-        billing = Billing.find_by customer_id: customer
+        billing = Billing.find_by customer_id: card.customer
         return unless billing
 
         billing.update({
@@ -61,19 +63,19 @@ module Api::V1
         if billing.card.nil?
           AccountMailer.payment_method_missing(account: billing.account).deliver_later
         end
-      when "invoice.payment_successful"
+      when "invoice.payment_succeeded"
         invoice = event.data.object
         billing = Billing.find_by customer_id: invoice.customer
         return unless billing
 
         # Ask for feedback after first successful payment
         if billing.receipts.paid.empty?
-          AccountMailer.first_payment_successful(account: billing.account).deliver_later
+          AccountMailer.first_payment_succeeded(account: billing.account).deliver_later
         end
 
         billing.receipts.create(
           invoice_id: invoice.id,
-          total: invoice.total,
+          amount: invoice.total,
           paid: invoice.paid
         )
       when "invoice.payment_failed"
@@ -89,7 +91,7 @@ module Api::V1
 
         billing.receipts.create(
           invoice_id: invoice.id,
-          total: invoice.total,
+          amount: invoice.total,
           paid: invoice.paid
         )
       when "customer.created"
@@ -98,7 +100,7 @@ module Api::V1
         return unless billing && billing.subscription_id.nil?
 
         # Create a trial subscription (possibly without a payment method)
-        ::Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.new(
           customer: billing.customer_id,
           plan: billing.plan.plan_id
         ).execute

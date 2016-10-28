@@ -14,7 +14,7 @@ module Api::V1::Accounts::Relationships
       render_unprocessable_entity detail: "must be a valid plan", source: {
         pointer: "/data/relationships/plan" } and return if @plan.nil?
 
-      status = ::Billings::UpdateSubscriptionService.new(
+      status = Billings::UpdateSubscriptionService.new(
         subscription: @account.billing.subscription_id,
         plan: @plan.plan_id
       ).execute

@@ -1,3 +1,4 @@
+require 'cucumber/rspec/doubles'
 require 'cucumber/rails'
 require 'faker'
 

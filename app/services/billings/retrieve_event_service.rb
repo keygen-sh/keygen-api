@@ -6,8 +6,8 @@ module Billings
     end
 
     def execute
-      ::Billings::BaseService::Event.retrieve event
-    rescue ::Billings::BaseService::Error
+      Billings::BaseService::Event.retrieve event
+    rescue Billings::BaseService::Error
       nil
     end
 

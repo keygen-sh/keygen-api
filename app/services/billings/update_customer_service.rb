@@ -7,10 +7,10 @@ module Billings
     end
 
     def execute
-      c = ::Billings::BaseService::Customer.retrieve customer
+      c = Billings::BaseService::Customer.retrieve customer
       c.card = token
       c.save
-    rescue ::Billings::BaseService::Error
+    rescue Billings::BaseService::Error
       nil
     end
 

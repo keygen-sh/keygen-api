@@ -14,8 +14,8 @@ module Billings
         plan: plan
       }
 
-      ::Billings::BaseService::Subscription.create params
-    rescue ::Billings::BaseService::Error
+      Billings::BaseService::Subscription.create params
+    rescue Billings::BaseService::Error
       nil
     end
 

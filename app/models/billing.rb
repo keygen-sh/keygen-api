@@ -22,7 +22,7 @@ class Billing < ApplicationRecord
 
     event :activate_trial do
       transitions from: :pending, to: :trialing, after: -> {
-        ::Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.new(
           customer: customer_id,
           plan: plan.plan_id
         ).execute
@@ -35,7 +35,7 @@ class Billing < ApplicationRecord
 
     event :pause_subscription do
       transitions from: :subscribed, to: :paused, after: -> {
-        ::Billings::DeleteSubscriptionService.new(
+        Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
         ).execute
       }
@@ -45,7 +45,7 @@ class Billing < ApplicationRecord
       transitions from: :paused, to: :subscribed, after: -> {
         # Setting a trial allows us to continue to use the previously 'paused'
         # subscription's billing cycle
-        ::Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.new(
           customer: customer_id,
           trial: subscription_period_end,
           plan: plan.plan_id
@@ -57,7 +57,7 @@ class Billing < ApplicationRecord
       transitions from: [:pending, :trialing, :subscribed], to: :canceled, after: -> {
         AccountMailer.subscription_canceled(account: account).deliver_later
 
-        ::Billings::DeleteSubscriptionService.new(
+        Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
         ).execute
       }
@@ -65,7 +65,7 @@ class Billing < ApplicationRecord
 
     event :renew_subscription do
       transitions from: :canceled, to: :subscribed, after: -> {
-        ::Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.new(
           customer: customer_id,
           plan: plan.plan_id
         ).execute
@@ -92,7 +92,7 @@ class Billing < ApplicationRecord
   private
 
   def close_customer_account
-    ::Billings::DeleteCustomerService.new(
+    Billings::DeleteCustomerService.new(
       customer: customer_id
     ).execute
   end
