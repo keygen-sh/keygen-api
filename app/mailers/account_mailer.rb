@@ -1,12 +1,12 @@
 class AccountMailer < ApplicationMailer
 
-  def card_needed_reminder(account)
+  def payment_method_missing(account)
     @account = account
 
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "Your trial is ending soon: payment details needed"
+      mail to: admin.email, subject: "Your account is still missing payment details"
     end
   end
 
