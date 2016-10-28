@@ -34,7 +34,6 @@ Rails.application.routes.draw do
         resources "keys"
         resources "machines"
         resources "webhook_endpoints", path: "webhook-endpoints"
-        resources "webhook_events", path: "webhook-events", only: [:index, :show]
 
         resources "users" do
           scope module: "users" do
@@ -67,6 +66,14 @@ Rails.application.routes.draw do
           scope module: "products" do
             namespace "relationships" do
               get "tokens", to: "tokens#generate"
+            end
+          end
+        end
+
+        resources "webhook_events", path: "webhook-events", only: [:index, :show] do
+          scope module: "webhook_events" do
+            namespace "actions" do
+              post "retry", to: "retries#retry"
             end
           end
         end
