@@ -30,7 +30,7 @@ class Billing < ApplicationRecord
     end
 
     event :activate_subscription do
-      transitions from: :trialing, to: :subscribed
+      transitions from: [:pending, :trialing], to: :subscribed
     end
 
     event :pause_subscription do
