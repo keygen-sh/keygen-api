@@ -33,7 +33,7 @@ module Api::V1
       authorize @machine
 
       if @machine.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "machine.created",
           account: current_account,
           resource: @machine
@@ -52,7 +52,7 @@ module Api::V1
       authorize @machine
 
       if @machine.update(machine_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "machine.updated",
           account: current_account,
           resource: @machine
@@ -70,7 +70,7 @@ module Api::V1
 
       authorize @machine
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "machine.deleted",
         account: current_account,
         resource: @machine

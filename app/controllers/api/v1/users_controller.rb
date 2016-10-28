@@ -32,7 +32,7 @@ module Api::V1
       authorize @user
 
       if @user.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "user.created",
           account: current_account,
           resource: @user
@@ -51,7 +51,7 @@ module Api::V1
       authorize @user
 
       if @user.update(user_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "user.updated",
           account: current_account,
           resource: @user
@@ -69,7 +69,7 @@ module Api::V1
 
       authorize @user
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "user.deleted",
         account: current_account,
         resource: @user

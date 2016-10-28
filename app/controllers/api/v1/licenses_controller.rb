@@ -37,7 +37,7 @@ module Api::V1
       authorize @license
 
       if @license.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "license.created",
           account: current_account,
           resource: @license
@@ -56,7 +56,7 @@ module Api::V1
       authorize @license
 
       if @license.update(license_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "license.updated",
           account: current_account,
           resource: @license
@@ -74,7 +74,7 @@ module Api::V1
 
       authorize @license
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "license.deleted",
         account: current_account,
         resource: @license

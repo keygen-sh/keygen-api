@@ -1,4 +1,4 @@
-class WebhookEventService < BaseService
+class CreateWebhookEventService < BaseService
 
   def initialize(event:, account:, resource:)
     @event    = event
@@ -24,7 +24,7 @@ class WebhookEventService < BaseService
         jid: jid
       )
     end
-  rescue
+  rescue Redis::CannotConnectError
     false
   end
 
