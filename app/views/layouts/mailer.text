@@ -1,4 +1,4 @@
-Hey #{@user.name}
+Hi there,
 
 = yield
 
