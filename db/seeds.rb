@@ -32,7 +32,7 @@ Plan.create!([{
   max_policies: 25
 }])
 
-account = Account.create!({
+account = Account.create!(
   name: "Apptacular",
   subdomain: "apptacular",
   plan: Plan.first,
@@ -41,55 +41,59 @@ account = Account.create!({
     email: "admin@keygen.sh",
     password: "password"
   }]
-})
+)
 
-product = account.products.create!({
+account.webhook_endpoints.create!(
+  url: "https://keygen.sh"
+)
+
+product = account.products.create!(
   name: "Apptastic"
-})
+)
 
-policy = account.policies.create!({
+policy = account.policies.create!(
   name: "Premium Add-On",
   price: 199,
   product: product,
   max_machines: 5,
   floating: true,
   duration: 2.weeks
-})
+)
 
-account.keys.create!({
+account.keys.create!(
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
-})
-account.keys.create!({
+)
+account.keys.create!(
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
-})
-account.keys.create!({
+)
+account.keys.create!(
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
-})
+)
 
-user = account.users.create!({
+user = account.users.create!(
   name: "User",
   email: "user@keygen.sh",
   password: "password"
-})
+)
 
-license = account.licenses.create!({
+license = account.licenses.create!(
   key: SecureRandom.hex,
   user: user,
   policy: policy
-})
+)
 
-account.machines.create!({
+account.machines.create!(
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
   license: license
-})
-account.machines.create!({
+)
+account.machines.create!(
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
   license: license
-})
-account.machines.create!({
+)
+account.machines.create!(
   fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
   license: license
-})
+)
