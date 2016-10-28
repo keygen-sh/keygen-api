@@ -144,7 +144,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     get "//keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   end
   json = JSON.parse last_response.body
-  assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
+
+  expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
@@ -158,11 +159,12 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, coun
 
   case resource
   when /^admins?$/
-    assert_equal count.to_i, account.users.admins.count
+    expect(account.users.admins.count).to eq count.to_i
   else
     get "//#{account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
 
     json = JSON.parse last_response.body
-    assert_equal count.to_i, json["data"].select { |d| d["type"] == resource.pluralize }.length
+
+    expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
   end
 end

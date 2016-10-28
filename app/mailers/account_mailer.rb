@@ -29,4 +29,14 @@ class AccountMailer < ApplicationMailer
       mail to: admin.email, subject: "Your subscription has been canceled"
     end
   end
+
+  def first_payment_succeeded(account:)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "Thanks so much for subscribing!"
+    end
+  end
 end

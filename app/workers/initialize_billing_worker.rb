@@ -7,7 +7,7 @@ class InitializeBillingWorker
     account = Account.find account_id
 
     if account.billing.nil?
-      customer = ::Billings::CreateCustomerService.new(
+      customer = Billings::CreateCustomerService.new(
         account: account
       ).execute
 

@@ -6,11 +6,11 @@ module Billings
     end
 
     def execute
-      ::Billings::BaseService::Customer.create(
+      Billings::BaseService::Customer.create(
         description: "#{account.name} (#{account.subdomain}.keygen.sh)",
         email: account.admins.first.email
       )
-    rescue ::Billings::BaseService::Error
+    rescue Billings::BaseService::Error
       nil
     end
 

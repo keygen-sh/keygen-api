@@ -58,49 +58,57 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
-  assert_equal status.to_i, last_response.status
+  expect(status.to_i).to eq last_response.status
 end
 
 Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
-  assert_equal count.to_i, json["data"].select { |d| d["type"] == name.pluralize }.length
+
+  expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
 end
 
 Then /^the JSON response should be an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
-  assert_equal name.pluralize, json["data"]["type"]
+
+  expect(json["data"]["type"]).to eq name.pluralize
 end
 
 Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |name, attribute, value|
   json = JSON.parse last_response.body
-  assert_equal name.pluralize, json["data"]["type"]
-  assert_equal value.to_s, json["data"]["attributes"][attribute].to_s
+
+  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
 end
 
 Then /^the JSON response should be an? "([^\"]*)" that is (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
-  assert_equal name.pluralize, json["data"]["type"]
-  assert_equal true, json["data"]["attributes"][attribute]
+  expect(name.pluralize).to eq json["data"]["type"]
+
+  expect(json["data"]["attributes"][attribute]).to be true
 end
 
 Then /^the JSON response should be an? "([^\"]*)" that is not (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
-  assert_equal name.pluralize, json["data"]["type"]
-  assert_equal false, json["data"]["attributes"][attribute]
+
+  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["attributes"][attribute]).to be false
 end
 
 Then /^the JSON response should be an? "([^\"]*)" with the following (\w+):$/ do |name, attribute, body|
   json = JSON.parse last_response.body
-  assert_equal name.pluralize, json["data"]["type"]
-  assert_equal JSON.parse(body), json["data"]["attributes"][attribute]
+
+  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
 end
 
 Then /^the JSON response should be meta with the following:$/ do |body|
   json = JSON.parse last_response.body
-  assert_equal JSON.parse(body), json["meta"]
+
+  expect(json["meta"]).to eq JSON.parse(body)
 end
 
 Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
-  assert_equal count.to_i, json["errors"].length
+
+  expect(json["errors"].length).to eq count.to_i
 end
