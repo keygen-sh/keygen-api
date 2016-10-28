@@ -1,7 +1,7 @@
 class Billing < ApplicationRecord
-  AVAILABLE_EVENTS = %w[activate_trial activate_subscription pause_subscription resume_subscription cancel_subscription renew_subscription]
-  AVAILABLE_STATES = %w[pending trialing subscribed paused canceled]
-  ACTIVE_STATES = %w[pending trialing subscribed]
+  AVAILABLE_EVENTS = %w[activate_trial activate_subscription pause_subscription resume_subscription cancel_subscription renew_subscription].freeze
+  AVAILABLE_STATES = %w[pending trialing subscribed paused canceled].freeze
+  ACTIVE_STATES = %w[pending trialing subscribed].freeze
 
   include AASM
 
