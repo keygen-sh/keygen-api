@@ -16,17 +16,7 @@ class AccountMailer < ApplicationMailer
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "Your payment failed"
-    end
-  end
-
-  def failed_payment(account)
-    @account = account
-
-    account.admins.each do |admin|
-      @user = admin
-
-      mail to: admin.email, subject: "Your payment failed"
+      mail to: admin.email, subject: "There was a problem with your payment"
     end
   end
 
