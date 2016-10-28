@@ -32,7 +32,7 @@ module Api::V1
       authorize @policy
 
       if @policy.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "policy.created",
           account: current_account,
           resource: @policy
@@ -51,7 +51,7 @@ module Api::V1
       authorize @policy
 
       if @policy.update(policy_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "policy.updated",
           account: current_account,
           resource: @policy
@@ -69,7 +69,7 @@ module Api::V1
 
       authorize @policy
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "policy.deleted",
         account: current_account,
         resource: @policy

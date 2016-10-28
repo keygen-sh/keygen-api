@@ -29,7 +29,7 @@ module Api::V1
       authorize @product
 
       if @product.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "product.created",
           account: current_account,
           resource: @product
@@ -48,7 +48,7 @@ module Api::V1
       authorize @product
 
       if @product.update(product_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "product.updated",
           account: current_account,
           resource: @product
@@ -66,7 +66,7 @@ module Api::V1
 
       authorize @product
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "product.deleted",
         account: current_account,
         resource: @product

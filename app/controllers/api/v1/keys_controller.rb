@@ -32,7 +32,7 @@ module Api::V1
       authorize @key
 
       if @key.save
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "key.created",
           account: current_account,
           resource: @key
@@ -51,7 +51,7 @@ module Api::V1
       authorize @key
 
       if @key.update(key_params)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "key.updated",
           account: current_account,
           resource: @key
@@ -69,7 +69,7 @@ module Api::V1
 
       authorize @key
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "key.deleted",
         account: current_account,
         resource: @key

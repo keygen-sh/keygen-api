@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.update(expiry: @license.expiry + @license.policy.duration)
-        WebhookEventService.new(
+        CreateWebhookEventService.new(
           event: "license.renewed",
           account: current_account,
           resource: @license
@@ -36,7 +36,7 @@ module Api::V1::Licenses::Actions
 
       authorize @license
 
-      WebhookEventService.new(
+      CreateWebhookEventService.new(
         event: "license.revoked",
         account: current_account,
         resource: @license
