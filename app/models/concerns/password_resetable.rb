@@ -11,6 +11,6 @@ module PasswordResetable
     self.password_reset_token   = enc
     save
 
-    UserMailer.password_reset(self, token).deliver_later
+    UserMailer.password_reset(user: self, token: token).deliver_later
   end
 end
