@@ -10,8 +10,8 @@ module Api::V1::WebhookEvents::Actions
 
       authorize @event
 
-      if retried_event = RetryWebhookEventService.new(event: @event).execute
-        render json: retried_event
+      if event = RetryWebhookEventService.new(event: @event).execute
+        render json: event, status: :created, location: v1_webhook_event_url(event)
       else
         render_unprocessable_entity detail: "webhook event failed to retry"
       end

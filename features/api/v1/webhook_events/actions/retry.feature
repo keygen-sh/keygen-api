@@ -14,7 +14,7 @@ Feature: Retry webhook events
     And the current account has 3 "webhookEvents"
     And I use my authentication token
     When I send a POST request to "/webhook-events/$0/actions/retry"
-    Then the response status should be "200"
+    Then the response status should be "201"
     And the JSON response should be a "webhookEvent"
     And the current account should have 4 "webhookEvents"
 
