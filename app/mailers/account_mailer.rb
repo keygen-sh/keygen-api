@@ -1,16 +1,16 @@
 class AccountMailer < ApplicationMailer
 
-  def payment_method_missing(account)
+  def payment_method_missing(account:)
     @account = account
 
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "Your account is still missing payment details"
+      mail to: admin.email, subject: "Your account is missing payment details"
     end
   end
 
-  def payment_failed(account)
+  def payment_failed(account:)
     @account = account
 
     account.admins.each do |admin|
@@ -20,7 +20,7 @@ class AccountMailer < ApplicationMailer
     end
   end
 
-  def subscription_canceled(account)
+  def subscription_canceled(account:)
     @account = account
 
     account.admins.each do |admin|

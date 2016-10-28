@@ -59,7 +59,7 @@ module Api::V1
         # Make sure our customer knows that they need to add a card to their
         # account within the next few days
         if billing.card.nil?
-          AccountMailer.payment_method_missing(billing.account).deliver_later
+          AccountMailer.payment_method_missing(account: billing.account).deliver_later
         end
       when "invoice.payment_successful"
         invoice = event.data.object
@@ -68,7 +68,7 @@ module Api::V1
 
         # Ask for feedback after first successful payment
         if billing.receipts.paid.empty?
-          AccountMailer.first_payment_successful(billing.account).deliver_later
+          AccountMailer.first_payment_successful(account: billing.account).deliver_later
         end
 
         billing.receipts.create(
@@ -82,9 +82,9 @@ module Api::V1
         return unless billing
 
         if billing.card.nil?
-          AccountMailer.payment_method_missing(billing.account).deliver_later
+          AccountMailer.payment_method_missing(account: billing.account).deliver_later
         else
-          AccountMailer.payment_failed(billing.account).deliver_later
+          AccountMailer.payment_failed(account: billing.account).deliver_later
         end
 
         billing.receipts.create(

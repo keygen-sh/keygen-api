@@ -55,7 +55,7 @@ class Billing < ApplicationRecord
 
     event :cancel_subscription do
       transitions from: [:pending, :trialing, :subscribed], to: :canceled, after: -> {
-        AccountMailer.subscription_canceled(account).deliver_later
+        AccountMailer.subscription_canceled(account: account).deliver_later
 
         ::Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
