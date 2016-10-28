@@ -7,4 +7,8 @@ class WebhookEventPolicy < ApplicationPolicy
   def show?
     bearer.role? :admin
   end
+
+  def retry?
+    bearer.role? :admin
+  end
 end
