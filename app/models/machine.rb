@@ -16,3 +16,24 @@ class Machine < ApplicationRecord
   scope :user, -> (id) { joins(:license).where licenses: { user_id: User.decode_id(id) } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: Product.decode_id(id) } }
 end
+
+# == Schema Information
+#
+# Table name: machines
+#
+#  id          :integer          not null, primary key
+#  fingerprint :string
+#  ip          :string
+#  hostname    :string
+#  platform    :string
+#  account_id  :integer
+#  license_id  :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  name        :string
+#
+# Indexes
+#
+#  index_machines_on_account_id  (account_id)
+#  index_machines_on_license_id  (license_id)
+#

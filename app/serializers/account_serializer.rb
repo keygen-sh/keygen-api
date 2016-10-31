@@ -18,3 +18,21 @@ class AccountSerializer < BaseSerializer
   has_many :licenses, through: :policies
   has_one :billing
 end
+
+# == Schema Information
+#
+# Table name: accounts
+#
+#  id                 :integer          not null, primary key
+#  name               :string
+#  subdomain          :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  plan_id            :integer
+#  activation_token   :string
+#  activation_sent_at :datetime
+#
+# Indexes
+#
+#  index_accounts_on_subdomain  (subdomain)
+#
