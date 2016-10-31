@@ -11,3 +11,21 @@ class WebhookEvent < ApplicationRecord
     Sidekiq::Status.status jid rescue :unavailable
   end
 end
+
+# == Schema Information
+#
+# Table name: webhook_events
+#
+#  id         :integer          not null, primary key
+#  account_id :integer
+#  payload    :string
+#  jid        :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  endpoint   :string
+#
+# Indexes
+#
+#  index_webhook_events_on_account_id  (account_id)
+#  index_webhook_events_on_jid         (jid)
+#

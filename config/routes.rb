@@ -87,3 +87,84 @@ Rails.application.routes.draw do
 
   root to: "errors#show", code: 404
 end
+
+# == Route Map
+#
+#                           Prefix Verb   URI Pattern                                                  Controller#Action
+#                        v1_stripe POST   /v1/stripe(.:format)                                         api/v1/stripe#receive_webhook {:format=>"json"}
+#                         v1_plans GET    /v1/plans(.:format)                                          api/v1/plans#index {:format=>"json"}
+#                          v1_plan GET    /v1/plans/:id(.:format)                                      api/v1/plans#show {:format=>"json"}
+# v1_account_relationships_billing GET    /v1/accounts/:account_id/relationships/billing(.:format)     api/v1/accounts/relationships/billing#show {:format=>"json"}
+#                                  POST   /v1/accounts/:account_id/relationships/billing(.:format)     api/v1/accounts/relationships/billing#update {:format=>"json"}
+#    v1_account_relationships_plan POST   /v1/accounts/:account_id/relationships/plan(.:format)        api/v1/accounts/relationships/plan#update {:format=>"json"}
+#         v1_account_actions_pause POST   /v1/accounts/:account_id/actions/pause(.:format)             api/v1/accounts/actions/subscription#pause {:format=>"json"}
+#        v1_account_actions_resume POST   /v1/accounts/:account_id/actions/resume(.:format)            api/v1/accounts/actions/subscription#resume {:format=>"json"}
+#        v1_account_actions_cancel POST   /v1/accounts/:account_id/actions/cancel(.:format)            api/v1/accounts/actions/subscription#cancel {:format=>"json"}
+#         v1_account_actions_renew POST   /v1/accounts/:account_id/actions/renew(.:format)             api/v1/accounts/actions/subscription#renew {:format=>"json"}
+#                      v1_accounts GET    /v1/accounts(.:format)                                       api/v1/accounts#index {:format=>"json"}
+#                                  POST   /v1/accounts(.:format)                                       api/v1/accounts#create {:format=>"json"}
+#                       v1_account GET    /v1/accounts/:id(.:format)                                   api/v1/accounts#show {:format=>"json"}
+#                                  PATCH  /v1/accounts/:id(.:format)                                   api/v1/accounts#update {:format=>"json"}
+#                                  PUT    /v1/accounts/:id(.:format)                                   api/v1/accounts#update {:format=>"json"}
+#                                  DELETE /v1/accounts/:id(.:format)                                   api/v1/accounts#destroy {:format=>"json"}
+#                        v1_tokens GET    /v1/tokens(.:format)                                         api/v1/tokens#generate {:format=>"json"}
+#                                  POST   /v1/tokens(.:format)                                         api/v1/tokens#regenerate {:format=>"json"}
+#                     v1_passwords POST   /v1/passwords(.:format)                                      api/v1/passwords#reset_password {:format=>"json"}
+#                       v1_profile GET    /v1/profile(.:format)                                        api/v1/profiles#show {:format=>"json"}
+#                          v1_keys GET    /v1/keys(.:format)                                           api/v1/keys#index {:format=>"json"}
+#                                  POST   /v1/keys(.:format)                                           api/v1/keys#create {:format=>"json"}
+#                           v1_key GET    /v1/keys/:id(.:format)                                       api/v1/keys#show {:format=>"json"}
+#                                  PATCH  /v1/keys/:id(.:format)                                       api/v1/keys#update {:format=>"json"}
+#                                  PUT    /v1/keys/:id(.:format)                                       api/v1/keys#update {:format=>"json"}
+#                                  DELETE /v1/keys/:id(.:format)                                       api/v1/keys#destroy {:format=>"json"}
+#                      v1_machines GET    /v1/machines(.:format)                                       api/v1/machines#index {:format=>"json"}
+#                                  POST   /v1/machines(.:format)                                       api/v1/machines#create {:format=>"json"}
+#                       v1_machine GET    /v1/machines/:id(.:format)                                   api/v1/machines#show {:format=>"json"}
+#                                  PATCH  /v1/machines/:id(.:format)                                   api/v1/machines#update {:format=>"json"}
+#                                  PUT    /v1/machines/:id(.:format)                                   api/v1/machines#update {:format=>"json"}
+#                                  DELETE /v1/machines/:id(.:format)                                   api/v1/machines#destroy {:format=>"json"}
+#             v1_webhook_endpoints GET    /v1/webhook-endpoints(.:format)                              api/v1/webhook_endpoints#index {:format=>"json"}
+#                                  POST   /v1/webhook-endpoints(.:format)                              api/v1/webhook_endpoints#create {:format=>"json"}
+#              v1_webhook_endpoint GET    /v1/webhook-endpoints/:id(.:format)                          api/v1/webhook_endpoints#show {:format=>"json"}
+#                                  PATCH  /v1/webhook-endpoints/:id(.:format)                          api/v1/webhook_endpoints#update {:format=>"json"}
+#                                  PUT    /v1/webhook-endpoints/:id(.:format)                          api/v1/webhook_endpoints#update {:format=>"json"}
+#                                  DELETE /v1/webhook-endpoints/:id(.:format)                          api/v1/webhook_endpoints#destroy {:format=>"json"}
+#  v1_user_actions_update_password POST   /v1/users/:user_id/actions/update-password(.:format)         api/v1/users/actions/password#update_password {:format=>"json"}
+#   v1_user_actions_reset_password POST   /v1/users/:user_id/actions/reset-password(.:format)          api/v1/users/actions/password#reset_password {:format=>"json"}
+#                         v1_users GET    /v1/users(.:format)                                          api/v1/users#index {:format=>"json"}
+#                                  POST   /v1/users(.:format)                                          api/v1/users#create {:format=>"json"}
+#                          v1_user GET    /v1/users/:id(.:format)                                      api/v1/users#show {:format=>"json"}
+#                                  PATCH  /v1/users/:id(.:format)                                      api/v1/users#update {:format=>"json"}
+#                                  PUT    /v1/users/:id(.:format)                                      api/v1/users#update {:format=>"json"}
+#                                  DELETE /v1/users/:id(.:format)                                      api/v1/users#destroy {:format=>"json"}
+#      v1_license_actions_validate GET    /v1/licenses/:license_id/actions/validate(.:format)          api/v1/licenses/actions/permits#validate {:format=>"json"}
+#        v1_license_actions_revoke POST   /v1/licenses/:license_id/actions/revoke(.:format)            api/v1/licenses/actions/permits#revoke {:format=>"json"}
+#         v1_license_actions_renew POST   /v1/licenses/:license_id/actions/renew(.:format)             api/v1/licenses/actions/permits#renew {:format=>"json"}
+#                      v1_licenses GET    /v1/licenses(.:format)                                       api/v1/licenses#index {:format=>"json"}
+#                                  POST   /v1/licenses(.:format)                                       api/v1/licenses#create {:format=>"json"}
+#                       v1_license GET    /v1/licenses/:id(.:format)                                   api/v1/licenses#show {:format=>"json"}
+#                                  PATCH  /v1/licenses/:id(.:format)                                   api/v1/licenses#update {:format=>"json"}
+#                                  PUT    /v1/licenses/:id(.:format)                                   api/v1/licenses#update {:format=>"json"}
+#                                  DELETE /v1/licenses/:id(.:format)                                   api/v1/licenses#destroy {:format=>"json"}
+#     v1_policy_relationships_pool DELETE /v1/policies/:policy_id/relationships/pool(.:format)         api/v1/policies/relationships/pool#pop {:format=>"json"}
+#                      v1_policies GET    /v1/policies(.:format)                                       api/v1/policies#index {:format=>"json"}
+#                                  POST   /v1/policies(.:format)                                       api/v1/policies#create {:format=>"json"}
+#                        v1_policy GET    /v1/policies/:id(.:format)                                   api/v1/policies#show {:format=>"json"}
+#                                  PATCH  /v1/policies/:id(.:format)                                   api/v1/policies#update {:format=>"json"}
+#                                  PUT    /v1/policies/:id(.:format)                                   api/v1/policies#update {:format=>"json"}
+#                                  DELETE /v1/policies/:id(.:format)                                   api/v1/policies#destroy {:format=>"json"}
+#  v1_product_relationships_tokens GET    /v1/products/:product_id/relationships/tokens(.:format)      api/v1/products/relationships/tokens#generate {:format=>"json"}
+#                      v1_products GET    /v1/products(.:format)                                       api/v1/products#index {:format=>"json"}
+#                                  POST   /v1/products(.:format)                                       api/v1/products#create {:format=>"json"}
+#                       v1_product GET    /v1/products/:id(.:format)                                   api/v1/products#show {:format=>"json"}
+#                                  PATCH  /v1/products/:id(.:format)                                   api/v1/products#update {:format=>"json"}
+#                                  PUT    /v1/products/:id(.:format)                                   api/v1/products#update {:format=>"json"}
+#                                  DELETE /v1/products/:id(.:format)                                   api/v1/products#destroy {:format=>"json"}
+#   v1_webhook_event_actions_retry POST   /v1/webhook-events/:webhook_event_id/actions/retry(.:format) api/v1/webhook_events/actions/retries#retry {:format=>"json"}
+#                v1_webhook_events GET    /v1/webhook-events(.:format)                                 api/v1/webhook_events#index {:format=>"json"}
+#                 v1_webhook_event GET    /v1/webhook-events/:id(.:format)                             api/v1/webhook_events#show {:format=>"json"}
+#                                         /404(.:format)                                               errors#show {:code=>404}
+#                                         /422(.:format)                                               errors#show {:code=>422}
+#                                         /500(.:format)                                               errors#show {:code=>500}
+#                             root GET    /                                                            errors#show {:code=>404}
+#
