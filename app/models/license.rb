@@ -15,7 +15,7 @@ class License < ApplicationRecord
   validates :policy, presence: { message: "must exist" }
 
   validate unless: -> { policy.nil? } do
-    errors.add :machines, "count has reached maximum allowed by policy" if machines.size > policy.max_machines
+    errors.add :machines, "count has reached maximum allowed by policy" if !policy.max_machines.nil? && machines.size > policy.max_machines
   end
 
   validates :key, presence: true, blank: false, uniqueness: { case_sensitive: false }
