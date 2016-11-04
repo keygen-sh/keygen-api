@@ -16,7 +16,6 @@ class Product < ApplicationRecord
 
   after_create :set_role
 
-  validates_associated :account, message: -> (_, obj) { obj[:value].errors.full_messages.first.downcase }
   validates :account, presence: { message: "must exist" }
   validates :name, presence: true
 

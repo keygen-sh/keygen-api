@@ -24,10 +24,10 @@ class Account < ApplicationRecord
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
-  validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
-    next unless account.send(record).size > account.plan.send("max_#{record}")
-    account.errors.add record, "count has reached maximum allowed by current plan"
-  end
+  # validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
+  #   next unless account.send(record).size > account.plan.send("max_#{record}")
+  #   account.errors.add record, "count has reached maximum allowed by current plan"
+  # end
 
   validates :name, presence: true
   validates :subdomain, subdomain: true, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
