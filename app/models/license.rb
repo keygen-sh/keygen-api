@@ -8,6 +8,8 @@ class License < ApplicationRecord
   has_many :machines, dependent: :destroy
   has_one :product, through: :policy
 
+  attr_reader :raw
+
   before_validation :set_license_key, on: :create, unless: -> { policy.nil? }
   before_validation :set_expiry, on: :create, unless: -> { policy.nil? }
 
@@ -36,8 +38,16 @@ class License < ApplicationRecord
         errors.add :policy, "pool is empty"
       end
     else
-      self.key = generate_token :key do |token|
-        token.scan(/.{4}/).join "-"
+      if policy.encrypted?
+        @raw, enc = generate_encrypted_token :key do |token|
+          token.scan(/.{4}/).join "-"
+        end
+
+        self.key = enc
+      else
+        self.key = generate_token :key do |token|
+          token.scan(/.{4}/).join "-"
+        end
       end
     end
   end

@@ -58,7 +58,7 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
-  expect(status.to_i).to eq last_response.status
+  expect(last_response.status).to eq status.to_i
 end
 
 Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, name|
@@ -73,11 +73,18 @@ Then /^the JSON response should be an? "([^\"]*)"$/ do |name|
   expect(json["data"]["type"]).to eq name.pluralize
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |name, attribute, value|
+Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
-  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
+end
+
+Then /^the JSON response should be an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  expect(json["data"]["attributes"][attribute]).to eq nil
 end
 
 Then /^the JSON response should be an? "([^\"]*)" that is (\w+)$/ do |name, attribute|

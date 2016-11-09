@@ -17,6 +17,10 @@ class Policy < ApplicationRecord
     use_pool
   end
 
+  def encrypted?
+    encrypted
+  end
+
   def pop!
     return nil if pool.empty?
     key = pool.first.destroy
@@ -46,6 +50,7 @@ end
 #  account_id   :integer
 #  max_machines :integer
 #  meta         :string
+#  encrypted    :boolean          default(FALSE)
 #
 # Indexes
 #

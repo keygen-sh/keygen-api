@@ -22,6 +22,24 @@ Feature: Create license
     Then the response status should be "201"
     And sidekiq should have 1 "webhook" job
 
+  Scenario: Admin creates an encrypted license for a user of their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "encrypted": true }
+      """
+    And the current account has 1 "user"
+    And I use my authentication token
+    When I send a POST request to "/licenses" with the following:
+      """
+      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"

@@ -52,6 +52,12 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
+Given /^the current account has (\d+) encrypted "([^\"]*)"$/ do |count, resource|
+  count.to_i.times do
+    create resource.singularize.underscore, :encrypted, account: @account
+  end
+end
+
 Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
   finders  = %w[first second third fourth fifth]
   resource = resource.pluralize.underscore
@@ -131,11 +137,28 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   end
 end
 
+Given /^the (\w+) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
+  parse_placeholders! body
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+
+  @account.send(resource.pluralize).all.send(:[], numbers[i]).update(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
+end
+
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
     user = @account.admins.first
-    user.token.update account: @account # FIXME ???
-
     token = user.token.generate!
     header "Authorization", "Bearer \"#{token}\""
 
@@ -152,8 +175,6 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, coun
   account = Account.find_by subdomain: subdomain
 
   user = account.admins.first
-  user.token.update account: account # FIXME ???
-
   token = user.token.generate!
   header "Authorization", "Bearer \"#{token}\""
 

@@ -24,11 +24,11 @@ end
 #
 #  id         :integer          not null, primary key
 #  name       :string
-#  platforms  :array
-#  meta       :hash
+#  platforms  :string
 #  account_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  meta       :string
 #
 # Indexes
 #

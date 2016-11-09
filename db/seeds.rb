@@ -60,6 +60,16 @@ policy = account.policies.create!(
   duration: 2.weeks
 )
 
+enc_policy = account.policies.create!(
+  name: "Secret Add-On",
+  price: 999,
+  product: product,
+  max_machines: 5,
+  floating: true,
+  encrypted: true,
+  duration: 1.month
+)
+
 account.keys.create!(
   key: SecureRandom.hex.scan(/.{4}/).join("-"),
   policy: policy
@@ -80,20 +90,24 @@ user = account.users.create!(
 )
 
 license = account.licenses.create!(
-  key: SecureRandom.hex,
-  user: user,
-  policy: policy
+  policy: policy,
+  user: user
+)
+
+enc_license = account.licenses.create!(
+  policy: enc_policy,
+  user: user
 )
 
 account.machines.create!(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
   license: license
 )
 account.machines.create!(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
   license: license
 )
 account.machines.create!(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join("-"),
-  license: license
+  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+  license: enc_license
 )

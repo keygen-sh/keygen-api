@@ -8,8 +8,13 @@ FactoryGirl.define do
     recurring false
     floating false
     use_pool false
+    encrypted false
     pool []
     account
     product
+
+    trait :encrypted do
+      encrypted true
+    end
   end
 end

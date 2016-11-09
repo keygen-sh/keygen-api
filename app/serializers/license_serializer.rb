@@ -13,6 +13,14 @@ class LicenseSerializer < BaseSerializer
   belongs_to :user
   belongs_to :policy
   has_many :machines
+
+  def key
+    if object.policy.encrypted?
+      object.raw
+    else
+      object.key
+    end
+  end
 end
 
 # == Schema Information
@@ -23,11 +31,11 @@ end
 #  key        :string
 #  expiry     :datetime
 #  user_id    :integer
-#  meta       :hash
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  policy_id  :integer
 #  account_id :integer
+#  meta       :string
 #
 # Indexes
 #
