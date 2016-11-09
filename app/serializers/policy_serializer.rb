@@ -40,7 +40,7 @@ end
 #  account_id   :integer
 #  max_machines :integer
 #  meta         :string
-#  encrypt      :boolean
+#  encrypted    :boolean          default(FALSE)
 #
 # Indexes
 #

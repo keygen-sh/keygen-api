@@ -14,6 +14,7 @@ class Machine < ApplicationRecord
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
   validates :name, presence: true, allow_nil: true, uniqueness: { scope: :license_id }
 
+  scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :license, -> (id) { where license: License.decode_id(id) }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: User.decode_id(id) } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: Product.decode_id(id) } }
@@ -37,6 +38,7 @@ end
 #
 # Indexes
 #
-#  index_machines_on_account_id  (account_id)
-#  index_machines_on_license_id  (license_id)
+#  index_machines_on_account_id   (account_id)
+#  index_machines_on_fingerprint  (fingerprint)
+#  index_machines_on_license_id   (license_id)
 #

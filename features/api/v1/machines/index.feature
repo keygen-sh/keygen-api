@@ -54,3 +54,26 @@ Feature: List machines
     When I send a GET request to "/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
+
+  Scenario: User attempts to retrieve machines for their account scoped by fingerprint
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": $users[1].id }
+      """
+    And I am a user of account "test1"
+    And the current account has 5 "machines"
+    And 5 "machines" have the following attributes:
+      """
+      { "licenseId": $licenses[0].id }
+      """
+    And the third "machine" has the following attributes:
+      """
+      { "fingerprint": "test" }
+      """
+    And I use my authentication token
+    When I send a GET request to "/machines?fingerprint=test"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
