@@ -5,6 +5,7 @@ class ProductSerializer < BaseSerializer
     :id,
     :name,
     :platforms,
+    :meta,
     :created,
     :updated
   ]
@@ -23,7 +24,8 @@ end
 #
 #  id         :integer          not null, primary key
 #  name       :string
-#  platforms  :string
+#  platforms  :array
+#  meta       :hash
 #  account_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

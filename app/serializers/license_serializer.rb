@@ -5,6 +5,7 @@ class LicenseSerializer < BaseSerializer
     :id,
     :key,
     :expiry,
+    :meta,
     :created,
     :updated
   ]
@@ -22,6 +23,7 @@ end
 #  key        :string
 #  expiry     :datetime
 #  user_id    :integer
+#  meta       :hash
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  policy_id  :integer

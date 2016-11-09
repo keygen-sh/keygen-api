@@ -6,6 +6,8 @@ class Machine < ApplicationRecord
   has_one :product, through: :license
   has_one :user, through: :license
 
+  serialize :meta, Hash
+
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
@@ -31,6 +33,7 @@ end
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  name        :string
+#  meta        :string
 #
 # Indexes
 #

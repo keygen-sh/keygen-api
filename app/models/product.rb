@@ -13,6 +13,7 @@ class Product < ApplicationRecord
   has_one :token, as: :bearer, dependent: :destroy
 
   serialize :platforms, Array
+  serialize :meta, Hash
 
   after_create :set_role
 
@@ -36,6 +37,7 @@ end
 #  account_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  meta       :string
 #
 # Indexes
 #
