@@ -36,6 +36,7 @@ end
 #
 # Indexes
 #
-#  index_machines_on_account_id  (account_id)
-#  index_machines_on_license_id  (license_id)
+#  index_machines_on_account_id   (account_id)
+#  index_machines_on_fingerprint  (fingerprint)
+#  index_machines_on_license_id   (license_id)
 #
