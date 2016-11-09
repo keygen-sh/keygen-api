@@ -17,6 +17,15 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
+  Scenario: Admin retrieves an encrypted license for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 3 encrypted "licenses"
+    And I use my authentication token
+    When I send a GET request to "/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with a nil key
+
   Scenario: Product retrieves a license for their product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"

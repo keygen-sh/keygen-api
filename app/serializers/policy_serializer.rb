@@ -35,10 +35,12 @@ end
 #  use_pool     :boolean          default(FALSE)
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  meta         :hash
+#  lock_version :integer          default(0), not null
 #  product_id   :integer
 #  account_id   :integer
 #  max_machines :integer
+#  meta         :string
+#  encrypt      :boolean
 #
 # Indexes
 #

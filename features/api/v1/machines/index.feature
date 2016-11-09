@@ -40,7 +40,7 @@ Feature: List machines
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And the current account has 2 "licenses"
-    And 1 "license" has the following attributes:
+    And the first "license" has the following attributes:
       """
       { "userId": $users[1].id }
       """

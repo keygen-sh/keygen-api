@@ -106,7 +106,6 @@ module Api::V1
             permits << :user
           when "update"
             permits << :expiry
-            permits << :key
           end
 
           param.permit *permits

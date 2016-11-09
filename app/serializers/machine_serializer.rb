@@ -29,10 +29,10 @@ end
 #  platform    :string
 #  account_id  :integer
 #  license_id  :integer
-#  meta        :hash
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  name        :string
+#  meta        :string
 #
 # Indexes
 #

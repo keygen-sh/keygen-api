@@ -96,6 +96,7 @@ module Api::V1
           permits = []
 
           if action_name == "create"
+            permits << :encrypted
             permits << :product
           end
 
