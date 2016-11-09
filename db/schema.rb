@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161025195849) do
+ActiveRecord::Schema.define(version: 20161109161521) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 20161025195849) do
     t.datetime "updated_at", null: false
     t.integer  "policy_id"
     t.integer  "account_id"
+    t.string   "meta"
     t.index ["account_id"], name: "index_licenses_on_account_id", using: :btree
     t.index ["policy_id"], name: "index_licenses_on_policy_id", using: :btree
     t.index ["user_id"], name: "index_licenses_on_user_id", using: :btree
@@ -76,6 +77,7 @@ ActiveRecord::Schema.define(version: 20161025195849) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.string   "name"
+    t.string   "meta"
     t.index ["account_id"], name: "index_machines_on_account_id", using: :btree
     t.index ["license_id"], name: "index_machines_on_license_id", using: :btree
   end
@@ -107,6 +109,7 @@ ActiveRecord::Schema.define(version: 20161025195849) do
     t.integer  "product_id"
     t.integer  "account_id"
     t.integer  "max_machines"
+    t.string   "meta"
     t.index ["account_id"], name: "index_policies_on_account_id", using: :btree
     t.index ["product_id"], name: "index_policies_on_product_id", using: :btree
   end
@@ -117,6 +120,7 @@ ActiveRecord::Schema.define(version: 20161025195849) do
     t.integer  "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "meta"
     t.index ["account_id"], name: "index_products_on_account_id", using: :btree
   end
 

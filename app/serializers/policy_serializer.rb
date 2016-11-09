@@ -11,6 +11,7 @@ class PolicySerializer < BaseSerializer
     :floating,
     :max_machines,
     :use_pool,
+    :meta,
     :created,
     :updated
   ]
@@ -34,7 +35,7 @@ end
 #  use_pool     :boolean          default(FALSE)
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  lock_version :integer          default(0), not null
+#  meta         :hash
 #  product_id   :integer
 #  account_id   :integer
 #  max_machines :integer

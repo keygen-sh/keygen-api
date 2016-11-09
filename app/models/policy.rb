@@ -6,6 +6,8 @@ class Policy < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
 
+  serialize :meta, Hash
+
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 
@@ -43,6 +45,7 @@ end
 #  product_id   :integer
 #  account_id   :integer
 #  max_machines :integer
+#  meta         :string
 #
 # Indexes
 #
