@@ -33,7 +33,7 @@ Feature: Create user
   Scenario: Admin creates an admin for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 3 "webhookEndpoints"
     When I send a POST request to "/users" with the following:
       """
@@ -56,7 +56,7 @@ Feature: Create user
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/users" with the following:
       """
       {

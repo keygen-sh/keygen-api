@@ -13,7 +13,7 @@ Feature: Delete machine
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/machines/$2"
     Then the response status should be "204"
     And the current account should have 2 "machines"
@@ -25,7 +25,7 @@ Feature: Delete machine
     And the current account has 3 "machines"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/machines/$1"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
@@ -38,7 +38,7 @@ Feature: Delete machine
     And the current account has 1 "machines"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current user has 1 "machine"
     When I send a DELETE request to "/machines/$0"
     Then the response status should be "204"
@@ -60,7 +60,7 @@ Feature: Delete machine
     But I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/machines/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

@@ -11,7 +11,7 @@ Feature: Create webhook endpoint
   Scenario: Admin creates a webhook endpoint for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
@@ -22,7 +22,7 @@ Feature: Create webhook endpoint
   Scenario: Admin creates a webhook endpoint with missing url
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/webhook-endpoints" with the following:
       """
       { "endpoint": {} }
@@ -32,7 +32,7 @@ Feature: Create webhook endpoint
   Scenario: Admin creates a webhook endpoint with an invalid url protocol
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "ssh://example.com" } }
@@ -43,7 +43,7 @@ Feature: Create webhook endpoint
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
@@ -61,7 +61,7 @@ Feature: Create webhook endpoint
   Scenario: Admin of another account attempts to create a webhook endpoint
     Given I am an admin of account "test2"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }

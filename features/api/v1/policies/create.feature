@@ -13,7 +13,7 @@ Feature: Create policy
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/policies" with the following:
       """
       {
@@ -37,7 +37,7 @@ Feature: Create policy
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/policies" with the following:
       """
       {
@@ -59,7 +59,7 @@ Feature: Create policy
     But I am on the subdomain "test1"
     And the current account has 7 "webhookEndpoints"
     And the current account has 1 "product"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/policies" with the following:
       """
       {
@@ -82,7 +82,7 @@ Feature: Create policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/policies" with the following:
       """
       {
@@ -106,7 +106,7 @@ Feature: Create policy
     And the current account has 1 "product"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/policies" with the following:
       """
       {

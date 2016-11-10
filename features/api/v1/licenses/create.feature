@@ -14,7 +14,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -32,7 +32,7 @@ Feature: Create license
       { "encrypted": true }
       """
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -45,7 +45,7 @@ Feature: Create license
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]" } }
@@ -58,7 +58,7 @@ Feature: Create license
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "user": "$users[1]" } }
@@ -72,7 +72,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]", "key": "a" } }
@@ -86,7 +86,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -100,7 +100,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]" } }
@@ -114,7 +114,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
@@ -141,7 +141,7 @@ Feature: Create license
       }
       """
     And the current account has 3 "users"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -162,7 +162,7 @@ Feature: Create license
       }
       """
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
@@ -177,7 +177,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
