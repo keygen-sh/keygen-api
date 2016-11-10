@@ -60,7 +60,7 @@ module Api::V1
     private
 
     def set_endpoint
-      @endpoint = WebhookEndpoint.find_by_hashid params[:id]
+      @endpoint = current_account.webhook_endpoints.find_by_hashid params[:id]
     end
 
     def endpoint_params
