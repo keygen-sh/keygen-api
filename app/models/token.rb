@@ -6,6 +6,9 @@ class Token < ApplicationRecord
 
   attr_reader :raw
 
+  validates :account, presence: true
+  validates :bearer, presence: true
+
   def generate!
     @raw, enc = generate_encrypted_token :digest do |token|
       "#{account.hashid}.#{hashid}.#{token}"
