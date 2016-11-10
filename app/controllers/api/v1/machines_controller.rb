@@ -83,7 +83,7 @@ module Api::V1
     private
 
     def set_machine
-      @machine = Machine.find_by_hashid params[:id]
+      @machine = current_account.machines.find_by_hashid params[:id]
     end
 
     def machine_params

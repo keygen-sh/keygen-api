@@ -81,7 +81,7 @@ module Api::V1
     private
 
     def set_key
-      @key = Key.find_by_hashid params[:id]
+      @key = current_account.keys.find_by_hashid params[:id]
     end
 
     def key_params
