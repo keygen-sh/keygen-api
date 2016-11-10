@@ -54,6 +54,26 @@ Feature: Create policy
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
 
+  Scenario: Admin attempts to create a policy that is encrypted and uses a pool
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/policies" with the following:
+      """
+      {
+        "policy": {
+          "name": "Invalid",
+          "product": "$products[0]",
+          "encrypted": true,
+          "usePool": true
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: Admin attempts to create a policy for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
