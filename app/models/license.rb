@@ -10,8 +10,8 @@ class License < ApplicationRecord
 
   attr_reader :raw
 
-  before_validation :set_license_key, on: :create, unless: -> { policy.nil? }
-  before_validation :set_expiry, on: :create, unless: -> { policy.nil? }
+  before_create :set_expiry, unless: -> { policy.nil? }
+  after_create :set_key, unless: -> { policy.nil? }
 
   serialize :meta, Hash
 
@@ -22,7 +22,7 @@ class License < ApplicationRecord
     errors.add :machines, "count has reached maximum allowed by policy" if !policy.max_machines.nil? && machines.size > policy.max_machines
   end
 
-  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: false }
+  validates :key, uniqueness: { case_sensitive: true }, unless: -> { key.nil? }
 
   scope :policy, -> (id) { where policy: Policy.decode_id(id) }
   scope :user, -> (id) { where user: User.decode_id(id) }
@@ -30,26 +30,34 @@ class License < ApplicationRecord
 
   private
 
-  def set_license_key
-    if policy.pool?
+  def set_key
+    case
+    when policy.pool?
       if item = policy.pop!
         self.key = item.key
       else
         errors.add :policy, "pool is empty"
       end
-    else
-      if policy.encrypted?
-        @raw, enc = generate_encrypted_token :key do |token|
-          token.scan(/.{4}/).join "-"
-        end
+    when policy.encrypted?
+      @raw, enc = generate_encrypted_token :key do |token|
+        # Replace first n characters with our hashid so that we can do a lookup
+        # on the encrypted key
+        token.gsub(/\A.{#{Hashid::Rails.configuration.length}}/, hashid)
+             .scan(/.{#{Hashid::Rails.configuration.length}}/).join "-"
+      end
 
-        self.key = enc
-      else
-        self.key = generate_token :key do |token|
-          token.scan(/.{4}/).join "-"
-        end
+      self.key = enc
+    else
+      self.key = generate_token :key do |token|
+        token.scan(/.{#{Hashid::Rails.configuration.length}}/).join "-"
       end
     end
+
+    # We're raising a RecordInvalid exception so that the transaction will be
+    # halted and rolled back (since our record is invalid without a key)
+    raise ActiveRecord::RecordInvalid if key.nil?
+
+    save
   end
 
   def set_expiry
@@ -78,6 +86,7 @@ end
 # Indexes
 #
 #  index_licenses_on_account_id  (account_id)
+#  index_licenses_on_key         (key)
 #  index_licenses_on_policy_id   (policy_id)
 #  index_licenses_on_user_id     (user_id)
 #

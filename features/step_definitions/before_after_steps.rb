@@ -7,6 +7,8 @@ end
 Before do
   ActionMailer::Base.deliveries.clear
   StripeHelper.start
+
+  @crypt = []
 end
 
 After do |s|

@@ -97,6 +97,7 @@ module Api::V1
 
           if action_name == "create"
             permits << :encrypted
+            permits << :use_pool
             permits << :product
           end
 
@@ -106,7 +107,6 @@ module Api::V1
           permits << :strict
           permits << :recurring
           permits << :floating
-          permits << :use_pool
           permits << :max_machines
 
           param.permit *permits

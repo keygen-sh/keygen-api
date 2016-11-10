@@ -77,3 +77,16 @@ Feature: Update policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Admin updates a policy for their account to use a pool
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a PATCH request to "/policies/$0" with the following:
+      """
+      { "policy": { "usePool": true } }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs

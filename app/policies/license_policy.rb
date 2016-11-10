@@ -20,15 +20,19 @@ class LicensePolicy < ApplicationPolicy
     bearer.role? :admin or resource.user == bearer or resource.product == bearer
   end
 
-  def validate?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
-  end
-
   def revoke?
     bearer.role? :admin or resource.user == bearer or resource.product == bearer
   end
 
   def renew?
     bearer.role? :admin or resource.user == bearer or resource.product == bearer
+  end
+
+  def validate_by_id?
+    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+  end
+
+  def validate_by_key?
+    true
   end
 end
