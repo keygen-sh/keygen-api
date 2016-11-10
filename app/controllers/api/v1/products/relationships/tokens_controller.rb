@@ -7,9 +7,12 @@ module Api::V1::Products::Relationships
     def generate
       authorize @product
 
-      @product.token.generate!
+      token = TokenGeneratorService.new(
+        account: current_account,
+        bearer: @product
+      ).execute
 
-      render json: @product.token
+      render json: token
     end
 
     private

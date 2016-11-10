@@ -28,7 +28,10 @@ Given /^I send the following headers:$/ do |body|
 end
 
 Given /^I use my authentication token$/ do
-  token = @bearer.token.generate!
+  token = TokenGeneratorService.new(
+    account: @bearer.account,
+    bearer: @bearer
+  ).execute
 
-  header "Authorization", "Bearer \"#{token}\""
+  header "Authorization", "Bearer \"#{token.raw}\""
 end

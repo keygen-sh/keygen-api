@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-  include TokenAuthenticatable
   include PasswordResetable
   include Paginatable
   include Roleable
@@ -10,8 +9,8 @@ class User < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :products, through: :licenses
   has_many :machines, through: :licenses
+  has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
-  has_one :token, as: :bearer, dependent: :destroy
 
   accepts_nested_attributes_for :role
 

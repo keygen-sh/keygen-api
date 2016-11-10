@@ -16,6 +16,7 @@ class Token < ApplicationRecord
 
     raw
   end
+  alias_method :regenerate!, :generate!
 end
 
 # == Schema Information
