@@ -27,11 +27,22 @@ Given /^I send the following headers:$/ do |body|
   end
 end
 
-Given /^I use my authentication token$/ do
+Given /^I use an authentication token$/ do
   token = TokenGeneratorService.new(
     account: @bearer.account,
     bearer: @bearer
   ).execute
+
+  header "Authorization", "Bearer \"#{token.raw}\""
+end
+
+Given /^I use an expired authentication token$/ do
+  token = TokenGeneratorService.new(
+    account: @bearer.account,
+    bearer: @bearer
+  ).execute
+
+  token.update expiry: Time.current
 
   header "Authorization", "Bearer \"#{token.raw}\""
 end

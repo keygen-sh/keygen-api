@@ -12,7 +12,7 @@ Feature: Show machine
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 3 "machines"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/machines/$0"
     Then the response status should be "200"
     And the JSON response should be a "machine"
@@ -21,7 +21,7 @@ Feature: Show machine
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "machine"
     And the current product has 1 "machine"
     When I send a GET request to "/machines/$0"
@@ -32,7 +32,7 @@ Feature: Show machine
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "machine"
     And the current user has 1 "machine"
     When I send a GET request to "/machines/$0"
@@ -43,7 +43,7 @@ Feature: Show machine
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "machine"
     When I send a GET request to "/machines/$0"
     Then the response status should be "403"
@@ -52,7 +52,7 @@ Feature: Show machine
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
     And the account "test1" has 3 "machines"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/machines/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

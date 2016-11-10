@@ -12,7 +12,7 @@ Feature: Show user
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 3 "users"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/users/$0"
     Then the response status should be "200"
     And the JSON response should be a "user"
@@ -21,7 +21,7 @@ Feature: Show user
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "user"
     And the current product has 1 "user"
     When I send a GET request to "/users/$1"
@@ -32,7 +32,7 @@ Feature: Show user
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "user"
     When I send a GET request to "/users/$1"
     Then the response status should be "403"
@@ -40,7 +40,7 @@ Feature: Show user
   Scenario: Admin attempts to retrieve a user for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/users/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

@@ -13,7 +13,7 @@ Feature: Create key
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L" } }
@@ -27,7 +27,7 @@ Feature: Create key
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/keys" with the following:
       """
       { "key": { "policy": "$policies[0]" } }
@@ -38,7 +38,7 @@ Feature: Create key
   Scenario: Admin creates a key with missing policy
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/keys" with the following:
       """
@@ -53,7 +53,7 @@ Feature: Create key
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "sVbmZKq4not2mCEvjEuMVE4cViCWLi" } }
@@ -77,7 +77,7 @@ Feature: Create key
     And I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "PmL2UPti9ZeJTs4kZvGnLJcvsndWhw" } }

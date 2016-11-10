@@ -12,7 +12,7 @@ Feature: Regenerate authentication token
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
@@ -32,7 +32,7 @@ Feature: Regenerate authentication token
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a POST request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"

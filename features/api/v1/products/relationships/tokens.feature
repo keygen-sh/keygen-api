@@ -12,7 +12,7 @@ Feature: Generate authentication token for product
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "product"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/products/$0/relationships/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
@@ -21,7 +21,7 @@ Feature: Generate authentication token for product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/products/$0/relationships/tokens"
     Then the response status should be "403"
 
@@ -29,7 +29,7 @@ Feature: Generate authentication token for product
     Given I am on the subdomain "test1"
     And the current account has 2 "products"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/products/$1/relationships/tokens"
     Then the response status should be "403"
 
@@ -38,7 +38,7 @@ Feature: Generate authentication token for product
     And the current account has 1 "product"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/products/$0/relationships/tokens"
     Then the response status should be "403"
 
@@ -46,6 +46,6 @@ Feature: Generate authentication token for product
     Given I am an admin of account "test1"
     And I am on the subdomain "test2"
     And the current account has 1 "product"
-    And I use my authentication token
+    And I use an authentication token
     When I send a GET request to "/products/$0/relationships/tokens"
     Then the response status should be "401"

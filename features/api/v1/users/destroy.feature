@@ -13,7 +13,7 @@ Feature: Delete user
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "users"
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/users/$3"
     Then the response status should be "204"
     And the current account should have 2 "users"
@@ -23,7 +23,7 @@ Feature: Delete user
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
     And the current account has 3 "users"
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/users/$3"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
@@ -35,7 +35,7 @@ Feature: Delete user
     And the current account has 1 "webhookEndpoint"
     And I am a user of account "test1"
     And I send and accept JSON
-    And I use my authentication token
+    And I use an authentication token
     When I send a DELETE request to "/users/$current"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error

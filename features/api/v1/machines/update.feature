@@ -13,7 +13,7 @@ Feature: Update machine
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "name": "Home iMac" } }
@@ -27,7 +27,7 @@ Feature: Update machine
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "fingerprint": "b7:WE:YV:oR:jU:Bc:d6:Wk:Yo:Po:Mu:oN:4Q:bC:pi" } }
@@ -40,7 +40,7 @@ Feature: Update machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "machine"
     And the current product has 1 "machine"
     When I send a PATCH request to "/machines/$0" with the following:
@@ -56,7 +56,7 @@ Feature: Update machine
     And the current account has 3 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     And the current account has 1 "machine"
     When I send a PATCH request to "/machines/$0" with the following:
       """
@@ -80,7 +80,7 @@ Feature: Update machine
       { "licenseId": $licenses[0].id }
       """
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "name": "Office Mac" } }
@@ -103,7 +103,7 @@ Feature: Update machine
       { "licenseId": $licenses[0].id }
       """
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "fingerprint": "F8:2B:DV:tH:Tm:AY:uG:QG:VJ:ct:N6:nK:WF:tq:vr" } }
@@ -116,7 +116,7 @@ Feature: Update machine
     And the current account has 3 "machines"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "name": "Office Mac" } }
@@ -140,7 +140,7 @@ Feature: Update machine
     But I am on the subdomain "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
-    And I use my authentication token
+    And I use an authentication token
     When I send a PATCH request to "/machines/$0" with the following:
       """
       { "machine": { "name": "PC" } }
