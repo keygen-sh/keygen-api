@@ -158,9 +158,13 @@ end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   if @account
-    user = @account.admins.first
-    token = user.token.generate!
-    header "Authorization", "Bearer \"#{token}\""
+    user  = @account.admins.first
+    token = TokenGeneratorService.new(
+      account: @account,
+      bearer: user
+    ).execute
+
+    header "Authorization", "Bearer \"#{token.raw}\""
 
     get "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   else
@@ -174,9 +178,13 @@ end
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
   account = Account.find_by subdomain: subdomain
 
-  user = account.admins.first
-  token = user.token.generate!
-  header "Authorization", "Bearer \"#{token}\""
+  user  = account.admins.first
+  token = TokenGeneratorService.new(
+    account: account,
+    bearer: user
+  ).execute
+
+  header "Authorization", "Bearer \"#{token.raw}\""
 
   case resource
   when /^admins?$/

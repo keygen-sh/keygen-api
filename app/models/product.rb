@@ -1,5 +1,4 @@
 class Product < ApplicationRecord
-  include TokenAuthenticatable
   include Paginatable
   include Roleable
 
@@ -9,8 +8,8 @@ class Product < ApplicationRecord
   has_many :licenses, through: :policies
   has_many :machines, through: :licenses
   has_many :users, through: :licenses
+  has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
-  has_one :token, as: :bearer, dependent: :destroy
 
   serialize :platforms, Array
   serialize :meta, Hash

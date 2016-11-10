@@ -10,10 +10,12 @@ module TokenAuthentication
     authenticate_or_request_with_http_token do |token, options|
       next if account.nil?
 
-      @current_bearer = TokenAuthenticationService.new(
+      tok = TokenAuthenticationService.new(
         account: account,
         token: token
       ).execute
+
+      @current_bearer = tok&.bearer
     end
   end
 
@@ -24,10 +26,12 @@ module TokenAuthentication
     authenticate_with_http_token do |token, options|
       next if account.nil?
 
-      @current_bearer = TokenAuthenticationService.new(
+      tok = TokenAuthenticationService.new(
         account: account,
         token: token
       ).execute
+
+      @current_bearer = tok&.bearer
     end
   end
 

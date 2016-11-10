@@ -8,7 +8,7 @@ Feature: Generate authentication token
       | Test2 | test2     |
     And I send and accept JSON
 
-  Scenario: User retrieve their tokens via basic authentication
+  Scenario: User generates a new token via basic authentication
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -20,7 +20,7 @@ Feature: Generate authentication token
     Then the response status should be "200"
     And the JSON response should be a "token"
 
-  Scenario: User attempts to retrieve their tokens but fails to authenticate
+  Scenario: User attempts to generate a new token but fails to authenticate
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -31,7 +31,7 @@ Feature: Generate authentication token
     When I send a GET request to "/tokens"
     Then the response status should be "401"
 
-  Scenario: User attempts to retrieve their tokens without authentication
+  Scenario: User attempts to generate a new token without authentication
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"

@@ -25,8 +25,9 @@ Rails.application.routes.draw do
       end
 
       constraints lambda { |r| r.subdomain.present? } do
-        get  "tokens", to: "tokens#generate"
-        post "tokens", to: "tokens#regenerate"
+        get    "tokens",     to: "tokens#generate"
+        post   "tokens",     to: "tokens#regenerate"
+        delete "tokens/:id", to: "tokens#revoke"
 
         post "passwords", to: "passwords#reset_password"
         get  "profile", to: "profiles#show"

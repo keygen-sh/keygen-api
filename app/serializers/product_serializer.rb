@@ -15,7 +15,7 @@ class ProductSerializer < BaseSerializer
   has_many :licenses, through: :policies
   has_many :machines, through: :licenses
   has_many :users, through: :licenses
-  has_one :token
+  has_many :tokens
 end
 
 # == Schema Information
