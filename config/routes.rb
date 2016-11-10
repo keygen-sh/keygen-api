@@ -110,6 +110,7 @@ end
 #                                  DELETE /v1/accounts/:id(.:format)                                   api/v1/accounts#destroy {:format=>"json"}
 #                        v1_tokens GET    /v1/tokens(.:format)                                         api/v1/tokens#generate {:format=>"json"}
 #                                  POST   /v1/tokens(.:format)                                         api/v1/tokens#regenerate {:format=>"json"}
+#                               v1 DELETE /v1/tokens/:id(.:format)                                     api/v1/tokens#revoke {:format=>"json"}
 #                     v1_passwords POST   /v1/passwords(.:format)                                      api/v1/passwords#reset_password {:format=>"json"}
 #                       v1_profile GET    /v1/profile(.:format)                                        api/v1/profiles#show {:format=>"json"}
 #                          v1_keys GET    /v1/keys(.:format)                                           api/v1/keys#index {:format=>"json"}

@@ -35,11 +35,16 @@ module Api::V1
           token: token
         ).execute
 
-        if !token.nil?
-          token.regenerate!
+        next if token.nil?
 
-          render json: token and return
+        if token.expired?
+          render_unauthorized detail: "is expired", source: {
+            pointer: "/data/relationships/token" } and return
         end
+
+        token.regenerate!
+
+        render json: token and return
       end
 
       render_unauthorized detail: "must be a valid token", source: {
