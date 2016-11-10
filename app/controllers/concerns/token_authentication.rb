@@ -15,6 +15,11 @@ module TokenAuthentication
         token: token
       ).execute
 
+      if tok&.expired?
+        render_unauthorized detail: "is expired", source: {
+          pointer: "/data/relationships/token" } and return
+      end
+
       @current_bearer = tok&.bearer
     end
   end
@@ -30,6 +35,11 @@ module TokenAuthentication
         account: account,
         token: token
       ).execute
+
+      if tok&.expired?
+        render_unauthorized detail: "is expired", source: {
+          pointer: "/data/relationships/token" } and return
+      end
 
       @current_bearer = tok&.bearer
     end

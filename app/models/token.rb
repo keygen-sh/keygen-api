@@ -1,4 +1,6 @@
 class Token < ApplicationRecord
+  TOKEN_DURATION = 2.weeks
+
   include Tokenable
 
   belongs_to :account
@@ -15,11 +17,16 @@ class Token < ApplicationRecord
     end
 
     self.digest = enc
+    self.expiry = Time.current + TOKEN_DURATION
     save
 
     raw
   end
   alias_method :regenerate!, :generate!
+
+  def expired?
+    expiry.nil? || expiry < Time.current
+  end
 end
 
 # == Schema Information
@@ -33,6 +40,7 @@ end
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  account_id  :integer
+#  expiry      :datetime
 #
 # Indexes
 #

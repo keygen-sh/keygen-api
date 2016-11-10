@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161109175721) do
+ActiveRecord::Schema.define(version: 20161110144731) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20161109175721) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.integer  "account_id"
+    t.datetime "expiry"
     t.index ["account_id"], name: "index_tokens_on_account_id", using: :btree
     t.index ["bearer_id", "bearer_type"], name: "index_tokens_on_bearer_id_and_bearer_type", using: :btree
   end

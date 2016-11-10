@@ -11,6 +11,11 @@ class TokenGeneratorService < BaseService
     token = bearer.tokens.create account: account
     token&.generate!
 
+    TokenCleanupWorker.perform_at(
+      Token::TOKEN_DURATION,
+      token.id
+    )
+
     token
   end
 

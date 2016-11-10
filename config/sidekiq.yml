@@ -1,4 +1,5 @@
 :queues:
-  - [default, 1]
-  - [webhooks, 2]
-  - [mailers, 3]
+  - [cleanup, 1]
+  - [default, 2]
+  - [webhooks, 3]
+  - [mailers, 4]
