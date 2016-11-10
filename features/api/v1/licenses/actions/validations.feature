@@ -8,7 +8,7 @@ Feature: License validation
       | Test2 | test2     |
     And I send and accept JSON
 
-  Scenario: Admin verifies a strict license that is valid
+  Scenario: Admin validates a strict license that is valid
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -42,7 +42,7 @@ Feature: License validation
       { "isValid": true }
       """
 
-  Scenario: Admin verifies a strict license that has too many machines
+  Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -76,7 +76,7 @@ Feature: License validation
       { "isValid": false }
       """
 
-  Scenario: Admin verifies a non-strict license that has too many machines
+  Scenario: Admin validates a non-strict license that has too many machines
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -110,7 +110,7 @@ Feature: License validation
       { "isValid": true }
       """
 
-  Scenario: Admin verifies a license that has not been used
+  Scenario: Admin validates a license that has not been used
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -136,7 +136,7 @@ Feature: License validation
       { "isValid": true }
       """
 
-  Scenario: Admin verifies a strict license that has not been used
+  Scenario: Admin validates a strict license that has not been used
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -162,7 +162,7 @@ Feature: License validation
       { "isValid": false }
       """
 
-  Scenario: Admin verifies a license that is expired
+  Scenario: Admin validates a license that is expired
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -182,7 +182,7 @@ Feature: License validation
       { "isValid": false }
       """
 
-  Scenario: Admin verifies a valid license by key
+  Scenario: Admin validates a valid license by key
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -205,7 +205,7 @@ Feature: License validation
       { "isValid": true }
       """
 
-  Scenario: Admin verifies an invalid license by key
+  Scenario: Admin validates an invalid license by key
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -228,7 +228,7 @@ Feature: License validation
       { "isValid": false }
       """
 
-  Scenario: Admin verifies an encrypted license by key
+  Scenario: Admin validates an encrypted license by key
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
@@ -251,7 +251,53 @@ Feature: License validation
       { "isValid": true }
       """
 
-  Scenario: Admin verifies a valid license by key from a pool
+  Scenario: Admin validates an encrypted license key as an unencrypted key
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 encrypted "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/licenses/actions/validate-key" with the following:
+      """
+      { "key": "$crypt[0].raw", "encrypted": false }
+      """
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "isValid": false }
+      """
+
+  Scenario: Admin validates an unencrypted license key as an encrypted key
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": $policies[0].id,
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/licenses/actions/validate-key" with the following:
+      """
+      { "key": "$licenses[0].key", "encrypted": true }
+      """
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "isValid": false }
+      """
+
+  Scenario: Admin validates a valid license by key from a pool
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 1 "policies"
