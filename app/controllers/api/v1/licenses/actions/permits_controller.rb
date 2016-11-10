@@ -2,7 +2,7 @@ module Api::V1::Licenses::Actions
   class PermitsController < Api::V1::BaseController
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!
-    before_action :set_license, only: [:renew, :revoke, :validate]
+    before_action :set_license, only: [:renew, :revoke]
 
     # POST /licenses/1/actions/renew
     def renew
@@ -43,15 +43,6 @@ module Api::V1::Licenses::Actions
       ).execute
 
       @license.destroy
-    end
-
-    # GET /licenses/1/actions/validate
-    def validate
-      render_not_found and return unless @license
-
-      authorize @license
-
-      render_meta is_valid: LicenseValidationService.new(license: @license).execute
     end
 
     private

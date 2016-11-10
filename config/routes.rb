@@ -48,10 +48,16 @@ Rails.application.routes.draw do
         resources "licenses" do
           scope module: "licenses" do
             namespace "actions" do
-              get "validate", to: "permits#validate"
+              get "validate", to: "validations#validate_by_id"
               post "revoke", to: "permits#revoke"
               post "renew", to: "permits#renew"
             end
+          end
+        end
+
+        namespace "licenses" do
+          namespace "actions" do
+            post "validate-key", to: "validations#validate_by_key"
           end
         end
 
@@ -139,7 +145,7 @@ end
 #                                  PATCH  /v1/users/:id(.:format)                                      api/v1/users#update {:format=>"json"}
 #                                  PUT    /v1/users/:id(.:format)                                      api/v1/users#update {:format=>"json"}
 #                                  DELETE /v1/users/:id(.:format)                                      api/v1/users#destroy {:format=>"json"}
-#      v1_license_actions_validate GET    /v1/licenses/:license_id/actions/validate(.:format)          api/v1/licenses/actions/permits#validate {:format=>"json"}
+#      v1_license_actions_validate GET    /v1/licenses/:license_id/actions/validate(.:format)          api/v1/licenses/actions/validations#validate_by_id {:format=>"json"}
 #        v1_license_actions_revoke POST   /v1/licenses/:license_id/actions/revoke(.:format)            api/v1/licenses/actions/permits#revoke {:format=>"json"}
 #         v1_license_actions_renew POST   /v1/licenses/:license_id/actions/renew(.:format)             api/v1/licenses/actions/permits#renew {:format=>"json"}
 #                      v1_licenses GET    /v1/licenses(.:format)                                       api/v1/licenses#index {:format=>"json"}
@@ -148,6 +154,7 @@ end
 #                                  PATCH  /v1/licenses/:id(.:format)                                   api/v1/licenses#update {:format=>"json"}
 #                                  PUT    /v1/licenses/:id(.:format)                                   api/v1/licenses#update {:format=>"json"}
 #                                  DELETE /v1/licenses/:id(.:format)                                   api/v1/licenses#destroy {:format=>"json"}
+# v1_licenses_actions_validate_key POST   /v1/licenses/actions/validate-key(.:format)                  api/v1/licenses/actions/validations#validate_by_key {:format=>"json"}
 #     v1_policy_relationships_pool DELETE /v1/policies/:policy_id/relationships/pool(.:format)         api/v1/policies/relationships/pool#pop {:format=>"json"}
 #                      v1_policies GET    /v1/policies(.:format)                                       api/v1/policies#index {:format=>"json"}
 #                                  POST   /v1/policies(.:format)                                       api/v1/policies#create {:format=>"json"}

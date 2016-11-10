@@ -33,7 +33,7 @@ module Api::V1
       @license = current_account.licenses.new license_params.merge(
         policy: policy,
         user: user
-      ).compact
+      )
       authorize @license
 
       if @license.save

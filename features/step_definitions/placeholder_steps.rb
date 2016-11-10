@@ -22,6 +22,9 @@ def parse_placeholders!(str)
       case resource.underscore
       when "current"
         @bearer.send attribute
+      when "crypt"
+        @crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              .send attribute
       when "time"
         case attribute
         when /(\d+)\.(\w+)\.(\w+)/

@@ -1,6 +1,6 @@
 Hashid::Rails.configure do |config|
-  config.secret = 'qLW2ZgYbW4ndzmGfHmfqffC7d2cTVJ'
-  config.length = 16
+  config.secret = "I think Halo is a pretty cool guy. Eh kills aleins and doesnt afraid of anything."
+  config.length = 8
 end
 
 module Hashid

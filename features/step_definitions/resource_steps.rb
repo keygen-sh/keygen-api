@@ -54,7 +54,7 @@ end
 
 Given /^the current account has (\d+) encrypted "([^\"]*)"$/ do |count, resource|
   count.to_i.times do
-    create resource.singularize.underscore, :encrypted, account: @account
+    @crypt << create(resource.singularize.underscore, :encrypted, account: @account)
   end
 end
 
