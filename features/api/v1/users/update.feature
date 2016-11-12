@@ -138,6 +138,18 @@ Feature: Update user
       """
     And sidekiq should have 2 "webhook" jobs
 
+  Scenario: Admin updates a users meta data with a nested hash
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "webhookEndpoints"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/users/$1" with the following:
+      """
+      { "user": { "meta": { "nested": { "meta": "data" } } } }
+      """
+    Then the response status should be "400"
+
   Scenario: Product updates a user for their product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"

@@ -44,6 +44,10 @@ class TypedParameters
     time: Time
   }
 
+  SCALAR_TYPES = VALID_TYPES.slice(
+    *(VALID_TYPES.keys - [:hash, :array])
+  )
+
   def self.build(context, &block)
     schema = Schema.new context: context, &block
     handler = schema.handlers[context.action_name]
@@ -128,7 +132,7 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for #{key} (got #{type} expected one of #{VALID_TYPES.join ", "})"
+        raise InvalidParameterError, "Invalid type defined for #{key} (got #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
         raise InvalidParameterError, "Parameter missing: #{key}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
@@ -146,6 +150,9 @@ class TypedParameters
           ctx.params = value
           params.merge! name => Schema.new(context: ctx, keys: keys, &block).params
         else
+          if !value.values.all? { |v| SCALAR_TYPES[Helper.class_name(v.class).to_sym] }
+            raise InvalidParameterError, "Unpermitted type found for #{key} (expected hash of scalar types)"
+          end
           value.keys.each { |k| keys << k.to_sym }
           params.merge! name => value
         end
@@ -155,6 +162,10 @@ class TypedParameters
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
             raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{Helper.class_name(arr_type).pluralize})"
+          end
+        else
+          if !value.all? { |v| SCALAR_TYPES[Helper.class_name(v.class).to_sym] }
+            raise InvalidParameterError, "Unpermitted type found for #{key} (expected array of scalar types)"
           end
         end
         params.merge! name => value
