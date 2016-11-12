@@ -25,7 +25,7 @@ module Api::V1
 
     # POST /webhook-endpoints
     def create
-      @endpoint = current_account.webhook_endpoints.new endpoint_params
+      @endpoint = current_account.webhook_endpoints.new endpoint_parameters
       authorize @endpoint
 
       if @endpoint.save
@@ -41,7 +41,7 @@ module Api::V1
 
       authorize @endpoint
 
-      if @endpoint.update(endpoint_params)
+      if @endpoint.update(endpoint_parameters)
         render json: @endpoint
       else
         render_unprocessable_resource @endpoint
@@ -65,7 +65,7 @@ module Api::V1
       @endpoint = current_account.webhook_endpoints.find_by_hashid params[:id]
     end
 
-    def endpoint_params
+    def endpoint_parameters
       parameters[:endpoint]
     end
 

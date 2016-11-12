@@ -28,9 +28,9 @@ module Api::V1
 
     # POST /machines
     def create
-      license = current_account.licenses.find_by_hashid machine_params[:license]
+      license = current_account.licenses.find_by_hashid machine_parameters[:license]
 
-      @machine = current_account.machines.new machine_params.merge(license: license)
+      @machine = current_account.machines.new machine_parameters.merge(license: license)
       authorize @machine
 
       if @machine.save
@@ -52,7 +52,7 @@ module Api::V1
 
       authorize @machine
 
-      if @machine.update(machine_params)
+      if @machine.update(machine_parameters)
         CreateWebhookEventService.new(
           event: "machine.updated",
           account: current_account,
@@ -88,7 +88,7 @@ module Api::V1
       @machine = current_account.machines.find_by_hashid params[:id]
     end
 
-    def machine_params
+    def machine_parameters
       parameters[:machine]
     end
 

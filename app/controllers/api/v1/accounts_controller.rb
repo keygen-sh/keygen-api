@@ -25,9 +25,9 @@ module Api::V1
 
     # POST /accounts
     def create
-      plan = Plan.find_by_hashid account_params[:plan]
+      plan = Plan.find_by_hashid account_parameters[:plan]
 
-      @account = Account.new account_params.merge(plan: plan)
+      @account = Account.new account_parameters.merge(plan: plan)
       authorize @account
 
       if @account.save
@@ -43,7 +43,7 @@ module Api::V1
 
       authorize @account
 
-      if @account.update(account_params)
+      if @account.update(account_parameters)
         render json: @account
       else
         render_unprocessable_resource @account
@@ -67,7 +67,7 @@ module Api::V1
       @account = Account.find_by_hashid params[:id]
     end
 
-    def account_params
+    def account_parameters
       parameters[:account]
     end
 

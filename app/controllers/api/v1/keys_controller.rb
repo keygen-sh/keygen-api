@@ -26,9 +26,9 @@ module Api::V1
 
     # POST /keys
     def create
-      policy = current_account.policies.find_by_hashid key_params[:policy]
+      policy = current_account.policies.find_by_hashid key_parameters[:policy]
 
-      @key = current_account.keys.new key_params.merge(policy: policy)
+      @key = current_account.keys.new key_parameters.merge(policy: policy)
       authorize @key
 
       if @key.save
@@ -50,7 +50,7 @@ module Api::V1
 
       authorize @key
 
-      if @key.update(key_params)
+      if @key.update(key_parameters)
         CreateWebhookEventService.new(
           event: "key.updated",
           account: current_account,
@@ -86,7 +86,7 @@ module Api::V1
       @key = current_account.keys.find_by_hashid params[:id]
     end
 
-    def key_params
+    def key_parameters
       parameters[:key]
     end
 
