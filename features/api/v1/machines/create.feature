@@ -32,7 +32,7 @@ Feature: Create machine
       """
       { "machine": { "license": "$licenses[0]" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin creates a machine with missing license
@@ -45,7 +45,7 @@ Feature: Create machine
       """
       { "machine": { "fingerprint": "qv:8W:qh:Fx:Ua:kN:LY:fj:yG:8H:Ar:N8:KZ:Uk:ge" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User creates a machine for their license

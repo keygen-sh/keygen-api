@@ -80,49 +80,49 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_user
       @user = current_account.users.find_by_hashid params[:id]
     end
 
     def user_params
-      permitted_params
+      parameters[:user]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:user).tap do |param|
-          permits = []
+        on :create do
+          param :user, type: Hash do
+            param :name, type: String
+            param :email, type: String
+            param :password, type: String
+            param :meta, type: Hash, optional: true
 
-          permits << :name
-          permits << :email
-
-          if action_name == "create"
-            permits << :password
+            if current_bearer&.role? :admin
+              param :role_attributes, type: Hash, as: :role, optional: true do
+                param :name, type: String
+              end
+            end
           end
+        end
 
-          if current_bearer&.role? :admin
-            permits << { role: [:name] }
+        on :update do
+          param :user, type: Hash do
+            param :name, type: String, optional: true
+            param :email, type: String, optional: true
+            param :meta, type: Hash, optional: true
+
+            if current_bearer&.role? :admin
+              param :role_attributes, type: Hash, as: :role, optional: true do
+                param :name, type: String
+              end
+            end
           end
-
-          # TODO: Possibly unsafe. See: http://stackoverflow.com/questions/17810838/strong-parameters-permit-all-attributes-for-nested-attributes
-          permits << {
-            meta: params.to_unsafe_h.fetch(:user, {}).fetch(:meta, {}).keys.map(&:to_sym)
-          }
-
-          param.permit *permits
-        end.transform_keys! { |key|
-          case key
-          when "role"
-            "role_attributes"
-          else
-            key
-          end
-        }.to_unsafe_h
-
-        schema
-      end.call
+        end
+      end
     end
   end
 end

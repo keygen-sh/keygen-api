@@ -57,7 +57,7 @@ Feature: Create account
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the JSON response should be an array of 1 error
 
   Scenario: Anonymous attempts to create an account without any admin users
@@ -72,7 +72,7 @@ Feature: Create account
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the JSON response should be an array of 1 errors
 
   Scenario: Anonymous attempts to create a duplicate account

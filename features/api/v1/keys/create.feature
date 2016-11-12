@@ -32,7 +32,7 @@ Feature: Create key
       """
       { "key": { "policy": "$policies[0]" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin creates a key with missing policy
@@ -44,7 +44,7 @@ Feature: Create key
       """
       { "key": { "key": "b" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to create a key

@@ -80,40 +80,49 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_policy
       @policy = current_account.policies.find_by_hashid params[:id]
     end
 
     def policy_params
-      permitted_params
+      parameters[:policy]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:policy).tap do |param|
-          permits = []
-
-          if action_name == "create"
-            permits << :encrypted
-            permits << :use_pool
-            permits << :product
+        on :create do
+          param :policy, type: Hash do
+            param :product, type: String
+            param :encrypted, type: Boolean, optional: true
+            param :use_pool, type: Boolean, optional: true
+            param :name, type: String, optional: true
+            param :price, type: Integer, optional: true
+            param :duration, type: Integer, optional: true
+            param :strict, type: Boolean, optional: true
+            param :recurring, type: Boolean, optional: true
+            param :floating, type: Boolean, optional: true
+            param :max_machines, type: Integer, optional: true
+            param :meta, type: Hash, optional: true
           end
+        end
 
-          permits << :name
-          permits << :price
-          permits << :duration
-          permits << :strict
-          permits << :recurring
-          permits << :floating
-          permits << :max_machines
-
-          param.permit *permits
-        end.to_unsafe_h
-
-        schema
-      end.call
+        on :update do
+          param :policy, type: Hash do
+            param :name, type: String, optional: true
+            param :price, type: Integer, optional: true
+            param :duration, type: Integer, optional: true
+            param :strict, type: Boolean, optional: true
+            param :recurring, type: Boolean, optional: true
+            param :floating, type: Boolean, optional: true
+            param :max_machines, type: Integer, optional: true
+            param :meta, type: Hash, optional: true
+          end
+        end
+      end
     end
   end
 end
