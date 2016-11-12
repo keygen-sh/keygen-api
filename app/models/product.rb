@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
   include Paginatable
+  include Limitable
   include Roleable
 
   belongs_to :account

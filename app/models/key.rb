@@ -1,5 +1,6 @@
 class Key < ApplicationRecord
   include Paginatable
+  include Limitable
 
   belongs_to :account
   belongs_to :policy

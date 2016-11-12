@@ -17,6 +17,41 @@ Feature: List machines
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
+  Scenario: Admin retrieves all machines without a limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "machines"
+
+  Scenario: Admin retrieves all machines with a low limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 10 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?limit=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "machines"
+
+  Scenario: Admin retrieves all machines with a high limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?limit=20"
+    Then the response status should be "200"
+    And the JSON response should be an array with 20 "machines"
+
+  Scenario: Admin retrieves all machines with a limit that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?limit=900"
+    Then the response status should be "400"
+
   Scenario: Product retrieves all machines for their product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"

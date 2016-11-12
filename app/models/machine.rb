@@ -1,5 +1,6 @@
 class Machine < ApplicationRecord
   include Paginatable
+  include Limitable
 
   belongs_to :account
   belongs_to :license

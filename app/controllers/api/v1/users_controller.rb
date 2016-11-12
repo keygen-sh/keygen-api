@@ -2,7 +2,6 @@ module Api::V1
   class UsersController < Api::V1::BaseController
     has_scope :roles, type: :array, default: [:user]
     has_scope :product
-    has_scope :page, type: :hash
 
     before_action :scope_by_subdomain!
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]

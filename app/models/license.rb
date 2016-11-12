@@ -1,5 +1,6 @@
 class License < ApplicationRecord
   include Paginatable
+  include Limitable
   include Tokenable
 
   belongs_to :account

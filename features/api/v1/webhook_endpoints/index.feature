@@ -17,6 +17,41 @@ Feature: List webhook endpoints
     Then the response status should be "200"
     And the JSON response should be an array with 3 "webhookEndpoints"
 
+  Scenario: Admin retrieves all webhook endpoints without a limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEndpoints"
+    And I use an authentication token
+    When I send a GET request to "/webhook-endpoints"
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "webhookEndpoints"
+
+  Scenario: Admin retrieves all webhook endpoints with a low limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 10 "webhookEndpoints"
+    And I use an authentication token
+    When I send a GET request to "/webhook-endpoints?limit=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "webhookEndpoints"
+
+  Scenario: Admin retrieves all webhook endpoints with a high limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEndpoints"
+    And I use an authentication token
+    When I send a GET request to "/webhook-endpoints?limit=20"
+    Then the response status should be "200"
+    And the JSON response should be an array with 20 "webhookEndpoints"
+
+  Scenario: Admin retrieves all webhook endpoints with a limit that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEndpoints"
+    And I use an authentication token
+    When I send a GET request to "/webhook-endpoints?limit=900"
+    Then the response status should be "400"
+
   Scenario: Admin attempts to retrieve all webhook endpoints for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"

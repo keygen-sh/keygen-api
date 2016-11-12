@@ -3,5 +3,6 @@ module Api::V1
     include ActionController::Serialization
     include TokenAuthentication
     include SubdomainScope
+    include SharedScopes
   end
 end

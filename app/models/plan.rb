@@ -1,5 +1,6 @@
 class Plan < ApplicationRecord
   include Paginatable
+  include Limitable
 
   has_many :accounts
 end

@@ -17,6 +17,41 @@ Feature: List products
     Then the response status should be "200"
     And the JSON response should be an array with 3 "products"
 
+  Scenario: Admin retrieves all products without a limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "products"
+    And I use an authentication token
+    When I send a GET request to "/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "products"
+
+  Scenario: Admin retrieves all products with a low limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 10 "products"
+    And I use an authentication token
+    When I send a GET request to "/products?limit=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "products"
+
+  Scenario: Admin retrieves all products with a high limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "products"
+    And I use an authentication token
+    When I send a GET request to "/products?limit=20"
+    Then the response status should be "200"
+    And the JSON response should be an array with 20 "products"
+
+  Scenario: Admin retrieves all products with a limit that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "products"
+    And I use an authentication token
+    When I send a GET request to "/products?limit=900"
+    Then the response status should be "400"
+
   Scenario: Admin attempts to retrieve all products for another account
     Given I am an admin of account "test2"
     But I am on the subdomain "test1"
