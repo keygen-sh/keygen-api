@@ -20,7 +20,7 @@ module Api::V1::Accounts::Relationships
 
       status = Billings::UpdateCustomerService.new(
         customer: @billing.customer_id,
-        token: token_params
+        token: parameters[:token]
       ).execute
 
       if status
@@ -32,12 +32,20 @@ module Api::V1::Accounts::Relationships
 
     private
 
+    attr_reader :parameters
+
     def set_billing
       @billing = Account.find_by_hashid(params[:account_id])&.billing
     end
 
-    def token_params
-      params.require :token
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
+
+        on :update do
+          param :token, type: String
+        end
+      end
     end
   end
 end

@@ -11,12 +11,20 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_user
-      @user = current_account.users.find_by_email email_params
+      @user = current_account.users.find_by_email parameters[:email]
     end
 
-    def email_params
-      params.require :email
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
+
+        on :reset_password do
+          param :email, type: String
+        end
+      end
     end
   end
 end

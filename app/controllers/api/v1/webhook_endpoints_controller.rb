@@ -59,12 +59,32 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_endpoint
       @endpoint = current_account.webhook_endpoints.find_by_hashid params[:id]
     end
 
     def endpoint_params
-      params.require(:endpoint).permit :url
+      parameters[:endpoint]
+    end
+
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
+
+        on :create do
+          param :endpoint, type: Hash do
+            param :url, type: String
+          end
+        end
+
+        on :update do
+          param :endpoint, type: Hash do
+            param :url, type: String, optional: true
+          end
+        end
+      end
     end
   end
 end

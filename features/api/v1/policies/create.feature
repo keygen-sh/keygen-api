@@ -51,7 +51,7 @@ Feature: Create policy
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin attempts to create a policy that is encrypted and uses a pool

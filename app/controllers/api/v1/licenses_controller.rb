@@ -85,34 +85,35 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_license
       @license = current_account.licenses.find_by_hashid params[:id]
     end
 
     def license_params
-      permitted_params
+      parameters[:license]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:license).tap do |param|
-          permits = []
-
-          case action_name
-          when "create"
-            permits << :policy
-            permits << :user
-          when "update"
-            permits << :expiry
+        on :create do
+          param :license, type: Hash do
+            param :policy, type: String
+            param :user, type: String, optional: true
+            param :meta, type: Hash, optional: true
           end
+        end
 
-          param.permit *permits
-        end.to_unsafe_h
-
-        schema
-      end.call
+        on :update do
+          param :license, type: Hash do
+            param :expiry, type: String, optional: true
+            param :meta, type: Hash, optional: true
+          end
+        end
+      end
     end
   end
 end

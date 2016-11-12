@@ -66,7 +66,7 @@ Feature: Create license
       """
       { "license": { "user": "$users[1]" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" job
 

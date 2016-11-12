@@ -82,36 +82,39 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_machine
       @machine = current_account.machines.find_by_hashid params[:id]
     end
 
     def machine_params
-      permitted_params
+      parameters[:machine]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:machine).tap do |param|
-          permits = []
-
-          if action_name == "create"
-            permits << :fingerprint
-            permits << :ip
-            permits << :hostname
-            permits << :platform
-            permits << :license
+        on :create do
+          param :machine, type: Hash do
+            param :license, type: String
+            param :fingerprint, type: String
+            param :name, type: String, optional: true
+            param :ip, type: String, optional: true
+            param :hostname, type: String, optional: true
+            param :platform, type: String, optional: true
+            param :meta, type: Hash, optional: true
           end
+        end
 
-          permits << :name
-
-          param.permit *permits
-        end.to_unsafe_h
-
-        schema
-      end.call
+        on :update do
+          param :machine, type: Hash do
+            param :name, type: String, optional: true
+            param :meta, type: Hash, optional: true
+          end
+        end
+      end
     end
   end
 end

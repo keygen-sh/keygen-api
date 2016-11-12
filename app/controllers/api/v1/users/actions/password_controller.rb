@@ -8,11 +8,8 @@ module Api::V1::Users::Actions
     def update_password
       authorize @user
 
-      params.require :old_password
-      params.require :new_password
-
-      if @user.try(:authenticate, params[:old_password])
-        if @user.update(password: params[:new_password])
+      if @user.try(:authenticate, parameters[:old_password])
+        if @user.update(password: parameters[:new_password])
           render json: @user
         else
           render_unprocessable_resource @user
@@ -27,17 +24,14 @@ module Api::V1::Users::Actions
     def reset_password
       skip_authorization
 
-      params.require :password_reset_token
-      params.require :new_password
-
-      if @user.compare_encrypted_token(:password_reset_token, params[:password_reset_token])
+      if @user.compare_encrypted_token(:password_reset_token, parameters[:password_reset_token])
 
         if @user.password_reset_sent_at < 24.hours.ago
           render_unauthorized detail: "is expired", source: {
             pointer: "/data/attributes/passwordResetToken" } and return
         end
 
-        if @user.update(password: params[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
+        if @user.update(password: parameters[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
           render json: @user
         else
           render_unprocessable_resource @user
@@ -50,8 +44,26 @@ module Api::V1::Users::Actions
 
     private
 
+    attr_reader :parameters
+
     def set_user
       @user = current_account.users.find_by_hashid params[:user_id]
+    end
+
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
+
+        on :update_password do
+          param :old_password, type: String
+          param :new_password, type: String
+        end
+
+        on :reset_password do
+          param :password_reset_token, type: String
+          param :new_password, type: String
+        end
+      end
     end
   end
 end

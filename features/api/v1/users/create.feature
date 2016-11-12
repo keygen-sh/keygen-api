@@ -27,7 +27,17 @@ Feature: Create user
       """
       { "user": { "name": "Superman", "email": "superman@keygen.sh" } }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+
+  Scenario: Anonymous attempts to create a user with invalid parameter types
+    Given I am on the subdomain "test1"
+    And the current account has 1 "user"
+    When I send a POST request to "/users" with the following:
+      """
+      { "user": { "name": "Superman", "email": 42 } }
+      """
+    Then the response status should be "400"
     And the JSON response should be an array of 1 error
 
   Scenario: Admin creates an admin for their account

@@ -77,14 +77,38 @@ module Api::V1
 
     private
 
-    # Use callbacks to share common setup or constraints between actions.
     def set_product
       @product = current_account.products.find_by_hashid params[:id]
     end
 
-    # Only allow a trusted parameter "white list" through.
     def product_params
-      params.require(:product).permit :name, :platforms => []
+      parameters[:product]
+    end
+
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
+
+        on :create do
+          param :product, type: Hash do
+            param :name, type: String
+            param :meta, type: Hash, optional: true
+            param :platforms, type: Array, optional: true do
+              item type: String
+            end
+          end
+        end
+
+        on :update do
+          param :product, type: Hash do
+            param :name, type: String, optional: true
+            param :meta, type: Hash, optional: true
+            param :platforms, type: Array, optional: true do
+              item type: String
+            end
+          end
+        end
+      end
     end
   end
 end

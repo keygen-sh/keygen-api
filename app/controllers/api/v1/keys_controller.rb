@@ -80,32 +80,33 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_key
       @key = current_account.keys.find_by_hashid params[:id]
     end
 
     def key_params
-      permitted_params
+      parameters[:key]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:key).tap do |param|
-          permits = []
-
-          if action_name == "create"
-            permits << :policy
+        on :create do
+          param :key, type: Hash do
+            param :policy, type: String
+            param :key, type: String
           end
+        end
 
-          permits << :key
-
-          param.permit *permits
-        end.to_unsafe_h
-
-        schema
-      end.call
+        on :update do
+          param :key, type: Hash do
+            param :key, type: String, optional: true
+          end
+        end
+      end
     end
   end
 end

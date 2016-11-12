@@ -61,41 +61,42 @@ module Api::V1
 
     private
 
+    attr_reader :parameters
+
     def set_account
       @account = Account.find_by_hashid params[:id]
     end
 
     def account_params
-      permitted_params
+      parameters[:account]
     end
 
-    attr_accessor :permitted_params
+    def parameters
+      @parameters ||= TypedParameters.build self do
+        options strict: true
 
-    def permitted_params
-      @permitted_params ||= Proc.new do
-        schema = params.require(:account).tap do |param|
-          permits = []
-
-          permits << :name
-          permits << :subdomain
-
-          if action_name == "create"
-            permits << :plan
-            permits << { admins: [[:name, :email, :password]] }
+        on :create do
+          param :account, type: Hash do
+            param :name, type: String
+            param :subdomain, type: String
+            param :plan, type: String
+            param :users_attributes, type: Array, as: :admins do
+              item type: Hash do
+                param :name, type: String
+                param :email, type: String
+                param :password, type: String
+              end
+            end
           end
+        end
 
-          param.permit *permits
-        end.transform_keys! { |key|
-          case key
-          when "admins"
-            "users_attributes"
-          else
-            key
+        on :update do
+          param :account, type: Hash do
+            param :name, type: String, optional: true
+            param :subdomain, type: String, optional: true
           end
-        }.to_unsafe_h
-
-        schema
-      end.call
+        end
+      end
     end
   end
 end
