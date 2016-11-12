@@ -55,13 +55,13 @@ module Api::V1::Users::Actions
         options strict: true
 
         on :update_password do
-          param :old_password, type: String
-          param :new_password, type: String
+          param :old_password, type: :string
+          param :new_password, type: :string
         end
 
         on :reset_password do
-          param :password_reset_token, type: String
-          param :new_password, type: String
+          param :password_reset_token, type: :string
+          param :new_password, type: :string
         end
       end
     end

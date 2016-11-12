@@ -95,31 +95,31 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :policy, type: Hash do
-            param :product, type: String
-            param :encrypted, type: Boolean, optional: true
-            param :use_pool, type: Boolean, optional: true
-            param :name, type: String, optional: true
-            param :price, type: Integer, optional: true
-            param :duration, type: Integer, optional: true
-            param :strict, type: Boolean, optional: true
-            param :recurring, type: Boolean, optional: true
-            param :floating, type: Boolean, optional: true
-            param :max_machines, type: Integer, optional: true
-            param :meta, type: Hash, optional: true
+          param :policy, type: :hash do
+            param :product, type: :string
+            param :encrypted, type: :boolean, optional: true
+            param :use_pool, type: :boolean, optional: true
+            param :name, type: :string, optional: true
+            param :price, type: :integer, optional: true
+            param :duration, type: :integer, optional: true
+            param :strict, type: :boolean, optional: true
+            param :recurring, type: :boolean, optional: true
+            param :floating, type: :boolean, optional: true
+            param :max_machines, type: :integer, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
 
         on :update do
-          param :policy, type: Hash do
-            param :name, type: String, optional: true
-            param :price, type: Integer, optional: true
-            param :duration, type: Integer, optional: true
-            param :strict, type: Boolean, optional: true
-            param :recurring, type: Boolean, optional: true
-            param :floating, type: Boolean, optional: true
-            param :max_machines, type: Integer, optional: true
-            param :meta, type: Hash, optional: true
+          param :policy, type: :hash do
+            param :name, type: :string, optional: true
+            param :price, type: :integer, optional: true
+            param :duration, type: :integer, optional: true
+            param :strict, type: :boolean, optional: true
+            param :recurring, type: :boolean, optional: true
+            param :floating, type: :boolean, optional: true
+            param :max_machines, type: :integer, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
       end

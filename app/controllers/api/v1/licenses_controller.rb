@@ -100,17 +100,17 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :license, type: Hash do
-            param :policy, type: String
-            param :user, type: String, optional: true
-            param :meta, type: Hash, optional: true
+          param :license, type: :hash do
+            param :policy, type: :string
+            param :user, type: :string, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
 
         on :update do
-          param :license, type: Hash do
-            param :expiry, type: String, optional: true
-            param :meta, type: Hash, optional: true
+          param :license, type: :hash do
+            param :expiry, type: :string, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
       end

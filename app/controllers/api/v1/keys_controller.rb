@@ -95,15 +95,15 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :key, type: Hash do
-            param :policy, type: String
-            param :key, type: String
+          param :key, type: :hash do
+            param :policy, type: :string
+            param :key, type: :string
           end
         end
 
         on :update do
-          param :key, type: Hash do
-            param :key, type: String, optional: true
+          param :key, type: :hash do
+            param :key, type: :string, optional: true
           end
         end
       end

@@ -76,24 +76,24 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :account, type: Hash do
-            param :name, type: String
-            param :subdomain, type: String
-            param :plan, type: String
-            param :users_attributes, type: Array, as: :admins do
-              item type: Hash do
-                param :name, type: String
-                param :email, type: String
-                param :password, type: String
+          param :account, type: :hash do
+            param :name, type: :string
+            param :subdomain, type: :string
+            param :plan, type: :string
+            param :users_attributes, type: :array, as: :admins do
+              item type: :hash do
+                param :name, type: :string
+                param :email, type: :string
+                param :password, type: :string
               end
             end
           end
         end
 
         on :update do
-          param :account, type: Hash do
-            param :name, type: String, optional: true
-            param :subdomain, type: String, optional: true
+          param :account, type: :hash do
+            param :name, type: :string, optional: true
+            param :subdomain, type: :string, optional: true
           end
         end
       end

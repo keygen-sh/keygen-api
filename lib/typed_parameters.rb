@@ -2,30 +2,50 @@
 #   options strict: true
 #
 #   on :create do
-#     param :license, type: Hash do
-#       param :policy, type: String
-#       param :user, type: String, optional: true
-#       param :role_attributes, type: Hash, as: :role do
-#         param :name, type: Integer
+#     param :license, type: :hash do
+#       param :policy, type: :string
+#       param :user, type: :string, optional: true
+#       param :role_attributes, type: :hash, as: :role do
+#         param :name, type: :integer
 #       end
-#       param :array, type: Array do
-#         item type: Integer
+#       param :array, type: :array do
+#         item type: :integer
 #       end
-#       param :hash, type: Hash
+#       param :hash, type: :hash
 #     end
 #   end
 #
 #   on :update do
-#     param :license, type: Hash do
-#       param :policy, type: String
+#     param :license, type: :hash do
+#       param :policy, type: :string
 #     end
 #   end
 # end
 class TypedParameters
-  IGNORED_KEYS = [:controller, :action].freeze
+  class Boolean; end
+
+  VALID_TYPES = {
+    number: Numeric,
+    integer: Integer,
+    float: Float,
+    fixnum: Fixnum,
+    big_decimal: BigDecimal,
+    boolean: Boolean,
+    true: TrueClass,
+    false: FalseClass,
+    symbol: Symbol,
+    string: String,
+    hash: Hash,
+    array: Array,
+    null: NilClass,
+    nil: NilClass,
+    date_time: DateTime,
+    date: Date,
+    time: Time
+  }
 
   def self.build(context, &block)
-    schema = Schema.new context, &block
+    schema = Schema.new context: context, &block
     handler = schema.handlers[context.action_name]
     params = handler.call
 
@@ -33,7 +53,7 @@ class TypedParameters
       # Grab our segment of the params (getting rid of cruft added by Rails middleware)
       params_slice = context.params.slice *params.keys
       # Get deep array keys and calc the difference when compared to our parsed keys
-      unpermiited = deep_keys(params_slice) - schema.keys
+      unpermiited = Helper.deep_keys(params_slice) - schema.keys
 
       raise InvalidParameterError, "Unpermitted parameters: #{unpermiited.join ", "}" if unpermiited.any?
     end
@@ -43,15 +63,31 @@ class TypedParameters
 
   private
 
-  def self.deep_keys(obj)
-    return unless obj.respond_to? :keys
-    obj.keys.map(&:to_sym) + obj.values.flat_map { |v| deep_keys v }.compact
+  class Helper
+
+    def self.deep_keys(o)
+      return unless o.respond_to? :keys
+      o.keys.map(&:to_sym) + o.values.flat_map { |v| deep_keys v }.compact
+    end
+
+    def self.compare_types(a, b)
+      case class_name(b).to_sym
+      when :boolean
+        a <= TrueClass || a <= FalseClass
+      else
+        a <= b
+      end
+    end
+
+    def self.class_name(c)
+      c.name.demodulize.underscore rescue nil
+    end
   end
 
   class Schema
     attr_reader :handlers, :params, :keys
 
-    def initialize(context, keys = nil, &block)
+    def initialize(context:, keys: nil, &block)
       @configuration = HashWithIndifferentAccess.new
       @handlers = HashWithIndifferentAccess.new
       @params = HashWithIndifferentAccess.new
@@ -82,6 +118,7 @@ class TypedParameters
     end
 
     def param(name, type:, as: nil, optional: false, allow_nil: false, &block)
+      real_type = VALID_TYPES.fetch type.to_sym, nil
       key = (as || name).to_sym
       value = if context.params.is_a? ActionController::Parameters
                 context.params.to_unsafe_h[key]
@@ -90,22 +127,24 @@ class TypedParameters
               end
 
       case
+      when real_type.nil?
+        raise InvalidParameterError, "Invalid type defined for #{key} (got #{type} expected one of #{VALID_TYPES.join ", "})"
       when value.nil? && !optional
         raise InvalidParameterError, "Parameter missing: #{key}"
-      when !value.nil? && !(value.class <= type)
-        raise InvalidParameterError, "Type mismatch for #{key} (expected #{type.name.underscore} got #{value.class.name.underscore})"
+      when !value.nil? && !Helper.compare_types(value.class, real_type)
+        raise InvalidParameterError, "Type mismatch for #{key} (got #{Helper.class_name(value.class)} expected #{type})"
       when value.nil? && !allow_nil
         return
       end
 
       keys << key
 
-      case type.name.downcase.to_sym
+      case type.to_sym
       when :hash
         if block_given?
           ctx = context.dup
           ctx.params = value
-          params.merge! name => Schema.new(ctx, keys, &block).params
+          params.merge! name => Schema.new(context: ctx, keys: keys, &block).params
         else
           value.keys.each { |k| keys << k.to_sym }
           params.merge! name => value
@@ -114,8 +153,8 @@ class TypedParameters
         if block_given?
           arr_type = block.call
 
-          if !value.all? { |v| v.class <= arr_type }
-            raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{arr_type.name.underscore.pluralize})"
+          if !value.all? { |v| Helper.compare_types v.class, arr_type }
+            raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{Helper.class_name(arr_type).pluralize})"
           end
         end
         params.merge! name => value
@@ -125,14 +164,9 @@ class TypedParameters
     end
 
     def item(type:)
-      type
+      VALID_TYPES.fetch type.to_sym, nil
     end
   end
 
   class InvalidParameterError < StandardError; end
 end
-
-# FIXME: Need to figure out a way to create a boolean type that isn't global
-module Boolean; end
-class TrueClass; include Boolean; end
-class FalseClass; include Boolean; end

@@ -48,7 +48,7 @@ module Api::V1::Accounts::Relationships
         options strict: true
 
         on :update do
-          param :plan, type: String
+          param :plan, type: :string
         end
       end
     end

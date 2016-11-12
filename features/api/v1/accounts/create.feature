@@ -43,6 +43,26 @@ Feature: Create account
     Then the response status should be "201"
     And the account "google" should have 3 "admins"
 
+  Scenario: Anonymous creates an account with multiple admins and an invalid parameter
+    Given there exists 1 "plan"
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "account": {
+          "subdomain": "google",
+          "name": "Google",
+          "plan": "$plan[0]",
+          "admins": [
+            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
+            { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
+            { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" },
+            "someInvalidParam"
+          ]
+        }
+      }
+      """
+    Then the response status should be "400"
+
   Scenario: Anonymous attempts to create an account without a plan
     Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:

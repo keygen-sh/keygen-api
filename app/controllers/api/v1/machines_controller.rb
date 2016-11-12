@@ -97,21 +97,21 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :machine, type: Hash do
-            param :license, type: String
-            param :fingerprint, type: String
-            param :name, type: String, optional: true
-            param :ip, type: String, optional: true
-            param :hostname, type: String, optional: true
-            param :platform, type: String, optional: true
-            param :meta, type: Hash, optional: true
+          param :machine, type: :hash do
+            param :license, type: :string
+            param :fingerprint, type: :string
+            param :name, type: :string, optional: true
+            param :ip, type: :string, optional: true
+            param :hostname, type: :string, optional: true
+            param :platform, type: :string, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
 
         on :update do
-          param :machine, type: Hash do
-            param :name, type: String, optional: true
-            param :meta, type: Hash, optional: true
+          param :machine, type: :hash do
+            param :name, type: :string, optional: true
+            param :meta, type: :hash, optional: true
           end
         end
       end
