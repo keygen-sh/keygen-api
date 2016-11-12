@@ -101,8 +101,8 @@ class TypedParameters
       configuration.fetch :strict, false
     end
 
-    def method_missing(method)
-      context.send method
+    def method_missing(method, *args, &block)
+      context.send method, *args, &block
     end
 
     private
