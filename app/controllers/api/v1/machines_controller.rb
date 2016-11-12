@@ -110,6 +110,9 @@ module Api::V1
         on :update do
           param :machine, type: :hash do
             param :name, type: :string, optional: true
+            param :ip, type: :string, optional: true
+            param :hostname, type: :string, optional: true
+            param :platform, type: :string, optional: true
             param :meta, type: :hash, optional: true
           end
         end
