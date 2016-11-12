@@ -28,7 +28,7 @@ module Api::V1
 
     # POST /users
     def create
-      @user = current_account.users.new user_params
+      @user = current_account.users.new user_parameters
       authorize @user
 
       if @user.save
@@ -50,7 +50,7 @@ module Api::V1
 
       authorize @user
 
-      if @user.update(user_params)
+      if @user.update(user_parameters)
         CreateWebhookEventService.new(
           event: "user.updated",
           account: current_account,
@@ -86,7 +86,7 @@ module Api::V1
       @user = current_account.users.find_by_hashid params[:id]
     end
 
-    def user_params
+    def user_parameters
       parameters[:user]
     end
 

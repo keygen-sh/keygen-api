@@ -25,7 +25,7 @@ module Api::V1
 
     # POST /products
     def create
-      @product = current_account.products.new product_params
+      @product = current_account.products.new product_parameters
       authorize @product
 
       if @product.save
@@ -47,7 +47,7 @@ module Api::V1
 
       authorize @product
 
-      if @product.update(product_params)
+      if @product.update(product_parameters)
         CreateWebhookEventService.new(
           event: "product.updated",
           account: current_account,
@@ -81,7 +81,7 @@ module Api::V1
       @product = current_account.products.find_by_hashid params[:id]
     end
 
-    def product_params
+    def product_parameters
       parameters[:product]
     end
 

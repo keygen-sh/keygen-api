@@ -27,10 +27,10 @@ module Api::V1
 
     # POST /licenses
     def create
-      policy = current_account.policies.find_by_hashid license_params[:policy]
-      user = current_account.users.find_by_hashid license_params[:user]
+      policy = current_account.policies.find_by_hashid license_parameters[:policy]
+      user = current_account.users.find_by_hashid license_parameters[:user]
 
-      @license = current_account.licenses.new license_params.merge(
+      @license = current_account.licenses.new license_parameters.merge(
         policy: policy,
         user: user
       )
@@ -55,7 +55,7 @@ module Api::V1
 
       authorize @license
 
-      if @license.update(license_params)
+      if @license.update(license_parameters)
         CreateWebhookEventService.new(
           event: "license.updated",
           account: current_account,
@@ -91,7 +91,7 @@ module Api::V1
       @license = current_account.licenses.find_by_hashid params[:id]
     end
 
-    def license_params
+    def license_parameters
       parameters[:license]
     end
 

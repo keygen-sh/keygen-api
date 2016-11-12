@@ -26,9 +26,9 @@ module Api::V1
 
     # POST /policies
     def create
-      product = current_account.products.find_by_hashid policy_params[:product]
+      product = current_account.products.find_by_hashid policy_parameters[:product]
 
-      @policy = current_account.policies.new policy_params.merge(product: product)
+      @policy = current_account.policies.new policy_parameters.merge(product: product)
       authorize @policy
 
       if @policy.save
@@ -50,7 +50,7 @@ module Api::V1
 
       authorize @policy
 
-      if @policy.update(policy_params)
+      if @policy.update(policy_parameters)
         CreateWebhookEventService.new(
           event: "policy.updated",
           account: current_account,
@@ -86,7 +86,7 @@ module Api::V1
       @policy = current_account.policies.find_by_hashid params[:id]
     end
 
-    def policy_params
+    def policy_parameters
       parameters[:policy]
     end
 
