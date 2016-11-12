@@ -43,7 +43,7 @@ module Api::V1::Accounts::Relationships
         options strict: true
 
         on :update do
-          param :token, type: String
+          param :token, type: :string
         end
       end
     end

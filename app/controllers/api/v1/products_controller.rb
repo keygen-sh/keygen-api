@@ -90,21 +90,21 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :product, type: Hash do
-            param :name, type: String
-            param :meta, type: Hash, optional: true
-            param :platforms, type: Array, optional: true do
-              item type: String
+          param :product, type: :hash do
+            param :name, type: :string
+            param :meta, type: :hash, optional: true
+            param :platforms, type: :array, optional: true do
+              item type: :string
             end
           end
         end
 
         on :update do
-          param :product, type: Hash do
-            param :name, type: String, optional: true
-            param :meta, type: Hash, optional: true
-            param :platforms, type: Array, optional: true do
-              item type: String
+          param :product, type: :hash do
+            param :name, type: :string, optional: true
+            param :meta, type: :hash, optional: true
+            param :platforms, type: :array, optional: true do
+              item type: :string
             end
           end
         end

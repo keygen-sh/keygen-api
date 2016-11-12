@@ -74,14 +74,14 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :endpoint, type: Hash do
-            param :url, type: String
+          param :endpoint, type: :hash do
+            param :url, type: :string
           end
         end
 
         on :update do
-          param :endpoint, type: Hash do
-            param :url, type: String, optional: true
+          param :endpoint, type: :hash do
+            param :url, type: :string, optional: true
           end
         end
       end

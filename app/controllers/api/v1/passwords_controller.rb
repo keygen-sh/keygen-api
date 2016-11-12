@@ -22,7 +22,7 @@ module Api::V1
         options strict: true
 
         on :reset_password do
-          param :email, type: String
+          param :email, type: :string
         end
       end
     end
