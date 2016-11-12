@@ -17,6 +17,39 @@ Feature: List policies
     Then the response status should be "200"
     And the JSON response should be an array with 3 "policies"
 
+  Scenario: Admin retrieves a paginated list of policies
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "policies"
+    And I use an authentication token
+    When I send a GET request to "/policies?page[number]=2&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "policies"
+
+  Scenario: Admin retrieves a paginated list of policies with a page size that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "policies"
+    And I use an authentication token
+    When I send a GET request to "/policies?page[number]=1&page[size]=250"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of policies with a page size that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "policies"
+    And I use an authentication token
+    When I send a GET request to "/policies?page[number]=1&page[size]=-10"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of policies with an invalid page number
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "policies"
+    And I use an authentication token
+    When I send a GET request to "/policies?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves all policies without a limit for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
@@ -50,6 +83,14 @@ Feature: List policies
     And the current account has 20 "policies"
     And I use an authentication token
     When I send a GET request to "/policies?limit=900"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves all policies with a limit that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "policies"
+    And I use an authentication token
+    When I send a GET request to "/policies?limit=-10"
     Then the response status should be "400"
 
   Scenario: Product retrieves all policies for their product

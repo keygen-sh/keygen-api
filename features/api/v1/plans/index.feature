@@ -10,6 +10,27 @@ Feature: List plans
     Then the response status should be "200"
     And the JSON response should be an array with 3 "plans"
 
+  Scenario: Anonymous retrieves a paginated list of plans
+    Given there exists 20 "plans"
+    When I send a GET request to "/plans?page[number]=2&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "plans"
+
+  Scenario: Anonymous retrieves a paginated list of plans with a page size that is too high
+    Given there exists 20 "plans"
+    When I send a GET request to "/plans?page[number]=1&page[size]=250"
+    Then the response status should be "400"
+
+  Scenario: Anonymous retrieves a paginated list of plans with a page size that is too low
+    Given there exists 20 "plans"
+    When I send a GET request to "/plans?page[number]=1&page[size]=-10"
+    Then the response status should be "400"
+
+  Scenario: Anonymous retrieves a paginated list of plans with an invalid page number
+    Given there exists 20 "plans"
+    When I send a GET request to "/plans?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
   Scenario: Anonymous retrieves all plans without a limit for their account
     Given there exists 20 "plans"
     When I send a GET request to "/plans"
@@ -31,4 +52,9 @@ Feature: List plans
   Scenario: Anonymous retrieves all plans with a limit that is too high
     Given there exists 2 "plans"
     When I send a GET request to "/plans?limit=900"
+    Then the response status should be "400"
+
+  Scenario: Anonymous retrieves all plans with a limit that is too low
+    Given there exists 2 "plans"
+    When I send a GET request to "/plans?limit=0"
     Then the response status should be "400"

@@ -91,7 +91,7 @@ Feature: License permits
     And I am a user of account "test1"
     And the current user has 2 "licenses"
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/revoke"
+    When I send a POST request to "/licenses/$1/actions/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job

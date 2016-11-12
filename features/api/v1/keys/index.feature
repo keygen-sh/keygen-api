@@ -17,6 +17,39 @@ Feature: List keys
     Then the response status should be "200"
     And the JSON response should be an array with 3 "keys"
 
+  Scenario: Admin retrieves a paginated list of keys
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "keys"
+    And I use an authentication token
+    When I send a GET request to "/keys?page[number]=2&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "keys"
+
+  Scenario: Admin retrieves a paginated list of keys with a page size that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "keys"
+    And I use an authentication token
+    When I send a GET request to "/keys?page[number]=1&page[size]=250"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of keys with a page size that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "keys"
+    And I use an authentication token
+    When I send a GET request to "/keys?page[number]=1&page[size]=-250"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of keys with an invalid page number
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "keys"
+    And I use an authentication token
+    When I send a GET request to "/keys?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves all keys without a limit for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
@@ -50,6 +83,14 @@ Feature: List keys
     And the current account has 2 "keys"
     And I use an authentication token
     When I send a GET request to "/keys?limit=900"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves all keys with a limit that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "keys"
+    And I use an authentication token
+    When I send a GET request to "/keys?limit=-900"
     Then the response status should be "400"
 
   Scenario: Product retrieves all keys for their product

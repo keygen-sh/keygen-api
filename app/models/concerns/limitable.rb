@@ -8,9 +8,12 @@ module Limitable
     # Since we can't redefine limit (stupid), we're defining a lim scope to add
     # additional validation on the allowed range for limit
     scope :lim, -> (num) {
+      num = num.to_i
+
       if num < LIMIT_LOWER || num > LIMIT_UPPER
         raise InvalidLimitError, "limit must be a number between 1 and 100 (got #{num})"
       end
+
       limit num
     }
   end

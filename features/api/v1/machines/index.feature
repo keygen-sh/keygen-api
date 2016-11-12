@@ -17,6 +17,39 @@ Feature: List machines
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
+  Scenario: Admin retrieves a paginated list of machines
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?page[number]=2&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "machines"
+
+  Scenario: Admin retrieves a paginated list of machines with a page size that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?page[number]=1&page[size]=250"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of machines with a page size that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?page[number]=1&page[size]=0"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of machines with an invalid page number
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves all machines without a limit for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
@@ -52,6 +85,14 @@ Feature: List machines
     When I send a GET request to "/machines?limit=900"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves all machines with a limit that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "machines"
+    And I use an authentication token
+    When I send a GET request to "/machines?limit=0"
+    Then the response status should be "400"
+
   Scenario: Product retrieves all machines for their product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"
@@ -74,7 +115,7 @@ Feature: List machines
   Scenario: User attempts to retrieve all machines for their account
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
-    And the current account has 2 "licenses"
+    And the current account has 1 "license"
     And the first "license" has the following attributes:
       """
       { "userId": $users[1].id }
@@ -93,7 +134,7 @@ Feature: List machines
   Scenario: User attempts to retrieve machines for their account scoped by fingerprint
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
-    And the current account has 2 "licenses"
+    And the current account has 1 "license"
     And the first "license" has the following attributes:
       """
       { "userId": $users[1].id }

@@ -17,6 +17,39 @@ Feature: List webhook events
     Then the response status should be "200"
     And the JSON response should be an array with 3 "webhookEvents"
 
+  Scenario: Admin retrieves a paginated list of webhook events
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/webhook-events?page[number]=2&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "webhookEvents"
+
+  Scenario: Admin retrieves a paginated list of webhook events with a page size that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/webhook-events?page[number]=1&page[size]=250"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of webhook events with a page size that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/webhook-events?page[number]=1&page[size]=-10"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of webhook events with an invalid page number
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/webhook-events?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves all webhook events without a limit for their account
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
@@ -50,6 +83,14 @@ Feature: List webhook events
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?limit=900"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves all webhook events with a limit that is too low
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/webhook-events?limit=-10"
     Then the response status should be "400"
 
   Scenario: Admin attempts to retrieve all webhook events for another account
