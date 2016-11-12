@@ -1,7 +1,5 @@
 module Api::V1
   class PlansController < Api::V1::BaseController
-    has_scope :page, type: :hash
-
     before_action :set_plan, only: [:show]
 
     # GET /plans

@@ -17,6 +17,41 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 3 "licenses"
 
+  Scenario: Admin retrieves all licenses without a limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "licenses"
+
+  Scenario: Admin retrieves all licenses with a low limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 10 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/licenses?limit=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "licenses"
+
+  Scenario: Admin retrieves all licenses with a high limit for their account
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 20 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/licenses?limit=20"
+    Then the response status should be "200"
+    And the JSON response should be an array with 20 "licenses"
+
+  Scenario: Admin retrieves all licenses with a limit that is too high
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 2 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/licenses?limit=900"
+    Then the response status should be "400"
+
   Scenario: Product retrieves all licenses for their product
     Given I am on the subdomain "test1"
     And the current account has 1 "product"

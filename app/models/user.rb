@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   include PasswordResetable
   include Paginatable
+  include Limitable
   include Roleable
 
   has_secure_password

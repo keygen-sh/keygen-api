@@ -7,14 +7,14 @@ FactoryGirl.define do
     account
 
     after :create do |user|
+      user.role = create :role, :user, resource: user
       create_list :license, 1, user: user
-      create :role, :user, resource: user
       create :token, bearer: user
     end
 
     factory :admin do
       after :create do |admin|
-        create :role, :admin, resource: admin
+        admin.role = create :role, :admin, resource: admin
         create :token, bearer: admin
       end
     end

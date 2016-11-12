@@ -1,5 +1,6 @@
 class WebhookEvent < ApplicationRecord
   include Paginatable
+  include Limitable
 
   belongs_to :account
 
