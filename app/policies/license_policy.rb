@@ -9,7 +9,7 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def create?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
 
   def update?
@@ -17,15 +17,15 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def destroy?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
 
   def revoke?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
 
   def renew?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
 
   def validate_by_id?

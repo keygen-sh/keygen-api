@@ -26,6 +26,10 @@ class Policy < ApplicationRecord
     encrypted
   end
 
+  def protected?
+    protected
+  end
+
   def pop!
     return nil if pool.empty?
     key = pool.first.destroy
@@ -56,6 +60,7 @@ end
 #  max_machines :integer
 #  meta         :string
 #  encrypted    :boolean          default(FALSE)
+#  protected    :boolean          default(FALSE)
 #
 # Indexes
 #
