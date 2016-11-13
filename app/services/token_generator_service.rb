@@ -9,7 +9,7 @@ class TokenGeneratorService < BaseService
     return nil if account.nil? || bearer.nil?
 
     token = bearer.tokens.create account: account
-    token&.generate!
+    token.generate!
 
     TokenCleanupWorker.perform_at(
       Token::TOKEN_DURATION,
