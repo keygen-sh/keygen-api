@@ -195,3 +195,68 @@ Feature: Create license
     Then the response status should be "401"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Admin creates a license using a protected policy
+    Given I am an admin of account "test1"
+    And I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/licenses" with the following:
+      """
+      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Product creates a license using a protected policy
+    Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": true
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/licenses" with the following:
+      """
+      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: User creates a license using a protected policy
+    Given I am on the subdomain "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": true
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/licenses" with the following:
+      """
+      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      """
+    Then the response status should be "403"
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs

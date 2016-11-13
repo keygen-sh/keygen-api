@@ -41,6 +41,7 @@ end
 #  max_machines :integer
 #  meta         :string
 #  encrypted    :boolean          default(FALSE)
+#  protected    :boolean          default(FALSE)
 #
 # Indexes
 #

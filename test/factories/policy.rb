@@ -9,6 +9,7 @@ FactoryGirl.define do
     floating false
     use_pool false
     encrypted false
+    protected false
     pool []
     account
     product
