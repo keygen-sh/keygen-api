@@ -7,6 +7,7 @@ module Api::V1
     before_action :authenticate_with_token!, only: [:revoke]
     before_action :set_token, only: [:revoke]
 
+    # GET /tokens
     def generate
       skip_authorization
 
@@ -26,6 +27,7 @@ module Api::V1
       render_unauthorized detail: "credentials must be valid"
     end
 
+    # POST /tokens
     def regenerate
       skip_authorization
 
@@ -51,6 +53,7 @@ module Api::V1
         pointer: "/data/relationships/token" }
     end
 
+    # DELETE /tokens
     def revoke
       render_not_found and return unless @token
 
