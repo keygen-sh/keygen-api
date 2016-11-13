@@ -11,6 +11,7 @@ class PolicySerializer < BaseSerializer
     :floating,
     :max_machines,
     :use_pool,
+    :protected,
     :meta,
     :created,
     :updated
