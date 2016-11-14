@@ -57,9 +57,9 @@ class TypedParameters
       # Grab our segment of the params (getting rid of cruft added by Rails middleware)
       params_slice = context.params.slice *params.keys
       # Get deep array keys and calc the difference when compared to our parsed keys
-      unpermiited = Helper.deep_keys(params_slice) - schema.keys
+      unpermitted = Helper.deep_keys(params_slice) - schema.keys
 
-      raise InvalidParameterError, "Unpermitted parameters: #{unpermiited.join ", "}" if unpermiited.any?
+      raise InvalidParameterError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
     end
 
     params
