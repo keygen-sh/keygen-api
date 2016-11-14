@@ -20,7 +20,12 @@ class Rack::Attack
     [
       429,
       {'Content-Type' => 'application/json', 'Retry-After' => retry_after.to_s},
-      [{error: "Throttle limit reached. Retry later."}.to_json]
+      [{
+        'errors': [{
+          'title': 'Throttle limit reached',
+          'detail': 'Throttle limit for this resource has been reached'
+        }]
+      }.to_json]
     ]
   }
 end
