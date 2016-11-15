@@ -6,6 +6,7 @@ class StripeHelper
   end
 
   class << self
+
     def start
       StripeMock.start
       instance.helper = StripeMock.create_test_helper
