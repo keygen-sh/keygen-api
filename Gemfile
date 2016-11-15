@@ -34,6 +34,9 @@ gem 'httparty'
 # State machine
 gem 'aasm'
 
+# Haml for templating
+gem 'haml-rails'
+
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'

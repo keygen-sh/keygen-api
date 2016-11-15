@@ -118,3 +118,8 @@ account.machines.create(
   fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
   license: enc_license
 )
+
+User.all.each do |user|
+  token = user.tokens.create account: user.account
+  token.generate!
+end
