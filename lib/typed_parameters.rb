@@ -75,7 +75,7 @@ class TypedParameters
     end
 
     def self.compare_types(a, b)
-      case class_name(b).to_sym
+      case class_type(b).to_sym
       when :boolean
         a <= TrueClass || a <= FalseClass
       else
@@ -83,7 +83,7 @@ class TypedParameters
       end
     end
 
-    def self.class_name(c)
+    def self.class_type(c)
       c.name.demodulize.underscore rescue nil
     end
   end
@@ -136,7 +136,7 @@ class TypedParameters
       when value.nil? && !optional
         raise InvalidParameterError, "Parameter missing: #{key}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for #{key} (got #{Helper.class_name(value.class)} expected #{type})"
+        raise InvalidParameterError, "Type mismatch for #{key} (got #{Helper.class_type(value.class)} expected #{type})"
       when value.nil? && !allow_nil
         return
       end
@@ -150,7 +150,7 @@ class TypedParameters
           ctx.params = value
           params.merge! name => Schema.new(context: ctx, keys: keys, &block).params
         else
-          if !value.values.all? { |v| SCALAR_TYPES[Helper.class_name(v.class).to_sym] }
+          if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
             raise InvalidParameterError, "Unpermitted type found for #{key} (expected hash of scalar types)"
           end
           value.keys.each { |k| keys << k.to_sym }
@@ -161,10 +161,10 @@ class TypedParameters
           arr_type = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{Helper.class_name(arr_type).pluralize})"
+            raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
         else
-          if !value.all? { |v| SCALAR_TYPES[Helper.class_name(v.class).to_sym] }
+          if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
             raise InvalidParameterError, "Unpermitted type found for #{key} (expected array of scalar types)"
           end
         end
