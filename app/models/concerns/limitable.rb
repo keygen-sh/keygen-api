@@ -11,7 +11,7 @@ module Limitable
       num = num.to_i
 
       if num < LIMIT_LOWER || num > LIMIT_UPPER
-        raise InvalidLimitError, "limit must be a number between 1 and 100 (got #{num})"
+        raise InvalidLimitError, "limit must be a number between #{LIMIT_LOWER} and #{LIMIT_UPPER} (got #{num})"
       end
 
       limit num
