@@ -11,10 +11,10 @@ module Paginatable
       size = size.to_i
 
       if number < PAGE_LOWER
-        raise InvalidPageError, "page number must be a number greater than 0 (got #{number})"
+        raise InvalidPageError, "page number must be a number greater than #{PAGE_LOWER - 1} (got #{number})"
       end
       if size < SIZE_LOWER || size > SIZE_UPPER
-        raise InvalidPageError, "page size must be a number between 1 and 100 (got #{size})"
+        raise InvalidPageError, "page size must be a number between #{SIZE_LOWER} and #{SIZE_UPPER} (got #{size})"
       end
 
       paginate(number).per size
