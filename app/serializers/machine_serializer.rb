@@ -33,10 +33,12 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  meta        :string
+#  deleted_at  :datetime
 #
 # Indexes
 #
 #  index_machines_on_account_id   (account_id)
+#  index_machines_on_deleted_at   (deleted_at)
 #  index_machines_on_fingerprint  (fingerprint)
 #  index_machines_on_license_id   (license_id)
 #

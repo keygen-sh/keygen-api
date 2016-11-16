@@ -35,9 +35,11 @@ end
 #  card_brand                :string
 #  card_last4                :string
 #  state                     :string
+#  deleted_at                :datetime
 #
 # Indexes
 #
 #  index_billings_on_customer_id      (customer_id)
+#  index_billings_on_deleted_at       (deleted_at)
 #  index_billings_on_subscription_id  (subscription_id)
 #

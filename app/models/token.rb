@@ -3,6 +3,8 @@ class Token < ApplicationRecord
 
   include Tokenable
 
+  acts_as_paranoid
+
   belongs_to :account
   belongs_to :bearer, polymorphic: true
 
@@ -41,9 +43,11 @@ end
 #  updated_at  :datetime         not null
 #  account_id  :integer
 #  expiry      :datetime
+#  deleted_at  :datetime
 #
 # Indexes
 #
 #  index_tokens_on_account_id                 (account_id)
 #  index_tokens_on_bearer_id_and_bearer_type  (bearer_id,bearer_type)
+#  index_tokens_on_deleted_at                 (deleted_at)
 #

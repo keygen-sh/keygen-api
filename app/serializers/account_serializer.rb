@@ -31,8 +31,10 @@ end
 #  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
+#  deleted_at         :datetime
 #
 # Indexes
 #
-#  index_accounts_on_subdomain  (subdomain)
+#  index_accounts_on_deleted_at  (deleted_at)
+#  index_accounts_on_subdomain   (subdomain)
 #

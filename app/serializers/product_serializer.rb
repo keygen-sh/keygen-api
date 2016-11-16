@@ -29,8 +29,10 @@ end
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  meta       :string
+#  deleted_at :datetime
 #
 # Indexes
 #
 #  index_products_on_account_id  (account_id)
+#  index_products_on_deleted_at  (deleted_at)
 #

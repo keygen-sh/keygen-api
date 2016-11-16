@@ -3,6 +3,8 @@ class Product < ApplicationRecord
   include Limitable
   include Roleable
 
+  acts_as_paranoid
+
   belongs_to :account
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
@@ -38,8 +40,10 @@ end
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  meta       :string
+#  deleted_at :datetime
 #
 # Indexes
 #
 #  index_products_on_account_id  (account_id)
+#  index_products_on_deleted_at  (deleted_at)
 #

@@ -4,6 +4,8 @@ class Account < ApplicationRecord
   include Limitable
   include Billable
 
+  acts_as_paranoid
+
   belongs_to :plan
   has_many :webhook_endpoints, dependent: :destroy
   has_many :webhook_events, dependent: :destroy
@@ -64,8 +66,10 @@ end
 #  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
+#  deleted_at         :datetime
 #
 # Indexes
 #
-#  index_accounts_on_subdomain  (subdomain)
+#  index_accounts_on_deleted_at  (deleted_at)
+#  index_accounts_on_subdomain   (subdomain)
 #

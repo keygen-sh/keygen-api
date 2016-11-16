@@ -43,9 +43,11 @@ end
 #  meta         :string
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
+#  deleted_at   :datetime
 #
 # Indexes
 #
 #  index_policies_on_account_id  (account_id)
+#  index_policies_on_deleted_at  (deleted_at)
 #  index_policies_on_product_id  (product_id)
 #

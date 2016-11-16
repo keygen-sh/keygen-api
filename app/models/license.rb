@@ -3,6 +3,8 @@ class License < ApplicationRecord
   include Limitable
   include Tokenable
 
+  acts_as_paranoid
+
   belongs_to :account
   belongs_to :user
   belongs_to :policy
@@ -83,10 +85,12 @@ end
 #  policy_id  :integer
 #  account_id :integer
 #  meta       :string
+#  deleted_at :datetime
 #
 # Indexes
 #
 #  index_licenses_on_account_id  (account_id)
+#  index_licenses_on_deleted_at  (deleted_at)
 #  index_licenses_on_key         (key)
 #  index_licenses_on_policy_id   (policy_id)
 #  index_licenses_on_user_id     (user_id)
