@@ -31,10 +31,12 @@ end
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
 #  meta                   :string
+#  deleted_at             :datetime
 #
 # Indexes
 #
 #  index_users_on_account_id            (account_id)
+#  index_users_on_deleted_at            (deleted_at)
 #  index_users_on_email                 (email)
 #  index_users_on_password_reset_token  (password_reset_token)
 #

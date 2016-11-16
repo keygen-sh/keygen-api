@@ -2,6 +2,8 @@ class Key < ApplicationRecord
   include Paginatable
   include Limitable
 
+  acts_as_paranoid
+
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
@@ -25,9 +27,11 @@ end
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  account_id :integer
+#  deleted_at :datetime
 #
 # Indexes
 #
 #  index_keys_on_account_id  (account_id)
+#  index_keys_on_deleted_at  (deleted_at)
 #  index_keys_on_policy_id   (policy_id)
 #

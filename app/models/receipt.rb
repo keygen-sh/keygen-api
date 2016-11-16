@@ -1,4 +1,6 @@
 class Receipt < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :billing
 
   scope :unpaid, -> { where paid: false }
@@ -16,4 +18,9 @@ end
 #  paid       :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  deleted_at :datetime
+#
+# Indexes
+#
+#  index_receipts_on_deleted_at  (deleted_at)
 #

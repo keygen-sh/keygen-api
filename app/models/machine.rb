@@ -2,6 +2,8 @@ class Machine < ApplicationRecord
   include Paginatable
   include Limitable
 
+  acts_as_paranoid
+
   belongs_to :account
   belongs_to :license
   has_one :product, through: :license
@@ -36,10 +38,12 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  meta        :string
+#  deleted_at  :datetime
 #
 # Indexes
 #
 #  index_machines_on_account_id   (account_id)
+#  index_machines_on_deleted_at   (deleted_at)
 #  index_machines_on_fingerprint  (fingerprint)
 #  index_machines_on_license_id   (license_id)
 #

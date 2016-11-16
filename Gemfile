@@ -37,6 +37,9 @@ gem 'aasm'
 # Haml for templating
 gem 'haml-rails'
 
+# Soft-deletion of database records
+gem 'paranoia', '~> 2.2'
+
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'

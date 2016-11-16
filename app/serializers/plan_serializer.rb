@@ -28,8 +28,10 @@ end
 #  updated_at   :datetime         not null
 #  max_products :integer
 #  plan_id      :string
+#  deleted_at   :datetime
 #
 # Indexes
 #
-#  index_plans_on_plan_id  (plan_id)
+#  index_plans_on_deleted_at  (deleted_at)
+#  index_plans_on_plan_id     (plan_id)
 #
