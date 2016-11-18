@@ -35,8 +35,8 @@ end
 #  updated_at :datetime         not null
 #  policy_id  :integer
 #  account_id :integer
-#  meta       :string
 #  deleted_at :datetime
+#  meta       :json
 #
 # Indexes
 #

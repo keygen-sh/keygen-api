@@ -40,10 +40,10 @@ end
 #  product_id   :integer
 #  account_id   :integer
 #  max_machines :integer
-#  meta         :string
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
 #  deleted_at   :datetime
+#  meta         :json
 #
 # Indexes
 #

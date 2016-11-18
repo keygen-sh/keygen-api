@@ -16,8 +16,6 @@ class License < ApplicationRecord
   before_create :set_expiry, unless: -> { policy.nil? }
   after_create :set_key, unless: -> { policy.nil? }
 
-  serialize :meta, Hash
-
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
@@ -84,8 +82,8 @@ end
 #  updated_at :datetime         not null
 #  policy_id  :integer
 #  account_id :integer
-#  meta       :string
 #  deleted_at :datetime
+#  meta       :json
 #
 # Indexes
 #
