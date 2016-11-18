@@ -5,12 +5,11 @@ class RetryWebhookEventService < BaseService
   end
 
   def execute
-    payload  = JSON.parse event.payload
     endpoint = event.endpoint
+    payload  = event.payload
     account  = event.account
 
     jid = WebhookWorker.perform_async(
-      account.id,
       endpoint,
       payload
     )

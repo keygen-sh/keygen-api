@@ -8,8 +8,7 @@ class WebhookWorker
 
   sidekiq_options queue: :webhooks
 
-  def perform(account_id, endpoint, payload)
-    event = WebhookEvent.find_by jid: jid
+  def perform(endpoint, payload)
     request = Request.post(endpoint, {
       headers: { "Content-Type" => "application/json" },
       body: payload
