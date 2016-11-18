@@ -13,7 +13,6 @@ class CreateWebhookEventService < BaseService
       ).to_json
 
       jid = WebhookWorker.perform_async(
-        account.id,
         endpoint.url,
         payload
       )
