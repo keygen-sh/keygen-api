@@ -16,7 +16,7 @@ end
 #
 #  id         :integer          not null, primary key
 #  account_id :integer
-#  payload    :string
+#  payload    :text
 #  jid        :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

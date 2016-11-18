@@ -30,8 +30,8 @@ end
 #  updated_at             :datetime         not null
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
-#  meta                   :string
 #  deleted_at             :datetime
+#  meta                   :json
 #
 # Indexes
 #

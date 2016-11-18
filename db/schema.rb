@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161116173514) do
+ActiveRecord::Schema.define(version: 20161118203800) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,8 +67,8 @@ ActiveRecord::Schema.define(version: 20161116173514) do
     t.datetime "updated_at", null: false
     t.integer  "policy_id"
     t.integer  "account_id"
-    t.string   "meta"
     t.datetime "deleted_at"
+    t.json     "meta"
     t.index ["account_id"], name: "index_licenses_on_account_id", using: :btree
     t.index ["deleted_at"], name: "index_licenses_on_deleted_at", using: :btree
     t.index ["key"], name: "index_licenses_on_key", using: :btree
@@ -86,8 +86,8 @@ ActiveRecord::Schema.define(version: 20161116173514) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.string   "name"
-    t.string   "meta"
     t.datetime "deleted_at"
+    t.json     "meta"
     t.index ["account_id"], name: "index_machines_on_account_id", using: :btree
     t.index ["deleted_at"], name: "index_machines_on_deleted_at", using: :btree
     t.index ["fingerprint"], name: "index_machines_on_fingerprint", using: :btree
@@ -123,10 +123,10 @@ ActiveRecord::Schema.define(version: 20161116173514) do
     t.integer  "product_id"
     t.integer  "account_id"
     t.integer  "max_machines"
-    t.string   "meta"
     t.boolean  "encrypted",    default: false
     t.boolean  "protected",    default: false
     t.datetime "deleted_at"
+    t.json     "meta"
     t.index ["account_id"], name: "index_policies_on_account_id", using: :btree
     t.index ["deleted_at"], name: "index_policies_on_deleted_at", using: :btree
     t.index ["product_id"], name: "index_policies_on_product_id", using: :btree
@@ -134,12 +134,12 @@ ActiveRecord::Schema.define(version: 20161116173514) do
 
   create_table "products", force: :cascade do |t|
     t.string   "name"
-    t.string   "platforms"
     t.integer  "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string   "meta"
     t.datetime "deleted_at"
+    t.json     "platforms"
+    t.json     "meta"
     t.index ["account_id"], name: "index_products_on_account_id", using: :btree
     t.index ["deleted_at"], name: "index_products_on_deleted_at", using: :btree
   end
@@ -190,8 +190,8 @@ ActiveRecord::Schema.define(version: 20161116173514) do
     t.datetime "updated_at",             null: false
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
-    t.string   "meta"
     t.datetime "deleted_at"
+    t.json     "meta"
     t.index ["account_id"], name: "index_users_on_account_id", using: :btree
     t.index ["deleted_at"], name: "index_users_on_deleted_at", using: :btree
     t.index ["email"], name: "index_users_on_email", using: :btree
@@ -210,7 +210,7 @@ ActiveRecord::Schema.define(version: 20161116173514) do
 
   create_table "webhook_events", force: :cascade do |t|
     t.integer  "account_id"
-    t.string   "payload"
+    t.text     "payload"
     t.string   "jid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

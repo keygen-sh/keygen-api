@@ -14,9 +14,6 @@ class Product < ApplicationRecord
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
 
-  serialize :platforms, Array
-  serialize :meta, Hash
-
   after_create :set_role
 
   validates :account, presence: { message: "must exist" }
@@ -35,12 +32,12 @@ end
 #
 #  id         :integer          not null, primary key
 #  name       :string
-#  platforms  :string
 #  account_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  meta       :string
 #  deleted_at :datetime
+#  platforms  :json
+#  meta       :json
 #
 # Indexes
 #
