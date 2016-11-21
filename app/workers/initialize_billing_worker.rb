@@ -11,7 +11,7 @@ class InitializeBillingWorker
         account: account
       ).execute
 
-      account.billing = Billing.create!(
+      account.billing = Billing.create(
         customer_id: customer.id
       )
     end
