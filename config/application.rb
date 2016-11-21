@@ -33,14 +33,6 @@ module Keygen
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
 
-    # Allow CORS
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins '*'
-        resource '*', headers: :any, methods: :any
-      end
-    end
-
     # Add services/validators to autoload path
     config.autoload_paths += %W[
       #{config.root}/app/validators
