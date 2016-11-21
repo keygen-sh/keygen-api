@@ -123,7 +123,8 @@ Then /^the account should have a subscription$/ do
 end
 
 Then /^the account should not have a subscription$/ do
-  expect(@billing.reload.subscription_id).to_not eq @subscription.id
+  expect(@billing.reload.subscription_status).to_not eq @subscription.status
+  expect(@billing.reload.subscription_id).to eq @subscription.id
 end
 
 Then /^the account should be in a "([^\"]*)" state$/ do |state|

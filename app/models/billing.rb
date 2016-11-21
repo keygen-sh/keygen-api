@@ -67,8 +67,8 @@ class Billing < ApplicationRecord
 
     event :renew_subscription do
       transitions from: :canceled, to: :subscribed, after: -> {
-        Billings::CreateSubscriptionService.new(
-          customer: customer_id,
+        Billings::UpdateSubscriptionService.new(
+          subscription: subscription_id,
           plan: plan.plan_id
         ).execute
       }
