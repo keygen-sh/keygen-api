@@ -17,12 +17,12 @@ module Api::V1
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing
 
-        billing.update({
+        billing.update(
           subscription_period_start: Time.at(subscription.current_period_start),
           subscription_period_end: Time.at(subscription.current_period_end),
           subscription_id: subscription.id,
           subscription_status: subscription.status
-        })
+        )
 
         case subscription.status
         when "active"
@@ -39,20 +39,19 @@ module Api::V1
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing&.subscription_id == subscription.id
 
-        billing.update({
-          subscription_id: nil,
+        billing.update(
           subscription_status: subscription.status
-        })
+        )
       when "customer.source.created", "customer.source.updated"
         card = event.data.object
         billing = Billing.find_by customer_id: card.customer
         return unless billing
 
-        billing.update({
+        billing.update(
           card_expiry: DateTime.new(card.exp_year.to_i, card.exp_month.to_i),
           card_brand: card.brand,
           card_last4: card.last4
-        })
+        )
       when "customer.subscription.trial_will_end"
         subscription = event.data.object
         billing = Billing.find_by customer_id: subscription.customer
