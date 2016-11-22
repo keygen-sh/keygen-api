@@ -113,7 +113,10 @@ module Api::V1
             param :ip, type: :string, optional: true
             param :hostname, type: :string, optional: true
             param :platform, type: :string, optional: true
-            param :metadata, type: :hash, optional: true
+
+            if current_bearer&.role? :admin or current_bearer&.role? :product
+              param :metadata, type: :hash, optional: true
+            end
           end
         end
       end
