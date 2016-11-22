@@ -12,7 +12,7 @@ module Api::V1::Accounts::Relationships
       render json: @billing
     end
 
-    # PATCH/PUT /accounts/1/relationships/billing
+    # PATCH /accounts/1/relationships/billing
     def update
       render_not_found and return unless @billing
 

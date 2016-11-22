@@ -11,8 +11,8 @@ Rails.application.routes.draw do
           scope module: "accounts" do
             namespace "relationships" do
               get "billing", to: "billing#show"
-              post "billing", to: "billing#update"
-              post "plan", to: "plan#update"
+              patch "billing", to: "billing#update"
+              put "plan", to: "plan#update"
             end
             namespace "actions" do
               post "pause", to: "subscription#pause"
@@ -25,8 +25,10 @@ Rails.application.routes.draw do
       end
 
       constraints lambda { |r| r.subdomain.present? } do
-        get    "tokens",     to: "tokens#generate"
-        post   "tokens",     to: "tokens#regenerate"
+        post   "tokens",     to: "tokens#generate"
+        put    "tokens",     to: "tokens#regenerate"
+        get    "tokens",     to: "tokens#index"
+        get    "tokens/:id", to: "tokens#show"
         delete "tokens/:id", to: "tokens#revoke"
 
         post "passwords", to: "passwords#reset_password"
@@ -49,7 +51,7 @@ Rails.application.routes.draw do
           scope module: "licenses" do
             namespace "actions" do
               get "validate", to: "validations#validate_by_id"
-              post "revoke", to: "permits#revoke"
+              delete "revoke", to: "permits#revoke"
               post "renew", to: "permits#renew"
             end
           end
@@ -72,7 +74,7 @@ Rails.application.routes.draw do
         resources "products" do
           scope module: "products" do
             namespace "relationships" do
-              get "tokens", to: "tokens#generate"
+              post "tokens", to: "tokens#generate"
             end
           end
         end
@@ -102,8 +104,8 @@ end
 #                         v1_plans GET    /v1/plans(.:format)                                          api/v1/plans#index {:format=>"json"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                      api/v1/plans#show {:format=>"json"}
 # v1_account_relationships_billing GET    /v1/accounts/:account_id/relationships/billing(.:format)     api/v1/accounts/relationships/billing#show {:format=>"json"}
-#                                  POST   /v1/accounts/:account_id/relationships/billing(.:format)     api/v1/accounts/relationships/billing#update {:format=>"json"}
-#    v1_account_relationships_plan POST   /v1/accounts/:account_id/relationships/plan(.:format)        api/v1/accounts/relationships/plan#update {:format=>"json"}
+#                                  PATCH  /v1/accounts/:account_id/relationships/billing(.:format)     api/v1/accounts/relationships/billing#update {:format=>"json"}
+#    v1_account_relationships_plan PUT    /v1/accounts/:account_id/relationships/plan(.:format)        api/v1/accounts/relationships/plan#update {:format=>"json"}
 #         v1_account_actions_pause POST   /v1/accounts/:account_id/actions/pause(.:format)             api/v1/accounts/actions/subscription#pause {:format=>"json"}
 #        v1_account_actions_resume POST   /v1/accounts/:account_id/actions/resume(.:format)            api/v1/accounts/actions/subscription#resume {:format=>"json"}
 #        v1_account_actions_cancel POST   /v1/accounts/:account_id/actions/cancel(.:format)            api/v1/accounts/actions/subscription#cancel {:format=>"json"}
@@ -114,9 +116,11 @@ end
 #                                  PATCH  /v1/accounts/:id(.:format)                                   api/v1/accounts#update {:format=>"json"}
 #                                  PUT    /v1/accounts/:id(.:format)                                   api/v1/accounts#update {:format=>"json"}
 #                                  DELETE /v1/accounts/:id(.:format)                                   api/v1/accounts#destroy {:format=>"json"}
-#                        v1_tokens GET    /v1/tokens(.:format)                                         api/v1/tokens#generate {:format=>"json"}
-#                                  POST   /v1/tokens(.:format)                                         api/v1/tokens#regenerate {:format=>"json"}
-#                               v1 DELETE /v1/tokens/:id(.:format)                                     api/v1/tokens#revoke {:format=>"json"}
+#                        v1_tokens POST   /v1/tokens(.:format)                                         api/v1/tokens#generate {:format=>"json"}
+#                                  PUT    /v1/tokens(.:format)                                         api/v1/tokens#regenerate {:format=>"json"}
+#                                  GET    /v1/tokens(.:format)                                         api/v1/tokens#index {:format=>"json"}
+#                               v1 GET    /v1/tokens/:id(.:format)                                     api/v1/tokens#show {:format=>"json"}
+#                                  DELETE /v1/tokens/:id(.:format)                                     api/v1/tokens#revoke {:format=>"json"}
 #                     v1_passwords POST   /v1/passwords(.:format)                                      api/v1/passwords#reset_password {:format=>"json"}
 #                       v1_profile GET    /v1/profile(.:format)                                        api/v1/profiles#show {:format=>"json"}
 #                          v1_keys GET    /v1/keys(.:format)                                           api/v1/keys#index {:format=>"json"}
@@ -146,7 +150,7 @@ end
 #                                  PUT    /v1/users/:id(.:format)                                      api/v1/users#update {:format=>"json"}
 #                                  DELETE /v1/users/:id(.:format)                                      api/v1/users#destroy {:format=>"json"}
 #      v1_license_actions_validate GET    /v1/licenses/:license_id/actions/validate(.:format)          api/v1/licenses/actions/validations#validate_by_id {:format=>"json"}
-#        v1_license_actions_revoke POST   /v1/licenses/:license_id/actions/revoke(.:format)            api/v1/licenses/actions/permits#revoke {:format=>"json"}
+#        v1_license_actions_revoke DELETE /v1/licenses/:license_id/actions/revoke(.:format)            api/v1/licenses/actions/permits#revoke {:format=>"json"}
 #         v1_license_actions_renew POST   /v1/licenses/:license_id/actions/renew(.:format)             api/v1/licenses/actions/permits#renew {:format=>"json"}
 #                      v1_licenses GET    /v1/licenses(.:format)                                       api/v1/licenses#index {:format=>"json"}
 #                                  POST   /v1/licenses(.:format)                                       api/v1/licenses#create {:format=>"json"}
@@ -162,7 +166,7 @@ end
 #                                  PATCH  /v1/policies/:id(.:format)                                   api/v1/policies#update {:format=>"json"}
 #                                  PUT    /v1/policies/:id(.:format)                                   api/v1/policies#update {:format=>"json"}
 #                                  DELETE /v1/policies/:id(.:format)                                   api/v1/policies#destroy {:format=>"json"}
-#  v1_product_relationships_tokens GET    /v1/products/:product_id/relationships/tokens(.:format)      api/v1/products/relationships/tokens#generate {:format=>"json"}
+#  v1_product_relationships_tokens POST   /v1/products/:product_id/relationships/tokens(.:format)      api/v1/products/relationships/tokens#generate {:format=>"json"}
 #                      v1_products GET    /v1/products(.:format)                                       api/v1/products#index {:format=>"json"}
 #                                  POST   /v1/products(.:format)                                       api/v1/products#create {:format=>"json"}
 #                       v1_product GET    /v1/products/:id(.:format)                                   api/v1/products#show {:format=>"json"}

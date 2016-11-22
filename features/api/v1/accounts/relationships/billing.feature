@@ -36,7 +36,7 @@ Feature: Account billing info
     And I am an admin of account "test1"
     And I use an authentication token
     And I have a valid payment token
-    When I send a POST request to "/accounts/$0/relationships/billing" with the following:
+    When I send a PATCH request to "/accounts/$0/relationships/billing" with the following:
       """
       { "token": "some_token" }
       """
@@ -48,7 +48,7 @@ Feature: Account billing info
     And I am a product of account "test1"
     And I use an authentication token
     And I have a valid payment token
-    When I send a POST request to "/accounts/$0/relationships/billing" with the following:
+    When I send a PATCH request to "/accounts/$0/relationships/billing" with the following:
       """
       { "token": "some_token" }
       """
@@ -59,7 +59,7 @@ Feature: Account billing info
     And I am an admin of account "test2"
     And I use an authentication token
     And I have a valid payment token
-    When I send a POST request to "/accounts/$0/relationships/billing" with the following:
+    When I send a PATCH request to "/accounts/$0/relationships/billing" with the following:
       """
       { "token": "some_token" }
       """

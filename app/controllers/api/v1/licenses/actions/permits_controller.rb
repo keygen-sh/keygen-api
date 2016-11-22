@@ -30,7 +30,7 @@ module Api::V1::Licenses::Actions
       end
     end
 
-    # POST /licenses/1/actions/revoke
+    # DELETE /licenses/1/actions/revoke
     def revoke
       render_not_found and return unless @license
 

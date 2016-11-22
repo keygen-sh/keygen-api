@@ -1,8 +1,8 @@
 class TokenSerializer < BaseSerializer
   type :tokens
 
+  attribute :token, unless: -> { token.nil? }
   attributes [
-    :token,
     :expiry,
     :created,
     :updated

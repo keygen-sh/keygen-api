@@ -3,7 +3,7 @@ module Api::V1::Accounts::Relationships
     before_action :authenticate_with_token!
     before_action :set_account
 
-    # POST /accounts/1/relationships/plan
+    # PUT /accounts/1/relationships/plan
     def update
       render_not_found and return unless @account
 
