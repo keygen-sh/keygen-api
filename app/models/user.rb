@@ -47,7 +47,7 @@ end
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
 #  deleted_at             :datetime
-#  meta                   :json
+#  metadata               :json
 #
 # Indexes
 #

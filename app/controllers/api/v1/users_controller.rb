@@ -98,7 +98,7 @@ module Api::V1
             param :name, type: :string
             param :email, type: :string
             param :password, type: :string
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
 
             if current_bearer&.role? :admin
               param :role_attributes, type: :hash, as: :role, optional: true do
@@ -112,7 +112,7 @@ module Api::V1
           param :user, type: :hash do
             param :name, type: :string, optional: true
             param :email, type: :string, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
 
             if current_bearer&.role? :admin
               param :role_attributes, type: :hash, as: :role, optional: true do

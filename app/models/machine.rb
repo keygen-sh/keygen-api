@@ -36,7 +36,7 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  deleted_at  :datetime
-#  meta        :json
+#  metadata    :json
 #
 # Indexes
 #
