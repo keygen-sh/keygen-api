@@ -4,10 +4,27 @@ module Api::V1
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
     before_action :scope_by_subdomain!
-    before_action :authenticate_with_token!, only: [:revoke]
-    before_action :set_token, only: [:revoke]
+    before_action :authenticate_with_token!, only: [:index, :show, :revoke]
+    before_action :set_token, only: [:show, :revoke]
 
     # GET /tokens
+    def index
+      @tokens = policy_scope apply_scopes(current_bearer.tokens).all
+      authorize @tokens
+
+      render json: @tokens
+    end
+
+    # GET /tokens/1
+    def show
+      render_not_found and return unless @token
+
+      authorize @token
+
+      render json: @token
+    end
+
+    # POST /tokens
     def generate
       skip_authorization
 
@@ -27,7 +44,7 @@ module Api::V1
       render_unauthorized detail: "credentials must be valid"
     end
 
-    # POST /tokens
+    # PUT /tokens
     def regenerate
       skip_authorization
 

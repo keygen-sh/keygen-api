@@ -16,7 +16,7 @@ Feature: Generate authentication token
       """
       { "Authorization": "Basic \"$users[1].email:password\"" }
       """
-    When I send a GET request to "/tokens"
+    When I send a POST request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
 
@@ -28,12 +28,12 @@ Feature: Generate authentication token
       """
       { "Authorization": "Basic \"$users[1].email:someBadPassword\"" }
       """
-    When I send a GET request to "/tokens"
+    When I send a POST request to "/tokens"
     Then the response status should be "401"
 
   Scenario: User attempts to generate a new token without authentication
     Given I am on the subdomain "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    When I send a GET request to "/tokens"
+    When I send a POST request to "/tokens"
     Then the response status should be "401"

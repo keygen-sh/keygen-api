@@ -28,6 +28,15 @@ When /^I send a POST request to "([^\"]*)"$/ do |path|
   end
 end
 
+When /^I send a PUT request to "([^\"]*)"$/ do |path|
+  parse_path_placeholders! path
+  if @account
+    put "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    put "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  end
+end
+
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
@@ -38,7 +47,17 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   end
 end
 
-When /^I send a (?:PUT|PATCH) request to "([^\"]*)" with the following:$/ do |path, body|
+When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_path_placeholders! path
+  parse_placeholders! body
+  if @account
+    patch "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  else
+    patch "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+  end
+end
+
+When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
   if @account
@@ -65,6 +84,12 @@ Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, n
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
+end
+
+Then /^the JSON response should be an array of "([^\"]*)"$/ do |name|
+  json = JSON.parse last_response.body
+
+  json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
 end
 
 Then /^the JSON response should be an? "([^\"]*)"$/ do |name|

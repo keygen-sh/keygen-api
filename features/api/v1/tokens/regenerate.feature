@@ -13,7 +13,7 @@ Feature: Regenerate authentication token
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/tokens"
+    When I send a PUT request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
 
@@ -25,7 +25,7 @@ Feature: Regenerate authentication token
       """
       { "Authorization": "Bearer someBadToken" }
       """
-    When I send a POST request to "/tokens"
+    When I send a PUT request to "/tokens"
     Then the response status should be "401"
 
   Scenario: Product resets their token
@@ -33,6 +33,6 @@ Feature: Regenerate authentication token
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/tokens"
+    When I send a PUT request to "/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"

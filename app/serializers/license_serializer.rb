@@ -1,9 +1,9 @@
 class LicenseSerializer < BaseSerializer
   type :licenses
 
+  attribute :key, unless: -> { key.nil? }
   attributes [
     :id,
-    :key,
     :expiry,
     :meta,
     :created,
