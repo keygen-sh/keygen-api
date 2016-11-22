@@ -103,7 +103,7 @@ module Api::V1
             param :ip, type: :string, optional: true
             param :hostname, type: :string, optional: true
             param :platform, type: :string, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
           end
         end
 
@@ -113,7 +113,7 @@ module Api::V1
             param :ip, type: :string, optional: true
             param :hostname, type: :string, optional: true
             param :platform, type: :string, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
           end
         end
       end

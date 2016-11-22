@@ -8,7 +8,7 @@ class MachineSerializer < BaseSerializer
     :ip,
     :hostname,
     :platform,
-    :meta,
+    :metadata,
     :created,
     :updated
   ]
@@ -33,7 +33,7 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  deleted_at  :datetime
-#  meta        :json
+#  metadata    :json
 #
 # Indexes
 #

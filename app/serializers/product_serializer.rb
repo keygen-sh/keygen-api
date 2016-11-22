@@ -5,7 +5,7 @@ class ProductSerializer < BaseSerializer
     :id,
     :name,
     :platforms,
-    :meta,
+    :metadata,
     :created,
     :updated
   ]
@@ -29,7 +29,7 @@ end
 #  updated_at :datetime         not null
 #  deleted_at :datetime
 #  platforms  :json
-#  meta       :json
+#  metadata   :json
 #
 # Indexes
 #

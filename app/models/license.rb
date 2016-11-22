@@ -83,7 +83,7 @@ end
 #  policy_id  :integer
 #  account_id :integer
 #  deleted_at :datetime
-#  meta       :json
+#  metadata   :json
 #
 # Indexes
 #

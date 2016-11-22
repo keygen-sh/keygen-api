@@ -12,7 +12,7 @@ class PolicySerializer < BaseSerializer
     :max_machines,
     :use_pool,
     :protected,
-    :meta,
+    :metadata,
     :created,
     :updated
   ]
@@ -43,7 +43,7 @@ end
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
 #  deleted_at   :datetime
-#  meta         :json
+#  metadata     :json
 #
 # Indexes
 #

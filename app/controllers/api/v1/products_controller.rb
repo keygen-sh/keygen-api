@@ -90,7 +90,7 @@ module Api::V1
         on :create do
           param :product, type: :hash do
             param :name, type: :string
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
             param :platforms, type: :array, optional: true do
               item type: :string
             end
@@ -100,7 +100,7 @@ module Api::V1
         on :update do
           param :product, type: :hash do
             param :name, type: :string, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
             param :platforms, type: :array, optional: true do
               item type: :string
             end

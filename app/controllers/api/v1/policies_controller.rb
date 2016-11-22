@@ -106,7 +106,7 @@ module Api::V1
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
           end
         end
 
@@ -120,7 +120,7 @@ module Api::V1
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true
-            param :meta, type: :hash, optional: true
+            param :metadata, type: :hash, optional: true
           end
         end
       end

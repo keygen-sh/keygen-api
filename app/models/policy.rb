@@ -61,7 +61,7 @@ end
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
 #  deleted_at   :datetime
-#  meta         :json
+#  metadata     :json
 #
 # Indexes
 #

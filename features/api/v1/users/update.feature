@@ -121,7 +121,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And the account "test1" should have 1 "admin"
 
-  Scenario: Admin updates a users meta data
+  Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
@@ -129,16 +129,16 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/users/$1" with the following:
       """
-      { "user": { "meta": { "customerId": "cust_gV4dW9jrc" } } }
+      { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following meta:
+    And the JSON response should be a "user" with the following metadata:
       """
       { "customerId": "cust_gV4dW9jrc" }
       """
     And sidekiq should have 2 "webhook" jobs
 
-  Scenario: Admin updates a users meta data with a nested hash
+  Scenario: Admin updates a users metadata with a nested hash
     Given I am an admin of account "test1"
     And I am on the subdomain "test1"
     And the current account has 2 "webhookEndpoints"
@@ -146,7 +146,7 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/users/$1" with the following:
       """
-      { "user": { "meta": { "nested": { "meta": "data" } } } }
+      { "user": { "metadata": { "nested": { "meta": "data" } } } }
       """
     Then the response status should be "400"
 
