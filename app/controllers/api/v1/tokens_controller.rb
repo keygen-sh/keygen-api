@@ -4,8 +4,8 @@ module Api::V1
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
     before_action :scope_by_subdomain!
-    before_action :authenticate_with_token!, only: [:index, :show, :revoke]
-    before_action :set_token, only: [:show, :revoke]
+    before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :revoke]
+    before_action :set_token, only: [:show, :regenerate, :revoke]
 
     # GET /tokens
     def index
@@ -45,7 +45,7 @@ module Api::V1
     end
 
     # PUT /tokens
-    def regenerate
+    def regenerate_current
       skip_authorization
 
       authenticate_with_http_token do |token, options|
@@ -68,6 +68,17 @@ module Api::V1
 
       render_unauthorized detail: "must be a valid token", source: {
         pointer: "/data/relationships/token" }
+    end
+
+    # PUT /tokens/1
+    def regenerate
+      render_not_found and return unless @token
+
+      authorize @token
+
+      @token.regenerate!
+
+      render json: @token and return
     end
 
     # DELETE /tokens

@@ -8,6 +8,10 @@ class TokenPolicy < ApplicationPolicy
     bearer == resource.bearer
   end
 
+  def regenerate?
+    bearer == resource.bearer
+  end
+
   def revoke?
     bearer == resource.bearer
   end

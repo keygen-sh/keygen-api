@@ -26,7 +26,8 @@ Rails.application.routes.draw do
 
       constraints lambda { |r| r.subdomain.present? } do
         post   "tokens",     to: "tokens#generate"
-        put    "tokens",     to: "tokens#regenerate"
+        put    "tokens",     to: "tokens#regenerate_current"
+        put    "tokens/:id", to: "tokens#regenerate"
         get    "tokens",     to: "tokens#index"
         get    "tokens/:id", to: "tokens#show"
         delete "tokens/:id", to: "tokens#revoke"
@@ -117,9 +118,10 @@ end
 #                                  PUT    /v1/accounts/:id(.:format)                                   api/v1/accounts#update {:format=>"json"}
 #                                  DELETE /v1/accounts/:id(.:format)                                   api/v1/accounts#destroy {:format=>"json"}
 #                        v1_tokens POST   /v1/tokens(.:format)                                         api/v1/tokens#generate {:format=>"json"}
-#                                  PUT    /v1/tokens(.:format)                                         api/v1/tokens#regenerate {:format=>"json"}
+#                                  PUT    /v1/tokens(.:format)                                         api/v1/tokens#regenerate_current {:format=>"json"}
+#                               v1 PUT    /v1/tokens/:id(.:format)                                     api/v1/tokens#regenerate {:format=>"json"}
 #                                  GET    /v1/tokens(.:format)                                         api/v1/tokens#index {:format=>"json"}
-#                               v1 GET    /v1/tokens/:id(.:format)                                     api/v1/tokens#show {:format=>"json"}
+#                                  GET    /v1/tokens/:id(.:format)                                     api/v1/tokens#show {:format=>"json"}
 #                                  DELETE /v1/tokens/:id(.:format)                                     api/v1/tokens#revoke {:format=>"json"}
 #                     v1_passwords POST   /v1/passwords(.:format)                                      api/v1/passwords#reset_password {:format=>"json"}
 #                       v1_profile GET    /v1/profile(.:format)                                        api/v1/profiles#show {:format=>"json"}
