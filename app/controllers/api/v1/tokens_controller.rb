@@ -3,7 +3,7 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :revoke]
     before_action :set_token, only: [:show, :regenerate, :revoke]
 

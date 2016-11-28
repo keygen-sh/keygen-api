@@ -3,14 +3,14 @@ Feature: Create machine
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin creates a machine for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Create machine
 
   Scenario: Admin creates a machine with missing fingerprint
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
@@ -37,7 +37,7 @@ Feature: Create machine
 
   Scenario: Admin creates a machine with missing license
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
@@ -49,7 +49,7 @@ Feature: Create machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User creates a machine for their license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -65,7 +65,7 @@ Feature: Create machine
     And sidekiq should have 2 "webhook" jobs
 
   Scenario: User creates a machine for another user's license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -79,7 +79,7 @@ Feature: Create machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Unauthenticated user attempts to create a machine
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     When I send a POST request to "/machines" with the following:
@@ -91,7 +91,7 @@ Feature: Create machine
 
   Scenario: Admin of another account attempts to create a machine
     Given I am an admin of account "test2"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 10 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token

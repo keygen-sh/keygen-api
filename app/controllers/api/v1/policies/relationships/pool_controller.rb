@@ -1,6 +1,6 @@
 module Api::V1::Policies::Relationships
   class PoolController < Api::V1::BaseController
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_policy, only: [:pop]
 

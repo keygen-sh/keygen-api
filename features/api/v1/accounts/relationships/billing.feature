@@ -3,9 +3,9 @@ Feature: Account billing info
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin retrieves the billing info for their account

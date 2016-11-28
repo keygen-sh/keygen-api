@@ -1,6 +1,6 @@
 module Api::V1
   class WebhookEventsController < Api::V1::BaseController
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_event, only: [:show]
 

@@ -3,14 +3,14 @@ Feature: Show policy
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin retrieves a policy for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 3 "policies"
     And I use an authentication token
     When I send a GET request to "/policies/$0"
@@ -18,7 +18,7 @@ Feature: Show policy
     And the JSON response should be a "policy"
 
   Scenario: Product retrieves a policy for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -29,7 +29,7 @@ Feature: Show policy
     And the JSON response should be a "policy"
 
   Scenario: Product attempts to retrieve a policy for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -39,7 +39,7 @@ Feature: Show policy
 
   Scenario: Admin attempts to retrieve a policy for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the account "test1" has 3 "policies"
     And I use an authentication token
     When I send a GET request to "/policies/$0"

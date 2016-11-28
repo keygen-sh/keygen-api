@@ -3,14 +3,14 @@ Feature: License permits
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin renews a license
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -35,7 +35,7 @@ Feature: License permits
 
   Scenario: User renews their license
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -63,7 +63,7 @@ Feature: License permits
 
   Scenario: Admin renews a license that implements a protected policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -89,7 +89,7 @@ Feature: License permits
 
   Scenario: Product renews a license that implements a protected policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -119,7 +119,7 @@ Feature: License permits
 
   Scenario: User renews their license that implements a protected policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -147,7 +147,7 @@ Feature: License permits
 
   Scenario: Admin attempts to renew a license for another account
     Given I am an admin of account "test2"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "license"
@@ -158,7 +158,7 @@ Feature: License permits
 
   Scenario: Admin revokes a license
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "licenses"
     And I use an authentication token
@@ -168,7 +168,7 @@ Feature: License permits
     And sidekiq should have 1 "webhook" job
 
   Scenario: User revokes their own license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
@@ -182,7 +182,7 @@ Feature: License permits
 
   Scenario: Admin revokes a license that implements a protected policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
@@ -206,7 +206,7 @@ Feature: License permits
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product revokes a license that implements a protected policy
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
@@ -233,7 +233,7 @@ Feature: License permits
     And sidekiq should have 1 "webhook" job
 
   Scenario: User revokes their own license that implements a protected policy
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
@@ -259,7 +259,7 @@ Feature: License permits
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User tries to revoke another user's license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
@@ -272,7 +272,7 @@ Feature: License permits
 
   Scenario: Admin tries to revoke a license for another account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test2"
+    And the current account is "test2"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "licenses"
     And I use an authentication token

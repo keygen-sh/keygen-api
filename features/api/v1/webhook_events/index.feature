@@ -3,14 +3,14 @@ Feature: List webhook events
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin retrieves all webhook events for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 3 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events"
@@ -19,7 +19,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves a paginated list of webhook events
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?page[number]=2&page[size]=5"
@@ -28,7 +28,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves a paginated list of webhook events with a page size that is too high
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?page[number]=1&page[size]=250"
@@ -36,7 +36,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves a paginated list of webhook events with a page size that is too low
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?page[number]=1&page[size]=-10"
@@ -44,7 +44,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves a paginated list of webhook events with an invalid page number
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?page[number]=-1&page[size]=10"
@@ -52,7 +52,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves all webhook events without a limit for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events"
@@ -61,7 +61,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves all webhook events with a low limit for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 10 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?limit=5"
@@ -70,7 +70,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves all webhook events with a high limit for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?limit=20"
@@ -79,7 +79,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves all webhook events with a limit that is too high
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?limit=900"
@@ -87,7 +87,7 @@ Feature: List webhook events
 
   Scenario: Admin retrieves all webhook events with a limit that is too low
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 20 "webhookEvents"
     And I use an authentication token
     When I send a GET request to "/webhook-events?limit=-10"
@@ -95,14 +95,14 @@ Feature: List webhook events
 
   Scenario: Admin attempts to retrieve all webhook events for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And I use an authentication token
     When I send a GET request to "/webhook-events"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
   Scenario: User attempts to retrieve all webhook events for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token

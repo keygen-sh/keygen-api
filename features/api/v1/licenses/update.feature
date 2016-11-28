@@ -3,14 +3,14 @@ Feature: Update license
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Update license
 
   Scenario: Admin updates a license policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "policies"
     And the current account has 1 "license"
@@ -38,7 +38,7 @@ Feature: Update license
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
@@ -50,7 +50,7 @@ Feature: Update license
     And sidekiq should have 0 "webhook" job
 
   Scenario: Product updates a license for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -65,7 +65,7 @@ Feature: Update license
     And sidekiq should have 0 "webhook" job
 
   Scenario: Product attempts to update a license for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -79,7 +79,7 @@ Feature: Update license
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to update a license for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
@@ -94,7 +94,7 @@ Feature: Update license
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Anonymous user attempts to update a license for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 5 "webhookEndpoints"
     And the current account has 3 "licenses"
     When I send a PATCH request to "/licenses/$0" with the following:
@@ -106,7 +106,7 @@ Feature: Update license
 
   Scenario: Admin attempts to update a license for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 3 "licenses"
     And I use an authentication token
@@ -119,7 +119,7 @@ Feature: Update license
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
@@ -132,7 +132,7 @@ Feature: Update license
 
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
@@ -145,7 +145,7 @@ Feature: Update license
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product updates a license expiry for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -161,7 +161,7 @@ Feature: Update license
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product attempts to update a license expiry for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -175,7 +175,7 @@ Feature: Update license
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to update a license expiry for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"

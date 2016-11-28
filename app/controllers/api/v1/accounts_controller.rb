@@ -76,8 +76,8 @@ module Api::V1
 
         on :create do
           param :account, type: :hash do
+            param :company, type: :string
             param :name, type: :string
-            param :subdomain, type: :string
             param :plan, type: :string
             param :users_attributes, type: :array, as: :admins do
               item type: :hash do
@@ -91,8 +91,8 @@ module Api::V1
 
         on :update do
           param :account, type: :hash do
+            param :company, type: :string, optional: true
             param :name, type: :string, optional: true
-            param :subdomain, type: :string, optional: true
           end
         end
       end

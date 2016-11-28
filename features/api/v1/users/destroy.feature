@@ -3,14 +3,14 @@ Feature: Delete user
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin deletes one of their users
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "users"
     And I use an authentication token
@@ -21,7 +21,7 @@ Feature: Delete user
 
   Scenario: Admin attempts to delete a user for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 3 "users"
     And I use an authentication token
     When I send a DELETE request to "/users/$3"
@@ -30,7 +30,7 @@ Feature: Delete user
     And the current account should have 3 "users"
 
   Scenario: User attempts to delete themself
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 3 "users"
     And the current account has 1 "webhookEndpoint"
     And I am a user of account "test1"

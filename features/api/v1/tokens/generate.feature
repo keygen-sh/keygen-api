@@ -3,13 +3,13 @@ Feature: Generate authentication token
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: User generates a new token via basic authentication
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I send the following headers:
@@ -21,7 +21,7 @@ Feature: Generate authentication token
     And the JSON response should be a "token"
 
   Scenario: User attempts to generate a new token but fails to authenticate
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I send the following headers:
@@ -32,7 +32,7 @@ Feature: Generate authentication token
     Then the response status should be "401"
 
   Scenario: User attempts to generate a new token without authentication
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     When I send a POST request to "/tokens"

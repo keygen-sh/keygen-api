@@ -3,14 +3,14 @@ Feature: Delete machine
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin deletes one of their machines
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     And I use an authentication token
@@ -20,7 +20,7 @@ Feature: Delete machine
     And sidekiq should have 2 "webhook" jobs
 
   Scenario: User attempts to delete a machine for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     And the current account has 1 "user"
@@ -33,7 +33,7 @@ Feature: Delete machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User deletes a machine for their license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "machines"
     And the current account has 1 "user"
@@ -46,7 +46,7 @@ Feature: Delete machine
     And sidekiq should have 1 "webhook" job
 
   Scenario: Anonymous user attempts to delete a machine for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     When I send a DELETE request to "/machines/$1"
@@ -57,7 +57,7 @@ Feature: Delete machine
 
   Scenario: Admin attempts to delete a machine for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     And I use an authentication token

@@ -4,7 +4,7 @@ module Api::V1
     has_scope :license
     has_scope :user
 
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_machine, only: [:show, :update, :destroy]
 
