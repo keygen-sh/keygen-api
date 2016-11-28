@@ -49,21 +49,21 @@ module Api::V1
       skip_authorization
 
       authenticate_with_http_token do |token, options|
-        token = TokenAuthenticationService.new(
+        tok = TokenAuthenticationService.new(
           account: current_account,
           token: token
         ).execute
 
-        next if token.nil?
+        next if tok.nil?
 
-        if token.expired?
+        if tok.expired?
           render_unauthorized detail: "is expired", source: {
             pointer: "/data/relationships/token" } and return
         end
 
-        token.regenerate!
+        tok.regenerate!
 
-        render json: token and return
+        render json: tok and return
       end
 
       render_unauthorized detail: "must be a valid token", source: {
