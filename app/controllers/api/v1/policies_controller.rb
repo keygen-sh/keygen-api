@@ -2,7 +2,7 @@ module Api::V1
   class PoliciesController < Api::V1::BaseController
     has_scope :product
 
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_policy, only: [:show, :update, :destroy]
 

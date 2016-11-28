@@ -3,14 +3,14 @@ Feature: License validation
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin validates a strict license that is valid
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -44,7 +44,7 @@ Feature: License validation
 
   Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -78,7 +78,7 @@ Feature: License validation
 
   Scenario: Admin validates a non-strict license that has too many machines
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -112,7 +112,7 @@ Feature: License validation
 
   Scenario: Admin validates a license that has not been used
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -138,7 +138,7 @@ Feature: License validation
 
   Scenario: Admin validates a strict license that has not been used
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -164,7 +164,7 @@ Feature: License validation
 
   Scenario: Admin validates a license that is expired
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
@@ -184,7 +184,7 @@ Feature: License validation
 
   Scenario: Admin validates a valid license by key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -207,7 +207,7 @@ Feature: License validation
 
   Scenario: Admin validates an invalid license by key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -230,7 +230,7 @@ Feature: License validation
 
   Scenario: Admin validates an encrypted license by key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 encrypted "license"
     And the first "license" has the following attributes:
@@ -253,7 +253,7 @@ Feature: License validation
 
   Scenario: Admin validates an encrypted license key as an unencrypted key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 encrypted "license"
     And the first "license" has the following attributes:
@@ -276,7 +276,7 @@ Feature: License validation
 
   Scenario: Admin validates an unencrypted license key as an encrypted key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -299,7 +299,7 @@ Feature: License validation
 
   Scenario: Admin validates a valid license by key from a pool
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """

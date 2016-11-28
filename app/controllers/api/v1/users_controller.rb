@@ -3,7 +3,7 @@ module Api::V1
     has_scope :roles, type: :array, default: [:user]
     has_scope :product
 
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
     before_action :authenticate_with_token, only: [:create]
     before_action :set_user, only: [:show, :update, :destroy]

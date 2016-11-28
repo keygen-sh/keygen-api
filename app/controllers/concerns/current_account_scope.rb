@@ -1,8 +1,10 @@
-module SubdomainScope
+module CurrentAccountScope
+  SCOPE_HEADER_KEY = "Keygen-Account".freeze
+
   extend ActiveSupport::Concern
 
-  def scope_by_subdomain!
-    @current_account = Account.find_by_subdomain! request.subdomains.first
+  def scope_to_current_account!
+    @current_account = Account.find_by_name! request.headers.fetch(SCOPE_HEADER_KEY, nil)
 
     if current_account.active?
       current_account
@@ -16,6 +18,6 @@ module SubdomainScope
       })
     end
   rescue ActiveRecord::RecordNotFound
-    render_not_found detail: "The requested resource requires a valid account subdomain"
+    render_not_found detail: "The requested resource requires a valid account"
   end
 end

@@ -7,7 +7,7 @@ module Billings
 
     def execute
       Billings::BaseService::Customer.create(
-        description: "#{account.name} (#{account.subdomain}.keygen.sh)",
+        description: "#{account.company} (#{account.name})",
         email: account.admins.first.email
       )
     rescue Billings::BaseService::Error

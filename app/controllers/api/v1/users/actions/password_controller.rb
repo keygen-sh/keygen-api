@@ -1,6 +1,6 @@
 module Api::V1::Users::Actions
   class PasswordController < Api::V1::BaseController
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!, only: [:update_password]
     before_action :set_user, only: [:update_password, :reset_password]
 

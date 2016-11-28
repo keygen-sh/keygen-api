@@ -20,7 +20,7 @@ class Account < ApplicationRecord
 
   accepts_nested_attributes_for :users
 
-  before_create -> { self.subdomain = subdomain.downcase }
+  before_create -> { self.name = name.downcase }
   after_create :set_founding_users_roles
   after_create :initialize_billing
   after_create :send_welcome_email
@@ -33,8 +33,8 @@ class Account < ApplicationRecord
   #   account.errors.add record, "count has reached maximum allowed by current plan"
   # end
 
-  validates :name, presence: true
-  validates :subdomain, subdomain: true, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
+  validates :company, presence: true
+  validates :name, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
 
   scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
@@ -56,6 +56,8 @@ class Account < ApplicationRecord
 
   def send_welcome_email
     AccountMailer.welcome(account: self).deliver_later
+  rescue Redis::CannotConnectError
+    false
   end
 end
 
@@ -64,17 +66,17 @@ end
 # Table name: accounts
 #
 #  id                 :integer          not null, primary key
-#  name               :string
-#  subdomain          :string
+#  company            :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
 #  deleted_at         :datetime
+#  name               :string
 #
 # Indexes
 #
 #  index_accounts_on_deleted_at  (deleted_at)
-#  index_accounts_on_subdomain   (subdomain)
+#  index_accounts_on_name        (name)
 #

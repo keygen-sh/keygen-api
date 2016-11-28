@@ -3,14 +3,14 @@ Feature: Update policy
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin updates a policy for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Update policy
 
   Scenario: Admin attempts to update a policy for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "policy"
     And I use an authentication token
@@ -36,7 +36,7 @@ Feature: Update policy
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Product updates a policy for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -52,7 +52,7 @@ Feature: Update policy
     And sidekiq should have 3 "webhook" jobs
 
   Scenario: Product attempts to update a policy for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -67,7 +67,7 @@ Feature: Update policy
 
   Scenario: Admin updates a policy's encrypted attribute for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token
@@ -80,7 +80,7 @@ Feature: Update policy
 
   Scenario: Admin updates a policy for their account to use a pool
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token

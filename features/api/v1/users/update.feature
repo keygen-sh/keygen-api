@@ -3,14 +3,14 @@ Feature: Update user
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin updates themself
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And I use an authentication token
     When I send a PATCH request to "/users/$current" with the following:
       """
@@ -21,7 +21,7 @@ Feature: Update user
 
   Scenario: Admin updates a user for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 2 "webhookEndpoints"
     And I use an authentication token
@@ -35,7 +35,7 @@ Feature: Update user
 
   Scenario: Admin attempts to update a user for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And I use an authentication token
     When I send a PATCH request to "/users/$0" with the following:
       """
@@ -45,7 +45,7 @@ Feature: Update user
 
   Scenario: Admin promotes a user to admin for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "users"
     And I use an authentication token
     When I send a PATCH request to "/users/$2" with the following:
@@ -64,7 +64,7 @@ Feature: Update user
 
   Scenario: Admin promotes a user with an invalid role name for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "users"
     And I use an authentication token
@@ -83,7 +83,7 @@ Feature: Update user
 
   Scenario: Admin promotes a user to a product role for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "users"
     And I use an authentication token
@@ -102,7 +102,7 @@ Feature: Update user
 
   Scenario: User updates attempts to promote themself to admin
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -123,7 +123,7 @@ Feature: Update user
 
   Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I use an authentication token
@@ -140,7 +140,7 @@ Feature: Update user
 
   Scenario: Admin updates a users metadata with a nested hash
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I use an authentication token
@@ -151,7 +151,7 @@ Feature: Update user
     Then the response status should be "400"
 
   Scenario: Product updates a users metadata
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And the current account has 1 "user"
@@ -170,7 +170,7 @@ Feature: Update user
     And sidekiq should have 2 "webhook" jobs
 
   Scenario: User updates their metadata
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -183,7 +183,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Product updates a user for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -199,7 +199,7 @@ Feature: Update user
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product attempts to update a user for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -213,7 +213,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to update their password
-   Given I am on the subdomain "test1"
+   Given the current account is "test1"
    And the current account has 2 "webhookEndpoints"
    And the current account has 3 "users"
    And I am a user of account "test1"
@@ -227,7 +227,7 @@ Feature: Update user
 
   Scenario: Admin attempts to update a users password
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "users"
     And I use an authentication token

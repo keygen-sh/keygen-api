@@ -1,7 +1,7 @@
 World Rack::Test::Methods
 
-Given /^the account "([^\"]*)" is (\w+)$/ do |subdomain, state|
-  account = Account.find_by subdomain: subdomain
+Given /^the account "([^\"]*)" is (\w+)$/ do |name, state|
+  account = Account.find_by name: name
 
   # Set up a fake subscription
   plan = create :plan
@@ -111,7 +111,7 @@ Given /^the account is in a "([^\"]*)" state$/ do |state|
 end
 
 When /^the event is received at "\/stripe"$/ do
-  post "//keygen.sh/#{@api_version}/stripe", id: @event.id
+  post "//api.keygen.sh/#{@api_version}/stripe", id: @event.id
 end
 
 Then /^a new "([^\"]*)" should be (\w+)$/ do |type, event|

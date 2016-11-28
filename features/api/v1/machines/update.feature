@@ -3,14 +3,14 @@ Feature: Update machine
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin updates a machine
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Update machine
 
   Scenario: Admin attempts to update a machine's fingerprint
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use an authentication token
@@ -36,7 +36,7 @@ Feature: Update machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Product updates a machine for their product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -52,7 +52,7 @@ Feature: Update machine
     And sidekiq should have 2 "webhook" jobs
 
   Scenario: Product attempts to update a machine for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
@@ -66,7 +66,7 @@ Feature: Update machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User updates a machine's name for their license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -90,7 +90,7 @@ Feature: Update machine
     And sidekiq should have 2 "webhook" jobs
 
   Scenario: User updates a machine's fingerprint for their license
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
@@ -111,7 +111,7 @@ Feature: Update machine
     Then the response status should be "400"
 
   Scenario: User attempts to update a machine for another user
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
     And the current account has 1 "user"
@@ -125,7 +125,7 @@ Feature: Update machine
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Anonymous user attempts to update a machine for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     When I send a PATCH request to "/machines/$0" with the following:
@@ -137,7 +137,7 @@ Feature: Update machine
 
   Scenario: Admin attempts to update a machine for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
     And I use an authentication token

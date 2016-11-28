@@ -3,14 +3,14 @@ Feature: Create license
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin creates a license for a user of their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -25,7 +25,7 @@ Feature: Create license
 
   Scenario: Admin creates an encrypted license for a user of their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
@@ -44,7 +44,7 @@ Feature: Create license
 
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
@@ -58,7 +58,7 @@ Feature: Create license
 
   Scenario: Admin attempts to create a license without a policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And I use an authentication token
@@ -72,7 +72,7 @@ Feature: Create license
 
   Scenario: Admin creates a license specifying a key
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -86,7 +86,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User creates a license for themself
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -101,7 +101,7 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
 
   Scenario: User attempts to create a license without a user
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -116,7 +116,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to create a license for another user
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -132,7 +132,7 @@ Feature: Create license
 
   Scenario: Admin creates a license with the policy license pool
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -160,7 +160,7 @@ Feature: Create license
 
   Scenario: Admin creates a license with an empty policy license pool
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And the current account has 1 "policies"
@@ -183,7 +183,7 @@ Feature: Create license
 
   Scenario: Admin creates a license for a user of another account
     Given I am an admin of account "test2"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -198,7 +198,7 @@ Feature: Create license
 
   Scenario: Admin creates a license using a protected policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
@@ -218,7 +218,7 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product creates a license using a protected policy
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
@@ -241,7 +241,7 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
 
   Scenario: User creates a license using a protected policy
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:

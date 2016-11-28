@@ -10,22 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161122225420) do
+ActiveRecord::Schema.define(version: 20161128224903) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "accounts", force: :cascade do |t|
-    t.string   "name"
-    t.string   "subdomain"
+    t.string   "company"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
     t.integer  "plan_id"
     t.string   "activation_token"
     t.datetime "activation_sent_at"
     t.datetime "deleted_at"
+    t.string   "name"
     t.index ["deleted_at"], name: "index_accounts_on_deleted_at", using: :btree
-    t.index ["subdomain"], name: "index_accounts_on_subdomain", using: :btree
+    t.index ["name"], name: "index_accounts_on_name", using: :btree
   end
 
   create_table "billings", force: :cascade do |t|

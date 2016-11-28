@@ -3,8 +3,8 @@ class AccountSerializer < BaseSerializer
 
   attributes [
     :id,
+    :company,
     :name,
-    :subdomain,
     :created,
     :updated
   ]
@@ -24,17 +24,17 @@ end
 # Table name: accounts
 #
 #  id                 :integer          not null, primary key
-#  name               :string
-#  subdomain          :string
+#  company            :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
 #  deleted_at         :datetime
+#  name               :string
 #
 # Indexes
 #
 #  index_accounts_on_deleted_at  (deleted_at)
-#  index_accounts_on_subdomain   (subdomain)
+#  index_accounts_on_name        (name)
 #

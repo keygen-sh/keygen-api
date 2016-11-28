@@ -33,8 +33,8 @@ Plan.create([{
 }])
 
 account = Account.create(
-  name: "Apptacular",
-  subdomain: "apptacular",
+  company: "Apptacular",
+  name: "apptacular",
   plan: Plan.first,
   users_attributes: [{
     name: "Admin",

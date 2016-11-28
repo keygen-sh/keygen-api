@@ -3,14 +3,14 @@ Feature: Delete key
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin deletes one of their keys
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     And I use an authentication token
@@ -20,7 +20,7 @@ Feature: Delete key
     And sidekiq should have 1 "webhook" job
 
   Scenario: User attempts to delete a key for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     And the current account has 1 "user"
@@ -33,7 +33,7 @@ Feature: Delete key
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Anonymous user attempts to delete a key for their account
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     When I send a DELETE request to "/keys/$1"
@@ -44,7 +44,7 @@ Feature: Delete key
 
   Scenario: Admin attempts to delete a key for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     And I use an authentication token

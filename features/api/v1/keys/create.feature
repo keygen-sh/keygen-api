@@ -3,14 +3,14 @@ Feature: Create key
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin creates a key for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Create key
 
   Scenario: Admin creates a key with missing key value
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
@@ -37,7 +37,7 @@ Feature: Create key
 
   Scenario: Admin creates a key with missing policy
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And I use an authentication token
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/keys" with the following:
@@ -48,7 +48,7 @@ Feature: Create key
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User attempts to create a key
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
@@ -62,7 +62,7 @@ Feature: Create key
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Unauthenticated user attempts to create a key
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     When I send a POST request to "/keys" with the following:
@@ -74,7 +74,7 @@ Feature: Create key
 
   Scenario: Admin of another account attempts to create a key
     Given I am an admin of account "test2"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token

@@ -3,14 +3,14 @@ Feature: Update product
 
   Background:
     Given the following "accounts" exist:
-      | Name  | Subdomain |
-      | Test1 | test1     |
-      | Test2 | test2     |
+      | Company | Name  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
     And I send and accept JSON
 
   Scenario: Admin updates a product for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I use an authentication token
@@ -24,7 +24,7 @@ Feature: Update product
 
   Scenario: Admin attempts to update a product for another account
     Given I am an admin of account "test2"
-    But I am on the subdomain "test1"
+    But the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "product"
     And I use an authentication token
@@ -37,7 +37,7 @@ Feature: Update product
 
   Scenario: Admin updates a product's platforms for their account
     Given I am an admin of account "test1"
-    And I am on the subdomain "test1"
+    And the current account is "test1"
     And the current account has 3 "webhookEndpoints"
     And the current account has 2 "products"
     And I use an authentication token
@@ -57,7 +57,7 @@ Feature: Update product
     And sidekiq should have 3 "webhook" jobs
 
   Scenario: Product updates the platforms for itself
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"
@@ -74,7 +74,7 @@ Feature: Update product
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product attempts to update the platforms for another product
-    Given I am on the subdomain "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"

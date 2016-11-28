@@ -1,7 +1,7 @@
 World Rack::Test::Methods
 
-Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, subdomain|
-  account = Account.find_by subdomain: subdomain
+Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, name|
+  account = Account.find_by name: name
   @bearer =
     case role
     when "admin", "user"

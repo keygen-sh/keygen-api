@@ -12,68 +12,47 @@ end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
-  if @account
-    get "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    get "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  end
+
+  get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
-  if @account
-    post "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    post "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  end
+
+  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
-  if @account
-    put "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    put "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  end
+
+  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
-  if @account
-    post "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    post "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  end
+
+  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
-  if @account
-    patch "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    patch "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  end
+
+  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
-  if @account
-    put "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  else
-    put "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
-  end
+
+  put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
-  if @account
-    delete "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  else
-    delete "//keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
-  end
+
+  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|

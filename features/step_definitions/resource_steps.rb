@@ -12,15 +12,15 @@ Given /^the following "([^\"]*)" exists:$/ do |resource, body|
   create resource.singularize.underscore, attributes
 end
 
-Given /^there exists an(?:other)? account "([^\"]*)"$/ do |subdomain|
-  create :account, subdomain: subdomain
+Given /^there exists an(?:other)? account "([^\"]*)"$/ do |name|
+  create :account, name: name
 end
 
-Given /^the account "([^\"]*)" has the following attributes:$/ do |subdomain, body|
+Given /^the account "([^\"]*)" has the following attributes:$/ do |name, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.find_by(subdomain: subdomain).update attributes
+  Account.find_by(name: name).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -30,16 +30,17 @@ Given /^I have the following attributes:$/ do |body|
   @bearer.update attributes
 end
 
-Given /^I am on the subdomain "([^\"]*)"$/ do |subdomain|
-  @account = Account.find_by subdomain: subdomain
+Given /^the current account is "([^\"]*)"$/ do |name|
+  @account = Account.find_by name: name
+  header "Keygen-Account", @account.name
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
 end
 
-Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
-  account = Account.find_by subdomain: subdomain
+Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |name, count, resource|
+  account = Account.find_by name: name
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -157,26 +158,23 @@ Given /^the (\w+) "([^\"]*)" has the following attributes:$/ do |i, resource, bo
 end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
-  if @account
-    user  = @account.admins.first
-    token = TokenGeneratorService.new(
-      account: @account,
-      bearer: user
-    ).execute
+  user  = @account.admins.first
+  token = TokenGeneratorService.new(
+    account: @account,
+    bearer: user
+  ).execute
 
-    header "Authorization", "Bearer \"#{token.raw}\""
+  header "Authorization", "Bearer \"#{token.raw}\""
+  header "Keygen-Account", @account.name
 
-    get "//#{@account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
-  else
-    get "//keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
-  end
+  get "//api.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
 end
 
-Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, count, resource|
-  account = Account.find_by subdomain: subdomain
+Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |name, count, resource|
+  account = Account.find_by name: name
 
   user  = account.admins.first
   token = TokenGeneratorService.new(
@@ -185,12 +183,13 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |subdomain, coun
   ).execute
 
   header "Authorization", "Bearer \"#{token.raw}\""
+  header "Keygen-Account", account.name
 
   case resource
   when /^admins?$/
     expect(account.users.admins.count).to eq count.to_i
   else
-    get "//#{account.subdomain}.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+    get "//api.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
 
     json = JSON.parse last_response.body
 

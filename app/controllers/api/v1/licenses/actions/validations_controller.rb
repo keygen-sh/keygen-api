@@ -1,6 +1,6 @@
 module Api::V1::Licenses::Actions
   class ValidationsController < Api::V1::BaseController
-    before_action :scope_by_subdomain!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
 
     # GET /licenses/1/actions/validate
