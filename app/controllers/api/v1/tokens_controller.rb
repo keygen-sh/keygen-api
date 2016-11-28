@@ -81,7 +81,7 @@ module Api::V1
       render json: @token and return
     end
 
-    # DELETE /tokens
+    # DELETE /tokens/1
     def revoke
       render_not_found and return unless @token
 
