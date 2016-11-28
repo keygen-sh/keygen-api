@@ -26,5 +26,8 @@
 # Ignore Redis DB dumps
 /*.rdb
 
+# Compilation caches
+/.sass-cache
+
 # Other
 .DS_Store

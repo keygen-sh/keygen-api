@@ -16,6 +16,10 @@ class AccountMailerPreview < ActionMailer::Preview
     AccountMailer.first_payment_succeeded account: account
   end
 
+  def welcome
+    AccountMailer.welcome account: account
+  end
+
   private
 
   def account

@@ -39,4 +39,14 @@ class AccountMailer < ApplicationMailer
       mail to: admin.email, subject: "Thanks so much for subscribing!"
     end
   end
+
+  def welcome(account:)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "Welcome to Keygen!"
+    end
+  end
 end
