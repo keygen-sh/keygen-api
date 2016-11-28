@@ -34,8 +34,10 @@ gem 'httparty'
 # State machine
 gem 'aasm'
 
-# Haml for templating
+# Email templating
+gem 'premailer-rails'
 gem 'haml-rails'
+gem 'sass-rails'
 
 # Soft-deletion of database records
 gem 'paranoia', '~> 2.2'
