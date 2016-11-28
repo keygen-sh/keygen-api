@@ -2,7 +2,6 @@ module SharedScopes
   extend ActiveSupport::Concern
 
   included do
-
     has_scope :limit, default: 10, only: :index do |controller, resource, limit|
       if resource.respond_to?(:lim)
         resource.lim limit
