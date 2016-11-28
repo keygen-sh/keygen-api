@@ -3,6 +3,7 @@ module Api::V1
     before_action :scope_by_subdomain!
     before_action :set_user, only: [:reset_password]
 
+    # POST /passwords
     def reset_password
       skip_authorization
 
