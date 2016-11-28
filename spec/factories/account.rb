@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :account do
     name { Faker::Company.name }
-    subdomain { [Faker::Internet.domain_word, Faker::Internet.domain_word].join }
+    subdomain { [Faker::Internet.domain_word, SecureRandom.hex].join }
 
     users []
     billing
