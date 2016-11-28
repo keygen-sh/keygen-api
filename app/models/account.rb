@@ -23,6 +23,7 @@ class Account < ApplicationRecord
   before_create -> { self.subdomain = subdomain.downcase }
   after_create :set_founding_users_roles
   after_create :initialize_billing
+  after_create :send_welcome_email
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -51,6 +52,10 @@ class Account < ApplicationRecord
     InitializeBillingWorker.perform_async id
   rescue Redis::CannotConnectError
     false
+  end
+
+  def send_welcome_email
+    AccountMailer.welcome(account: self).deliver_later
   end
 end
 
