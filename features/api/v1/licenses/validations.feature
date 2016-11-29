@@ -35,7 +35,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -69,7 +69,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -103,7 +103,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -129,7 +129,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -155,7 +155,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -175,7 +175,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a GET request to "/licenses/$0/actions/validate"
+    When I send a GET request to "/licenses/$0/validate"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -195,7 +195,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "$licenses[0].key" }
       """
@@ -218,7 +218,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "invalid" }
       """
@@ -241,7 +241,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "$crypt[0].raw", "encrypted": true }
       """
@@ -264,7 +264,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "$crypt[0].raw", "encrypted": false }
       """
@@ -287,7 +287,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "$licenses[0].key", "encrypted": true }
       """
@@ -316,7 +316,7 @@ Feature: License validation
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/actions/validate-key" with the following:
+    When I send a POST request to "/licenses/validate-key" with the following:
       """
       { "key": "$licenses[0].key" }
       """

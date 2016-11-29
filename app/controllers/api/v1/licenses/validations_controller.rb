@@ -1,17 +1,17 @@
-module Api::V1::Licenses::Actions
+module Api::V1::Licenses
   class ValidationsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
 
-    # GET /licenses/1/actions/validate
+    # GET /licenses/1/validate
     def validate_by_id
-      @license = current_account.licenses.find_by_hashid params[:license_id]
+      @license = current_account.licenses.find_by_hashid params[:id]
       authorize @license
 
       render_meta is_valid: LicenseValidationService.new(license: @license).execute
     end
 
-    # POST /licenses/actions/validate-key
+    # POST /licenses/validate-key
     def validate_by_key
       skip_authorization
 

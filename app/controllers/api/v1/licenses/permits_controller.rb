@@ -1,10 +1,10 @@
-module Api::V1::Licenses::Actions
+module Api::V1::Licenses
   class PermitsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_license, only: [:renew, :revoke]
 
-    # POST /licenses/1/actions/renew
+    # POST /licenses/1/renew
     def renew
       render_not_found and return unless @license
 
@@ -30,7 +30,7 @@ module Api::V1::Licenses::Actions
       end
     end
 
-    # DELETE /licenses/1/actions/revoke
+    # DELETE /licenses/1/revoke
     def revoke
       render_not_found and return unless @license
 
@@ -48,7 +48,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = current_account.licenses.find_by_hashid params[:license_id]
+      @license = current_account.licenses.find_by_hashid params[:id]
     end
   end
 end

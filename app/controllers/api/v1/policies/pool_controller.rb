@@ -1,10 +1,10 @@
-module Api::V1::Policies::Relationships
+module Api::V1::Policies
   class PoolController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_policy, only: [:pop]
 
-    # DELETE /policies/1/relationships/pool
+    # DELETE /policies/1/pool
     def pop
       render_not_found and return unless @policy
 
@@ -26,7 +26,7 @@ module Api::V1::Policies::Relationships
     private
 
     def set_policy
-      @policy = current_account.policies.find_by_hashid params[:policy_id]
+      @policy = current_account.policies.find_by_hashid params[:id]
     end
   end
 end

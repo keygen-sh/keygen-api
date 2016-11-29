@@ -1,9 +1,9 @@
-module Api::V1::Accounts::Relationships
+module Api::V1::Accounts
   class PlanController < Api::V1::BaseController
     before_action :authenticate_with_token!
     before_action :set_account
 
-    # PUT /accounts/1/relationships/plan
+    # PUT /accounts/1/plan
     def update
       render_not_found and return unless @account
 
@@ -36,7 +36,7 @@ module Api::V1::Accounts::Relationships
     attr_reader :parameters
 
     def set_account
-      @account = Account.find_by_hashid params[:account_id]
+      @account = Account.find_by_hashid params[:id]
     end
 
     def plan_parameters
