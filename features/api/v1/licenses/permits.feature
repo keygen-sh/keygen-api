@@ -28,7 +28,7 @@ Feature: License permits
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
@@ -56,7 +56,7 @@ Feature: License permits
     And I am a user of account "test1"
     And the current user has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
@@ -82,7 +82,7 @@ Feature: License permits
       }
       """
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
@@ -112,7 +112,7 @@ Feature: License permits
     And I am a product of account "test1"
     And the current product has 1 "policy"
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
@@ -141,7 +141,7 @@ Feature: License permits
     And I am a user of account "test1"
     And the current user has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
 
@@ -152,7 +152,7 @@ Feature: License permits
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/licenses/$0/actions/renew"
+    When I send a POST request to "/licenses/$0/renew"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
 
@@ -162,7 +162,7 @@ Feature: License permits
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "licenses"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$0/actions/revoke"
+    When I send a DELETE request to "/licenses/$0/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
@@ -175,7 +175,7 @@ Feature: License permits
     And I am a user of account "test1"
     And the current user has 2 "licenses"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$1/actions/revoke"
+    When I send a DELETE request to "/licenses/$1/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
@@ -200,7 +200,7 @@ Feature: License permits
       }
       """
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$1/actions/revoke"
+    When I send a DELETE request to "/licenses/$1/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
@@ -227,7 +227,7 @@ Feature: License permits
     And I am a product of account "test1"
     And the current product has 3 "licenses"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$1/actions/revoke"
+    When I send a DELETE request to "/licenses/$1/revoke"
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
@@ -253,7 +253,7 @@ Feature: License permits
     And I am a user of account "test1"
     And the current user has 2 "licenses"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$1/actions/revoke"
+    When I send a DELETE request to "/licenses/$1/revoke"
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
@@ -265,7 +265,7 @@ Feature: License permits
     And the current account has 3 "licenses"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$0/actions/revoke"
+    When I send a DELETE request to "/licenses/$0/revoke"
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
@@ -276,7 +276,7 @@ Feature: License permits
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "licenses"
     And I use an authentication token
-    When I send a DELETE request to "/licenses/$0/actions/revoke"
+    When I send a DELETE request to "/licenses/$0/revoke"
     Then the response status should be "401"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs

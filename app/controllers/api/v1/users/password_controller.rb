@@ -1,4 +1,4 @@
-module Api::V1::Users::Actions
+module Api::V1::Users
   class PasswordController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!, only: [:update_password]
@@ -47,7 +47,7 @@ module Api::V1::Users::Actions
     attr_reader :parameters
 
     def set_user
-      @user = current_account.users.find_by_hashid params[:user_id]
+      @user = current_account.users.find_by_hashid params[:id]
     end
 
     def parameters

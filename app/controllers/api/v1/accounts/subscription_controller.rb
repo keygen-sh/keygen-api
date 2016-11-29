@@ -1,9 +1,9 @@
-module Api::V1::Accounts::Actions
+module Api::V1::Accounts
   class SubscriptionController < Api::V1::BaseController
     before_action :authenticate_with_token!
     before_action :set_account
 
-    # POST /accounts/1/actions/pause
+    # POST /accounts/1/pause-subscription
     def pause
       render_not_found and return unless @account
 
@@ -17,7 +17,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/actions/resume
+    # POST /accounts/1/resume-subscription
     def resume
       render_not_found and return unless @account
 
@@ -31,7 +31,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/actions/cancel
+    # POST /accounts/1/cancel-subscription
     def cancel
       render_not_found and return unless @account
 
@@ -45,7 +45,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/actions/renew
+    # POST /accounts/1/renew-subscription
     def renew
       render_not_found and return unless @account
 
@@ -62,7 +62,7 @@ module Api::V1::Accounts::Actions
     private
 
     def set_account
-      @account = Account.find_by_hashid params[:account_id]
+      @account = Account.find_by_hashid params[:id]
     end
   end
 end

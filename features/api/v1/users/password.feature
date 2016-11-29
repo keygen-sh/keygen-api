@@ -13,7 +13,7 @@ Feature: User password
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/users/$current/actions/update-password" with the following:
+    When I send a POST request to "/users/$current/update-password" with the following:
       """
       { "oldPassword": "password", "newPassword": "pass" }
       """
@@ -24,7 +24,7 @@ Feature: User password
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/users/$current/actions/update-password" with the following:
+    When I send a POST request to "/users/$current/update-password" with the following:
       """
       { "newPassword": "pass" }
       """
@@ -35,7 +35,7 @@ Feature: User password
     And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/users/$2/actions/update-password" with the following:
+    When I send a POST request to "/users/$2/update-password" with the following:
       """
       { "oldPassword": "password", "newPassword": "pass" }
       """
@@ -47,7 +47,7 @@ Feature: User password
     And the account "test2" has 3 "users"
     And I am a user of account "test2"
     And I use an authentication token
-    When I send a POST request to "/users/$2/actions/update-password" with the following:
+    When I send a POST request to "/users/$2/update-password" with the following:
       """
       { "oldPassword": "password", "newPassword": "pass" }
       """
@@ -58,7 +58,7 @@ Feature: User password
     And the current account has 3 "users"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/users/$3/actions/update-password" with the following:
+    When I send a POST request to "/users/$3/update-password" with the following:
       """
       { "oldPassword": "password", "newPassword": "pass" }
       """
@@ -73,7 +73,7 @@ Feature: User password
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     And I use an authentication token
-    When I send a POST request to "/users/$current/actions/reset-password" with the following:
+    When I send a POST request to "/users/$current/reset-password" with the following:
       """
       { "passwordResetToken": "password", "newPassword": "pass" }
       """
@@ -88,7 +88,7 @@ Feature: User password
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     And I use an authentication token
-    When I send a POST request to "/users/$current/actions/reset-password" with the following:
+    When I send a POST request to "/users/$current/reset-password" with the following:
       """
       { "newPassword": "pass" }
       """
@@ -103,7 +103,7 @@ Feature: User password
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.25.hours.ago" }
       """
     And I use an authentication token
-    When I send a POST request to "/users/$current/actions/reset-password" with the following:
+    When I send a POST request to "/users/$current/reset-password" with the following:
       """
       { "passwordResetToken": "password", "newPassword": "pass" }
       """

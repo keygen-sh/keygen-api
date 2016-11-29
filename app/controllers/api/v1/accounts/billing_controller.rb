@@ -1,9 +1,9 @@
-module Api::V1::Accounts::Relationships
+module Api::V1::Accounts
   class BillingController < Api::V1::BaseController
     before_action :authenticate_with_token!
     before_action :set_billing
 
-    # GET /accounts/1/relationships/billing
+    # GET /accounts/1/billing
     def show
       render_not_found and return unless @billing
 
@@ -12,7 +12,7 @@ module Api::V1::Accounts::Relationships
       render json: @billing
     end
 
-    # PATCH /accounts/1/relationships/billing
+    # PATCH /accounts/1/billing
     def update
       render_not_found and return unless @billing
 
@@ -35,7 +35,7 @@ module Api::V1::Accounts::Relationships
     attr_reader :parameters
 
     def set_billing
-      @billing = Account.find_by_hashid(params[:account_id])&.billing
+      @billing = Account.find_by_hashid(params[:id])&.billing
     end
 
     def parameters

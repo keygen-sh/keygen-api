@@ -24,7 +24,7 @@ Feature: Policy pool
       }
       """
     And I use an authentication token
-    When I send a DELETE request to "/policies/$0/relationships/pool"
+    When I send a DELETE request to "/policies/$0/pool"
     Then the response status should be "200"
     And the JSON response should be a "key"
 
@@ -37,7 +37,7 @@ Feature: Policy pool
       { "usePool": true }
       """
     And I use an authentication token
-    When I send a DELETE request to "/policies/$0/relationships/pool"
+    When I send a DELETE request to "/policies/$0/pool"
     Then the response status should be "422"
 
   Scenario: Admin attempts to take a key from a policy that doesn't use a pool
@@ -56,7 +56,7 @@ Feature: Policy pool
       }
       """
     And I use an authentication token
-    When I send a DELETE request to "/policies/$0/relationships/pool"
+    When I send a DELETE request to "/policies/$0/pool"
     Then the response status should be "422"
 
   Scenario: Admin attempts to take a key from a pool for another account
@@ -65,5 +65,5 @@ Feature: Policy pool
     And the account "test1" has 1 "policy"
     And the account "test1" has 1 "key"
     And I use an authentication token
-    When I send a DELETE request to "/policies/$0/relationships/pool"
+    When I send a DELETE request to "/policies/$0/pool"
     Then the response status should be "401"

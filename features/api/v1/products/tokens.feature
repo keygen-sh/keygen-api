@@ -13,7 +13,7 @@ Feature: Generate authentication token for product
     And the current account is "test1"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/products/$0/relationships/tokens"
+    When I send a POST request to "/products/$0/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token"
 
@@ -22,7 +22,7 @@ Feature: Generate authentication token for product
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/products/$0/relationships/tokens"
+    When I send a POST request to "/products/$0/tokens"
     Then the response status should be "403"
 
   Scenario: Product attempts to generate a token for another product
@@ -30,7 +30,7 @@ Feature: Generate authentication token for product
     And the current account has 2 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/products/$1/relationships/tokens"
+    When I send a POST request to "/products/$1/tokens"
     Then the response status should be "403"
 
   Scenario: User attempts to generate a product token
@@ -39,7 +39,7 @@ Feature: Generate authentication token for product
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/products/$0/relationships/tokens"
+    When I send a POST request to "/products/$0/tokens"
     Then the response status should be "403"
 
   Scenario: Admin attempts to generate a product token for another account
@@ -47,5 +47,5 @@ Feature: Generate authentication token for product
     And the current account is "test2"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/products/$0/relationships/tokens"
+    When I send a POST request to "/products/$0/tokens"
     Then the response status should be "401"

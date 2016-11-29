@@ -1,4 +1,4 @@
-module Api::V1::Products::Relationships
+module Api::V1::Products
   class TokensController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
@@ -18,7 +18,7 @@ module Api::V1::Products::Relationships
     private
 
     def set_product
-      @product = current_account.products.find_by_hashid params[:product_id]
+      @product = current_account.products.find_by_hashid params[:id]
     end
   end
 end

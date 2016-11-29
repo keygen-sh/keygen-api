@@ -1,10 +1,10 @@
-module Api::V1::WebhookEvents::Actions
+module Api::V1::WebhookEvents
   class RetriesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_event
 
-    # POST /webhook-events/1/actions/retry
+    # POST /webhook-events/1/retry
     def retry
       render_not_found and return unless @event
 
@@ -20,7 +20,7 @@ module Api::V1::WebhookEvents::Actions
     private
 
     def set_event
-      @event = current_account.webhook_events.find_by_hashid params[:webhook_event_id]
+      @event = current_account.webhook_events.find_by_hashid params[:id]
     end
   end
 end
