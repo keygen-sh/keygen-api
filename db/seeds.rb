@@ -33,8 +33,8 @@ Plan.create([{
 }])
 
 account = Account.create(
-  company: "Apptacular",
-  name: "apptacular",
+  company: "Account",
+  name: "account",
   plan: Plan.first,
   users_attributes: [{
     name: "Admin",
@@ -48,7 +48,7 @@ account.webhook_endpoints.create(
 )
 
 product = account.products.create(
-  name: "Apptastic"
+  name: "App"
 )
 
 policy = account.policies.create(
@@ -74,52 +74,54 @@ enc_policy = account.policies.create(
   duration: 1.month
 )
 
-account.keys.create(
-  key: SecureRandom.hex.scan(/.{4}/).join("-"),
-  policy: pool_policy
-)
-account.keys.create(
-  key: SecureRandom.hex.scan(/.{4}/).join("-"),
-  policy: pool_policy
-)
-account.keys.create(
-  key: SecureRandom.hex.scan(/.{4}/).join("-"),
-  policy: pool_policy
-)
+1_000.times do
+  account.keys.create(
+    key: SecureRandom.hex.scan(/.{4}/).join("-"),
+    policy: pool_policy
+  )
+  account.keys.create(
+    key: SecureRandom.hex.scan(/.{4}/).join("-"),
+    policy: pool_policy
+  )
+  account.keys.create(
+    key: SecureRandom.hex.scan(/.{4}/).join("-"),
+    policy: pool_policy
+  )
 
-user = account.users.create(
-  name: "User",
-  email: "user@keygen.sh",
-  password: "password"
-)
+  user = account.users.create(
+    name: "#{SecureRandom.hex}",
+    email: "#{SecureRandom.hex}@keygen.sh",
+    password: "password"
+  )
 
-license = account.licenses.create(
-  policy: policy,
-  user: user
-)
-pool_license = account.licenses.create(
-  policy: pool_policy,
-  user: user
-)
-enc_license = account.licenses.create(
-  policy: enc_policy,
-  user: user
-)
+  license = account.licenses.create(
+    policy: policy,
+    user: user
+  )
+  pool_license = account.licenses.create(
+    policy: pool_policy,
+    user: user
+  )
+  enc_license = account.licenses.create(
+    policy: enc_policy,
+    user: user
+  )
 
-account.machines.create(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-  license: license
-)
-account.machines.create(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-  license: pool_license
-)
-account.machines.create(
-  fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-  license: enc_license
-)
+  account.machines.create(
+    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+    license: license
+  )
+  account.machines.create(
+    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+    license: pool_license
+  )
+  account.machines.create(
+    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+    license: enc_license
+  )
+end
 
-User.all.each do |user|
+User.find_each do |user|
   token = user.tokens.create account: user.account
   token.generate!
 end

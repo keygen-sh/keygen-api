@@ -78,5 +78,6 @@ end
 # Indexes
 #
 #  index_accounts_on_deleted_at  (deleted_at)
+#  index_accounts_on_id          (id)
 #  index_accounts_on_name        (name)
 #

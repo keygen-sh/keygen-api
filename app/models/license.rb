@@ -1,4 +1,6 @@
 class License < ApplicationRecord
+  LICENSE_KEY_BREAK_SIZE = Hashid::Rails.configuration.length.freeze
+
   include Paginatable
   include Limitable
   include Tokenable
@@ -43,14 +45,14 @@ class License < ApplicationRecord
       @raw, enc = generate_encrypted_token :key do |token|
         # Replace first n characters with our hashid so that we can do a lookup
         # on the encrypted key
-        token.gsub(/\A.{#{Hashid::Rails.configuration.length}}/, hashid)
-             .scan(/.{#{Hashid::Rails.configuration.length}}/).join "-"
+        token.gsub(/\A.{#{LICENSE_KEY_BREAK_SIZE}}/, hashid)
+             .scan(/.{#{LICENSE_KEY_BREAK_SIZE}}/).join "-"
       end
 
       self.key = enc
     else
       self.key = generate_token :key do |token|
-        token.scan(/.{#{Hashid::Rails.configuration.length}}/).join "-"
+        token.scan(/.{#{LICENSE_KEY_BREAK_SIZE}}/).join "-"
       end
     end
 
@@ -83,12 +85,13 @@ end
 #  policy_id  :integer
 #  account_id :integer
 #  deleted_at :datetime
-#  metadata   :json
+#  metadata   :jsonb
 #
 # Indexes
 #
-#  index_licenses_on_account_id_and_key        (account_id,key)
-#  index_licenses_on_account_id_and_policy_id  (account_id,policy_id)
-#  index_licenses_on_account_id_and_user_id    (account_id,user_id)
+#  index_licenses_on_account_id_and_id         (account_id,id)
 #  index_licenses_on_deleted_at                (deleted_at)
+#  index_licenses_on_key_and_account_id        (key,account_id)
+#  index_licenses_on_policy_id_and_account_id  (policy_id,account_id)
+#  index_licenses_on_user_id_and_account_id    (user_id,account_id)
 #
