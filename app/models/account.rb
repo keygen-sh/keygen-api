@@ -1,7 +1,7 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
-  include Paginatable
   include Limitable
+  include Pageable
   include Billable
 
   acts_as_paranoid

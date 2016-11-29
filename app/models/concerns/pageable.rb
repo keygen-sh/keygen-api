@@ -1,4 +1,4 @@
-module Paginatable
+module Pageable
   SIZE_UPPER = 100
   SIZE_LOWER = 1
   PAGE_LOWER = 1

@@ -1,6 +1,6 @@
 class Product < ApplicationRecord
-  include Paginatable
   include Limitable
+  include Pageable
   include Roleable
 
   acts_as_paranoid

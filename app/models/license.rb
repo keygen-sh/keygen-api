@@ -1,9 +1,9 @@
 class License < ApplicationRecord
   LICENSE_KEY_BREAK_SIZE = Hashid::Rails.configuration.length.freeze
 
-  include Paginatable
   include Limitable
   include Tokenable
+  include Pageable
 
   acts_as_paranoid
 
