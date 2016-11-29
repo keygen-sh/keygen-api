@@ -1,6 +1,6 @@
 class Policy < ApplicationRecord
-  include Paginatable
   include Limitable
+  include Pageable
 
   acts_as_paranoid
 

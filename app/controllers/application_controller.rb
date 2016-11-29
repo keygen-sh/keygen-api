@@ -4,8 +4,8 @@ class ApplicationController < ActionController::API
   after_action :verify_authorized
 
   rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message }
-  rescue_from Paginatable::InvalidPageError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Limitable::InvalidLimitError, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from Pageable::InvalidPageError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
