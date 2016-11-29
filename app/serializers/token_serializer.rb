@@ -6,8 +6,6 @@ class TokenSerializer < BaseSerializer
              :created,
              :updated
 
-  belongs_to :bearer, polymorphic: true
-
   def token
     object.raw
   end

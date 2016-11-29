@@ -10,10 +10,6 @@ class MachineSerializer < BaseSerializer
              :metadata,
              :created,
              :updated
-
-  belongs_to :license
-  has_one :product, through: :license
-  has_one :user, through: :license
 end
 
 # == Schema Information
