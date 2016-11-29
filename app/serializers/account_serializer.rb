@@ -6,8 +6,6 @@ class AccountSerializer < BaseSerializer
              :name,
              :created,
              :updated
-
-  belongs_to :plan
 end
 
 # == Schema Information

@@ -14,8 +14,6 @@ class PolicySerializer < BaseSerializer
              :metadata,
              :created,
              :updated
-
-  belongs_to :product
 end
 
 # == Schema Information

@@ -9,10 +9,6 @@ class LicenseSerializer < BaseSerializer
              :created,
              :updated
 
-  belongs_to :user
-  belongs_to :policy
-  has_one :product, through: :policy
-
   def key
     if object.policy.encrypted?
       object.raw

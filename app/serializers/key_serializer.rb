@@ -5,8 +5,6 @@ class KeySerializer < BaseSerializer
              :key,
              :created,
              :updated
-
-  belongs_to :policy
 end
 
 # == Schema Information

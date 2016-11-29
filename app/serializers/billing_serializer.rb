@@ -12,6 +12,8 @@ class BillingSerializer < BaseSerializer
              :card_last4,
              :created,
              :updated
+
+  has_one :plan
 end
 
 # == Schema Information
