@@ -5,14 +5,14 @@ class TokenPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer == resource.bearer
+    bearer.role? :admin or resource.bearer == bearer
   end
 
   def regenerate?
-    bearer == resource.bearer
+    bearer.role? :admin or resource.bearer == bearer
   end
 
   def revoke?
-    bearer == resource.bearer
+    bearer.role? :admin or resource.bearer == bearer
   end
 end

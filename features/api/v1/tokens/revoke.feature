@@ -31,13 +31,13 @@ Feature: Revoke authentication token
     When I send a DELETE request to "/tokens/$0"
     Then the response status should be "204"
 
-  Scenario: Admin attempts to revoke another user's token
+  Scenario: Admin revokes another user's token
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 5 "users"
     And I use an authentication token
     When I send a DELETE request to "/tokens/$2"
-    Then the response status should be "403"
+    Then the response status should be "204"
 
   Scenario: User attempts to revoke another user's token
     Given the current account is "test1"
