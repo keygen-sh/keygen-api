@@ -1,25 +1,21 @@
 class PolicySerializer < BaseSerializer
   type :policies
 
-  attributes [
-    :id,
-    :name,
-    :price,
-    :duration,
-    :strict,
-    :recurring,
-    :floating,
-    :max_machines,
-    :use_pool,
-    :protected,
-    :metadata,
-    :created,
-    :updated
-  ]
+  attributes :id,
+             :name,
+             :price,
+             :duration,
+             :strict,
+             :recurring,
+             :floating,
+             :max_machines,
+             :use_pool,
+             :protected,
+             :metadata,
+             :created,
+             :updated
 
   belongs_to :product
-  has_many :licenses
-  has_many :pool, class_name: "Key"
 end
 
 # == Schema Information
@@ -43,10 +39,11 @@ end
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
 #  deleted_at   :datetime
-#  metadata     :json
+#  metadata     :jsonb
 #
 # Indexes
 #
-#  index_policies_on_account_id_and_product_id  (account_id,product_id)
+#  index_policies_on_account_id_and_id          (account_id,id)
 #  index_policies_on_deleted_at                 (deleted_at)
+#  index_policies_on_product_id_and_account_id  (product_id,account_id)
 #

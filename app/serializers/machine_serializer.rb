@@ -1,21 +1,19 @@
 class MachineSerializer < BaseSerializer
   type :machines
 
-  attributes [
-    :id,
-    :fingerprint,
-    :name,
-    :ip,
-    :hostname,
-    :platform,
-    :metadata,
-    :created,
-    :updated
-  ]
+  attributes :id,
+             :fingerprint,
+             :name,
+             :ip,
+             :hostname,
+             :platform,
+             :metadata,
+             :created,
+             :updated
 
-  belongs_to :account
   belongs_to :license
-  belongs_to :user
+  has_one :product, through: :license
+  has_one :user, through: :license
 end
 
 # == Schema Information
@@ -33,11 +31,12 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  deleted_at  :datetime
-#  metadata    :json
+#  metadata    :jsonb
 #
 # Indexes
 #
-#  index_machines_on_account_id_and_fingerprint  (account_id,fingerprint)
-#  index_machines_on_account_id_and_license_id   (account_id,license_id)
+#  index_machines_on_account_id_and_id           (account_id,id)
 #  index_machines_on_deleted_at                  (deleted_at)
+#  index_machines_on_fingerprint_and_account_id  (fingerprint,account_id)
+#  index_machines_on_license_id_and_account_id   (license_id,account_id)
 #

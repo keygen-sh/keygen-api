@@ -9,7 +9,7 @@ class User < ApplicationRecord
 
   belongs_to :account
   has_many :licenses, dependent: :destroy
-  has_many :products, through: :licenses
+  has_many :products, -> { distinct }, through: :licenses
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
@@ -47,11 +47,12 @@ end
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
 #  deleted_at             :datetime
-#  metadata               :json
+#  metadata               :jsonb
 #
 # Indexes
 #
-#  index_users_on_account_id_and_email                 (account_id,email)
-#  index_users_on_account_id_and_password_reset_token  (account_id,password_reset_token)
+#  index_users_on_account_id_and_id                    (account_id,id)
 #  index_users_on_deleted_at                           (deleted_at)
+#  index_users_on_email_and_account_id                 (email,account_id)
+#  index_users_on_password_reset_token_and_account_id  (password_reset_token,account_id)
 #

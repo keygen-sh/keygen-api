@@ -1,13 +1,9 @@
 class WebhookEventSerializer < BaseSerializer
   type :webhook_events
 
-  attributes [
-    :endpoint,
-    :payload,
-    :status
-  ]
-
-  belongs_to :account
+  attributes :endpoint,
+             :payload,
+             :status
 end
 
 # == Schema Information
@@ -25,7 +21,7 @@ end
 #
 # Indexes
 #
-#  index_webhook_events_on_account_id  (account_id)
-#  index_webhook_events_on_deleted_at  (deleted_at)
-#  index_webhook_events_on_jid         (jid)
+#  index_webhook_events_on_account_id_and_id  (account_id,id)
+#  index_webhook_events_on_deleted_at         (deleted_at)
+#  index_webhook_events_on_jid                (jid)
 #

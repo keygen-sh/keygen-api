@@ -1,6 +1,7 @@
 module Api::V1
   class MachinesController < Api::V1::BaseController
     has_scope :fingerprint
+    has_scope :product
     has_scope :license
     has_scope :user
 

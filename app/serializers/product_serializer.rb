@@ -1,21 +1,12 @@
 class ProductSerializer < BaseSerializer
   type :products
 
-  attributes [
-    :id,
-    :name,
-    :platforms,
-    :metadata,
-    :created,
-    :updated
-  ]
-
-  belongs_to :account
-  has_many :policies, dependent: :destroy
-  has_many :licenses, through: :policies
-  has_many :machines, through: :licenses
-  has_many :users, through: :licenses
-  has_many :tokens
+  attributes :id,
+             :name,
+             :platforms,
+             :metadata,
+             :created,
+             :updated
 end
 
 # == Schema Information
@@ -28,11 +19,12 @@ end
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  deleted_at :datetime
-#  platforms  :json
-#  metadata   :json
+#  platforms  :jsonb
+#  metadata   :jsonb
 #
 # Indexes
 #
-#  index_products_on_account_id  (account_id)
-#  index_products_on_deleted_at  (deleted_at)
+#  index_products_on_account_id         (account_id)
+#  index_products_on_account_id_and_id  (account_id,id)
+#  index_products_on_deleted_at         (deleted_at)
 #

@@ -1,17 +1,15 @@
 class PlanSerializer < BaseSerializer
   type :plans
 
-  attributes [
-    :id,
-    :name,
-    :price,
-    :max_products,
-    :max_users,
-    :max_policies,
-    :max_licenses,
-    :created,
-    :updated
-  ]
+  attributes :id,
+             :name,
+             :price,
+             :max_products,
+             :max_users,
+             :max_policies,
+             :max_licenses,
+             :created,
+             :updated
 end
 
 # == Schema Information

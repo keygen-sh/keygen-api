@@ -1,13 +1,9 @@
 class WebhookEndpointSerializer < BaseSerializer
   type :webhook_endpoints
 
-  attributes [
-    :url,
-    :created,
-    :updated
-  ]
-
-  belongs_to :account
+  attributes :url,
+             :created,
+             :updated
 end
 
 # == Schema Information
@@ -23,6 +19,6 @@ end
 #
 # Indexes
 #
-#  index_webhook_endpoints_on_account_id  (account_id)
-#  index_webhook_endpoints_on_deleted_at  (deleted_at)
+#  index_webhook_endpoints_on_account_id_and_id  (account_id,id)
+#  index_webhook_endpoints_on_deleted_at         (deleted_at)
 #

@@ -1,22 +1,13 @@
 class AccountSerializer < BaseSerializer
   type :accounts
 
-  attributes [
-    :id,
-    :company,
-    :name,
-    :created,
-    :updated
-  ]
+  attributes :id,
+             :company,
+             :name,
+             :created,
+             :updated
 
   belongs_to :plan
-  has_many :webhook_endpoints
-  has_many :webhook_events
-  has_many :users
-  has_many :products
-  has_many :policies, through: :products
-  has_many :licenses, through: :policies
-  has_one :billing
 end
 
 # == Schema Information
@@ -36,5 +27,6 @@ end
 # Indexes
 #
 #  index_accounts_on_deleted_at  (deleted_at)
+#  index_accounts_on_id          (id)
 #  index_accounts_on_name        (name)
 #
