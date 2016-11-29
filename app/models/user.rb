@@ -51,8 +51,7 @@ end
 #
 # Indexes
 #
-#  index_users_on_account_id            (account_id)
-#  index_users_on_deleted_at            (deleted_at)
-#  index_users_on_email                 (email)
-#  index_users_on_password_reset_token  (password_reset_token)
+#  index_users_on_account_id_and_email                 (account_id,email)
+#  index_users_on_account_id_and_password_reset_token  (account_id,password_reset_token)
+#  index_users_on_deleted_at                           (deleted_at)
 #

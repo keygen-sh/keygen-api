@@ -121,7 +121,7 @@ end
 #
 # Indexes
 #
-#  index_billings_on_customer_id      (customer_id)
-#  index_billings_on_deleted_at       (deleted_at)
-#  index_billings_on_subscription_id  (subscription_id)
+#  index_billings_on_account_id_and_customer_id      (account_id,customer_id)
+#  index_billings_on_account_id_and_subscription_id  (account_id,subscription_id)
+#  index_billings_on_deleted_at                      (deleted_at)
 #

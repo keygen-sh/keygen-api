@@ -31,7 +31,6 @@ end
 #
 # Indexes
 #
-#  index_keys_on_account_id  (account_id)
-#  index_keys_on_deleted_at  (deleted_at)
-#  index_keys_on_policy_id   (policy_id)
+#  index_keys_on_account_id_and_policy_id  (account_id,policy_id)
+#  index_keys_on_deleted_at                (deleted_at)
 #
