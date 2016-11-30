@@ -130,6 +130,15 @@ GEM
     json (1.8.3)
     jsonapi (0.1.1.beta2)
       json (~> 1.8)
+    jsonapi-deserializable (0.1.1.beta3)
+    jsonapi-parser (0.1.1.beta3)
+    jsonapi-rails (0.1.1.beta4)
+      jsonapi-deserializable (= 0.1.1.beta3)
+      jsonapi-parser (= 0.1.1.beta3)
+      jsonapi-serializable (= 0.1.1.beta4)
+    jsonapi-renderer (0.1.1.beta3)
+    jsonapi-serializable (0.1.1.beta4)
+      jsonapi-renderer (= 0.1.1.beta3)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -291,6 +300,7 @@ DEPENDENCIES
   has_scope
   hashid-rails
   httparty
+  jsonapi-rails
   kaminari
   listen (~> 3.0.5)
   paranoia (~> 2.2)

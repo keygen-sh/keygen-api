@@ -9,7 +9,7 @@ module Api::V1
       @products = policy_scope apply_scopes(current_account.products).all
       authorize @products
 
-      render json: @products
+      render jsonapi: @products
     end
 
     # GET /products/1
