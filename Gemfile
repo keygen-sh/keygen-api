@@ -13,6 +13,7 @@ gem 'hashid-rails'
 
 # JSON API serializers
 gem 'active_model_serializers'
+gem 'jsonapi-rails'
 
 # Billing and subscriptions
 gem 'stripe'
