@@ -16,7 +16,14 @@ Feature: Update product
     And I use an authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
-      { "product": { "name": "New App" } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "New App"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "product" with the name "New App"
@@ -30,7 +37,14 @@ Feature: Update product
     And I use an authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
-      { "product": { "name": "Updated App" } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Updated App"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -43,7 +57,14 @@ Feature: Update product
     And I use an authentication token
     When I send a PATCH request to "/products/$1" with the following:
       """
-      { "product": { "platforms": ["iOS", "Android", "Windows"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["iOS", "Android", "Windows"]
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "product" with the following platforms:
@@ -64,7 +85,14 @@ Feature: Update product
     And I use an authentication token
     When I send a PATCH request to "/products/$0" with the following:
       """
-      { "product": { "platforms": ["Nintendo"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["Nintendo"]
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "product" with the following platforms:
@@ -81,7 +109,14 @@ Feature: Update product
     And I use an authentication token
     When I send a PATCH request to "/products/$1" with the following:
       """
-      { "product": { "platforms": ["PC"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["PC"]
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs

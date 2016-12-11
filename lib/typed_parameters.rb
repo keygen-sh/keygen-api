@@ -121,7 +121,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(name, type:, as: nil, optional: false, allow_nil: false, &block)
+    def param(name, type:, as: nil, optional: false, allow_nil: false, one_of: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       key = (as || name).to_sym
       value = if context.params.is_a? ActionController::Parameters
@@ -132,11 +132,13 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for #{key} (got #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError, "Invalid type defined for parameter '#{key}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
         raise InvalidParameterError, "Parameter missing: #{key}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for #{key} (got #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError, "Type mismatch for parameter '#{key}' (received #{Helper.class_type(value.class)} expected #{type})"
+      when !one_of.empty? && !one_of.include?(value)
+        raise InvalidParameterError, "Parameter '#{key}' must be one of: #{one_of.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return
       end
@@ -151,7 +153,7 @@ class TypedParameters
           params.merge! name => Schema.new(context: ctx, keys: keys, &block).params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for #{key} (expected hash of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{key}' (expected hash of scalar types)"
           end
           value.keys.each { |k| keys << k.to_sym }
           params.merge! name => value
@@ -161,11 +163,11 @@ class TypedParameters
           arr_type = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for #{key} (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError, "Type mismatch for parameter '#{key}' (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
         else
           if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for #{key} (expected array of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{key}' (expected array of scalar types)"
           end
         end
         params.merge! name => value
