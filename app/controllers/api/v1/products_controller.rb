@@ -18,12 +18,12 @@ module Api::V1
 
       authorize @product
 
-      render json: @product
+      render jsonapi: @product
     end
 
     # POST /products
     def create
-      @product = current_account.products.new product_parameters
+      @product = current_account.products.new product_attributes
       authorize @product
 
       if @product.save
@@ -33,7 +33,7 @@ module Api::V1
           resource: @product
         ).execute
 
-        render json: @product, status: :created, location: v1_product_url(@product)
+        render jsonapi: @product, status: :created, location: v1_product_url(@product)
       else
         render_unprocessable_resource @product
       end
@@ -45,14 +45,14 @@ module Api::V1
 
       authorize @product
 
-      if @product.update(product_parameters)
+      if @product.update(product_attributes)
         CreateWebhookEventService.new(
           event: "product.updated",
           account: current_account,
           resource: @product
         ).execute
 
-        render json: @product
+        render jsonapi: @product
       else
         render_unprocessable_resource @product
       end
@@ -79,8 +79,8 @@ module Api::V1
       @product = current_account.products.find_by_hashid params[:id]
     end
 
-    def product_parameters
-      parameters[:product]
+    def product_attributes
+      parameters[:data][:attributes]
     end
 
     def parameters
@@ -88,21 +88,27 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :product, type: :hash do
-            param :name, type: :string
-            param :metadata, type: :hash, optional: true
-            param :platforms, type: :array, optional: true do
-              item type: :string
+          param :data, type: :hash do
+            param :type, type: :string, one_of: %w[product products]
+            param :attributes, type: :hash do
+              param :name, type: :string
+              param :metadata, type: :hash, optional: true
+              param :platforms, type: :array, optional: true do
+                item type: :string
+              end
             end
           end
         end
 
         on :update do
-          param :product, type: :hash do
-            param :name, type: :string, optional: true
-            param :metadata, type: :hash, optional: true
-            param :platforms, type: :array, optional: true do
-              item type: :string
+          param :data, type: :hash do
+            param :type, type: :string, one_of: %w[product products]
+            param :attributes, type: :hash do
+              param :name, type: :string, optional: true
+              param :metadata, type: :hash, optional: true
+              param :platforms, type: :array, optional: true do
+                item type: :string
+              end
             end
           end
         end

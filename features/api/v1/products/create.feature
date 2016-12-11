@@ -15,7 +15,15 @@ Feature: Create product
     And the current account has 4 "webhookEndpoints"
     When I send a POST request to "/products" with the following:
       """
-      { "product": { "name": "Cool App", "platforms": ["iOS", "Android"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And sidekiq should have 4 "webhook" jobs
@@ -27,7 +35,14 @@ Feature: Create product
     And the current account has 2 "webhookEndpoints"
     When I send a POST request to "/products" with the following:
       """
-      { "product": { "platforms": ["iOS", "Android"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -39,7 +54,14 @@ Feature: Create product
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/products" with the following:
       """
-      { "product": { "name": "Another Cool App" } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -52,7 +74,15 @@ Feature: Create product
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/products" with the following:
       """
-      { "product": { "name": "Hello World App", "platforms": ["PC"] } }
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Hello World App",
+            "platforms": ["PC"]
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
