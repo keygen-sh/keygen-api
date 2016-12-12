@@ -37,7 +37,7 @@ module Api::V1
           resource: @key
         ).execute
 
-        render json: @key, status: :created, location: v1_key_url(@key)
+        render json: @key, status: :created, location: v1_account_key_url(@key.account, @key)
       else
         render_unprocessable_resource @key
       end

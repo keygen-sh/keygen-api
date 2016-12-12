@@ -3,7 +3,7 @@ Feature: Update user
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -12,7 +12,7 @@ Feature: Update user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a PATCH request to "/users/$current" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$current" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -25,7 +25,7 @@ Feature: Update user
     And the current account has 1 "user"
     And the current account has 2 "webhookEndpoints"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -37,7 +37,7 @@ Feature: Update user
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    When I send a PATCH request to "/users/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$0" with the following:
       """
       { "user": { "name": "Updated name" } }
       """
@@ -48,7 +48,7 @@ Feature: Update user
     And the current account is "test1"
     And the current account has 2 "users"
     And I use an authentication token
-    When I send a PATCH request to "/users/$2" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
         "user": {
@@ -68,7 +68,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "users"
     And I use an authentication token
-    When I send a PATCH request to "/users/$2" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
         "user": {
@@ -87,7 +87,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 2 "users"
     And I use an authentication token
-    When I send a PATCH request to "/users/$2" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
         "user": {
@@ -107,7 +107,7 @@ Feature: Update user
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       {
         "user": {
@@ -127,7 +127,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
       """
@@ -144,7 +144,7 @@ Feature: Update user
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "metadata": { "nested": { "meta": "data" } } } }
       """
@@ -158,7 +158,7 @@ Feature: Update user
     And I am a product of account "test1"
     And the current product has 1 "user"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
       """
@@ -175,7 +175,7 @@ Feature: Update user
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
       """
@@ -190,7 +190,7 @@ Feature: Update user
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And the current product has 1 "user"
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -205,7 +205,7 @@ Feature: Update user
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "user"
-    When I send a PATCH request to "/users/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       { "user": { "name": "Mr. Robot" } }
       """
@@ -218,7 +218,7 @@ Feature: Update user
    And the current account has 3 "users"
    And I am a user of account "test1"
    And I use an authentication token
-   When I send a PATCH request to "/users/$current" with the following:
+   When I send a PATCH request to "/accounts/test1/users/$current" with the following:
      """
      { "user": { "password": "newPassword" } }
      """
@@ -231,7 +231,7 @@ Feature: Update user
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "users"
     And I use an authentication token
-    When I send a PATCH request to "/users/$2" with the following:
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       { "user": { "password": "h4ck3d!" } }
       """

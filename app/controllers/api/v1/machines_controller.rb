@@ -40,7 +40,7 @@ module Api::V1
           resource: @machine
         ).execute
 
-        render json: @machine, status: :created, location: v1_machine_url(@machine)
+        render json: @machine, status: :created, location: v1_account_machine_url(@machine.account, @machine)
       else
         render_unprocessable_resource @machine
       end

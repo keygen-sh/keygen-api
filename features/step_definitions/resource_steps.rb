@@ -12,15 +12,15 @@ Given /^the following "([^\"]*)" exists:$/ do |resource, body|
   create resource.singularize.underscore, attributes
 end
 
-Given /^there exists an(?:other)? account "([^\"]*)"$/ do |name|
-  create :account, name: name
+Given /^there exists an(?:other)? account "([^\"]*)"$/ do |slug|
+  create :account, slug: slug
 end
 
-Given /^the account "([^\"]*)" has the following attributes:$/ do |name, body|
+Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.find_by(name: name).update attributes
+  Account.friendly.find(slug).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -30,17 +30,16 @@ Given /^I have the following attributes:$/ do |body|
   @bearer.update attributes
 end
 
-Given /^the current account is "([^\"]*)"$/ do |name|
-  @account = Account.find_by name: name
-  header "Keygen-Account", @account.name
+Given /^the current account is "([^\"]*)"$/ do |slug|
+  @account = Account.friendly.find slug
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
 end
 
-Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |name, count, resource|
-  account = Account.find_by name: name
+Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
+  account = Account.friendly.find slug
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -165,16 +164,15 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   ).execute
 
   header "Authorization", "Bearer \"#{token.raw}\""
-  header "Keygen-Account", @account.name
 
-  get "//api.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+  get "//api.keygen.sh/#{@api_version}/accounts/#{@account.slug}/#{resource.pluralize.underscore.dasherize}"
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
 end
 
-Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |name, count, resource|
-  account = Account.find_by name: name
+Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, resource|
+  account = Account.friendly.find slug
 
   user  = account.admins.first
   token = TokenGeneratorService.new(
@@ -183,13 +181,12 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |name, count, re
   ).execute
 
   header "Authorization", "Bearer \"#{token.raw}\""
-  header "Keygen-Account", account.name
 
   case resource
   when /^admins?$/
     expect(account.users.admins.count).to eq count.to_i
   else
-    get "//api.keygen.sh/#{@api_version}/#{resource.pluralize.underscore.dasherize}"
+    get "//api.keygen.sh/#{@api_version}/accounts/#{account.slug}/#{resource.pluralize.underscore.dasherize}"
 
     json = JSON.parse last_response.body
 

@@ -3,7 +3,7 @@ Feature: Account plan
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """
@@ -24,7 +24,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """
@@ -35,7 +35,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """
@@ -46,7 +46,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """
@@ -57,7 +57,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """
@@ -68,7 +68,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "invalid" }
       """
@@ -79,7 +79,7 @@ Feature: Account plan
     And there exists 3 "plans"
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a PUT request to "/accounts/$0/plan" with the following:
+    When I send a PUT request to "/accounts/test1/plan" with the following:
       """
       { "plan": "$plan[0]" }
       """

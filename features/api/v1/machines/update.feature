@@ -3,7 +3,7 @@ Feature: Update machine
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Update machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "Home iMac" } }
       """
@@ -28,7 +28,7 @@ Feature: Update machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "machine"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "fingerprint": "b7:WE:YV:oR:jU:Bc:d6:Wk:Yo:Po:Mu:oN:4Q:bC:pi" } }
       """
@@ -43,7 +43,7 @@ Feature: Update machine
     And I use an authentication token
     And the current account has 1 "machine"
     And the current product has 1 "machine"
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "Work MacBook Pro" } }
       """
@@ -58,7 +58,7 @@ Feature: Update machine
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "machine"
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "Office PC" } }
       """
@@ -81,7 +81,7 @@ Feature: Update machine
       """
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "Office Mac" } }
       """
@@ -104,7 +104,7 @@ Feature: Update machine
       """
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "fingerprint": "F8:2B:DV:tH:Tm:AY:uG:QG:VJ:ct:N6:nK:WF:tq:vr" } }
       """
@@ -117,7 +117,7 @@ Feature: Update machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "Office Mac" } }
       """
@@ -128,7 +128,7 @@ Feature: Update machine
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "iPad 4" } }
       """
@@ -141,7 +141,7 @@ Feature: Update machine
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "machines"
     And I use an authentication token
-    When I send a PATCH request to "/machines/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
       { "machine": { "name": "PC" } }
       """

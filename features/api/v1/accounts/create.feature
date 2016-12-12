@@ -2,7 +2,7 @@
 Feature: Create account
 
   Background:
-    And I send and accept JSON
+    Given I send and accept JSON
 
   Scenario: Anonymous creates an account
     Given there exists 1 "plan"
@@ -10,8 +10,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
@@ -20,14 +20,14 @@ Feature: Create account
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "account" with the company "Google"
+    And the JSON response should be a "account" with the name "Google"
     And the account "google" should have 1 "admin"
 
   # NOTE: This is really just a test to make sure endpoints are valid even when
   #       we're authenticated as another account
   Scenario: Admin of an account creates another account
     Given the following "accounts" exist:
-      | Company   | Name      |
+      | Name      | Slug      |
       | Hashicorp | hashicorp |
     And there exists 1 "plan"
     And I am an admin of account "hashicorp"
@@ -36,8 +36,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
@@ -46,7 +46,7 @@ Feature: Create account
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "account" with the company "Google"
+    And the JSON response should be a "account" with the name "Google"
     And the account "google" should have 1 "admin"
 
   Scenario: Anonymous creates an account with multiple admins
@@ -55,8 +55,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
@@ -75,8 +75,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
@@ -95,8 +95,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
           ]
@@ -112,8 +112,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Google",
-          "name": "google",
+          "name": "Google",
+          "slug": "google",
           "plan": "$plan[0]"
         }
       }
@@ -128,8 +128,8 @@ Feature: Create account
       """
       {
         "account": {
-          "company": "Test1",
-          "name": "test1",
+          "name": "Test1",
+          "slug": "test1",
           "plan": "$plan[0]",
           "admins": [
             { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }

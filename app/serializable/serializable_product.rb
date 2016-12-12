@@ -14,26 +14,26 @@ class SerializableProduct < SerializableBase
   has_many :tokens
   has_many :policies do
     link :related do
-      @url_helpers.v1_policies_path product: @object.hashid
+      @url_helpers.v1_account_policies_path @object.account, product: @object.hashid
     end
   end
   has_many :licenses do
     link :related do
-      @url_helpers.v1_licenses_path product: @object.hashid
+      @url_helpers.v1_account_licenses_path @object.account, product: @object.hashid
     end
   end
   has_many :machines do
     link :related do
-      @url_helpers.v1_machines_path product: @object.hashid
+      @url_helpers.v1_account_machines_path @object.account, product: @object.hashid
     end
   end
   has_many :users do
     link :related do
-      @url_helpers.v1_users_path product: @object.hashid
+      @url_helpers.v1_account_users_path @object.account, product: @object.hashid
     end
   end
 
   link :self do
-    @url_helpers.v1_product_url @object.hashid, host: "keygen.sh"
+    @url_helpers.v1_account_product_path @object.account, @object.hashid, host: "keygen.sh"
   end
 end

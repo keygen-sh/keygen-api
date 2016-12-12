@@ -3,7 +3,7 @@ Feature: Update webhook endpoint
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: Update webhook endpoint
     And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And I use an authentication token
-    When I send a PATCH request to "/webhook-endpoints/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -26,7 +26,7 @@ Feature: Update webhook endpoint
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/webhook-endpoints/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -35,7 +35,7 @@ Feature: Update webhook endpoint
   Scenario: Anonymous user attempts to update a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhookEndpoints"
-    When I send a PATCH request to "/webhook-endpoints/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -46,7 +46,7 @@ Feature: Update webhook endpoint
     But the current account is "test1"
     And the current account has 3 "webhookEndpoints"
     And I use an authentication token
-    When I send a PATCH request to "/webhook-endpoints/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """

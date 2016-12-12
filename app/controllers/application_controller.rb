@@ -1,3 +1,5 @@
+require "active_model_serializers/key_transform"
+
 class ApplicationController < ActionController::API
   include Pundit
 
@@ -9,6 +11,7 @@ class ApplicationController < ActionController::API
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
+  rescue_from ActiveRecord::RecordNotFound, with: -> { render_not_found }
 
   rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
   rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }

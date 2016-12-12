@@ -3,7 +3,7 @@ Feature: Create key
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Create key
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L" } }
       """
@@ -28,7 +28,7 @@ Feature: Create key
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "policy": "$policies[0]" } }
       """
@@ -40,7 +40,7 @@ Feature: Create key
     And the current account is "test1"
     And I use an authentication token
     And the current account has 1 "webhookEndpoint"
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "key": "b" } }
       """
@@ -54,7 +54,7 @@ Feature: Create key
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "sVbmZKq4not2mCEvjEuMVE4cViCWLi" } }
       """
@@ -65,7 +65,7 @@ Feature: Create key
     Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "fw8vuUbmWtZfrLe7Xgmg8xNVhTEjjK" } }
       """
@@ -78,7 +78,7 @@ Feature: Create key
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
-    When I send a POST request to "/keys" with the following:
+    When I send a POST request to "/accounts/test1/keys" with the following:
       """
       { "key": { "policy": "$policies[0]", "key": "PmL2UPti9ZeJTs4kZvGnLJcvsndWhw" } }
       """

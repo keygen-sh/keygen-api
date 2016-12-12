@@ -63,7 +63,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_account
-      @account = Account.find_by_hashid params[:id]
+      @account = Account.friendly.find params[:id]
     end
 
     def account_parameters
@@ -76,8 +76,8 @@ module Api::V1
 
         on :create do
           param :account, type: :hash do
-            param :company, type: :string
             param :name, type: :string
+            param :slug, type: :string
             param :plan, type: :string
             param :users_attributes, type: :array, as: :admins do
               item type: :hash do
@@ -91,8 +91,8 @@ module Api::V1
 
         on :update do
           param :account, type: :hash do
-            param :company, type: :string, optional: true
             param :name, type: :string, optional: true
+            param :slug, type: :string, optional: true
           end
         end
       end

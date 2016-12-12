@@ -37,7 +37,7 @@ module Api::V1
           resource: @user
         ).execute
 
-        render json: @user, status: :created, location: v1_user_url(@user)
+        render json: @user, status: :created, location: v1_account_user_url(@user.account, @user)
       else
         render_unprocessable_resource @user
       end

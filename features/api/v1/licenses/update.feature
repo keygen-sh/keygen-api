@@ -3,7 +3,7 @@ Feature: Update license
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Update license
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-09-05T22:53:37.000Z" } }
       """
@@ -29,7 +29,7 @@ Feature: Update license
     And the current account has 2 "policies"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "policy": "$policies[1]" } }
       """
@@ -42,7 +42,7 @@ Feature: Update license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "a" } }
       """
@@ -57,7 +57,7 @@ Feature: Update license
     And I use an authentication token
     And the current account has 1 "license"
     And the current product has 1 "license"
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "b" } }
       """
@@ -71,7 +71,7 @@ Feature: Update license
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "license"
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "c" } }
       """
@@ -86,7 +86,7 @@ Feature: Update license
     And I am a user of account "test1"
     And the current user has 3 "licenses"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "x" } }
       """
@@ -97,7 +97,7 @@ Feature: Update license
     Given the current account is "test1"
     And the current account has 5 "webhookEndpoints"
     And the current account has 3 "licenses"
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "y" } }
       """
@@ -110,7 +110,7 @@ Feature: Update license
     And the current account has 3 "webhookEndpoints"
     And the current account has 3 "licenses"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "z" } }
       """
@@ -123,7 +123,7 @@ Feature: Update license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "key": "xyz" } }
       """
@@ -136,7 +136,7 @@ Feature: Update license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
       """
@@ -152,7 +152,7 @@ Feature: Update license
     And I use an authentication token
     And the current account has 1 "license"
     And the current product has 1 "license"
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
       """
@@ -167,7 +167,7 @@ Feature: Update license
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "license"
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
       """
@@ -182,7 +182,7 @@ Feature: Update license
     And I am a user of account "test1"
     And the current user has 3 "licenses"
     And I use an authentication token
-    When I send a PATCH request to "/licenses/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
       { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
       """

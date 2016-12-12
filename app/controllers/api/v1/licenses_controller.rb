@@ -43,7 +43,7 @@ module Api::V1
           resource: @license
         ).execute
 
-        render json: @license, status: :created, location: v1_license_url(@license)
+        render json: @license, status: :created, location: v1_account_license_url(@license.account, @license)
       else
         render_unprocessable_resource @license
       end

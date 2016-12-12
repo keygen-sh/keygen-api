@@ -1,7 +1,7 @@
 World Rack::Test::Methods
 
-Given /^the account "([^\"]*)" is (\w+)$/ do |name, state|
-  account = Account.find_by name: name
+Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
+  account = Account.friendly.find slug
 
   # Set up a fake subscription
   plan = create :plan

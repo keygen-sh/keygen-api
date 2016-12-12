@@ -3,7 +3,7 @@ Feature: Create machine
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Create machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]", "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC" } }
       """
@@ -28,7 +28,7 @@ Feature: Create machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]" } }
       """
@@ -41,7 +41,7 @@ Feature: Create machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "fingerprint": "qv:8W:qh:Fx:Ua:kN:LY:fj:yG:8H:Ar:N8:KZ:Uk:ge" } }
       """
@@ -56,7 +56,7 @@ Feature: Create machine
     And the current account has 1 "license"
     And the current user has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]", "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE" } }
       """
@@ -71,7 +71,7 @@ Feature: Create machine
     And the current account has 1 "license"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]", "fingerprint": "oD:aP:3o:GD:vi:H3:Zw:up:h8:3a:hC:MD:2e:4d:cr" } }
       """
@@ -82,7 +82,7 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "license"
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]", "fingerprint": "fw:8v:uU:bm:Wt:Zf:rL:e7:Xg:mg:8x:NV:hT:Ej:jK" } }
       """
@@ -95,7 +95,7 @@ Feature: Create machine
     And the current account has 10 "webhookEndpoints"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a POST request to "/machines" with the following:
+    When I send a POST request to "/accounts/test1/machines" with the following:
       """
       { "machine": { "license": "$licenses[0]", "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw" } }
       """

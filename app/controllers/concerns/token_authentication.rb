@@ -5,11 +5,9 @@ module TokenAuthentication
 
   def authenticate_with_token!
     account = current_account ||
-      Account.find_by_hashid(params[:account_id] || params[:id])
+      Account.friendly.find(params[:account_id] || params[:id])
 
     authenticate_or_request_with_http_token do |token, options|
-      next if account.nil?
-
       tok = TokenAuthenticationService.new(
         account: account,
         token: token
@@ -26,11 +24,9 @@ module TokenAuthentication
 
   def authenticate_with_token
     account = current_account ||
-      Account.find_by_hashid(params[:account_id] || params[:id])
+      Account.friendly.find(params[:account_id] || params[:id])
 
     authenticate_with_http_token do |token, options|
-      next if account.nil?
-
       tok = TokenAuthenticationService.new(
         account: account,
         token: token

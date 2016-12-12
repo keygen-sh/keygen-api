@@ -1,7 +1,7 @@
 World Rack::Test::Methods
 
-Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, name|
-  account = Account.find_by name: name
+Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, slug|
+  account = Account.friendly.find slug
   @bearer =
     case role
     when "admin", "user"

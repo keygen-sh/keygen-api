@@ -40,6 +40,9 @@ gem 'premailer-rails'
 gem 'haml-rails'
 gem 'sass-rails'
 
+# Friendly IDs
+gem 'friendly_id'
+
 # Soft-deletion of database records
 gem 'paranoia', '~> 2.2'
 

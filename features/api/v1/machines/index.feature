@@ -3,7 +3,7 @@ Feature: List machines
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 3 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines"
+    When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
@@ -22,7 +22,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?page[number]=2&page[size]=5"
+    When I send a GET request to "/accounts/test1/machines?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "machines"
 
@@ -31,7 +31,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?page[number]=1&page[size]=250"
+    When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of machines with a page size that is too low
@@ -39,7 +39,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?page[number]=1&page[size]=0"
+    When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=0"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of machines with an invalid page number
@@ -47,7 +47,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?page[number]=-1&page[size]=10"
+    When I send a GET request to "/accounts/test1/machines?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all machines without a limit for their account
@@ -55,7 +55,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines"
+    When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "machines"
 
@@ -64,7 +64,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 10 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?limit=5"
+    When I send a GET request to "/accounts/test1/machines?limit=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "machines"
 
@@ -73,7 +73,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 20 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?limit=20"
+    When I send a GET request to "/accounts/test1/machines?limit=20"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "machines"
 
@@ -82,7 +82,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 2 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?limit=900"
+    When I send a GET request to "/accounts/test1/machines?limit=900"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all machines with a limit that is too low
@@ -90,7 +90,7 @@ Feature: List machines
     And the current account is "test1"
     And the current account has 2 "machines"
     And I use an authentication token
-    When I send a GET request to "/machines?limit=0"
+    When I send a GET request to "/accounts/test1/machines?limit=0"
     Then the response status should be "400"
 
   Scenario: Product retrieves all machines for their product
@@ -100,7 +100,7 @@ Feature: List machines
     And I use an authentication token
     And the current account has 3 "machines"
     And the current product has 1 "machine"
-    When I send a GET request to "/machines"
+    When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
 
@@ -108,7 +108,7 @@ Feature: List machines
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/machines"
+    When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
@@ -127,7 +127,7 @@ Feature: List machines
       { "licenseId": $licenses[0].id }
       """
     And I use an authentication token
-    When I send a GET request to "/machines"
+    When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
@@ -150,6 +150,6 @@ Feature: List machines
       { "fingerprint": "test" }
       """
     And I use an authentication token
-    When I send a GET request to "/machines?fingerprint=test"
+    When I send a GET request to "/accounts/test1/machines?fingerprint=test"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"

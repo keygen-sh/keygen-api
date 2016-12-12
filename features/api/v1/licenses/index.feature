@@ -3,7 +3,7 @@ Feature: List license
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses"
+    When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "licenses"
 
@@ -22,7 +22,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?page[number]=2&page[size]=5"
+    When I send a GET request to "/accounts/test1/licenses?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "licenses"
 
@@ -31,7 +31,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?page[number]=1&page[size]=250"
+    When I send a GET request to "/accounts/test1/licenses?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of licenses with a page size that is too low
@@ -39,7 +39,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?page[number]=1&page[size]=-250"
+    When I send a GET request to "/accounts/test1/licenses?page[number]=1&page[size]=-250"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of licenses with an invalid page number
@@ -47,7 +47,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?page[number]=-1&page[size]=10"
+    When I send a GET request to "/accounts/test1/licenses?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all licenses without a limit for their account
@@ -55,7 +55,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses"
+    When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "licenses"
 
@@ -64,7 +64,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 10 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?limit=5"
+    When I send a GET request to "/accounts/test1/licenses?limit=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "licenses"
 
@@ -73,7 +73,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?limit=20"
+    When I send a GET request to "/accounts/test1/licenses?limit=20"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "licenses"
 
@@ -82,7 +82,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 2 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?limit=900"
+    When I send a GET request to "/accounts/test1/licenses?limit=900"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all licenses with a limit that is too low
@@ -90,7 +90,7 @@ Feature: List license
     And the current account is "test1"
     And the current account has 2 "licenses"
     And I use an authentication token
-    When I send a GET request to "/licenses?limit=-900"
+    When I send a GET request to "/accounts/test1/licenses?limit=-900"
     Then the response status should be "400"
 
   Scenario: Product retrieves all licenses for their product
@@ -100,7 +100,7 @@ Feature: List license
     And I use an authentication token
     And the current account has 3 "licenses"
     And the current product has 1 "license"
-    When I send a GET request to "/licenses"
+    When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
 
@@ -108,7 +108,7 @@ Feature: List license
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/licenses"
+    When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
@@ -119,6 +119,6 @@ Feature: List license
     And I use an authentication token
     And the current account has 3 "licenses"
     And the current user has 1 "license"
-    When I send a GET request to "/licenses"
+    When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"

@@ -4,6 +4,10 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
+  extend FriendlyId
+
+  friendly_id :slug, use: :slugged
+
   acts_as_paranoid
 
   belongs_to :plan
@@ -20,7 +24,7 @@ class Account < ApplicationRecord
 
   accepts_nested_attributes_for :users
 
-  before_create -> { self.name = name.downcase }
+  before_create -> { self.slug = slug.downcase }
   after_create :set_founding_users_roles
   after_create :initialize_billing
   after_create :send_welcome_email
@@ -33,8 +37,8 @@ class Account < ApplicationRecord
   #   account.errors.add record, "count has reached maximum allowed by current plan"
   # end
 
-  validates :company, presence: true
-  validates :name, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
+  validates :name, presence: true
+  validates :slug, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
 
   scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
@@ -66,18 +70,18 @@ end
 # Table name: accounts
 #
 #  id                 :integer          not null, primary key
-#  company            :string
+#  name               :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
 #  deleted_at         :datetime
-#  name               :string
+#  slug               :string
 #
 # Indexes
 #
 #  index_accounts_on_deleted_at  (deleted_at)
 #  index_accounts_on_id          (id)
-#  index_accounts_on_name        (name)
+#  index_accounts_on_slug        (slug)
 #

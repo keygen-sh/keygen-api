@@ -3,7 +3,7 @@ Feature: List products
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 3 "products"
     And I use an authentication token
-    When I send a GET request to "/products"
+    When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "products"
 
@@ -22,7 +22,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?page[number]=2&page[size]=5"
+    When I send a GET request to "/accounts/test1/products?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "products"
 
@@ -31,7 +31,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?page[number]=1&page[size]=250"
+    When I send a GET request to "/accounts/test1/products?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of products with a page size that is too low
@@ -39,7 +39,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?page[number]=1&page[size]=-10"
+    When I send a GET request to "/accounts/test1/products?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of products with an invalid page number
@@ -47,7 +47,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?page[number]=-1&page[size]=10"
+    When I send a GET request to "/accounts/test1/products?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all products without a limit for their account
@@ -55,7 +55,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products"
+    When I send a GET request to "/accounts/test1/products"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "products"
 
@@ -64,7 +64,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 10 "products"
     And I use an authentication token
-    When I send a GET request to "/products?limit=5"
+    When I send a GET request to "/accounts/test1/products?limit=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "products"
 
@@ -73,7 +73,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?limit=20"
+    When I send a GET request to "/accounts/test1/products?limit=20"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "products"
 
@@ -82,7 +82,7 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?limit=900"
+    When I send a GET request to "/accounts/test1/products?limit=900"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all products with a limit that is too low
@@ -90,14 +90,14 @@ Feature: List products
     And the current account is "test1"
     And the current account has 20 "products"
     And I use an authentication token
-    When I send a GET request to "/products?limit=-10"
+    When I send a GET request to "/accounts/test1/products?limit=-10"
     Then the response status should be "400"
 
   Scenario: Admin attempts to retrieve all products for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/products"
+    When I send a GET request to "/accounts/test1/products"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
@@ -107,7 +107,7 @@ Feature: List products
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 3 "products"
-    When I send a GET request to "/products"
+    When I send a GET request to "/accounts/test1/products"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
 
@@ -116,6 +116,6 @@ Feature: List products
     And the current account has 3 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/products"
+    When I send a GET request to "/accounts/test1/products"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error

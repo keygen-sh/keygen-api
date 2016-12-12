@@ -3,7 +3,7 @@ Feature: Update product
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Update product
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a PATCH request to "/products/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
       """
       {
         "data": {
@@ -35,7 +35,7 @@ Feature: Update product
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "product"
     And I use an authentication token
-    When I send a PATCH request to "/products/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
       """
       {
         "data": {
@@ -55,7 +55,7 @@ Feature: Update product
     And the current account has 3 "webhookEndpoints"
     And the current account has 2 "products"
     And I use an authentication token
-    When I send a PATCH request to "/products/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/products/$1" with the following:
       """
       {
         "data": {
@@ -83,7 +83,7 @@ Feature: Update product
     And the current account has 2 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/products/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
       """
       {
         "data": {
@@ -107,7 +107,7 @@ Feature: Update product
     And the current account has 2 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/products/$1" with the following:
+    When I send a PATCH request to "/accounts/test1/products/$1" with the following:
       """
       {
         "data": {

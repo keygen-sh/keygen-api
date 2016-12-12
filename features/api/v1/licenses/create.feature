@@ -3,7 +3,7 @@ Feature: Create license
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -15,7 +15,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -34,7 +34,7 @@ Feature: Create license
       """
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -48,7 +48,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]" } }
       """
@@ -62,7 +62,7 @@ Feature: Create license
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "user": "$users[1]" } }
       """
@@ -77,7 +77,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]", "key": "a" } }
       """
@@ -92,7 +92,7 @@ Feature: Create license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -107,7 +107,7 @@ Feature: Create license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]" } }
       """
@@ -122,7 +122,7 @@ Feature: Create license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
       """
@@ -150,7 +150,7 @@ Feature: Create license
       """
     And the current account has 3 "users"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -172,7 +172,7 @@ Feature: Create license
       """
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -188,7 +188,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -209,7 +209,7 @@ Feature: Create license
       """
     And the current account has 1 "user"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -232,7 +232,7 @@ Feature: Create license
     And I am a product of account "test1"
     And the current product has 1 "policy"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """
@@ -253,7 +253,7 @@ Feature: Create license
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/licenses" with the following:
+    When I send a POST request to "/accounts/test1/licenses" with the following:
       """
       { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
       """

@@ -3,7 +3,7 @@ Feature: Create policy
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Create policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {
@@ -38,7 +38,7 @@ Feature: Create policy
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {
@@ -60,7 +60,7 @@ Feature: Create policy
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {
@@ -80,7 +80,7 @@ Feature: Create policy
     And the current account has 7 "webhookEndpoints"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {
@@ -103,7 +103,7 @@ Feature: Create policy
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {
@@ -127,7 +127,7 @@ Feature: Create policy
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/policies" with the following:
+    When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
         "policy": {

@@ -3,7 +3,7 @@ Feature: Create product
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: Create product
     And the current account is "test1"
     And I use an authentication token
     And the current account has 4 "webhookEndpoints"
-    When I send a POST request to "/products" with the following:
+    When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
         "data": {
@@ -33,7 +33,7 @@ Feature: Create product
     And the current account is "test1"
     And I use an authentication token
     And the current account has 2 "webhookEndpoints"
-    When I send a POST request to "/products" with the following:
+    When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
         "data": {
@@ -52,7 +52,7 @@ Feature: Create product
     But the current account is "test1"
     And I use an authentication token
     And the current account has 1 "webhookEndpoint"
-    When I send a POST request to "/products" with the following:
+    When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
         "data": {
@@ -72,7 +72,7 @@ Feature: Create product
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "webhookEndpoint"
-    When I send a POST request to "/products" with the following:
+    When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
         "data": {
