@@ -1,8 +1,8 @@
 class SerializableAccount < SerializableBase
   type 'accounts'
 
-  attribute :company
   attribute :name
+  attribute :slug
   attribute :created_at
   attribute :updated_at
 

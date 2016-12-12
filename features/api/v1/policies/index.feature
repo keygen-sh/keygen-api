@@ -3,7 +3,7 @@ Feature: List policies
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -13,7 +13,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 3 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies"
+    When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "policies"
 
@@ -22,7 +22,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?page[number]=2&page[size]=5"
+    When I send a GET request to "/accounts/test1/policies?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "policies"
 
@@ -31,7 +31,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?page[number]=1&page[size]=250"
+    When I send a GET request to "/accounts/test1/policies?page[number]=1&page[size]=250"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of policies with a page size that is too low
@@ -39,7 +39,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?page[number]=1&page[size]=-10"
+    When I send a GET request to "/accounts/test1/policies?page[number]=1&page[size]=-10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a paginated list of policies with an invalid page number
@@ -47,7 +47,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?page[number]=-1&page[size]=10"
+    When I send a GET request to "/accounts/test1/policies?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all policies without a limit for their account
@@ -55,7 +55,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies"
+    When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "policies"
 
@@ -64,7 +64,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 10 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?limit=5"
+    When I send a GET request to "/accounts/test1/policies?limit=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "policies"
 
@@ -73,7 +73,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?limit=20"
+    When I send a GET request to "/accounts/test1/policies?limit=20"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "policies"
 
@@ -82,7 +82,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?limit=900"
+    When I send a GET request to "/accounts/test1/policies?limit=900"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all policies with a limit that is too low
@@ -90,7 +90,7 @@ Feature: List policies
     And the current account is "test1"
     And the current account has 20 "policies"
     And I use an authentication token
-    When I send a GET request to "/policies?limit=-10"
+    When I send a GET request to "/accounts/test1/policies?limit=-10"
     Then the response status should be "400"
 
   Scenario: Product retrieves all policies for their product
@@ -100,7 +100,7 @@ Feature: List policies
     And I use an authentication token
     And the current account has 3 "policies"
     And the current product has 1 "policy"
-    When I send a GET request to "/policies"
+    When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "policy"
 
@@ -108,7 +108,7 @@ Feature: List policies
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/policies"
+    When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
@@ -118,6 +118,6 @@ Feature: List policies
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 3 "policies"
-    When I send a GET request to "/policies"
+    When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error

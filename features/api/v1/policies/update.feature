@@ -3,7 +3,7 @@ Feature: Update policy
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Update policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "name": "Trial" } }
       """
@@ -28,7 +28,7 @@ Feature: Update policy
     And the current account has 2 "webhookEndpoints"
     And the account "test1" has 1 "policy"
     And I use an authentication token
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "price": 0 } }
       """
@@ -43,7 +43,7 @@ Feature: Update policy
     And I use an authentication token
     And the current account has 1 "policy"
     And the current product has 1 "policy"
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "price": 1000 } }
       """
@@ -58,7 +58,7 @@ Feature: Update policy
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "policy"
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "price": 1000 } }
       """
@@ -71,7 +71,7 @@ Feature: Update policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "encrypted": false } }
       """
@@ -84,7 +84,7 @@ Feature: Update policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And I use an authentication token
-    When I send a PATCH request to "/policies/$0" with the following:
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       { "policy": { "usePool": true } }
       """

@@ -3,7 +3,7 @@ Feature: List accounts
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON

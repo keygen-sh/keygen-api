@@ -3,7 +3,7 @@ Feature: Account subscription
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -12,7 +12,7 @@ Feature: Account subscription
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/pause-subscription"
+    When I send a POST request to "/accounts/test1/pause-subscription"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -25,7 +25,7 @@ Feature: Account subscription
     Given the account "test1" is paused
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/resume-subscription"
+    When I send a POST request to "/accounts/test1/resume-subscription"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -38,7 +38,7 @@ Feature: Account subscription
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/cancel-subscription"
+    When I send a POST request to "/accounts/test1/cancel-subscription"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -51,7 +51,7 @@ Feature: Account subscription
     Given the account "test1" is canceled
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/renew-subscription"
+    When I send a POST request to "/accounts/test1/renew-subscription"
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
@@ -64,54 +64,54 @@ Feature: Account subscription
     Given the account "test1" is paused
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/pause-subscription"
+    When I send a POST request to "/accounts/test1/pause-subscription"
     Then the response status should be "422"
 
   Scenario: Admin attempts to resume their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/resume-subscription"
+    When I send a POST request to "/accounts/test1/resume-subscription"
     Then the response status should be "422"
 
   Scenario: Admin attempts to cancel their canceled account
     Given the account "test1" is canceled
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/cancel-subscription"
+    When I send a POST request to "/accounts/test1/cancel-subscription"
     Then the response status should be "422"
 
   Scenario: Admin attempts to renews their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/renew-subscription"
+    When I send a POST request to "/accounts/test1/renew-subscription"
     Then the response status should be "422"
 
   Scenario: Admin attempts to pause another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/pause-subscription"
+    When I send a POST request to "/accounts/test1/pause-subscription"
     Then the response status should be "401"
 
   Scenario: Admin attempts to resume another account
     Given the account "test1" is paused
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/resume-subscription"
+    When I send a POST request to "/accounts/test1/resume-subscription"
     Then the response status should be "401"
 
   Scenario: Admin attempts to cancel another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/cancel-subscription"
+    When I send a POST request to "/accounts/test1/cancel-subscription"
     Then the response status should be "401"
 
   Scenario: Admin attempts to renew another account
     Given the account "test1" is canceled
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a POST request to "/accounts/$0/renew-subscription"
+    When I send a POST request to "/accounts/test1/renew-subscription"
     Then the response status should be "401"

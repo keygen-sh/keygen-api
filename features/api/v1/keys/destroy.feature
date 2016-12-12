@@ -3,7 +3,7 @@ Feature: Delete key
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Delete key
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     And I use an authentication token
-    When I send a DELETE request to "/keys/$2"
+    When I send a DELETE request to "/accounts/test1/keys/$2"
     Then the response status should be "204"
     And the current account should have 2 "keys"
     And sidekiq should have 1 "webhook" job
@@ -26,7 +26,7 @@ Feature: Delete key
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/keys/$1"
+    When I send a DELETE request to "/accounts/test1/keys/$1"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "keys"
@@ -36,7 +36,7 @@ Feature: Delete key
     Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
-    When I send a DELETE request to "/keys/$1"
+    When I send a DELETE request to "/accounts/test1/keys/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "keys"
@@ -48,7 +48,7 @@ Feature: Delete key
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "keys"
     And I use an authentication token
-    When I send a DELETE request to "/keys/$1"
+    When I send a DELETE request to "/accounts/test1/keys/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "keys"

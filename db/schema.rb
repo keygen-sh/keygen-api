@@ -10,23 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161129180943) do
+ActiveRecord::Schema.define(version: 20161212161422) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "accounts", force: :cascade do |t|
-    t.string   "company"
+    t.string   "name"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
     t.integer  "plan_id"
     t.string   "activation_token"
     t.datetime "activation_sent_at"
     t.datetime "deleted_at"
-    t.string   "name"
+    t.string   "slug"
     t.index ["deleted_at"], name: "index_accounts_on_deleted_at", using: :btree
     t.index ["id"], name: "index_accounts_on_id", where: "(deleted_at IS NULL)", using: :btree
-    t.index ["name"], name: "index_accounts_on_name", where: "(deleted_at IS NULL)", using: :btree
+    t.index ["slug"], name: "index_accounts_on_slug", where: "(deleted_at IS NULL)", using: :btree
   end
 
   create_table "billings", force: :cascade do |t|
@@ -47,6 +47,18 @@ ActiveRecord::Schema.define(version: 20161129180943) do
     t.index ["customer_id", "account_id"], name: "index_billings_on_customer_id_and_account_id", where: "(deleted_at IS NULL)", using: :btree
     t.index ["deleted_at"], name: "index_billings_on_deleted_at", using: :btree
     t.index ["subscription_id", "account_id"], name: "index_billings_on_subscription_id_and_account_id", where: "(deleted_at IS NULL)", using: :btree
+  end
+
+  create_table "friendly_id_slugs", force: :cascade do |t|
+    t.string   "slug",                      null: false
+    t.integer  "sluggable_id",              null: false
+    t.string   "sluggable_type", limit: 50
+    t.string   "scope"
+    t.datetime "created_at"
+    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true, using: :btree
+    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type", using: :btree
+    t.index ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id", using: :btree
+    t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type", using: :btree
   end
 
   create_table "keys", force: :cascade do |t|

@@ -37,7 +37,7 @@ module Api::V1
           resource: @policy
         ).execute
 
-        render json: @policy, status: :created, location: v1_policy_url(@policy)
+        render json: @policy, status: :created, location: v1_account_policy_url(@policy.account, @policy)
       else
         render_unprocessable_resource @policy
       end

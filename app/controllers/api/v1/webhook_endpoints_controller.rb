@@ -27,7 +27,7 @@ module Api::V1
       authorize @endpoint
 
       if @endpoint.save
-        render json: @endpoint, status: :created, location: v1_webhook_endpoint_url(@endpoint)
+        render json: @endpoint, status: :created, location: v1_account_webhook_endpoint_url(@endpoint.account, @endpoint)
       else
         render_unprocessable_resource @endpoint
       end

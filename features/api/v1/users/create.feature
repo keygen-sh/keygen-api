@@ -3,7 +3,7 @@ Feature: Create user
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -12,7 +12,7 @@ Feature: Create user
     Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "user"
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       { "user": { "name": "Superman", "email": "superman@keygen.sh", "password": "lois" } }
       """
@@ -24,7 +24,7 @@ Feature: Create user
   Scenario: Anonymous attempts to create an incomplete user for an account
     Given the current account is "test1"
     And the current account has 1 "user"
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       { "user": { "name": "Superman", "email": "superman@keygen.sh" } }
       """
@@ -34,7 +34,7 @@ Feature: Create user
   Scenario: Anonymous attempts to create a user with invalid parameter types
     Given the current account is "test1"
     And the current account has 1 "user"
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       { "user": { "name": "Superman", "email": 42 } }
       """
@@ -46,7 +46,7 @@ Feature: Create user
     And the current account is "test1"
     And I use an authentication token
     And the current account has 3 "webhookEndpoints"
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
         "user": {
@@ -68,7 +68,7 @@ Feature: Create user
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
         "user": {
@@ -87,7 +87,7 @@ Feature: Create user
   Scenario: Anonymous attempts to create an admin for an account
     Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"
-    When I send a POST request to "/users" with the following:
+    When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
         "user": {

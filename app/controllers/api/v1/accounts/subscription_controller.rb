@@ -62,7 +62,7 @@ module Api::V1::Accounts
     private
 
     def set_account
-      @account = Account.find_by_hashid params[:id]
+      @account = Account.friendly.find params[:id]
     end
   end
 end

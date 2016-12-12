@@ -3,7 +3,7 @@ Feature: Delete product
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Delete product
     And the current account has 1 "webhookEndpoint"
     And the current account has 3 "products"
     And I use an authentication token
-    When I send a DELETE request to "/products/$2"
+    When I send a DELETE request to "/accounts/test1/products/$2"
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
@@ -25,7 +25,7 @@ Feature: Delete product
     And the current account has 4 "webhookEndpoints"
     And the current account has 3 "products"
     And I use an authentication token
-    When I send a DELETE request to "/products/$1"
+    When I send a DELETE request to "/accounts/test1/products/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "products"
@@ -37,7 +37,7 @@ Feature: Delete product
     And the current account has 3 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/products/$0"
+    When I send a DELETE request to "/accounts/test1/products/$0"
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
@@ -48,7 +48,7 @@ Feature: Delete product
     And the current account has 3 "products"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/products/$1"
+    When I send a DELETE request to "/accounts/test1/products/$1"
     Then the response status should be "403"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs

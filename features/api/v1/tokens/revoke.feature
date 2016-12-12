@@ -3,7 +3,7 @@ Feature: Revoke authentication token
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -12,7 +12,7 @@ Feature: Revoke authentication token
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$0"
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
 
   Scenario: User revokes one of their tokens
@@ -20,7 +20,7 @@ Feature: Revoke authentication token
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$0"
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
 
   Scenario: Product revokes one of their tokens
@@ -28,7 +28,7 @@ Feature: Revoke authentication token
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$0"
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
 
   Scenario: Admin revokes another user's token
@@ -36,7 +36,7 @@ Feature: Revoke authentication token
     And the current account is "test1"
     And the current account has 5 "users"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$2"
+    When I send a DELETE request to "/accounts/test1/tokens/$2"
     Then the response status should be "204"
 
   Scenario: User attempts to revoke another user's token
@@ -44,7 +44,7 @@ Feature: Revoke authentication token
     And the current account has 5 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$3"
+    When I send a DELETE request to "/accounts/test1/tokens/$3"
     Then the response status should be "403"
 
   Scenario: Product attempts to revoke a user's token
@@ -52,5 +52,5 @@ Feature: Revoke authentication token
     And the current account has 5 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/tokens/$4"
+    When I send a DELETE request to "/accounts/test1/tokens/$4"
     Then the response status should be "403"

@@ -33,7 +33,7 @@ module Api::V1
           resource: @product
         ).execute
 
-        render jsonapi: @product, status: :created, location: v1_product_url(@product)
+        render jsonapi: @product, status: :created, location: v1_account_product_url(@product.account, @product)
       else
         render_unprocessable_resource @product
       end

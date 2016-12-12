@@ -3,7 +3,7 @@ Feature: Delete machine
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Delete machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     And I use an authentication token
-    When I send a DELETE request to "/machines/$2"
+    When I send a DELETE request to "/accounts/test1/machines/$2"
     Then the response status should be "204"
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
@@ -26,7 +26,7 @@ Feature: Delete machine
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/machines/$1"
+    When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "machines"
@@ -40,7 +40,7 @@ Feature: Delete machine
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "machine"
-    When I send a DELETE request to "/machines/$0"
+    When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "204"
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
@@ -49,7 +49,7 @@ Feature: Delete machine
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
-    When I send a DELETE request to "/machines/$1"
+    When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "machines"
@@ -61,7 +61,7 @@ Feature: Delete machine
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "machines"
     And I use an authentication token
-    When I send a DELETE request to "/machines/$1"
+    When I send a DELETE request to "/accounts/test1/machines/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "machines"

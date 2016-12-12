@@ -3,7 +3,7 @@ Feature: Delete policy
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -14,7 +14,7 @@ Feature: Delete policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "policies"
     And I use an authentication token
-    When I send a DELETE request to "/policies/$2"
+    When I send a DELETE request to "/accounts/test1/policies/$2"
     Then the response status should be "204"
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
@@ -25,7 +25,7 @@ Feature: Delete policy
     And the current account has 2 "webhookEndpoints"
     And the current account has 3 "policies"
     And I use an authentication token
-    When I send a DELETE request to "/policies/$1"
+    When I send a DELETE request to "/accounts/test1/policies/$1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "policies"

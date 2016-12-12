@@ -1,10 +1,8 @@
 module CurrentAccountScope
-  SCOPE_HEADER_KEY = "Keygen-Account".freeze
-
   extend ActiveSupport::Concern
 
   def scope_to_current_account!
-    @current_account = Account.find_by_name! request.headers.fetch(SCOPE_HEADER_KEY, nil)
+    @current_account = Account.friendly.find params[:account_id] || params[:id]
 
     if current_account.active?
       current_account

@@ -3,7 +3,7 @@ Feature: Update account
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -11,29 +11,29 @@ Feature: Update account
   Scenario: Admin updates their account
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/accounts/$0" with the following:
+    When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "company": "Company Name" } }
+      { "account": { "name": "Company Name" } }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the company "Company Name"
+    And the JSON response should be an "account" with the name "Company Name"
 
   Scenario: Admin updates the name for their account
     Given I am an admin of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/accounts/$0" with the following:
+    When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "name": "new-name" } }
+      { "account": { "slug": "new-name" } }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the name "new-name"
+    And the JSON response should be an "account" with the slug "new-name"
 
   Scenario: Admin attempts to update another account
     Given I am an admin of account "test2"
     And I use an authentication token
-    When I send a PATCH request to "/accounts/$0" with the following:
+    When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "company": "Company Name" } }
+      { "account": { "name": "Company Name" } }
       """
     Then the response status should be "401"
 
@@ -41,8 +41,8 @@ Feature: Update account
     Given the account "test1" has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PATCH request to "/accounts/$0" with the following:
+    When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "company": "Company Name" } }
+      { "account": { "name": "Company Name" } }
       """
     Then the response status should be "403"

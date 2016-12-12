@@ -3,7 +3,7 @@ Feature: Create webhook endpoint
 
   Background:
     Given the following "accounts" exist:
-      | Company | Name  |
+      | Name    | Slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -12,7 +12,7 @@ Feature: Create webhook endpoint
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -23,7 +23,7 @@ Feature: Create webhook endpoint
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": {} }
       """
@@ -33,7 +33,7 @@ Feature: Create webhook endpoint
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "ssh://example.com" } }
       """
@@ -44,7 +44,7 @@ Feature: Create webhook endpoint
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -52,7 +52,7 @@ Feature: Create webhook endpoint
 
   Scenario: Unauthenticated user attempts to create a webhook endpoint
     Given the current account is "test1"
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
@@ -62,7 +62,7 @@ Feature: Create webhook endpoint
     Given I am an admin of account "test2"
     And the current account is "test1"
     And I use an authentication token
-    When I send a POST request to "/webhook-endpoints" with the following:
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
       { "endpoint": { "url": "https://example.com" } }
       """
