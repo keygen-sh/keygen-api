@@ -80,7 +80,7 @@ module Api::V1
             param :slug, type: :string
             param :plan, type: :string
             param :users_attributes, type: :array, as: :admins do
-              item type: :hash do
+              items type: :hash do
                 param :name, type: :string
                 param :email, type: :string
                 param :password, type: :string

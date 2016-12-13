@@ -94,7 +94,7 @@ module Api::V1
               param :name, type: :string
               param :metadata, type: :hash, optional: true
               param :platforms, type: :array, optional: true do
-                item type: :string
+                items type: :string
               end
             end
           end
@@ -107,7 +107,7 @@ module Api::V1
               param :name, type: :string, optional: true
               param :metadata, type: :hash, optional: true
               param :platforms, type: :array, optional: true do
-                item type: :string
+                items type: :string
               end
             end
           end
