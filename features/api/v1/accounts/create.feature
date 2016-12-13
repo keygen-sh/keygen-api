@@ -9,13 +9,18 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "plan": "$plan[0]",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
+            ]
+          }
         }
       }
       """
@@ -35,13 +40,18 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "plan": "$plan[0]",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
+            ]
+          }
         }
       }
       """
@@ -54,15 +64,20 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "plan": "$plan[0]",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
-            { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
-            { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" }
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
+              { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
+              { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" }
+            ]
+          }
         }
       }
       """
@@ -74,16 +89,21 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "plan": "$plan[0]",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
-            { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
-            { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" },
-            "someInvalidParam"
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" },
+              { "name": "Sergey Brin", "email": "sbrin@keygen.sh", "password": "goog" },
+              { "name": "Sundar Pichai", "email": "spichai@keygen.sh", "password": "goog" },
+              "someInvalidParam"
+            ]
+          }
         }
       }
       """
@@ -94,12 +114,17 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
+            ]
+          }
         }
       }
       """
@@ -111,10 +136,15 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Google",
-          "slug": "google",
-          "plan": "$plan[0]"
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": "$plan[0]"
+          }
         }
       }
       """
@@ -127,13 +157,18 @@ Feature: Create account
     When I send a POST request to "/accounts" with the following:
       """
       {
-        "account": {
-          "name": "Test1",
-          "slug": "test1",
-          "plan": "$plan[0]",
-          "admins": [
-            { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
-          ]
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Test1",
+            "slug": "test1"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
+            ]
+          }
         }
       }
       """
