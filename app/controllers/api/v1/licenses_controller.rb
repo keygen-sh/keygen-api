@@ -109,7 +109,7 @@ module Api::V1
 
         on :update do
           param :license, type: :hash do
-            param :expiry, type: :string, optional: true
+            param :expiry, type: :datetime, optional: true, coerce: true
             param :metadata, type: :hash, optional: true
           end
         end
