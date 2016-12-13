@@ -25,28 +25,34 @@ class TypedParameters
   class Boolean; end
 
   VALID_TYPES = {
-    number: Numeric,
     integer: Integer,
     float: Float,
-    fixnum: Fixnum,
-    big_decimal: BigDecimal,
+    decimal: BigDecimal,
     boolean: Boolean,
-    true: TrueClass,
-    false: FalseClass,
     symbol: Symbol,
     string: String,
     hash: Hash,
     array: Array,
-    null: NilClass,
-    nil: NilClass,
-    date_time: DateTime,
+    datetime: DateTime,
     date: Date,
     time: Time
   }
 
   SCALAR_TYPES = VALID_TYPES.slice(
-    *(VALID_TYPES.keys - [:hash, :array])
+    *(VALID_TYPES.keys - [:hash, :array, :datetime, :date, :time])
   )
+
+  COERCABLE_TYPES = {
+    integer: -> (v) { v.to_i },
+    float: -> (v) { v.to_f },
+    decimal: -> (v) { v.to_d },
+    boolean: -> (v) { !!v },
+    symbol: -> (v) { v.to_sym },
+    string: -> (v) { v.to_s },
+    datetime: -> (v) { v.to_datetime },
+    date: -> (v) { v.to_date },
+    time: -> (v) { v.to_time }
+  }
 
   def self.build(context, &block)
     schema = Schema.new context: context, &block
@@ -121,7 +127,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(name, type:, as: nil, optional: false, allow_nil: false, inclusion: [], &block)
+    def param(name, type:, as: nil, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       key = (as || name).to_sym
       value = if context.params.is_a? ActionController::Parameters
@@ -129,6 +135,18 @@ class TypedParameters
               else
                 context.params[key]
               end
+
+      if coerce && value
+        if !COERCABLE_TYPES[type.to_sym].nil?
+          begin
+            value = COERCABLE_TYPES[type.to_sym].call value
+          rescue
+            raise InvalidParameterError, "Parameter '#{key}' could not be coerced to #{type}"
+          end
+        else
+          raise InvalidParameterError, "Invalid type for coercion: #{type}"
+        end
+      end
 
       case
       when real_type.nil?
