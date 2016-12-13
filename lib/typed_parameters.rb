@@ -9,7 +9,7 @@
 #         param :name, type: :integer
 #       end
 #       param :array, type: :array do
-#         item type: :integer
+#         items type: :integer
 #       end
 #       param :hash, type: :hash
 #     end
@@ -176,7 +176,7 @@ class TypedParameters
       end
     end
 
-    def item(type:)
+    def items(type:)
       VALID_TYPES.fetch type.to_sym, nil
     end
   end
