@@ -13,7 +13,14 @@ Feature: Update account
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "name": "Company Name" } }
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Company Name"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be an "account" with the name "Company Name"
@@ -23,7 +30,14 @@ Feature: Update account
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "slug": "new-name" } }
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "new-name"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be an "account" with the slug "new-name"
@@ -33,7 +47,14 @@ Feature: Update account
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "name": "Company Name" } }
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Company Name"
+          }
+        }
+      }
       """
     Then the response status should be "401"
 
@@ -43,6 +64,13 @@ Feature: Update account
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1" with the following:
       """
-      { "account": { "name": "Company Name" } }
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Company Name"
+          }
+        }
+      }
       """
     Then the response status should be "403"

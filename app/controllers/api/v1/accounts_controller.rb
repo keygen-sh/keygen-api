@@ -24,9 +24,11 @@ module Api::V1
 
     # POST /accounts
     def create
-      plan = Plan.find_by_hashid account_parameters[:plan]
+      plan = Plan.find_by_hashid account_relationships[:plan]
 
-      @account = Account.new account_parameters.merge(plan: plan)
+      @account = Account.new account_attributes.merge(
+        account_relationships.merge(plan: plan)
+      )
       authorize @account
 
       if @account.save
@@ -42,7 +44,7 @@ module Api::V1
 
       authorize @account
 
-      if @account.update(account_parameters)
+      if @account.update(account_attributes)
         render jsonapi: @account
       else
         render_unprocessable_resource @account
@@ -66,8 +68,12 @@ module Api::V1
       @account = Account.friendly.find params[:id]
     end
 
-    def account_parameters
-      parameters[:account]
+    def account_attributes
+      parameters[:data][:attributes]
+    end
+
+    def account_relationships
+      parameters[:data][:relationships]
     end
 
     def parameters
@@ -75,24 +81,32 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :account, type: :hash do
-            param :name, type: :string
-            param :slug, type: :string
-            param :plan, type: :string
-            param :users_attributes, type: :array, as: :admins do
-              items type: :hash do
-                param :name, type: :string
-                param :email, type: :string
-                param :password, type: :string
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: %w[account accounts]
+            param :attributes, type: :hash do
+              param :name, type: :string
+              param :slug, type: :string
+            end
+            param :relationships, type: :hash do
+              param :plan, type: :string
+              param :users_attributes, type: :array, as: :admins do
+                items type: :hash do
+                  param :name, type: :string
+                  param :email, type: :string
+                  param :password, type: :string
+                end
               end
             end
           end
         end
 
         on :update do
-          param :account, type: :hash do
-            param :name, type: :string, optional: true
-            param :slug, type: :string, optional: true
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: %w[account accounts]
+            param :attributes, type: :hash do
+              param :name, type: :string, optional: true
+              param :slug, type: :string, optional: true
+            end
           end
         end
       end
