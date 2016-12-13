@@ -89,7 +89,7 @@ module Api::V1
 
         on :create do
           param :data, type: :hash do
-            param :type, type: :string, one_of: %w[product products]
+            param :type, type: :string, inclusion: %w[product products]
             param :attributes, type: :hash do
               param :name, type: :string
               param :metadata, type: :hash, optional: true
@@ -102,7 +102,7 @@ module Api::V1
 
         on :update do
           param :data, type: :hash do
-            param :type, type: :string, one_of: %w[product products]
+            param :type, type: :string, inclusion: %w[product products]
             param :attributes, type: :hash do
               param :name, type: :string, optional: true
               param :metadata, type: :hash, optional: true
