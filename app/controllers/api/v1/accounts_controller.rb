@@ -10,7 +10,7 @@ module Api::V1
       @accounts = apply_scopes(Account).all
       authorize @accounts
 
-      render json: @accounts
+      render jsonapi: @accounts
     end
 
     # GET /accounts/1
@@ -19,7 +19,7 @@ module Api::V1
 
       authorize @account
 
-      render json: @account
+      render jsonapi: @account
     end
 
     # POST /accounts
@@ -30,7 +30,7 @@ module Api::V1
       authorize @account
 
       if @account.save
-        render json: @account, status: :created, location: v1_account_url(@account)
+        render jsonapi: @account, status: :created, location: v1_account_url(@account)
       else
         render_unprocessable_resource @account
       end
@@ -43,7 +43,7 @@ module Api::V1
       authorize @account
 
       if @account.update(account_parameters)
-        render json: @account
+        render jsonapi: @account
       else
         render_unprocessable_resource @account
       end
