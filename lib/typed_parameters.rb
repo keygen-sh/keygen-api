@@ -121,7 +121,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(name, type:, as: nil, optional: false, allow_nil: false, one_of: [], &block)
+    def param(name, type:, as: nil, optional: false, allow_nil: false, inclusion: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       key = (as || name).to_sym
       value = if context.params.is_a? ActionController::Parameters
@@ -137,8 +137,8 @@ class TypedParameters
         raise InvalidParameterError, "Parameter missing: #{key}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
         raise InvalidParameterError, "Type mismatch for parameter '#{key}' (received #{Helper.class_type(value.class)} expected #{type})"
-      when !one_of.empty? && !one_of.include?(value)
-        raise InvalidParameterError, "Parameter '#{key}' must be one of: #{one_of.join ", "} (received #{value})"
+      when !inclusion.empty? && !inclusion.include?(value)
+        raise InvalidParameterError, "Parameter '#{key}' must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return
       end
