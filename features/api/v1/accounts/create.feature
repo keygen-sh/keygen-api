@@ -25,7 +25,7 @@ Feature: Create account
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "account" with the name "Google"
+    And the JSON response should be an "account" with the name "Google"
     And the account "google" should have 1 "admin"
 
   # NOTE: This is really just a test to make sure endpoints are valid even when
@@ -56,7 +56,7 @@ Feature: Create account
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "account" with the name "Google"
+    And the JSON response should be an "account" with the name "Google"
     And the account "google" should have 1 "admin"
 
   Scenario: Anonymous creates an account with multiple admins
@@ -162,6 +162,29 @@ Feature: Create account
           "attributes": {
             "name": "Test1",
             "slug": "test1"
+          },
+          "relationships": {
+            "plan": "$plan[0]",
+            "admins": [
+              { "name": "Larry Page", "email": "lpage@keygen.sh", "password": "goog" }
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+
+  Scenario: Anonymous attempts to create an account with an invalid slug
+    Given there exists 1 "plan"
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "Invalid_\$lug/Is;here"
           },
           "relationships": {
             "plan": "$plan[0]",

@@ -38,7 +38,7 @@ class Account < ApplicationRecord
   # end
 
   validates :name, presence: true
-  validates :slug, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }
+  validates :slug, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }
 
   scope :plan, -> (id) { where plan: Plan.decode_id(id) }
 
