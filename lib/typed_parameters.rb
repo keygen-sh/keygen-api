@@ -137,14 +137,14 @@ class TypedParameters
               end
 
       if coerce && value
-        if !COERCABLE_TYPES[type.to_sym].nil?
+        if COERCABLE_TYPES.key?(type.to_sym)
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
             raise InvalidParameterError, "Parameter '#{key}' could not be coerced to #{type}"
           end
         else
-          raise InvalidParameterError, "Invalid type for coercion: #{type}"
+          raise InvalidParameterError, "Invalid type for coercion (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
         end
       end
 
