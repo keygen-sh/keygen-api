@@ -59,6 +59,8 @@ class TypedParameters
     handler = schema.handlers[context.action_name]
     params = handler.call
 
+    # TODO: This needs to do a real comparison of schemas, not simply allowed
+    #       keys like it's doing now.
     if schema.strict?
       # Grab our segment of the params (getting rid of cruft added by Rails middleware)
       params_slice = context.params.slice *params.keys
@@ -76,8 +78,13 @@ class TypedParameters
   class Helper
 
     def self.deep_keys(o)
-      return unless o.respond_to? :keys
-      o.keys.map(&:to_sym) + o.values.flat_map { |v| deep_keys v }.compact
+      return unless o.respond_to? :each
+
+      if o.is_a? Array
+        o.flat_map { |v| deep_keys v }.compact
+      else
+        o.keys.map(&:to_sym) + o.values.flat_map { |v| deep_keys v }.compact
+      end
     end
 
     def self.compare_types(a, b)
@@ -97,12 +104,13 @@ class TypedParameters
   class Schema
     attr_reader :handlers, :params, :keys
 
-    def initialize(context:, keys: nil, &block)
+    def initialize(context:, stack: [], keys: [], &block)
       @configuration = HashWithIndifferentAccess.new
       @handlers = HashWithIndifferentAccess.new
       @params = HashWithIndifferentAccess.new
       @context = context
-      @keys = keys || []
+      @stack = stack
+      @keys = keys
 
       self.instance_eval &block
     end
@@ -117,7 +125,7 @@ class TypedParameters
 
     private
 
-    attr_reader :context, :configuration
+    attr_reader :context, :configuration, :stack
 
     def options(opts)
       configuration.merge! opts
@@ -130,6 +138,7 @@ class TypedParameters
     def param(name, type:, as: nil, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       key = (as || name).to_sym
+      stack_keys = stack.dup << key
       value = if context.params.is_a? ActionController::Parameters
                 context.params.to_unsafe_h[key]
               else
@@ -141,7 +150,7 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError, "Parameter '#{key}' could not be coerced to #{type}"
+            raise InvalidParameterError, "Parameter '#{stack_keys.join "."}' could not be coerced to #{type}"
           end
         else
           raise InvalidParameterError, "Invalid type for coercion (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
@@ -150,15 +159,15 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for parameter '#{key}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError, "Invalid type defined for parameter '#{stack_keys.join "."}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
-        raise InvalidParameterError, "Parameter missing: #{key}"
+        raise InvalidParameterError, "Parameter missing: #{stack_keys.join "."}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for parameter '#{key}' (received #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError, "Type mismatch for parameter '#{stack_keys.join "."}' (received #{Helper.class_type(value.class)} expected #{type})"
       when !inclusion.empty? && !inclusion.include?(value)
-        raise InvalidParameterError, "Parameter '#{key}' must be one of: #{inclusion.join ", "} (received #{value})"
+        raise InvalidParameterError, "Parameter '#{stack_keys.join "."}' must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
-        return
+        return # We've encountered an optional param (okay to bail early)
       end
 
       keys << key
@@ -168,34 +177,44 @@ class TypedParameters
         if block_given?
           ctx = context.dup
           ctx.params = value
-          params.merge! name => Schema.new(context: ctx, keys: keys, &block).params
+          params.merge! name => Schema.new(context: ctx, stack: stack_keys, keys: keys, &block).params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{key}' (expected hash of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{stack_keys.join "."}' (expected hash of scalar types)"
           end
           value.keys.each { |k| keys << k.to_sym }
           params.merge! name => value
         end
       when :array
         if block_given?
-          arr_type = block.call
+          arr_type, b = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for parameter '#{key}' (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError, "Type mismatch for parameter '#{stack_keys.join "."}' (expected array of #{Helper.class_type(arr_type).pluralize})"
+          end
+
+          if Helper.compare_types(arr_type, Hash)
+            params.merge! name => value.each_with_index.map { |v, i|
+              ctx = context.dup
+              ctx.params = v
+              Schema.new(context: ctx, stack: stack_keys, keys: keys, &b).params
+            }
+          else
+            params.merge! name => value
           end
         else
           if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{key}' (expected array of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{stack_keys.join "."}' (expected array of scalar types)"
           end
+          params.merge! name => value
         end
-        params.merge! name => value
       else
         params.merge! name => value
       end
     end
 
-    def items(type:)
-      VALID_TYPES.fetch type.to_sym, nil
+    def items(type:, &block)
+      [VALID_TYPES.fetch(type.to_sym, nil), block]
     end
   end
 
