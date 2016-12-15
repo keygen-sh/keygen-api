@@ -13,7 +13,7 @@ module Api::V1
       @users = policy_scope apply_scopes(current_account.users).all
       authorize @users
 
-      render json: @users
+      render jsonapi: @users
     end
 
     # GET /users/1
@@ -22,12 +22,12 @@ module Api::V1
 
       authorize @user
 
-      render json: @user
+      render jsonapi: @user
     end
 
     # POST /users
     def create
-      @user = current_account.users.new user_parameters
+      @user = current_account.users.new user_attributes.merge(user_relationships)
       authorize @user
 
       if @user.save
@@ -37,7 +37,7 @@ module Api::V1
           resource: @user
         ).execute
 
-        render json: @user, status: :created, location: v1_account_user_url(@user.account, @user)
+        render jsonapi: @user, status: :created, location: v1_account_user_url(@user.account, @user)
       else
         render_unprocessable_resource @user
       end
@@ -49,14 +49,14 @@ module Api::V1
 
       authorize @user
 
-      if @user.update(user_parameters)
+      if @user.update(user_attributes.merge(user_relationships))
         CreateWebhookEventService.new(
           event: "user.updated",
           account: current_account,
           resource: @user
         ).execute
 
-        render json: @user
+        render jsonapi: @user
       else
         render_unprocessable_resource @user
       end
@@ -85,8 +85,12 @@ module Api::V1
       @user = current_account.users.find_by_hashid params[:id]
     end
 
-    def user_parameters
-      parameters[:user]
+    def user_attributes
+      parameters[:data][:attributes] || {}
+    end
+
+    def user_relationships
+      parameters[:data][:relationships] || {}
     end
 
     def parameters
@@ -94,32 +98,41 @@ module Api::V1
         options strict: true
 
         on :create do
-          param :user, type: :hash do
-            param :name, type: :string
-            param :email, type: :string
-            param :password, type: :string
-            param :metadata, type: :hash, optional: true
-
-            if current_bearer&.role? :admin
-              param :role_attributes, type: :hash, as: :role, optional: true do
-                param :name, type: :string
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: %w[user users]
+            param :attributes, type: :hash do
+              param :name, type: :string
+              param :email, type: :string
+              param :password, type: :string
+              if current_bearer&.role? :admin or current_bearer&.role? :product
+                param :metadata, type: :hash, optional: true
+              end
+            end
+            param :relationships, type: :hash, optional: true do
+              if current_bearer&.role? :admin
+                param :role_attributes, type: :hash, as: :role, optional: true do
+                  param :name, type: :string, inclusion: %w[user admin]
+                end
               end
             end
           end
         end
 
         on :update do
-          param :user, type: :hash do
-            param :name, type: :string, optional: true
-            param :email, type: :string, optional: true
-
-            if current_bearer&.role? :admin or current_bearer&.role? :product
-              param :metadata, type: :hash, optional: true
+          param :data, type: :hash do
+            param :type, type: :string, inclusion: %w[user users]
+            param :attributes, type: :hash, optional: true do
+              param :name, type: :string, optional: true
+              param :email, type: :string, optional: true
+              if current_bearer&.role? :admin or current_bearer&.role? :product
+                param :metadata, type: :hash, optional: true
+              end
             end
-
-            if current_bearer&.role? :admin
-              param :role_attributes, type: :hash, as: :role, optional: true do
-                param :name, type: :string
+            param :relationships, type: :hash, optional: true do
+              if current_bearer&.role? :admin
+                param :role_attributes, type: :hash, as: :role, optional: true do
+                  param :name, type: :string, inclusion: %w[user admin]
+                end
               end
             end
           end

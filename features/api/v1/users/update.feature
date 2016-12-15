@@ -14,7 +14,14 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$current" with the following:
       """
-      { "user": { "name": "Mr. Robot" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Mr. Robot"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the name "Mr. Robot"
@@ -27,7 +34,14 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "name": "Mr. Robot" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Mr. Robot"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the name "Mr. Robot"
@@ -39,7 +53,14 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$0" with the following:
       """
-      { "user": { "name": "Updated name" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Updated name"
+          }
+        }
+      }
       """
     Then the response status should be "401"
 
@@ -51,9 +72,12 @@ Feature: Update user
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
-        "user": {
-          "role": {
-            "name": "admin"
+        "data": {
+          "type": "users",
+          "relationships": {
+            "role": {
+              "name": "admin"
+            }
           }
         }
       }
@@ -71,14 +95,17 @@ Feature: Update user
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
-        "user": {
-          "role": {
-            "name": "moderator"
+        "data": {
+          "type": "users",
+          "relationships": {
+            "role": {
+              "name": "moderator"
+            }
           }
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin promotes a user to a product role for their account
@@ -90,14 +117,17 @@ Feature: Update user
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
       {
-        "user": {
-          "role": {
-            "name": "product"
+        "data": {
+          "type": "users",
+          "relationships": {
+            "role": {
+              "name": "product"
+            }
           }
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
   Scenario: User updates attempts to promote themself to admin
@@ -110,9 +140,12 @@ Feature: Update user
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
       {
-        "user": {
-          "role": {
-            "name": "admin"
+        "data": {
+          "type": "users",
+          "relationships": {
+            "role": {
+              "name": "admin"
+            }
           }
         }
       }
@@ -129,7 +162,16 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "customerId": "cust_gV4dW9jrc"
+            }
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the following metadata:
@@ -146,7 +188,16 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "metadata": { "nested": { "meta": "data" } } } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "nested": { "meta": "data" }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
 
@@ -160,7 +211,16 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "customerId": "cust_gV4dW9jrc"
+            }
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the following metadata:
@@ -177,7 +237,16 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "metadata": { "customerId": "cust_gV4dW9jrc" } } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "customerId": "cust_gV4dW9jrc"
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -192,7 +261,14 @@ Feature: Update user
     And the current product has 1 "user"
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "name": "Mr. Robot" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Mr. Robot"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the name "Mr. Robot"
@@ -207,7 +283,14 @@ Feature: Update user
     And the current account has 1 "user"
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
-      { "user": { "name": "Mr. Robot" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Mr. Robot"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -220,7 +303,14 @@ Feature: Update user
    And I use an authentication token
    When I send a PATCH request to "/accounts/test1/users/$current" with the following:
      """
-     { "user": { "password": "newPassword" } }
+     {
+       "data": {
+        "type": "users",
+         "attributes": {
+           "password": "new-password"
+         }
+       }
+     }
      """
    Then the response status should be "400"
    And sidekiq should have 0 "webhook" jobs
@@ -233,7 +323,14 @@ Feature: Update user
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
       """
-      { "user": { "password": "h4ck3d!" } }
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "password": "h4ck3d!"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs

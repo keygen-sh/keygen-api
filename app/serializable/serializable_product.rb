@@ -12,6 +12,11 @@ class SerializableProduct < SerializableBase
   end
 
   relationship :tokens
+  relationship :account do
+    link :related do
+      @url_helpers.v1_account_path @object.account
+    end
+  end
   relationship :policies do
     link :related do
       @url_helpers.v1_account_policies_path @object.account, product: @object.hashid

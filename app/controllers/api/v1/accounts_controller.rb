@@ -69,11 +69,11 @@ module Api::V1
     end
 
     def account_attributes
-      parameters[:data][:attributes]
+      parameters[:data][:attributes] || {}
     end
 
     def account_relationships
-      parameters[:data][:relationships]
+      parameters[:data][:relationships] || {}
     end
 
     def parameters
