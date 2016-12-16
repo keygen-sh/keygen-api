@@ -17,7 +17,10 @@ After do |s|
 
   # Tell Cucumber to quit if a scenario fails
   if s.failed?
-    puts last_request.url, last_response.status, last_response.body
+    puts JSON.pretty_generate(
+      request: { resource: last_request.url, body: (JSON.parse(last_request.body.string) rescue nil) },
+      response: { status: last_response.status, body: (JSON.parse(last_response.body) rescue nil) }
+    )
     Cucumber.wants_to_quit = true
   end
 end

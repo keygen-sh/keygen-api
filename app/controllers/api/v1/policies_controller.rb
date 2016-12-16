@@ -25,7 +25,7 @@ module Api::V1
 
     # POST /policies
     def create
-      product = current_account.products.find_by_hashid policy_parameters[:product]
+      product = current_account.products.find_by id: policy_parameters[:product]
 
       @policy = current_account.policies.new policy_parameters.merge(product: product)
       authorize @policy
@@ -82,7 +82,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_policy
-      @policy = current_account.policies.find_by_hashid params[:id]
+      @policy = current_account.policies.find_by id: params[:id]
     end
 
     def policy_parameters

@@ -1,12 +1,9 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
+  include Sluggable
   include Limitable
   include Pageable
   include Billable
-
-  extend FriendlyId
-
-  friendly_id :slug, use: :slugged
 
   acts_as_paranoid
 
@@ -40,7 +37,7 @@ class Account < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }
 
-  scope :plan, -> (id) { where plan: Plan.decode_id(id) }
+  scope :plan, -> (id) { where plan: id }
 
   def admins
     users.admins
@@ -69,19 +66,20 @@ end
 #
 # Table name: accounts
 #
-#  id                 :integer          not null, primary key
 #  name               :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  plan_id            :integer
 #  activation_token   :string
 #  activation_sent_at :datetime
 #  deleted_at         :datetime
 #  slug               :string
+#  id                 :uuid             not null, primary key
+#  plan_id            :uuid
 #
 # Indexes
 #
+#  index_accounts_on_created_at  (created_at)
 #  index_accounts_on_deleted_at  (deleted_at)
-#  index_accounts_on_id          (id)
+#  index_accounts_on_plan_id     (plan_id)
 #  index_accounts_on_slug        (slug)
 #

@@ -76,7 +76,7 @@ module Api::V1
     private
 
     def set_product
-      @product = current_account.products.find_by_hashid params[:id]
+      @product = current_account.products.find_by id: params[:id]
     end
 
     def product_attributes

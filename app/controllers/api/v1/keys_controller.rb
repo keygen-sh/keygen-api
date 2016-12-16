@@ -25,7 +25,7 @@ module Api::V1
 
     # POST /keys
     def create
-      policy = current_account.policies.find_by_hashid key_parameters[:policy]
+      policy = current_account.policies.find_by id: key_parameters[:policy]
 
       @key = current_account.keys.new key_parameters.merge(policy: policy)
       authorize @key
@@ -82,7 +82,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_key
-      @key = current_account.keys.find_by_hashid params[:id]
+      @key = current_account.keys.find_by id: params[:id]
     end
 
     def key_parameters

@@ -26,7 +26,7 @@ Feature: Delete license
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
       """
-      { "userId": $users[1].id }
+      { "userId": "$users[1]" }
       """
     And I am a user of account "test1"
     And I use an authentication token

@@ -8,9 +8,6 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'rack-attack'
 gem 'rack-cors'
 
-# Hashed record IDs
-gem 'hashid-rails'
-
 # JSON API serializers
 gem 'active_model_serializers'
 gem 'jsonapi-rails'
@@ -39,9 +36,6 @@ gem 'aasm'
 gem 'premailer-rails'
 gem 'haml-rails'
 gem 'sass-rails'
-
-# Friendly IDs
-gem 'friendly_id'
 
 # Soft-deletion of database records
 gem 'paranoia', '~> 2.2'

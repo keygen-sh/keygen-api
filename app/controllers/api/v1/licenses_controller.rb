@@ -27,8 +27,8 @@ module Api::V1
 
     # POST /licenses
     def create
-      policy = current_account.policies.find_by_hashid license_parameters[:policy]
-      user = current_account.users.find_by_hashid license_parameters[:user]
+      policy = current_account.policies.find_by id: license_parameters[:policy]
+      user = current_account.users.find_by id: license_parameters[:user]
 
       @license = current_account.licenses.new license_parameters.merge(
         policy: policy,
@@ -88,7 +88,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_license
-      @license = current_account.licenses.find_by_hashid params[:id]
+      @license = current_account.licenses.find_by id: params[:id]
     end
 
     def license_parameters

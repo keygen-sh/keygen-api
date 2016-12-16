@@ -23,7 +23,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.from_now"
       }
       """
@@ -31,7 +31,7 @@ Feature: License validation
     And all "machines" have the following attributes:
       """
       {
-        "licenseId": $licenses[0].id
+        "licenseId": "$licenses[0]"
       }
       """
     And I use an authentication token
@@ -57,7 +57,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.from_now"
       }
       """
@@ -65,7 +65,7 @@ Feature: License validation
     And all "machines" have the following attributes:
       """
       {
-        "licenseId": $licenses[0].id
+        "licenseId": "$licenses[0]"
       }
       """
     And I use an authentication token
@@ -91,7 +91,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.from_now"
       }
       """
@@ -99,7 +99,7 @@ Feature: License validation
     And all "machines" have the following attributes:
       """
       {
-        "licenseId": $licenses[0].id
+        "licenseId": "$licenses[0]"
       }
       """
     And I use an authentication token
@@ -124,7 +124,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.from_now"
       }
       """
@@ -150,7 +150,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.from_now"
       }
       """
@@ -170,7 +170,7 @@ Feature: License validation
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.day.ago"
       }
       """
@@ -190,7 +190,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.from_now"
       }
       """
@@ -213,7 +213,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.ago"
       }
       """
@@ -236,7 +236,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.from_now"
       }
       """
@@ -259,7 +259,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.from_now"
       }
       """
@@ -282,7 +282,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.from_now"
       }
       """
@@ -311,7 +311,7 @@ Feature: License validation
     And the first "license" has the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "$time.1.year.from_now"
       }
       """

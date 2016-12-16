@@ -20,7 +20,7 @@ Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.friendly.find(slug).update attributes
+  find(slug).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -31,7 +31,7 @@ Given /^I have the following attributes:$/ do |body|
 end
 
 Given /^the current account is "([^\"]*)"$/ do |slug|
-  @account = Account.friendly.find slug
+  @account = Account.find slug
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
@@ -39,7 +39,7 @@ Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.friendly.find slug
+  account = Account.find slug
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -172,7 +172,7 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.friendly.find slug
+  account = Account.find slug
 
   user  = account.admins.first
   token = TokenGeneratorService.new(

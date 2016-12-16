@@ -5,5 +5,5 @@ class SerializableBase < JSONAPI::Serializable::Resource
 
   self.key_transform = -> (key) { key.to_s.camelize :lower }
 
-  id { @object.hashid }
+  id { @object.id }
 end

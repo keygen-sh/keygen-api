@@ -1,7 +1,7 @@
 World Rack::Test::Methods
 
 Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, slug|
-  account = Account.friendly.find slug
+  account = Account.find slug
   @bearer =
     case role
     when "admin", "user"

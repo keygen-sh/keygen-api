@@ -145,7 +145,7 @@ Feature: Create license
     And all "keys" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And the current account has 3 "users"

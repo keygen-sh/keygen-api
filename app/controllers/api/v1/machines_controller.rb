@@ -28,7 +28,7 @@ module Api::V1
 
     # POST /machines
     def create
-      license = current_account.licenses.find_by_hashid machine_parameters[:license]
+      license = current_account.licenses.find_by id: machine_parameters[:license]
 
       @machine = current_account.machines.new machine_parameters.merge(license: license)
       authorize @machine
@@ -85,7 +85,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_machine
-      @machine = current_account.machines.find_by_hashid params[:id]
+      @machine = current_account.machines.find_by id: params[:id]
     end
 
     def machine_parameters

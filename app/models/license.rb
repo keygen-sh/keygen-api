@@ -1,5 +1,5 @@
 class License < ApplicationRecord
-  LICENSE_KEY_BREAK_SIZE = Hashid::Rails.configuration.length.freeze
+  LICENSE_ID_LENGTH = 32
 
   include Limitable
   include Tokenable
@@ -27,9 +27,9 @@ class License < ApplicationRecord
 
   validates :key, uniqueness: { case_sensitive: true }, unless: -> { key.nil? }
 
-  scope :policy, -> (id) { where policy: Policy.decode_id(id) }
-  scope :user, -> (id) { where user: User.decode_id(id) }
-  scope :product, -> (id) { joins(:policy).where policies: { product_id: Product.decode_id(id) } }
+  scope :policy, -> (id) { where policy: id }
+  scope :user, -> (id) { where user: id }
+  scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
 
   private
 
@@ -43,16 +43,17 @@ class License < ApplicationRecord
       end
     when policy.encrypted?
       @raw, enc = generate_encrypted_token :key do |token|
-        # Replace first n characters with our hashid so that we can do a lookup
+        # Replace first n characters with our id so that we can do a lookup
         # on the encrypted key
-        token.gsub(/\A.{#{LICENSE_KEY_BREAK_SIZE}}/, hashid)
-             .scan(/.{#{LICENSE_KEY_BREAK_SIZE}}/).join "-"
+        token.gsub(/\A.{#{LICENSE_ID_LENGTH}}/, id.gsub(/-/, ""))
+             .scan(/.{#{LICENSE_ID_LENGTH}}/).join "-"
       end
 
       self.key = enc
     else
       self.key = generate_token :key do |token|
-        token.scan(/.{#{LICENSE_KEY_BREAK_SIZE}}/).join "-"
+        token.gsub(/\A.{#{LICENSE_ID_LENGTH}}/, id.gsub(/-/, ""))
+             .scan(/.{#{LICENSE_ID_LENGTH}}/).join "-"
       end
     end
 
@@ -76,7 +77,7 @@ end
 #
 # Table name: licenses
 #
-#  id         :integer          not null, primary key
+#  id         :uuid             not null, primary key
 #  key        :string
 #  expiry     :datetime
 #  user_id    :integer

@@ -20,7 +20,7 @@ Feature: Policy pool
     And all "keys" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And I use an authentication token
@@ -52,7 +52,7 @@ Feature: Policy pool
     And all "keys" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And I use an authentication token

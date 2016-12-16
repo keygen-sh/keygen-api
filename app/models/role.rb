@@ -11,16 +11,17 @@ end
 #
 # Table name: roles
 #
-#  id            :integer          not null, primary key
 #  name          :string
 #  resource_type :string
-#  resource_id   :integer
 #  created_at    :datetime
 #  updated_at    :datetime
 #  deleted_at    :datetime
+#  id            :uuid             not null, primary key
+#  resource_id   :uuid
 #
 # Indexes
 #
-#  index_roles_on_deleted_at                              (deleted_at)
-#  index_roles_on_name_and_resource_type_and_resource_id  (name,resource_type,resource_id)
+#  index_roles_on_created_at   (created_at)
+#  index_roles_on_deleted_at   (deleted_at)
+#  index_roles_on_resource_id  (resource_id)
 #

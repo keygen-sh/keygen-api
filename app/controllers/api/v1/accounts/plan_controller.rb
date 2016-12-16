@@ -9,7 +9,7 @@ module Api::V1::Accounts
 
       authorize @account
 
-      @plan = Plan.find_by_hashid plan_parameters
+      @plan = Plan.find_by id: plan_parameters
 
       render_unprocessable_entity detail: "must be a valid plan", source: {
         pointer: "/data/relationships/plan" } and return if @plan.nil?
@@ -36,7 +36,7 @@ module Api::V1::Accounts
     attr_reader :parameters
 
     def set_account
-      @account = Account.friendly.find params[:id]
+      @account = Account.find params[:id]
     end
 
     def plan_parameters

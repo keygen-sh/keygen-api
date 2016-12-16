@@ -2,7 +2,7 @@ class BaseSerializer < ActiveModel::Serializer
   cache
 
   def id
-    object.hashid
+    object.id
   end
 
   def created

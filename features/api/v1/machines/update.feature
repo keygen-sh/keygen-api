@@ -72,12 +72,12 @@ Feature: Update machine
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
-      { "userId": $users[1].id }
+      { "userId": "$users[1]" }
       """
     And the current account has 1 "machine"
     And all "machines" have the following attributes:
       """
-      { "licenseId": $licenses[0].id }
+      { "licenseId": "$licenses[0]" }
       """
     And I am a user of account "test1"
     And I use an authentication token
@@ -95,12 +95,12 @@ Feature: Update machine
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
-      { "userId": $users[1].id }
+      { "userId": "$users[1]" }
       """
     And the current account has 1 "machine"
     And all "machines" have the following attributes:
       """
-      { "licenseId": $licenses[0].id }
+      { "licenseId": "$licenses[0]" }
       """
     And I am a user of account "test1"
     And I use an authentication token

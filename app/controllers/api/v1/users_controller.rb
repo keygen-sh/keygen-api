@@ -82,7 +82,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_user
-      @user = current_account.users.find_by_hashid params[:id]
+      @user = current_account.users.find_by id: params[:id]
     end
 
     def user_attributes

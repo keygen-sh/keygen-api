@@ -23,7 +23,7 @@ module Api::V1
     private
 
     def set_plan
-      @plan = Plan.find_by_hashid params[:id]
+      @plan = Plan.find_by id: params[:id]
     end
   end
 end

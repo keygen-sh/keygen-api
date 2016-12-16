@@ -35,7 +35,7 @@ module Api::V1::Accounts
     attr_reader :parameters
 
     def set_billing
-      @billing = Account.friendly.find(params[:id])&.billing
+      @billing = Account.find(params[:id])&.billing
     end
 
     def parameters
