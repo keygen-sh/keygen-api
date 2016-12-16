@@ -1,27 +1,5 @@
-# TypedParameters.build context do
-#   options strict: true
-#
-#   on :create do
-#     param :license, type: :hash do
-#       param :policy, type: :string
-#       param :user, type: :string, optional: true
-#       param :role_attributes, type: :hash, as: :role do
-#         param :name, type: :integer
-#       end
-#       param :array, type: :array do
-#         items type: :integer
-#       end
-#       param :hash, type: :hash
-#     end
-#   end
-#
-#   on :update do
-#     param :license, type: :hash do
-#       param :policy, type: :string
-#     end
-#   end
-# end
 class TypedParameters
+  class InvalidParameterError < StandardError; end
   class Boolean; end
 
   VALID_TYPES = {
@@ -218,13 +196,10 @@ class TypedParameters
     end
   end
 
-  class InvalidParameterError < StandardError; end
-
   module ControllerMethods
     extend ActiveSupport::Concern
 
     included do
-
       class << self
         def typed_parameters(transform: false, &block)
           model = controller_name.classify.underscore
