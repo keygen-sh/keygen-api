@@ -43,15 +43,15 @@ class TypedParameters
   )
 
   COERCABLE_TYPES = {
-    integer: -> (v) { v.to_i },
-    float: -> (v) { v.to_f },
-    decimal: -> (v) { v.to_d },
-    boolean: -> (v) { !!v },
-    symbol: -> (v) { v.to_sym },
-    string: -> (v) { v.to_s },
-    datetime: -> (v) { v.to_datetime },
-    date: -> (v) { v.to_date },
-    time: -> (v) { v.to_time }
+    integer: lambda { |v| v.to_i },
+    float: lambda { |v| v.to_f },
+    decimal: lambda { |v| v.to_d },
+    boolean: lambda { |v| !!v },
+    symbol: lambda { |v| v.to_sym },
+    string: lambda { |v| v.to_s },
+    datetime: lambda { |v| v.to_datetime },
+    date: lambda { |v| v.to_date },
+    time: lambda { |v| v.to_time }
   }
 
   def self.build(context, &block)
@@ -219,4 +219,85 @@ class TypedParameters
   end
 
   class InvalidParameterError < StandardError; end
+
+  module ControllerMethods
+    extend ActiveSupport::Concern
+
+    included do
+
+      class << self
+        def typed_parameters(transform: false, &block)
+          model = controller_name.classify.underscore
+          method = lambda do
+            @_typed_parameters ||= TypedParameters.build self, &block
+
+            if transform
+              _transform_parameters! @_typed_parameters
+            else
+              @_typed_parameters
+            end
+          end
+
+          define_method "#{model}_parameters", &method
+          define_method "#{model}_params", &method
+        end
+        alias_method :typed_params, :typed_parameters
+      end
+
+      private
+
+      def _transform_parameters!(parameters)
+        parameters.inject({}) do |hash, (_, data)|
+          hash.merge! data.fetch(:attributes, {})
+          hash.merge! data.fetch(:relationships, {}).map { |key, rel|
+            dat = rel.fetch :data, {}
+
+            case dat
+            when Array
+              _transform_data_array! dat
+            when Hash
+              _transform_data_hash! dat
+            end
+          }.reduce :merge
+        end
+      end
+
+      def _transform_data_array!(datum)
+        store = {}
+
+        datum.each do |data|
+          type = data.fetch(:type).pluralize
+
+          if data.key? :attributes
+            attrs = data.fetch(:attributes, {}).merge data.slice(:id)
+            attrs_key = "#{type}_attributes"
+            store.key?(attrs_key) ? store[attrs_key] << attrs : store.merge!(attrs_key => [attrs])
+          else
+            id = data.fetch :id, nil
+            id_key = "#{type}_id"
+            store.merge! id_key => id if !id.nil?
+          end
+        end
+
+        store
+      end
+
+      def _transform_data_hash!(data)
+        store = {}
+        type = data.fetch(:type).singularize
+
+        if data.key? :attributes
+          attrs = data.fetch(:attributes, {}).merge data.slice(:id)
+          attrs_key = "#{type}_attributes"
+          store.merge! attrs_key => attrs
+        else
+          id = data.fetch :id, nil
+          id_key = "#{type}_id"
+          store.merge! id_key => id if !id.nil?
+        end
+
+        store
+      end
+    end
+  end
 end
