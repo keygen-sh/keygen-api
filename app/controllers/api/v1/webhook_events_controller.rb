@@ -24,7 +24,7 @@ module Api::V1
     private
 
     def set_event
-      @event = current_account.webhook_events.find_by_hashid params[:id]
+      @event = current_account.webhook_events.find_by id: params[:id]
     end
   end
 end

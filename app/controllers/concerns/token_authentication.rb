@@ -4,8 +4,7 @@ module TokenAuthentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
   def authenticate_with_token!
-    account = current_account ||
-      Account.friendly.find(params[:account_id] || params[:id])
+    account = current_account || Account.find(params[:account_id] || params[:id])
 
     authenticate_or_request_with_http_token do |token, options|
       tok = TokenAuthenticationService.new(
@@ -23,8 +22,7 @@ module TokenAuthentication
   end
 
   def authenticate_with_token
-    account = current_account ||
-      Account.friendly.find(params[:account_id] || params[:id])
+    account = current_account || Account.find(params[:account_id] || params[:id])
 
     authenticate_with_http_token do |token, options|
       tok = TokenAuthenticationService.new(

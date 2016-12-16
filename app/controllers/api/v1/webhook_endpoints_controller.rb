@@ -60,7 +60,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_endpoint
-      @endpoint = current_account.webhook_endpoints.find_by_hashid params[:id]
+      @endpoint = current_account.webhook_endpoints.find_by id: params[:id]
     end
 
     def endpoint_parameters

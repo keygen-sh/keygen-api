@@ -93,7 +93,7 @@ module Api::V1
     private
 
     def set_token
-      @token = current_account.tokens.find_by_hashid params[:id]
+      @token = current_account.tokens.find_by id: params[:id]
     end
   end
 end

@@ -51,9 +51,9 @@ class ApplicationPolicy
       when bearer.role?(:admin)
         scope.all
       when bearer.role?(:product)
-        scope.product bearer.hashid
+        scope.product bearer.id
       when bearer.role?(:user)
-        scope.user bearer.hashid
+        scope.user bearer.id
       end
     rescue NoMethodError
       scope

@@ -249,7 +249,7 @@ class TypedParameters
       def _transform_parameters!(parameters)
         parameters.inject({}) do |hash, (_, data)|
           hash.merge! data.fetch(:attributes, {})
-          hash.merge! data.fetch(:relationships, {}).map { |key, rel|
+          hash.merge! (data.fetch(:relationships, nil)&.map { |key, rel|
             dat = rel.fetch :data, {}
 
             case dat
@@ -258,7 +258,7 @@ class TypedParameters
             when Hash
               _transform_data_hash! dat
             end
-          }.reduce :merge
+          }&.reduce(:merge) || {})
         end
       end
 

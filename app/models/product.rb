@@ -30,18 +30,18 @@ end
 #
 # Table name: products
 #
-#  id         :integer          not null, primary key
 #  name       :string
-#  account_id :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  deleted_at :datetime
 #  platforms  :jsonb
 #  metadata   :jsonb
+#  id         :uuid             not null, primary key
+#  account_id :uuid
 #
 # Indexes
 #
-#  index_products_on_account_id         (account_id)
-#  index_products_on_account_id_and_id  (account_id,id)
-#  index_products_on_deleted_at         (deleted_at)
+#  index_products_on_account_id  (account_id)
+#  index_products_on_created_at  (created_at)
+#  index_products_on_deleted_at  (deleted_at)
 #

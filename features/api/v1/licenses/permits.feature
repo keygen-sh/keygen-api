@@ -23,7 +23,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "2016-09-05T22:53:37.000Z"
       }
       """
@@ -48,7 +48,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "2016-12-01T22:53:37.000Z"
       }
       """
@@ -77,7 +77,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "2016-09-05T22:53:37.000Z"
       }
       """
@@ -103,7 +103,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "2016-09-05T22:53:37.000Z"
       }
       """
@@ -133,7 +133,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id,
+        "policyId": "$policies[0]",
         "expiry": "2016-12-01T22:53:37.000Z"
       }
       """
@@ -196,7 +196,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And I use an authentication token
@@ -220,7 +220,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And the current account has 1 "product"
@@ -247,7 +247,7 @@ Feature: License permits
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": $policies[0].id
+        "policyId": "$policies[0]"
       }
       """
     And I am a user of account "test1"

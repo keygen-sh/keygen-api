@@ -118,13 +118,13 @@ Feature: List machines
     And the current account has 1 "license"
     And the first "license" has the following attributes:
       """
-      { "userId": $users[1].id }
+      { "userId": "$users[1]" }
       """
     And I am a user of account "test1"
     And the current account has 5 "machines"
     And 3 "machines" have the following attributes:
       """
-      { "licenseId": $licenses[0].id }
+      { "licenseId": "$licenses[0]" }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
@@ -137,13 +137,13 @@ Feature: List machines
     And the current account has 1 "license"
     And the first "license" has the following attributes:
       """
-      { "userId": $users[1].id }
+      { "userId": "$users[1]" }
       """
     And I am a user of account "test1"
     And the current account has 5 "machines"
     And 5 "machines" have the following attributes:
       """
-      { "licenseId": $licenses[0].id }
+      { "licenseId": "$licenses[0]" }
       """
     And the third "machine" has the following attributes:
       """

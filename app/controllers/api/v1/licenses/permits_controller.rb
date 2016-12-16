@@ -48,7 +48,7 @@ module Api::V1::Licenses
     private
 
     def set_license
-      @license = current_account.licenses.find_by_hashid params[:id]
+      @license = current_account.licenses.find_by id: params[:id]
     end
   end
 end

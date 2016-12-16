@@ -3,7 +3,7 @@ module Tokenable
 
   def generate_token(attribute)
     loop do
-      token = SecureRandom.hex 32
+      token = SecureRandom.hex 64
       token = yield token if block_given?
       break token unless self.class.exists? attribute => token
     end
@@ -11,7 +11,7 @@ module Tokenable
 
   def generate_encrypted_token(attribute)
     loop do
-      raw = SecureRandom.hex 32
+      raw = SecureRandom.hex 64
       raw = yield raw if block_given?
       enc = ::BCrypt::Password.create raw
       break [raw, enc] unless self.class.exists? attribute => enc

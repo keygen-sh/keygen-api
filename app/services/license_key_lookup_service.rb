@@ -1,5 +1,5 @@
 class LicenseKeyLookupService < BaseService
-  ENCRYPTED_KEY_REGEX = /\A([^-]+)/ # Form: {hashid}-xxxx-xxxx-xxxx
+  ENCRYPTED_KEY_REGEX = /\A(.{#{License::LICENSE_ID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
 
   def initialize(account:, encrypted:, key:)
     @account   = account
@@ -11,7 +11,7 @@ class LicenseKeyLookupService < BaseService
     if encrypted
       key =~ ENCRYPTED_KEY_REGEX # Run regex against key
 
-      license = account.licenses.find_by_hashid $1
+      license = account.licenses.find_by id: $1
 
       if license&.compare_encrypted_token(:key, key)
         license

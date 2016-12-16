@@ -11,8 +11,6 @@ def parse_placeholders!(str)
     attribute =
       case attribute&.underscore
       when nil
-        :hashid
-      when "hashid"
         :id
       else
         attribute.underscore
@@ -38,7 +36,6 @@ def parse_placeholders!(str)
         if @account
           @account.send(resource.underscore)
             .all
-            .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             .send attribute
         else
@@ -47,7 +44,6 @@ def parse_placeholders!(str)
             .classify
             .constantize
             .all
-            .sort
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             .send attribute
         end
@@ -67,21 +63,20 @@ def parse_path_placeholders!(str)
       when "current"
         case resource
         when "users", "products"
-          @bearer.hashid
+          @bearer.id
         else
-          instance_variable_get("@#{resource.singularize}").hashid
+          instance_variable_get("@#{resource.singularize}").id
         end
       else
         if @account
           case resource.underscore
           when "billing"
-            @account.send(resource.underscore).hashid
+            @account.send(resource.underscore).id
           else
             @account.send(resource.underscore)
               .all
-              .sort
               .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-              .hashid
+              .id
           end
         else
           resource.singularize
@@ -89,9 +84,8 @@ def parse_path_placeholders!(str)
             .classify
             .constantize
             .all
-            .sort
             .send(:[], index.to_i)
-            .hashid
+            .id
         end
       end
 

@@ -23,7 +23,7 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
 
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles } }
-  scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: Product.decode_id(id) } }
+  scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :admins, -> { roles :admin }
 
   private
@@ -37,22 +37,21 @@ end
 #
 # Table name: users
 #
-#  id                     :integer          not null, primary key
 #  name                   :string
 #  email                  :string
 #  password_digest        :string
-#  account_id             :integer
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
 #  deleted_at             :datetime
 #  metadata               :jsonb
+#  id                     :uuid             not null, primary key
+#  account_id             :uuid
 #
 # Indexes
 #
-#  index_users_on_account_id_and_id                    (account_id,id)
-#  index_users_on_deleted_at                           (deleted_at)
-#  index_users_on_email_and_account_id                 (email,account_id)
-#  index_users_on_password_reset_token_and_account_id  (password_reset_token,account_id)
+#  index_users_on_account_id  (account_id)
+#  index_users_on_created_at  (created_at)
+#  index_users_on_deleted_at  (deleted_at)
 #

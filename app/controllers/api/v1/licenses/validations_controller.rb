@@ -5,7 +5,7 @@ module Api::V1::Licenses
 
     # GET /licenses/1/validate
     def validate_by_id
-      @license = current_account.licenses.find_by_hashid params[:id]
+      @license = current_account.licenses.find_by id: params[:id]
       authorize @license
 
       render_meta is_valid: LicenseValidationService.new(license: @license).execute
