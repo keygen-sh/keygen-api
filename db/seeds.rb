@@ -33,8 +33,8 @@ Plan.create([{
 }])
 
 account = Account.create(
-  company: "Account",
-  name: "account",
+  name: "Account",
+  slug: "account",
   plan: Plan.first,
   users_attributes: [{
     name: "Admin",

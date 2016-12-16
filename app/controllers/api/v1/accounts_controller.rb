@@ -1,5 +1,7 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
+    include TypedParameters::ControllerMethods
+
     has_scope :plan
 
     before_action :authenticate_with_token!, only: [:show, :update, :destroy]
@@ -24,11 +26,13 @@ module Api::V1
 
     # POST /accounts
     def create
-      plan = Plan.find_by_hashid account_relationships[:plan]
+      puts "PARAMS:", account_params.inspect
+      # # puts "ATRS:", account_attributes.inspect
+      # # puts "RELS:", account_relationships.inspect
+      #
+      # plan = Plan.find_by_hashid account_relationships.dig(:plan, :id)
 
-      @account = Account.new account_attributes.merge(
-        account_relationships.merge(plan: plan)
-      )
+      @account = Account.new account_params
       authorize @account
 
       if @account.save
@@ -68,45 +72,110 @@ module Api::V1
       @account = Account.friendly.find params[:id]
     end
 
-    def account_attributes
-      parameters[:data][:attributes] || {}
-    end
+    # def account_attributes
+    #   parameters.fetch(:data, {}).fetch :attributes, {}
+    # end
+    #
+    # def account_relationships
+    #   parameters.fetch(:data, {}).fetch(:relationships, {}).each { |key, val|
+    #     data = val.fetch :data, {}
+    #
+    #     case data
+    #     when Array
+    #       puts "ARRAY:", data
+    #       data.map { |v| v.slice(:id).merge v.fetch(:attributes, {}) }
+    #     when Hash
+    #       puts "HASH:", data
+    #       data.slice(:id).merge data.fetch(:attributes, {})
+    #     end
+    #   }
+    # end
 
-    def account_relationships
-      parameters[:data][:relationships] || {}
-    end
+    # def parameters
+    #   @parameters ||= TypedParameters.build self do
+    #     options strict: true
+    #
+    #     on :create do
+    #       param :data, type: :hash do
+    #         param :type, type: :string, inclusion: %w[account accounts]
+    #         param :attributes, type: :hash do
+    #           param :name, type: :string
+    #           param :slug, type: :string
+    #         end
+    #         param :relationships, type: :hash do
+    #           param :plan, type: :hash do
+    #             param :data, type: :hash do
+    #               param :type, type: :string, inclusion: %w[plan plans]
+    #               param :id, type: :string
+    #             end
+    #           end
+    #           param :users_attributes, type: :hash, as: :admins do
+    #             param :data, type: :array do
+    #               items type: :hash do
+    #                 param :type, type: :string, inclusion: %w[user users]
+    #                 param :attributes, type: :hash do
+    #                   param :name, type: :string
+    #                   param :email, type: :string
+    #                   param :password, type: :string
+    #                 end
+    #               end
+    #             end
+    #           end
+    #         end
+    #       end
+    #     end
+    #
+    #     on :update do
+    #       param :data, type: :hash do
+    #         param :type, type: :string, inclusion: %w[account accounts]
+    #         param :attributes, type: :hash do
+    #           param :name, type: :string, optional: true
+    #           param :slug, type: :string, optional: true
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
+    typed_parameters transform: true do
+      options strict: true
 
-        on :create do
-          param :data, type: :hash do
-            param :type, type: :string, inclusion: %w[account accounts]
-            param :attributes, type: :hash do
-              param :name, type: :string
-              param :slug, type: :string
+      on :create do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[account accounts]
+          param :attributes, type: :hash do
+            param :name, type: :string
+            param :slug, type: :string
+          end
+          param :relationships, type: :hash do
+            param :plan, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[plan plans]
+                param :id, type: :string
+              end
             end
-            param :relationships, type: :hash do
-              param :plan, type: :string
-              param :users_attributes, type: :array, as: :admins do
+            param :admins, type: :hash do
+              param :data, type: :array do
                 items type: :hash do
-                  param :name, type: :string
-                  param :email, type: :string
-                  param :password, type: :string
+                  param :type, type: :string, inclusion: %w[user users]
+                  param :attributes, type: :hash do
+                    param :name, type: :string
+                    param :email, type: :string
+                    param :password, type: :string
+                  end
                 end
               end
             end
           end
         end
+      end
 
-        on :update do
-          param :data, type: :hash do
-            param :type, type: :string, inclusion: %w[account accounts]
-            param :attributes, type: :hash do
-              param :name, type: :string, optional: true
-              param :slug, type: :string, optional: true
-            end
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[account accounts]
+          param :attributes, type: :hash do
+            param :name, type: :string, optional: true
+            param :slug, type: :string, optional: true
           end
         end
       end
