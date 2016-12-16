@@ -26,22 +26,23 @@ end
 #
 # Table name: licenses
 #
-#  id         :integer          not null, primary key
 #  key        :string
 #  expiry     :datetime
-#  user_id    :integer
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  policy_id  :integer
-#  account_id :integer
 #  deleted_at :datetime
 #  metadata   :jsonb
+#  id         :uuid             not null, primary key
+#  user_id    :uuid
+#  policy_id  :uuid
+#  account_id :uuid
 #
 # Indexes
 #
-#  index_licenses_on_account_id_and_id         (account_id,id)
-#  index_licenses_on_deleted_at                (deleted_at)
-#  index_licenses_on_key_and_account_id        (key,account_id)
-#  index_licenses_on_policy_id_and_account_id  (policy_id,account_id)
-#  index_licenses_on_user_id_and_account_id    (user_id,account_id)
+#  index_licenses_on_account_id  (account_id)
+#  index_licenses_on_created_at  (created_at)
+#  index_licenses_on_deleted_at  (deleted_at)
+#  index_licenses_on_id          (id)
+#  index_licenses_on_policy_id   (policy_id)
+#  index_licenses_on_user_id     (user_id)
 #

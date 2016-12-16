@@ -16,7 +16,6 @@ end
 #
 # Table name: plans
 #
-#  id           :integer          not null, primary key
 #  name         :string
 #  price        :integer
 #  max_users    :integer
@@ -27,9 +26,12 @@ end
 #  max_products :integer
 #  plan_id      :string
 #  deleted_at   :datetime
+#  id           :uuid             not null, primary key
 #
 # Indexes
 #
+#  index_plans_on_created_at  (created_at)
 #  index_plans_on_deleted_at  (deleted_at)
+#  index_plans_on_id          (id)
 #  index_plans_on_plan_id     (plan_id)
 #

@@ -43,5 +43,6 @@ end
 #  index_machines_on_account_id  (account_id)
 #  index_machines_on_created_at  (created_at)
 #  index_machines_on_deleted_at  (deleted_at)
+#  index_machines_on_id          (id)
 #  index_machines_on_license_id  (license_id)
 #

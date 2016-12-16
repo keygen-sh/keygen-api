@@ -1,5 +1,5 @@
-class AddCreatedAtIndices < ActiveRecord::Migration[5.0]
-  def up
+class AddIndicesToResourceIds < ActiveRecord::Migration[5.0]
+  def change
     tables = [
       :accounts,
       :billings,
@@ -18,7 +18,7 @@ class AddCreatedAtIndices < ActiveRecord::Migration[5.0]
     ]
 
     tables.each do |table|
-      add_index table, :created_at, where: "deleted_at IS NULL"
+      add_index table, :id, where: "deleted_at IS NULL"
     end
   end
 end
