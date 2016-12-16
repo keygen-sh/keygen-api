@@ -124,4 +124,5 @@ end
 #  index_billings_on_account_id  (account_id)
 #  index_billings_on_created_at  (created_at)
 #  index_billings_on_deleted_at  (deleted_at)
+#  index_billings_on_id          (id)
 #

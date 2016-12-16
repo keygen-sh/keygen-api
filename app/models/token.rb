@@ -51,4 +51,5 @@ end
 #  index_tokens_on_bearer_id   (bearer_id)
 #  index_tokens_on_created_at  (created_at)
 #  index_tokens_on_deleted_at  (deleted_at)
+#  index_tokens_on_id          (id)
 #

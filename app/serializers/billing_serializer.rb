@@ -20,12 +20,10 @@ end
 #
 # Table name: billings
 #
-#  id                        :integer          not null, primary key
 #  customer_id               :string
 #  subscription_status       :string
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  account_id                :integer
 #  subscription_id           :string
 #  subscription_period_start :datetime
 #  subscription_period_end   :datetime
@@ -34,11 +32,13 @@ end
 #  card_last4                :string
 #  state                     :string
 #  deleted_at                :datetime
+#  id                        :uuid             not null, primary key
+#  account_id                :uuid
 #
 # Indexes
 #
-#  index_billings_on_account_id_and_id               (account_id,id)
-#  index_billings_on_customer_id_and_account_id      (customer_id,account_id)
-#  index_billings_on_deleted_at                      (deleted_at)
-#  index_billings_on_subscription_id_and_account_id  (subscription_id,account_id)
+#  index_billings_on_account_id  (account_id)
+#  index_billings_on_created_at  (created_at)
+#  index_billings_on_deleted_at  (deleted_at)
+#  index_billings_on_id          (id)
 #

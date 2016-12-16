@@ -23,5 +23,6 @@ end
 #
 #  index_roles_on_created_at   (created_at)
 #  index_roles_on_deleted_at   (deleted_at)
+#  index_roles_on_id           (id)
 #  index_roles_on_resource_id  (resource_id)
 #

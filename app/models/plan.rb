@@ -27,5 +27,6 @@ end
 #
 #  index_plans_on_created_at  (created_at)
 #  index_plans_on_deleted_at  (deleted_at)
+#  index_plans_on_id          (id)
 #  index_plans_on_plan_id     (plan_id)
 #
