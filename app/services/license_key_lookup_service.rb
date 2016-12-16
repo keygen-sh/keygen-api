@@ -1,5 +1,5 @@
 class LicenseKeyLookupService < BaseService
-  ENCRYPTED_KEY_REGEX = /\A(.{#{License::LICENSE_ID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
+  ENCRYPTED_KEY_REGEX = /\A(.{#{RESOURCE_UUID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
 
   def initialize(account:, encrypted:, key:)
     @account   = account
