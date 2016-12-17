@@ -60,8 +60,6 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_account
       @account = Account.find params[:id]
     end
