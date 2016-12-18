@@ -76,7 +76,7 @@ Feature: Update user
           "type": "users",
           "relationships": {
             "role": {
-              "name": "admin"
+              "data": { "type": "role", "attributes": { "name": "admin" } }
             }
           }
         }
@@ -99,7 +99,7 @@ Feature: Update user
           "type": "users",
           "relationships": {
             "role": {
-              "name": "moderator"
+              "data": { "type": "role", "attributes": { "name": "mod" } }
             }
           }
         }
@@ -121,7 +121,7 @@ Feature: Update user
           "type": "users",
           "relationships": {
             "role": {
-              "name": "product"
+              "data": { "type": "role", "attributes": { "name": "product" } }
             }
           }
         }
@@ -144,7 +144,7 @@ Feature: Update user
           "type": "users",
           "relationships": {
             "role": {
-              "name": "admin"
+              "data": { "type": "role", "attributes": { "name": "admin" } }
             }
           }
         }
