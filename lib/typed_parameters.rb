@@ -37,16 +37,9 @@ class TypedParameters
     handler = schema.handlers[context.action_name]
     params = handler.call
 
-    # TODO: This needs to do a real comparison of schemas, not simply allowed
-    #       keys like it's doing now.
-    if schema.strict?
-      # Grab our segment of the params (getting rid of cruft added by Rails middleware)
-      params_slice = context.params.slice *params.keys
-      # Get deep array keys and calc the difference when compared to our parsed keys
-      unpermitted = Helper.deep_keys(params_slice) - schema.keys
-
-      raise InvalidParameterError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
-    end
+    # Grab our segment of the params (getting rid of cruft added by Rails middleware)
+    # and validate for unpermitted params
+    schema.validate! context.params.slice(*params.keys) if schema.strict?
 
     params
   end
@@ -80,21 +73,34 @@ class TypedParameters
   end
 
   class Schema
-    attr_reader :handlers, :params, :keys
+    attr_reader :handlers, :params
 
-    def initialize(context:, stack: [], keys: [], &block)
-      @configuration = HashWithIndifferentAccess.new
+    def initialize(context:, stack: [], config: nil, &block)
+      @config = config || HashWithIndifferentAccess.new
       @handlers = HashWithIndifferentAccess.new
       @params = HashWithIndifferentAccess.new
       @context = context
       @stack = stack
-      @keys = keys
+      @children = []
 
       self.instance_eval &block
     end
 
     def strict?
-      configuration.fetch :strict, false
+      config.fetch :strict, false
+    end
+
+    def validate!(segment = nil)
+      return unless strict?
+
+      # Validate nested schemas in reverse order
+      children.reverse.map &:validate!
+
+      # Get the difference of current param segment and schema's params
+      segment ||= context.params
+      unpermitted = segment.keys - params.keys
+
+      raise InvalidParameterError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
     end
 
     def method_missing(method, *args, &block)
@@ -103,20 +109,19 @@ class TypedParameters
 
     private
 
-    attr_reader :context, :configuration, :stack
+    attr_reader :context, :config, :stack, :children
 
     def options(opts)
-      configuration.merge! opts
+      config.merge! opts
     end
 
     def on(action, &block)
       handlers.merge! action => block
     end
 
-    def param(name, type:, as: nil, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
+    def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
-      key = (as || name).to_sym
-      stack_keys = stack.dup << key
+      keys = stack.dup << key
       value = if context.params.is_a? ActionController::Parameters
                 context.params.to_unsafe_h[key]
               else
@@ -128,7 +133,7 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError, "Parameter '#{stack_keys.join "."}' could not be coerced to #{type}"
+            raise InvalidParameterError, "Parameter '#{keys.join "."}' could not be coerced to #{type}"
           end
         else
           raise InvalidParameterError, "Invalid type for coercion (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
@@ -137,57 +142,63 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for parameter '#{stack_keys.join "."}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError, "Invalid type defined for parameter '#{keys.join "."}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
-        raise InvalidParameterError, "Parameter missing: #{stack_keys.join "."}"
+        raise InvalidParameterError, "Parameter missing: #{keys.join "."}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for parameter '#{stack_keys.join "."}' (received #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError, "Type mismatch for parameter '#{keys.join "."}' (received #{Helper.class_type(value.class)} expected #{type})"
       when !inclusion.empty? && !inclusion.include?(value)
-        raise InvalidParameterError, "Parameter '#{stack_keys.join "."}' must be one of: #{inclusion.join ", "} (received #{value})"
+        raise InvalidParameterError, "Parameter '#{keys.join "."}' must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return # We've encountered an optional param (okay to bail early)
       end
-
-      keys << key
 
       case type.to_sym
       when :hash
         if block_given?
           ctx = context.dup
           ctx.params = value
-          params.merge! name => Schema.new(context: ctx, stack: stack_keys, keys: keys, &block).params
+
+          child = Schema.new(context: ctx, stack: keys, config: config, &block)
+          children << child
+
+          params.merge! key => child.params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{stack_keys.join "."}' (expected hash of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{keys.join "."}' (expected hash of scalar types)"
           end
-          value.keys.each { |k| keys << k.to_sym }
-          params.merge! name => value
+          params.merge! key => value
         end
       when :array
         if block_given?
           arr_type, b = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for parameter '#{stack_keys.join "."}' (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError, "Type mismatch for parameter '#{keys.join "."}' (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
 
+          # TODO: Handle array type here as well
           if Helper.compare_types(arr_type, Hash)
-            params.merge! name => value.each_with_index.map { |v, i|
+            params.merge! key => value.each_with_index.map { |v, i|
               ctx = context.dup
               ctx.params = v
-              Schema.new(context: ctx, stack: stack_keys, keys: keys, &b).params
+
+              child = Schema.new(context: ctx, stack: keys, config: config, &b)
+              children << child
+
+              child.params
             }
           else
-            params.merge! name => value
+            params.merge! key => value
           end
         else
           if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{stack_keys.join "."}' (expected array of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter '#{keys.join "."}' (expected array of scalar types)"
           end
-          params.merge! name => value
+          params.merge! key => value
         end
       else
-        params.merge! name => value
+        params.merge! key => value
       end
     end
 

@@ -3,9 +3,9 @@ Feature: Create account
 
   Background:
     Given I send and accept JSON
+    And there exists 1 "plan"
 
   Scenario: Anonymous creates an account
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -48,7 +48,6 @@ Feature: Create account
     Given the following "accounts" exist:
       | Name      | Slug      |
       | Hashicorp | hashicorp |
-    And there exists 1 "plan"
     And I am an admin of account "hashicorp"
     And I use an authentication token
     When I send a POST request to "/accounts" with the following:
@@ -88,7 +87,6 @@ Feature: Create account
     And the account "google" should have 1 "admin"
 
   Scenario: Anonymous creates an account with multiple admins
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -141,7 +139,6 @@ Feature: Create account
     And the account "google" should have 3 "admins"
 
   Scenario: Anonymous creates an account with multiple admins and an invalid parameter
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -194,7 +191,6 @@ Feature: Create account
     Then the response status should be "400"
 
   Scenario: Anonymous attempts to create an account without a plan
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -225,7 +221,6 @@ Feature: Create account
     And the JSON response should be an array of 1 error
 
   Scenario: Anonymous attempts to create an account without any admin users
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -251,7 +246,6 @@ Feature: Create account
 
   Scenario: Anonymous attempts to create a duplicate account
     Given there exists an account "test1"
-    And there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -288,7 +282,6 @@ Feature: Create account
     And the JSON response should be an array of 1 errors
 
   Scenario: Anonymous attempts to create an account with an invalid slug
-    Given there exists 1 "plan"
     When I send a POST request to "/accounts" with the following:
       """
       {

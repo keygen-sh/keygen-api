@@ -1,7 +1,5 @@
 module Api::V1
   class AccountsController < Api::V1::BaseController
-    include TypedParameters::ControllerMethods
-
     has_scope :plan
 
     before_action :authenticate_with_token!, only: [:show, :update, :destroy]

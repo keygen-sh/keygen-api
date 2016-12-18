@@ -84,7 +84,7 @@ Feature: Create user
           },
           "relationships": {
             "role": {
-              "name": "admin"
+              "data": { "type": "role", "attributes": { "name": "admin" } }
             }
           }
         }
@@ -110,7 +110,7 @@ Feature: Create user
           },
           "relationships": {
             "role": {
-              "name": "spider"
+              "data": { "type": "role", "attributes": { "name": "spider" } }
             }
           }
         }
@@ -137,7 +137,7 @@ Feature: Create user
           },
           "relationships": {
             "role": {
-              "name": "admin"
+              "data": { "type": "role", "attributes": { "name": "admin" } }
             }
           }
         }
@@ -161,7 +161,7 @@ Feature: Create user
           },
           "relationships": {
             "role": {
-              "name": "admin"
+              "data": { "type": "role", "attributes": { "name": "admin" } }
             }
           }
         }
