@@ -3,6 +3,8 @@ class TypedParameters
   class Boolean; end
 
   VALID_TYPES = {
+    fixnum: Fixnum,
+    number: Numeric,
     integer: Integer,
     float: Float,
     decimal: BigDecimal,
@@ -21,6 +23,8 @@ class TypedParameters
   )
 
   COERCABLE_TYPES = {
+    fixnum: lambda { |v| v.to_i },
+    number: lambda { |v| v.to_i },
     integer: lambda { |v| v.to_i },
     float: lambda { |v| v.to_f },
     decimal: lambda { |v| v.to_d },
@@ -39,7 +43,10 @@ class TypedParameters
 
     # Grab our segment of the params (getting rid of cruft added by Rails middleware)
     # and validate for unpermitted params
-    schema.validate! context.params.slice(*params.keys) if schema.strict?
+    if schema.strict?
+      segment = ActiveSupport::JSON.decode(context.request.raw_post).keys.map &:to_sym
+      schema.validate! context.params.slice *segment
+    end
 
     params
   end
