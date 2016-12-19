@@ -10,7 +10,8 @@ describe TypedParameters do
       action_name: action,
       params: params,
       request: OpenStruct.new(
-        raw_post: JSON.generate(params)
+        raw_post: JSON.generate(params),
+        format: Mime[:json]
       )
     )
   end
