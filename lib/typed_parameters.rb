@@ -44,8 +44,10 @@ class TypedParameters
     # Grab our segment of the params (getting rid of cruft added by Rails middleware)
     # and validate for unpermitted params
     if schema.strict?
-      segment = ActiveSupport::JSON.decode(context.request.raw_post).keys.map &:to_sym
-      schema.validate! context.params.slice *segment
+      parser = ActionDispatch::Request.parameter_parsers[context.request.format.symbol]
+      segment = parser.call context.request.raw_post
+
+      schema.validate! segment
     end
 
     params
