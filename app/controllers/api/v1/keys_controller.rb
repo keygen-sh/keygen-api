@@ -11,7 +11,7 @@ module Api::V1
       @keys = policy_scope apply_scopes(current_account.keys).all
       authorize @keys
 
-      render json: @keys
+      render jsonapi: @keys
     end
 
     # GET /keys/1
@@ -20,14 +20,12 @@ module Api::V1
 
       authorize @key
 
-      render json: @key
+      render jsonapi: @key
     end
 
     # POST /keys
     def create
-      policy = current_account.policies.find_by id: key_parameters[:policy]
-
-      @key = current_account.keys.new key_parameters.merge(policy: policy)
+      @key = current_account.keys.new key_params
       authorize @key
 
       if @key.save
@@ -37,7 +35,7 @@ module Api::V1
           resource: @key
         ).execute
 
-        render json: @key, status: :created, location: v1_account_key_url(@key.account, @key)
+        render jsonapi: @key, status: :created, location: v1_account_key_url(@key.account, @key)
       else
         render_unprocessable_resource @key
       end
@@ -49,14 +47,14 @@ module Api::V1
 
       authorize @key
 
-      if @key.update(key_parameters)
+      if @key.update(key_params)
         CreateWebhookEventService.new(
           event: "key.updated",
           account: current_account,
           resource: @key
         ).execute
 
-        render json: @key
+        render jsonapi: @key
       else
         render_unprocessable_resource @key
       end
@@ -79,29 +77,34 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_key
       @key = current_account.keys.find_by id: params[:id]
     end
 
-    def key_parameters
-      parameters[:key]
-    end
+    typed_parameters transform: true do
+      options strict: true
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
-
-        on :create do
-          param :key, type: :hash do
-            param :policy, type: :string
+      on :create do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[key keys]
+          param :attributes, type: :hash do
             param :key, type: :string
           end
+          param :relationships, type: :hash do
+            param :policy, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[policy policies]
+                param :id, type: :string
+              end
+            end
+          end
         end
+      end
 
-        on :update do
-          param :key, type: :hash do
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[key keys]
+          param :attributes, type: :hash do
             param :key, type: :string, optional: true
           end
         end

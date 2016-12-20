@@ -16,7 +16,14 @@ Feature: Update key
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "key" with the key "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
@@ -31,7 +38,19 @@ Feature: Update key
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "policy": "$policies[0]" } }
+      {
+        "data": {
+          "type": "keys",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -46,7 +65,14 @@ Feature: Update key
     And the current product has 1 "key"
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "key" with the key "b7WEYVoRjUBcd6WkYoPoMuoN4QbCpi"
@@ -61,7 +87,14 @@ Feature: Update key
     And the current account has 1 "key"
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "Xh69xdPCfDR8KnjgCYPsGREdJMkvkD" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "Xh69xdPCfDR8KnjgCYPsGREdJMkvkD"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -75,7 +108,14 @@ Feature: Update key
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "ro4eusvzGsdkMBo7pzyyZsAV4tYuvU" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "ro4eusvzGsdkMBo7pzyyZsAV4tYuvU"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -86,7 +126,14 @@ Feature: Update key
     And the current account has 3 "keys"
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "JoTX8VtoVhGyUoz7mfATgZh6nsnWPB" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "JoTX8VtoVhGyUoz7mfATgZh6nsnWPB"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -99,7 +146,14 @@ Feature: Update key
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
-      { "key": { "key": "X7jsEKVwYgJ6CJGjqCgXARq7tWkqNZ" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "X7jsEKVwYgJ6CJGjqCgXARq7tWkqNZ"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs

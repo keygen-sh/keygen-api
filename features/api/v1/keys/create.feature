@@ -16,7 +16,22 @@ Feature: Create key
     And I use an authentication token
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "policy": "$policies[0]", "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the JSON response should be a "key" with the key "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
@@ -30,7 +45,19 @@ Feature: Create key
     And I use an authentication token
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "policy": "$policies[0]" } }
+      {
+        "data": {
+          "type": "keys",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -42,7 +69,14 @@ Feature: Create key
     And the current account has 1 "webhookEndpoint"
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "key": "b" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -56,7 +90,22 @@ Feature: Create key
     And I use an authentication token
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "policy": "$policies[0]", "key": "sVbmZKq4not2mCEvjEuMVE4cViCWLi" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "sVbmZKq4not2mCEvjEuMVE4cViCWLi"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -67,7 +116,22 @@ Feature: Create key
     And the current account has 1 "policies"
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "policy": "$policies[0]", "key": "fw8vuUbmWtZfrLe7Xgmg8xNVhTEjjK" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "fw8vuUbmWtZfrLe7Xgmg8xNVhTEjjK"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -80,7 +144,22 @@ Feature: Create key
     And I use an authentication token
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
-      { "key": { "policy": "$policies[0]", "key": "PmL2UPti9ZeJTs4kZvGnLJcvsndWhw" } }
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "PmL2UPti9ZeJTs4kZvGnLJcvsndWhw"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
