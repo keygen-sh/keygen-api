@@ -17,7 +17,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -36,7 +54,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -50,7 +86,19 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -64,7 +112,19 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And the current account should have 0 "licenses"
@@ -79,7 +139,28 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]", "key": "a" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And the current account should have 0 "licenses"
@@ -94,7 +175,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -109,7 +208,19 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And the current account should have 0 "licenses"
@@ -124,7 +235,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[0]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And the current account should have 0 "licenses"
@@ -152,7 +281,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -174,7 +321,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 error
@@ -190,7 +355,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And the current account should have 0 "licenses"
@@ -211,7 +394,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -234,7 +435,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
@@ -255,7 +474,25 @@ Feature: Create license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
-      { "license": { "policy": "$policies[0]", "user": "$users[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And the current account should have 0 "licenses"

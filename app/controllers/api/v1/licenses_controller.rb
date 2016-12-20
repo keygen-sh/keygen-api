@@ -13,7 +13,7 @@ module Api::V1
       @licenses = policy_scope apply_scopes(current_account.licenses).all
       authorize @licenses
 
-      render json: @licenses
+      render jsonapi: @licenses
     end
 
     # GET /licenses/1
@@ -22,18 +22,12 @@ module Api::V1
 
       authorize @license
 
-      render json: @license
+      render jsonapi: @license
     end
 
     # POST /licenses
     def create
-      policy = current_account.policies.find_by id: license_parameters[:policy]
-      user = current_account.users.find_by id: license_parameters[:user]
-
-      @license = current_account.licenses.new license_parameters.merge(
-        policy: policy,
-        user: user
-      )
+      @license = current_account.licenses.new license_params
       authorize @license
 
       if @license.save
@@ -43,7 +37,7 @@ module Api::V1
           resource: @license
         ).execute
 
-        render json: @license, status: :created, location: v1_account_license_url(@license.account, @license)
+        render jsonapi: @license, status: :created, location: v1_account_license_url(@license.account, @license)
       else
         render_unprocessable_resource @license
       end
@@ -55,14 +49,14 @@ module Api::V1
 
       authorize @license
 
-      if @license.update(license_parameters)
+      if @license.update(license_params)
         CreateWebhookEventService.new(
           event: "license.updated",
           account: current_account,
           resource: @license
         ).execute
 
-        render json: @license
+        render jsonapi: @license
       else
         render_unprocessable_resource @license
       end
@@ -85,30 +79,40 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_license
       @license = current_account.licenses.find_by id: params[:id]
     end
 
-    def license_parameters
-      parameters[:license]
-    end
+    typed_parameters transform: true do
+      options strict: true
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
-
-        on :create do
-          param :license, type: :hash do
-            param :policy, type: :string
-            param :user, type: :string, optional: true
+      on :create do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[license licenses]
+          param :attributes, type: :hash, optional: true do
             param :metadata, type: :hash, optional: true
           end
+          param :relationships, type: :hash do
+            param :policy, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[policy policies]
+                param :id, type: :string
+              end
+            end
+            param :user, type: :hash, optional: true do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[user users]
+                param :id, type: :string
+              end
+            end
+          end
         end
+      end
 
-        on :update do
-          param :license, type: :hash do
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[license licenses]
+          param :attributes, type: :hash do
             param :expiry, type: :datetime, optional: true, coerce: true
             param :metadata, type: :hash, optional: true
           end
