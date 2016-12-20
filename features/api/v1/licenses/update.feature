@@ -16,7 +16,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "expiry": "2016-09-05T22:53:37.000Z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-09-05T22:53:37.000Z"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
@@ -31,7 +38,19 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "policy": "$policies[1]" } }
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[1]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -44,7 +63,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "a" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" job
@@ -59,7 +85,14 @@ Feature: Update license
     And the current product has 1 "license"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "b" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "b"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" job
@@ -73,7 +106,14 @@ Feature: Update license
     And the current account has 1 "license"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "c" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "c"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -88,7 +128,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "x" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "x"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -99,7 +146,14 @@ Feature: Update license
     And the current account has 3 "licenses"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "y" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "y"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -112,7 +166,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "z"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -125,7 +186,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "key": "xyz" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "xyz"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" job
@@ -138,7 +206,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
@@ -154,7 +229,14 @@ Feature: Update license
     And the current product has 1 "license"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
@@ -169,7 +251,14 @@ Feature: Update license
     And the current account has 1 "license"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -184,7 +273,14 @@ Feature: Update license
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
-      { "license": { "expiry": "2016-10-05T22:53:37.000Z" } }
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
