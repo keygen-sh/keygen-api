@@ -16,7 +16,14 @@ Feature: Update machine
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "Home iMac" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Home iMac"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Home iMac"
@@ -30,7 +37,14 @@ Feature: Update machine
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "fingerprint": "b7:WE:YV:oR:jU:Bc:d6:Wk:Yo:Po:Mu:oN:4Q:bC:pi" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "b7:WE:YV:oR:jU:Bc:d6:Wk:Yo:Po:Mu:oN:4Q:bC:pi"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -45,7 +59,14 @@ Feature: Update machine
     And the current product has 1 "machine"
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "Work MacBook Pro" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Work MacBook Pro"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Work MacBook Pro"
@@ -60,7 +81,14 @@ Feature: Update machine
     And the current account has 1 "machine"
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "Office PC" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Office PC"
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -83,7 +111,14 @@ Feature: Update machine
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "Office Mac" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Office Mac"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Office Mac"
@@ -106,7 +141,14 @@ Feature: Update machine
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "fingerprint": "F8:2B:DV:tH:Tm:AY:uG:QG:VJ:ct:N6:nK:WF:tq:vr" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "F8:2B:DV:tH:Tm:AY:uG:QG:VJ:ct:N6:nK:WF:tq:vr"
+          }
+        }
+      }
       """
     Then the response status should be "400"
 
@@ -130,7 +172,14 @@ Feature: Update machine
     And the current account has 3 "machines"
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "iPad 4" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "iPad 4"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -143,7 +192,14 @@ Feature: Update machine
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
-      { "machine": { "name": "PC" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "PC"
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
