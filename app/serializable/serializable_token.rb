@@ -1,11 +1,30 @@
 class SerializableToken < SerializableBase
-  type 'tokens'
+  type :tokens
 
-  attribute :digest
+  attribute :token, if: -> { @object.raw.present? } do
+    @object.raw
+  end
   attribute :expiry
-  attribute :created_at
-  attribute :updated_at
+  attribute :created do
+    @object.created_at
+  end
+  attribute :updated do
+    @object.updated_at
+  end
 
-  has_one :account
-  has_one :bearer
+  relationship :account do
+    link :related do
+      @url_helpers.v1_account_path @object.account
+    end
+  end
+  relationship :bearer do
+    link :related do
+      @url_helpers.send "v1_account_#{@object.bearer.class.name.demodulize.underscore}_path",
+                        @object.account, @object.bearer
+    end
+  end
+
+  link :self do
+    @url_helpers.v1_account_token_path @object.account, @object
+  end
 end

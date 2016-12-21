@@ -14,7 +14,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: User resets their current token
     Given the current account is "test1"
@@ -23,7 +23,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: User resets their current token with a bad reset token
     Given the current account is "test1"
@@ -43,7 +43,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: Admin resets their token by id
     Given the current account is "test1"
@@ -51,7 +51,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: User resets their token by id
     Given the current account is "test1"
@@ -60,7 +60,7 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: User resets their token by id with a bad reset token
     Given the current account is "test1"
@@ -80,4 +80,4 @@ Feature: Regenerate authentication token
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token

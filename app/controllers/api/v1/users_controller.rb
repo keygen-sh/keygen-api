@@ -22,7 +22,7 @@ module Api::V1
 
       authorize @user
 
-      render jsonapi: @user
+      render jsonapi: @user, include: [:tokens]
     end
 
     # POST /users

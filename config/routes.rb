@@ -22,7 +22,7 @@ Rails.application.routes.draw do
         put    "tokens",     to: "tokens#regenerate_current"
         put    "tokens/:id", to: "tokens#regenerate"
         get    "tokens",     to: "tokens#index"
-        get    "tokens/:id", to: "tokens#show"
+        get    "tokens/:id", to: "tokens#show", as: :token
         delete "tokens/:id", to: "tokens#revoke"
 
         post "passwords", to: "passwords#reset_password"

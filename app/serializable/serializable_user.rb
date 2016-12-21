@@ -34,7 +34,9 @@ class SerializableUser < SerializableBase
       @url_helpers.v1_account_machines_path @object.account, user: @object.id
     end
   end
-  relationship :tokens
+  relationship :tokens do
+    resources { @object.tokens }
+  end
 
   link :self do
     @url_helpers.v1_account_user_path @object.account, @object
