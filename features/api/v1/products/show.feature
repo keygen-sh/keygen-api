@@ -17,6 +17,13 @@ Feature: Show product
     Then the response status should be "200"
     And the JSON response should be a "product"
 
+  Scenario: Admin retrieves an invalid product for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/invalid"
+    Then the response status should be "404"
+
   Scenario: Admin attempts to retrieve a product for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

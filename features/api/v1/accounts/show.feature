@@ -28,3 +28,10 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/test1"
     Then the response status should be "403"
+
+  Scenario: User attempts to retrieve an invalid account
+    Given the account "test1" has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/invalid"
+    Then the response status should be "404"

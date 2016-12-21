@@ -15,8 +15,6 @@ module Api::V1
 
     # GET /accounts/1
     def show
-      render_not_found and return unless @account
-
       authorize @account
 
       render jsonapi: @account
@@ -36,8 +34,6 @@ module Api::V1
 
     # PATCH/PUT /accounts/1
     def update
-      render_not_found and return unless @account
-
       authorize @account
 
       if @account.update(account_params)
@@ -49,8 +45,6 @@ module Api::V1
 
     # DELETE /accounts/1
     def destroy
-      render_not_found and return unless @account
-
       authorize @account
 
       @account.destroy

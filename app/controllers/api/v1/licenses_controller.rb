@@ -18,8 +18,6 @@ module Api::V1
 
     # GET /licenses/1
     def show
-      render_not_found and return unless @license
-
       authorize @license
 
       render jsonapi: @license
@@ -45,8 +43,6 @@ module Api::V1
 
     # PATCH/PUT /licenses/1
     def update
-      render_not_found and return unless @license
-
       authorize @license
 
       if @license.update(license_params)
@@ -64,8 +60,6 @@ module Api::V1
 
     # DELETE /licenses/1
     def destroy
-      render_not_found and return unless @license
-
       authorize @license
 
       CreateWebhookEventService.new(
@@ -80,7 +74,7 @@ module Api::V1
     private
 
     def set_license
-      @license = current_account.licenses.find_by id: params[:id]
+      @license = current_account.licenses.find params[:id]
     end
 
     typed_parameters transform: true do

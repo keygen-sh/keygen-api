@@ -16,8 +16,6 @@ module Api::V1
 
     # GET /policies/1
     def show
-      render_not_found and return unless @policy
-
       authorize @policy
 
       render jsonapi: @policy
@@ -43,8 +41,6 @@ module Api::V1
 
     # PATCH/PUT /policies/1
     def update
-      render_not_found and return unless @policy
-
       authorize @policy
 
       if @policy.update(policy_params)
@@ -62,8 +58,6 @@ module Api::V1
 
     # DELETE /policies/1
     def destroy
-      render_not_found and return unless @policy
-
       authorize @policy
 
       CreateWebhookEventService.new(
@@ -78,7 +72,7 @@ module Api::V1
     private
 
     def set_policy
-      @policy = current_account.policies.find_by id: params[:id]
+      @policy = current_account.policies.find params[:id]
     end
 
     typed_parameters transform: true do

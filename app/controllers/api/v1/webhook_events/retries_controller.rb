@@ -6,8 +6,6 @@ module Api::V1::WebhookEvents
 
     # POST /webhook-events/1/retry
     def retry
-      render_not_found and return unless @event
-
       authorize @event
 
       if event = RetryWebhookEventService.new(event: @event).execute
@@ -20,7 +18,7 @@ module Api::V1::WebhookEvents
     private
 
     def set_event
-      @event = current_account.webhook_events.find_by id: params[:id]
+      @event = current_account.webhook_events.find params[:id]
     end
   end
 end

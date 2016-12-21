@@ -17,6 +17,13 @@ Feature: Show machine
     Then the response status should be "200"
     And the JSON response should be a "machine"
 
+  Scenario: Admin retrieves an invalid machine for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/invalid"
+    Then the response status should be "404"
+
   Scenario: Product retrieves a machine for their product
     Given the current account is "test1"
     And the current account has 1 "product"

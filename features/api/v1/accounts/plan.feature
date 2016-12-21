@@ -72,7 +72,7 @@ Feature: Account plan
       """
       { "plan": "invalid" }
       """
-    Then the response status should be "422"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to change plan for another account
     Given the account "test1" is subscribed

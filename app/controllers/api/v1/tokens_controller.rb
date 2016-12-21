@@ -17,8 +17,6 @@ module Api::V1
 
     # GET /tokens/1
     def show
-      render_not_found and return unless @token
-
       authorize @token
 
       render jsonapi: @token
@@ -72,8 +70,6 @@ module Api::V1
 
     # PUT /tokens/1
     def regenerate
-      render_not_found and return unless @token
-
       authorize @token
 
       @token.regenerate!
@@ -83,8 +79,6 @@ module Api::V1
 
     # DELETE /tokens/1
     def revoke
-      render_not_found and return unless @token
-
       authorize @token
 
       @token.destroy
@@ -93,7 +87,7 @@ module Api::V1
     private
 
     def set_token
-      @token = current_account.tokens.find_by id: params[:id]
+      @token = current_account.tokens.find params[:id]
     end
   end
 end

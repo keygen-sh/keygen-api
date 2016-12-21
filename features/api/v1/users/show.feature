@@ -17,6 +17,13 @@ Feature: Show user
     Then the response status should be "200"
     And the JSON response should be a "user"
 
+  Scenario: Admin retrieves an invalid user for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/invalid"
+    Then the response status should be "404"
+
   Scenario: Product retrieves a user for their product
     Given the current account is "test1"
     And the current account has 1 "product"

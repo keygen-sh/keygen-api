@@ -14,8 +14,6 @@ module Api::V1
 
     # GET /webhook-endpoints/1
     def show
-      render_not_found and return unless @endpoint
-
       authorize @endpoint
 
       render json: @endpoint
@@ -35,8 +33,6 @@ module Api::V1
 
     # PATCH/PUT /webhook-endpoints/1
     def update
-      render_not_found and return unless @endpoint
-
       authorize @endpoint
 
       if @endpoint.update(endpoint_parameters)
@@ -48,8 +44,6 @@ module Api::V1
 
     # DELETE /webhook-endpoints/1
     def destroy
-      render_not_found and return unless @endpoint
-
       authorize @endpoint
 
       @endpoint.destroy
@@ -60,7 +54,7 @@ module Api::V1
     attr_reader :parameters
 
     def set_endpoint
-      @endpoint = current_account.webhook_endpoints.find_by id: params[:id]
+      @endpoint = current_account.webhook_endpoints.find params[:id]
     end
 
     def endpoint_parameters

@@ -14,8 +14,6 @@ module Api::V1
 
     # GET /webhook-events/1
     def show
-      render_not_found and return unless @event
-
       authorize @event
 
       render json: @event
@@ -24,7 +22,7 @@ module Api::V1
     private
 
     def set_event
-      @event = current_account.webhook_events.find_by id: params[:id]
+      @event = current_account.webhook_events.find params[:id]
     end
   end
 end

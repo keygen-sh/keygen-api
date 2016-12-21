@@ -18,8 +18,6 @@ module Api::V1
 
     # GET /users/1
     def show
-      render_not_found and return unless @user
-
       authorize @user
 
       render jsonapi: @user, include: [:tokens]
@@ -45,8 +43,6 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
-      render_not_found and return unless @user
-
       authorize @user
 
       if @user.update(user_params)
@@ -64,8 +60,6 @@ module Api::V1
 
     # DELETE /users/1
     def destroy
-      render_not_found and return unless @user
-
       authorize @user
 
       CreateWebhookEventService.new(
@@ -80,7 +74,7 @@ module Api::V1
     private
 
     def set_user
-      @user = current_account.users.find_by id: params[:id]
+      @user = current_account.users.find params[:id]
     end
 
     typed_parameters transform: true do

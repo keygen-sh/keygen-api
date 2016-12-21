@@ -17,6 +17,13 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
+  Scenario: Admin retrieves an invalid license for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/invalid"
+    Then the response status should be "404"
+
   Scenario: Admin retrieves an encrypted license for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -18,7 +18,7 @@ module Api::V1::Products
     private
 
     def set_product
-      @product = current_account.products.find_by id: params[:id]
+      @product = current_account.products.find params[:id]
     end
   end
 end

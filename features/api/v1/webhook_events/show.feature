@@ -17,6 +17,13 @@ Feature: Show webhook event
     Then the response status should be "200"
     And the JSON response should be a "webhookEvent"
 
+  Scenario: Admin retrieves an invalid webhook event for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events/invalid"
+    Then the response status should be "404"
+
   Scenario: Admin attempts to retrieve a webhook event for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

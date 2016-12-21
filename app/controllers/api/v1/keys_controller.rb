@@ -16,8 +16,6 @@ module Api::V1
 
     # GET /keys/1
     def show
-      render_not_found and return unless @key
-
       authorize @key
 
       render jsonapi: @key
@@ -43,8 +41,6 @@ module Api::V1
 
     # PATCH/PUT /keys/1
     def update
-      render_not_found and return unless @key
-
       authorize @key
 
       if @key.update(key_params)
@@ -62,8 +58,6 @@ module Api::V1
 
     # DELETE /keys/1
     def destroy
-      render_not_found and return unless @key
-
       authorize @key
 
       CreateWebhookEventService.new(
@@ -78,7 +72,7 @@ module Api::V1
     private
 
     def set_key
-      @key = current_account.keys.find_by id: params[:id]
+      @key = current_account.keys.find params[:id]
     end
 
     typed_parameters transform: true do

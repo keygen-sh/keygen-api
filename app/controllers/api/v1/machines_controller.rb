@@ -19,8 +19,6 @@ module Api::V1
 
     # GET /machines/1
     def show
-      render_not_found and return unless @machine
-
       authorize @machine
 
       render jsonapi: @machine
@@ -46,8 +44,6 @@ module Api::V1
 
     # PATCH/PUT /machines/1
     def update
-      render_not_found and return unless @machine
-
       authorize @machine
 
       if @machine.update(machine_params)
@@ -65,8 +61,6 @@ module Api::V1
 
     # DELETE /machines/1
     def destroy
-      render_not_found and return unless @machine
-
       authorize @machine
 
       CreateWebhookEventService.new(
@@ -81,7 +75,7 @@ module Api::V1
     private
 
     def set_machine
-      @machine = current_account.machines.find_by id: params[:id]
+      @machine = current_account.machines.find params[:id]
     end
 
     typed_parameters transform: true do

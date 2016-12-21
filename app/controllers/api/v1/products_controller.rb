@@ -14,8 +14,6 @@ module Api::V1
 
     # GET /products/1
     def show
-      render_not_found and return unless @product
-
       authorize @product
 
       render jsonapi: @product, include: [:tokens]
@@ -41,8 +39,6 @@ module Api::V1
 
     # PATCH/PUT /products/1
     def update
-      render_not_found and return unless @product
-
       authorize @product
 
       if @product.update(product_attributes)
@@ -60,8 +56,6 @@ module Api::V1
 
     # DELETE /products/1
     def destroy
-      render_not_found and return unless @product
-
       authorize @product
 
       CreateWebhookEventService.new(
@@ -76,7 +70,7 @@ module Api::V1
     private
 
     def set_product
-      @product = current_account.products.find_by id: params[:id]
+      @product = current_account.products.find params[:id]
     end
 
     def product_attributes

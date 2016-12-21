@@ -13,8 +13,6 @@ module Api::V1
 
     # GET /plans/1
     def show
-      render_not_found and return unless @plan
-
       authorize @plan
 
       render jsonapi: @plan
@@ -23,7 +21,7 @@ module Api::V1
     private
 
     def set_plan
-      @plan = Plan.find_by id: params[:id]
+      @plan = Plan.find params[:id]
     end
   end
 end
