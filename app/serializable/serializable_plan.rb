@@ -1,5 +1,5 @@
 class SerializablePlan < SerializableBase
-  type 'plans'
+  type :plans
 
   attribute :name
   attribute :price
@@ -7,6 +7,10 @@ class SerializablePlan < SerializableBase
   attribute :max_policies
   attribute :max_licenses
   attribute :max_products
-  attribute :created_at
-  attribute :updated_at
+  attribute :created do
+    @object.created_at
+  end
+  attribute :updated do
+    @object.updated_at
+  end
 end
