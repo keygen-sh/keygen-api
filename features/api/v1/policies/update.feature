@@ -16,7 +16,14 @@ Feature: Update policy
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "name": "Trial" } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Trial"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "policy" with the name "Trial"
@@ -30,7 +37,14 @@ Feature: Update policy
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "price": 0 } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "price": 0
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -45,7 +59,14 @@ Feature: Update policy
     And the current product has 1 "policy"
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "price": 1000 } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "price": 1000
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "policy" with the price "1000"
@@ -60,7 +81,14 @@ Feature: Update policy
     And the current account has 1 "policy"
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "price": 1000 } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "price": 1000
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -73,7 +101,14 @@ Feature: Update policy
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "encrypted": false } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "encrypted": false
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -86,7 +121,14 @@ Feature: Update policy
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
-      { "policy": { "usePool": true } }
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "usePool": true
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs

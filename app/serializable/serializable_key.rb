@@ -24,4 +24,8 @@ class SerializableKey < SerializableBase
       @url_helpers.v1_account_policy_path @object.account, @object.policy
     end
   end
+
+  link :self do
+    @url_helpers.v1_account_key_path @object.account, @object
+  end
 end

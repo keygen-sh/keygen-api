@@ -14,7 +14,6 @@ class SerializableUser < SerializableBase
     @object.updated_at
   end
 
-  relationship :tokens
   relationship :account do
     link :related do
       @url_helpers.v1_account_path @object.account
@@ -34,5 +33,10 @@ class SerializableUser < SerializableBase
     link :related do
       @url_helpers.v1_account_machines_path @object.account, user: @object.id
     end
+  end
+  relationship :tokens
+
+  link :self do
+    @url_helpers.v1_account_user_path @object.account, @object
   end
 end

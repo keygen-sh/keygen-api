@@ -34,4 +34,8 @@ class SerializableMachine < SerializableBase
       @url_helpers.v1_account_user_path @object.account, @object.user
     end
   end
+
+  link :self do
+    @url_helpers.v1_account_machine_path @object.account, @object
+  end
 end
