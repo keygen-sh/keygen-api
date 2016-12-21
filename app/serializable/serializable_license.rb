@@ -43,4 +43,8 @@ class SerializableLicense < SerializableBase
       @url_helpers.v1_account_machines_path @object.account, license: @object.id
     end
   end
+
+  link :self do
+    @url_helpers.v1_account_license_path @object.account, @object
+  end
 end

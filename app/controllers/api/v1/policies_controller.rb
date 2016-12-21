@@ -11,7 +11,7 @@ module Api::V1
       @policies = policy_scope apply_scopes(current_account.policies).all
       authorize @policies
 
-      render json: @policies
+      render jsonapi: @policies
     end
 
     # GET /policies/1
@@ -20,14 +20,12 @@ module Api::V1
 
       authorize @policy
 
-      render json: @policy
+      render jsonapi: @policy
     end
 
     # POST /policies
     def create
-      product = current_account.products.find_by id: policy_parameters[:product]
-
-      @policy = current_account.policies.new policy_parameters.merge(product: product)
+      @policy = current_account.policies.new policy_params
       authorize @policy
 
       if @policy.save
@@ -37,7 +35,7 @@ module Api::V1
           resource: @policy
         ).execute
 
-        render json: @policy, status: :created, location: v1_account_policy_url(@policy.account, @policy)
+        render jsonapi: @policy, status: :created, location: v1_account_policy_url(@policy.account, @policy)
       else
         render_unprocessable_resource @policy
       end
@@ -49,14 +47,14 @@ module Api::V1
 
       authorize @policy
 
-      if @policy.update(policy_parameters)
+      if @policy.update(policy_params)
         CreateWebhookEventService.new(
           event: "policy.updated",
           account: current_account,
           resource: @policy
         ).execute
 
-        render json: @policy
+        render jsonapi: @policy
       else
         render_unprocessable_resource @policy
       end
@@ -79,23 +77,17 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_policy
       @policy = current_account.policies.find_by id: params[:id]
     end
 
-    def policy_parameters
-      parameters[:policy]
-    end
+    typed_parameters transform: true do
+      options strict: true
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
-
-        on :create do
-          param :policy, type: :hash do
-            param :product, type: :string
+      on :create do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[policy policies]
+          param :attributes, type: :hash do
             param :encrypted, type: :boolean, optional: true
             param :use_pool, type: :boolean, optional: true
             param :name, type: :string, optional: true
@@ -108,10 +100,21 @@ module Api::V1
             param :max_machines, type: :integer, optional: true
             param :metadata, type: :hash, optional: true
           end
+          param :relationships, type: :hash do
+            param :product, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[product products]
+                param :id, type: :string
+              end
+            end
+          end
         end
+      end
 
-        on :update do
-          param :policy, type: :hash do
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[policy policies]
+          param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :price, type: :integer, optional: true
             param :duration, type: :integer, optional: true

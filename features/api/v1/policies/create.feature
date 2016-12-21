@@ -17,15 +17,25 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Premium Add-On",
-          "price": 199,
-          "product": "$products[0]",
-          "maxMachines": 5,
-          "floating": true,
-          "strict": false,
-          "encrypted": true,
-          "duration": $time.2.weeks
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Add-On",
+            "price": 199,
+            "maxMachines": 5,
+            "floating": true,
+            "strict": false,
+            "encrypted": true,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
         }
       }
       """
@@ -41,13 +51,17 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Basic",
-          "price": 900,
-          "maxMachines": 1,
-          "floating": false,
-          "strict": true,
-          "duration": $time.2.weeks
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Add-On",
+            "price": 199,
+            "maxMachines": 5,
+            "floating": true,
+            "strict": false,
+            "encrypted": true,
+            "duration": $time.2.weeks
+          }
         }
       }
       """
@@ -63,11 +77,21 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Invalid",
-          "product": "$products[0]",
-          "encrypted": true,
-          "usePool": true
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Invalid",
+            "encrypted": true,
+            "usePool": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
         }
       }
       """
@@ -83,14 +107,24 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Basic",
-          "price": 900,
-          "product": "$products[0]",
-          "maxMachines": 1,
-          "floating": false,
-          "strict": true,
-          "duration": $time.2.weeks
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Basic",
+            "price": 900,
+            "maxMachines": 1,
+            "floating": false,
+            "strict": true,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
         }
       }
       """
@@ -106,15 +140,24 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Basic",
-          "price": 900,
-          "product": "$products[0]",
-          "maxMachines": 1,
-          "floating": false,
-          "strict": true,
-          "encrypted": true,
-          "duration": $time.2.weeks
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "price": 900,
+            "maxMachines": 1,
+            "floating": false,
+            "strict": true,
+            "encrypted": true,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
         }
       }
       """
@@ -130,14 +173,24 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies" with the following:
       """
       {
-        "policy": {
-          "name": "Basic",
-          "price": 900,
-          "product": "$products[0]",
-          "maxMachines": 1,
-          "floating": false,
-          "strict": true,
-          "duration": $time.2.weeks
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Basic",
+            "price": 900,
+            "maxMachines": 1,
+            "floating": false,
+            "strict": true,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
         }
       }
       """

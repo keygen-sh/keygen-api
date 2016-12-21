@@ -13,4 +13,8 @@ class SerializablePlan < SerializableBase
   attribute :updated do
     @object.updated_at
   end
+
+  link :self do
+    @url_helpers.v1_plan_path @object
+  end
 end

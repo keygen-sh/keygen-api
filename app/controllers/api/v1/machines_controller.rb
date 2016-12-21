@@ -80,8 +80,6 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_machine
       @machine = current_account.machines.find_by id: params[:id]
     end
