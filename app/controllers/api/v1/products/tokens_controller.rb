@@ -12,7 +12,7 @@ module Api::V1::Products
         bearer: @product
       ).execute
 
-      render json: token
+      render jsonapi: token
     end
 
     private

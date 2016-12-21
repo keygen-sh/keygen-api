@@ -18,7 +18,7 @@ module Api::V1
 
       authorize @product
 
-      render jsonapi: @product
+      render jsonapi: @product, include: [:tokens]
     end
 
     # POST /products

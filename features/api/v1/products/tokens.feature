@@ -15,7 +15,7 @@ Feature: Generate authentication token for product
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: Product attempts to generate a token
     Given the current account is "test1"

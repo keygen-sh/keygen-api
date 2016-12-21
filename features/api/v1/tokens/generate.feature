@@ -18,7 +18,7 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" with a token
 
   Scenario: User attempts to generate a new token but fails to authenticate
     Given the current account is "test1"

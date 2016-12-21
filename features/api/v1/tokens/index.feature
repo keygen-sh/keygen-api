@@ -8,7 +8,7 @@ Feature: List authentication tokens
       | Test 2  | test2 |
     And I send and accept JSON
 
-  Scenario: Admin requests their tokens while authenticated
+  Scenario: Admin requests all tokens while authenticated
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I use an authentication token
@@ -16,7 +16,7 @@ Feature: List authentication tokens
     Then the response status should be "200"
     And the JSON response should be an array of "tokens"
 
-  Scenario: Product requeststheir  tokens while authenticated
+  Scenario: Product requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"

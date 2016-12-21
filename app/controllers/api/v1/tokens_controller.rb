@@ -12,7 +12,7 @@ module Api::V1
       @tokens = policy_scope apply_scopes(current_bearer.tokens).all
       authorize @tokens
 
-      render json: @tokens
+      render jsonapi: @tokens
     end
 
     # GET /tokens/1
@@ -21,7 +21,7 @@ module Api::V1
 
       authorize @token
 
-      render json: @token
+      render jsonapi: @token
     end
 
     # POST /tokens
@@ -37,7 +37,7 @@ module Api::V1
             bearer: user
           ).execute
 
-          render json: token and return
+          render jsonapi: token and return
         end
       end
 
@@ -63,7 +63,7 @@ module Api::V1
 
         tok.regenerate!
 
-        render json: tok and return
+        render jsonapi: tok and return
       end
 
       render_unauthorized detail: "must be a valid token", source: {
@@ -78,7 +78,7 @@ module Api::V1
 
       @token.regenerate!
 
-      render json: @token and return
+      render jsonapi: @token and return
     end
 
     # DELETE /tokens/1
