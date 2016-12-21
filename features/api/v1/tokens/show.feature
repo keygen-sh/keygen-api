@@ -16,6 +16,13 @@ Feature: Show authentication token
     Then the response status should be "200"
     And the JSON response should be a "token"
 
+  Scenario: Admin retrieves an invalid token while authenticated
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens/invalid"
+    Then the response status should be "404"
+
   Scenario: Product requests a token while authenticated
     Given the current account is "test1"
     And the current account has 1 "product"

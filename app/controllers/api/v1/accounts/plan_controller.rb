@@ -5,14 +5,9 @@ module Api::V1::Accounts
 
     # PUT /accounts/1/plan
     def update
-      render_not_found and return unless @account
-
       authorize @account
 
-      @plan = Plan.find_by id: plan_parameters
-
-      render_unprocessable_entity detail: "must be a valid plan", source: {
-        pointer: "/data/relationships/plan" } and return if @plan.nil?
+      @plan = Plan.find plan_parameters
 
       status = Billings::UpdateSubscriptionService.new(
         subscription: @account.billing.subscription_id,

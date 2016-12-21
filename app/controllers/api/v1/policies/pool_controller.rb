@@ -6,8 +6,6 @@ module Api::V1::Policies
 
     # DELETE /policies/1/pool
     def pop
-      render_not_found and return unless @policy
-
       authorize @policy
 
       unless @policy.use_pool
@@ -26,7 +24,7 @@ module Api::V1::Policies
     private
 
     def set_policy
-      @policy = current_account.policies.find_by id: params[:id]
+      @policy = current_account.policies.find params[:id]
     end
   end
 end

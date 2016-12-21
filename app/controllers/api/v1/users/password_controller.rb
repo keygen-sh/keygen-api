@@ -47,7 +47,7 @@ module Api::V1::Users
     attr_reader :parameters
 
     def set_user
-      @user = current_account.users.find_by id: params[:id]
+      @user = current_account.users.find params[:id]
     end
 
     def parameters

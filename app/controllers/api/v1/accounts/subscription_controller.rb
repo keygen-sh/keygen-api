@@ -5,8 +5,6 @@ module Api::V1::Accounts
 
     # POST /accounts/1/pause-subscription
     def pause
-      render_not_found and return unless @account
-
       authorize @account
 
       if @account.pause_subscription
@@ -19,8 +17,6 @@ module Api::V1::Accounts
 
     # POST /accounts/1/resume-subscription
     def resume
-      render_not_found and return unless @account
-
       authorize @account
 
       if @account.resume_subscription
@@ -33,8 +29,6 @@ module Api::V1::Accounts
 
     # POST /accounts/1/cancel-subscription
     def cancel
-      render_not_found and return unless @account
-
       authorize @account
 
       if @account.cancel_subscription
@@ -47,8 +41,6 @@ module Api::V1::Accounts
 
     # POST /accounts/1/renew-subscription
     def renew
-      render_not_found and return unless @account
-
       authorize @account
 
       if @account.renew_subscription
