@@ -8,7 +8,7 @@ module Api::V1
 
       authorize @plans
 
-      render json: @plans
+      render jsonapi: @plans
     end
 
     # GET /plans/1
@@ -17,7 +17,7 @@ module Api::V1
 
       authorize @plan
 
-      render json: @plan
+      render jsonapi: @plan
     end
 
     private
