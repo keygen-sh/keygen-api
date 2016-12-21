@@ -16,7 +16,22 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
@@ -30,7 +45,19 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]" } }
+      {
+        "data": {
+          "type": "machines",
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -43,7 +70,14 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "fingerprint": "qv:8W:qh:Fx:Ua:kN:LY:fj:yG:8H:Ar:N8:KZ:Uk:ge" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "qv:8W:qh:Fx:Ua:kN:LY:fj:yG:8H:Ar:N8:KZ:Uk:ge"
+          }
+        }
+      }
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
@@ -58,7 +92,22 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
@@ -73,7 +122,22 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "oD:aP:3o:GD:vi:H3:Zw:up:h8:3a:hC:MD:2e:4d:cr" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "oD:aP:3o:GD:vi:H3:Zw:up:h8:3a:hC:MD:2e:4d:cr"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
@@ -84,7 +148,22 @@ Feature: Create machine
     And the current account has 1 "license"
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "fw:8v:uU:bm:Wt:Zf:rL:e7:Xg:mg:8x:NV:hT:Ej:jK" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "fw:8v:uU:bm:Wt:Zf:rL:e7:Xg:mg:8x:NV:hT:Ej:jK"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
@@ -97,7 +176,22 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
-      { "machine": { "license": "$licenses[0]", "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw" } }
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs

@@ -1,17 +1,37 @@
 class SerializableMachine < SerializableBase
-  type 'machines'
+  type :machines
 
   attribute :fingerprint
   attribute :ip
   attribute :hostname
   attribute :platform
-  attribute :created_at
-  attribute :updated_at
   attribute :name
   attribute :metadata
+  attribute :created do
+    @object.created_at
+  end
+  attribute :updated do
+    @object.updated_at
+  end
 
-  has_one :product
-  has_one :user
-  has_one :account
-  has_one :license
+  relationship :account do
+    link :related do
+      @url_helpers.v1_account_path @object.account
+    end
+  end
+  relationship :product do
+    link :related do
+      @url_helpers.v1_account_product_path @object.account, @object.product
+    end
+  end
+  relationship :license do
+    link :related do
+      @url_helpers.v1_account_license_path @object.account, @object.license
+    end
+  end
+  relationship :user do
+    link :related do
+      @url_helpers.v1_account_user_path @object.account, @object.user
+    end
+  end
 end
