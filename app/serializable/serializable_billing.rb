@@ -29,6 +29,6 @@ class SerializableBilling < SerializableBase
   end
 
   link :self do
-    @url_helpers.v1_account_key_path @object.account, @object
+    @url_helpers.billing_v1_account_path @object.account
   end
 end
