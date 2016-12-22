@@ -137,10 +137,6 @@ Then /^the account should have a(?:n? (?:new|updated)) card$/ do
   expect(@billing.reload.card.brand).to eq @event.data.object.brand
 end
 
-Then /^the account should receive an email$/ do
-  expect(Sidekiq::Queues["mailers"]).to_not be_empty
-end
-
 Then /^the account should contain (\d+) "(paid|unpaid)" receipts?$/ do |count, status|
   expect(@billing.receipts.send(status).count).to be count.to_i
 end

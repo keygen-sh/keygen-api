@@ -15,7 +15,12 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/update-password" with the following:
       """
-      { "oldPassword": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "200"
 
@@ -26,7 +31,11 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/update-password" with the following:
       """
-      { "newPassword": "pass" }
+      {
+        "meta": {
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "400"
 
@@ -37,7 +46,12 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$2/update-password" with the following:
       """
-      { "oldPassword": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "403"
 
@@ -49,7 +63,12 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$2/update-password" with the following:
       """
-      { "oldPassword": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "401"
 
@@ -60,7 +79,12 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$3/update-password" with the following:
       """
-      { "oldPassword": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "403"
 
@@ -75,7 +99,12 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/reset-password" with the following:
       """
-      { "passwordResetToken": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "passwordResetToken": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "200"
 
@@ -90,7 +119,11 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/reset-password" with the following:
       """
-      { "newPassword": "pass" }
+      {
+        "meta": {
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "400"
 
@@ -105,6 +138,11 @@ Feature: User password
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/reset-password" with the following:
       """
-      { "passwordResetToken": "password", "newPassword": "pass" }
+      {
+        "meta": {
+          "passwordResetToken": "password",
+          "newPassword": "pass"
+        }
+      }
       """
     Then the response status should be "401"

@@ -39,6 +39,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the account should receive a "welcome" email
     And sidekiq should have 1 "webhook" job
 
   Scenario: Admin creates an encrypted license for a user of their account

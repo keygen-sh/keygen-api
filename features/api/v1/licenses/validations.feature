@@ -197,7 +197,11 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "$licenses[0].key" }
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -220,7 +224,11 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "invalid" }
+      {
+        "meta": {
+          "key": "invalid"
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -243,7 +251,12 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "$crypt[0].raw", "encrypted": true }
+      {
+        "meta": {
+          "key": "$crypt[0].raw",
+          "encrypted": true
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -266,7 +279,12 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "$crypt[0].raw", "encrypted": false }
+      {
+        "meta": {
+          "key": "$crypt[0].raw",
+          "encrypted": false
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -289,7 +307,12 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "$licenses[0].key", "encrypted": true }
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "encrypted": true
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:
@@ -318,7 +341,11 @@ Feature: License validation
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/validate-key" with the following:
       """
-      { "key": "$licenses[0].key" }
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be meta with the following:

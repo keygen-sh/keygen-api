@@ -17,8 +17,8 @@ module Api::V1::Licenses
 
       @license = LicenseKeyLookupService.new(
         account: current_account,
-        encrypted: validation_params[:encrypted] == true,
-        key: validation_params[:key],
+        encrypted: validation_params[:meta][:encrypted] == true,
+        key: validation_params[:meta][:key],
       ).execute
 
       render_meta is_valid: LicenseValidationService.new(license: @license).execute
@@ -28,8 +28,10 @@ module Api::V1::Licenses
       options strict: true
 
       on :validate_by_key do
-        param :key, type: :string
-        param :encrypted, type: :boolean, optional: true
+        param :meta, type: :hash do
+          param :key, type: :string
+          param :encrypted, type: :boolean, optional: true
+        end
       end
     end
   end
