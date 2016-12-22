@@ -242,6 +242,7 @@ class TypedParameters
       private
 
       def _transform_parameters!(parameters)
+        # TODO: Handle meta here as well?
         parameters.inject(HashWithIndifferentAccess.new) do |hash, (_, data)|
           hash.merge! data.slice(:id)
           hash.merge! data.fetch(:attributes, {})

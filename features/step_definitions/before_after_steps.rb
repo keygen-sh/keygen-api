@@ -6,13 +6,13 @@ end
 
 Before do
   ActionMailer::Base.deliveries.clear
+  Sidekiq::Worker.clear_all
   StripeHelper.start
 
   @crypt = []
 end
 
 After do |s|
-  Sidekiq::Worker.clear_all
   StripeHelper.stop
 
   # Tell Cucumber to quit if a scenario fails

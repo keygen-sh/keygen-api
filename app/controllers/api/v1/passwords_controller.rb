@@ -13,14 +13,16 @@ module Api::V1
     private
 
     def set_user
-      @user = current_account.users.find_by_email password_params[:email]
+      @user = current_account.users.find_by_email password_params[:meta][:email]
     end
 
     typed_parameters do
       options strict: true
 
       on :reset_password do
-        param :email, type: :string
+        param :meta, type: :hash do
+          param :email, type: :string
+        end
       end
     end
   end
