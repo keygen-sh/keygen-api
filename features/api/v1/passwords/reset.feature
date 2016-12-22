@@ -1,5 +1,5 @@
 @api/v1
-Feature: User password
+Feature: Password reset
 
   Background:
     Given the following "accounts" exist:
