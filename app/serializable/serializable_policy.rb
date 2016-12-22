@@ -11,7 +11,9 @@ class SerializablePolicy < SerializableBase
   attribute :max_machines
   attribute :encrypted
   attribute :protected
-  attribute :metadata
+  attribute :metadata do
+    @object.metadata&.transform_keys { |k| k.camelize :lower } or {}
+  end
   attribute :created do
     @object.created_at
   end

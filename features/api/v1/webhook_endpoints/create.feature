@@ -14,7 +14,14 @@ Feature: Create webhook endpoint
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "201"
     And the JSON response should be a "webhookEndpoint" with the url "https://example.com"
@@ -25,7 +32,12 @@ Feature: Create webhook endpoint
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": {} }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {}
+        }
+      }
       """
     Then the response status should be "400"
 
@@ -35,7 +47,14 @@ Feature: Create webhook endpoint
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": { "url": "ssh://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "ssh://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "422"
 
@@ -46,7 +65,14 @@ Feature: Create webhook endpoint
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "403"
 
@@ -54,7 +80,14 @@ Feature: Create webhook endpoint
     Given the current account is "test1"
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "401"
 
@@ -64,6 +97,13 @@ Feature: Create webhook endpoint
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "401"

@@ -22,7 +22,7 @@ module Api::V1::Licenses
           resource: @license
         ).execute
 
-        render json: @license
+        render jsonapi: @license
       else
         render_unprocessable_resource @license
       end

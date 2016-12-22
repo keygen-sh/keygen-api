@@ -15,7 +15,14 @@ Feature: Update webhook endpoint
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "200"
     And the JSON response should be a "webhookEndpoint" with the url "https://example.com"
@@ -28,7 +35,14 @@ Feature: Update webhook endpoint
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "403"
 
@@ -37,7 +51,14 @@ Feature: Update webhook endpoint
     And the current account has 3 "webhookEndpoints"
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "401"
 
@@ -48,6 +69,13 @@ Feature: Update webhook endpoint
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
-      { "endpoint": { "url": "https://example.com" } }
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
       """
     Then the response status should be "401"

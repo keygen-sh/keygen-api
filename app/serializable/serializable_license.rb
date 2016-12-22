@@ -9,7 +9,9 @@ class SerializableLicense < SerializableBase
     end
   end
   attribute :expiry
-  attribute :metadata
+  attribute :metadata do
+    @object.metadata&.transform_keys { |k| k.camelize :lower } or {}
+  end
   attribute :created do
     @object.created_at
   end

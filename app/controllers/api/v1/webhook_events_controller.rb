@@ -9,14 +9,14 @@ module Api::V1
       @events = policy_scope apply_scopes(current_account.webhook_events).all
       authorize @events
 
-      render json: @events
+      render jsonapi: @events
     end
 
     # GET /webhook-events/1
     def show
       authorize @event
 
-      render json: @event
+      render jsonapi: @event
     end
 
     private

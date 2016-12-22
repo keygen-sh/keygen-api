@@ -7,7 +7,7 @@ module Api::V1
     def show
       authorize current_bearer
 
-      render json: current_bearer
+      render jsonapi: current_bearer
     end
   end
 end
