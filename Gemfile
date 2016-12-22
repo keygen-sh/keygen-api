@@ -10,7 +10,7 @@ gem 'rack-cors'
 
 # JSON API serializers
 gem 'active_model_serializers'
-gem 'jsonapi-rails'
+gem 'jsonapi-rails', github: "ezekg/jsonapi-rails"
 
 # Billing and subscriptions
 gem 'stripe'
