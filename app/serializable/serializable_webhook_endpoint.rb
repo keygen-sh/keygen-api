@@ -1,9 +1,21 @@
 class SerializableWebhookEndpoint < SerializableBase
-  type 'webhook_endpoints'
+  type :webhookEndpoints
 
   attribute :url
-  attribute :created_at
-  attribute :updated_at
+  attribute :created do
+    @object.created_at
+  end
+  attribute :updated do
+    @object.updated_at
+  end
 
-  has_one :account
+  relationship :account do
+    link :related do
+      @url_helpers.v1_account_path @object.account
+    end
+  end
+
+  link :self do
+    @url_helpers.v1_account_webhook_endpoint_path @object.account, @object
+  end
 end

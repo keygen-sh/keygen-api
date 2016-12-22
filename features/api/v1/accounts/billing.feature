@@ -38,7 +38,14 @@ Feature: Account billing info
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
       """
-      { "token": "some_token" }
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
       """
     Then the response status should be "202"
 
@@ -50,7 +57,14 @@ Feature: Account billing info
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
       """
-      { "token": "some_token" }
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
       """
     Then the response status should be "403"
 
@@ -61,6 +75,13 @@ Feature: Account billing info
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
       """
-      { "token": "some_token" }
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
       """
     Then the response status should be "401"

@@ -14,7 +14,7 @@ module Api::V1::Policies
       end
 
       if key = @policy.pop!
-        render json: key
+        render jsonapi: key
       else
         render_unprocessable_entity detail: "pool is empty",
           source: { pointer: "/data/relationships/pool" }

@@ -15,7 +15,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "200"
 
@@ -26,7 +31,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "200"
 
@@ -37,7 +47,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "200"
 
@@ -48,7 +63,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "422"
 
@@ -59,7 +79,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "422"
 
@@ -70,7 +95,12 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "invalid" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "invalid"
+        }
+      }
       """
     Then the response status should be "404"
 
@@ -81,6 +111,11 @@ Feature: Account plan
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
-      { "plan": "$plan[0]" }
+      {
+        "data": {
+          "type": "plans",
+          "id": "$plans[0]"
+        }
+      }
       """
     Then the response status should be "401"

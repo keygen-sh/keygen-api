@@ -9,23 +9,23 @@ module Api::V1
       @endpoints = policy_scope apply_scopes(current_account.webhook_endpoints).all
       authorize @endpoints
 
-      render json: @endpoints
+      render jsonapi: @endpoints
     end
 
     # GET /webhook-endpoints/1
     def show
       authorize @endpoint
 
-      render json: @endpoint
+      render jsonapi: @endpoint
     end
 
     # POST /webhook-endpoints
     def create
-      @endpoint = current_account.webhook_endpoints.new endpoint_parameters
+      @endpoint = current_account.webhook_endpoints.new webhook_endpoint_params
       authorize @endpoint
 
       if @endpoint.save
-        render json: @endpoint, status: :created, location: v1_account_webhook_endpoint_url(@endpoint.account, @endpoint)
+        render jsonapi: @endpoint, status: :created, location: v1_account_webhook_endpoint_url(@endpoint.account, @endpoint)
       else
         render_unprocessable_resource @endpoint
       end
@@ -35,8 +35,8 @@ module Api::V1
     def update
       authorize @endpoint
 
-      if @endpoint.update(endpoint_parameters)
-        render json: @endpoint
+      if @endpoint.update(webhook_endpoint_params)
+        render jsonapi: @endpoint
       else
         render_unprocessable_resource @endpoint
       end
@@ -51,28 +51,26 @@ module Api::V1
 
     private
 
-    attr_reader :parameters
-
     def set_endpoint
       @endpoint = current_account.webhook_endpoints.find params[:id]
     end
 
-    def endpoint_parameters
-      parameters[:endpoint]
-    end
+    typed_parameters transform: true do
+      options strict: true
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
-
-        on :create do
-          param :endpoint, type: :hash do
+      on :create do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints]
+          param :attributes, type: :hash do
             param :url, type: :string
           end
         end
+      end
 
-        on :update do
-          param :endpoint, type: :hash do
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints]
+          param :attributes, type: :hash do
             param :url, type: :string, optional: true
           end
         end

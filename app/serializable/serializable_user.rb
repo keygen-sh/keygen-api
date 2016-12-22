@@ -3,7 +3,9 @@ class SerializableUser < SerializableBase
 
   attribute :name
   attribute :email
-  attribute :metadata
+  attribute :metadata do
+    @object.metadata&.transform_keys { |k| k.camelize :lower } or {}
+  end
   attribute :role do
     @object.role&.name
   end

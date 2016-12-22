@@ -39,7 +39,7 @@ class TypedParameters
   def self.build(context, &block)
     schema = Schema.new context: context, &block
     handler = schema.handlers[context.action_name]
-    params = handler.call
+    handler.call
 
     # Grab our segment of the params (getting rid of cruft added by Rails middleware)
     # and validate for unpermitted params
@@ -50,7 +50,7 @@ class TypedParameters
       schema.validate! segment
     end
 
-    params
+    schema.params
   end
 
   private
@@ -142,7 +142,7 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError, "Parameter '#{keys.join "."}' could not be coerced to #{type}"
+            raise InvalidParameterError, "Parameter /#{keys.join "/"}' could not be coerced to #{type}"
           end
         else
           raise InvalidParameterError, "Invalid type for coercion (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
@@ -151,13 +151,13 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for parameter '#{keys.join "."}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError, "Invalid type defined for parameter /#{keys.join "/"}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
-        raise InvalidParameterError, "Parameter missing: #{keys.join "."}"
+        raise InvalidParameterError, "Parameter missing: /#{keys.join "/"}"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for parameter '#{keys.join "."}' (received #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError, "Type mismatch for parameter /#{keys.join "/"}' (received #{Helper.class_type(value.class)} expected #{type})"
       when !inclusion.empty? && !inclusion.include?(value)
-        raise InvalidParameterError, "Parameter '#{keys.join "."}' must be one of: #{inclusion.join ", "} (received #{value})"
+        raise InvalidParameterError, "Parameter /#{keys.join "/"}' must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return # We've encountered an optional param (okay to bail early)
       end
@@ -174,7 +174,7 @@ class TypedParameters
           params.merge! key => child.params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{keys.join "."}' (expected hash of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter /#{keys.join "/"} (expected hash of scalar types)"
           end
           params.merge! key => value
         end
@@ -183,7 +183,7 @@ class TypedParameters
           arr_type, b = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for parameter '#{keys.join "."}' (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError, "Type mismatch for parameter /#{keys.join "/"} (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
 
           # TODO: Handle array type here as well
@@ -202,7 +202,7 @@ class TypedParameters
           end
         else
           if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter '#{keys.join "."}' (expected array of scalar types)"
+            raise InvalidParameterError, "Unpermitted type found for parameter /#{keys.join "/"} (expected array of scalar types)"
           end
           params.merge! key => value
         end
@@ -222,7 +222,7 @@ class TypedParameters
     included do
       class << self
         def typed_parameters(transform: false, &block)
-          model = controller_name.classify.underscore
+          resource = controller_name.classify.underscore
           method = lambda do
             @_typed_parameters ||= TypedParameters.build self, &block
 
@@ -233,8 +233,8 @@ class TypedParameters
             end
           end
 
-          define_method "#{model}_parameters", &method
-          define_method "#{model}_params", &method
+          define_method "#{resource}_parameters", &method
+          define_method "#{resource}_params", &method
         end
         alias_method :typed_params, :typed_parameters
       end
@@ -242,7 +242,8 @@ class TypedParameters
       private
 
       def _transform_parameters!(parameters)
-        parameters.inject({}) do |hash, (_, data)|
+        parameters.inject(HashWithIndifferentAccess.new) do |hash, (_, data)|
+          hash.merge! data.slice(:id)
           hash.merge! data.fetch(:attributes, {})
           hash.merge! data.fetch(:relationships, nil)&.map { |key, rel|
             dat = rel.fetch :data, {}

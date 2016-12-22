@@ -1,11 +1,23 @@
 class SerializableWebhookEvent < SerializableBase
-  type 'webhook_events'
+  type :webhookEvents
 
+  attribute :endpoint
   attribute :payload
   attribute :jid
-  attribute :created_at
-  attribute :updated_at
-  attribute :endpoint
+  attribute :created do
+    @object.created_at
+  end
+  attribute :updated do
+    @object.updated_at
+  end
 
-  has_one :account
+  relationship :account do
+    link :related do
+      @url_helpers.v1_account_path @object.account
+    end
+  end
+
+  link :self do
+    @url_helpers.v1_account_webhook_event_path @object.account, @object
+  end
 end

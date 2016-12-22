@@ -15,15 +15,22 @@ module Api::V1::Licenses
     def validate_by_key
       skip_authorization
 
-      params.require :key
-
       @license = LicenseKeyLookupService.new(
         account: current_account,
-        encrypted: params[:encrypted] == true,
-        key: params[:key],
+        encrypted: validation_params[:encrypted] == true,
+        key: validation_params[:key],
       ).execute
 
       render_meta is_valid: LicenseValidationService.new(license: @license).execute
+    end
+
+    typed_parameters do
+      options strict: true
+
+      on :validate_by_key do
+        param :key, type: :string
+        param :encrypted, type: :boolean, optional: true
+      end
     end
   end
 end

@@ -7,7 +7,7 @@ module Api::V1::Accounts
     def update
       authorize @account
 
-      @plan = Plan.find plan_parameters
+      @plan = Plan.find plan_params[:id]
 
       status = Billings::UpdateSubscriptionService.new(
         subscription: @account.billing.subscription_id,
@@ -16,7 +16,7 @@ module Api::V1::Accounts
 
       if status
         if @account.update(plan: @plan)
-          render json: @account
+          render jsonapi: @account
         else
           render_unprocessable_resource @account
         end
@@ -28,22 +28,17 @@ module Api::V1::Accounts
 
     private
 
-    attr_reader :parameters
-
     def set_account
       @account = Account.find params[:id]
     end
 
-    def plan_parameters
-      parameters[:plan]
-    end
+    typed_parameters transform: true do
+      options strict: true
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
-
-        on :update do
-          param :plan, type: :string
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[plan plans]
+          param :id, type: :string
         end
       end
     end

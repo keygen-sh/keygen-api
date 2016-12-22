@@ -9,7 +9,7 @@ module Api::V1::Accounts
 
       authorize @billing
 
-      render json: @billing
+      render jsonapi: @billing
     end
 
     # PATCH /accounts/1/billing
@@ -20,7 +20,7 @@ module Api::V1::Accounts
 
       status = Billings::UpdateCustomerService.new(
         customer: @billing.customer_id,
-        token: parameters[:token]
+        token: billing_params[:token]
       ).execute
 
       if status
@@ -32,18 +32,19 @@ module Api::V1::Accounts
 
     private
 
-    attr_reader :parameters
-
     def set_billing
       @billing = Account.find(params[:id])&.billing
     end
 
-    def parameters
-      @parameters ||= TypedParameters.build self do
-        options strict: true
+    typed_parameters transform: true do
+      options strict: true
 
-        on :update do
-          param :token, type: :string
+      on :update do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[billing billings]
+          param :attributes, type: :hash do
+            param :token, type: :string
+          end
         end
       end
     end
