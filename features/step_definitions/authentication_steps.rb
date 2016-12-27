@@ -28,20 +28,15 @@ Given /^I send the following headers:$/ do |body|
 end
 
 Given /^I use an authentication token$/ do
-  token = TokenGeneratorService.new(
-    account: @bearer.account,
-    bearer: @bearer
-  ).execute
+  token = @bearer.tokens.first_or_create account: @bearer.account
+  token.regenerate!
 
   header "Authorization", "Bearer \"#{token.raw}\""
 end
 
 Given /^I use an expired authentication token$/ do
-  token = TokenGeneratorService.new(
-    account: @bearer.account,
-    bearer: @bearer
-  ).execute
-
+  token = @bearer.tokens.first_or_create account: @bearer.account
+  token.regenerate!
   token.update expiry: Time.current
 
   header "Authorization", "Bearer \"#{token.raw}\""

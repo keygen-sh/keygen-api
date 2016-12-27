@@ -59,7 +59,7 @@ Then /^the response status should be "([^\"]*)"$/ do |status|
   expect(last_response.status).to eq status.to_i
 end
 
-Then /^the JSON response should be an array with (\d+) "([^\"]*)"$/ do |count, name|
+Then /^the JSON response should be an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i

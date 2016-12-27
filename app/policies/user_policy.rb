@@ -17,7 +17,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
-    bearer.role? :admin or resource.products.include? bearer
+    bearer.role? :admin
+  end
+
+  def read_tokens?
+    bearer.role? :admin or resource == bearer
   end
 
   def update_password?

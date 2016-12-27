@@ -49,3 +49,43 @@ Feature: Generate authentication token for product
     And I use an authentication token
     When I send a POST request to "/accounts/test2/products/$0/tokens"
     Then the response status should be "401"
+
+  Scenario: Admin requests tokens for one of their products
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And the current account has 3 "products"
+    And the current account has 5 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/tokens"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
+
+  Scenario: Product requests their tokens
+    Given the current account is "test1"
+    And the current account has 5 "products"
+    And I am a product of account "test1"
+    And the current account has 5 "users"
+    And the current product has 2 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/tokens"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
+
+  Scenario: Product requests tokens for another product
+    Given the current account is "test1"
+    And the current account has 5 "products"
+    And I am a product of account "test1"
+    And the current account has 5 "users"
+    And the current product has 2 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$2/tokens"
+    Then the response status should be "403"
+
+  Scenario: User requests tokens for a product
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 6 "users"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$1/tokens"
+    Then the response status should be "403"

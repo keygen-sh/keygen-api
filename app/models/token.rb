@@ -13,6 +13,8 @@ class Token < ApplicationRecord
   validates :account, presence: true
   validates :bearer, presence: true
 
+  scope :bearer, -> (id) { where bearer: id }
+
   def generate!
     @raw, enc = generate_encrypted_token :digest do |token|
       "#{account.id}.#{id}.#{token}"
