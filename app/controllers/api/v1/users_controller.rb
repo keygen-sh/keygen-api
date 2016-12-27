@@ -20,7 +20,7 @@ module Api::V1
     def show
       authorize @user
 
-      render jsonapi: @user, include: [:tokens]
+      render jsonapi: @user
     end
 
     # POST /users
