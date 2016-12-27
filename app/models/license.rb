@@ -43,14 +43,14 @@ class License < ApplicationRecord
       @raw, enc = generate_encrypted_token :key do |token|
         # Replace first n characters with our id so that we can do a lookup
         # on the encrypted key
-        token.gsub(/\A.{#{UUID_LENGTH}}/, id.gsub(/-/, ""))
+        token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
              .scan(/.{#{UUID_LENGTH}}/).join "-"
       end
 
       self.key = enc
     else
       self.key = generate_token :key do |token|
-        token.gsub(/\A.{#{UUID_LENGTH}}/, id.gsub(/-/, ""))
+        token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
              .scan(/.{#{UUID_LENGTH}}/).join "-"
       end
     end
