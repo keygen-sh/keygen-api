@@ -28,12 +28,12 @@ class SerializablePolicy < SerializableBase
   end
   relationship :product do
     link :related do
-      @url_helpers.v1_account_product_path @object.account, @object.product
+      @url_helpers.v1_account_policy_product_path @object.account, @object
     end
   end
   relationship :licenses do
     link :related do
-      @url_helpers.v1_account_licenses_path @object.account, policy: @object.id
+      @url_helpers.v1_account_policy_licenses_path @object.account, @object
     end
   end
   relationship :pool, if: -> { @object.pool? }

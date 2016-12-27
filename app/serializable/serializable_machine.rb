@@ -23,17 +23,17 @@ class SerializableMachine < SerializableBase
   end
   relationship :product do
     link :related do
-      @url_helpers.v1_account_product_path @object.account, @object.product
+      @url_helpers.v1_account_machine_product_path @object.account, @object
     end
   end
   relationship :license do
     link :related do
-      @url_helpers.v1_account_license_path @object.account, @object.license
+      @url_helpers.v1_account_machine_license_path @object.account, @object
     end
   end
   relationship :user do
     link :related do
-      @url_helpers.v1_account_user_path @object.account, @object.user
+      @url_helpers.v1_account_machine_user_path @object.account, @object
     end
   end
 

@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user do
     name { Faker::Name.name }
-    email { Faker::Internet.safe_email }
+    email { [SecureRandom.hex, Faker::Internet.safe_email].join }
     password "password"
 
     account
