@@ -50,6 +50,8 @@ class ApplicationPolicy
       case
       when bearer.role?(:admin)
         scope.all
+      when scope.respond_to?(:bearer) && (bearer.role?(:product) || bearer.role?(:user))
+        scope.bearer bearer.id
       when bearer.role?(:product)
         scope.product bearer.id
       when bearer.role?(:user)

@@ -39,8 +39,8 @@ class SerializableProduct < SerializableBase
     end
   end
   relationship :tokens do
-    linkage always: true do
-      @object.tokens.map { |t| { type: "tokens", id: t.id } }
+    link :related do
+      @url_helpers.v1_account_product_tokens_path @object.account, @object
     end
   end
 

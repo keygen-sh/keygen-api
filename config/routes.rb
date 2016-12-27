@@ -42,6 +42,7 @@ Rails.application.routes.draw do
           resources "products", controller: "users/relationships/products", only: [:index, :show]
           resources "licenses", controller: "users/relationships/licenses", only: [:index, :show]
           resources "machines", controller: "users/relationships/machines", only: [:index, :show]
+          resources "tokens", controller: "users/relationships/tokens", only: [:index, :show]
           member do
             scope "actions" do
               post "update-password", to: "users/actions/password#update_password"
@@ -81,6 +82,7 @@ Rails.application.routes.draw do
           resources "policies", controller: "products/relationships/policies", only: [:index, :show]
           resources "licenses", controller: "products/relationships/licenses", only: [:index, :show]
           resources "machines", controller: "products/relationships/machines", only: [:index, :show]
+          resources "tokens", controller: "products/relationships/tokens", only: [:index, :show]
           resources "users", controller: "products/relationships/users", only: [:index, :show]
           member do
             post "tokens", to: "products/relationships/tokens#generate"
