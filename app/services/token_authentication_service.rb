@@ -9,7 +9,7 @@ class TokenAuthenticationService < BaseService
   def execute
     token =~ TOKEN_ID_REGEX # Run regex against token
 
-    return nil unless account&.id == $1
+    return nil unless account&.id.delete("-") == $1
 
     tok = account.tokens.find_by id: $2
 

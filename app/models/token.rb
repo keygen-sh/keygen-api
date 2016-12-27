@@ -17,7 +17,7 @@ class Token < ApplicationRecord
 
   def generate!
     @raw, enc = generate_encrypted_token :digest do |token|
-      "#{account.id}.#{id}.#{token}"
+      "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
     end
 
     self.digest = enc
