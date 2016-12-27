@@ -1,5 +1,6 @@
 # Register JSON API mime-type
 Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
+  application/vnd.keygen+json
   application/vnd.api+json
   application/json
   text/x-json

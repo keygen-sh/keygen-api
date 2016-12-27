@@ -1,21 +1,20 @@
 Rails.application.routes.draw do
   scope module: "api" do
-    namespace "v1", constraints: { subdomain: "api", format: "json" } do
+    namespace "v1", constraints: { subdomain: "api", format: "jsonapi" } do
       post "stripe", to: "stripe#receive_webhook"
 
       resources "plans", only: [:index, :show]
 
       resources "accounts" do
+        resource "billing", controller: "accounts/relationships/billing", only: [:show, :update]
+        resource "plan", controller: "accounts/relationships/plan", only: [:update]
         member do
-          get "billing", to: "accounts/billing#show"
-          patch "billing", to: "accounts/billing#update"
-
-          put "plan", to: "accounts/plan#update"
-
-          post "pause-subscription", to: "accounts/subscription#pause"
-          post "resume-subscription", to: "accounts/subscription#resume"
-          post "cancel-subscription", to: "accounts/subscription#cancel"
-          post "renew-subscription", to: "accounts/subscription#renew"
+          scope "actions" do
+            post "pause-subscription", to: "accounts/actions/subscription#pause"
+            post "resume-subscription", to: "accounts/actions/subscription#resume"
+            post "cancel-subscription", to: "accounts/actions/subscription#cancel"
+            post "renew-subscription", to: "accounts/actions/subscription#renew"
+          end
         end
 
         post   "tokens",     to: "tokens#generate"
@@ -28,43 +27,72 @@ Rails.application.routes.draw do
         post "passwords", to: "passwords#reset_password"
         get  "profile", to: "profiles#show"
 
-        resources "keys"
-        resources "machines"
-        resources "webhook_endpoints", path: "webhook-endpoints"
+        resources "keys" do
+          resource "product", controller: "keys/relationships/product", only: [:show]
+          resource "policy", controller: "keys/relationships/policy", only: [:show]
+        end
+
+        resources "machines" do
+          resource "product", controller: "machines/relationships/product", only: [:show]
+          resource "license", controller: "machines/relationships/license", only: [:show]
+          resource "user", controller: "machines/relationships/user", only: [:show]
+        end
 
         resources "users" do
+          resources "products", controller: "users/relationships/products", only: [:index, :show]
+          resources "licenses", controller: "users/relationships/licenses", only: [:index, :show]
+          resources "machines", controller: "users/relationships/machines", only: [:index, :show]
           member do
-            post "update-password", to: "users/password#update_password"
-            post "reset-password", to: "users/password#reset_password"
+            scope "actions" do
+              post "update-password", to: "users/actions/password#update_password"
+              post "reset-password", to: "users/actions/password#reset_password"
+            end
           end
         end
 
         resources "licenses" do
+          resources "machines", controller: "licenses/relationships/machines", only: [:index, :show]
+          resource "product", controller: "licenses/relationships/product", only: [:show]
+          resource "policy", controller: "licenses/relationships/policy", only: [:show]
+          resource "user", controller: "licenses/relationships/user", only: [:show]
           member do
-            get "validate", to: "licenses/validations#validate_by_id"
-            delete "revoke", to: "licenses/permits#revoke"
-            post "renew", to: "licenses/permits#renew"
+            scope "actions" do
+              get "validate", to: "licenses/actions/validations#validate_by_id"
+              delete "revoke", to: "licenses/actions/permits#revoke"
+              post "renew", to: "licenses/actions/permits#renew"
+            end
           end
           collection do
-            post "validate-key", to: "licenses/validations#validate_by_key"
+            scope "actions" do
+              post "validate-key", to: "licenses/actions/validations#validate_by_key"
+            end
           end
         end
 
         resources "policies" do
+          resources "licenses", controller: "policies/relationships/licenses", only: [:index, :show]
+          resource "product", controller: "policies/relationships/product", only: [:index, :show]
           member do
-            delete "pool", to: "policies/pool#pop"
+            delete "pool", to: "policies/relationships/pool#pop"
           end
         end
 
         resources "products" do
+          resources "policies", controller: "products/relationships/policies", only: [:index, :show]
+          resources "licenses", controller: "products/relationships/licenses", only: [:index, :show]
+          resources "machines", controller: "products/relationships/machines", only: [:index, :show]
+          resources "users", controller: "products/relationships/users", only: [:index, :show]
           member do
-            post "tokens", to: "products/tokens#generate"
+            post "tokens", to: "products/relationships/tokens#generate"
           end
         end
 
+        resources "webhook_endpoints", path: "webhook-endpoints"
         resources "webhook_events", path: "webhook-events", only: [:index, :show] do
           member do
-            post "retry", to: "webhook_events/retries#retry"
+            scope "actions" do
+              post "retry", to: "webhook_events/actions/retries#retry"
+            end
           end
         end
       end
@@ -95,7 +123,7 @@ end
 #                                  PUT    /v1/accounts/:account_id/tokens(.:format)                    api/v1/tokens#regenerate_current {:subdomain=>"api", :format=>"json"}
 #                                  PUT    /v1/accounts/:account_id/tokens/:id(.:format)                api/v1/tokens#regenerate {:subdomain=>"api", :format=>"json"}
 #                                  GET    /v1/accounts/:account_id/tokens(.:format)                    api/v1/tokens#index {:subdomain=>"api", :format=>"json"}
-#                                  GET    /v1/accounts/:account_id/tokens/:id(.:format)                api/v1/tokens#show {:subdomain=>"api", :format=>"json"}
+#                 v1_account_token GET    /v1/accounts/:account_id/tokens/:id(.:format)                api/v1/tokens#show {:subdomain=>"api", :format=>"json"}
 #                                  DELETE /v1/accounts/:account_id/tokens/:id(.:format)                api/v1/tokens#revoke {:subdomain=>"api", :format=>"json"}
 #             v1_account_passwords POST   /v1/accounts/:account_id/passwords(.:format)                 api/v1/passwords#reset_password {:subdomain=>"api", :format=>"json"}
 #               v1_account_profile GET    /v1/accounts/:account_id/profile(.:format)                   api/v1/profiles#show {:subdomain=>"api", :format=>"json"}

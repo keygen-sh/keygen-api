@@ -20,22 +20,22 @@ class SerializableProduct < SerializableBase
   end
   relationship :policies do
     link :related do
-      @url_helpers.v1_account_policies_path @object.account, product: @object.id
+      @url_helpers.v1_account_product_policies_path @object.account, @object
     end
   end
   relationship :licenses do
     link :related do
-      @url_helpers.v1_account_licenses_path @object.account, product: @object.id
+      @url_helpers.v1_account_product_licenses_path @object.account, @object
     end
   end
   relationship :machines do
     link :related do
-      @url_helpers.v1_account_machines_path @object.account, product: @object.id
+      @url_helpers.v1_account_product_machines_path @object.account, @object
     end
   end
   relationship :users do
     link :related do
-      @url_helpers.v1_account_users_path @object.account, product: @object.id
+      @url_helpers.v1_account_product_users_path @object.account, @object
     end
   end
   relationship :tokens do

@@ -1,0 +1,30 @@
+module Api::V1::Products::Relationships
+  class LicensesController < Api::V1::BaseController
+    before_action :scope_to_current_account!
+    before_action :authenticate_with_token!
+    before_action :set_product
+
+    # GET /products/1/licenses
+    def index
+      @licenses = policy_scope apply_scopes(@product.licenses).all
+      authorize @licenses
+
+      render jsonapi: @licenses
+    end
+
+    # GET /products/1/licenses/1
+    def show
+      @license = @product.licenses.find params[:id]
+      authorize @license
+
+      render jsonapi: @license
+    end
+
+    private
+
+    def set_product
+      @product = current_account.products.find params[:product_id]
+      authorize @product, :show?
+    end
+  end
+end

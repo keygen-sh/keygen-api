@@ -16,12 +16,12 @@ class SerializableKey < SerializableBase
   end
   relationship :product do
     link :related do
-      @url_helpers.v1_account_product_path @object.account, @object.product
+      @url_helpers.v1_account_key_product_path @object.account, @object
     end
   end
   relationship :policy do
     link :related do
-      @url_helpers.v1_account_policy_path @object.account, @object.policy
+      @url_helpers.v1_account_key_policy_path @object.account, @object
     end
   end
 
