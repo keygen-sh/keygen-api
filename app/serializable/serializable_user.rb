@@ -37,7 +37,9 @@ class SerializableUser < SerializableBase
     end
   end
   relationship :tokens do
-    resources { @object.tokens }
+    linkage always: true do
+      @object.tokens.map { |t| { type: "tokens", id: t.id } }
+    end
   end
 
   link :self do
