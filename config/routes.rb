@@ -43,6 +43,7 @@ Rails.application.routes.draw do
           resources "licenses", controller: "users/relationships/licenses", only: [:index, :show]
           resources "machines", controller: "users/relationships/machines", only: [:index, :show]
           resources "tokens", controller: "users/relationships/tokens", only: [:index, :show]
+          resource "role", controller: "users/relationships/role", only: [:show]
           member do
             scope "actions" do
               post "update-password", to: "users/actions/password#update_password"
