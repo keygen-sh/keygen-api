@@ -229,6 +229,30 @@ Feature: Update user
       """
     And sidekiq should have 2 "webhook" jobs
 
+  Scenario: Product promotes a user's role to admin
+    Given the current account is "test1"
+    And the current account has 2 "webhookEndpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "test1"
+    And the current product has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "relationships": {
+            "role": {
+              "data": { "type": "role", "attributes": { "name": "admin" } }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User updates their metadata
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"

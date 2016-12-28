@@ -119,6 +119,33 @@ Feature: Create user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
+  Scenario: Product creates an admin for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current account has 1 "webhookEndpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Ironman",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis"
+          },
+          "relationships": {
+            "role": {
+              "data": { "type": "role", "attributes": { "name": "admin" } }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
