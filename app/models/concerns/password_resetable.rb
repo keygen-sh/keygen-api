@@ -4,7 +4,7 @@ module PasswordResetable
 
   def send_password_reset_email
     token, enc = generate_encrypted_token :password_reset_token do |token|
-      "#{account.id}.#{id}.#{token}"
+      "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
     end
 
     self.password_reset_sent_at = Time.zone.now

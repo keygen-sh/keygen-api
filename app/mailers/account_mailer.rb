@@ -1,5 +1,15 @@
 class AccountMailer < ApplicationMailer
 
+  def beta_invitation(account:, token:)
+    @account, @token = account, token
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "You've been invited to the beta program!"
+    end
+  end
+
   def payment_method_missing(account:)
     @account = account
 

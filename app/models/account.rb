@@ -1,5 +1,6 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
+  include Inviteable
   include Sluggable
   include Limitable
   include Pageable
@@ -24,7 +25,8 @@ class Account < ApplicationRecord
   before_create -> { self.slug = slug.downcase }
   after_create :set_founding_users_roles
   after_create :initialize_billing
-  after_create :send_welcome_email
+  # TODO: This is disabled while we're in the beta period
+  # after_create :send_welcome_email
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -66,6 +68,7 @@ end
 #
 # Table name: accounts
 #
+#  id                 :uuid             not null, primary key
 #  name               :string
 #  slug               :string
 #  created_at         :datetime         not null
@@ -73,8 +76,10 @@ end
 #  activation_token   :string
 #  activation_sent_at :datetime
 #  deleted_at         :datetime
-#  id                 :uuid             not null, primary key
 #  plan_id            :uuid
+#  invite_state       :string
+#  invite_token       :string
+#  invite_sent_at     :datetime
 #
 # Indexes
 #

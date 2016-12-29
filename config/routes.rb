@@ -10,6 +10,7 @@ Rails.application.routes.draw do
         resource "plan", controller: "accounts/relationships/plan", only: [:update]
         member do
           scope "actions" do
+            post "accept-invitation", to: "accounts/actions/invitations#accept"
             post "pause-subscription", to: "accounts/actions/subscription#pause"
             post "resume-subscription", to: "accounts/actions/subscription#resume"
             post "cancel-subscription", to: "accounts/actions/subscription#cancel"
@@ -120,6 +121,7 @@ end
 #                                  PUT    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billing#update {:subdomain=>"api", :format=>"jsonapi"}
 #                  v1_account_plan PATCH  /v1/accounts/:account_id/plan(.:format)                              api/v1/accounts/relationships/plan#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PUT    /v1/accounts/:account_id/plan(.:format)                              api/v1/accounts/relationships/plan#update {:subdomain=>"api", :format=>"jsonapi"}
+#     accept_invitation_v1_account POST   /v1/accounts/:id/actions/accept-invitation(.:format)                 api/v1/accounts/actions/invitations#accept {:subdomain=>"api", :format=>"jsonapi"}
 #    pause_subscription_v1_account POST   /v1/accounts/:id/actions/pause-subscription(.:format)                api/v1/accounts/actions/subscription#pause {:subdomain=>"api", :format=>"jsonapi"}
 #   resume_subscription_v1_account POST   /v1/accounts/:id/actions/resume-subscription(.:format)               api/v1/accounts/actions/subscription#resume {:subdomain=>"api", :format=>"jsonapi"}
 #   cancel_subscription_v1_account POST   /v1/accounts/:id/actions/cancel-subscription(.:format)               api/v1/accounts/actions/subscription#cancel {:subdomain=>"api", :format=>"jsonapi"}
