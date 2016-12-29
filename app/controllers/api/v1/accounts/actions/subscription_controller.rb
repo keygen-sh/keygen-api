@@ -3,7 +3,7 @@ module Api::V1::Accounts::Actions
     before_action :authenticate_with_token!
     before_action :set_account
 
-    # POST /accounts/1/pause-subscription
+    # POST /accounts/1/actions/pause-subscription
     def pause
       authorize @account
 
@@ -15,7 +15,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/resume-subscription
+    # POST /accounts/1/actions/resume-subscription
     def resume
       authorize @account
 
@@ -27,7 +27,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/cancel-subscription
+    # POST /accounts/1/actions/cancel-subscription
     def cancel
       authorize @account
 
@@ -39,7 +39,7 @@ module Api::V1::Accounts::Actions
       end
     end
 
-    # POST /accounts/1/renew-subscription
+    # POST /accounts/1/actions/renew-subscription
     def renew
       authorize @account
 

@@ -1,0 +1,19 @@
+- accept_invitation_link = link_to "https://app.keygen.sh/beta/#{@token}",
+                                   "https://app.keygen.sh/beta/#{@token}",
+                                   class: "ellipsis"
+- docs_link = link_to "documentation",
+                      "https://keygen.sh/docs/api"
+%p
+  You've been invited to the beta program! Please click the link below to accept
+  the invitation and get started.
+  %br
+  %br
+  = accept_invitation_link
+%p
+  To get started with Keygen, be sure to check out the #{docs_link} section of
+  the site for coverage on everything from integrating Keygen into your product
+  to an in-depth API reference.
+%p
+  Please let me know if I can provide you with a demo, lend some support, or help
+  out in any other way. Since this is a beta, I'd absolutely love to hear any
+  feedback that you have. You're a huge part of crafting the final product!

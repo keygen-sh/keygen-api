@@ -20,7 +20,7 @@ Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  find(slug).update attributes
+  Account.find(slug).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -36,6 +36,21 @@ end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
+end
+
+Given /^the account "([^\"]*)" has not been invited$/ do |slug|
+  account = Account.find slug
+  account.update invite_state: :uninvited
+end
+
+Given /^the account "([^\"]*)" has been invited$/ do |slug|
+  account = Account.find slug
+  account.update invite_state: :invited
+end
+
+Given /^the account "([^\"]*)" has accepted an invitation$/ do |slug|
+  account = Account.find slug
+  account.update invite_state: :accepted
 end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
@@ -137,7 +152,7 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   end
 end
 
-Given /^the (\w+) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
+Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
   parse_placeholders! body
   numbers = {
     "first"   => 0,
@@ -192,4 +207,13 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, re
 
     expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
   end
+end
+
+Then /^the account "([^\"]*)" should have the following attributes:$/ do |slug, body|
+  parse_placeholders! body
+
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+  account = Account.find(slug)
+
+  expect(account.attributes).to include attributes
 end
