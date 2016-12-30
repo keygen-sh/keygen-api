@@ -36,7 +36,6 @@ module Sidekiq::Status
   end
 
   class ClientMiddleware
-
     def store_for_id(id, status_updates, expiration = nil, redis_pool = nil)
       if Sidekiq::Testing.fake?
         Sidekiq::Status::Testing.fake! unless Sidekiq::Status::Testing.fake?
