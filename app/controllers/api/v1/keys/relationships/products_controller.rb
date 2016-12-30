@@ -1,15 +1,15 @@
 module Api::V1::Keys::Relationships
-  class PolicyController < Api::V1::BaseController
+  class ProductsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_key
 
-    # GET /keys/1/policy
+    # GET /keys/1/product
     def show
-      @policy = @key.policy
-      authorize @policy
+      @product = @key.product
+      authorize @product
 
-      render jsonapi: @policy
+      render jsonapi: @product
     end
 
     private

@@ -1,5 +1,5 @@
 module Api::V1::Machines::Relationships
-  class LicenseController < Api::V1::BaseController
+  class LicensesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_machine
