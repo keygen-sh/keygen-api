@@ -1,15 +1,15 @@
 module Api::V1::Licenses::Relationships
-  class UserController < Api::V1::BaseController
+  class PoliciesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_license
 
-    # GET /licenses/1/user
+    # GET /licenses/1/policy
     def show
-      @user = @license.user
-      authorize @user
+      @policy = @license.policy
+      authorize @policy
 
-      render jsonapi: @user
+      render jsonapi: @policy
     end
 
     private

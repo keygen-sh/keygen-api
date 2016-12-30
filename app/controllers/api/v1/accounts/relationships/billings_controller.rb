@@ -1,5 +1,5 @@
 module Api::V1::Accounts::Relationships
-  class BillingController < Api::V1::BaseController
+  class BillingsController < Api::V1::BaseController
     before_action :authenticate_with_token!
     before_action :set_billing
 

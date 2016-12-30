@@ -1,5 +1,5 @@
 module Api::V1::Accounts::Relationships
-  class PlanController < Api::V1::BaseController
+  class PlansController < Api::V1::BaseController
     before_action :authenticate_with_token!
     before_action :set_account
 

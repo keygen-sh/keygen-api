@@ -1,5 +1,5 @@
 module Api::V1::Policies::Relationships
-  class ProductController < Api::V1::BaseController
+  class ProductsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_policy

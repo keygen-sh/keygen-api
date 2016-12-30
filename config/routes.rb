@@ -6,15 +6,17 @@ Rails.application.routes.draw do
       resources "plans", only: [:index, :show]
 
       resources "accounts" do
-        resource "billing", controller: "accounts/relationships/billing", only: [:show, :update]
-        resource "plan", controller: "accounts/relationships/plan", only: [:update]
+        scope module: "accounts/relationships" do
+          resource "billing", only: [:show, :update]
+          resource "plan", only: [:update]
+        end
         member do
-          scope "actions" do
-            post "accept-invitation", to: "accounts/actions/invitations#accept"
-            post "pause-subscription", to: "accounts/actions/subscription#pause"
-            post "resume-subscription", to: "accounts/actions/subscription#resume"
-            post "cancel-subscription", to: "accounts/actions/subscription#cancel"
-            post "renew-subscription", to: "accounts/actions/subscription#renew"
+          scope "actions", module: "accounts/actions" do
+            post "accept-invitation", to: "invitations#accept"
+            post "pause-subscription", to: "subscription#pause"
+            post "resume-subscription", to: "subscription#resume"
+            post "cancel-subscription", to: "subscription#cancel"
+            post "renew-subscription", to: "subscription#renew"
           end
         end
 
@@ -29,73 +31,85 @@ Rails.application.routes.draw do
         get  "profile", to: "profiles#show"
 
         resources "keys" do
-          resource "product", controller: "keys/relationships/product", only: [:show]
-          resource "policy", controller: "keys/relationships/policy", only: [:show]
+          scope module: "keys/relationships" do
+            resource "product", only: [:show]
+            resource "policy", only: [:show]
+          end
         end
 
         resources "machines" do
-          resource "product", controller: "machines/relationships/product", only: [:show]
-          resource "license", controller: "machines/relationships/license", only: [:show]
-          resource "user", controller: "machines/relationships/user", only: [:show]
+          scope module: "machines/relationships" do
+            resource "product", only: [:show]
+            resource "license", only: [:show]
+            resource "user", only: [:show]
+          end
         end
 
         resources "users" do
-          resources "products", controller: "users/relationships/products", only: [:index, :show]
-          resources "licenses", controller: "users/relationships/licenses", only: [:index, :show]
-          resources "machines", controller: "users/relationships/machines", only: [:index, :show]
-          resources "tokens", controller: "users/relationships/tokens", only: [:index, :show]
-          resource "role", controller: "users/relationships/role", only: [:show]
+          scope module: "users/relationships" do
+            resources "products", only: [:index, :show]
+            resources "licenses", only: [:index, :show]
+            resources "machines", only: [:index, :show]
+            resources "tokens", only: [:index, :show]
+            resource "role", only: [:show]
+          end
           member do
-            scope "actions" do
-              post "update-password", to: "users/actions/password#update_password"
-              post "reset-password", to: "users/actions/password#reset_password"
+            scope "actions", module: "users/actions" do
+              post "update-password", to: "password#update_password"
+              post "reset-password", to: "password#reset_password"
             end
           end
         end
 
         resources "licenses" do
-          resources "machines", controller: "licenses/relationships/machines", only: [:index, :show]
-          resource "product", controller: "licenses/relationships/product", only: [:show]
-          resource "policy", controller: "licenses/relationships/policy", only: [:show]
-          resource "user", controller: "licenses/relationships/user", only: [:show]
+          scope module: "licenses/relationships" do
+            resources "machines", only: [:index, :show]
+            resource "product", only: [:show]
+            resource "policy", only: [:show]
+            resource "user", only: [:show]
+          end
           member do
-            scope "actions" do
-              get "validate", to: "licenses/actions/validations#validate_by_id"
-              delete "revoke", to: "licenses/actions/permits#revoke"
-              post "renew", to: "licenses/actions/permits#renew"
+            scope "actions", module: "licenses/actions" do
+              get "validate", to: "validations#validate_by_id"
+              delete "revoke", to: "permits#revoke"
+              post "renew", to: "permits#renew"
             end
           end
           collection do
-            scope "actions" do
-              post "validate-key", to: "licenses/actions/validations#validate_by_key"
+            scope "actions", module: "licenses/actions" do
+              post "validate-key", to: "validations#validate_by_key"
             end
           end
         end
 
         resources "policies" do
-          resources "licenses", controller: "policies/relationships/licenses", only: [:index, :show]
-          resource "product", controller: "policies/relationships/product", only: [:index, :show]
-          member do
-            delete "pool", to: "policies/relationships/pool#pop"
+          scope module: "policies/relationships" do
+            resources "licenses", only: [:index, :show]
+            resource "product", only: [:index, :show]
+            member do
+              delete "pool", to: "pool#pop"
+            end
           end
         end
 
         resources "products" do
-          resources "policies", controller: "products/relationships/policies", only: [:index, :show]
-          resources "licenses", controller: "products/relationships/licenses", only: [:index, :show]
-          resources "machines", controller: "products/relationships/machines", only: [:index, :show]
-          resources "tokens", controller: "products/relationships/tokens", only: [:index, :show]
-          resources "users", controller: "products/relationships/users", only: [:index, :show]
-          member do
-            post "tokens", to: "products/relationships/tokens#generate"
+          scope module: "products/relationships" do
+            resources "policies", only: [:index, :show]
+            resources "licenses", only: [:index, :show]
+            resources "machines", only: [:index, :show]
+            resources "tokens", only: [:index, :show]
+            resources "users", only: [:index, :show]
+            member do
+              post "tokens", to: "tokens#generate"
+            end
           end
         end
 
         resources "webhook_endpoints", path: "webhook-endpoints"
         resources "webhook_events", path: "webhook-events", only: [:index, :show] do
           member do
-            scope "actions" do
-              post "retry", to: "webhook_events/actions/retries#retry"
+            scope "actions", module: "webhook_events/actions" do
+              post "retry", to: "retries#retry"
             end
           end
         end
