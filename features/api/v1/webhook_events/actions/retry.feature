@@ -17,7 +17,10 @@ Feature: Retry webhook events
     Then the response status should be "201"
     And the JSON response should be a "webhookEvent" with the following attributes:
       """
-      { "idempotencyToken": "$webhookEvents[0].idempotency_token" }
+      {
+        "idempotencyToken": "$webhookEvents[0].idempotency_token",
+        "payload": $!webhookEvents[0].payload
+      }
       """
     And the current account should have 4 "webhookEvents"
 

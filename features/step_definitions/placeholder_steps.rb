@@ -5,8 +5,8 @@ World Rack::Test::Methods
 # $resource.attribute (random resource)
 # $current.attribute (current user)
 def parse_placeholders!(str)
-  str.dup.scan /((?<!\\)\$([-\w]+)(?:\[(\w+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
-    resource, index, attribute = matches
+  str.dup.scan /((?<!\\)\$(!)?([-\w]+)(?:\[(\w+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
+    escape, resource, index, attribute = matches
 
     attribute =
       case attribute&.underscore
@@ -49,7 +49,7 @@ def parse_placeholders!(str)
         end
       end
 
-    str.sub! pattern.to_s, value.to_s
+    str.sub! pattern.to_s, escape ? value.to_s.to_json : value.to_s
   end
 end
 
