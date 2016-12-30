@@ -1,17 +1,17 @@
 module Tokenable
   extend ActiveSupport::Concern
 
-  def generate_token(attribute)
+  def generate_token(attribute, length: 64)
     loop do
-      token = SecureRandom.hex 64
+      token = SecureRandom.hex length
       token = yield token if block_given?
       break token unless self.class.exists? attribute => token
     end
   end
 
-  def generate_encrypted_token(attribute)
+  def generate_encrypted_token(attribute, length: 64)
     loop do
-      raw = SecureRandom.hex 64
+      raw = SecureRandom.hex length
       raw = yield raw if block_given?
       enc = ::BCrypt::Password.create raw
       break [raw, enc] unless self.class.exists? attribute => enc

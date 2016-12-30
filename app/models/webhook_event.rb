@@ -1,4 +1,5 @@
 class WebhookEvent < ApplicationRecord
+  include Idempotentable
   include Limitable
   include Pageable
 
@@ -8,7 +9,6 @@ class WebhookEvent < ApplicationRecord
 
   validates :account, presence: { message: "must exist" }
   validates :endpoint, url: true, presence: true
-  validates :jid, presence: true, uniqueness: true
 
   def status
     Sidekiq::Status.status jid rescue :unavailable
@@ -19,14 +19,15 @@ end
 #
 # Table name: webhook_events
 #
-#  payload    :text
-#  jid        :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  endpoint   :string
-#  deleted_at :datetime
-#  id         :uuid             not null, primary key
-#  account_id :uuid
+#  id                :uuid             not null, primary key
+#  payload           :text
+#  jid               :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  endpoint          :string
+#  deleted_at        :datetime
+#  account_id        :uuid
+#  idempotency_token :string
 #
 # Indexes
 #
