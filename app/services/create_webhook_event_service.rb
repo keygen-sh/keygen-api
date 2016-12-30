@@ -7,19 +7,33 @@ class CreateWebhookEventService < BaseService
   end
 
   def execute
-    account&.webhook_endpoints.find_each do |endpoint|
-      payload = ActiveModelSerializers::SerializableResource.new(resource).serializable_hash.merge(
-        event: event
-      ).to_json
+    options = {
+      expose: { url_helpers: Rails.application.routes.url_helpers }
+    }
 
-      jid = WebhookWorker.perform_async(
-        endpoint.url,
-        payload
+    account&.webhook_endpoints.find_each do |endpoint|
+      # Create a partial event (we'll complete it after the job is fired)
+      webhook_event = account.webhook_events.create endpoint: endpoint.url
+
+      # Serialize the event and decode so we can use in webhook job
+      payload = ActiveSupport::JSON.decode(
+        JSONAPI::Serializable::Renderer.render(webhook_event, options)
       )
 
-      account.webhook_events.create(
-        endpoint: endpoint.url,
-        payload: payload,
+      # Set the payload attr of the webhook payload (since it's incomplete at the moment)
+      payload["data"]["attributes"]["payload"] = ActiveSupport::JSON.decode(
+        JSONAPI::Serializable::Renderer.render(resource, options)
+      )
+
+      # Enqueue the worker, which will fire off the webhook
+      jid = WebhookWorker.perform_async(
+        endpoint.url,
+        payload.to_json
+      )
+
+      # Update the event to contain the payload and job identifier
+      webhook_event.update(
+        payload: payload.dig("data", "attributes", "payload").to_json,
         jid: jid
       )
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161229170420) do
+ActiveRecord::Schema.define(version: 20161230174909) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -237,11 +237,12 @@ ActiveRecord::Schema.define(version: 20161229170420) do
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text     "payload"
     t.string   "jid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
     t.string   "endpoint"
     t.datetime "deleted_at"
     t.uuid     "account_id"
+    t.string   "idempotency_token"
     t.index ["account_id"], name: "index_webhook_events_on_account_id", where: "(deleted_at IS NULL)", using: :btree
     t.index ["created_at"], name: "index_webhook_events_on_created_at", where: "(deleted_at IS NULL)", using: :btree
     t.index ["deleted_at"], name: "index_webhook_events_on_deleted_at", using: :btree

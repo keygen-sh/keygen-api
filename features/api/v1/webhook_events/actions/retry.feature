@@ -15,7 +15,10 @@ Feature: Retry webhook events
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "201"
-    And the JSON response should be a "webhookEvent"
+    And the JSON response should be a "webhookEvent" with the following attributes:
+      """
+      { "idempotencyToken": "$webhookEvents[0].idempotency_token" }
+      """
     And the current account should have 4 "webhookEvents"
 
   Scenario: Admin retries a webhook event for another account
@@ -26,6 +29,7 @@ Feature: Retry webhook events
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhookEvents"
 
   Scenario: User retries a webhook event for their account
     Given the current account is "test1"
@@ -36,3 +40,4 @@ Feature: Retry webhook events
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhookEvents"
