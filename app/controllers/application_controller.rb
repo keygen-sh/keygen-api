@@ -58,7 +58,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Unprocessable entity",
-        detail: "The request could not be completed on this resouce"
+        detail: "The request could not be completed on this resource"
       }.merge(opts)]
     }, status: :unprocessable_entity
   end
