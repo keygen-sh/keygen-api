@@ -137,3 +137,9 @@ Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
 
   expect(json["errors"].length).to eq count.to_i
 end
+
+Then /^the JSON response should contain the following links:$/ do |body|
+  json = JSON.parse last_response.body
+
+  expect(json["links"]&.transform_values { |l| URI.decode(l) }).to include JSON.parse(body)
+end

@@ -25,6 +25,16 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "users"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/users?page[number]=2&page[size]=5",
+        "next": "/v1/accounts/test1/users?page[number]=3&page[size]=5",
+        "prev": "/v1/accounts/test1/users?page[number]=1&page[size]=5",
+        "first": "/v1/accounts/test1/users?page[number]=1&page[size]=5",
+        "last": "/v1/accounts/test1/users?page[number]=4&page[size]=5"
+      }
+      """
 
   Scenario: Admin retrieves a paginated list of users with a page size that is too high
     Given I am an admin of account "test1"
