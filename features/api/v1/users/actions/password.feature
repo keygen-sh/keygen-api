@@ -96,7 +96,6 @@ Feature: User password actions
       """
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
@@ -116,7 +115,6 @@ Feature: User password actions
       """
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.23.hours.ago" }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
@@ -135,7 +133,6 @@ Feature: User password actions
       """
       { "passwordResetToken": "\$2a\$10\$YiAlOBdS39F.SU/MAJwjw.DMWaY7GO3v6Bt3yq10922w.y7UDOooa", "passwordResetSentAt": "$time.25.hours.ago" }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
