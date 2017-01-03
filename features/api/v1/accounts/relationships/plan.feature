@@ -8,6 +8,29 @@ Feature: Account plan relationship
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Admin retrieves the plan for their account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "200"
+    And the JSON response should be a "plan"
+
+  Scenario: Product attempts to retrieve the plan for their account
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "403"
+
+  Scenario: Admin attempts to retrieve the plan for another account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test2"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "401"
+
   Scenario: Admin changes subscribed account to a new plan
     Given the account "test1" is subscribed
     And there exists 3 "plans"

@@ -3,6 +3,14 @@ module Api::V1::Accounts::Relationships
     before_action :authenticate_with_token!
     before_action :set_account
 
+    # GET /accounts/1/plan
+    def show
+      authorize @account
+      @plan = @account.plan
+
+      render jsonapi: @plan
+    end
+
     # PUT /accounts/1/plan
     def update
       authorize @account
