@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  constraints -> (req) { req.format.symbol != :jsonapi } do
-    match "*bad_request", to: "errors#show", code: 400, via: [:get, :post, :patch, :put, :delete, :head, :options]
-  end
+  # constraints -> (req) { req.format.symbol != :jsonapi } do
+  #   match "*bad_request", to: "errors#show", code: 400, via: [:get, :post, :patch, :put, :delete, :head, :options]
+  # end
 
   scope module: "api", constraints: { subdomain: "api", format: "jsonapi" } do
     namespace "v1" do
