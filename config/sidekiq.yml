@@ -1,3 +1,4 @@
+:concurrency: 15
 :queues:
   - [cleanup, 1]
   - [default, 2]

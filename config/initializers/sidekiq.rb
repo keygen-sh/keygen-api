@@ -2,6 +2,8 @@ require 'sidekiq'
 require 'sidekiq-status'
 
 Sidekiq.configure_client do |config|
+  config.redis = { size: 1 }
+
   config.client_middleware do |chain|
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 30.days
   end
