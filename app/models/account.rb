@@ -68,18 +68,16 @@ end
 #
 # Table name: accounts
 #
-#  id                 :uuid             not null, primary key
-#  name               :string
-#  slug               :string
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  activation_token   :string
-#  activation_sent_at :datetime
-#  deleted_at         :datetime
-#  plan_id            :uuid
-#  invite_state       :string
-#  invite_token       :string
-#  invite_sent_at     :datetime
+#  id             :uuid             not null, primary key
+#  name           :string
+#  slug           :string
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  deleted_at     :datetime
+#  plan_id        :uuid
+#  invite_state   :string
+#  invite_token   :string
+#  invite_sent_at :datetime
 #
 # Indexes
 #
