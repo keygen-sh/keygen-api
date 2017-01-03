@@ -3,6 +3,7 @@ require "active_model_serializers/key_transform"
 class ApplicationController < ActionController::API
   include Pundit
 
+  before_action :force_jsonapi_response_format
   after_action :verify_authorized
 
   rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message }
@@ -23,7 +24,7 @@ class ApplicationController < ActionController::API
     current_bearer
   end
 
-  protected
+  private
 
   def render_meta(meta)
     render json: ActiveModelSerializers::KeyTransform.camel_lower(meta: meta).to_json
@@ -123,5 +124,10 @@ class ApplicationController < ActionController::API
 
     render json: resource, status: :unprocessable_entity, adapter: :json_api,
       serializer: ActiveModel::Serializer::ErrorSerializer
+  end
+
+  def force_jsonapi_response_format
+    response.headers["Content-Type"] =
+      Mime::Type.lookup_by_extension(:jsonapi).to_s
   end
 end
