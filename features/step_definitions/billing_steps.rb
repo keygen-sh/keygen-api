@@ -111,7 +111,7 @@ Given /^the account is in a "([^\"]*)" state$/ do |state|
 end
 
 When /^the event is received at "\/stripe"$/ do
-  post "//api.keygen.sh/#{@api_version}/stripe", id: @event.id
+  post "//api.keygen.sh/#{@api_version}/stripe", { id: @event.id }.to_json
 end
 
 Then /^a new "([^\"]*)" should be (\w+)$/ do |type, event|
