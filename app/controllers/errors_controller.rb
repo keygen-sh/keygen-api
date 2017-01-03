@@ -5,9 +5,10 @@ class ErrorsController < ApplicationController
 
   def show
     skip_authorization
-
     self.send "render_#{@status}"
   end
+
+  private
 
   def set_status
     @status = STATUS_CODES[params[:code].to_i || 500].parameterize.underscore
