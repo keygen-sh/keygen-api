@@ -10,7 +10,7 @@ gem 'rack-cors'
 
 # JSON API serializers
 gem 'active_model_serializers'
-gem 'jsonapi-rails', github: "ezekg/jsonapi-rails"
+gem 'jsonapi-rails', git: "https://github.com/ezekg/jsonapi-rails"
 
 # Billing and subscriptions
 gem 'stripe'
@@ -39,6 +39,9 @@ gem 'sass-rails'
 
 # Soft-deletion of database records
 gem 'paranoia', '~> 2.2'
+
+# Exception reporting
+gem 'raygun4ruby'
 
 group :development, :test do
   gem 'byebug', platform: :mri

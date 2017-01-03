@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/ezekg/jsonapi-rails.git
+  remote: https://github.com/ezekg/jsonapi-rails
   revision: d9ef54a998ac391b3ef3989637c64a0785e69ed3
   specs:
     jsonapi-rails (0.1.1)
@@ -210,6 +210,10 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (11.3.0)
+    raygun4ruby (1.1.9)
+      httparty (~> 0.11)
+      json
+      rack
     rb-fsevent (0.9.8)
     rb-inotify (0.9.7)
       ffi (>= 0.5.0)
@@ -313,6 +317,7 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rails (~> 5.0)
+  raygun4ruby
   rspec-expectations
   rspec-rails (~> 3.5)
   sass-rails
