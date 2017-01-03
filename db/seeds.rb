@@ -5,123 +5,132 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-
-Plan.create([{
-  plan_id: "weekender",
-  name: "Weekender",
-  price: 900,
-  max_products: 1,
-  max_users: 250,
-  max_licenses: 250,
-  max_policies: 1
-}, {
-  plan_id: "startup",
-  name: "Startup",
-  price: 2400,
-  max_products: 5,
-  max_users: 1000,
-  max_licenses: 5000,
-  max_policies: 5
-}, {
-  plan_id: "business",
-  name: "Business",
-  price: 4900,
-  max_products: 25,
-  max_users: 5000,
-  max_licenses: 25000,
-  max_policies: 25
-}])
-
-account = Account.create(
-  name: "Account",
-  slug: "account",
-  plan: Plan.first,
-  users_attributes: [{
-    name: "Admin",
-    email: "admin@keygen.sh",
-    password: "password"
-  }]
+Plan.create(
+  plan_id: "beta",
+  name: "beta",
+  price: 0,
+  max_products: 1_000,
+  max_users: 1_000,
+  max_licenses: 1_000,
+  max_policies: 1_000
 )
 
-account.webhook_endpoints.create(
-  url: "https://keygen.sh"
-)
-
-product = account.products.create(
-  name: "App"
-)
-
-policy = account.policies.create(
-  name: "Premium Add-On",
-  price: 199,
-  product: product,
-  floating: true,
-  duration: 2.weeks
-)
-pool_policy = account.policies.create(
-  name: "Premium Add-On",
-  price: 499,
-  product: product,
-  use_pool: true,
-  duration: 4.weeks
-)
-enc_policy = account.policies.create(
-  name: "Secret Add-On",
-  price: 999,
-  product: product,
-  floating: true,
-  encrypted: true,
-  duration: 1.month
-)
-
-1_000.times do
-  account.keys.create(
-    key: SecureRandom.hex.scan(/.{4}/).join("-"),
-    policy: pool_policy
-  )
-  account.keys.create(
-    key: SecureRandom.hex.scan(/.{4}/).join("-"),
-    policy: pool_policy
-  )
-  account.keys.create(
-    key: SecureRandom.hex.scan(/.{4}/).join("-"),
-    policy: pool_policy
-  )
-
-  user = account.users.create(
-    name: "#{SecureRandom.hex}",
-    email: "#{SecureRandom.hex}@keygen.sh",
-    password: "password"
-  )
-
-  license = account.licenses.create(
-    policy: policy,
-    user: user
-  )
-  pool_license = account.licenses.create(
-    policy: pool_policy,
-    user: user
-  )
-  enc_license = account.licenses.create(
-    policy: enc_policy,
-    user: user
-  )
-
-  account.machines.create(
-    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-    license: license
-  )
-  account.machines.create(
-    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-    license: pool_license
-  )
-  account.machines.create(
-    fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
-    license: enc_license
-  )
-end
-
-User.find_each do |user|
-  token = user.tokens.create account: user.account
-  token.generate!
-end
+# Plan.create([{
+#   plan_id: "weekender",
+#   name: "Weekender",
+#   price: 9_00,
+#   max_products: 1,
+#   max_users: 250,
+#   max_licenses: 250,
+#   max_policies: 1
+# }, {
+#   plan_id: "startup",
+#   name: "Startup",
+#   price: 24_00,
+#   max_products: 5,
+#   max_users: 1000,
+#   max_licenses: 5000,
+#   max_policies: 5
+# }, {
+#   plan_id: "business",
+#   name: "Business",
+#   price: 49_00,
+#   max_products: 25,
+#   max_users: 5_000,
+#   max_licenses: 25_000,
+#   max_policies: 25
+# }])
+#
+# account = Account.create(
+#   name: "Account",
+#   slug: "account",
+#   plan: Plan.first,
+#   users_attributes: [{
+#     name: "Admin",
+#     email: "admin@keygen.sh",
+#     password: "password"
+#   }]
+# )
+#
+# account.webhook_endpoints.create(
+#   url: "https://keygen.sh"
+# )
+#
+# product = account.products.create(
+#   name: "App"
+# )
+#
+# policy = account.policies.create(
+#   name: "Premium Add-On",
+#   price: 1_99,
+#   product: product,
+#   floating: true,
+#   duration: 2.weeks
+# )
+# pool_policy = account.policies.create(
+#   name: "Premium Add-On",
+#   price: 4_99,
+#   product: product,
+#   use_pool: true,
+#   duration: 4.weeks
+# )
+# enc_policy = account.policies.create(
+#   name: "Secret Add-On",
+#   price: 9_99,
+#   product: product,
+#   floating: true,
+#   encrypted: true,
+#   duration: 1.month
+# )
+#
+# 1_000.times do
+#   account.keys.create(
+#     key: SecureRandom.hex.scan(/.{4}/).join("-"),
+#     policy: pool_policy
+#   )
+#   account.keys.create(
+#     key: SecureRandom.hex.scan(/.{4}/).join("-"),
+#     policy: pool_policy
+#   )
+#   account.keys.create(
+#     key: SecureRandom.hex.scan(/.{4}/).join("-"),
+#     policy: pool_policy
+#   )
+#
+#   user = account.users.create(
+#     name: "#{SecureRandom.hex}",
+#     email: "#{SecureRandom.hex}@keygen.sh",
+#     password: "password"
+#   )
+#
+#   license = account.licenses.create(
+#     policy: policy,
+#     user: user
+#   )
+#   pool_license = account.licenses.create(
+#     policy: pool_policy,
+#     user: user
+#   )
+#   enc_license = account.licenses.create(
+#     policy: enc_policy,
+#     user: user
+#   )
+#
+#   account.machines.create(
+#     fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+#     license: license
+#   )
+#   account.machines.create(
+#     fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+#     license: pool_license
+#   )
+#   account.machines.create(
+#     fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
+#     license: enc_license
+#   )
+# end
+#
+# User.find_each do |user|
+#   token = user.tokens.create account: user.account
+#   token.generate!
+# end
