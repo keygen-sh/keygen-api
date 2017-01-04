@@ -1,9 +1,11 @@
 module Tokenable
+  TOKEN_PREFIX = "v1."
+
   extend ActiveSupport::Concern
 
   def generate_token(attribute, length: 64)
     loop do
-      token = SecureRandom.hex length
+      token = SecureRandom.hex(length).gsub /\A.{#{TOKEN_PREFIX.length}}/, TOKEN_PREFIX
       token = yield token if block_given?
       break token unless self.class.exists? attribute => token
     end
@@ -11,11 +13,12 @@ module Tokenable
 
   def generate_encrypted_token(attribute, length: 64)
     loop do
-      raw = SecureRandom.hex length
+      raw = SecureRandom.hex(length).gsub /\A.{#{TOKEN_PREFIX.length}}/, TOKEN_PREFIX
       raw = yield raw if block_given?
-      # We're hashing with SHA256 _first_ so that we can bypass Bcrypt's 72 max
-      # length, since the first ~64 chars of our string consist of the account
-      # and the bearer's UUID.
+      # We're hashing with SHA256 first so that we can bypass Bcrypt's 72 max
+      # length, since the first 66 chars of our string consist of the account
+      # and the bearer's UUID. This lets us use larger tokens (as seen here)
+      # and avoid the nasty truncation.
       enc = ::BCrypt::Password.create Digest::SHA256.digest(raw)
       break [raw, enc] unless self.class.exists? attribute => enc
     end
