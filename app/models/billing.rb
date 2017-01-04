@@ -114,7 +114,6 @@ end
 #  card_brand                :string
 #  card_last4                :string
 #  state                     :string
-#  deleted_at                :datetime
 #  account_id                :uuid
 #
 # Indexes

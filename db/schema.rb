@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104171359) do
+ActiveRecord::Schema.define(version: 20170104171634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,7 +21,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "slug"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
-    t.datetime "deleted_at"
     t.uuid     "plan_id"
     t.string   "invite_state"
     t.string   "invite_token"
@@ -43,7 +42,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "card_brand"
     t.string   "card_last4"
     t.string   "state"
-    t.datetime "deleted_at"
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_billings_on_account_id", using: :btree
     t.index ["created_at"], name: "index_billings_on_created_at", using: :btree
@@ -53,7 +51,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.uuid     "policy_id"
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_keys_on_account_id", using: :btree
@@ -66,7 +63,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "expiry"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.jsonb    "metadata"
     t.uuid     "user_id"
     t.uuid     "policy_id"
@@ -85,7 +81,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.string   "name"
-    t.datetime "deleted_at"
     t.jsonb    "metadata"
     t.uuid     "account_id"
     t.uuid     "license_id"
@@ -104,7 +99,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "updated_at",   null: false
     t.integer  "max_products"
     t.string   "plan_id"
-    t.datetime "deleted_at"
     t.index ["created_at"], name: "index_plans_on_created_at", using: :btree
     t.index ["plan_id"], name: "index_plans_on_plan_id", using: :btree
   end
@@ -123,7 +117,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.integer  "max_machines"
     t.boolean  "encrypted",    default: false
     t.boolean  "protected",    default: false
-    t.datetime "deleted_at"
     t.jsonb    "metadata"
     t.uuid     "product_id"
     t.uuid     "account_id"
@@ -136,7 +129,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.jsonb    "platforms"
     t.jsonb    "metadata"
     t.uuid     "account_id"
@@ -150,7 +142,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.boolean  "paid"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.uuid     "billing_id"
     t.index ["billing_id"], name: "index_receipts_on_billing_id", using: :btree
     t.index ["created_at"], name: "index_receipts_on_created_at", using: :btree
@@ -161,7 +152,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "deleted_at"
     t.uuid     "resource_id"
     t.index ["created_at"], name: "index_roles_on_created_at", using: :btree
     t.index ["name"], name: "index_roles_on_name", using: :btree
@@ -174,7 +164,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
     t.datetime "expiry"
-    t.datetime "deleted_at"
     t.uuid     "bearer_id"
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_tokens_on_account_id", using: :btree
@@ -190,7 +179,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "updated_at",             null: false
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
-    t.datetime "deleted_at"
     t.jsonb    "metadata"
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_users_on_account_id", using: :btree
@@ -201,7 +189,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.string   "url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "deleted_at"
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_webhook_endpoints_on_account_id", using: :btree
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", using: :btree
@@ -213,7 +200,6 @@ ActiveRecord::Schema.define(version: 20170104171359) do
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
     t.string   "endpoint"
-    t.datetime "deleted_at"
     t.uuid     "account_id"
     t.string   "idempotency_token"
     t.index ["account_id"], name: "index_webhook_events_on_account_id", using: :btree
