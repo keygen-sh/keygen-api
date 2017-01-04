@@ -38,7 +38,7 @@ gem 'haml-rails'
 gem 'sass-rails'
 
 # Exception reporting
-gem 'raygun4ruby'
+gem 'raygun4ruby', "~> 1.1.11"
 
 group :development, :test do
   gem 'byebug', platform: :mri
