@@ -40,4 +40,5 @@ end
 #
 #  index_products_on_account_id  (account_id)
 #  index_products_on_created_at  (created_at)
+#  index_products_on_id          (id) UNIQUE
 #

@@ -87,6 +87,7 @@ end
 #
 #  index_licenses_on_account_id  (account_id)
 #  index_licenses_on_created_at  (created_at)
+#  index_licenses_on_id          (id) UNIQUE
 #  index_licenses_on_policy_id   (policy_id)
 #  index_licenses_on_user_id     (user_id)
 #

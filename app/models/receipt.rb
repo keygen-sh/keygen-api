@@ -21,4 +21,5 @@ end
 #
 #  index_receipts_on_billing_id  (billing_id)
 #  index_receipts_on_created_at  (created_at)
+#  index_receipts_on_id          (id) UNIQUE
 #
