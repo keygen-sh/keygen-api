@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104170644) do
+ActiveRecord::Schema.define(version: 20170104171359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,6 +164,7 @@ ActiveRecord::Schema.define(version: 20170104170644) do
     t.datetime "deleted_at"
     t.uuid     "resource_id"
     t.index ["created_at"], name: "index_roles_on_created_at", using: :btree
+    t.index ["name"], name: "index_roles_on_name", using: :btree
     t.index ["resource_id", "resource_type"], name: "index_roles_on_resource_id_and_resource_type", using: :btree
   end
 
