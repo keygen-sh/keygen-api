@@ -13,7 +13,10 @@ module Tokenable
     loop do
       raw = SecureRandom.hex length
       raw = yield raw if block_given?
-      enc = ::BCrypt::Password.create raw
+      # We're hashing with SHA256 _first_ so that we can bypass Bcrypt's 72 max
+      # length, since the first ~64 chars of our string consist of the account
+      # and the bearer's UUID.
+      enc = ::BCrypt::Password.create Digest::SHA256.digest(raw)
       break [raw, enc] unless self.class.exists? attribute => enc
     end
   end
@@ -24,7 +27,7 @@ module Tokenable
 
     hashed_token = self.send attribute
     bcrypt = ::BCrypt::Password.new hashed_token
-    token = ::BCrypt::Engine.hash_secret token, bcrypt.salt
+    token = ::BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
 
     secure_compare token, hashed_token
   rescue
