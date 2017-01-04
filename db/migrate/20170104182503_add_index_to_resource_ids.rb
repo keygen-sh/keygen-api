@@ -1,7 +1,6 @@
 class AddIndexToResourceIds < ActiveRecord::Migration[5.0]
   def change
     tables = [
-      :accounts,
       :billings,
       :keys,
       :licenses,
@@ -22,6 +21,6 @@ class AddIndexToResourceIds < ActiveRecord::Migration[5.0]
     end
 
     remove_index :accounts, :slug
-    add_index :accounts, [:slug, :id]
+    add_index :accounts, [:id, :slug], unique: true
   end
 end

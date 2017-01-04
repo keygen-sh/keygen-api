@@ -26,9 +26,8 @@ ActiveRecord::Schema.define(version: 20170104182503) do
     t.string   "invite_token"
     t.datetime "invite_sent_at"
     t.index ["created_at"], name: "index_accounts_on_created_at", using: :btree
-    t.index ["id"], name: "index_accounts_on_id", unique: true, using: :btree
+    t.index ["id", "slug"], name: "index_accounts_on_id_and_slug", unique: true, using: :btree
     t.index ["plan_id"], name: "index_accounts_on_plan_id", using: :btree
-    t.index ["slug", "id"], name: "index_accounts_on_slug_and_id", using: :btree
   end
 
   create_table "billings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

@@ -79,7 +79,6 @@ end
 # Indexes
 #
 #  index_accounts_on_created_at   (created_at)
-#  index_accounts_on_id           (id) UNIQUE
+#  index_accounts_on_id_and_slug  (id,slug) UNIQUE
 #  index_accounts_on_plan_id      (plan_id)
-#  index_accounts_on_slug_and_id  (slug,id)
 #
