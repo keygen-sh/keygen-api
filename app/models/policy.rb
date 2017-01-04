@@ -62,8 +62,7 @@ end
 #
 # Indexes
 #
-#  index_policies_on_account_id  (account_id)
-#  index_policies_on_created_at  (created_at)
-#  index_policies_on_id          (id) UNIQUE
-#  index_policies_on_product_id  (product_id)
+#  index_policies_on_created_at_and_account_id  (created_at,account_id)
+#  index_policies_on_created_at_and_id          (created_at,id) UNIQUE
+#  index_policies_on_created_at_and_product_id  (created_at,product_id)
 #
