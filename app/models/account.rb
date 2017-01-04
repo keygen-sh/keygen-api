@@ -6,8 +6,6 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  acts_as_paranoid
-
   belongs_to :plan
   has_many :webhook_endpoints, dependent: :destroy
   has_many :webhook_events, dependent: :destroy
@@ -81,9 +79,6 @@ end
 #
 # Indexes
 #
-#  index_accounts_on_created_at  (created_at)
-#  index_accounts_on_deleted_at  (deleted_at)
-#  index_accounts_on_id          (id)
-#  index_accounts_on_plan_id     (plan_id)
-#  index_accounts_on_slug        (slug)
+#  index_accounts_on_plan_id  (plan_id)
+#  index_accounts_on_slug     (slug)
 #

@@ -5,8 +5,6 @@ class Billing < ApplicationRecord
 
   include AASM
 
-  acts_as_paranoid
-
   belongs_to :account
   has_many :receipts, dependent: :destroy
   has_one :plan, through: :account
@@ -104,6 +102,7 @@ end
 #
 # Table name: billings
 #
+#  id                        :uuid             not null, primary key
 #  customer_id               :string
 #  subscription_status       :string
 #  created_at                :datetime         not null
@@ -116,13 +115,9 @@ end
 #  card_last4                :string
 #  state                     :string
 #  deleted_at                :datetime
-#  id                        :uuid             not null, primary key
 #  account_id                :uuid
 #
 # Indexes
 #
 #  index_billings_on_account_id  (account_id)
-#  index_billings_on_created_at  (created_at)
-#  index_billings_on_deleted_at  (deleted_at)
-#  index_billings_on_id          (id)
 #

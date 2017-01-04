@@ -5,8 +5,6 @@ class Token < ApplicationRecord
   include Limitable
   include Pageable
 
-  acts_as_paranoid
-
   belongs_to :account
   belongs_to :bearer, polymorphic: true
 
@@ -39,21 +37,18 @@ end
 #
 # Table name: tokens
 #
+#  id          :uuid             not null, primary key
 #  digest      :string
 #  bearer_type :string
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  expiry      :datetime
 #  deleted_at  :datetime
-#  id          :uuid             not null, primary key
 #  bearer_id   :uuid
 #  account_id  :uuid
 #
 # Indexes
 #
-#  index_tokens_on_account_id  (account_id)
-#  index_tokens_on_bearer_id   (bearer_id)
-#  index_tokens_on_created_at  (created_at)
-#  index_tokens_on_deleted_at  (deleted_at)
-#  index_tokens_on_id          (id)
+#  index_tokens_on_account_id                 (account_id)
+#  index_tokens_on_bearer_id_and_bearer_type  (bearer_id,bearer_type)
 #

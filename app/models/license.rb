@@ -3,8 +3,6 @@ class License < ApplicationRecord
   include Tokenable
   include Pageable
 
-  acts_as_paranoid
-
   belongs_to :account
   belongs_to :user
   belongs_to :policy
@@ -75,13 +73,13 @@ end
 #
 # Table name: licenses
 #
+#  id         :uuid             not null, primary key
 #  key        :string
 #  expiry     :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  deleted_at :datetime
 #  metadata   :jsonb
-#  id         :uuid             not null, primary key
 #  user_id    :uuid
 #  policy_id  :uuid
 #  account_id :uuid
@@ -89,9 +87,6 @@ end
 # Indexes
 #
 #  index_licenses_on_account_id  (account_id)
-#  index_licenses_on_created_at  (created_at)
-#  index_licenses_on_deleted_at  (deleted_at)
-#  index_licenses_on_id          (id)
 #  index_licenses_on_policy_id   (policy_id)
 #  index_licenses_on_user_id     (user_id)
 #
