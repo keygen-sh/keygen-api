@@ -30,5 +30,6 @@ end
 # Indexes
 #
 #  index_keys_on_account_id  (account_id)
+#  index_keys_on_created_at  (created_at)
 #  index_keys_on_policy_id   (policy_id)
 #

@@ -23,5 +23,6 @@ end
 #
 # Indexes
 #
-#  index_plans_on_plan_id  (plan_id)
+#  index_plans_on_created_at  (created_at)
+#  index_plans_on_plan_id     (plan_id)
 #
