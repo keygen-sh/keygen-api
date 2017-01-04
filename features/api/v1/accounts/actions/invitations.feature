@@ -11,7 +11,7 @@ Feature: Account invitation actions
     Given the account "tesla" has been invited
     And the account "tesla" has the following attributes:
       """
-      { "inviteToken": "\$2a\$10\$KW.pA/mao7GeXL4iihG3hOev7SjcfqFY9/o/Ct52LJ7CiCFmGUotm" }
+      { "inviteToken": "\$2a\$10\$K8doI8vgTkW4HUT1XIxf9.Wi9hBM/UapBefwU4fPSDB/gzVv85BOy" }
       """
     When I send a POST request to "/accounts/tesla/actions/accept-invitation" with the following:
       """
@@ -28,7 +28,7 @@ Feature: Account invitation actions
     Given the account "tesla" has accepted an invitation
     And the account "tesla" has the following attributes:
       """
-      { "inviteToken": "\$2a\$10\$KW.pA/mao7GeXL4iihG3hOev7SjcfqFY9/o/Ct52LJ7CiCFmGUotm" }
+      { "inviteToken": "\$2a\$10\$K8doI8vgTkW4HUT1XIxf9.Wi9hBM/UapBefwU4fPSDB/gzVv85BOy" }
       """
     When I send a POST request to "/accounts/tesla/actions/accept-invitation" with the following:
       """
@@ -45,7 +45,7 @@ Feature: Account invitation actions
     Given the account "tesla" has been invited
     And the account "tesla" has the following attributes:
       """
-      { "inviteToken": "\$2a\$10\$KW.pA/mao7GeXL4iihG3hOev7SjcfqFY9/o/Ct52LJ7CiCFmGUotm" }
+      { "inviteToken": "\$2a\$10\$K8doI8vgTkW4HUT1XIxf9.Wi9hBM/UapBefwU4fPSDB/gzVv85BOy" }
       """
     When I send a POST request to "/accounts/tesla/actions/accept-invitation" with the following:
       """
@@ -62,7 +62,7 @@ Feature: Account invitation actions
     Given the account "tesla" has not been invited
     And the account "tesla" has the following attributes:
       """
-      { "inviteToken": "\$2a\$10\$KW.pA/mao7GeXL4iihG3hOev7SjcfqFY9/o/Ct52LJ7CiCFmGUotm" }
+      { "inviteToken": "\$2a\$10\$K8doI8vgTkW4HUT1XIxf9.Wi9hBM/UapBefwU4fPSDB/gzVv85BOy" }
       """
     When I send a POST request to "/accounts/tesla/actions/accept-invitation" with the following:
       """
