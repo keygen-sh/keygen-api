@@ -60,6 +60,11 @@ class SerializableAccount < SerializableBase
       @url_helpers.v1_account_machines_path @object
     end
   end
+  relationship :tokens do
+    link :related do
+      @url_helpers.v1_account_tokens_path @object
+    end
+  end
 
   link :self do
     @url_helpers.v1_account_path @object
