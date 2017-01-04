@@ -21,12 +21,7 @@ class Billing < ApplicationRecord
     state :canceled
 
     event :activate_trial do
-      transitions from: :pending, to: :trialing, after: -> {
-        Billings::CreateSubscriptionService.new(
-          customer: customer_id,
-          plan: plan.plan_id
-        ).execute
-      }
+      transitions from: :pending, to: :trialing
     end
 
     event :activate_subscription do
