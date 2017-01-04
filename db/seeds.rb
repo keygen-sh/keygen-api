@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 Plan.create(
   plan_id: "beta",
-  name: "beta",
+  name: "Beta",
   price: 0,
   max_products: 1_000,
   max_users: 1_000,
