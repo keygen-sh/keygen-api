@@ -2,7 +2,11 @@ module Roleable
   extend ActiveSupport::Concern
 
   def grant(name)
-    self.role = Role.create name: name
+    if role.present?
+      self.role.update name: name
+    else
+      self.role = Role.create name: name
+    end
   rescue ActiveRecord::RecordNotSaved
     self.role = Role.new name: name
   end
