@@ -85,9 +85,8 @@ end
 #
 # Indexes
 #
-#  index_licenses_on_account_id  (account_id)
-#  index_licenses_on_created_at  (created_at)
-#  index_licenses_on_id          (id) UNIQUE
-#  index_licenses_on_policy_id   (policy_id)
-#  index_licenses_on_user_id     (user_id)
+#  index_licenses_on_created_at_and_account_id  (created_at,account_id)
+#  index_licenses_on_created_at_and_id          (created_at,id) UNIQUE
+#  index_licenses_on_created_at_and_policy_id   (created_at,policy_id)
+#  index_licenses_on_created_at_and_user_id     (created_at,user_id)
 #

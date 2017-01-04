@@ -28,8 +28,7 @@ end
 #
 # Indexes
 #
-#  index_webhook_events_on_account_id  (account_id)
-#  index_webhook_events_on_created_at  (created_at)
-#  index_webhook_events_on_id          (id) UNIQUE
-#  index_webhook_events_on_jid         (jid)
+#  index_webhook_events_on_created_at_and_account_id  (created_at,account_id)
+#  index_webhook_events_on_created_at_and_id          (created_at,id) UNIQUE
+#  index_webhook_events_on_created_at_and_jid         (created_at,jid)
 #

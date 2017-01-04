@@ -20,7 +20,6 @@ end
 #
 # Indexes
 #
-#  index_webhook_endpoints_on_account_id  (account_id)
-#  index_webhook_endpoints_on_created_at  (created_at)
-#  index_webhook_endpoints_on_id          (id) UNIQUE
+#  index_webhook_endpoints_on_created_at_and_account_id  (created_at,account_id)
+#  index_webhook_endpoints_on_created_at_and_id          (created_at,id) UNIQUE
 #
