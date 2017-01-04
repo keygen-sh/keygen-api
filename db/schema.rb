@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104173439) do
+ActiveRecord::Schema.define(version: 20170104182503) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,8 +26,9 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.string   "invite_token"
     t.datetime "invite_sent_at"
     t.index ["created_at"], name: "index_accounts_on_created_at", using: :btree
+    t.index ["id"], name: "index_accounts_on_id", unique: true, using: :btree
     t.index ["plan_id"], name: "index_accounts_on_plan_id", using: :btree
-    t.index ["slug"], name: "index_accounts_on_slug", using: :btree
+    t.index ["slug", "id"], name: "index_accounts_on_slug_and_id", using: :btree
   end
 
   create_table "billings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -45,6 +46,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_billings_on_account_id", using: :btree
     t.index ["created_at"], name: "index_billings_on_created_at", using: :btree
+    t.index ["id"], name: "index_billings_on_id", unique: true, using: :btree
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -55,6 +57,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_keys_on_account_id", using: :btree
     t.index ["created_at"], name: "index_keys_on_created_at", using: :btree
+    t.index ["id"], name: "index_keys_on_id", unique: true, using: :btree
     t.index ["policy_id"], name: "index_keys_on_policy_id", using: :btree
   end
 
@@ -69,6 +72,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_licenses_on_account_id", using: :btree
     t.index ["created_at"], name: "index_licenses_on_created_at", using: :btree
+    t.index ["id"], name: "index_licenses_on_id", unique: true, using: :btree
     t.index ["policy_id"], name: "index_licenses_on_policy_id", using: :btree
     t.index ["user_id"], name: "index_licenses_on_user_id", using: :btree
   end
@@ -86,6 +90,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "license_id"
     t.index ["account_id"], name: "index_machines_on_account_id", using: :btree
     t.index ["created_at"], name: "index_machines_on_created_at", using: :btree
+    t.index ["id"], name: "index_machines_on_id", unique: true, using: :btree
     t.index ["license_id"], name: "index_machines_on_license_id", using: :btree
   end
 
@@ -100,6 +105,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.integer  "max_products"
     t.string   "plan_id"
     t.index ["created_at"], name: "index_plans_on_created_at", using: :btree
+    t.index ["id"], name: "index_plans_on_id", unique: true, using: :btree
     t.index ["plan_id"], name: "index_plans_on_plan_id", using: :btree
   end
 
@@ -122,6 +128,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_policies_on_account_id", using: :btree
     t.index ["created_at"], name: "index_policies_on_created_at", using: :btree
+    t.index ["id"], name: "index_policies_on_id", unique: true, using: :btree
     t.index ["product_id"], name: "index_policies_on_product_id", using: :btree
   end
 
@@ -134,6 +141,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_products_on_account_id", using: :btree
     t.index ["created_at"], name: "index_products_on_created_at", using: :btree
+    t.index ["id"], name: "index_products_on_id", unique: true, using: :btree
   end
 
   create_table "receipts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -145,6 +153,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "billing_id"
     t.index ["billing_id"], name: "index_receipts_on_billing_id", using: :btree
     t.index ["created_at"], name: "index_receipts_on_created_at", using: :btree
+    t.index ["id"], name: "index_receipts_on_id", unique: true, using: :btree
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -154,6 +163,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.datetime "updated_at"
     t.uuid     "resource_id"
     t.index ["created_at"], name: "index_roles_on_created_at", using: :btree
+    t.index ["id"], name: "index_roles_on_id", unique: true, using: :btree
     t.index ["name"], name: "index_roles_on_name", using: :btree
     t.index ["resource_id", "resource_type"], name: "index_roles_on_resource_id_and_resource_type", using: :btree
   end
@@ -169,6 +179,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.index ["account_id"], name: "index_tokens_on_account_id", using: :btree
     t.index ["bearer_id", "bearer_type"], name: "index_tokens_on_bearer_id_and_bearer_type", using: :btree
     t.index ["created_at"], name: "index_tokens_on_created_at", using: :btree
+    t.index ["id"], name: "index_tokens_on_id", unique: true, using: :btree
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -184,6 +195,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.index ["account_id"], name: "index_users_on_account_id", using: :btree
     t.index ["created_at"], name: "index_users_on_created_at", using: :btree
     t.index ["email"], name: "index_users_on_email", using: :btree
+    t.index ["id"], name: "index_users_on_id", unique: true, using: :btree
   end
 
   create_table "webhook_endpoints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -193,6 +205,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.uuid     "account_id"
     t.index ["account_id"], name: "index_webhook_endpoints_on_account_id", using: :btree
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", using: :btree
+    t.index ["id"], name: "index_webhook_endpoints_on_id", unique: true, using: :btree
   end
 
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -205,6 +218,7 @@ ActiveRecord::Schema.define(version: 20170104173439) do
     t.string   "idempotency_token"
     t.index ["account_id"], name: "index_webhook_events_on_account_id", using: :btree
     t.index ["created_at"], name: "index_webhook_events_on_created_at", using: :btree
+    t.index ["id"], name: "index_webhook_events_on_id", unique: true, using: :btree
     t.index ["jid"], name: "index_webhook_events_on_jid", using: :btree
   end
 

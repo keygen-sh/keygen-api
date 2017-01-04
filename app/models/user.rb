@@ -52,4 +52,5 @@ end
 #  index_users_on_account_id  (account_id)
 #  index_users_on_created_at  (created_at)
 #  index_users_on_email       (email)
+#  index_users_on_id          (id) UNIQUE
 #

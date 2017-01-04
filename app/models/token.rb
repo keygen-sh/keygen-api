@@ -51,4 +51,5 @@ end
 #  index_tokens_on_account_id                 (account_id)
 #  index_tokens_on_bearer_id_and_bearer_type  (bearer_id,bearer_type)
 #  index_tokens_on_created_at                 (created_at)
+#  index_tokens_on_id                         (id) UNIQUE
 #
