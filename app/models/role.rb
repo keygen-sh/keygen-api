@@ -1,6 +1,4 @@
 class Role < ApplicationRecord
-  acts_as_paranoid
-
   belongs_to :resource, polymorphic: true
 
   validates :name, inclusion: { in: %w[user admin], message: "must be a valid user role" }, if: -> { resource.is_a? User }
@@ -11,18 +9,15 @@ end
 #
 # Table name: roles
 #
+#  id            :uuid             not null, primary key
 #  name          :string
 #  resource_type :string
 #  created_at    :datetime
 #  updated_at    :datetime
 #  deleted_at    :datetime
-#  id            :uuid             not null, primary key
 #  resource_id   :uuid
 #
 # Indexes
 #
-#  index_roles_on_created_at   (created_at)
-#  index_roles_on_deleted_at   (deleted_at)
-#  index_roles_on_id           (id)
-#  index_roles_on_resource_id  (resource_id)
+#  index_roles_on_resource_id_and_resource_type  (resource_id,resource_type)
 #

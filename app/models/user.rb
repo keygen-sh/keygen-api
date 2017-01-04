@@ -5,7 +5,6 @@ class User < ApplicationRecord
   include Roleable
 
   has_secure_password
-  acts_as_paranoid
 
   belongs_to :account
   has_many :licenses, dependent: :destroy
@@ -37,6 +36,7 @@ end
 #
 # Table name: users
 #
+#  id                     :uuid             not null, primary key
 #  name                   :string
 #  email                  :string
 #  password_digest        :string
@@ -46,13 +46,9 @@ end
 #  password_reset_sent_at :datetime
 #  deleted_at             :datetime
 #  metadata               :jsonb
-#  id                     :uuid             not null, primary key
 #  account_id             :uuid
 #
 # Indexes
 #
 #  index_users_on_account_id  (account_id)
-#  index_users_on_created_at  (created_at)
-#  index_users_on_deleted_at  (deleted_at)
-#  index_users_on_id          (id)
 #

@@ -3,8 +3,6 @@ class Product < ApplicationRecord
   include Pageable
   include Roleable
 
-  acts_as_paranoid
-
   belongs_to :account
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
@@ -30,19 +28,16 @@ end
 #
 # Table name: products
 #
+#  id         :uuid             not null, primary key
 #  name       :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  deleted_at :datetime
 #  platforms  :jsonb
 #  metadata   :jsonb
-#  id         :uuid             not null, primary key
 #  account_id :uuid
 #
 # Indexes
 #
 #  index_products_on_account_id  (account_id)
-#  index_products_on_created_at  (created_at)
-#  index_products_on_deleted_at  (deleted_at)
-#  index_products_on_id          (id)
 #

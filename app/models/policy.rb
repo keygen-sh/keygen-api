@@ -2,8 +2,6 @@ class Policy < ApplicationRecord
   include Limitable
   include Pageable
 
-  acts_as_paranoid
-
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -44,6 +42,7 @@ end
 #
 # Table name: policies
 #
+#  id           :uuid             not null, primary key
 #  name         :string
 #  price        :integer
 #  duration     :integer
@@ -59,15 +58,11 @@ end
 #  protected    :boolean          default(FALSE)
 #  deleted_at   :datetime
 #  metadata     :jsonb
-#  id           :uuid             not null, primary key
 #  product_id   :uuid
 #  account_id   :uuid
 #
 # Indexes
 #
 #  index_policies_on_account_id  (account_id)
-#  index_policies_on_created_at  (created_at)
-#  index_policies_on_deleted_at  (deleted_at)
-#  index_policies_on_id          (id)
 #  index_policies_on_product_id  (product_id)
 #

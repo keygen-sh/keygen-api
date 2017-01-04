@@ -2,8 +2,6 @@ class Machine < ApplicationRecord
   include Limitable
   include Pageable
 
-  acts_as_paranoid
-
   belongs_to :account
   belongs_to :license
   has_one :product, through: :license
@@ -25,6 +23,7 @@ end
 #
 # Table name: machines
 #
+#  id          :uuid             not null, primary key
 #  fingerprint :string
 #  ip          :string
 #  hostname    :string
@@ -34,15 +33,11 @@ end
 #  name        :string
 #  deleted_at  :datetime
 #  metadata    :jsonb
-#  id          :uuid             not null, primary key
 #  account_id  :uuid
 #  license_id  :uuid
 #
 # Indexes
 #
 #  index_machines_on_account_id  (account_id)
-#  index_machines_on_created_at  (created_at)
-#  index_machines_on_deleted_at  (deleted_at)
-#  index_machines_on_id          (id)
 #  index_machines_on_license_id  (license_id)
 #

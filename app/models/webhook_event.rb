@@ -3,8 +3,6 @@ class WebhookEvent < ApplicationRecord
   include Limitable
   include Pageable
 
-  acts_as_paranoid
-
   belongs_to :account
 
   validates :account, presence: { message: "must exist" }
@@ -32,8 +30,5 @@ end
 # Indexes
 #
 #  index_webhook_events_on_account_id  (account_id)
-#  index_webhook_events_on_created_at  (created_at)
-#  index_webhook_events_on_deleted_at  (deleted_at)
-#  index_webhook_events_on_id          (id)
 #  index_webhook_events_on_jid         (jid)
 #

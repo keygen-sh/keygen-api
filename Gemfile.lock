@@ -165,8 +165,6 @@ GEM
     nio4r (1.2.1)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
-    paranoia (2.2.0)
-      activerecord (>= 4.0, < 5.1)
     pg (0.19.0)
     premailer (1.8.7)
       css_parser (>= 1.4.5)
@@ -309,7 +307,6 @@ DEPENDENCIES
   jsonapi-rails!
   kaminari
   listen (~> 3.0.5)
-  paranoia (~> 2.2)
   pg
   premailer-rails
   puma (~> 3.0)
