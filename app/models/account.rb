@@ -79,6 +79,7 @@ end
 #
 # Indexes
 #
-#  index_accounts_on_plan_id  (plan_id)
-#  index_accounts_on_slug     (slug)
+#  index_accounts_on_created_at  (created_at)
+#  index_accounts_on_plan_id     (plan_id)
+#  index_accounts_on_slug        (slug)
 #

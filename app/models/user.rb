@@ -51,4 +51,5 @@ end
 # Indexes
 #
 #  index_users_on_account_id  (account_id)
+#  index_users_on_created_at  (created_at)
 #
