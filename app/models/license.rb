@@ -78,7 +78,6 @@ end
 #  expiry     :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  deleted_at :datetime
 #  metadata   :jsonb
 #  user_id    :uuid
 #  policy_id  :uuid

@@ -31,7 +31,6 @@ end
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  name        :string
-#  deleted_at  :datetime
 #  metadata    :jsonb
 #  account_id  :uuid
 #  license_id  :uuid

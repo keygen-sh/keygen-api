@@ -19,7 +19,6 @@ end
 #  updated_at   :datetime         not null
 #  max_products :integer
 #  plan_id      :string
-#  deleted_at   :datetime
 #
 # Indexes
 #

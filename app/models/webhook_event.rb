@@ -23,7 +23,6 @@ end
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  endpoint          :string
-#  deleted_at        :datetime
 #  account_id        :uuid
 #  idempotency_token :string
 #

@@ -44,7 +44,6 @@ end
 #  updated_at             :datetime         not null
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
-#  deleted_at             :datetime
 #  metadata               :jsonb
 #  account_id             :uuid
 #

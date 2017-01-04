@@ -43,7 +43,6 @@ end
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  expiry      :datetime
-#  deleted_at  :datetime
 #  bearer_id   :uuid
 #  account_id  :uuid
 #

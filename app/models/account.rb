@@ -71,7 +71,6 @@ end
 #  slug           :string
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  deleted_at     :datetime
 #  plan_id        :uuid
 #  invite_state   :string
 #  invite_token   :string

@@ -56,7 +56,6 @@ end
 #  max_machines :integer
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
-#  deleted_at   :datetime
 #  metadata     :jsonb
 #  product_id   :uuid
 #  account_id   :uuid
