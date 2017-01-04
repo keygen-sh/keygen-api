@@ -2,6 +2,8 @@ class Token < ApplicationRecord
   TOKEN_DURATION = 2.weeks
 
   include Tokenable
+  include Limitable
+  include Pageable
 
   acts_as_paranoid
 
