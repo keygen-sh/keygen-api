@@ -3,6 +3,7 @@ class SerializableAccount < SerializableBase
 
   attribute :name
   attribute :slug
+  attribute :protected
   attribute :created do
     @object.created_at
   end

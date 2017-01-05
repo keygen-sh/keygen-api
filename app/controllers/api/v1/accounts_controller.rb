@@ -65,6 +65,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string
             param :slug, type: :string
+            param :protected, type: :boolean, optional: true
           end
           param :relationships, type: :hash do
             param :plan, type: :hash do
@@ -95,6 +96,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :slug, type: :string, optional: true
+            param :protected, type: :boolean, optional: true
           end
         end
       end
