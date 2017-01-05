@@ -86,7 +86,7 @@ Feature: Create account
     And the JSON response should be an "account" with the name "Google"
     And the account "google" should have 1 "admin"
 
-  Scenario: Anonymous creates an account with multiple admins
+  Scenario: Anonymous creates a protected account with multiple admins
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -94,7 +94,8 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "protected": true
           },
           "relationships": {
             "plan": {
@@ -137,6 +138,10 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the account "google" should have 3 "admins"
+    And the account "google" should have the following attributes:
+      """
+      { "protected": true }
+      """
 
   Scenario: Anonymous creates an account with multiple admins and an invalid parameter
     When I send a POST request to "/accounts" with the following:

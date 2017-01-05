@@ -9,11 +9,11 @@ class LicenseValidationService < BaseService
     # Check if license is expired (move along if it has no expiry)
     return false if !license.expiry.nil? && license.expiry < Time.current
     # Check if license policy is strict, e.g. enforces reporting of machine usage
-    return true if !license.policy.strict
+    return true if !license.policy.strict?
     # Check if license policy allows floating and if not, should have single activation
-    return true if !license.policy.floating && license.machines.count == 1
+    return true if !license.policy.floating? && license.machines.count == 1
     # Assume floating, should have at least 1 activation but no more than policy allows
-    return true if license.policy.floating && license.machines.count >= 1 && license.machines.count <= license.policy.max_machines
+    return true if license.policy.floating? && license.machines.count >= 1 && license.machines.count <= license.policy.max_machines
     # Otherwise, assume invalid
     return false
   end

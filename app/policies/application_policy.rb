@@ -38,6 +38,10 @@ class ApplicationPolicy
     Pundit.policy_scope! bearer, resource.class
   end
 
+  def account
+    resource.account || bearer.account
+  end
+
   class Scope
     attr_reader :bearer, :scope
 

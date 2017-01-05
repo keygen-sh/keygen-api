@@ -22,9 +22,11 @@ module Keygen
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
-    # Use UUIDs for table primary keys
     config.generators do |generator|
+      # Use UUIDs for table primary keys
       generator.orm :active_record, primary_key_type: :uuid
+      # Skip test generation (we do it manually)
+      generator.test_framework false
     end
 
     # Only loads a smaller set of middleware suitable for API only apps.

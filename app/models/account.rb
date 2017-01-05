@@ -39,6 +39,10 @@ class Account < ApplicationRecord
 
   scope :plan, -> (id) { where plan: id }
 
+  def protected?
+    protected
+  end
+
   def admins
     users.admins
   end
@@ -75,6 +79,7 @@ end
 #  invite_state   :string
 #  invite_token   :string
 #  invite_sent_at :datetime
+#  protected      :boolean          default(FALSE)
 #
 # Indexes
 #

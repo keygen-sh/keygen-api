@@ -20,12 +20,20 @@ class Policy < ApplicationRecord
     use_pool
   end
 
+  def strict?
+    strict
+  end
+
+  def floating?
+    floating
+  end
+
   def encrypted?
     encrypted
   end
 
   def protected?
-    protected
+    account.protected? || protected
   end
 
   def pop!
