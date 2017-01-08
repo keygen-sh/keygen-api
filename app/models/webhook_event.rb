@@ -17,14 +17,15 @@ end
 #
 # Table name: webhook_events
 #
-#  id                :uuid             not null, primary key
 #  payload           :text
 #  jid               :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  endpoint          :string
+#  id                :uuid             not null, primary key
 #  account_id        :uuid
 #  idempotency_token :string
+#  event             :string
 #
 # Indexes
 #

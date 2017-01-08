@@ -4,6 +4,7 @@ class SerializableWebhookEvent < SerializableBase
   attribute :idempotency_token
   attribute :endpoint
   attribute :payload
+  attribute :event
   attribute :status
   attribute :created do
     @object.created_at
