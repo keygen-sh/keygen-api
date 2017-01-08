@@ -1,11 +1,11 @@
 module Tokenable
-  TOKEN_PREFIX = "v1."
+  ALGO_VERSION = "v1"
 
   extend ActiveSupport::Concern
 
   def generate_token(attribute, length: 64)
     loop do
-      token = SecureRandom.hex(length).gsub /\A.{#{TOKEN_PREFIX.length}}/, TOKEN_PREFIX
+      token = SecureRandom.hex(length).gsub /.{#{ALGO_VERSION.length}}\z/, ALGO_VERSION
       token = yield token if block_given?
       break token unless self.class.exists? attribute => token
     end
@@ -13,7 +13,7 @@ module Tokenable
 
   def generate_encrypted_token(attribute, length: 64)
     loop do
-      raw = SecureRandom.hex(length).gsub /\A.{#{TOKEN_PREFIX.length}}/, TOKEN_PREFIX
+      raw = SecureRandom.hex(length).gsub /.{#{ALGO_VERSION.length}}\z/, ALGO_VERSION
       raw = yield raw if block_given?
       # We're hashing with SHA256 first so that we can bypass Bcrypt's 72 max
       # length, since the first 66 chars of our string consist of the account
