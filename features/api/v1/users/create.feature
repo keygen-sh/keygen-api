@@ -195,6 +195,32 @@ Feature: Create user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
+  Scenario: Product creates a user for a protected account
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current account has 1 "webhookEndpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "name": "Ironman",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
     And the current account has 2 "webhookEndpoints"
@@ -222,7 +248,7 @@ Feature: Create user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
 
-  Scenario: User attempts to create a user for their account
+  Scenario: User attempts to create a user for a protected account
     Given the current account is "test1"
     And the account "test1" has the following attributes:
       """
