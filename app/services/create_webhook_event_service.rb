@@ -13,7 +13,10 @@ class CreateWebhookEventService < BaseService
 
     account&.webhook_endpoints.find_each do |endpoint|
       # Create a partial event (we'll complete it after the job is fired)
-      webhook_event = account.webhook_events.create endpoint: endpoint.url
+      webhook_event = account.webhook_events.create(
+        endpoint: endpoint.url,
+        event: event
+      )
 
       # Serialize the event and decode so we can use in webhook job
       payload = ActiveSupport::JSON.decode(
