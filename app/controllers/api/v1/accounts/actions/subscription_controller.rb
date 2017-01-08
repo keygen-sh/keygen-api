@@ -7,7 +7,7 @@ module Api::V1::Accounts::Actions
     def pause
       authorize @account
 
-      if @account.pause_subscription
+      if @account.pause_subscription!
         render_meta status: "paused"
       else
         render_unprocessable_entity detail: "failed to pause subscription", source: {
@@ -19,7 +19,7 @@ module Api::V1::Accounts::Actions
     def resume
       authorize @account
 
-      if @account.resume_subscription
+      if @account.resume_subscription!
         render_meta status: "resumed"
       else
         render_unprocessable_entity detail: "failed to resume subscription", source: {
@@ -31,7 +31,7 @@ module Api::V1::Accounts::Actions
     def cancel
       authorize @account
 
-      if @account.cancel_subscription
+      if @account.cancel_subscription!
         render_meta status: "canceled"
       else
         render_unprocessable_entity detail: "failed to cancel subscription", source: {
@@ -43,7 +43,7 @@ module Api::V1::Accounts::Actions
     def renew
       authorize @account
 
-      if @account.renew_subscription
+      if @account.renew_subscription!
         render_meta status: "renewed"
       else
         render_unprocessable_entity detail: "failed to renew subscription", source: {
