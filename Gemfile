@@ -9,8 +9,7 @@ gem 'rack-attack'
 gem 'rack-cors'
 
 # JSON API serializers
-gem 'active_model_serializers'
-gem 'jsonapi-rails', git: "https://github.com/ezekg/jsonapi-rails"
+gem 'jsonapi-rails', git: 'https://github.com/ezekg/jsonapi-rails'
 
 # Billing and subscriptions
 gem 'stripe'
