@@ -249,7 +249,7 @@ Feature: Create account
     Then the response status should be "400"
     And the JSON response should be an array of 1 errors
 
-  Scenario: Anonymous attempts to create a duplicate account
+  Scenario: Anonymous attempts to create a duplicate account with an invalid plan
     Given there exists an account "test1"
     When I send a POST request to "/accounts" with the following:
       """
@@ -264,7 +264,7 @@ Feature: Create account
             "plan": {
               "data": {
                 "type": "plans",
-                "id": "$plan[0]"
+                "id": "invalid"
               }
             },
             "admins": {
@@ -284,7 +284,7 @@ Feature: Create account
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 errors
+    And the JSON response should be an array of 2 errors
 
   Scenario: Anonymous attempts to create an account with an invalid slug
     When I send a POST request to "/accounts" with the following:
