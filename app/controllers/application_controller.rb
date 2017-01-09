@@ -27,7 +27,7 @@ class ApplicationController < ActionController::API
   private
 
   def render_meta(meta)
-    render json: ActiveModelSerializers::KeyTransform.camel_lower(meta: meta).to_json
+    render json: { meta: meta.transform_keys! { |k| k.to_s.camelize :lower } }
   end
 
   def render_forbidden(opts = {})
