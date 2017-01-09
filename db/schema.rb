@@ -18,9 +18,9 @@ ActiveRecord::Schema.define(version: 20170108191700) do
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
+    t.string   "slug"
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
-    t.string   "slug"
     t.uuid     "plan_id"
     t.string   "invite_state"
     t.string   "invite_token"

@@ -1,5 +1,3 @@
-require "active_model_serializers/key_transform"
-
 class ApplicationController < ActionController::API
   include Pundit
 
