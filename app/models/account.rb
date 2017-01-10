@@ -1,5 +1,6 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
+  include Welcomeable
   include Inviteable
   include Sluggable
   include Limitable
@@ -22,9 +23,6 @@ class Account < ApplicationRecord
 
   before_create -> { self.slug = slug.downcase }
   after_create :set_founding_users_roles
-  after_create :initialize_billing
-  # TODO: This is disabled while we're in the beta period
-  # after_create :send_welcome_email
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -51,18 +49,6 @@ class Account < ApplicationRecord
 
   def set_founding_users_roles
     users.each { |u| u.grant :admin }
-  end
-
-  def initialize_billing
-    InitializeBillingWorker.perform_async id
-  rescue Redis::CannotConnectError
-    false
-  end
-
-  def send_welcome_email
-    AccountMailer.welcome(account: self).deliver_later
-  rescue Redis::CannotConnectError
-    false
   end
 end
 
