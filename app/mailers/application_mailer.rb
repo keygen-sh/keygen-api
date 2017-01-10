@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "hello@keygen.sh"
+  default from: "Zeke Gabrielse <hello@keygen.sh>"
   layout "mailer"
 end
