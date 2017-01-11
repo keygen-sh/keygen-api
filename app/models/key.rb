@@ -11,6 +11,10 @@ class Key < ApplicationRecord
 
   validates :key, presence: true, blank: false, uniqueness: { scope: :policy_id }
 
+  validate on: :create do
+    errors.add :policy, "cannot add key to an unpooled policy" unless policy.pool?
+  end
+
   scope :policy, -> (id) { where policy: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
 end

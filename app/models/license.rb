@@ -17,8 +17,11 @@ class License < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
+  validate on: :create do
+    errors.add :key, "cannot specify key for encrypted license" if key.present? && policy.encrypted?
+  end
+
   validate unless: -> { policy.nil? } do
-    errors.add :key, "cannot specify key for encrypted license" if !persisted? && key.present? && policy.encrypted?
     errors.add :machines, "count has reached maximum allowed by policy" if !policy.max_machines.nil? && machines.size > policy.max_machines
   end
 
