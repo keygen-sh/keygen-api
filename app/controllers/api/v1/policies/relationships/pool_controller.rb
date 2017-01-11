@@ -23,6 +23,12 @@ module Api::V1::Policies::Relationships
     # DELETE /policies/1/pool
     def pop
       if key = @policy.pop!
+        CreateWebhookEventService.new(
+          event: "key.popped",
+          account: current_account,
+          resource: key
+        ).execute
+
         render jsonapi: key
       else
         render_unprocessable_entity detail: "pool is empty",
