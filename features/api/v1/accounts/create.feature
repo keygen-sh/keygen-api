@@ -40,6 +40,7 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the JSON response should be an "account" with the name "Google"
+    And the account should receive a "welcome" email
     And the account "google" should have 1 "admin"
 
   # NOTE: This is really just a test to make sure endpoints are valid even when

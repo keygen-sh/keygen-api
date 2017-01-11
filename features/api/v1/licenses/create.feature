@@ -39,8 +39,73 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the account should receive a "welcome" email
     And sidekiq should have 1 "webhook" job
+
+  Scenario: Admin creates a license with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the key "a"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Admin creates a duplicate license with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policy"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "a"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 3 "licenses"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin creates an encrypted license for a user of their account
     Given I am an admin of account "test1"
@@ -131,11 +196,15 @@ Feature: Create license
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" job
 
-  Scenario: Admin creates a license specifying a key
+  Scenario: Admin creates an encrypted license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
     And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "encrypted": true }
+      """
     And the current account has 1 "user"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -163,7 +232,7 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
 

@@ -12,12 +12,13 @@ class License < ApplicationRecord
   attr_reader :raw
 
   before_create :set_expiry, unless: -> { policy.nil? }
-  after_create :set_key, unless: -> { policy.nil? }
+  after_create :set_key, unless: -> { key.present? || policy.nil? }
 
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
   validate unless: -> { policy.nil? } do
+    errors.add :key, "cannot specify key for encrypted license" if !persisted? && key.present? && policy.encrypted?
     errors.add :machines, "count has reached maximum allowed by policy" if !policy.max_machines.nil? && machines.size > policy.max_machines
   end
 

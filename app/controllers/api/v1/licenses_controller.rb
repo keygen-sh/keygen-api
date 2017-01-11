@@ -84,6 +84,7 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[license licenses]
           param :attributes, type: :hash, optional: true do
+            param :key, type: :string, optional: true
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
