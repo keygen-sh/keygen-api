@@ -1,7 +1,6 @@
 class SerializableWebhookEvent < SerializableBase
   type :webhookEvents
 
-  attribute :idempotency_token
   attribute :endpoint
   attribute :payload
   attribute :event
@@ -21,5 +20,9 @@ class SerializableWebhookEvent < SerializableBase
 
   link :self do
     @url_helpers.v1_account_webhook_event_path @object.account, @object
+  end
+
+  meta do
+    { idempotencyToken: @object.idempotency_token }
   end
 end
