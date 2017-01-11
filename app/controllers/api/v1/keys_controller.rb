@@ -1,5 +1,6 @@
 module Api::V1
   class KeysController < Api::V1::BaseController
+    has_scope :product
     has_scope :policy
 
     before_action :scope_to_current_account!
