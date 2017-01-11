@@ -1,7 +1,7 @@
 class SerializableLicense < SerializableBase
   type :licenses
 
-  attribute :key, unless: -> { @object.raw.nil? || @object.key.nil? } do
+  attribute :key, unless: -> { @object.policy.encrypted? && @object.raw.nil? } do
     if @object.policy.encrypted?
       @object.raw
     else
@@ -9,6 +9,9 @@ class SerializableLicense < SerializableBase
     end
   end
   attribute :expiry
+  attribute :encrypted do
+    @object.policy.encrypted?
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

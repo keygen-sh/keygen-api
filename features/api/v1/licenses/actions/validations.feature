@@ -352,3 +352,31 @@ Feature: License validation actions
       """
       { "valid": true }
       """
+
+  Scenario: Admin validates a valid license that used a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "a"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "a"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": true }
+      """
