@@ -132,6 +132,7 @@ Feature: Policy pool relationship
   Scenario: Admin pops a key from a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
       """
@@ -148,6 +149,7 @@ Feature: Policy pool relationship
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "200"
     And the JSON response should be a "key"
+    And sidekiq should have 2 "webhook" jobs
 
   Scenario: Admin attempts to pop a key from an empty pool
     Given I am an admin of account "test1"
