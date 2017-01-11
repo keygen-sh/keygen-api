@@ -174,7 +174,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following metadata:
+    And the JSON response should be a "user" with the following "metadata":
       """
       { "customerId": "cust_gV4dW9jrc" }
       """
@@ -223,7 +223,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the following metadata:
+    And the JSON response should be a "user" with the following "metadata":
       """
       { "customerId": "cust_gV4dW9jrc" }
       """

@@ -67,7 +67,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following platforms:
+    And the JSON response should be a "product" with the following "platforms":
       """
       [
         "iOS",
@@ -95,7 +95,7 @@ Feature: Update product
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "product" with the following platforms:
+    And the JSON response should be a "product" with the following "platforms":
       """
       ["Nintendo"]
       """
