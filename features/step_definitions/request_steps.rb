@@ -112,7 +112,7 @@ Then /^the JSON response should be an? "([^\"]*)" that is not (\w+)$/ do |name, 
   expect(json["data"]["attributes"][attribute]).to be false
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with the following ((?!attributes)\w+):$/ do |name, attribute, body|
+Then /^the JSON response should be an? "([^\"]*)" with the following ((?!meta|attributes)\w+):$/ do |name, attribute, body|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
@@ -124,6 +124,13 @@ Then /^the JSON response should be an? "(?:[^\"]*)" with the following attribute
   json = JSON.parse last_response.body
 
   expect(json["data"]["attributes"]).to include JSON.parse(body)
+end
+
+Then /^the JSON response should be an? "(?:[^\"]*)" with the following meta:$/ do |body|
+  parse_placeholders! body
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["meta"]).to include JSON.parse(body)
 end
 
 Then /^the JSON response should be meta with the following:$/ do |body|
