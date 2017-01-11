@@ -8,7 +8,7 @@ module Api::V1::Licenses::Actions
       @license = current_account.licenses.find params[:id]
       authorize @license
 
-      render_meta is_valid: LicenseValidationService.new(license: @license).execute
+      render_meta valid: LicenseValidationService.new(license: @license).execute
     end
 
     # POST /licenses/validate-key
@@ -21,7 +21,7 @@ module Api::V1::Licenses::Actions
         key: validation_params[:meta][:key],
       ).execute
 
-      render_meta is_valid: LicenseValidationService.new(license: @license).execute
+      render_meta valid: LicenseValidationService.new(license: @license).execute
     end
 
     typed_parameters do
