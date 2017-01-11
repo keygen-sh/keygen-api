@@ -39,7 +39,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
 
   Scenario: Admin validates a strict license that has too many machines
@@ -73,7 +73,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates a non-strict license that has too many machines
@@ -107,7 +107,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
 
   Scenario: Admin validates a license that has not been used
@@ -133,7 +133,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
 
   Scenario: Admin validates a strict license that has not been used
@@ -159,7 +159,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates a license that is expired
@@ -179,7 +179,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates a valid license by key
@@ -206,7 +206,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
 
   Scenario: Admin validates an invalid license by key
@@ -233,7 +233,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates an encrypted license by key
@@ -261,7 +261,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
 
   Scenario: Admin validates an encrypted license key as an unencrypted key
@@ -289,7 +289,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates an unencrypted license key as an encrypted key
@@ -317,7 +317,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": false }
+      { "valid": false }
       """
 
   Scenario: Admin validates a valid license by key from a pool
@@ -350,5 +350,5 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "isValid": true }
+      { "valid": true }
       """
