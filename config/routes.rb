@@ -91,9 +91,9 @@ Rails.application.routes.draw do
 
         resources "policies" do
           scope module: "policies/relationships" do
-            resources "pool", only: [:index, :show] do
+            resources "pool", only: [:index, :show], as: "keys" do
               collection do
-                delete "/", to: "pool#pop"
+                delete "/", to: "pool#pop", as: "pop"
               end
             end
             resources "licenses", only: [:index, :show]
@@ -136,7 +136,7 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fe0a5d0dfd0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007faaac784ac0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -208,9 +208,9 @@ end
 #                                  PATCH  /v1/accounts/:account_id/licenses/:id(.:format)                      api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PUT    /v1/accounts/:account_id/licenses/:id(.:format)                      api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                  DELETE /v1/accounts/:account_id/licenses/:id(.:format)                      api/v1/licenses#destroy {:subdomain=>"api", :format=>"jsonapi"}
-#     v1_account_policy_pool_index GET    /v1/accounts/:account_id/policies/:policy_id/pool(.:format)          api/v1/policies/relationships/pool#index {:subdomain=>"api", :format=>"jsonapi"}
-#           v1_account_policy_pool GET    /v1/accounts/:account_id/policies/:policy_id/pool/:id(.:format)      api/v1/policies/relationships/pool#show {:subdomain=>"api", :format=>"jsonapi"}
-#                                  DELETE /v1/accounts/:account_id/policies/:policy_id/pool/:id(.:format)      api/v1/policies/relationships/pool#destroy {:subdomain=>"api", :format=>"jsonapi"}
+#       pop_v1_account_policy_keys DELETE /v1/accounts/:account_id/policies/:policy_id/pool(.:format)          api/v1/policies/relationships/pool#pop {:subdomain=>"api", :format=>"jsonapi"}
+#           v1_account_policy_keys GET    /v1/accounts/:account_id/policies/:policy_id/pool(.:format)          api/v1/policies/relationships/pool#index {:subdomain=>"api", :format=>"jsonapi"}
+#            v1_account_policy_key GET    /v1/accounts/:account_id/policies/:policy_id/pool/:id(.:format)      api/v1/policies/relationships/pool#show {:subdomain=>"api", :format=>"jsonapi"}
 #       v1_account_policy_licenses GET    /v1/accounts/:account_id/policies/:policy_id/licenses(.:format)      api/v1/policies/relationships/licenses#index {:subdomain=>"api", :format=>"jsonapi"}
 #        v1_account_policy_license GET    /v1/accounts/:account_id/policies/:policy_id/licenses/:id(.:format)  api/v1/policies/relationships/licenses#show {:subdomain=>"api", :format=>"jsonapi"}
 #        v1_account_policy_product GET    /v1/accounts/:account_id/policies/:policy_id/product(.:format)       api/v1/policies/relationships/products#show {:subdomain=>"api", :format=>"jsonapi"}
