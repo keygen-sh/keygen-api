@@ -113,6 +113,50 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
 
+  Scenario: User hits the machine limit for their license
+    Given the current account is "test1"
+    And the current account has 2 "webhookEndpoints"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "maxMachines": 3 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
     And the current account has 1 "webhookEndpoint"

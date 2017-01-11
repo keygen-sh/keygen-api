@@ -21,10 +21,6 @@ class License < ApplicationRecord
     errors.add :key, "cannot specify key for encrypted license" if key.present? && policy.encrypted?
   end
 
-  validate unless: -> { policy.nil? } do
-    errors.add :machines, "count has reached maximum allowed by policy" if !policy.max_machines.nil? && machines.size > policy.max_machines
-  end
-
   validates :key, uniqueness: { case_sensitive: true }, unless: -> { key.nil? }
 
   scope :policy, -> (id) { where policy: id }
