@@ -13,6 +13,10 @@ class Machine < ApplicationRecord
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
   validates :name, presence: true, allow_nil: true, uniqueness: { scope: :license_id }
 
+  validate on: :create do
+    errors.add :license, "machine count has reached maximum allowed by license policy" if !license.policy.max_machines.nil? && license.machines.size >= license.policy.max_machines
+  end
+
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :license, -> (id) { where license: id }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
