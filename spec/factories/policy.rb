@@ -17,5 +17,9 @@ FactoryGirl.define do
     trait :encrypted do
       encrypted true
     end
+
+    trait :pooled do
+      use_pool true
+    end
   end
 end
