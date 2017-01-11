@@ -87,9 +87,7 @@ module Api::V1
             param :name, type: :string
             param :email, type: :string
             param :password, type: :string
-            if current_bearer&.role? :admin or current_bearer&.role? :product
-              param :metadata, type: :hash, optional: true
-            end
+            param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash, optional: true do
             if current_bearer&.role? :admin
