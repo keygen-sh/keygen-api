@@ -72,6 +72,11 @@ def parse_path_placeholders!(str)
           case resource.underscore
           when "billing"
             @account.send(resource.underscore).id
+          when "pool"
+            @account.keys
+              .all
+              .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              .id
           else
             @account.send(resource.underscore)
               .all

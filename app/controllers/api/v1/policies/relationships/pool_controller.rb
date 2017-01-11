@@ -2,17 +2,26 @@ module Api::V1::Policies::Relationships
   class PoolController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
-    before_action :set_policy, only: [:pop]
+    before_action :set_policy, only: [:index, :show, :pop]
+
+    # GET /policies/1/pool
+    def index
+      @pool = policy_scope apply_scopes(@policy.pool).all
+      authorize @pool
+
+      render jsonapi: @pool
+    end
+
+    # GET /policies/1/pool/1
+    def show
+      @pool = @policy.pool.find params[:id]
+      authorize @pool
+
+      render jsonapi: @pool
+    end
 
     # DELETE /policies/1/pool
     def pop
-      authorize @policy
-
-      unless @policy.use_pool
-        render_unprocessable_entity detail: "policy does not use a pool",
-          source: { pointer: "/data/attributes/usePool" } and return
-      end
-
       if key = @policy.pop!
         render jsonapi: key
       else
@@ -24,7 +33,13 @@ module Api::V1::Policies::Relationships
     private
 
     def set_policy
-      @policy = current_account.policies.find params[:id]
+      @policy = current_account.policies.find params[:policy_id]
+      authorize @policy, :show?
+
+      if !@policy.pool?
+        render_unprocessable_entity detail: "policy does not use a pool",
+          source: { pointer: "/data/attributes/usePool" } and return
+      end
     end
   end
 end
