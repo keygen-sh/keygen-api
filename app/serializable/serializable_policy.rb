@@ -33,7 +33,7 @@ class SerializablePolicy < SerializableBase
   end
   relationship :pool do
     link :related do
-      @url_helpers.v1_account_policy_pool_path @object.account, @object
+      @url_helpers.v1_account_policy_keys_path @object.account, @object
     end
   end
   relationship :licenses do
@@ -41,7 +41,6 @@ class SerializablePolicy < SerializableBase
       @url_helpers.v1_account_policy_licenses_path @object.account, @object
     end
   end
-  relationship :pool, if: -> { @object.pool? }
 
   link :self do
     @url_helpers.v1_account_policy_path @object.account, @object
