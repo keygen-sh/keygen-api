@@ -41,6 +41,23 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "400"
 
+  Scenario: Admin creates a webhook endpoint with a non-https url
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhookEndpoint",
+          "attributes": {
+            "url": "http://example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+
   Scenario: Admin creates a webhook endpoint with an invalid url protocol
     Given I am an admin of account "test1"
     And the current account is "test1"
