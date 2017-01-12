@@ -13,7 +13,7 @@ module Api::V1::Users::Actions
           render jsonapi: @user
         else
           render_unprocessable_entity detail: "failed to update password", source: {
-            pointer: "/data/attribute/password" }
+            pointer: "/data/attributes/password" }
         end
       else
         render_unauthorized detail: "is not valid", source: {
