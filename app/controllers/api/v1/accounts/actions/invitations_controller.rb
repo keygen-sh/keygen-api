@@ -9,15 +9,16 @@ module Api::V1::Accounts::Actions
       if @account.compare_encrypted_token(:invite_token, invitation_params[:meta][:invite_token])
         if @account.beta_user?
           render_conflict detail: "has already been used", source: {
-            pointer: "/data/attributes/inviteToken" }
+            pointer: "/meta/inviteToken" }
         elsif @account.accept_invitation!
           head :accepted
         else
-          render_unprocessable_resource @account
+          render_unprocessable_entity detail: "failed to accept invitation", source: {
+            pointer: "/meta/inviteToken" }
         end
       else
         render_unprocessable_entity detail: "is not valid", source: {
-          pointer: "/data/attributes/inviteToken" }
+          pointer: "/meta/inviteToken" }
       end
     end
 
