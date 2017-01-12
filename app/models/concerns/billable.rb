@@ -2,7 +2,7 @@ module Billable
   extend ActiveSupport::Concern
 
   included do
-    after_create :initialize_billing
+    after_commit :initialize_billing, on: :create
 
     Billing::AVAILABLE_EVENTS.each do |event|
       delegate "#{event}!", to: :billing, allow_nil: true

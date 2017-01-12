@@ -2,8 +2,7 @@ module Welcomeable
   extend ActiveSupport::Concern
 
   included do
-    # TODO: This is disabled while we're in the beta period
-    after_create :send_welcome_email
+    after_commit :send_welcome_email, on: :create
   end
 
   def send_welcome_email
