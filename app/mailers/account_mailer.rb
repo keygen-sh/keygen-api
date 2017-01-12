@@ -6,7 +6,7 @@ class AccountMailer < ApplicationMailer
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "You've been invited to the beta program!"
+      mail to: admin.email, subject: "You've been invited to join the Keygen beta!"
     end
   end
 
