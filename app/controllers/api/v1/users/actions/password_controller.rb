@@ -12,7 +12,8 @@ module Api::V1::Users::Actions
         if @user.update(password: password_params[:meta][:new_password])
           render jsonapi: @user
         else
-          render_unprocessable_resource @user
+          render_unprocessable_entity detail: "failed to update password", source: {
+            pointer: "/data/attribute/password" }
         end
       else
         render_unauthorized detail: "is not valid", source: {
