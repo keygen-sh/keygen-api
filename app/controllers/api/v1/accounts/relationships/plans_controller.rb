@@ -24,7 +24,7 @@ module Api::V1::Accounts::Relationships
 
       if status
         if @account.update(plan: @plan)
-          render jsonapi: @account
+          render jsonapi: @plan
         else
           render_unprocessable_resource @account
         end
