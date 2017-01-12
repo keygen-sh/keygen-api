@@ -329,7 +329,7 @@ Feature: Create license
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
 
-  Scenario: Admin creates a license with the policy license pool
+  Scenario: Admin creates a license using a pooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
@@ -373,9 +373,10 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the current account should have 3 "keys"
     And sidekiq should have 1 "webhook" job
 
-  Scenario: Admin creates a license with an empty policy license pool
+  Scenario: Admin creates a license with an empty policy pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhookEndpoint"
