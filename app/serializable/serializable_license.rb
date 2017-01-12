@@ -45,7 +45,7 @@ class SerializableLicense < SerializableBase
   end
   relationship :machines do
     link :related do
-      @url_helpers.v1_account_machines_path @object.account, license: @object.id
+      @url_helpers.v1_account_license_machines_path @object.account, @object
     end
   end
 
