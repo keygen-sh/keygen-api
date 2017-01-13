@@ -13,11 +13,13 @@ class SerializableToken < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
   end
   relationship :bearer do
+    linkage always: true
     link :related do
       @url_helpers.send "v1_account_#{@object.bearer.class.name.demodulize.underscore}_path",
                         @object.account, @object.bearer

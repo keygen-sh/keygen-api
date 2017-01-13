@@ -17,21 +17,25 @@ class SerializableMachine < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
   end
   relationship :product do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_machine_product_path @object.account, @object
     end
   end
   relationship :license do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_machine_license_path @object.account, @object
     end
   end
   relationship :user do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_machine_user_path @object.account, @object
     end
