@@ -3,7 +3,8 @@ class UserMailer < ApplicationMailer
 
   def password_reset(user:, token:)
     @user, @token = user, token
+    @account = @user.account
 
-    mail to: user.email, subject: "Password reset requested for Keygen account"
+    mail to: user.email, subject: "Password reset requested for your #{@account.name} account"
   end
 end
