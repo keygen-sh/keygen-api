@@ -10,16 +10,19 @@ class SerializableKey < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
   end
   relationship :product do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_key_product_path @object.account, @object
     end
   end
   relationship :policy do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_key_policy_path @object.account, @object
     end

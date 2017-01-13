@@ -23,24 +23,27 @@ class SerializableLicense < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
   end
   relationship :product do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_license_product_path @object.account, @object
     end
   end
   relationship :policy do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_license_policy_path @object.account, @object
     end
   end
-  relationship :user, unless: -> { @object.user.nil? } do
+  relationship :user do
+    linkage always: true
     link :related do
-      # TODO: https://github.com/jsonapi-rb/jsonapi-serializable/issues/49
-      @url_helpers.v1_account_license_user_path @object.account, @object if @object.user
+      @url_helpers.v1_account_license_user_path @object.account, @object
     end
   end
   relationship :machines do

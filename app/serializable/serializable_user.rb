@@ -14,6 +14,7 @@ class SerializableUser < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
@@ -39,6 +40,7 @@ class SerializableUser < SerializableBase
     end
   end
   relationship :role do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_user_role_path @object.account, @object
     end

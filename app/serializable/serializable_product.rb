@@ -14,6 +14,7 @@ class SerializableProduct < SerializableBase
   end
 
   relationship :account do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_path @object.account
     end
