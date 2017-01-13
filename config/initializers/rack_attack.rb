@@ -19,7 +19,7 @@ class Rack::Attack
     retry_after = (env['rack.attack.match_data'] || {})[:period]
     [
       429,
-      {'Content-Type' => 'application/json', 'Retry-After' => retry_after.to_s},
+      {'Content-Type' => 'application/vnd.api+json', 'Retry-After' => retry_after.to_s},
       [{
         'errors': [{
           'title': 'Throttle limit reached',
