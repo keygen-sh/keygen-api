@@ -1,5 +1,9 @@
 module Api::V1::Licenses::Relationships
   class MachinesController < Api::V1::BaseController
+    has_scope :fingerprint
+    has_scope :product
+    has_scope :user
+
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_license
