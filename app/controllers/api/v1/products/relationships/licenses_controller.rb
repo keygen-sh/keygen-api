@@ -1,5 +1,8 @@
 module Api::V1::Products::Relationships
   class LicensesController < Api::V1::BaseController
+    has_scope :policy
+    has_scope :user
+
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_product
