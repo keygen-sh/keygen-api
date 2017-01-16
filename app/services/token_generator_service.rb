@@ -11,10 +11,14 @@ class TokenGeneratorService < BaseService
     token = bearer.tokens.create account: account
     token.generate!
 
-    TokenCleanupWorker.perform_at(
-      Token::TOKEN_DURATION,
-      token.id
-    )
+    begin
+      TokenCleanupWorker.perform_at(
+        Token::TOKEN_DURATION,
+        token.id
+      )
+    rescue Redis::CannotConnectError
+      # noop
+    end
 
     token
   end
