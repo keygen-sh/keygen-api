@@ -10,6 +10,9 @@ Rails.application.routes.draw do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
 
+      # Health check
+      get "health", to: -> (*) { [204, {}, []] }
+
       resources "plans", only: [:index, :show]
 
       resources "accounts" do
