@@ -4,7 +4,7 @@ class TokenCleanupWorker
   sidekiq_options queue: :cleanup
 
   def perform(token_id)
-    token = Token.find token_id
+    token = Token.find_by id: token_id
     return if token.nil?
 
     if !token.expired?
