@@ -11,6 +11,10 @@ class AccountMailerPreview < ActionMailer::Preview
     AccountMailer.beta_invitation account: account, token: token
   end
 
+  def follow_up
+    AccountMailer.follow_up account: account
+  end
+
   def payment_method_missing
     AccountMailer.payment_method_missing account: account
   end

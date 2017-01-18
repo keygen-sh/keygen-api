@@ -12,6 +12,16 @@ class AccountMailer < ApplicationMailer
     end
   end
 
+  def follow_up(account:)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "Do you have any questions/feedback before giving Keygen a spin?"
+    end
+  end
+
   def payment_method_missing(account:)
     @account = account
 
