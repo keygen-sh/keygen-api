@@ -24,6 +24,12 @@ module Api::V1::Accounts::Relationships
       ).execute
 
       if status
+        CreateWebhookEventService.new(
+          event: "account.billing.updated",
+          account: @account,
+          resource: @billing
+        ).execute
+
         head :accepted
       else
         render_unprocessable_entity
@@ -33,7 +39,8 @@ module Api::V1::Accounts::Relationships
     private
 
     def set_billing
-      @billing = Account.find(params[:account_id])&.billing
+      @account = Account.find params[:account_id]
+      @billing = @account&.billing
     end
 
     typed_parameters transform: true do

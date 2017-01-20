@@ -8,6 +8,12 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.pause_subscription!
+        CreateWebhookEventService.new(
+          event: "account.paused",
+          account: @account,
+          resource: @account
+        ).execute
+
         render_meta status: "paused"
       else
         render_unprocessable_entity detail: "failed to pause subscription", source: {
@@ -20,6 +26,12 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.resume_subscription!
+        CreateWebhookEventService.new(
+          event: "account.resumed",
+          account: @account,
+          resource: @account
+        ).execute
+
         render_meta status: "resumed"
       else
         render_unprocessable_entity detail: "failed to resume subscription", source: {
@@ -32,6 +44,12 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.cancel_subscription!
+        CreateWebhookEventService.new(
+          event: "account.canceled",
+          account: @account,
+          resource: @account
+        ).execute
+
         render_meta status: "canceled"
       else
         render_unprocessable_entity detail: "failed to cancel subscription", source: {
@@ -44,6 +62,12 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.renew_subscription!
+        CreateWebhookEventService.new(
+          event: "account.renewed",
+          account: @account,
+          resource: @account
+        ).execute
+
         render_meta status: "renewed"
       else
         render_unprocessable_entity detail: "failed to renew subscription", source: {
