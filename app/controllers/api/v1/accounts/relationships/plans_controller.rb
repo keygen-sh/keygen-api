@@ -24,12 +24,18 @@ module Api::V1::Accounts::Relationships
 
       if status
         if @account.update(plan: @plan)
+          CreateWebhookEventService.new(
+            event: "account.plan.updated",
+            account: @account,
+            resource: @plan
+          ).execute
+
           render jsonapi: @plan
         else
           render_unprocessable_resource @account
         end
       else
-        render_unprocessable_entity detail: "must have a valid subscription", source: {
+        render_unprocessable_entity detail: "must have a valid subscription to change plans", source: {
           pointer: "/data/relationships/billing" }
       end
     end

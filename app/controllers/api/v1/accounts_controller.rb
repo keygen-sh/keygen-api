@@ -37,6 +37,12 @@ module Api::V1
       authorize @account
 
       if @account.update(account_params)
+        CreateWebhookEventService.new(
+          event: "account.updated",
+          account: @account,
+          resource: @account
+        ).execute
+
         render jsonapi: @account
       else
         render_unprocessable_resource @account

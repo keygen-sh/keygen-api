@@ -34,6 +34,7 @@ Feature: Account billing relationship
   Scenario: Admin updates the billing info for their account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
+    And the account "test1" has 1 "webhookEndpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
@@ -48,11 +49,13 @@ Feature: Account billing relationship
       }
       """
     Then the response status should be "202"
+    And sidekiq should have 1 "webhook" job
 
   Scenario: Product attempts to update the billing info for their account
     Given the account "test1" is subscribed
     And the account "test1" has 1 "product"
     And I am a product of account "test1"
+    And the account "test1" has 1 "webhookEndpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
@@ -67,10 +70,12 @@ Feature: Account billing relationship
       }
       """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
 
   Scenario: Admin attempts to update the billing info for another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
+    And the account "test1" has 1 "webhookEndpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
@@ -85,3 +90,4 @@ Feature: Account billing relationship
       }
       """
     Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs

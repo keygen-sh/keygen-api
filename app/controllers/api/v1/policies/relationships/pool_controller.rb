@@ -24,7 +24,7 @@ module Api::V1::Policies::Relationships
     def pop
       if key = @policy.pop!
         CreateWebhookEventService.new(
-          event: "key.popped",
+          event: "policy.pool.popped",
           account: current_account,
           resource: key
         ).execute
