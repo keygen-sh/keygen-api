@@ -6,8 +6,10 @@ Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
   text/x-json
 ]
 
+
 # Register parameter parser for JSON API mime-type to transform param keys from
 # camel case to snake case
+ActionDispatch::Request.parameter_parsers[:json]    =
 ActionDispatch::Request.parameter_parsers[:jsonapi] = -> (raw_post) {
   data = ActiveSupport::JSON.decode raw_post
   data = { _json: data } unless data.is_a? Hash
