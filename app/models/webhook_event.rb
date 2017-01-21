@@ -9,7 +9,7 @@ class WebhookEvent < ApplicationRecord
   validates :endpoint, url: true, presence: true
 
   def status
-    Sidekiq::Status.status(jid) || :complete rescue :unavailable
+    Sidekiq::Status.status(jid) || :working rescue :unavailable
   end
 end
 
