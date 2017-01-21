@@ -46,7 +46,7 @@ class TypedParameters
     # and validate for unpermitted params
     if schema.strict?
       parser = ActionDispatch::Request.parameter_parsers[context.request.format.symbol]
-      raise InvalidRequestError, "Request format is unsupported (expected application/vnd.api+json)" if parser.nil?
+      raise InvalidRequestError, "Request's content type and/or accept headers are unsupported (expected application/vnd.api+json)" if parser.nil?
 
       segment = parser.call context.request.raw_post
       schema.validate! segment
