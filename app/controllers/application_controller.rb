@@ -5,12 +5,14 @@ class ApplicationController < ActionController::API
   after_action :verify_authorized
 
   rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from TypedParameters::InvalidRequestError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Limitable::InvalidLimitError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Pageable::InvalidPageError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
   rescue_from ActiveRecord::RecordNotFound, with: -> { render_not_found }
+  rescue_from JSON::ParserError, with: -> { render_bad_request }
 
   rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
   rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }

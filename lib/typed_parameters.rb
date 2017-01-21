@@ -1,5 +1,6 @@
 class TypedParameters
   class InvalidParameterError < StandardError; end
+  class InvalidRequestError < StandardError; end
   class Boolean; end
 
   VALID_TYPES = {
@@ -44,9 +45,10 @@ class TypedParameters
     # Grab our segment of the params (getting rid of cruft added by Rails middleware)
     # and validate for unpermitted params
     if schema.strict?
-      parser = ActionDispatch::Request.parameter_parsers[:jsonapi]
-      segment = parser.call context.request.raw_post
+      parser = ActionDispatch::Request.parameter_parsers[context.request.format.symbol]
+      raise InvalidRequestError, "Request format is unsupported (expected application/vnd.api+json)" if parser.nil?
 
+      segment = parser.call context.request.raw_post
       schema.validate! segment
     end
 
