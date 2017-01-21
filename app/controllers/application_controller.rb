@@ -36,7 +36,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Access denied",
-        detail: "You do not have permission to view this resource"
+        detail: "You do not have permission to complete the request"
       }.merge(opts)]
     }, status: :forbidden
   end
@@ -48,7 +48,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Unauthorized",
-        detail: "You must be authenticated to view this resource"
+        detail: "You must be authenticated to complete the request"
       }.merge(opts)]
     }, status: :unauthorized
   end
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Unprocessable entity",
-        detail: "The request could not be completed on this resource"
+        detail: "The request could not be completed"
       }.merge(opts)]
     }, status: :unprocessable_entity
   end
@@ -92,7 +92,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Conflict",
-        detail: "The request could not be completed because the resource already exists"
+        detail: "The request could not be completed because of a conflict"
       }.merge(opts)]
     }, status: :conflict
   end
