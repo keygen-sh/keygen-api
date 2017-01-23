@@ -42,6 +42,41 @@ Feature: License validation actions
       { "valid": true }
       """
 
+  Scenario: Admin validates a suspended license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxMachines": 1,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now",
+        "suspended": true
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": false }
+      """
+
   Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
     And the current account is "test1"
