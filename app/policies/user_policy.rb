@@ -9,7 +9,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    (bearer.present? and (bearer.role? :admin or resource.products.include? bearer)) or !account.protected?
+    (bearer.present? and bearer.role? :admin) or !account.protected?
   end
 
   def update?
