@@ -23,9 +23,14 @@ class License < ApplicationRecord
 
   validates :key, uniqueness: { case_sensitive: true }, unless: -> { key.nil? }
 
+  scope :suspended, -> (status) { where(suspended: status == 'true') }
   scope :policy, -> (id) { where policy: id }
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
+
+  def suspended?
+    suspended
+  end
 
   private
 
@@ -82,6 +87,7 @@ end
 #  user_id    :uuid
 #  policy_id  :uuid
 #  account_id :uuid
+#  suspended  :boolean          default(FALSE)
 #
 # Indexes
 #

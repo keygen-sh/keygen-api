@@ -210,13 +210,15 @@ Feature: Update license
         "data": {
           "type": "licenses",
           "attributes": {
-            "expiry": "2016-10-05T22:53:37.000Z"
+            "expiry": "2016-10-05T22:53:37.000Z",
+            "suspended": true
           }
         }
       }
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
 
   Scenario: Product updates a license expiry for their product

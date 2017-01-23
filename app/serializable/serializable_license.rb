@@ -9,6 +9,7 @@ class SerializableLicense < SerializableBase
     end
   end
   attribute :expiry
+  attribute :suspended
   attribute :encrypted do
     @object.policy.encrypted?
   end

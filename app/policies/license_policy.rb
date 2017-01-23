@@ -28,6 +28,14 @@ class LicensePolicy < ApplicationPolicy
     bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
 
+  def suspend?
+    bearer.role? :admin or resource.product == bearer
+  end
+
+  def reinstate?
+    bearer.role? :admin or resource.product == bearer
+  end
+
   def validate_by_id?
     bearer.role? :admin or resource.user == bearer or resource.product == bearer
   end

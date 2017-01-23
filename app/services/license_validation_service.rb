@@ -6,6 +6,8 @@ class LicenseValidationService < BaseService
 
   def execute
     return false if license.nil?
+    # Check if license is suspended
+    return false if license.suspended?
     # Check if license is expired (move along if it has no expiry)
     return false if !license.expiry.nil? && license.expiry < Time.current
     # Check if license policy is strict, e.g. enforces reporting of machine usage

@@ -1,5 +1,6 @@
 module Api::V1
   class LicensesController < Api::V1::BaseController
+    has_scope :suspended
     has_scope :product
     has_scope :policy
     has_scope :user
@@ -85,6 +86,7 @@ module Api::V1
           param :type, type: :string, inclusion: %w[license licenses]
           param :attributes, type: :hash, optional: true do
             param :key, type: :string, optional: true
+            param :suspended, type: :boolean, optional: true
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
@@ -109,6 +111,7 @@ module Api::V1
           param :type, type: :string, inclusion: %w[license licenses]
           param :attributes, type: :hash do
             param :expiry, type: :datetime, optional: true, coerce: true
+            param :suspended, type: :boolean, optional: true
             param :metadata, type: :hash, optional: true
           end
         end

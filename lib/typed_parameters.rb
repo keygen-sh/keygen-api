@@ -3,6 +3,8 @@ class TypedParameters
   class InvalidRequestError < StandardError; end
   class Boolean; end
 
+  TRUTHY_VALUES = [true, 1, "1", "true", "TRUE"].freeze
+
   VALID_TYPES = {
     fixnum: Fixnum,
     number: Numeric,
@@ -29,7 +31,7 @@ class TypedParameters
     integer: lambda { |v| v.to_i },
     float: lambda { |v| v.to_f },
     decimal: lambda { |v| v.to_d },
-    boolean: lambda { |v| !!v },
+    boolean: lambda { |v| TRUTHY_VALUES.include?(v) },
     symbol: lambda { |v| v.to_sym },
     string: lambda { |v| v.to_s },
     datetime: lambda { |v| v.to_datetime },
