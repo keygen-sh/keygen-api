@@ -1,5 +1,6 @@
 module Api::V1::Users::Relationships
   class LicensesController < Api::V1::BaseController
+    has_scope :suspended
     has_scope :product
     has_scope :policy
 
