@@ -9,7 +9,7 @@ class ProductPolicy < ApplicationPolicy
   end
 
   def create?
-    bearer.role? :admin or resource == bearer
+    bearer.role? :admin
   end
 
   def update?
