@@ -83,6 +83,8 @@ Rails.application.routes.draw do
               get "validate", to: "validations#validate_by_id"
               delete "revoke", to: "permits#revoke"
               post "renew", to: "permits#renew"
+              post "suspend", to: "permits#suspend"
+              post "reinstate", to: "permits#reinstate"
             end
           end
           collection do
@@ -139,8 +141,9 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007faaac784ac0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fe28e2cdaa8@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fe28e2c60a0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -204,6 +207,8 @@ end
 #      validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)     api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
 #        revoke_v1_account_license DELETE /v1/accounts/:account_id/licenses/:id/actions/revoke(.:format)       api/v1/licenses/actions/permits#revoke {:subdomain=>"api", :format=>"jsonapi"}
 #         renew_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/renew(.:format)        api/v1/licenses/actions/permits#renew {:subdomain=>"api", :format=>"jsonapi"}
+#       suspend_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/suspend(.:format)      api/v1/licenses/actions/permits#suspend {:subdomain=>"api", :format=>"jsonapi"}
+#     reinstate_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reinstate(.:format)    api/v1/licenses/actions/permits#reinstate {:subdomain=>"api", :format=>"jsonapi"}
 # validate_key_v1_account_licenses POST   /v1/accounts/:account_id/licenses/actions/validate-key(.:format)     api/v1/licenses/actions/validations#validate_by_key {:subdomain=>"api", :format=>"jsonapi"}
 #              v1_account_licenses GET    /v1/accounts/:account_id/licenses(.:format)                          api/v1/licenses#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                  POST   /v1/accounts/:account_id/licenses(.:format)                          api/v1/licenses#create {:subdomain=>"api", :format=>"jsonapi"}

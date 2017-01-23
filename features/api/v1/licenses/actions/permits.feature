@@ -8,6 +8,322 @@ Feature: License permit actions
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Admin suspends a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Admin suspends a license that is already suspended
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+
+  Scenario: User suspends their license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Admin suspends a license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Product suspends a license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: User suspends their license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2016-12-01T22:53:37.000Z"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Admin reinstates a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is not suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Admin reinstates a license that is not suspended
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+
+  Scenario: User reinstates their license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
+  Scenario: Admin reinstates a license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is not suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: Product reinstates a license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is not suspended
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: User reinstates their license that implements a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "duration": $time.1.month,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "suspended": true
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+
   Scenario: Admin renews a license
     Given I am an admin of account "test1"
     And the current account is "test1"

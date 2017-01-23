@@ -101,6 +101,32 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?limit=-900"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves all suspended licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?suspended=true"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves all non-suspended licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?suspended=false"
+    Then the response status should be "200"
+    And the JSON response should be an array with 9 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"
