@@ -23,7 +23,7 @@ class License < ApplicationRecord
 
   validates :key, uniqueness: { case_sensitive: true }, unless: -> { key.nil? }
 
-  scope :suspended, -> (status) { where(suspended: status == 'true') }
+  scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :policy, -> (id) { where policy: id }
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
