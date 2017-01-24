@@ -23,7 +23,7 @@ class Rack::Attack
       [{
         'errors': [{
           'title': 'Throttle limit reached',
-          'detail': 'Throttle limit for this resource has been reached'
+          'detail': 'Throttle limit has been reached for your IP address. Please see https://keygen.sh/docs/api#rate-limiting for more info.'
         }]
       }.to_json]
     ]
