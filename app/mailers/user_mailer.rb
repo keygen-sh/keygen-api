@@ -1,5 +1,5 @@
 class UserMailer < ApplicationMailer
-  default from: "Keygen Support <hello@keygen.sh>"
+  default from: "Keygen Support <support@keygen.sh>"
   layout "user_mailer"
 
   def password_reset(user:, token:)
