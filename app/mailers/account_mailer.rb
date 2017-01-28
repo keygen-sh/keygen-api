@@ -1,5 +1,5 @@
 class AccountMailer < ApplicationMailer
-  default from: "Zeke Gabrielse <hello@keygen.sh>"
+  default from: "Zeke from Keygen <zeke@keygen.sh>"
   layout "account_mailer"
 
   def beta_invitation(account:, token:)
