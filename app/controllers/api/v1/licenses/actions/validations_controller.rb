@@ -8,6 +8,12 @@ module Api::V1::Licenses::Actions
       @license = current_account.licenses.find params[:id]
       authorize @license
 
+      CreateWebhookEventService.new(
+        event: "license.validated",
+        account: current_account,
+        resource: @license
+      ).execute
+
       render_meta valid: LicenseValidationService.new(license: @license).execute
     end
 
@@ -20,6 +26,14 @@ module Api::V1::Licenses::Actions
         encrypted: validation_params[:meta][:encrypted] == true,
         key: validation_params[:meta][:key],
       ).execute
+
+      if @license.present?
+        CreateWebhookEventService.new(
+          event: "license.validated",
+          account: current_account,
+          resource: @license
+        ).execute
+      end
 
       render_meta valid: LicenseValidationService.new(license: @license).execute
     end
