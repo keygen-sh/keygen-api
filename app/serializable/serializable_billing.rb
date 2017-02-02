@@ -1,9 +1,7 @@
 class SerializableBilling < SerializableBase
   type :billings
 
-  attribute :customer_id
   attribute :subscription_status
-  attribute :subscription_id
   attribute :subscription_period_start
   attribute :subscription_period_end
   attribute :card_expiry
