@@ -40,7 +40,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -78,7 +78,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "is suspended" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -115,7 +115,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "does not meet machine requirements" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -152,7 +152,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -181,7 +181,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -210,7 +210,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "does not meet machine requirements" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -233,7 +233,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "is expired" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -263,7 +263,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -293,7 +293,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "does not exist" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -324,7 +324,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -355,7 +355,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "does not exist" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -386,7 +386,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false }
+      { "valid": false, "detail": "does not exist" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -422,7 +422,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -453,7 +453,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": true }
+      { "valid": true, "detail": "is valid" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
