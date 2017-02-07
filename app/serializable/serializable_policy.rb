@@ -2,10 +2,8 @@ class SerializablePolicy < SerializableBase
   type :policies
 
   attribute :name
-  attribute :price
   attribute :duration
   attribute :strict
-  attribute :recurring
   attribute :floating
   attribute :use_pool
   attribute :max_machines
