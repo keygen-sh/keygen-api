@@ -11,6 +11,21 @@ class CreateWebhookEventService < BaseService
       expose: { url_helpers: Rails.application.routes.url_helpers }
     }
 
+    # TODO: Move this out of the webhook event service
+    begin
+      RecordMetricService.new(
+        metric: event,
+        account: account,
+        data: { resource: resource.id }.tap { |data|
+          %w[product policy license user].map(&:to_sym).each do |r|
+            data[r] = resource.send(r)&.id if resource.respond_to? r
+          end
+        }.compact
+      ).execute
+    rescue
+      # noop
+    end
+
     account&.webhook_endpoints.find_each do |endpoint|
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create(

@@ -40,6 +40,7 @@ Feature: Create key
     Then the response status should be "201"
     And the JSON response should be a "key" with the key "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin creates a key for an unpooled policy
     Given I am an admin of account "test1"
@@ -72,6 +73,7 @@ Feature: Create key
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin creates a key with missing key value
     Given I am an admin of account "test1"
@@ -101,6 +103,7 @@ Feature: Create key
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin creates a key with missing policy
     Given I am an admin of account "test1"
@@ -120,6 +123,7 @@ Feature: Create key
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to create a key
     Given the current account is "test1"
@@ -153,6 +157,7 @@ Feature: Create key
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Unauthenticated user attempts to create a key
     Given the current account is "test1"
@@ -183,6 +188,7 @@ Feature: Create key
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin of another account attempts to create a key
     Given I am an admin of account "test2"
@@ -215,3 +221,4 @@ Feature: Create key
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

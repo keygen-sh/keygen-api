@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170123141516) do
+ActiveRecord::Schema.define(version: 20170207171359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,6 +90,14 @@ ActiveRecord::Schema.define(version: 20170123141516) do
     t.index ["created_at", "account_id"], name: "index_machines_on_created_at_and_account_id", using: :btree
     t.index ["created_at", "id"], name: "index_machines_on_created_at_and_id", unique: true, using: :btree
     t.index ["created_at", "license_id"], name: "index_machines_on_created_at_and_license_id", using: :btree
+  end
+
+  create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid     "account_id"
+    t.string   "metric"
+    t.jsonb    "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

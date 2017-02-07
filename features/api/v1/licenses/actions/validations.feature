@@ -43,6 +43,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a suspended license
     Given I am an admin of account "test1"
@@ -80,6 +81,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
@@ -116,6 +118,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a non-strict license that has too many machines
     Given I am an admin of account "test1"
@@ -152,6 +155,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a license that has not been used
     Given I am an admin of account "test1"
@@ -180,6 +184,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a strict license that has not been used
     Given I am an admin of account "test1"
@@ -208,6 +213,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a license that is expired
     Given I am an admin of account "test1"
@@ -230,6 +236,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a valid license by key
     Given I am an admin of account "test1"
@@ -259,6 +266,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates an invalid license by key
     Given I am an admin of account "test1"
@@ -288,6 +296,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin validates an encrypted license by key
     Given I am an admin of account "test1"
@@ -318,6 +327,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates an encrypted license key as an unencrypted key
     Given I am an admin of account "test1"
@@ -348,6 +358,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin validates an unencrypted license key as an encrypted key
     Given I am an admin of account "test1"
@@ -378,6 +389,7 @@ Feature: License validation actions
       { "valid": false }
       """
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin validates a valid license by key from a pool
     Given I am an admin of account "test1"
@@ -413,6 +425,7 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin validates a valid license that used a pre-determined key
     Given I am an admin of account "test1"
@@ -443,3 +456,4 @@ Feature: License validation actions
       { "valid": true }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job

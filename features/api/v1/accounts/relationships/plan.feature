@@ -48,6 +48,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin changes trialing account to a new plan
     Given the account "test1" is trialing
@@ -66,6 +67,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin changes pending account to a new plan
     Given the account "test1" is pending
@@ -84,6 +86,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin changes paused account to a new plan
     Given the account "test1" is paused
@@ -102,6 +105,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin changes canceled account to a new plan
     Given the account "test1" is canceled
@@ -120,6 +124,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to change to an invalid plan
     Given the account "test1" is subscribed
@@ -138,6 +143,7 @@ Feature: Account plan relationship
       """
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to change plan for another account
     Given the account "test1" is subscribed
@@ -156,3 +162,4 @@ Feature: Account plan relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

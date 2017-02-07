@@ -28,6 +28,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Home iMac"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin attempts to update a machine's fingerprint
     Given I am an admin of account "test1"
@@ -48,6 +49,7 @@ Feature: Update machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product updates a machine for their product
     Given the current account is "test1"
@@ -71,6 +73,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Work MacBook Pro"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product attempts to update a machine for another product
     Given the current account is "test1"
@@ -92,6 +95,7 @@ Feature: Update machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User updates a machine's name for their license
     Given the current account is "test1"
@@ -123,6 +127,7 @@ Feature: Update machine
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Office Mac"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: User updates a machine's fingerprint for their license
     Given the current account is "test1"
@@ -151,6 +156,8 @@ Feature: Update machine
       }
       """
     Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to update a machine for another user
     Given the current account is "test1"
@@ -165,6 +172,7 @@ Feature: Update machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Anonymous user attempts to update a machine for their account
     Given the current account is "test1"
@@ -183,6 +191,7 @@ Feature: Update machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to update a machine for another account
     Given I am an admin of account "test2"
@@ -203,3 +212,4 @@ Feature: Update machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
