@@ -93,6 +93,28 @@ Feature: List webhook events
     When I send a GET request to "/accounts/test1/webhook-events?limit=-10"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves filters webhook events by event type
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "webhookEvents"
+    And the first "webhookEvent" has the following attributes:
+      """
+      { "event": "real.event" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?events[]=real.event"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "webhookEvent"
+
+  Scenario: Admin retrieves filters webhook events by event type that doesn't exist
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "webhookEvents"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?events[]=bad.event"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "webhookEvents"
+
   Scenario: Admin attempts to retrieve all webhook events for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
