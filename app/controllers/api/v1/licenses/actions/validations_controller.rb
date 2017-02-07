@@ -14,7 +14,9 @@ module Api::V1::Licenses::Actions
         resource: @license
       ).execute
 
-      render_meta valid: LicenseValidationService.new(license: @license).execute
+      valid, detail = LicenseValidationService.new(license: @license).execute
+
+      render_meta valid: valid, detail: detail
     end
 
     # POST /licenses/validate-key
@@ -35,7 +37,9 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render_meta valid: LicenseValidationService.new(license: @license).execute
+      valid, detail = LicenseValidationService.new(license: @license).execute
+
+      render_meta valid: valid, detail: detail
     end
 
     typed_parameters do
