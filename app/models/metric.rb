@@ -22,3 +22,8 @@ end
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_metrics_on_created_at_and_account_id  (created_at,account_id)
+#  index_metrics_on_created_at_and_id          (created_at,id) UNIQUE
+#
