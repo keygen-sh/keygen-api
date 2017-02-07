@@ -85,10 +85,8 @@ module Api::V1
             param :encrypted, type: :boolean, optional: true
             param :use_pool, type: :boolean, optional: true
             param :name, type: :string, optional: true
-            param :price, type: :integer, optional: true
             param :duration, type: :integer, optional: true
             param :strict, type: :boolean, optional: true
-            param :recurring, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true
@@ -110,10 +108,8 @@ module Api::V1
           param :type, type: :string, inclusion: %w[policy policies]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :price, type: :integer, optional: true
             param :duration, type: :integer, optional: true
             param :strict, type: :boolean, optional: true
-            param :recurring, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true

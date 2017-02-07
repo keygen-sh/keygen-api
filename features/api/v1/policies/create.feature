@@ -21,7 +21,6 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Premium Add-On",
-            "price": 199,
             "maxMachines": 5,
             "floating": true,
             "strict": false,
@@ -56,7 +55,6 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Premium Add-On",
-            "price": 199,
             "maxMachines": 5,
             "floating": true,
             "strict": false,
@@ -114,7 +112,6 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Basic",
-            "price": 900,
             "maxMachines": 1,
             "floating": false,
             "strict": true,
@@ -147,7 +144,6 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "price": 900,
             "maxMachines": 1,
             "floating": false,
             "strict": true,
@@ -182,7 +178,6 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Basic",
-            "price": 900,
             "maxMachines": 1,
             "floating": false,
             "strict": true,

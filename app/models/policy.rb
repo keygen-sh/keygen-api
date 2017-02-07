@@ -52,10 +52,8 @@ end
 #
 #  id           :uuid             not null, primary key
 #  name         :string
-#  price        :integer
 #  duration     :integer
 #  strict       :boolean          default(FALSE)
-#  recurring    :boolean          default(FALSE)
 #  floating     :boolean          default(TRUE)
 #  use_pool     :boolean          default(FALSE)
 #  created_at   :datetime         not null

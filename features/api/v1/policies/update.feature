@@ -42,7 +42,7 @@ Feature: Update policy
         "data": {
           "type": "policies",
           "attributes": {
-            "price": 0
+            "name": "Product Add-On"
           }
         }
       }
@@ -65,7 +65,7 @@ Feature: Update policy
         "data": {
           "type": "policies",
           "attributes": {
-            "price": 1000
+            "name": "Product A"
           }
         }
       }
@@ -88,7 +88,7 @@ Feature: Update policy
         "data": {
           "type": "policies",
           "attributes": {
-            "price": 1000
+            "name": "Product B"
           }
         }
       }
