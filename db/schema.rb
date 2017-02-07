@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207171359) do
+ActiveRecord::Schema.define(version: 20170207230359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,6 +98,8 @@ ActiveRecord::Schema.define(version: 20170207171359) do
     t.jsonb    "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at", "account_id"], name: "index_metrics_on_created_at_and_account_id", using: :btree
+    t.index ["created_at", "id"], name: "index_metrics_on_created_at_and_id", unique: true, using: :btree
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
