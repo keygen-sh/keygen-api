@@ -127,6 +127,8 @@ Rails.application.routes.draw do
             end
           end
         end
+
+        resources "metrics", only: [:index, :show]
       end
     end
   end
@@ -141,9 +143,9 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fe28e2cdaa8@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fa107367bd0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fe28e2c60a0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fa1035d8198@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -254,6 +256,8 @@ end
 #   retry_v1_account_webhook_event POST   /v1/accounts/:account_id/webhook-events/:id/actions/retry(.:format)  api/v1/webhook_events/actions/retries#retry {:subdomain=>"api", :format=>"jsonapi"}
 #        v1_account_webhook_events GET    /v1/accounts/:account_id/webhook-events(.:format)                    api/v1/webhook_events#index {:subdomain=>"api", :format=>"jsonapi"}
 #         v1_account_webhook_event GET    /v1/accounts/:account_id/webhook-events/:id(.:format)                api/v1/webhook_events#show {:subdomain=>"api", :format=>"jsonapi"}
+#               v1_account_metrics GET    /v1/accounts/:account_id/metrics(.:format)                           api/v1/metrics#index {:subdomain=>"api", :format=>"jsonapi"}
+#                v1_account_metric GET    /v1/accounts/:account_id/metrics/:id(.:format)                       api/v1/metrics#show {:subdomain=>"api", :format=>"jsonapi"}
 #                      v1_accounts GET    /v1/accounts(.:format)                                               api/v1/accounts#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                  POST   /v1/accounts(.:format)                                               api/v1/accounts#create {:subdomain=>"api", :format=>"jsonapi"}
 #                       v1_account GET    /v1/accounts/:id(.:format)                                           api/v1/accounts#show {:subdomain=>"api", :format=>"jsonapi"}

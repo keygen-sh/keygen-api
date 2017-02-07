@@ -36,6 +36,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin creates a machine with missing fingerprint
     Given I am an admin of account "test1"
@@ -61,6 +62,7 @@ Feature: Create machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin creates a machine with missing license
     Given I am an admin of account "test1"
@@ -81,6 +83,7 @@ Feature: Create machine
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User creates a machine for their license
     Given the current account is "test1"
@@ -112,6 +115,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: User hits the machine limit for their license
     Given the current account is "test1"
@@ -156,6 +160,7 @@ Feature: Create machine
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
@@ -185,6 +190,7 @@ Feature: Create machine
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Unauthenticated user attempts to create a machine
     Given the current account is "test1"
@@ -211,6 +217,7 @@ Feature: Create machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin of another account attempts to create a machine
     Given I am an admin of account "test2"
@@ -239,3 +246,4 @@ Feature: Create machine
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

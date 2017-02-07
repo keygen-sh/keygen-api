@@ -2,6 +2,7 @@
 :queues:
   - [cleanup, 1]
   - [default, 2]
-  - [webhooks, 3]
-  - [mailers, 4]
+  - [metrics, 2]
+  - [mailers, 3]
+  - [webhooks, 4]
   - [billing, 5]

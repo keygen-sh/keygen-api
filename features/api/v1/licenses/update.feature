@@ -28,6 +28,7 @@ Feature: Update license
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin updates a license policy
     Given I am an admin of account "test1"
@@ -54,6 +55,7 @@ Feature: Update license
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
@@ -73,7 +75,8 @@ Feature: Update license
       }
       """
     Then the response status should be "400"
-    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product updates a license for their product
     Given the current account is "test1"
@@ -96,6 +99,7 @@ Feature: Update license
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product attempts to update a license for another product
     Given the current account is "test1"
@@ -117,6 +121,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to update a license for their account
     Given the current account is "test1"
@@ -139,6 +144,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Anonymous user attempts to update a license for their account
     Given the current account is "test1"
@@ -157,6 +163,7 @@ Feature: Update license
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to update a license for another account
     Given I am an admin of account "test2"
@@ -177,6 +184,7 @@ Feature: Update license
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
@@ -196,7 +204,8 @@ Feature: Update license
       }
       """
     Then the response status should be "400"
-    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
@@ -220,6 +229,7 @@ Feature: Update license
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product updates a license expiry for their product
     Given the current account is "test1"
@@ -243,6 +253,7 @@ Feature: Update license
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product attempts to update a license expiry for another product
     Given the current account is "test1"
@@ -264,6 +275,7 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to update a license expiry for their account
     Given the current account is "test1"
@@ -286,3 +298,4 @@ Feature: Update license
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

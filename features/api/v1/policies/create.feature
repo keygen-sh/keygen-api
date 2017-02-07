@@ -41,6 +41,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin attempts to create an incomplete policy for their account
     Given I am an admin of account "test1"
@@ -67,6 +68,7 @@ Feature: Create policy
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to create a policy that is encrypted and uses a pool
     Given I am an admin of account "test1"
@@ -97,6 +99,7 @@ Feature: Create policy
       """
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to create a policy for another account
     Given I am an admin of account "test2"
@@ -130,6 +133,7 @@ Feature: Create policy
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product attempts to create a policy for their product
     Given the current account is "test1"
@@ -163,6 +167,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: User attempts to create a policy for their account
     Given the current account is "test1"
@@ -196,3 +201,4 @@ Feature: Create policy
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

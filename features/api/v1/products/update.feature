@@ -28,6 +28,7 @@ Feature: Update product
     Then the response status should be "200"
     And the JSON response should be a "product" with the name "New App"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin attempts to update a product for another account
     Given I am an admin of account "test2"
@@ -48,6 +49,7 @@ Feature: Update product
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin updates a product's platforms for their account
     Given I am an admin of account "test1"
@@ -76,6 +78,7 @@ Feature: Update product
       ]
       """
     And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product updates the platforms for itself
     Given the current account is "test1"
@@ -100,6 +103,7 @@ Feature: Update product
       ["Nintendo"]
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product attempts to update the platforms for another product
     Given the current account is "test1"
@@ -120,3 +124,4 @@ Feature: Update product
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

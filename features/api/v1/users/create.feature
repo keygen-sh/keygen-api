@@ -29,6 +29,7 @@ Feature: Create user
     And the JSON response should be a "user" with the name "Superman"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Anonymous attempts to create a user for a protected account
     Given the current account is "test1"
@@ -53,6 +54,8 @@ Feature: Create user
       """
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Anonymous attempts to create an incomplete user for an account
     Given the current account is "test1"
@@ -115,6 +118,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin creates an admin for their account
     Given I am an admin of account "test1"
@@ -141,6 +145,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin attempts to create a user with an invalid role
     Given I am an admin of account "test1"
@@ -167,6 +172,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product creates an admin for their account
     Given the current account is "test1"
@@ -194,6 +200,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product creates a user for a protected account
     Given the current account is "test1"
@@ -220,6 +227,7 @@ Feature: Create user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
@@ -247,6 +255,7 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User attempts to create a user for a protected account
     Given the current account is "test1"
@@ -273,6 +282,7 @@ Feature: Create user
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Anonymous attempts to create an admin for an account
     Given the current account is "test1"
@@ -297,3 +307,4 @@ Feature: Create user
       """
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

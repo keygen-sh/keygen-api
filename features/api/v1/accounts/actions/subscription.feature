@@ -22,6 +22,7 @@ Feature: Account subscription actions
       }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin resumes their paused account
     Given the account "test1" is paused
@@ -37,6 +38,7 @@ Feature: Account subscription actions
       }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin cancels their subscribed account
     Given the account "test1" is subscribed
@@ -52,6 +54,7 @@ Feature: Account subscription actions
       }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin renews their canceled account
     Given the account "test1" is canceled
@@ -67,6 +70,7 @@ Feature: Account subscription actions
       }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to pause their paused account
     Given the account "test1" is paused
@@ -76,6 +80,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to resume their subscribed account
     Given the account "test1" is subscribed
@@ -85,6 +90,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to cancel their canceled account
     Given the account "test1" is canceled
@@ -94,6 +100,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to renews their subscribed account
     Given the account "test1" is subscribed
@@ -103,6 +110,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to pause another account
     Given the account "test1" is subscribed
@@ -112,6 +120,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to resume another account
     Given the account "test1" is paused
@@ -121,6 +130,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to cancel another account
     Given the account "test1" is subscribed
@@ -130,6 +140,7 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to renew another account
     Given the account "test1" is canceled
@@ -139,3 +150,4 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

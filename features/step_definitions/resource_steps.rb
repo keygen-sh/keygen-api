@@ -140,14 +140,14 @@ end
 
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize).update_all(
+  @account.send(resource.pluralize.underscore).update_all(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
 end
 
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize).limit(count.to_i).all.each do |r|
+  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     r.update JSON.parse(body).deep_transform_keys! &:underscore
   end
 end
@@ -166,7 +166,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
     "ninth"   => 8
   }
 
-  @account.send(resource.pluralize).all.send(:[], numbers[i]).update(
+  @account.send(resource.pluralize.underscore).all.send(:[], numbers[i]).update(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
 end

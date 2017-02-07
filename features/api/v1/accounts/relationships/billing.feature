@@ -50,6 +50,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product attempts to update the billing info for their account
     Given the account "test1" is subscribed
@@ -71,6 +72,7 @@ Feature: Account billing relationship
       """
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to update the billing info for another account
     Given the account "test1" is subscribed
@@ -91,3 +93,4 @@ Feature: Account billing relationship
       """
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

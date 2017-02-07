@@ -18,6 +18,7 @@ Feature: Delete product
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin attempts to delete a product for another account
     Given I am an admin of account "test2"
@@ -30,6 +31,7 @@ Feature: Delete product
     And the JSON response should be an array of 1 error
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Product deletes itself
     Given the current account is "test1"
@@ -41,6 +43,7 @@ Feature: Delete product
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product attempts to delete another product for their account
     Given the current account is "test1"
@@ -52,3 +55,4 @@ Feature: Delete product
     Then the response status should be "403"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

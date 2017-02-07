@@ -31,6 +31,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin suspends a license that is already suspended
     Given I am an admin of account "test1"
@@ -55,6 +56,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User suspends their license
     Given I am an admin of account "test1"
@@ -81,6 +83,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin suspends a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -106,6 +109,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product suspends a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -135,6 +139,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User suspends their license that implements a protected policy
     Given I am an admin of account "test1"
@@ -163,6 +168,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin reinstates a license
     Given I am an admin of account "test1"
@@ -188,6 +194,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin reinstates a license that is not suspended
     Given I am an admin of account "test1"
@@ -212,6 +219,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User reinstates their license
     Given I am an admin of account "test1"
@@ -239,6 +247,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin reinstates a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -265,6 +274,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product reinstates a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -295,6 +305,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" that is not suspended
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User reinstates their license that implements a protected policy
     Given I am an admin of account "test1"
@@ -323,6 +334,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reinstate"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin renews a license
     Given I am an admin of account "test1"
@@ -348,6 +360,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User renews their license
     Given I am an admin of account "test1"
@@ -376,6 +389,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-12-31T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin renews a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -402,6 +416,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product renews a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -432,6 +447,7 @@ Feature: License permit actions
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User renews their license that implements a protected policy
     Given I am an admin of account "test1"
@@ -460,6 +476,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to renew a license for another account
     Given I am an admin of account "test2"
@@ -471,6 +488,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin revokes a license
     Given I am an admin of account "test1"
@@ -482,6 +500,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User revokes their own license
     Given the current account is "test1"
@@ -495,6 +514,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Admin revokes a license that implements a protected policy
     Given I am an admin of account "test1"
@@ -520,6 +540,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: Product revokes a license that implements a protected policy
     Given the current account is "test1"
@@ -547,6 +568,7 @@ Feature: License permit actions
     Then the response status should be "204"
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
 
   Scenario: User revokes their own license that implements a protected policy
     Given the current account is "test1"
@@ -573,6 +595,7 @@ Feature: License permit actions
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: User tries to revoke another user's license
     Given the current account is "test1"
@@ -585,6 +608,7 @@ Feature: License permit actions
     Then the response status should be "403"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin tries to revoke a license for another account
     Given I am an admin of account "test1"
@@ -596,3 +620,4 @@ Feature: License permit actions
     Then the response status should be "401"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
