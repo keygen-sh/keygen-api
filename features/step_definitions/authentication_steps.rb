@@ -31,7 +31,7 @@ Given /^I use an authentication token$/ do
   token = @bearer.tokens.first_or_create account: @bearer.account
   token.regenerate!
 
-  header "Authorization", "Bearer \"#{token.raw}\""
+  header "Authorization", "Bearer #{token.raw}"
 end
 
 Given /^I use an expired authentication token$/ do
@@ -39,5 +39,5 @@ Given /^I use an expired authentication token$/ do
   token.regenerate!
   token.update expiry: Time.current
 
-  header "Authorization", "Bearer \"#{token.raw}\""
+  header "Authorization", "Bearer #{token.raw}"
 end
