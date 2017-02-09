@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
       resources "plans", only: [:index, :show]
 
-      resources "accounts" do
+      resources "accounts", except: [:index] do
         scope module: "accounts/relationships" do
           resource "billing", only: [:show, :update]
           resource "plan", only: [:show, :update]
@@ -143,9 +143,9 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007f90b010f250@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fe7691c4be0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007f90b01177c0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fe7691bd0e8@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -258,8 +258,7 @@ end
 #         v1_account_webhook_event GET    /v1/accounts/:account_id/webhook-events/:id(.:format)                api/v1/webhook_events#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_metrics GET    /v1/accounts/:account_id/metrics(.:format)                           api/v1/metrics#index {:subdomain=>"api", :format=>"jsonapi"}
 #                v1_account_metric GET    /v1/accounts/:account_id/metrics/:id(.:format)                       api/v1/metrics#show {:subdomain=>"api", :format=>"jsonapi"}
-#                      v1_accounts GET    /v1/accounts(.:format)                                               api/v1/accounts#index {:subdomain=>"api", :format=>"jsonapi"}
-#                                  POST   /v1/accounts(.:format)                                               api/v1/accounts#create {:subdomain=>"api", :format=>"jsonapi"}
+#                      v1_accounts POST   /v1/accounts(.:format)                                               api/v1/accounts#create {:subdomain=>"api", :format=>"jsonapi"}
 #                       v1_account GET    /v1/accounts/:id(.:format)                                           api/v1/accounts#show {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PATCH  /v1/accounts/:id(.:format)                                           api/v1/accounts#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PUT    /v1/accounts/:id(.:format)                                           api/v1/accounts#update {:subdomain=>"api", :format=>"jsonapi"}

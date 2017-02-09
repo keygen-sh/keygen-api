@@ -5,14 +5,6 @@ module Api::V1
     before_action :authenticate_with_token!, only: [:show, :update, :destroy]
     before_action :set_account, only: [:show, :update, :destroy]
 
-    # GET /accounts
-    def index
-      @accounts = apply_scopes(Account).all
-      authorize @accounts
-
-      render jsonapi: @accounts
-    end
-
     # GET /accounts/1
     def show
       authorize @account

@@ -1,9 +1,5 @@
 class AccountPolicy < ApplicationPolicy
 
-  def index?
-    false
-  end
-
   def show?
     bearer.role? :admin
   end
