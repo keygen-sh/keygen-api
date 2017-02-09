@@ -178,12 +178,14 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     bearer: user
   ).execute
 
-  header "Authorization", "Bearer \"#{token.raw}\""
-
-  get "//api.keygen.sh/#{@api_version}/accounts/#{@account.slug}/#{resource.pluralize.underscore.dasherize}"
-  json = JSON.parse last_response.body
-
-  expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
+  case resource
+  when /^admins?$/
+    expect(@account.users.admins.count).to eq count.to_i
+  when /^users?$/
+    expect(@account.users.roles(:user).count).to eq count.to_i
+  else
+    expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
+  end
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, resource|
@@ -195,17 +197,13 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, re
     bearer: user
   ).execute
 
-  header "Authorization", "Bearer \"#{token.raw}\""
-
   case resource
   when /^admins?$/
     expect(account.users.admins.count).to eq count.to_i
+  when /^users?$/
+    expect(account.users.roles(:user).count).to eq count.to_i
   else
-    get "//api.keygen.sh/#{@api_version}/accounts/#{account.slug}/#{resource.pluralize.underscore.dasherize}"
-
-    json = JSON.parse last_response.body
-
-    expect(json["data"].select { |d| d["type"] == resource.pluralize }.length).to eq count.to_i
+    expect(account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
 end
 

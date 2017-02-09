@@ -4,49 +4,32 @@ module TokenAuthentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
   def authenticate_with_token!
-    account = current_account || Account.find(params[:account_id] || params[:id])
-
-    authenticate_or_request_with_http_token do |token, options|
-      tok = TokenAuthenticationService.new(
-        account: account,
-        token: token
-      ).execute
-
-      if tok&.expired?
-        render_unauthorized detail: "is expired", source: {
-          pointer: "/data/relationships/token" } and return
-      end
-
-      @current_bearer = tok&.bearer
-    end
+    @current_bearer = authenticate_or_request_with_http_token &method(:authenticator)
   end
 
   def authenticate_with_token
-    account = current_account || Account.find(params[:account_id] || params[:id])
-
-    authenticate_with_http_token do |token, options|
-      tok = TokenAuthenticationService.new(
-        account: account,
-        token: token
-      ).execute
-
-      if tok&.expired?
-        render_unauthorized detail: "is expired", source: {
-          pointer: "/data/relationships/token" } and return
-      end
-
-      @current_bearer = tok&.bearer
-    end
+    @current_bearer = authenticate_with_http_token &method(:authenticator)
   end
 
-  protected
+  private
+
+  def authenticator(token, options)
+    account = current_account || Account.find(params[:account_id] || params[:id])
+
+    tok = TokenAuthenticationService.new(
+      account: account,
+      token: token
+    ).execute
+
+    if tok&.expired?
+      render_unauthorized detail: "is expired", source: {
+        pointer: "/data/relationships/tokens" } and return
+    end
+
+    tok&.bearer
+  end
 
   def request_http_token_authentication(realm = "Application", message = nil)
-    render_unauthorized({
-      detail: "must be a valid token",
-      source: {
-        pointer: "/data/relationships/token"
-      }
-    })
+    render_unauthorized
   end
 end
