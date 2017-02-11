@@ -4,7 +4,8 @@ class ApplicationController < ActionController::API
   before_action :force_jsonapi_response_format
   after_action :verify_authorized
 
-  rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message, pointer: err.pointer }
   rescue_from TypedParameters::InvalidRequestError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Limitable::InvalidLimitError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Pageable::InvalidPageError, with: -> (err) { render_bad_request detail: err.message }

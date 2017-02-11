@@ -1,5 +1,12 @@
 class TypedParameters
-  class InvalidParameterError < StandardError; end
+  class InvalidParameterError < StandardError
+    attr_reader :pointer
+
+    def initialize(pointer:)
+      @pointer = { source: "/#{pointer}" }
+    end
+  end
+  class UnpermittedParametersError < StandardError; end
   class InvalidRequestError < StandardError; end
   class Boolean; end
 
@@ -113,7 +120,7 @@ class TypedParameters
       segment ||= context.params
       unpermitted = segment.keys - params.keys
 
-      raise InvalidParameterError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
+      raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
     end
 
     def method_missing(method, *args, &block)
@@ -132,6 +139,8 @@ class TypedParameters
       handlers.merge! action => block
     end
 
+    # TODO: Write param-level transforms?
+    # TODO: Reimplement as/alias option
     def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       keys = stack.dup << key
@@ -146,22 +155,22 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError, "Parameter /#{keys.join "/"}' could not be coerced to #{type}"
+            raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced to #{type}"
           end
         else
-          raise InvalidParameterError, "Invalid type for coercion (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
+          raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
         end
       end
 
       case
       when real_type.nil?
-        raise InvalidParameterError, "Invalid type defined for parameter /#{keys.join "/"}' (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "type is invalid (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional
-        raise InvalidParameterError, "Parameter missing: /#{keys.join "/"}"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError, "Type mismatch for parameter /#{keys.join "/"}' (received #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
       when !inclusion.empty? && !inclusion.include?(value)
-        raise InvalidParameterError, "Parameter /#{keys.join "/"}' must be one of: #{inclusion.join ", "} (received #{value})"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return # We've encountered an optional param (okay to bail early)
       end
@@ -178,7 +187,7 @@ class TypedParameters
           params.merge! key => child.params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter /#{keys.join "/"} (expected hash of scalar types)"
+            raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected hash of scalar types)"
           end
           params.merge! key => value
         end
@@ -187,7 +196,7 @@ class TypedParameters
           arr_type, b = block.call
 
           if !value.all? { |v| Helper.compare_types v.class, arr_type }
-            raise InvalidParameterError, "Type mismatch for parameter /#{keys.join "/"} (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
 
           # TODO: Handle array type here as well
@@ -206,7 +215,7 @@ class TypedParameters
           end
         else
           if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError, "Unpermitted type found for parameter /#{keys.join "/"} (expected array of scalar types)"
+            raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected array of scalar types)"
           end
           params.merge! key => value
         end
