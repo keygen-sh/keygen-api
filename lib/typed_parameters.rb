@@ -1,9 +1,9 @@
 class TypedParameters
   class InvalidParameterError < StandardError
-    attr_reader :pointer
+    attr_reader :source
 
     def initialize(pointer:)
-      @pointer = { source: "/#{pointer}" }
+      @source = { pointer: "/#{pointer}" }
     end
   end
   class UnpermittedParametersError < StandardError; end
