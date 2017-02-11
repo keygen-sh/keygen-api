@@ -38,7 +38,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/key"
+        expect(err.source).to include pointer: "/key"
       }
     end
 
@@ -63,7 +63,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/key"
+        expect(err.source).to include pointer: "/key"
       }
     end
 
@@ -88,7 +88,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/hash"
+        expect(err.source).to include pointer: "/hash"
       }
     end
 
@@ -121,7 +121,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/hash/nested"
+        expect(err.source).to include pointer: "/hash/nested"
       }
     end
 
@@ -146,7 +146,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/array"
+        expect(err.source).to include pointer: "/array"
       }
     end
 
@@ -185,7 +185,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.pointer).to include source: "/array/key"
+        expect(err.source).to include pointer: "/array/key"
       }
     end
   end
