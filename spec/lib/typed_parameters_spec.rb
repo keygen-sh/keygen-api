@@ -36,7 +36,10 @@ describe TypedParameters do
           on(:create) { param :key, type: :string }
         end
       }
-      expect(&params).to raise_error TypedParameters::InvalidParameterError
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/key"
+      }
     end
 
     it "should allow requests that contain a type mismatch that can be coerced" do
@@ -58,7 +61,10 @@ describe TypedParameters do
           on(:create) { param :key, type: :integer, coerce: true }
         end
       }
-      expect(&params).to raise_error TypedParameters::InvalidParameterError
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/key"
+      }
     end
 
     it "should allow requests that contain a hash with scalar values" do
@@ -80,10 +86,46 @@ describe TypedParameters do
           on(:create) { param :hash, type: :hash }
         end
       }
-      expect(&params).to raise_error TypedParameters::InvalidParameterError
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/hash"
+      }
     end
 
-    it "should allow requests that contain an array with scalar values" do
+    it "should allow requests that contain a nested hash" do
+      params = lambda {
+        ctx = request hash: { nested: { key: "value" } }
+
+        TypedParameters.build ctx do
+          on :create do
+            param :hash, type: :hash do
+              param :nested, type: :hash
+            end
+          end
+        end
+      }
+      expect(params.call).to eq "hash" => { "nested" => { "key" => "value" } }
+    end
+
+    it "should disallow requests that contain a nested hash with missing keys" do
+      params = lambda {
+        ctx = request hash: { }
+
+        TypedParameters.build ctx do
+          on :create do
+            param :hash, type: :hash do
+              param :nested, type: :hash
+            end
+          end
+        end
+      }
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/hash/nested"
+      }
+    end
+
+    it "should allow requests that contain an array of scalar values" do
       params = lambda {
         ctx = request array: [1, 2, 3]
 
@@ -94,15 +136,57 @@ describe TypedParameters do
       expect(params.call).to eq "array" => [1, 2, 3]
     end
 
-    it "should disallow requests that contain an array with non-scalar values" do
+    it "should disallow requests that contain an array of non-scalar values" do
       params = lambda {
         ctx = request array: [[1, 2], [3]]
 
         TypedParameters.build ctx do
-          on(:create) { param :hash, type: :array }
+          on(:create) { param :array, type: :array }
         end
       }
-      expect(&params).to raise_error TypedParameters::InvalidParameterError
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/array"
+      }
+    end
+
+    it "should allow requests that contain an array of hashes" do
+      params = lambda {
+        ctx = request array: [{ key: "value" }, { key: "value" }]
+
+        TypedParameters.build ctx do
+          on :create do
+            param :array, type: :array do
+              items type: :hash do
+                param :key, type: :string
+              end
+            end
+          end
+        end
+      }
+      expect(params.call).to eq "array" => [
+        { "key" => "value" }, { "key" => "value" }
+      ]
+    end
+
+    it "should disallow requests that contain an array of hashes with a type error" do
+      params = lambda {
+        ctx = request array: [{ key: true }, { key: 3 }]
+
+        TypedParameters.build ctx do
+          on :create do
+            param :array, type: :array do
+              items type: :hash do
+                param :key, type: :string
+              end
+            end
+          end
+        end
+      }
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.pointer).to include source: "/array/key"
+      }
     end
   end
 
@@ -148,7 +232,7 @@ describe TypedParameters do
           end
         end
       }
-      expect(&params).to raise_error TypedParameters::InvalidParameterError
+      expect(&params).to raise_error TypedParameters::UnpermittedParametersError
     end
   end
 
