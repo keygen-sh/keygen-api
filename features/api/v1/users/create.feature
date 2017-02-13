@@ -225,9 +225,9 @@ Feature: Create user
         }
       }
       """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
