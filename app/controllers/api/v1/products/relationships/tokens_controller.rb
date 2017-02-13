@@ -10,7 +10,8 @@ module Api::V1::Products::Relationships
 
       token = TokenGeneratorService.new(
         account: current_account,
-        bearer: @product
+        bearer: @product,
+        expiry: false
       ).execute
 
       render jsonapi: token
