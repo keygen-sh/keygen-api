@@ -15,13 +15,13 @@ class Token < ApplicationRecord
 
   scope :bearer, -> (id) { where bearer: id }
 
-  def generate!
+  def generate!(expiry: TOKEN_DURATION)
     @raw, enc = generate_encrypted_token :digest do |token|
       "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
     end
 
     self.digest = enc
-    self.expiry = Time.current + TOKEN_DURATION
+    self.expiry = Time.current + expiry if expiry
     save
 
     raw
@@ -29,7 +29,8 @@ class Token < ApplicationRecord
   alias_method :regenerate!, :generate!
 
   def expired?
-    expiry.nil? || expiry < Time.current
+    return false if expiry.nil?
+    expiry < Time.current
   end
 end
 
