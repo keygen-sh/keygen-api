@@ -241,6 +241,51 @@ describe TypedParameters do
   end
 
   context "transforms" do
-    # TODO: Write spec for param transformations
+    it "should transform a hash to a string value" do
+      params = lambda {
+        ctx = request key: { foo: "value" }
+
+        TypedParameters.build ctx do
+          options strict: true
+
+          on :create do
+            param :key, type: :hash, transform: -> (k, v) { [k, v[:foo]] }
+          end
+        end
+      }
+      expect(params.call).to eq "key" => "value"
+    end
+
+    it "should transform a string to a hash value" do
+      params = lambda {
+        ctx = request key: "value"
+
+        TypedParameters.build ctx do
+          options strict: true
+
+          on :create do
+            param :key, type: :string, transform: -> (k, v) { [k, { foo: v }] }
+          end
+        end
+      }
+      expect(params.call).to eq "key" => { "foo" => "value" }
+    end
+
+    it "should transform the param's key" do
+      params = lambda {
+        ctx = request key: "value"
+
+        TypedParameters.build ctx do
+          options strict: true
+
+          on :create do
+            param :key, type: :string, transform: -> (k, v) { ["#{k}_attributes", v] }
+          end
+        end
+      }
+      expect(params.call).to eq "key_attributes" => "value"
+    end
+
+    # TODO: Write additional specs for param transformations
   end
 end

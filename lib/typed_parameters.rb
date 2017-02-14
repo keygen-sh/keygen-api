@@ -60,6 +60,7 @@ class TypedParameters
       segment = parser.call context.request.raw_post
       schema.validate! segment
     end
+    schema.transform!
 
     schema.params
   end
@@ -99,6 +100,7 @@ class TypedParameters
       @config = config || HashWithIndifferentAccess.new
       @handlers = HashWithIndifferentAccess.new
       @params = HashWithIndifferentAccess.new
+      @transforms = HashWithIndifferentAccess.new
       @context = context
       @stack = stack
       @children = []
@@ -123,13 +125,27 @@ class TypedParameters
       raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
     end
 
+    def transform!
+      # Transform nested schemas in reverse order
+      children.reverse.map &:transform!
+
+      return if transforms.empty?
+
+      # NOTE: Transforms must return a tuple
+      transforms.each { |key, transform|
+        value = params.delete key
+        k, v = transform.call key, value
+        params[k] = v
+      }
+    end
+
     def method_missing(method, *args, &block)
       context.send method, *args, &block
     end
 
     private
 
-    attr_reader :context, :config, :stack, :children
+    attr_reader :context, :config, :stack, :children, :transforms
 
     def options(opts)
       config.merge! opts
@@ -141,14 +157,15 @@ class TypedParameters
 
     # TODO: Write param-level transforms?
     # TODO: Reimplement as/alias option
-    def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], &block)
+    def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], transform: nil, &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
-      keys = stack.dup << key
       value = if context.params.is_a? ActionController::Parameters
                 context.params.to_unsafe_h[key]
               else
                 context.params[key]
               end
+
+      keys = stack.dup << key
 
       if coerce && value
         if COERCABLE_TYPES.key?(type.to_sym)
@@ -169,11 +186,13 @@ class TypedParameters
         raise InvalidParameterError.new(pointer: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
         raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
-      when !inclusion.empty? && !inclusion.include?(value)
+      when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
         raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
       when value.nil? && !allow_nil
         return # We've encountered an optional param (okay to bail early)
       end
+
+      transforms.merge! key => transform if transform.present?
 
       case type.to_sym
       when :hash

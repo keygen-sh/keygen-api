@@ -61,7 +61,6 @@ Rails.application.routes.draw do
             resources "licenses", only: [:index, :show]
             resources "machines", only: [:index, :show]
             resources "tokens", only: [:index, :show]
-            resource "role", only: [:show]
           end
           member do
             scope "actions", module: "users/actions" do
@@ -143,9 +142,9 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fe7691c4be0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fbbaa763460@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fe7691bd0e8@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fbbaa76bc28@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -192,7 +191,6 @@ end
 #          v1_account_user_machine GET    /v1/accounts/:account_id/users/:user_id/machines/:id(.:format)       api/v1/users/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi"}
 #           v1_account_user_tokens GET    /v1/accounts/:account_id/users/:user_id/tokens(.:format)             api/v1/users/relationships/tokens#index {:subdomain=>"api", :format=>"jsonapi"}
 #            v1_account_user_token GET    /v1/accounts/:account_id/users/:user_id/tokens/:id(.:format)         api/v1/users/relationships/tokens#show {:subdomain=>"api", :format=>"jsonapi"}
-#             v1_account_user_role GET    /v1/accounts/:account_id/users/:user_id/role(.:format)               api/v1/users/relationships/roles#show {:subdomain=>"api", :format=>"jsonapi"}
 #  update_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/update-password(.:format) api/v1/users/actions/password#update_password {:subdomain=>"api", :format=>"jsonapi"}
 #   reset_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/reset-password(.:format)  api/v1/users/actions/password#reset_password {:subdomain=>"api", :format=>"jsonapi"}
 #                 v1_account_users GET    /v1/accounts/:account_id/users(.:format)                             api/v1/users#index {:subdomain=>"api", :format=>"jsonapi"}

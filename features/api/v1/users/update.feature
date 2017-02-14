@@ -77,10 +77,8 @@ Feature: Update user
       {
         "data": {
           "type": "users",
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+          "attributes": {
+            "role": "admin"
           }
         }
       }
@@ -101,10 +99,8 @@ Feature: Update user
       {
         "data": {
           "type": "users",
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "mod" } }
-            }
+          "attributes": {
+            "role": "mod"
           }
         }
       }
@@ -124,10 +120,8 @@ Feature: Update user
       {
         "data": {
           "type": "users",
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "product" } }
-            }
+          "attributes": {
+            "role": "product"
           }
         }
       }
@@ -148,10 +142,8 @@ Feature: Update user
       {
         "data": {
           "type": "users",
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+          "attributes": {
+            "role": "admin"
           }
         }
       }
@@ -251,10 +243,8 @@ Feature: Update user
       {
         "data": {
           "type": "users",
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+          "attributes": {
+            "role": "admin"
           }
         }
       }

@@ -88,17 +88,10 @@ module Api::V1
             param :email, type: :string
             param :password, type: :string
             param :metadata, type: :hash, optional: true
-          end
-          param :relationships, type: :hash, optional: true do
             if current_bearer&.role? :admin
-              param :role, type: :hash, optional: true do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: %w[role roles]
-                  param :attributes, type: :hash do
-                    param :name, type: :string, inclusion: %w[user admin]
-                  end
-                end
-              end
+              param :role, type: :string, inclusion: %w[user admin], optional: true, transform: -> (k, v) {
+                [:role_attributes, { name: v }]
+              }
             end
           end
         end
@@ -113,17 +106,10 @@ module Api::V1
             if current_bearer&.role? :admin or current_bearer&.role? :product
               param :metadata, type: :hash, optional: true
             end
-          end
-          param :relationships, type: :hash, optional: true do
             if current_bearer&.role? :admin
-              param :role, type: :hash, optional: true do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: %w[role roles]
-                  param :attributes, type: :hash do
-                    param :name, type: :string, inclusion: %w[user admin]
-                  end
-                end
-              end
+              param :role, type: :string, inclusion: %w[user admin], optional: true, transform: -> (k, v) {
+                [:role_attributes, { name: v }]
+              }
             end
           end
         end
