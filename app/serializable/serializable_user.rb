@@ -3,6 +3,9 @@ class SerializableUser < SerializableBase
 
   attribute :name
   attribute :email
+  attribute :role do
+    @object.role.name
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
@@ -37,11 +40,6 @@ class SerializableUser < SerializableBase
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_user_tokens_path @object.account, @object
-    end
-  end
-  relationship :role do
-    link :related do
-      @url_helpers.v1_account_user_role_path @object.account, @object
     end
   end
 

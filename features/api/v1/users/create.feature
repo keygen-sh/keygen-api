@@ -133,12 +133,8 @@ Feature: Create user
           "attributes": {
             "name": "Ironman",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
-          },
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+            "password": "jarvis",
+            "role": "admin"
           }
         }
       }
@@ -160,12 +156,8 @@ Feature: Create user
           "attributes": {
             "name": "Spiderman",
             "email": "spiderman@keygen.sh",
-            "password": "web"
-          },
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "spider" } }
-            }
+            "password": "web",
+            "role": "spider"
           }
         }
       }
@@ -188,12 +180,8 @@ Feature: Create user
           "attributes": {
             "name": "Ironman",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
-          },
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+            "password": "jarvis",
+            "role": "admin"
           }
         }
       }
@@ -243,12 +231,8 @@ Feature: Create user
           "attributes": {
             "name": "Superman",
             "email": "superman@keygen.sh",
-            "password": "sunlight"
-          },
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+            "password": "sunlight",
+            "role": "admin"
           }
         }
       }
@@ -295,12 +279,8 @@ Feature: Create user
           "attributes": {
             "name": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir"
-          },
-          "relationships": {
-            "role": {
-              "data": { "type": "role", "attributes": { "name": "admin" } }
-            }
+            "password": "mjolnir",
+            "role": "admin"
           }
         }
       }
