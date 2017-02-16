@@ -100,7 +100,7 @@ module Api::V1
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[user users]
-          param :id, type: :string, inclusion: [context.params[:id]], optional: true, transform: -> (k, v) { [] }
+          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash, optional: true do
             param :name, type: :string, optional: true
             param :email, type: :string, optional: true

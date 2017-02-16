@@ -92,7 +92,7 @@ module Api::V1
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[product products]
-          param :id, type: :string, inclusion: [context.params[:id]], optional: true, transform: -> (k, v) { [] }
+          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :metadata, type: :hash, optional: true

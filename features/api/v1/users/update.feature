@@ -50,6 +50,28 @@ Feature: Update user
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin updates a user for their account including the wrong id
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 2 "webhookEndpoints"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "foo",
+          "attributes": {
+            "name": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin attempts to update a user for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
