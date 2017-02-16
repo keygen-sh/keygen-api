@@ -19,6 +19,7 @@ Feature: Update machine
       {
         "data": {
           "type": "machines",
+          "id": "$machines[0].id",
           "attributes": {
             "name": "Home iMac"
           }

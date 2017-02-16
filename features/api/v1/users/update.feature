@@ -17,6 +17,7 @@ Feature: Update user
       {
         "data": {
           "type": "users",
+          "id": "$users[0].id",
           "attributes": {
             "name": "Mr. Robot"
           }
