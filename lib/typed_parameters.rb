@@ -47,7 +47,7 @@ class TypedParameters
   }
 
   def self.build(context, &block)
-    schema = Schema.new context: context, &block
+    schema = Schema.new controller: context, context: context, &block
     handler = schema.handlers[context.action_name]
     handler.call
 
@@ -94,13 +94,14 @@ class TypedParameters
   end
 
   class Schema
-    attr_reader :handlers, :params
+    attr_reader :controller, :handlers, :params
 
-    def initialize(context:, stack: [], config: nil, &block)
+    def initialize(controller:, context:, stack: [], config: nil, &block)
       @config = config || HashWithIndifferentAccess.new
       @handlers = HashWithIndifferentAccess.new
       @params = HashWithIndifferentAccess.new
       @transforms = HashWithIndifferentAccess.new
+      @controller = controller
       @context = context
       @stack = stack
       @children = []
@@ -141,7 +142,7 @@ class TypedParameters
     end
 
     def method_missing(method, *args, &block)
-      context.send method, *args, &block
+      controller.send method, *args, &block
     end
 
     private
@@ -201,7 +202,7 @@ class TypedParameters
           ctx = context.dup
           ctx.params = value
 
-          child = Schema.new(context: ctx, stack: keys, config: config, &block)
+          child = Schema.new(controller: context, context: ctx, stack: keys, config: config, &block)
           children << child
 
           params.merge! key => child.params
@@ -225,7 +226,7 @@ class TypedParameters
               ctx = context.dup
               ctx.params = v
 
-              child = Schema.new(context: ctx, stack: keys, config: config, &b)
+              child = Schema.new(controller: context, context: ctx, stack: keys, config: config, &b)
               children << child
 
               child.params
