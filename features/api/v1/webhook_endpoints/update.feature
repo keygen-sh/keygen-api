@@ -18,6 +18,7 @@ Feature: Update webhook endpoint
       {
         "data": {
           "type": "webhookEndpoint",
+          "id": "$webhookEndpoints[0].id",
           "attributes": {
             "url": "https://example.com"
           }

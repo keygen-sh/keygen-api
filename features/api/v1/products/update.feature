@@ -19,6 +19,7 @@ Feature: Update product
       {
         "data": {
           "type": "products",
+          "id": "$products[0].id",
           "attributes": {
             "name": "New App"
           }

@@ -19,6 +19,7 @@ Feature: Update policy
       {
         "data": {
           "type": "policies",
+          "id": "$policies[0].id",
           "attributes": {
             "name": "Trial"
           }

@@ -19,6 +19,7 @@ Feature: Update license
       {
         "data": {
           "type": "licenses",
+          "id": "$licenses[0].id",
           "attributes": {
             "expiry": "2016-09-05T22:53:37.000Z"
           }

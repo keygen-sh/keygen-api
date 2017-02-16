@@ -17,6 +17,7 @@ Feature: Update account
       {
         "data": {
           "type": "accounts",
+          "id": "$accounts[0].id",
           "attributes": {
             "name": "Company Name"
           }

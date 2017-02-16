@@ -135,6 +135,7 @@ class TypedParameters
       transforms.each { |key, transform|
         value = params.delete key
         k, v = transform.call key, value
+        next if k.nil?
         params[k] = v
       }
     end

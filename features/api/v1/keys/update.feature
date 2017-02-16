@@ -19,6 +19,7 @@ Feature: Update key
       {
         "data": {
           "type": "keys",
+          "id": "$keys[0].id",
           "attributes": {
             "key": "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
           }

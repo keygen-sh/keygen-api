@@ -109,6 +109,7 @@ module Api::V1
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[license licenses]
+          param :id, type: :string, inclusion: [context.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :expiry, type: :datetime, optional: true, coerce: true
             param :suspended, type: :boolean, optional: true
