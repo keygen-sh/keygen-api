@@ -8,7 +8,9 @@ module Api::V1
 
     # GET /metrics
     def index
-      @metrics = policy_scope apply_scopes(current_account.metrics).all
+      @metrics = Rails.cache.fetch cache_key, expires_in: 15.minutes do
+        policy_scope(apply_scopes(current_account.metrics)).all
+      end
       authorize @metrics
 
       render jsonapi: @metrics
@@ -25,6 +27,10 @@ module Api::V1
 
     def set_metric
       @metric = current_account.metrics.find params[:id]
+    end
+
+    def cache_key(id = nil)
+      [current_account.id, "metrics", id, request.query_string.parameterize].reject { |s| s.nil? || s.empty? }.join "/"
     end
   end
 end
