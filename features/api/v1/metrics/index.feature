@@ -17,37 +17,38 @@ Feature: List metrics
     Then the response status should be "200"
     And the JSON response should be an array with 3 "metrics"
 
-  Scenario: Admin retrieves a paginated list of metrics
+  Scenario: Admin retrieves an unsupported paginated list of metrics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "metrics"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=5"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a list of metrics within a date range that's full
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "metrics"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
-    And the JSON response should be an array with 5 "metrics"
+    And the JSON response should be an array with 20 "metrics"
 
-  Scenario: Admin retrieves a paginated list of metrics with a page size that is too high
+  Scenario: Admin retrieves a list of metrics within a date range that's empty
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "metrics"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?page[number]=1&page[size]=250"
-    Then the response status should be "400"
+    When I send a GET request to "/accounts/test1/metrics?date[start]=2017-1-2&date[end]=2017-01-03"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "metrics"
 
-  Scenario: Admin retrieves a paginated list of metrics with a page size that is too low
+  Scenario: Admin retrieves a list of metrics within a date range that's invalid
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "metrics"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?page[number]=1&page[size]=-10"
-    Then the response status should be "400"
-
-  Scenario: Admin retrieves a paginated list of metrics with an invalid page number
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 20 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?page[number]=-1&page[size]=10"
+    When I send a GET request to "/accounts/test1/metrics?date[start]=foo&date[end]=bar"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all metrics without a limit for their account

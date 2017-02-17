@@ -6,7 +6,7 @@ module SharedScopes
       if resource.respond_to?(:lim)
         resource.lim limit
       else
-        resource
+        raise Keygen::Error::InvalidScopeError.new(parameter: "limit"), "limit is not supported for this resource"
       end
     end
 
@@ -16,11 +16,19 @@ module SharedScopes
         resource.reorder "created_at DESC"
       when "ASC"
         resource.reorder "created_at ASC"
+      else
+        raise Keygen::Error::InvalidScopeError.new(parameter: "order"), "order is invalid or unsupported for this resource"
       end
     end
 
     # Kaminari's pagination will override any limit that was set previously,
     # so we're placing it after the limit scope.
-    has_scope :page, type: :hash, using: [:number, :size], only: :index
+    has_scope :page, type: :hash, using: [:number, :size], only: :index do |controller, resource, *args|
+      if resource.respond_to?(:page)
+        resource.page *args
+      else
+        raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page is not supported for this resource"
+      end
+    end
   end
 end

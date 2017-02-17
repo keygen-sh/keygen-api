@@ -1,6 +1,6 @@
 class Metric < ApplicationRecord
+  include DateRangeable
   include Limitable
-  include Pageable
 
   belongs_to :account
 
