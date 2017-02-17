@@ -1,5 +1,6 @@
 module Api::V1
   class MetricsController < Api::V1::BaseController
+    has_scope :date, type: :hash, using: [:start, :end], only: :index
     has_scope :metrics, type: :array
 
     before_action :scope_to_current_account!
@@ -9,7 +10,7 @@ module Api::V1
     # GET /metrics
     def index
       @metrics = Rails.cache.fetch cache_key, expires_in: 15.minutes do
-        policy_scope(apply_scopes(current_account.metrics)).all
+        policy_scope apply_scopes(current_account.metrics).all
       end
       authorize @metrics
 
@@ -30,7 +31,7 @@ module Api::V1
     end
 
     def cache_key(id = nil)
-      [current_account.id, "metrics", id, request.query_string.parameterize].reject { |s| s.nil? || s.empty? }.join "/"
+      [current_account.id, current_bearer.id, "metrics", id, request.query_string.parameterize].reject { |s| s.nil? || s.empty? }.join "/"
     end
   end
 end

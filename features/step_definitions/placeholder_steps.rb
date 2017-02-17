@@ -23,6 +23,8 @@ def parse_placeholders!(str)
       when "crypt"
         @crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .send attribute
+      when "date"
+        Date.send(attribute).to_s
       when "time"
         case attribute
         when /(\d+)\.(\w+)\.(\w+)/
@@ -57,7 +59,7 @@ end
 # resource/$current (current user or account)
 # resource/$0 (where 0 is a resource ID)
 def parse_path_placeholders!(str)
-  str.dup.scan /([-\w]+)\/((?<!\\)\$(\w+))/ do |resource, pattern, index|
+  str.dup.scan(/([-\w]+)\/((?<!\\)\$(\w+))/) do |resource, pattern, index|
     value =
       case index
       when "current"
@@ -96,4 +98,5 @@ def parse_path_placeholders!(str)
 
     str.sub! pattern.to_s, value
   end
+  parse_placeholders! str
 end
