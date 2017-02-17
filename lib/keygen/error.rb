@@ -1,6 +1,6 @@
 module Keygen
   module Error
-    class InvalidScopeError < StandardError;
+    class InvalidScopeError < StandardError
       attr_reader :source
 
       def initialize(parameter:)
