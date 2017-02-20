@@ -1,19 +1,24 @@
-- accept_invitation_link = link_to "https://keygen.sh/invitation?token=#{@token}",
-                                   "https://keygen.sh/invitation?token=#{@token}",
-                                   class: "ellipsis"
-- docs_link = link_to "documentation",
-                      "https://keygen.sh/docs/api"
 %p
-  You've been invited to the beta program! Please click the link below to accept
-  the invitation and join the party!
+  Welcome to the Keygen beta! I'm excited to show you around!
+%p
+  Please click the link below to accept the invitation.
   %br
-  %br
-  = accept_invitation_link
+  = link_to "https://keygen.sh/invitation?token=#{@token}", "https://keygen.sh/invitation?token=#{@token}", class: "ellipsis"
 %p
-  To get started with Keygen, be sure to check out the #{docs_link} section of
-  the site for coverage on everything from integrating Keygen into your product
-  to an in-depth API reference.
+  Getting started is easy! There are three main steps:
+%ol
+  %li
+    Add your <strong>product</strong>. This can be done from your #{link_to "dashboard", "https://app.keygen.sh"},
+    or directly utilizing Keygen's REST API.
+  %li
+    Create your first <strong>policy</strong>. These define the different types
+    of licenses that your product offers.
+  %li
+    <strong>Integrate Keygen</strong> into your product and start accepting new
+    users and licenses!
 %p
-  Please let me know if I can provide you with a demo, lend some support, or help
-  out in any other way. Since this is a beta, I'd absolutely love to hear any
-  feedback that you have. You're a huge part of crafting the final product!
+  Be sure to check out the #{link_to "documentation", "https://keygen.sh/docs/api"}
+  section of the site for an in-depth API reference and more tips.
+%p
+  I'd be happy to help you out with any of these steps! Feel free to contact me
+  anytime for help or feedback. You can reply to this email directly.

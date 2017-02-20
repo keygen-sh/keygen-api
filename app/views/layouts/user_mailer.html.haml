@@ -1,5 +1,3 @@
-- keygen_link = link_to "Keygen", "https://keygen.sh"
-- email_link = link_to "hello@keygen.sh", "mailto:hello@keygen.sh"
 !!!
 %html
   %head
@@ -169,7 +167,7 @@
                     %tr
                       %td.content-block
                         %p
-                          Hi there,
+                          Hi there #{@user.first_name},
                         = yield
                         %p
                           – Keygen Team
@@ -178,5 +176,5 @@
               %tr
                 %td.content-block
                   %span
-                    Questions? Reply back or contact #{email_link}.
+                    Questions? Reply back or contact #{link_to "support@keygen.sh", "mailto:support@keygen.sh"}.
         %td &nbsp;
