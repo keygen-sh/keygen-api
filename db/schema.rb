@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207233326) do
+ActiveRecord::Schema.define(version: 20170220152847) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -192,6 +192,8 @@ ActiveRecord::Schema.define(version: 20170207233326) do
     t.datetime "password_reset_sent_at"
     t.jsonb    "metadata"
     t.uuid     "account_id"
+    t.string   "first_name"
+    t.string   "last_name"
     t.index ["created_at", "account_id", "email"], name: "index_users_on_created_at_and_account_id_and_email", using: :btree
     t.index ["created_at", "account_id"], name: "index_users_on_created_at_and_account_id", using: :btree
     t.index ["created_at", "id"], name: "index_users_on_created_at_and_id", unique: true, using: :btree

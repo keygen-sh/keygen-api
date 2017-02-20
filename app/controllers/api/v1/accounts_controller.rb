@@ -77,7 +77,8 @@ module Api::V1
                 items type: :hash do
                   param :type, type: :string, inclusion: %w[user users]
                   param :attributes, type: :hash do
-                    param :name, type: :string
+                    param :first_name, type: :string
+                    param :last_name, type: :string
                     param :email, type: :string
                     param :password, type: :string
                   end

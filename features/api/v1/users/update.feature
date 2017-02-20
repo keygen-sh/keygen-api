@@ -19,13 +19,13 @@ Feature: Update user
           "type": "users",
           "id": "$users[0].id",
           "attributes": {
-            "name": "Mr. Robot"
+            "firstName": "Elliot"
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the name "Mr. Robot"
+    And the JSON response should be a "user" with the firstName "Elliot"
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin updates a user for their account
@@ -40,13 +40,13 @@ Feature: Update user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Mr. Robot"
+            "firstName": "Mr. Robot"
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the name "Mr. Robot"
+    And the JSON response should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
@@ -63,7 +63,7 @@ Feature: Update user
           "type": "users",
           "id": "foo",
           "attributes": {
-            "name": "Mr. Robot"
+            "firstName": "Foobar"
           }
         }
       }
@@ -82,7 +82,7 @@ Feature: Update user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Updated name"
+            "lastName": "Updated name"
           }
         }
       }
@@ -313,13 +313,13 @@ Feature: Update user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Mr. Robot"
+            "firstName": "Mr. Robot"
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "user" with the name "Mr. Robot"
+    And the JSON response should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
@@ -336,7 +336,7 @@ Feature: Update user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Mr. Robot"
+            "firstName": "Mr. Robot"
           }
         }
       }

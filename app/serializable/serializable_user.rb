@@ -1,7 +1,9 @@
 class SerializableUser < SerializableBase
   type :users
 
-  attribute :name
+  attribute :full_name
+  attribute :first_name
+  attribute :last_name
   attribute :email
   attribute :role do
     @object.role.name

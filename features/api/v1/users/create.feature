@@ -18,7 +18,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Clark",
+            "lastName": "Kent",
             "email": "superman@keygen.sh",
             "password": "lois"
           }
@@ -26,7 +27,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "user" with the name "Superman"
+    And the JSON response should be a "user" with the firstName "Clark"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -45,7 +46,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Clark",
+            "lastName": "Kent",
             "email": "superman@keygen.sh",
             "password": "lois"
           }
@@ -66,7 +68,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Clark",
+            "lastName": "Kent",
             "email": "superman@keygen.sh"
           }
         }
@@ -84,7 +87,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Clark",
+            "lastName": "Kent",
             "email": 42,
             "password": "lois"
           }
@@ -109,7 +113,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Ironman",
+            "firstName": "Tony",
+            "lastName": "Stark",
             "email": "ironman@keygen.sh",
             "password": "jarvis"
           }
@@ -131,7 +136,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Ironman",
+            "firstName": "Ironman",
+            "lastName": "Stark",
             "email": "ironman@keygen.sh",
             "password": "jarvis",
             "role": "admin"
@@ -154,7 +160,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Spiderman",
+            "firstName": "Spiderman",
+            "lastName": "Parker",
             "email": "spiderman@keygen.sh",
             "password": "web",
             "role": "spider"
@@ -178,7 +185,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Ironman",
+            "firstName": "Ironman",
+            "lastName": "Stark",
             "email": "ironman@keygen.sh",
             "password": "jarvis",
             "role": "admin"
@@ -206,7 +214,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Ironman",
+            "firstName": "Ironman",
+            "lastName": "Stark",
             "email": "ironman@keygen.sh",
             "password": "jarvis"
           }
@@ -229,7 +238,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Superman",
+            "lastName": "Kent",
             "email": "superman@keygen.sh",
             "password": "sunlight",
             "role": "admin"
@@ -257,7 +267,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Superman",
+            "firstName": "Clark",
+            "lastName": "Kent",
             "email": "superman@keygen.sh",
             "password": "sunlight"
           }
@@ -277,7 +288,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "name": "Thor",
+            "firstName": "Thor",
+            "lastName": "Thor",
             "email": "thor@keygen.sh",
             "password": "mjolnir",
             "role": "admin"
