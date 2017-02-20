@@ -6,13 +6,23 @@
     %title= message.subject
     :sass
       body
+        padding: 20px
         font:
           family: sans-serif
-          size: 0.875rem
+          size: 14px
         line:
           height: 1.5
       a
         color: #0000ff
+        &.ellipsis
+          display: block
+          text:
+            overflow: ellipsis
+          white:
+            space: nowrap
+          max:
+            width: 100%
+          overflow: hidden
   %body
     %p
       Hi there, #{@user.first_name}!
