@@ -42,7 +42,6 @@ end
 # Table name: users
 #
 #  id                     :uuid             not null, primary key
-#  name                   :string
 #  email                  :string
 #  password_digest        :string
 #  created_at             :datetime         not null
