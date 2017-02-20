@@ -167,7 +167,7 @@ class TypedParameters
                 context.params[key]
               end
 
-      keys = stack.dup << key
+      keys = stack.dup << key.to_s.camelize(:lower)
 
       if coerce && value
         if COERCABLE_TYPES.key?(type.to_sym)
