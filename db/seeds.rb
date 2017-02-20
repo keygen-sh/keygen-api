@@ -46,7 +46,8 @@ Plan.create(
 #   slug: "account",
 #   plan: Plan.first,
 #   users_attributes: [{
-#     name: "Admin",
+#     first_name: "Admin",
+#     last_name: "Admin",
 #     email: "admin@keygen.sh",
 #     password: "password"
 #   }]
@@ -98,7 +99,8 @@ Plan.create(
 #   )
 #
 #   user = account.users.create(
-#     name: "#{SecureRandom.hex}",
+#     first_name: "#{SecureRandom.hex}",
+#     last_name: "#{SecureRandom.hex}",
 #     email: "#{SecureRandom.hex}@keygen.sh",
 #     password: "password"
 #   )
