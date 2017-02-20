@@ -27,7 +27,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -72,7 +73,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -110,7 +112,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -118,7 +121,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Sergey Brin",
+                    "firstName": "Sergey",
+                    "lastName": "Brin",
                     "email": "sbrin@keygen.sh",
                     "password": "goog"
                   }
@@ -126,7 +130,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Sundar Pichai",
+                    "firstName": "Sundar",
+                    "lastName": "Pichai",
                     "email": "spichai@keygen.sh",
                     "password": "goog"
                   }
@@ -166,7 +171,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -174,7 +180,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Sergey Brin",
+                    "firstName": "Sergey",
+                    "lastName": "Brin",
                     "email": "sbrin@keygen.sh",
                     "password": "goog"
                   }
@@ -182,7 +189,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Sundar Pichai",
+                    "firstName": "Sundar",
+                    "lastName": "Pichai",
                     "email": "spichai@keygen.sh",
                     "password": "goog"
                   }
@@ -212,7 +220,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -273,7 +282,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }
@@ -309,7 +319,8 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "name": "Larry Page",
+                    "firstName": "Larry",
+                    "lastName": "Page",
                     "email": "lpage@keygen.sh",
                     "password": "goog"
                   }

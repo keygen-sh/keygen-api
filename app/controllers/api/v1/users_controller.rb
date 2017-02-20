@@ -84,7 +84,8 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[user users]
           param :attributes, type: :hash do
-            param :name, type: :string
+            param :first_name, type: :string
+            param :last_name, type: :string
             param :email, type: :string
             param :password, type: :string
             param :metadata, type: :hash, optional: true
@@ -102,7 +103,8 @@ module Api::V1
           param :type, type: :string, inclusion: %w[user users]
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash, optional: true do
-            param :name, type: :string, optional: true
+            param :first_name, type: :string, optional: true
+            param :last_name, type: :string, optional: true
             param :email, type: :string, optional: true
             if current_bearer&.role? :admin or current_bearer&.role? :product
               param :metadata, type: :hash, optional: true

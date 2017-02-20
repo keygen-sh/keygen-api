@@ -18,12 +18,17 @@ class User < ApplicationRecord
   before_save -> { self.email = email.downcase }
   after_create :set_role, if: -> { role.nil? }
 
-  validates :name, presence: true
+  validates :first_name, presence: true
+  validates :last_name, presence: true
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
 
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :admins, -> { roles :admin }
+
+  def full_name
+    [first_name, last_name].join " "
+  end
 
   private
 
@@ -46,6 +51,8 @@ end
 #  password_reset_sent_at :datetime
 #  metadata               :jsonb
 #  account_id             :uuid
+#  first_name             :string
+#  last_name              :string
 #
 # Indexes
 #
