@@ -171,13 +171,13 @@ describe TypedParameters do
 
     it "should disallow requests that contain an array of hashes with a type error" do
       params = lambda {
-        ctx = request array: [{ key: true }, { key: 3 }]
+        ctx = request array: [{ some_key: true }, { some_key: 3 }]
 
         TypedParameters.build ctx do
           on :create do
             param :array, type: :array do
               items type: :hash do
-                param :key, type: :string
+                param :some_key, type: :string
               end
             end
           end
@@ -185,7 +185,7 @@ describe TypedParameters do
       }
       expect(&params).to raise_error { |err|
         expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.source).to include pointer: "/array/key"
+        expect(err.source).to include pointer: "/array/someKey"
       }
     end
   end

@@ -130,9 +130,9 @@ class ApplicationController < ActionController::API
           source do
             pointer(
               if resource.class.reflect_on_association(src)
-                "/data/relationships/#{src}"
+                "/data/relationships/#{src.to_s.camelize :lower}"
               else
-                "/data/attributes/#{src}"
+                "/data/attributes/#{src.to_s.camelize :lower}"
               end
             )
           end
