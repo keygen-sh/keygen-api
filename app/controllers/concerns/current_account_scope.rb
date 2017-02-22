@@ -7,18 +7,12 @@ module CurrentAccountScope
     if !current_account.beta_user?
       render_forbidden({
         title: "Account is not in the beta program",
-        detail: "must have accepted an invite to take part in the beta program",
-        source: {
-          pointer: "/data/attribute/invited"
-        }
+        detail: "must have accepted an invite to take part in the beta program"
       })
     elsif !current_account.active?
       render_forbidden({
         title: "Account does not have an active subscription",
-        detail: "must have an active subscription to access this resource",
-        source: {
-          pointer: "/data/relationship/billing"
-        }
+        detail: "must have an active subscription to access this resource"
       })
     else
       current_account
