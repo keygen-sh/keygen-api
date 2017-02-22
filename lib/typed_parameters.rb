@@ -157,8 +157,6 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    # TODO: Write param-level transforms?
-    # TODO: Reimplement as/alias option
     def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], transform: nil, &block)
       real_type = VALID_TYPES.fetch type.to_sym, nil
       value = if context.params.is_a? ActionController::Parameters
