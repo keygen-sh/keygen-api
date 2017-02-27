@@ -204,6 +204,43 @@ Feature: Create account
       """
     Then the response status should be "400"
 
+  Scenario: Anonymous attempts to create an account with a reserved slug
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Forbidden",
+            "slug": "actions"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Bad",
+                    "lastName": "Actor",
+                    "email": "hacker@keygen.sh",
+                    "password": "h4X0r$"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+
   Scenario: Anonymous attempts to create an account without a plan
     When I send a POST request to "/accounts" with the following:
       """
