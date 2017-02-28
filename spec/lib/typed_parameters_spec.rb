@@ -67,6 +67,38 @@ describe TypedParameters do
       }
     end
 
+    it "should disallow requests that contain null values as missing" do
+      params = lambda {
+        ctx = request key: nil
+
+        TypedParameters.build ctx do
+          on :create do
+            param :key, type: :string
+          end
+        end
+      }
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.source).to include pointer: "/key"
+      }
+    end
+
+    it "should allow requests that contain optional null values" do
+      params = lambda {
+        ctx = request key: nil
+
+        TypedParameters.build ctx do
+          on :create do
+            param :key, type: :string, optional: true
+          end
+        end
+      }
+      expect(&params).to_not raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.source).to include pointer: "/key"
+      }
+    end
+
     it "should allow requests that contain a hash with scalar values" do
       params = lambda {
         ctx = request hash: { key: "value" }
