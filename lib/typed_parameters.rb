@@ -165,6 +165,11 @@ class TypedParameters
                 context.params[key]
               end
 
+      if value.nil? && optional && !allow_nil
+        [key.to_s, key.to_s.camelize(:lower)].map { |k| context.params.delete k }
+        return
+      end
+
       keys = stack.dup << key.to_s.camelize(:lower)
 
       if coerce && value
@@ -188,8 +193,6 @@ class TypedParameters
         raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
       when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
         raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
-      when value.nil? && !allow_nil
-        return # We've encountered an optional param (okay to bail early)
       end
 
       transforms.merge! key => transform if transform.present?
