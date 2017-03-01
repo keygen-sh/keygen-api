@@ -11,7 +11,6 @@ class Machine < ApplicationRecord
   validates :license, presence: { message: "must exist" }
 
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
-  validates :name, presence: true, allow_nil: true, uniqueness: { scope: :license_id }
 
   validate on: :create do
     errors.add :license, "machine count has reached maximum allowed by license policy" if !license.policy.max_machines.nil? && license.machines.size >= license.policy.max_machines
