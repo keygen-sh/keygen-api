@@ -85,7 +85,7 @@ module Api::V1
             param :encrypted, type: :boolean, optional: true
             param :use_pool, type: :boolean, optional: true
             param :name, type: :string, optional: true
-            param :duration, type: :integer, optional: true
+            param :duration, type: :integer, optional: true, allow_nil: true
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
@@ -109,7 +109,7 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :duration, type: :integer, optional: true
+            param :duration, type: :integer, optional: true, allow_nil: true
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
