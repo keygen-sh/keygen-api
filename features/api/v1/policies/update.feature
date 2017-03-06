@@ -66,13 +66,13 @@ Feature: Update policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Product A"
+            "duration": null
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with the name "Product A"
+    And the JSON response should be a "policy" with a nil duration
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
