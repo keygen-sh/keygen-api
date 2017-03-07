@@ -13,6 +13,10 @@ Feature: Update policy
     And the current account is "test1"
     And the current account has 2 "webhookEndpoints"
     And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "duration": 31557600 }
+      """
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
@@ -27,6 +31,7 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
+    And the JSON response should be a "policy" with a duration that is not nil
     And the JSON response should be a "policy" with the name "Trial"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job

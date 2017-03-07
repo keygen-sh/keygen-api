@@ -99,6 +99,32 @@ describe TypedParameters do
       }
     end
 
+    it "should allow requests that contain optional allowed null values" do
+      params = lambda {
+        ctx = request "key" => nil
+
+        TypedParameters.build ctx do
+          on :create do
+            param :key, type: :string, optional: true, allow_nil: true
+          end
+        end
+      }
+      expect(params.call).to eq "key" => nil
+    end
+
+    it "should not contain allowed nil param if value is missing" do
+      params = lambda {
+        ctx = request({})
+
+        TypedParameters.build ctx do
+          on :create do
+            param :key, type: :string, optional: true, allow_nil: true
+          end
+        end
+      }
+      expect(params.call).to_not eq "key" => nil
+    end
+
     it "should allow requests that contain a hash with scalar values" do
       params = lambda {
         ctx = request hash: { key: "value" }
