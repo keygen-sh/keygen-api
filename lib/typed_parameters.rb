@@ -158,6 +158,8 @@ class TypedParameters
     end
 
     def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], transform: nil, &block)
+      return if optional && !context.params.key?(key.to_s)
+
       real_type = VALID_TYPES.fetch type.to_sym, nil
       value = if context.params.is_a? ActionController::Parameters
                 context.params.to_unsafe_h[key]
