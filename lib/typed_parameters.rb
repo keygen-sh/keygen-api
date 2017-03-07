@@ -54,7 +54,7 @@ class TypedParameters
     # Grab our segment of the params (getting rid of cruft added by Rails middleware)
     # and validate for unpermitted params
     if schema.strict?
-      parser = ActionDispatch::Request.parameter_parsers[context.request.format.symbol]
+      parser = ActionDispatch::Request.parameter_parsers[:jsonapi]
       raise InvalidRequestError, "Request's content type and/or accept headers are unsupported (expected application/vnd.api+json)" if parser.nil?
 
       segment = parser.call context.request.raw_post
