@@ -15,7 +15,7 @@ class LicenseValidationService < BaseService
     # Check if license policy allows floating and if not, should have single activation
     return [true, "is valid"] if !license.policy.floating? && license.machines.count == 1
     # Assume floating, should have at least 1 activation but no more than policy allows
-    return [true, "is valid"] if license.policy.floating? && license.machines.count >= 1 && !policy.max_machines.nil? && license.machines.count <= license.policy.max_machines
+    return [true, "is valid"] if license.policy.floating? && license.machines.count >= 1 && license.machines.count <= license.policy.max_machines
     # Otherwise, assume invalid
     return [false, "does not meet machine requirements"]
   end

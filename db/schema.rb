@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170220160538) do
+ActiveRecord::Schema.define(version: 20170314014254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,9 +18,9 @@ ActiveRecord::Schema.define(version: 20170220160538) do
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
-    t.string   "slug"
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.string   "slug"
     t.uuid     "plan_id"
     t.string   "invite_state"
     t.string   "invite_token"
@@ -125,7 +125,7 @@ ActiveRecord::Schema.define(version: 20170220160538) do
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
     t.integer  "lock_version", default: 0,     null: false
-    t.integer  "max_machines"
+    t.integer  "max_machines", default: 1
     t.boolean  "encrypted",    default: false
     t.boolean  "protected",    default: false
     t.jsonb    "metadata"
