@@ -53,7 +53,7 @@ end
 #  name         :string
 #  duration     :integer
 #  strict       :boolean          default(FALSE)
-#  floating     :boolean          default(TRUE)
+#  floating     :boolean          default(FALSE)
 #  use_pool     :boolean          default(FALSE)
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
