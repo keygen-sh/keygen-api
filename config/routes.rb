@@ -142,9 +142,9 @@ end
 # == Route Map
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
-#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007fae3e1fd670@/Users/EzekielGabrielse/keygen/api/config/routes.rb:3 (lambda)>
+#                                  GET    /.well-known/acme-challenge(.:format)                                #<Proc:0x007f8ea5aa45c0@/Users/gabrielse/code/keygen/api/config/routes.rb:3 (lambda)>
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fae3e205cd0@/Users/EzekielGabrielse/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007f8ea5ae69c0@/Users/gabrielse/code/keygen/api/config/routes.rb:14 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}

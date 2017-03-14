@@ -50,7 +50,6 @@ end
 #
 # Table name: policies
 #
-#  id           :uuid             not null, primary key
 #  name         :string
 #  duration     :integer
 #  strict       :boolean          default(FALSE)
@@ -59,10 +58,11 @@ end
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  lock_version :integer          default(0), not null
-#  max_machines :integer
+#  max_machines :integer          default(1)
 #  encrypted    :boolean          default(FALSE)
 #  protected    :boolean          default(FALSE)
 #  metadata     :jsonb
+#  id           :uuid             not null, primary key
 #  product_id   :uuid
 #  account_id   :uuid
 #
