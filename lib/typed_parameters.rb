@@ -189,7 +189,7 @@ class TypedParameters
       case
       when real_type.nil?
         raise InvalidParameterError.new(pointer: keys.join("/")), "type is invalid (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
-      when value.nil? && !optional
+      when value.nil? && !optional && !allow_nil
         raise InvalidParameterError.new(pointer: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
         raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
@@ -198,6 +198,11 @@ class TypedParameters
       end
 
       transforms.merge! key => transform if transform.present?
+
+      if value.nil? && allow_nil
+        params.merge! key => value
+        return
+      end
 
       case type.to_sym
       when :hash
@@ -284,7 +289,8 @@ class TypedParameters
           hash.merge! data.slice(:id)
           hash.merge! data.fetch(:attributes, {})
           hash.merge! data.fetch(:relationships, nil)&.map { |key, rel|
-            dat = rel.fetch :data, {}
+            dat = rel.fetch :data, nil
+            next if dat.nil?
 
             case dat
             when Array
@@ -292,7 +298,7 @@ class TypedParameters
             when Hash
               _transform_data_hash! dat
             end
-          }&.reduce(:merge) || {}
+          }&.compact&.reduce(:merge) || {}
         end
       end
 

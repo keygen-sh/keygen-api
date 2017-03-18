@@ -97,7 +97,7 @@ module Api::V1
               end
             end
             param :user, type: :hash, optional: true do
-              param :data, type: :hash do
+              param :data, type: :hash, allow_nil: true do
                 param :type, type: :string, inclusion: %w[user users]
                 param :id, type: :string
               end

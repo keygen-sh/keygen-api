@@ -175,6 +175,36 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates a license with a null user
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin attempts to create a license without a policy
     Given I am an admin of account "test1"
     And the current account is "test1"
