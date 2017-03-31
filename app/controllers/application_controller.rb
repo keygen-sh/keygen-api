@@ -2,6 +2,7 @@ class ApplicationController < ActionController::API
   include Pundit
 
   before_action :force_jsonapi_response_format
+  before_action :send_rate_limiting_headers
   after_action :verify_authorized
 
   rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
@@ -143,7 +144,22 @@ class ApplicationController < ActionController::API
   end
 
   def force_jsonapi_response_format
-    response.headers["Content-Type"] =
-      Mime::Type.lookup_by_extension(:jsonapi).to_s
+    response.headers["Content-Type"] = Mime::Type.lookup_by_extension(:jsonapi).to_s
+  end
+
+  def send_rate_limiting_headers
+    data = (request.env["rack.attack.throttle_data"] || {})["req/ip"]
+    return unless data.present?
+
+    period = data[:period].to_i
+    count = data[:count].to_i
+    limit = data[:limit].to_i
+    now = Time.now
+
+    response.headers["X-RateLimit-Limit"] = limit.to_s
+    response.headers["X-RateLimit-Remaining"] = [0, limit - count].max.to_s
+    response.headers["X-RateLimit-Reset"] = (now + (period - now.to_i % period)).to_s
+  rescue => e
+    Raygun.track_exception e
   end
 end
