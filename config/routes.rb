@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  # Lets Encrypt cert challenge
-  get ".well-known/acme-challenge/#{ENV["LETS_ENCRYPT_CHALLENGE"]}", to: -> (*) { [200, {}, [ENV["LETS_ENCRYPT_ANSWER"]]] }
 
   # constraints -> (req) { req.format.symbol != :jsonapi } do
   #   match "*bad_request", to: "errors#show", code: 400, via: [:get, :post, :patch, :put, :delete, :head, :options]
