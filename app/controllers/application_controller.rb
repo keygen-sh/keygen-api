@@ -158,7 +158,7 @@ class ApplicationController < ActionController::API
 
     response.headers["X-RateLimit-Limit"] = limit.to_s
     response.headers["X-RateLimit-Remaining"] = [0, limit - count].max.to_s
-    response.headers["X-RateLimit-Reset"] = (now + (period - now.to_i % period)).to_s
+    response.headers["X-RateLimit-Reset"] = (now + (period - now.to_i % period)).to_i.to_s
   rescue => e
     Raygun.track_exception e
   end

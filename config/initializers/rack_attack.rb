@@ -27,7 +27,7 @@ class Rack::Attack
         "Content-Type" => "application/vnd.api+json",
         "X-RateLimit-Limit" => limit.to_s,
         "X-RateLimit-Remaining" => "0",
-        "X-RateLimit-Reset" => (now + (period - now.to_i % period)).to_s
+        "X-RateLimit-Reset" => (now + (period - now.to_i % period)).to_i.to_s
       },
       [{
         errors: [{
