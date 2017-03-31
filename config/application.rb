@@ -34,7 +34,7 @@ module Keygen
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    # Protect against DDOS
+    # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
 
     # Use Sidekiq for background jobs
