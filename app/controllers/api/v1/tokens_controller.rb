@@ -32,7 +32,8 @@ module Api::V1
         if user&.authenticate(password)
           token = TokenGeneratorService.new(
             account: current_account,
-            bearer: user
+            bearer: user,
+            expiry: user.role?(:admin) ? false : nil # Admin tokens don't expire
           ).execute
 
           render jsonapi: token and return
