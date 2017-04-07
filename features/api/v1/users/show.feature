@@ -35,14 +35,32 @@ Feature: Show user
     Then the response status should be "200"
     And the JSON response should be a "user"
 
-  Scenario: Product attempts to retrieve a user for another product
+  Scenario: Product retrieves a user for another product
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
     And the current account has 1 "user"
     When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
+  Scenario: User attempts to retrieve another user
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$2"
     Then the response status should be "403"
+
+  Scenario: User retrieves their profile
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
 
   Scenario: Admin attempts to retrieve a user for another account
     Given I am an admin of account "test2"

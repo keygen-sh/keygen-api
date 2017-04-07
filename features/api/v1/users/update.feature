@@ -341,9 +341,10 @@ Feature: Update user
         }
       }
       """
-    Then the response status should be "403"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the firstName "Mr. Robot"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
 
   Scenario: User attempts to update their password
    Given the current account is "test1"
