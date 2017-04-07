@@ -71,6 +71,12 @@ Then /^the JSON response should be an array of "([^\"]*)"$/ do |name|
   json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
 end
 
+Then /^the JSON response should be an empty array$/ do
+  json = JSON.parse last_response.body
+
+  expect(json["data"].empty?).to be true
+end
+
 Then /^the JSON response should be an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 

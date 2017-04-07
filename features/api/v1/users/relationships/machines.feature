@@ -130,7 +130,8 @@ Feature: User machines relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/machines"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an empty array
 
   Scenario: User attempts to retrieve the machines for another user
     Given the current account is "test1"
