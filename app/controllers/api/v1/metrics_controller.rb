@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /metrics
     def index
-      @metrics = Rails.cache.fetch cache_key, expires_in: 15.minutes do
+      @metrics = Rails.cache.fetch cache_key, expires_in: 5.minutes do
         policy_scope apply_scopes(current_account.metrics).all
       end
       authorize @metrics
