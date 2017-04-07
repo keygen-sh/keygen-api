@@ -5,7 +5,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.role? :admin or resource == bearer or resource.products.include? bearer
+    bearer.role? :admin or bearer.role? :product or resource == bearer
   end
 
   def create?
@@ -13,7 +13,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    bearer.role? :admin or resource == bearer or resource.products.include? bearer
+    bearer.role? :admin or bearer.role? :product or resource == bearer
   end
 
   def destroy?
