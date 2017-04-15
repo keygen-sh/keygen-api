@@ -35,7 +35,7 @@ module Pagination
   end
 
   def pagination_query_params(number, size)
-    request.query_parameters.merge(page: { number: number, size: size}).to_query
+    request.query_parameters.merge(page: { number: number, size: size }).to_query
   end
 
   def pagination_resource_path
