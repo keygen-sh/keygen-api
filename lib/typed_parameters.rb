@@ -224,7 +224,9 @@ class TypedParameters
         if block_given?
           arr_type, b = block.call
 
-          if !value.all? { |v| Helper.compare_types v.class, arr_type }
+          if index = value.index { |v| !Helper.compare_types(v.class, arr_type) }
+            keys << index
+
             raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
 
@@ -234,7 +236,7 @@ class TypedParameters
               ctx = context.dup
               ctx.params = v
 
-              child = Schema.new(controller: context, context: ctx, stack: keys, config: config, &b)
+              child = Schema.new(controller: context, context: ctx, stack: [*keys, i], config: config, &b)
               children << child
 
               child.params
@@ -243,7 +245,9 @@ class TypedParameters
             params.merge! key => value
           end
         else
-          if !value.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
+          if index = value.index { |v| !SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
+            keys << index
+
             raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected array of scalar types)"
           end
           params.merge! key => value
