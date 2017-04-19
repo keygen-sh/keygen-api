@@ -1,7 +1,7 @@
 %p
   Welcome to the Keygen beta! I'm excited to show you around!
 %p
-  Please click the link below to accept this invitation.
+  Please click the link below to accept this invitation:
   %br
   = link_to "https://app.keygen.sh/invite/#{@token}", "https://app.keygen.sh/invite/#{@token}", class: "ellipsis"
 %p
@@ -20,5 +20,11 @@
   Want more info? Check out our #{link_to "documentation", "https://keygen.sh/docs/api"}
   for an in-depth API reference and Getting Started guide.
 %p
-  I'd be happy to help you out with any of these steps! Feel free to contact me
-  anytime for help or feedback. You can reply to this email directly.
+  And in case it's been awhile, here's some info about the account you registered
+  under that may be useful when logging in:
+%ul
+  %li Account name: #{@account.name}
+  %li Account slug: #{@account.slug}
+%p
+  I'd be happy to help you out with any of the above steps! Feel free to contact
+  me anytime for help or feedback. You can reply to this email directly.
