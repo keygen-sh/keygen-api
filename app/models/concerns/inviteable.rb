@@ -18,9 +18,9 @@ module Inviteable
 
       event :accept_invitation do
         transitions from: :invited, to: :accepted, after: -> {
-          self.invite_sent_at = nil
-          self.invite_token   = nil
-          save
+          # self.invite_sent_at = nil
+          # self.invite_token   = nil
+          # save
         }
       end
     end
