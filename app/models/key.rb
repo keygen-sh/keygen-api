@@ -9,7 +9,7 @@ class Key < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
-  validates :key, presence: true, blank: false, uniqueness: { scope: :policy_id }
+  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :policy_id }
 
   validate on: :create do
     errors.add :policy, "cannot add key to an unpooled policy" unless policy.pool?
