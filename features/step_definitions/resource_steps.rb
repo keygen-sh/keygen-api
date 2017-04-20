@@ -171,6 +171,27 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
   )
 end
 
+Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
+  parse_placeholders! body
+
+  account = Account.find slug
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+
+  account.send(resource.pluralize.underscore).all.send(:[], numbers[i]).update(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
+end
+
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   user  = @account.admins.first
   token = TokenGeneratorService.new(

@@ -82,6 +82,7 @@ Feature: Create license
     And the first "license" has the following attributes:
       """
       {
+        "policyId": "$policies[0]",
         "key": "a"
       }
       """
@@ -109,6 +110,45 @@ Feature: Create license
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates a duplicate license of another account with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the account "test2" has 1 "policy"
+    And the account "test2" has 1 "license"
+    And the first "license" of account "test2" has the following attributes:
+      """
+      {
+        "key": "a"
+      }
+      """
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the key "a"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
 
   Scenario: Admin creates an encrypted license for a user of their account
     Given I am an admin of account "test1"
