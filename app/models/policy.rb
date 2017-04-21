@@ -10,6 +10,8 @@ class Policy < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 
+  validates :name, presence: true
+
   validate do
     errors.add :encrypted, "cannot be encrypted and use a pool" if pool? && encrypted?
   end
