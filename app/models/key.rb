@@ -9,10 +9,11 @@ class Key < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
-  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :policy_id }
+  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }
 
   validate on: :create do
     errors.add :policy, "cannot add key to an unpooled policy" unless policy.pool?
+    errors.add :key, "a license already exists with this key" if account.licenses.exists? key: key
   end
 
   scope :policy, -> (id) { where policy: id }

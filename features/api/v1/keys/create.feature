@@ -116,6 +116,86 @@ Feature: Create key
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin creates a key but a license already exists with the same key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "usePool": true }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/keys" with the following:
+      """
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates a key but a license for another already exists with the same key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "usePool": true }
+      """
+    And the account "test2" has 1 "license"
+    And the first "license" of account "test2" has the following attributes:
+      """
+      {
+        "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/keys" with the following:
+      """
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
   Scenario: Admin creates a key that is a duplicate of a key for another account
     Given I am an admin of account "test1"
     And the current account is "test1"
