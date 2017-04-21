@@ -144,6 +144,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
+            "name": "Add-On",
             "maxMachines": 1,
             "floating": false,
             "strict": true,
