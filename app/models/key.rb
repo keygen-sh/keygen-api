@@ -13,6 +13,9 @@ class Key < ApplicationRecord
 
   validate on: :create do
     errors.add :policy, "cannot add key to an unpooled policy" unless policy.pool?
+  end
+
+  validate on: [:create, :update] do
     errors.add :key, "a license already exists with this key" if account.licenses.exists? key: key
   end
 
