@@ -21,7 +21,7 @@ class License < ApplicationRecord
     errors.add :key, "cannot specify key for encrypted license" if key.present? && policy.encrypted?
   end
 
-  validates :key, uniqueness: { case_sensitive: true, scope: :policy_id }, unless: -> { key.nil? }
+  validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, unless: -> { key.nil? }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :policy, -> (id) { where policy: id }
