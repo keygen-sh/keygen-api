@@ -39,7 +39,7 @@ module Api::V1
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing&.subscription_id == subscription.id
 
-        billing.cancel_subscription! unless billing.canceled?
+        billing.cancel_subscription! unless billing.paused?
         billing.update(
           subscription_status: subscription.status
         )
