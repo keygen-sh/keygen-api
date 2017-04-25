@@ -42,8 +42,10 @@ module Api::V1::Accounts::Relationships
           render_unprocessable_resource @account
         end
       else
-        render_unprocessable_entity detail: "failed to update plan", source: {
-          pointer: "/data/relationships/plan" }
+        render_unprocessable_entity(
+          detail: "failed to update #{@account.billing.state} subscription",
+          source: { pointer: "/data/relationships/billing" }
+        )
       end
     end
 

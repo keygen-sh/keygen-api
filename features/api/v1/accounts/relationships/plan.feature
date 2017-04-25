@@ -122,8 +122,8 @@ Feature: Account plan relationship
         }
       }
       """
-    Then the response status should be "422"
-    And sidekiq should have 0 "webhook" jobs
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to change to an invalid plan
