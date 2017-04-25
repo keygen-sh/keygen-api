@@ -7,6 +7,9 @@ class SerializablePlan < SerializableBase
   attribute :max_policies
   attribute :max_licenses
   attribute :max_products
+  attribute :private, if: -> { @object.private? } do
+    @object.private
+  end
   attribute :created do
     @object.created_at
   end

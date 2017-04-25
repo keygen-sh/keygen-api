@@ -166,7 +166,13 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
     "ninth"   => 8
   }
 
-  @account.send(resource.pluralize.underscore).all.send(:[], numbers[i]).update(
+  model = if resource.singularize == "plan"
+            Plan.all
+          else
+            @account.send(resource.pluralize.underscore).all
+          end
+
+  model.send(:[], numbers[i]).update(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
 end

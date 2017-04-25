@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170314030836) do
+ActiveRecord::Schema.define(version: 20170425195815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -108,10 +108,11 @@ ActiveRecord::Schema.define(version: 20170314030836) do
     t.integer  "max_users"
     t.integer  "max_policies"
     t.integer  "max_licenses"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.integer  "max_products"
     t.string   "plan_id"
+    t.boolean  "private",      default: false
     t.index ["created_at", "id"], name: "index_plans_on_created_at_and_id", unique: true, using: :btree
     t.index ["created_at", "plan_id"], name: "index_plans_on_created_at_and_plan_id", using: :btree
   end
