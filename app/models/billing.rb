@@ -21,11 +21,11 @@ class Billing < ApplicationRecord
     state :canceled
 
     event :activate_trial do
-      transitions from: :pending, to: :trialing
+      transitions from: [:pending, :canceled], to: :trialing
     end
 
     event :activate_subscription do
-      transitions from: [:pending, :trialing], to: :subscribed
+      transitions from: [:pending, :trialing, :canceled], to: :subscribed
     end
 
     event :pause_subscription do
@@ -50,7 +50,7 @@ class Billing < ApplicationRecord
 
     event :cancel_subscription do
       transitions from: [:pending, :trialing, :subscribed], to: :canceled, after: -> {
-        AccountMailer.subscription_canceled(account: account).deliver_later
+        AccountMailer.subscription_canceled(account: account).deliver_later if aasm.from_state == :subscribed
 
         Billings::DeleteSubscriptionService.new(
           subscription: subscription_id

@@ -61,10 +61,31 @@ Feature: Process Stripe webhook events
     Then the account should be in a "canceled" state
     And the response status should be "202"
 
-  Scenario: We receive a "customer.subscription.deleted" event
+  Scenario: We receive a "customer.subscription.deleted" event when trialing
     Given there is an incoming "customer.subscription.deleted" event
+    And the account is in a "trialing" state
     When the event is received at "/stripe"
     Then the account should not have a subscription
+    And the account should be in a "canceled" state
+    And the account should not receive a "subscription canceled" email
+    And the response status should be "202"
+
+  Scenario: We receive a "customer.subscription.deleted" event when paused
+    Given there is an incoming "customer.subscription.deleted" event
+    And the account is in a "paused" state
+    When the event is received at "/stripe"
+    Then the account should not have a subscription
+    And the account should be in a "paused" state
+    And the account should not receive a "subscription canceled" email
+    And the response status should be "202"
+
+  Scenario: We receive a "customer.subscription.deleted" event when subscribed
+    Given there is an incoming "customer.subscription.deleted" event
+    And the account is in a "subscribed" state
+    When the event is received at "/stripe"
+    Then the account should not have a subscription
+    And the account should be in a "canceled" state
+    And the account should receive a "subscription_canceled" email
     And the response status should be "202"
 
   Scenario: We receive a "customer.source.created" event

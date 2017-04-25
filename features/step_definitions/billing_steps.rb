@@ -18,6 +18,8 @@ Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
   )
 
   case state.to_sym
+  when :trialing
+    account.billing.update subscription_status: "trialing"
   when :paused
     account.billing.update subscription_id: nil
   when :canceled
