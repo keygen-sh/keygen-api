@@ -4,7 +4,7 @@ module Api::V1
 
     # GET /plans
     def index
-      @plans = apply_scopes(Plan).all
+      @plans = apply_scopes(Plan.visible).all
 
       authorize @plans
 

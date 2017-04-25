@@ -10,6 +10,16 @@ Feature: List plans
     Then the response status should be "200"
     And the JSON response should be an array with 3 "plans"
 
+  Scenario: Anonymous should not be able to see private plans
+    Given there exists 3 "plans"
+    And the first "plan" has the following attributes:
+      """
+      { "private": true }
+      """
+    When I send a GET request to "/plans"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "plans"
+
   Scenario: Anonymous retrieves a paginated list of plans
     Given there exists 20 "plans"
     When I send a GET request to "/plans?page[number]=2&page[size]=5"

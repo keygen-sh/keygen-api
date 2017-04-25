@@ -3,6 +3,17 @@ class Plan < ApplicationRecord
   include Pageable
 
   has_many :accounts
+
+  scope :visible, -> { where private: false }
+  scope :hidden, -> { where private: true }
+
+  def private?
+    private
+  end
+
+  def public?
+    !private
+  end
 end
 
 # == Schema Information
@@ -19,6 +30,7 @@ end
 #  updated_at   :datetime         not null
 #  max_products :integer
 #  plan_id      :string
+#  private      :boolean          default(FALSE)
 #
 # Indexes
 #
