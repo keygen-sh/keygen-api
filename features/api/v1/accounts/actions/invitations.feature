@@ -22,7 +22,6 @@ Feature: Account invitation actions
       """
       { "inviteState": "accepted" }
       """
-    And the account should receive a "beta invitation" email
 
   Scenario: Anonymous accepts an invitation for an account that has already accepted
     Given the account "tesla" has accepted an invitation
@@ -39,7 +38,6 @@ Feature: Account invitation actions
       """
       { "inviteState": "accepted" }
       """
-    And the account should not receive a "beta invitation" email
 
   Scenario: Anonymous uses an invalid invitation token for an account
     Given the account "tesla" has been invited
@@ -56,7 +54,6 @@ Feature: Account invitation actions
       """
       { "inviteState": "invited" }
       """
-    And the account should not receive a "beta invitation" email
 
   Scenario: Anonymous accepts an invitation to nothing … because they weren't invited
     Given the account "tesla" has not been invited
@@ -73,4 +70,3 @@ Feature: Account invitation actions
       """
       { "inviteState": "uninvited" }
       """
-    And the account should not receive a "beta invitation" email

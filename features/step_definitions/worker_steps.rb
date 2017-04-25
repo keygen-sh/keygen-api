@@ -6,13 +6,15 @@ Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
 end
 
 Then /^the (?:account|user) should receive an? "([^\"]*)" email$/ do |mailer|
-  Sidekiq::Queues["mailers"].any? do |job|
-    job["args"].first["arguments"].include? mailer.underscore
+  received_any = Sidekiq::Queues["mailers"].any? do |job|
+    job["args"].first["arguments"].include? mailer.parameterize(separator: "_")
   end
+  expect(received_any).to be true
 end
 
 Then /^the (?:account|user) should not receive an? "([^\"]*)" email$/ do |mailer|
-  Sidekiq::Queues["mailers"].none? do |job|
-    job["args"].first["arguments"].include? mailer.underscore
+  received_any = Sidekiq::Queues["mailers"].any? do |job|
+    job["args"].first["arguments"].include? mailer.parameterize(separator: "_")
   end
+  expect(received_any).to be false
 end
