@@ -17,10 +17,17 @@ module Api::V1::Accounts::Relationships
 
       @plan = Plan.find plan_params[:id]
 
-      status = Billings::UpdateSubscriptionService.new(
-        subscription: @account.billing.subscription_id,
-        plan: @plan.plan_id
-      ).execute
+      status = if @account.billing.canceled?
+                 Billings::CreateSubscriptionService.new(
+                   customer: @account.billing.customer_id,
+                   plan: @plan.plan_id
+                 ).execute
+               else
+                 Billings::UpdateSubscriptionService.new(
+                   subscription: @account.billing.subscription_id,
+                   plan: @plan.plan_id
+                 ).execute
+               end
 
       if status
         if @account.update(plan: @plan)
@@ -35,8 +42,8 @@ module Api::V1::Accounts::Relationships
           render_unprocessable_resource @account
         end
       else
-        render_unprocessable_entity detail: "must have a valid subscription to change plans", source: {
-          pointer: "/data/relationships/billing" }
+        render_unprocessable_entity detail: "failed to update plan", source: {
+          pointer: "/data/relationships/plan" }
       end
     end
 
