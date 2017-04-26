@@ -22,7 +22,7 @@ class Billing < ApplicationRecord
     state :canceled
 
     event :activate_trial do
-      transitions from: %i[pending canceled], to: :trialing
+      transitions from: %i[pending canceling canceled], to: :trialing
     end
 
     event :activate_subscription do
