@@ -38,7 +38,7 @@ class Billing < ApplicationRecord
     end
 
     event :resume_subscription do
-      transitions from: %i[paused], to: :subscribed, after: -> {
+      transitions from: %i[paused], to: :pending, after: -> {
         # Setting a trial allows us to continue to use the previously 'paused'
         # subscription's billing cycle
         Billings::CreateSubscriptionService.new(
@@ -64,7 +64,7 @@ class Billing < ApplicationRecord
     end
 
     event :renew_subscription do
-      transitions from: %i[canceling], to: :subscribed, after: -> {
+      transitions from: %i[canceling], to: :pending, after: -> {
         Billings::UpdateSubscriptionService.new(
           subscription: subscription_id,
           plan: plan.plan_id
