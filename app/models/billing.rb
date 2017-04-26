@@ -53,7 +53,7 @@ class Billing < ApplicationRecord
       transitions from: %i[pending trialing subscribed], to: :canceling, after: -> {
         Billings::DeleteSubscriptionService.new(
           subscription: subscription_id,
-          at_period_end: false
+          at_period_end: true
         ).execute
       }
     end
