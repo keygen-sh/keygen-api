@@ -33,9 +33,9 @@ module Api::V1
           billing.cancel_subscription unless billing.canceled?
         end
 
-        if subscription.cancel_at_period_end
-          billing.cancel_subscription_at_period_end unless billing.canceling?
-        end
+        # if subscription.cancel_at_period_end
+        #   billing.cancel_subscription_at_period_end unless billing.canceling?
+        # end
 
         billing.save
       when "customer.subscription.deleted"
