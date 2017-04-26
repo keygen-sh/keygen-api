@@ -43,7 +43,7 @@ class Billing < ApplicationRecord
         # subscription's billing cycle
         Billings::CreateSubscriptionService.new(
           customer: customer_id,
-          trial: subscription_period_end,
+          trial: subscription_period_end.to_i,
           plan: plan.plan_id
         ).execute
       }
