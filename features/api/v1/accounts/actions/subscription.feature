@@ -50,7 +50,7 @@ Feature: Account subscription actions
     And the JSON response should be meta with the following:
       """
       {
-        "status": "canceled"
+        "status": "canceling"
       }
       """
     And sidekiq should have 1 "webhook" job
