@@ -24,18 +24,18 @@ module Api::V1
           subscription_status: subscription.status
         )
 
-        case subscription.status
-        when "active"
-          billing.activate_subscription unless billing.subscribed?
-        when "trialing"
-          billing.activate_trial unless billing.trialing?
-        when "canceled"
-          billing.cancel_subscription unless billing.canceled?
+        if subscription.cancel_at_period_end
+          billing.cancel_subscription_at_period_end unless billing.canceling?
+        else
+          case subscription.status
+          when "active"
+            billing.activate_subscription unless billing.subscribed?
+          when "trialing"
+            billing.activate_trial unless billing.trialing?
+          when "canceled"
+            billing.cancel_subscription unless billing.canceled?
+          end
         end
-
-        # if subscription.cancel_at_period_end
-        #   billing.cancel_subscription_at_period_end unless billing.canceling?
-        # end
 
         billing.save
       when "customer.subscription.deleted"
