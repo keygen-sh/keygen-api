@@ -18,18 +18,19 @@ class Billing < ApplicationRecord
     state :trialing
     state :subscribed
     state :paused
+    state :canceling
     state :canceled
 
     event :activate_trial do
-      transitions from: [:pending, :canceled], to: :trialing
+      transitions from: %i[pending canceled], to: :trialing
     end
 
     event :activate_subscription do
-      transitions from: [:pending, :trialing, :canceled], to: :subscribed
+      transitions from: %i[pending trialing canceling canceled], to: :subscribed
     end
 
     event :pause_subscription do
-      transitions from: :subscribed, to: :paused, after: -> {
+      transitions from: %i[subscribed], to: :paused, after: -> {
         Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
         ).execute
@@ -37,7 +38,7 @@ class Billing < ApplicationRecord
     end
 
     event :resume_subscription do
-      transitions from: :paused, to: :subscribed, after: -> {
+      transitions from: %i[paused], to: :subscribed, after: -> {
         # Setting a trial allows us to continue to use the previously 'paused'
         # subscription's billing cycle
         Billings::CreateSubscriptionService.new(
@@ -48,9 +49,13 @@ class Billing < ApplicationRecord
       }
     end
 
+    event :cancel_subscription_at_period_end do
+      transitions from: %i[pending trialing subscribed], to: :canceling
+    end
+
     event :cancel_subscription do
-      transitions from: [:pending, :trialing, :subscribed], to: :canceled, after: -> {
-        AccountMailer.subscription_canceled(account: account).deliver_later if aasm.from_state == :subscribed
+      transitions from: %i[pending trialing subscribed canceling], to: :canceled, after: -> {
+        AccountMailer.subscription_canceled(account: account).deliver_later if %i[subscribed canceling].include?(aasm.from_state)
 
         Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
@@ -59,7 +64,7 @@ class Billing < ApplicationRecord
     end
 
     event :renew_subscription do
-      transitions from: :canceled, to: :subscribed, after: -> {
+      transitions from: %i[canceling], to: :subscribed, after: -> {
         Billings::UpdateSubscriptionService.new(
           subscription: subscription_id,
           plan: plan.plan_id
