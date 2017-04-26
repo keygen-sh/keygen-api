@@ -24,13 +24,15 @@ module Api::V1
           subscription_status: subscription.status
         )
 
-        case subscription.status
-        when "active"
+        case
+        when subscription.status == "active"
           billing.activate_subscription unless billing.subscribed?
-        when "trialing"
+        when subscription.status == "trialing"
           billing.activate_trial unless billing.trialing?
-        when "canceled"
+        when subscription.status == "canceled"
           billing.cancel_subscription unless billing.canceled?
+        when subscription.cancel_at_period_end
+          billing.cancel_subscription_at_period_end unless billing.canceling?
         end
 
         billing.save
@@ -39,10 +41,9 @@ module Api::V1
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing&.subscription_id == subscription.id
 
-        billing.cancel_subscription! unless billing.paused?
-        billing.update(
-          subscription_status: subscription.status
-        )
+        billing.cancel_subscription
+        billing.subscription_status = subscription.status
+        billing.save
       when "customer.source.created", "customer.source.updated"
         card = event.data.object
         billing = Billing.find_by customer_id: card.customer

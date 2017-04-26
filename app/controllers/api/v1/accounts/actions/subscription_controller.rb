@@ -16,7 +16,7 @@ module Api::V1::Accounts::Actions
 
         render_meta status: "paused"
       else
-        render_unprocessable_entity detail: "failed to pause subscription", source: {
+        render_unprocessable_entity detail: "failed to pause #{@account.billing.state} subscription", source: {
           pointer: "/data/relationships/billing" }
       end
     end
@@ -34,7 +34,7 @@ module Api::V1::Accounts::Actions
 
         render_meta status: "resumed"
       else
-        render_unprocessable_entity detail: "failed to resume subscription", source: {
+        render_unprocessable_entity detail: "failed to resume #{@account.billing.state} subscription", source: {
           pointer: "/data/relationships/billing" }
       end
     end
@@ -52,7 +52,7 @@ module Api::V1::Accounts::Actions
 
         render_meta status: "canceled"
       else
-        render_unprocessable_entity detail: "failed to cancel subscription", source: {
+        render_unprocessable_entity detail: "failed to cancel #{@account.billing.state} subscription", source: {
           pointer: "/data/relationships/billing" }
       end
     end
@@ -70,7 +70,7 @@ module Api::V1::Accounts::Actions
 
         render_meta status: "renewed"
       else
-        render_unprocessable_entity detail: "failed to renew subscription", source: {
+        render_unprocessable_entity detail: "failed to renew #{@account.billing.state} subscription", source: {
           pointer: "/data/relationships/billing" }
       end
     end

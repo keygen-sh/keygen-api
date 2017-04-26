@@ -56,8 +56,8 @@ Feature: Account subscription actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin renews their canceled account
-    Given the account "test1" is canceled
+  Scenario: Admin renews their canceling account
+    Given the account "test1" is canceling
     And I am an admin of account "test1"
     And the account "test1" has 1 "webhookEndpoint"
     And I use an authentication token
@@ -70,6 +70,16 @@ Feature: Account subscription actions
       }
       """
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin renews their canceled account
+    Given the account "test1" is canceled
+    And I am an admin of account "test1"
+    And the account "test1" has 1 "webhookEndpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/renew-subscription"
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to pause their paused account
