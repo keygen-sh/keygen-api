@@ -43,14 +43,14 @@ module Api::V1::Accounts::Actions
     def cancel
       authorize @account
 
-      if @account.cancel_subscription!
+      if @account.cancel_subscription_at_period_end!
         CreateWebhookEventService.new(
           event: "account.subscription.canceled",
           account: @account,
           resource: @account
         ).execute
 
-        render_meta status: "canceled"
+        render_meta status: "canceling"
       else
         render_unprocessable_entity detail: "failed to cancel #{@account.billing.state} subscription", source: {
           pointer: "/data/relationships/billing" }
