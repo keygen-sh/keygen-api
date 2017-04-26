@@ -30,7 +30,7 @@ class Billing < ApplicationRecord
     end
 
     event :pause_subscription do
-      transitions from: %i[subscribed], to: :paused, after: -> {
+      transitions from: %i[trialing subscribed], to: :paused, after: -> {
         Billings::DeleteSubscriptionService.new(
           subscription: subscription_id
         ).execute
