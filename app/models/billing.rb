@@ -50,7 +50,12 @@ class Billing < ApplicationRecord
     end
 
     event :cancel_subscription_at_period_end do
-      transitions from: %i[pending trialing subscribed], to: :canceling
+      transitions from: %i[pending trialing subscribed], to: :canceling, after: -> {
+        Billings::DeleteSubscriptionService.new(
+          subscription: subscription_id,
+          at_period_end: false
+        ).execute
+      }
     end
 
     event :cancel_subscription do
@@ -58,7 +63,8 @@ class Billing < ApplicationRecord
         AccountMailer.subscription_canceled(account: account).deliver_later if %i[subscribed canceling].include?(aasm.from_state)
 
         Billings::DeleteSubscriptionService.new(
-          subscription: subscription_id
+          subscription: subscription_id,
+          at_period_end: false
         ).execute
       }
     end
