@@ -9,15 +9,8 @@ module CurrentAccountScope
         title: "Account is not in the beta program",
         detail: "must have accepted an invite to take part in the beta program"
       })
-    elsif !current_account.active?
-      render_forbidden({
-        title: "Account does not have an active subscription",
-        detail: "must have an active subscription to access this resource"
-      })
     else
       current_account
     end
-  rescue ActiveRecord::RecordNotFound
-    render_not_found detail: "The requested resource requires a valid account"
   end
 end

@@ -4,6 +4,7 @@ module Api::V1
     has_scope :product
 
     before_action :scope_to_current_account!
+    before_action :require_active_subscription!, only: [:index, :create, :destroy]
     before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
     before_action :authenticate_with_token, only: [:create]
     before_action :set_user, only: [:show, :update, :destroy]

@@ -1,6 +1,7 @@
 module Api::V1
   class PasswordsController < Api::V1::BaseController
     before_action :scope_to_current_account!
+    before_action :require_active_subscription!
     before_action :set_user, only: [:reset_password]
 
     # POST /passwords
