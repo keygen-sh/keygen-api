@@ -8,6 +8,11 @@ Feature: Delete account
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    When I send a DELETE request to "/accounts/test1"
+    Then the response status should not be "403"
+
   Scenario: Admin deletes their account
     Given I am an admin of account "test1"
     And I use an authentication token

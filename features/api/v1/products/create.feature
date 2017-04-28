@@ -8,6 +8,14 @@ Feature: Create product
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be inaccessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products"
+    Then the response status should be "403"
+
   Scenario: Admin creates a product for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

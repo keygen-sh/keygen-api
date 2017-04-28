@@ -8,6 +8,14 @@ Feature: Revoke authentication token
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/tokens/$0"
+    Then the response status should not be "403"
+
   Scenario: Admin revokes one of their tokens
     Given I am an admin of account "test1"
     And the current account is "test1"
