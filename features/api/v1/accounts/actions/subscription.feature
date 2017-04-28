@@ -8,6 +8,11 @@ Feature: Account subscription actions
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    When I send a POST request to "/accounts/test1/actions/pause-subscription"
+    Then the response status should not be "403"
+
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

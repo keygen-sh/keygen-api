@@ -8,6 +8,14 @@ Feature: Regenerate authentication token
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/tokens"
+    Then the response status should not be "403"
+
   Scenario: Admin resets their current token
     Given the current account is "test1"
     And I am an admin of account "test1"

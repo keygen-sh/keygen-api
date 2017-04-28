@@ -8,6 +8,14 @@ Feature: User password actions
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/actions/update-password"
+    Then the response status should not be "403"
+
   Scenario: User updates their password
     Given the current account is "test1"
     And the current account has 3 "users"

@@ -8,6 +8,11 @@ Feature: Account billing relationship
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "test1" is canceled
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should not be "403"
+
   Scenario: Admin retrieves the billing info for their account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

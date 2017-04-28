@@ -8,6 +8,15 @@ Feature: List policies
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be inaccessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+
   Scenario: Admin retrieves all policies for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

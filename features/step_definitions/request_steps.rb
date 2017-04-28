@@ -28,6 +28,12 @@ When /^I send a PUT request to "([^\"]*)"$/ do |path|
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
+When /^I send a PATCH request to "([^\"]*)"$/ do |path|
+  parse_path_placeholders! path
+
+  patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+end
+
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body
@@ -57,6 +63,10 @@ end
 
 Then /^the response status should be "([^\"]*)"$/ do |status|
   expect(last_response.status).to eq status.to_i
+end
+
+Then /^the response status should not be "([^\"]*)"$/ do |status|
+  expect(last_response.status).to_not eq status.to_i
 end
 
 Then /^the JSON response should be an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|

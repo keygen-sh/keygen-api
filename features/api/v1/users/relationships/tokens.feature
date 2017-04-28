@@ -8,6 +8,14 @@ Feature: User tokens relationship
       | Test 2  | test2 |
     And I send and accept JSON
 
+  Scenario: Endpoint should be inaccessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "403"
+
   Scenario: Admin requests tokens for one of their users
     Given the current account is "test1"
     And I am an admin of account "test1"

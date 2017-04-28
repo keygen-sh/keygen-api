@@ -7,6 +7,11 @@ Feature: Account invitation actions
       | Tesla  | tesla |
     And I send and accept JSON
 
+  Scenario: Endpoint should be accessible when account is disabled
+    Given the account "tesla" is canceled
+    When I send a POST request to "/accounts/tesla/actions/accept-invitation"
+    Then the response status should not be "403"
+
   Scenario: Anonymous accepts an invitation for an account
     Given the account "tesla" has been invited
     And the account "tesla" has the following attributes:
