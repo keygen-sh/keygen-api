@@ -37,7 +37,7 @@ module Api::V1
             expiry: user.role?(:admin) ? false : nil # Admin tokens don't expire
           ).execute
 
-          render jsonapi: token and return
+          render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
         end
       end
 
@@ -76,7 +76,7 @@ module Api::V1
 
       @token.regenerate!
 
-      render jsonapi: @token and return
+      render jsonapi: @token
     end
 
     # DELETE /tokens/1
