@@ -12,6 +12,16 @@ class AccountMailer < ApplicationMailer
     end
   end
 
+  def beta_ending_soon(account:)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "The beta is ending next week! (Meaning we're launching soon!)"
+    end
+  end
+
   def follow_up(account:)
     @account = account
 
