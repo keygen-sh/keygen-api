@@ -11,6 +11,10 @@ class AccountMailerPreview < ActionMailer::Preview
     AccountMailer.beta_invitation account: account, token: token
   end
 
+  def beta_ending_soon
+    AccountMailer.beta_ending_soon account: account
+  end
+
   def follow_up
     AccountMailer.follow_up account: account
   end
