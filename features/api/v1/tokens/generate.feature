@@ -24,7 +24,7 @@ Feature: Generate authentication token
       { "Authorization": "Basic \"$users[0].email:password\"" }
       """
     When I send a POST request to "/accounts/test1/tokens"
-    Then the response status should be "200"
+    Then the response status should be "201"
     And the JSON response should be a "token" with a token
     And the JSON response should be a "token" with a nil expiry
 
@@ -37,7 +37,7 @@ Feature: Generate authentication token
       { "Authorization": "Basic \"$users[1].email:password\"" }
       """
     When I send a POST request to "/accounts/test1/tokens"
-    Then the response status should be "200"
+    Then the response status should be "201"
     And the JSON response should be a "token" with a token
     And the JSON response should be a "token" with a expiry
 
