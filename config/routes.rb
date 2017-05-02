@@ -141,7 +141,7 @@ end
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007f8042e4d698@/Users/EzekielGabrielse/keygen/api/config/routes.rb:12 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fde00342e30@/Users/EzekielGabrielse/keygen/api/config/routes.rb:12 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
