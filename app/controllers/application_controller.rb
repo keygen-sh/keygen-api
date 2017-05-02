@@ -13,6 +13,7 @@ class ApplicationController < ActionController::API
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
   rescue_from ActiveRecord::StatementInvalid, with: -> { render_bad_request } # Invalid UUIDs, non-base64'd creds, etc.
+  rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
   rescue_from ActiveRecord::RecordNotFound, with: -> { render_not_found }
   rescue_from JSON::ParserError, with: -> { render_bad_request }
 
