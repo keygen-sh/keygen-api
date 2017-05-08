@@ -18,7 +18,7 @@ class AccountMailer < ApplicationMailer
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "The beta is ending next week! (Meaning we're launching soon!)"
+      mail to: admin.email, subject: "The beta is ending tomorrow! (Meaning we're launching soon!)"
     end
   end
 
