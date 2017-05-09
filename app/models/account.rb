@@ -1,7 +1,6 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
   include Welcomeable
-  include Inviteable
   include Sluggable
   include Limitable
   include Pageable
@@ -57,16 +56,13 @@ end
 #
 # Table name: accounts
 #
-#  id             :uuid             not null, primary key
-#  name           :string
-#  slug           :string
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  plan_id        :uuid
-#  invite_state   :string
-#  invite_token   :string
-#  invite_sent_at :datetime
-#  protected      :boolean          default(FALSE)
+#  name       :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  slug       :string
+#  id         :uuid             not null, primary key
+#  plan_id    :uuid
+#  protected  :boolean          default(FALSE)
 #
 # Indexes
 #
