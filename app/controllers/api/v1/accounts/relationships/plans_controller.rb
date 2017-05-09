@@ -17,17 +17,7 @@ module Api::V1::Accounts::Relationships
 
       @plan = Plan.find plan_params[:id]
 
-      status = if @account.plan.plan_id == "beta"
-                 # TODO: Remove this logic after beta. Stripe doesn't let us go
-                 #       from a free plan a trial without a card, so we need to
-                 #       cancel the beta plan *and then* subscribe.
-                 @account.cancel_subscription!
-
-                 Billings::CreateSubscriptionService.new(
-                   customer: @account.billing.customer_id,
-                   plan: @plan.plan_id
-                 ).execute
-               elsif @account.billing.canceled?
+      status = if @account.billing.canceled?
                  Billings::CreateSubscriptionService.new(
                    customer: @account.billing.customer_id,
                    plan: @plan.plan_id

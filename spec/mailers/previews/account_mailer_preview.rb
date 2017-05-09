@@ -1,18 +1,7 @@
 class AccountMailerPreview < ActionMailer::Preview
 
-  def beta_invitation
-    token, enc = account.generate_encrypted_token :invite_token do |token|
-      "#{account.id.delete "-"}.#{token}"
-    end
-
-    account.invite_sent_at = Time.zone.now
-    account.invite_token   = enc
-
-    AccountMailer.beta_invitation account: account, token: token
-  end
-
-  def beta_ending_soon
-    AccountMailer.beta_ending_soon account: account
+  def beta_ending_today
+    AccountMailer.beta_ending_today account: account
   end
 
   def follow_up

@@ -3,14 +3,5 @@ module CurrentAccountScope
 
   def scope_to_current_account!
     @current_account = Account.find params[:account_id] || params[:id]
-
-    if !current_account.beta_user?
-      render_forbidden({
-        title: "Account is not in the beta program",
-        detail: "must have accepted an invite to take part in the beta program"
-      })
-    else
-      current_account
-    end
   end
 end

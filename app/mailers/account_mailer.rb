@@ -2,23 +2,13 @@ class AccountMailer < ApplicationMailer
   default from: "Zeke from Keygen <zeke@keygen.sh>"
   layout "account_mailer"
 
-  def beta_invitation(account:, token:)
-    @account, @token = account, token
-
-    account.admins.each do |admin|
-      @user = admin
-
-      mail to: admin.email, subject: "You've been invited to join the Keygen beta!"
-    end
-  end
-
-  def beta_ending_soon(account:)
+  def beta_ending_today(account:)
     @account = account
 
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "The beta is ending tomorrow! (Meaning we're launching soon!)"
+      mail to: admin.email, subject: "The Keygen beta is ending within the next 24 hours"
     end
   end
 

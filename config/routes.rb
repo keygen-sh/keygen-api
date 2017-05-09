@@ -20,7 +20,6 @@ Rails.application.routes.draw do
         end
         member do
           scope "actions", module: "accounts/actions" do
-            post "accept-invitation", to: "invitations#accept"
             post "pause-subscription", to: "subscription#pause"
             post "resume-subscription", to: "subscription#resume"
             post "cancel-subscription", to: "subscription#cancel"
@@ -141,7 +140,7 @@ end
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fde00342e30@/Users/EzekielGabrielse/keygen/api/config/routes.rb:12 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fa90ba003f0@/Users/gabrielse/code/keygen/api/config/routes.rb:12 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
@@ -150,7 +149,6 @@ end
 #                  v1_account_plan GET    /v1/accounts/:account_id/plan(.:format)                              api/v1/accounts/relationships/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PATCH  /v1/accounts/:account_id/plan(.:format)                              api/v1/accounts/relationships/plans#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                  PUT    /v1/accounts/:account_id/plan(.:format)                              api/v1/accounts/relationships/plans#update {:subdomain=>"api", :format=>"jsonapi"}
-#     accept_invitation_v1_account POST   /v1/accounts/:id/actions/accept-invitation(.:format)                 api/v1/accounts/actions/invitations#accept {:subdomain=>"api", :format=>"jsonapi"}
 #    pause_subscription_v1_account POST   /v1/accounts/:id/actions/pause-subscription(.:format)                api/v1/accounts/actions/subscription#pause {:subdomain=>"api", :format=>"jsonapi"}
 #   resume_subscription_v1_account POST   /v1/accounts/:id/actions/resume-subscription(.:format)               api/v1/accounts/actions/subscription#resume {:subdomain=>"api", :format=>"jsonapi"}
 #   cancel_subscription_v1_account POST   /v1/accounts/:id/actions/cancel-subscription(.:format)               api/v1/accounts/actions/subscription#cancel {:subdomain=>"api", :format=>"jsonapi"}
