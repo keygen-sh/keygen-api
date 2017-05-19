@@ -1,5 +1,5 @@
 class SerializableWebhookEndpoint < SerializableBase
-  type :webhookEndpoints
+  type "webhook-endpoints"
 
   attribute :url
   attribute :created do

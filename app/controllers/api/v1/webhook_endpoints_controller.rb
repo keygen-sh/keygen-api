@@ -61,7 +61,7 @@ module Api::V1
 
       on :create do
         param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoints webhook_endpoints]
+          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints]
           param :attributes, type: :hash do
             param :url, type: :string
           end
@@ -70,7 +70,7 @@ module Api::V1
 
       on :update do
         param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoints webhook_endpoints]
+          param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints]
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :url, type: :string, optional: true

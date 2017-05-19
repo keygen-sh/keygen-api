@@ -1,5 +1,5 @@
 class SerializableWebhookEvent < SerializableBase
-  type :webhookEvents
+  type "webhook-events"
 
   attribute :endpoint
   attribute :payload
