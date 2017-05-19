@@ -19,7 +19,7 @@ Feature: Delete user
   Scenario: Admin deletes one of their users
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "users"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$3"
@@ -42,7 +42,7 @@ Feature: Delete user
     Given the current account is "test1"
     And the current account has 1 "product"
     And I am a product of account "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "users"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/users/$3"
@@ -54,7 +54,7 @@ Feature: Delete user
   Scenario: User attempts to delete themself
     Given the current account is "test1"
     And the current account has 3 "users"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And I am a user of account "test1"
     And I send and accept JSON
     And I use an authentication token

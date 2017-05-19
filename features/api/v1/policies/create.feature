@@ -19,7 +19,7 @@ Feature: Create policy
   Scenario: Admin creates a policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/policies" with the following:
@@ -53,7 +53,7 @@ Feature: Create policy
   Scenario: Admin attempts to create an incomplete policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/policies" with the following:
@@ -79,7 +79,7 @@ Feature: Create policy
   Scenario: Admin attempts to create a policy that is encrypted and uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/policies" with the following:
@@ -110,7 +110,7 @@ Feature: Create policy
   Scenario: Admin attempts to create a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 7 "webhookEndpoints"
+    And the current account has 7 "webhook-endpoints"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/policies" with the following:
@@ -142,7 +142,7 @@ Feature: Create policy
 
   Scenario: Product attempts to create a policy for their product
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token

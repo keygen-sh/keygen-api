@@ -40,7 +40,7 @@ Feature: Update user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
@@ -62,7 +62,7 @@ Feature: Update user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
       """
@@ -122,7 +122,7 @@ Feature: Update user
   Scenario: Admin promotes a user with an invalid role name for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 2 "users"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
@@ -143,7 +143,7 @@ Feature: Update user
   Scenario: Admin promotes a user to a product role for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 2 "users"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:
@@ -164,7 +164,7 @@ Feature: Update user
   Scenario: User updates attempts to promote themself to admin
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -187,7 +187,7 @@ Feature: Update user
   Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
@@ -214,7 +214,7 @@ Feature: Update user
   Scenario: Admin updates a users metadata with a nested hash
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
@@ -234,7 +234,7 @@ Feature: Update user
 
   Scenario: Product updates a users metadata
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And the current account has 1 "user"
     And I am a product of account "test1"
@@ -263,7 +263,7 @@ Feature: Update user
 
   Scenario: Product promotes a user's role to admin
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And the current account has 1 "user"
     And I am a product of account "test1"
@@ -286,7 +286,7 @@ Feature: Update user
 
   Scenario: User updates their metadata
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -312,7 +312,7 @@ Feature: Update user
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current product has 1 "user"
     When I send a PATCH request to "/accounts/test1/users/$1" with the following:
@@ -333,7 +333,7 @@ Feature: Update user
 
   Scenario: Product attempts to update a user for another product
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -356,7 +356,7 @@ Feature: Update user
 
   Scenario: User attempts to update their password
    Given the current account is "test1"
-   And the current account has 2 "webhookEndpoints"
+   And the current account has 2 "webhook-endpoints"
    And the current account has 3 "users"
    And I am a user of account "test1"
    And I use an authentication token
@@ -378,7 +378,7 @@ Feature: Update user
   Scenario: Admin attempts to update a users password
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "users"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$2" with the following:

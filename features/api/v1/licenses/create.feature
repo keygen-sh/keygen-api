@@ -19,7 +19,7 @@ Feature: Create license
   Scenario: Admin creates a license for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I use an authentication token
@@ -53,7 +53,7 @@ Feature: Create license
   Scenario: Admin creates a license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -84,7 +84,7 @@ Feature: Create license
   Scenario: Admin creates a duplicate license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the current account has 3 "licenses"
     And the first "license" has the following attributes:
@@ -122,7 +122,7 @@ Feature: Create license
   Scenario: Admin creates a duplicate license of another account with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the account "test2" has 1 "policy"
     And the account "test2" has 1 "license"
     And the first "license" of account "test2" has the following attributes:
@@ -161,7 +161,7 @@ Feature: Create license
   Scenario: Admin creates an encrypted license for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -199,7 +199,7 @@ Feature: Create license
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -226,7 +226,7 @@ Feature: Create license
   Scenario: Admin creates a license with a null user
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -256,7 +256,7 @@ Feature: Create license
   Scenario: Admin attempts to create a license without a policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -283,7 +283,7 @@ Feature: Create license
   Scenario: Admin creates an encrypted license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -323,7 +323,7 @@ Feature: Create license
 
   Scenario: User creates a license for themself
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -357,7 +357,7 @@ Feature: Create license
 
   Scenario: User attempts to create a license without a user
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -385,7 +385,7 @@ Feature: Create license
 
   Scenario: User attempts to create a license for another user
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -420,7 +420,7 @@ Feature: Create license
   Scenario: Admin creates a license using a pooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -468,7 +468,7 @@ Feature: Create license
   Scenario: Admin creates a license with an empty policy pool
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
@@ -510,7 +510,7 @@ Feature: Create license
   Scenario: Admin creates a license for a user of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "user"
     And I use an authentication token
@@ -544,7 +544,7 @@ Feature: Create license
   Scenario: Admin creates a license using a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
@@ -583,7 +583,7 @@ Feature: Create license
 
   Scenario: Product creates a license using a protected policy
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
@@ -625,7 +625,7 @@ Feature: Create license
 
   Scenario: User creates a license using a protected policy
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """

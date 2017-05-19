@@ -24,7 +24,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }
@@ -32,7 +32,7 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "webhookEndpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
 
   Scenario: Admin creates a webhook endpoint with missing url
     Given I am an admin of account "test1"
@@ -42,7 +42,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {}
         }
       }
@@ -57,7 +57,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "http://example.com"
           }
@@ -74,7 +74,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "ssh://example.com"
           }
@@ -92,7 +92,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }
@@ -107,7 +107,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }
@@ -124,7 +124,7 @@ Feature: Create webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }

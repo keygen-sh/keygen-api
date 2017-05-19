@@ -20,7 +20,7 @@ Feature: Update key
   Scenario: Admin updates a key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "key"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
@@ -43,7 +43,7 @@ Feature: Update key
   Scenario: Admin updates a key's policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the current account has 1 "key"
     And I use an authentication token
@@ -70,7 +70,7 @@ Feature: Update key
   Scenario: Admin updates a key but a license already exists with the same key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -103,7 +103,7 @@ Feature: Update key
   Scenario: Admin updates a key but a license for another already exists with the same key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -135,7 +135,7 @@ Feature: Update key
 
   Scenario: Product updates a key for their product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -159,7 +159,7 @@ Feature: Update key
 
   Scenario: Product attempts to update a key for another product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -181,7 +181,7 @@ Feature: Update key
 
   Scenario: User attempts to update a key for their account
     Given the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 3 "keys"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -203,7 +203,7 @@ Feature: Update key
 
   Scenario: Anonymous user attempts to update a key for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "keys"
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
       """
@@ -223,7 +223,7 @@ Feature: Update key
   Scenario: Admin attempts to update a key for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "keys"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/keys/$0" with the following:

@@ -20,7 +20,7 @@ Feature: License permit actions
   Scenario: Admin suspends a license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -45,7 +45,7 @@ Feature: License permit actions
   Scenario: Admin suspends a license that is already suspended
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -70,7 +70,7 @@ Feature: License permit actions
   Scenario: User suspends their license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -97,7 +97,7 @@ Feature: License permit actions
   Scenario: Admin suspends a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -123,7 +123,7 @@ Feature: License permit actions
   Scenario: Product suspends a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -153,7 +153,7 @@ Feature: License permit actions
   Scenario: User suspends their license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -182,7 +182,7 @@ Feature: License permit actions
   Scenario: Admin reinstates a license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -208,7 +208,7 @@ Feature: License permit actions
   Scenario: Admin reinstates a license that is not suspended
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -233,7 +233,7 @@ Feature: License permit actions
   Scenario: User reinstates their license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -261,7 +261,7 @@ Feature: License permit actions
   Scenario: Admin reinstates a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -288,7 +288,7 @@ Feature: License permit actions
   Scenario: Product reinstates a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -319,7 +319,7 @@ Feature: License permit actions
   Scenario: User reinstates their license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -348,7 +348,7 @@ Feature: License permit actions
   Scenario: Admin renews a license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -374,7 +374,7 @@ Feature: License permit actions
   Scenario: User renews their license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -403,7 +403,7 @@ Feature: License permit actions
   Scenario: Admin renews a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -430,7 +430,7 @@ Feature: License permit actions
   Scenario: Product renews a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -461,7 +461,7 @@ Feature: License permit actions
   Scenario: User renews their license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
@@ -490,7 +490,7 @@ Feature: License permit actions
   Scenario: Admin attempts to renew a license for another account
     Given I am an admin of account "test2"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And I use an authentication token
@@ -502,7 +502,7 @@ Feature: License permit actions
   Scenario: Admin revokes a license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$0/actions/revoke"
@@ -513,7 +513,7 @@ Feature: License permit actions
 
   Scenario: User revokes their own license
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I am a user of account "test1"
@@ -528,7 +528,7 @@ Feature: License permit actions
   Scenario: Admin revokes a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
@@ -553,7 +553,7 @@ Feature: License permit actions
 
   Scenario: Product revokes a license that implements a protected policy
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
@@ -581,7 +581,7 @@ Feature: License permit actions
 
   Scenario: User revokes their own license that implements a protected policy
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
@@ -608,7 +608,7 @@ Feature: License permit actions
 
   Scenario: User tries to revoke another user's license
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And I am a user of account "test1"
@@ -622,7 +622,7 @@ Feature: License permit actions
   Scenario: Admin tries to revoke a license for another account
     Given I am an admin of account "test1"
     And the current account is "test2"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test2/licenses/$0/actions/revoke"

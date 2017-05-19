@@ -20,7 +20,7 @@ Feature: Create product
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    And the current account has 4 "webhookEndpoints"
+    And the current account has 4 "webhook-endpoints"
     When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
@@ -41,7 +41,7 @@ Feature: Create product
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
@@ -61,7 +61,7 @@ Feature: Create product
     Given I am an admin of account "test2"
     But the current account is "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/products" with the following:
       """
       {
@@ -82,7 +82,7 @@ Feature: Create product
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/products" with the following:
       """
       {

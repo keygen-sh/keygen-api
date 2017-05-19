@@ -160,7 +160,7 @@ Feature: Policy pool relationship
   Scenario: Admin pops a key from a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
       """

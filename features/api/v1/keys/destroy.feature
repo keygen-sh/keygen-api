@@ -20,7 +20,7 @@ Feature: Delete key
   Scenario: Admin deletes one of their keys
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "keys"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/keys/$2"
@@ -31,7 +31,7 @@ Feature: Delete key
 
   Scenario: User attempts to delete a key for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "keys"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -45,7 +45,7 @@ Feature: Delete key
 
   Scenario: Anonymous user attempts to delete a key for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "keys"
     When I send a DELETE request to "/accounts/test1/keys/$1"
     Then the response status should be "401"
@@ -57,7 +57,7 @@ Feature: Delete key
   Scenario: Admin attempts to delete a key for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "keys"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/keys/$1"

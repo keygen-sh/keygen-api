@@ -19,7 +19,7 @@ Feature: Create machine
   Scenario: Admin creates a machine for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
@@ -49,7 +49,7 @@ Feature: Create machine
   Scenario: Admin creates a machine with missing fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
@@ -75,7 +75,7 @@ Feature: Create machine
   Scenario: Admin creates a machine with missing license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
@@ -95,7 +95,7 @@ Feature: Create machine
 
   Scenario: User creates a machine for their license
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current account has 1 "license"
@@ -127,7 +127,7 @@ Feature: Create machine
 
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "license"
     And I am a user of account "test1"
@@ -157,7 +157,7 @@ Feature: Create machine
 
   Scenario: Unauthenticated user attempts to create a machine
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
     When I send a POST request to "/accounts/test1/machines" with the following:
       """
@@ -185,7 +185,7 @@ Feature: Create machine
   Scenario: Admin of another account attempts to create a machine
     Given I am an admin of account "test2"
     And the current account is "test1"
-    And the current account has 10 "webhookEndpoints"
+    And the current account has 10 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines" with the following:
