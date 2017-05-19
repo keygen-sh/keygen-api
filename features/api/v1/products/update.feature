@@ -20,7 +20,7 @@ Feature: Update product
   Scenario: Admin updates a product for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/products/$0" with the following:
@@ -43,7 +43,7 @@ Feature: Update product
   Scenario: Admin attempts to update a product for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the account "test1" has 1 "product"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/products/$0" with the following:
@@ -64,7 +64,7 @@ Feature: Update product
   Scenario: Admin updates a product's platforms for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 2 "products"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/products/$1" with the following:
@@ -92,7 +92,7 @@ Feature: Update product
 
   Scenario: Product updates the platforms for itself
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"
     And I use an authentication token
@@ -117,7 +117,7 @@ Feature: Update product
 
   Scenario: Product attempts to update the platforms for another product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
     And I am a product of account "test1"
     And I use an authentication token

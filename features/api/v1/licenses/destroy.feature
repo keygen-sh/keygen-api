@@ -20,7 +20,7 @@ Feature: Delete license
   Scenario: Admin deletes one of their licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$2"
@@ -31,7 +31,7 @@ Feature: Delete license
 
   Scenario: User attempts to delete one of their licenses
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
@@ -48,7 +48,7 @@ Feature: Delete license
 
   Scenario: User attempts to delete a license for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -62,7 +62,7 @@ Feature: Delete license
 
   Scenario: Anonymous user attempts to delete a license for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     When I send a DELETE request to "/accounts/test1/licenses/$1"
     Then the response status should be "401"
@@ -74,7 +74,7 @@ Feature: Delete license
   Scenario: Admin attempts to delete a license for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$1"

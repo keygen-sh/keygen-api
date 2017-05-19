@@ -20,7 +20,7 @@ Feature: Delete policy
   Scenario: Admin deletes one of their policies
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "policies"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$2"
@@ -32,7 +32,7 @@ Feature: Delete policy
   Scenario: Admin attempts to delete a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "policies"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$1"

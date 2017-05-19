@@ -16,7 +16,7 @@ Feature: Account subscription actions
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should be "200"
@@ -32,7 +32,7 @@ Feature: Account subscription actions
   Scenario: Admin resumes their paused account
     Given the account "test1" is paused
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
     Then the response status should be "200"
@@ -48,7 +48,7 @@ Feature: Account subscription actions
   Scenario: Admin cancels their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
     Then the response status should be "200"
@@ -64,7 +64,7 @@ Feature: Account subscription actions
   Scenario: Admin renews their canceling account
     Given the account "test1" is canceling
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "200"
@@ -80,7 +80,7 @@ Feature: Account subscription actions
   Scenario: Admin renews their canceled account
     Given the account "test1" is canceled
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "422"
@@ -90,7 +90,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to pause their paused account
     Given the account "test1" is paused
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should be "422"
@@ -100,7 +100,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to resume their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
     Then the response status should be "422"
@@ -110,7 +110,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to cancel their canceled account
     Given the account "test1" is canceled
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
     Then the response status should be "422"
@@ -120,7 +120,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to renews their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "422"
@@ -130,7 +130,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to pause another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should be "401"
@@ -140,7 +140,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to resume another account
     Given the account "test1" is paused
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
     Then the response status should be "401"
@@ -150,7 +150,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to cancel another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
     Then the response status should be "401"
@@ -160,7 +160,7 @@ Feature: Account subscription actions
   Scenario: Admin attempts to renew another account
     Given the account "test1" is canceled
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
     Then the response status should be "401"

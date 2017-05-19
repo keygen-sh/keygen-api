@@ -12,7 +12,7 @@ Feature: Update webhook endpoint
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$2"
     Then the response status should be "403"
@@ -20,14 +20,14 @@ Feature: Update webhook endpoint
   Scenario: Admin updates a webhook endpoint's url
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       {
         "data": {
-          "type": "webhookEndpoint",
-          "id": "$webhookEndpoints[0].id",
+          "type": "webhook-endpoint",
+          "id": "$webhook-endpoints[0].id",
           "attributes": {
             "url": "https://example.com"
           }
@@ -35,11 +35,11 @@ Feature: Update webhook endpoint
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "webhookEndpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
 
   Scenario: User attempts to update a webhook endpoint for their account
     Given the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -47,7 +47,7 @@ Feature: Update webhook endpoint
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }
@@ -58,12 +58,12 @@ Feature: Update webhook endpoint
 
   Scenario: Anonymous user attempts to update a webhook endpoint for their account
     Given the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }
@@ -75,13 +75,13 @@ Feature: Update webhook endpoint
   Scenario: Admin attempts to update a webhook endpoint for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
       """
       {
         "data": {
-          "type": "webhookEndpoint",
+          "type": "webhook-endpoint",
           "attributes": {
             "url": "https://example.com"
           }

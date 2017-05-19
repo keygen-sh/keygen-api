@@ -12,7 +12,7 @@ Feature: Show webhook endpoint
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$2"
     Then the response status should be "403"
@@ -20,11 +20,11 @@ Feature: Show webhook endpoint
   Scenario: Admin retrieves a webhook endpoint for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
     Then the response status should be "200"
-    And the JSON response should be a "webhookEndpoint"
+    And the JSON response should be a "webhook-endpoint"
 
   Scenario: Admin retrieves an invalid webhook endpoint for their account
     Given I am an admin of account "test1"
@@ -36,7 +36,7 @@ Feature: Show webhook endpoint
   Scenario: Admin attempts to retrieve a webhook endpoint for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the account "test1" has 3 "webhookEndpoints"
+    And the account "test1" has 3 "webhook-endpoints"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
     Then the response status should be "401"

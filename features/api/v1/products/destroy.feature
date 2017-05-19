@@ -20,7 +20,7 @@ Feature: Delete product
   Scenario: Admin deletes one of their products
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "products"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$2"
@@ -32,7 +32,7 @@ Feature: Delete product
   Scenario: Admin attempts to delete a product for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 4 "webhookEndpoints"
+    And the current account has 4 "webhook-endpoints"
     And the current account has 3 "products"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$1"
@@ -44,7 +44,7 @@ Feature: Delete product
 
   Scenario: Product deletes itself
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "products"
     And I am a product of account "test1"
     And I use an authentication token
@@ -56,7 +56,7 @@ Feature: Delete product
 
   Scenario: Product attempts to delete another product for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "products"
     And I am a product of account "test1"
     And I use an authentication token

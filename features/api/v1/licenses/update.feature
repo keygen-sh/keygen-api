@@ -20,7 +20,7 @@ Feature: Update license
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -43,7 +43,7 @@ Feature: Update license
   Scenario: Admin updates a license policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 2 "policies"
     And the current account has 1 "license"
     And I use an authentication token
@@ -70,7 +70,7 @@ Feature: Update license
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -90,7 +90,7 @@ Feature: Update license
 
   Scenario: Product updates a license for their product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -113,7 +113,7 @@ Feature: Update license
 
   Scenario: Product attempts to update a license for another product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -135,7 +135,7 @@ Feature: Update license
 
   Scenario: User attempts to update a license for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -158,7 +158,7 @@ Feature: Update license
 
   Scenario: Anonymous user attempts to update a license for their account
     Given the current account is "test1"
-    And the current account has 5 "webhookEndpoints"
+    And the current account has 5 "webhook-endpoints"
     And the current account has 3 "licenses"
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
       """
@@ -178,7 +178,7 @@ Feature: Update license
   Scenario: Admin attempts to update a license for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -199,7 +199,7 @@ Feature: Update license
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -220,7 +220,7 @@ Feature: Update license
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -243,7 +243,7 @@ Feature: Update license
 
   Scenario: Product updates a license expiry for their product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -267,7 +267,7 @@ Feature: Update license
 
   Scenario: Product attempts to update a license expiry for another product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -289,7 +289,7 @@ Feature: Update license
 
   Scenario: User attempts to update a license expiry for their account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"

@@ -20,7 +20,7 @@ Feature: Update policy
   Scenario: Admin updates a policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
@@ -48,7 +48,7 @@ Feature: Update policy
   Scenario: Admin attempts to update a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the account "test1" has 1 "policy"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
@@ -68,7 +68,7 @@ Feature: Update policy
 
   Scenario: Product updates a policy for their product
     Given the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -92,7 +92,7 @@ Feature: Update policy
 
   Scenario: Product attempts to update a policy for another product
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -115,7 +115,7 @@ Feature: Update policy
   Scenario: Admin updates a policy's encrypted attribute for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
@@ -136,7 +136,7 @@ Feature: Update policy
   Scenario: Admin updates a policy for their account to use a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:

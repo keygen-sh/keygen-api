@@ -19,7 +19,7 @@ Feature: Create key
   Scenario: Admin creates a key for a pooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -53,7 +53,7 @@ Feature: Create key
   Scenario: Admin creates a key for an unpooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -86,7 +86,7 @@ Feature: Create key
   Scenario: Admin creates a duplicate key for a pooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -127,7 +127,7 @@ Feature: Create key
   Scenario: Admin creates a key but a license already exists with the same key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -167,7 +167,7 @@ Feature: Create key
   Scenario: Admin creates a key but a license for another already exists with the same key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -207,7 +207,7 @@ Feature: Create key
   Scenario: Admin creates a key that is a duplicate of a key for another account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -248,7 +248,7 @@ Feature: Create key
   Scenario: Admin creates a key with missing key value
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -279,7 +279,7 @@ Feature: Create key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/keys" with the following:
       """
       {
@@ -297,7 +297,7 @@ Feature: Create key
 
   Scenario: User attempts to create a key
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -331,7 +331,7 @@ Feature: Create key
 
   Scenario: Unauthenticated user attempts to create a key
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -363,7 +363,7 @@ Feature: Create key
   Scenario: Admin of another account attempts to create a key
     Given I am an admin of account "test2"
     And the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """

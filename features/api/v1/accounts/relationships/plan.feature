@@ -40,7 +40,7 @@ Feature: Account plan relationship
     Given the account "test1" is subscribed
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -59,7 +59,7 @@ Feature: Account plan relationship
     Given the account "test1" is trialing
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -78,7 +78,7 @@ Feature: Account plan relationship
     Given the account "test1" is pending
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -97,7 +97,7 @@ Feature: Account plan relationship
     Given the account "test1" is paused
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -116,7 +116,7 @@ Feature: Account plan relationship
     Given the account "test1" is canceled
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -135,7 +135,7 @@ Feature: Account plan relationship
     Given the account "test1" is subscribed
     And there exists 3 "plans"
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """
@@ -154,7 +154,7 @@ Feature: Account plan relationship
     Given the account "test1" is subscribed
     And there exists 3 "plans"
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/plan" with the following:
       """

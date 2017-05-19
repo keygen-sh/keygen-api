@@ -20,7 +20,7 @@ Feature: Update machine
   Scenario: Admin updates a machine
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "machine"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
@@ -43,7 +43,7 @@ Feature: Update machine
   Scenario: Admin attempts to update a machine's fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "machine"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
@@ -63,7 +63,7 @@ Feature: Update machine
 
   Scenario: Product updates a machine for their product
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -87,7 +87,7 @@ Feature: Update machine
 
   Scenario: Product attempts to update a machine for another product
     Given the current account is "test1"
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
@@ -109,7 +109,7 @@ Feature: Update machine
 
   Scenario: User updates a machine's name for their license
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
@@ -171,7 +171,7 @@ Feature: Update machine
 
   Scenario: User attempts to update a machine for another user
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "machines"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -186,7 +186,7 @@ Feature: Update machine
 
   Scenario: Anonymous user attempts to update a machine for their account
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 3 "machines"
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
       """
@@ -206,7 +206,7 @@ Feature: Update machine
   Scenario: Admin attempts to update a machine for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "machines"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:

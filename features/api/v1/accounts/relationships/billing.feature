@@ -39,7 +39,7 @@ Feature: Account billing relationship
   Scenario: Admin updates the billing info for their account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
@@ -61,7 +61,7 @@ Feature: Account billing relationship
     Given the account "test1" is subscribed
     And the account "test1" has 1 "product"
     And I am a product of account "test1"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:
@@ -82,7 +82,7 @@ Feature: Account billing relationship
   Scenario: Admin attempts to update the billing info for another account
     Given the account "test1" is subscribed
     And I am an admin of account "test2"
-    And the account "test1" has 1 "webhookEndpoint"
+    And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     And I have a valid payment token
     When I send a PATCH request to "/accounts/test1/billing" with the following:

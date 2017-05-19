@@ -18,7 +18,7 @@ Feature: Create user
 
   Scenario: Anonymous creates a user for an account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -46,7 +46,7 @@ Feature: Create user
       """
       { "protected": true }
       """
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -114,7 +114,7 @@ Feature: Create user
       { "protected": true }
       """
     And I use an authentication token
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -137,7 +137,7 @@ Feature: Create user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -161,7 +161,7 @@ Feature: Create user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    And the current account has 3 "webhookEndpoints"
+    And the current account has 3 "webhook-endpoints"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -186,7 +186,7 @@ Feature: Create user
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -215,7 +215,7 @@ Feature: Create user
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -236,7 +236,7 @@ Feature: Create user
 
   Scenario: User attempts to create an admin for their account
     Given the current account is "test1"
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -265,7 +265,7 @@ Feature: Create user
       """
       { "protected": true }
       """
-    And the current account has 2 "webhookEndpoints"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -289,7 +289,7 @@ Feature: Create user
 
   Scenario: Anonymous attempts to create an admin for an account
     Given the current account is "test1"
-    And the current account has 1 "webhookEndpoint"
+    And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
