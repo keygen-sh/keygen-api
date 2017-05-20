@@ -13,6 +13,9 @@ class SerializableLicense < SerializableBase
   attribute :encrypted do
     @object.policy.encrypted?
   end
+  attribute :last_check_in do
+    @object.last_check_in_at
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

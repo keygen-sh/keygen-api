@@ -17,6 +17,68 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
 
+  Scenario: Admin validates a check-in license that is valid
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInDuration": "day",
+        "checkInInterval": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": "$time.now"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": true, "detail": "is valid" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin validates a check-in license that is overdue
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInDuration": "day",
+        "checkInInterval": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": "$time.1.day.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": false, "detail": "is overdue for check in" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin validates a strict license that is valid
     Given I am an admin of account "test1"
     And the current account is "test1"
