@@ -5,6 +5,25 @@ module Api::V1::Licenses::Actions
     before_action :authenticate_with_token!
     before_action :set_license
 
+    # POST /licenses/1/check-in
+    def check_in
+      authorize @license
+
+      if !@license.policy.requires_check_in?
+        render_unprocessable_entity detail: "cannot be checked in because the policy does not require it"
+      elsif @license.check_in!
+        CreateWebhookEventService.new(
+          event: "license.checked-in",
+          account: current_account,
+          resource: @license
+        ).execute
+
+        render jsonapi: @license
+      else
+        render_unprocessable_resource @license
+      end
+    end
+
     # POST /licenses/1/renew
     def renew
       authorize @license
@@ -16,7 +35,7 @@ module Api::V1::Licenses::Actions
             pointer: "/data/attributes/expiry"
           }
         })
-      elsif @license.update(expiry: @license.expiry + @license.policy.duration)
+      elsif @license.renew!
         CreateWebhookEventService.new(
           event: "license.renewed",
           account: current_account,
@@ -53,7 +72,7 @@ module Api::V1::Licenses::Actions
             pointer: "/data/attributes/suspended"
           }
         })
-      elsif @license.update(suspended: true)
+      elsif @license.suspend!
         CreateWebhookEventService.new(
           event: "license.suspended",
           account: current_account,
@@ -77,7 +96,7 @@ module Api::V1::Licenses::Actions
             pointer: "/data/attributes/suspended"
           }
         })
-      elsif @license.update(suspended: false)
+      elsif @license.reinstate!
         CreateWebhookEventService.new(
           event: "license.reinstated",
           account: current_account,

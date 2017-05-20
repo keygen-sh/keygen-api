@@ -6,6 +6,8 @@ class LicenseValidationService < BaseService
 
   def execute
     return [false, "does not exist"] if license.nil?
+    # Check if license is overdue for check in
+    return [false, "is overdue for check in"] if license.check_in_overdue?
     # Check if license is suspended
     return [false, "is suspended"] if license.suspended?
     # Check if license is expired (move along if it has no expiry)
