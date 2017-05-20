@@ -81,6 +81,7 @@ Rails.application.routes.draw do
               post "renew", to: "permits#renew"
               post "suspend", to: "permits#suspend"
               post "reinstate", to: "permits#reinstate"
+              post "check-in", to: "permits#check_in"
             end
           end
           collection do
@@ -204,6 +205,7 @@ end
 #         renew_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/renew(.:format)        api/v1/licenses/actions/permits#renew {:subdomain=>"api", :format=>"jsonapi"}
 #       suspend_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/suspend(.:format)      api/v1/licenses/actions/permits#suspend {:subdomain=>"api", :format=>"jsonapi"}
 #     reinstate_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reinstate(.:format)    api/v1/licenses/actions/permits#reinstate {:subdomain=>"api", :format=>"jsonapi"}
+#      check_in_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/check-in(.:format)     api/v1/licenses/actions/permits#check_in {:subdomain=>"api", :format=>"jsonapi"}
 # validate_key_v1_account_licenses POST   /v1/accounts/:account_id/licenses/actions/validate-key(.:format)     api/v1/licenses/actions/validations#validate_by_key {:subdomain=>"api", :format=>"jsonapi"}
 #              v1_account_licenses GET    /v1/accounts/:account_id/licenses(.:format)                          api/v1/licenses#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                  POST   /v1/accounts/:account_id/licenses(.:format)                          api/v1/licenses#create {:subdomain=>"api", :format=>"jsonapi"}

@@ -28,8 +28,42 @@ class License < ApplicationRecord
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
 
+  delegate :requires_check_in?, to: :policy
+  delegate :check_in_duration, to: :policy
+  delegate :check_in_interval, to: :policy
+
   def suspended?
     suspended
+  end
+
+  def check_in_overdue?
+    return false unless requires_check_in?
+
+    last_check_in_at < check_in_interval.send(check_in_duration).ago
+  rescue NoMethodError
+    nil
+  end
+
+  def check_in!
+    return false unless requires_check_in?
+
+    self.last_check_in_at = Time.now
+    save
+  end
+
+  def renew!
+    self.expiry += policy.duration
+    save
+  end
+
+  def suspend!
+    self.suspended = true
+    save
+  end
+
+  def reinstate!
+    self.suspended = false
+    save
   end
 
   private
@@ -78,16 +112,17 @@ end
 #
 # Table name: licenses
 #
-#  id         :uuid             not null, primary key
-#  key        :string
-#  expiry     :datetime
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  metadata   :jsonb
-#  user_id    :uuid
-#  policy_id  :uuid
-#  account_id :uuid
-#  suspended  :boolean          default(FALSE)
+#  key              :string
+#  expiry           :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  metadata         :jsonb
+#  id               :uuid             not null, primary key
+#  user_id          :uuid
+#  policy_id        :uuid
+#  account_id       :uuid
+#  suspended        :boolean          default(FALSE)
+#  last_check_in_at :datetime
 #
 # Indexes
 #
