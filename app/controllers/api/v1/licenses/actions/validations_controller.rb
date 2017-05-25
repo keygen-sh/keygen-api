@@ -9,13 +9,14 @@ module Api::V1::Licenses::Actions
       @license = current_account.licenses.find params[:id]
       authorize @license
 
-      CreateWebhookEventService.new(
-        event: "license.validated",
-        account: current_account,
-        resource: @license
-      ).execute
-
       valid, detail = LicenseValidationService.new(license: @license).execute
+      if @license.present?
+        CreateWebhookEventService.new(
+          event: valid ? "license.validation.succeeded" : "license.validation.failed",
+          account: current_account,
+          resource: @license
+        ).execute
+      end
 
       render_meta valid: valid, detail: detail
     end
@@ -30,15 +31,14 @@ module Api::V1::Licenses::Actions
         key: validation_params[:meta][:key],
       ).execute
 
+      valid, detail = LicenseValidationService.new(license: @license).execute
       if @license.present?
         CreateWebhookEventService.new(
-          event: "license.validated",
+          event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license
         ).execute
       end
-
-      valid, detail = LicenseValidationService.new(license: @license).execute
 
       render_meta valid: valid, detail: detail
     end
