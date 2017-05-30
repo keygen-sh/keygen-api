@@ -20,17 +20,18 @@ end
 #
 # Table name: plans
 #
-#  id           :uuid             not null, primary key
-#  name         :string
-#  price        :integer
-#  max_users    :integer
-#  max_policies :integer
-#  max_licenses :integer
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  max_products :integer
-#  plan_id      :string
-#  private      :boolean          default(FALSE)
+#  id             :uuid             not null, primary key
+#  name           :string
+#  price          :integer
+#  max_users      :integer
+#  max_policies   :integer
+#  max_licenses   :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  max_products   :integer
+#  plan_id        :string
+#  private        :boolean          default(FALSE)
+#  trial_duration :integer
 #
 # Indexes
 #
