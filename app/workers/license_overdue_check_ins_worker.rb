@@ -1,7 +1,7 @@
 class LicenseOverdueCheckInsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :cron
+  sidekiq_options queue: :cron, unique: :until_and_while_executing
 
   def perform
     License.joins(:policy).where(policies: { require_check_in: true }).find_each do |license|
