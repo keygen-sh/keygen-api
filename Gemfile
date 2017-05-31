@@ -23,6 +23,7 @@ gem 'kaminari'
 
 # Background jobs
 gem 'sidekiq'
+gem 'sidekiq-unique-jobs'
 gem 'sidekiq-status'
 gem 'sidekiq-cron'
 
