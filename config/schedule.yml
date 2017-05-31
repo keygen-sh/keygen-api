@@ -1,0 +1,7 @@
+half_hourly_check_for_license_expirations:
+  cron: "*/30 * * * *" # Every 30 minutes
+  class: "LicenseExpirationsWorker"
+
+half_hourly_check_for_license_overdue_check_ins:
+  cron: "*/30 * * * *" # Every 30 minutes
+  class: "LicenseOverdueCheckInsWorker"

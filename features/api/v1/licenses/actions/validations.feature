@@ -154,7 +154,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates a strict license that has too many machines
+  Scenario: Admin validates a strict floating license that has too many machines
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"
@@ -163,6 +163,7 @@ Feature: License validation actions
       """
       {
         "maxMachines": 5,
+        "floating": true,
         "strict": true
       }
       """
@@ -186,7 +187,44 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false, "detail": "does not meet machine requirements" }
+      { "valid": false, "detail": "too many associated machines" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin validates a strict license that has too many machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": false, "detail": "too many associated machines" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -257,7 +295,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates a strict license that has not been used
+  Scenario: Admin validates a strict floating license that has not been used
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"
@@ -265,6 +303,7 @@ Feature: License validation actions
     And all "policies" have the following attributes:
       """
       {
+        "floating": true,
         "strict": true
       }
       """
@@ -281,7 +320,37 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should be meta with the following:
       """
-      { "valid": false, "detail": "does not meet machine requirements" }
+      { "valid": false, "detail": "must have at least 1 associated machine" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin validates a strict license that has not been used
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 2 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should be meta with the following:
+      """
+      { "valid": false, "detail": "must have exactly 1 associated machine" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job

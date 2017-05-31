@@ -16,6 +16,9 @@ class SerializableLicense < SerializableBase
   attribute :last_check_in do
     @object.last_check_in_at
   end
+  attribute :next_check_in do
+    @object.next_check_in_at
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

@@ -11,6 +11,7 @@ class License < ApplicationRecord
 
   attr_reader :raw
 
+  before_create :set_first_check_in, if: -> { requires_check_in? }
   before_create :set_expiry, unless: -> { policy.nil? }
   after_create :set_key, unless: -> { key.present? || policy.nil? }
 
@@ -36,12 +37,22 @@ class License < ApplicationRecord
     suspended
   end
 
+  def expired?
+    return false if expiry.nil?
+
+    expiry < Time.current
+  end
+
   def check_in_overdue?
     return false unless requires_check_in?
 
     last_check_in_at < check_in_interval.send(check_in_duration).ago
   rescue NoMethodError
     nil
+  end
+
+  def next_check_in_at
+    last_check_in_at + check_in_interval.send(check_in_duration) rescue nil
   end
 
   def check_in!
@@ -52,6 +63,8 @@ class License < ApplicationRecord
   end
 
   def renew!
+    return false if expiry.nil?
+
     self.expiry += policy.duration
     save
   end
@@ -67,6 +80,10 @@ class License < ApplicationRecord
   end
 
   private
+
+  def set_first_check_in
+    self.last_check_in_at = Time.now
+  end
 
   def set_key
     case
@@ -112,17 +129,19 @@ end
 #
 # Table name: licenses
 #
-#  key              :string
-#  expiry           :datetime
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  metadata         :jsonb
-#  id               :uuid             not null, primary key
-#  user_id          :uuid
-#  policy_id        :uuid
-#  account_id       :uuid
-#  suspended        :boolean          default(FALSE)
-#  last_check_in_at :datetime
+#  id                            :uuid             not null, primary key
+#  key                           :string
+#  expiry                        :datetime
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#  metadata                      :jsonb
+#  user_id                       :uuid
+#  policy_id                     :uuid
+#  account_id                    :uuid
+#  suspended                     :boolean          default(FALSE)
+#  last_check_in_at              :datetime
+#  last_expiration_event_sent_at :datetime
+#  last_check_in_event_sent_at   :datetime
 #
 # Indexes
 #
