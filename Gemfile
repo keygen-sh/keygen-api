@@ -24,6 +24,7 @@ gem 'kaminari'
 # Background jobs
 gem 'sidekiq'
 gem 'sidekiq-status'
+gem 'sidekiq-cron'
 
 # HTTP requests
 gem 'httparty'
