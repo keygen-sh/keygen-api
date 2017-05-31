@@ -11,15 +11,19 @@ class LicenseValidationService < BaseService
     # Check if license is suspended
     return [false, "is suspended"] if license.suspended?
     # Check if license is expired (move along if it has no expiry)
-    return [false, "is expired"] if !license.expiry.nil? && license.expiry < Time.current
-    # Check if license policy is strict, e.g. enforces reporting of machine usage
+    return [false, "is expired"] if license.expired?
+    # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
     return [true, "is valid"] if !license.policy.strict?
     # Check if license policy allows floating and if not, should have single activation
-    return [true, "is valid"] if !license.policy.floating? && license.machines.count == 1
-    # Assume floating, should have at least 1 activation but no more than policy allows
-    return [true, "is valid"] if license.policy.floating? && license.machines.count >= 1 && license.machines.count <= license.policy.max_machines
-    # Otherwise, assume invalid
-    return [false, "does not meet machine requirements"]
+    return [false, "must have exactly 1 associated machine"] if !license.policy.floating? && license.machines.count == 0
+    # When not floating, license's machine count should not surpass 1
+    return [false, "too many associated machines"] if !license.policy.floating? && license.machines.count > 1
+    # When floating, license should have at least 1 activation
+    return [false, "must have at least 1 associated machine"] if license.policy.floating? && license.machines.count == 0
+    # When floating, license's machine count should not surpass what policy allows
+    return [false, "too many associated machines"] if license.policy.floating? && license.machines.count > license.policy.max_machines
+    # All good
+    return [true, "is valid"]
   end
 
   private
