@@ -1,7 +1,7 @@
 class LicenseExpirationsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :cron, unique: :until_and_while_executing
+  sidekiq_options queue: :cron, unique: :until_executed
 
   def perform
     License.where.not(expiry: nil).find_each do |license|
