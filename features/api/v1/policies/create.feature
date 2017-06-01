@@ -221,8 +221,8 @@ Feature: Create policy
           "attributes": {
             "name": "Premium Add-On",
             "requireCheckIn": true,
-            "checkInDuration": "month",
-            "checkInInterval": 3
+            "checkInInterval": "month",
+            "checkInIntervalCount": 3
           },
           "relationships": {
             "product": {

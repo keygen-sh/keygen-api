@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170531143646) do
+ActiveRecord::Schema.define(version: 20170601145115) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -123,21 +123,21 @@ ActiveRecord::Schema.define(version: 20170531143646) do
   create_table "policies", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
     t.integer  "duration"
-    t.boolean  "strict",            default: false
-    t.boolean  "floating",          default: false
-    t.boolean  "use_pool",          default: false
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "lock_version",      default: 0,     null: false
-    t.integer  "max_machines",      default: 1
-    t.boolean  "encrypted",         default: false
-    t.boolean  "protected",         default: false
+    t.boolean  "strict",                  default: false
+    t.boolean  "floating",                default: false
+    t.boolean  "use_pool",                default: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "lock_version",            default: 0,     null: false
+    t.integer  "max_machines",            default: 1
+    t.boolean  "encrypted",               default: false
+    t.boolean  "protected",               default: false
     t.jsonb    "metadata"
     t.uuid     "product_id"
     t.uuid     "account_id"
-    t.string   "check_in_duration"
-    t.integer  "check_in_interval"
-    t.boolean  "require_check_in",  default: false
+    t.string   "check_in_interval"
+    t.integer  "check_in_interval_count"
+    t.boolean  "require_check_in",        default: false
     t.index ["created_at", "account_id"], name: "index_policies_on_created_at_and_account_id", using: :btree
     t.index ["created_at", "id"], name: "index_policies_on_created_at_and_id", unique: true, using: :btree
     t.index ["created_at", "product_id"], name: "index_policies_on_created_at_and_product_id", using: :btree
