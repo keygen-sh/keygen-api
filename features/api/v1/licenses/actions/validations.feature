@@ -26,8 +26,8 @@ Feature: License validation actions
       """
       {
         "requireCheckIn": true,
-        "checkInDuration": "day",
-        "checkInInterval": 1
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
       }
       """
     And the current account has 1 "license"
@@ -57,8 +57,8 @@ Feature: License validation actions
       """
       {
         "requireCheckIn": true,
-        "checkInDuration": "day",
-        "checkInInterval": 1
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
       }
       """
     And the current account has 1 "license"

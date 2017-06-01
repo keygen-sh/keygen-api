@@ -30,8 +30,8 @@ class License < ApplicationRecord
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
 
   delegate :requires_check_in?, to: :policy
-  delegate :check_in_duration, to: :policy
   delegate :check_in_interval, to: :policy
+  delegate :check_in_interval_count, to: :policy
 
   def suspended?
     suspended
@@ -46,13 +46,13 @@ class License < ApplicationRecord
   def check_in_overdue?
     return false unless requires_check_in?
 
-    last_check_in_at < check_in_interval.send(check_in_duration).ago
+    last_check_in_at < check_in_interval_count.send(check_in_interval).ago
   rescue NoMethodError
     nil
   end
 
   def next_check_in_at
-    last_check_in_at + check_in_interval.send(check_in_duration) rescue nil
+    last_check_in_at + check_in_interval_count.send(check_in_interval) rescue nil
   end
 
   def check_in!

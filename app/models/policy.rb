@@ -11,8 +11,8 @@ class Policy < ApplicationRecord
   validates :product, presence: { message: "must exist" }
 
   validates :name, presence: true
-  validates :check_in_duration, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
-  validates :check_in_interval, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
+  validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
+  validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
 
   validate do
     errors.add :encrypted, "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -58,24 +58,24 @@ end
 #
 # Table name: policies
 #
-#  name              :string
-#  duration          :integer
-#  strict            :boolean          default(FALSE)
-#  floating          :boolean          default(FALSE)
-#  use_pool          :boolean          default(FALSE)
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  lock_version      :integer          default(0), not null
-#  max_machines      :integer          default(1)
-#  encrypted         :boolean          default(FALSE)
-#  protected         :boolean          default(FALSE)
-#  metadata          :jsonb
-#  id                :uuid             not null, primary key
-#  product_id        :uuid
-#  account_id        :uuid
-#  check_in_duration :string
-#  check_in_interval :integer
-#  require_check_in  :boolean          default(FALSE)
+#  id                      :uuid             not null, primary key
+#  name                    :string
+#  duration                :integer
+#  strict                  :boolean          default(FALSE)
+#  floating                :boolean          default(FALSE)
+#  use_pool                :boolean          default(FALSE)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  lock_version            :integer          default(0), not null
+#  max_machines            :integer          default(1)
+#  encrypted               :boolean          default(FALSE)
+#  protected               :boolean          default(FALSE)
+#  metadata                :jsonb
+#  product_id              :uuid
+#  account_id              :uuid
+#  check_in_interval       :string
+#  check_in_interval_count :integer
+#  require_check_in        :boolean          default(FALSE)
 #
 # Indexes
 #
