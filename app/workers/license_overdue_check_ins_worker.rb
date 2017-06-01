@@ -12,9 +12,9 @@ class LicenseOverdueCheckInsWorker
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_check_in_event_sent_at.nil? &&
                 license.last_check_in_event_sent_at > 1.day.ago
-        # Stop sending events after 7 days have passed
+        # Stop sending events after 12 hours have passed (allowing 1-2 events to be sent total)
         next if !license.next_check_in_at.nil? &&
-                license.next_check_in_at < 7.days.ago
+                license.next_check_in_at < 12.hours.ago
 
         CreateWebhookEventService.new(
           event: "license.check-in-overdue",
