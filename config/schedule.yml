@@ -1,7 +1,7 @@
 check_for_license_expirations:
-  cron: "0 * * * *" # Every hour (when minute = zero)
+  cron: "0 3 * * *" # Every day at 3am
   class: "LicenseExpirationsWorker"
 
 check_for_license_overdue_check_ins:
-  cron: "0 * * * *" # Every hour (when minute = zero)
+  cron: "0 3 * * *" # Every day at 3am
   class: "LicenseOverdueCheckInsWorker"
