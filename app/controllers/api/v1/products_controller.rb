@@ -83,7 +83,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string
             param :metadata, type: :hash, optional: true
-            param :platforms, type: :array, optional: true do
+            param :platforms, type: :array, optional: true, allow_nil: true do
               items type: :string
             end
           end
@@ -97,7 +97,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :metadata, type: :hash, optional: true
-            param :platforms, type: :array, optional: true do
+            param :platforms, type: :array, optional: true, allow_nil: true do
               items type: :string
             end
           end

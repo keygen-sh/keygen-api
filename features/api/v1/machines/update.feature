@@ -40,6 +40,35 @@ Feature: Update machine
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin removes a machine's IP address
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "ip": "192.168.1.1"
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "ip": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with a nil ip
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin attempts to update a machine's fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"
