@@ -45,6 +45,40 @@ Feature: Update policy
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin removes attributes from a policy for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "requireCheckIn": false,
+            "checkInInterval": null,
+            "checkInIntervalCount": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with a nil checkInInterval
+    And the JSON response should be a "policy" with a nil checkInIntervalCount
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin attempts to update a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

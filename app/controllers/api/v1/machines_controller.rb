@@ -87,10 +87,10 @@ module Api::V1
           param :type, type: :string, inclusion: %w[machine machines]
           param :attributes, type: :hash do
             param :fingerprint, type: :string
-            param :name, type: :string, optional: true
-            param :ip, type: :string, optional: true
-            param :hostname, type: :string, optional: true
-            param :platform, type: :string, optional: true
+            param :name, type: :string, optional: true, allow_nil: true
+            param :ip, type: :string, optional: true, allow_nil: true
+            param :hostname, type: :string, optional: true, allow_nil: true
+            param :platform, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
@@ -109,10 +109,10 @@ module Api::V1
           param :type, type: :string, inclusion: %w[machine machines]
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :ip, type: :string, optional: true
-            param :hostname, type: :string, optional: true
-            param :platform, type: :string, optional: true
+            param :name, type: :string, optional: true, allow_nil: true
+            param :ip, type: :string, optional: true, allow_nil: true
+            param :hostname, type: :string, optional: true, allow_nil: true
+            param :platform, type: :string, optional: true, allow_nil: true
             if current_bearer&.role? :admin or current_bearer&.role? :product
               param :metadata, type: :hash, optional: true
             end

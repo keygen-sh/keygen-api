@@ -92,8 +92,8 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true
             param :require_check_in, type: :boolean, optional: true
-            param :check_in_interval, type: :string, optional: true
-            param :check_in_interval_count, type: :integer, optional: true
+            param :check_in_interval, type: :string, optional: true, allow_nil: true
+            param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
@@ -119,8 +119,8 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true
             param :require_check_in, type: :boolean, optional: true
-            param :check_in_interval, type: :string, optional: true
-            param :check_in_interval_count, type: :integer, optional: true
+            param :check_in_interval, type: :string, optional: true, allow_nil: true
+            param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
         end
