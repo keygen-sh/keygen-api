@@ -1,7 +1,7 @@
 check_for_license_expirations:
-  cron: "0 3 * * *" # Every day at 3am
+  cron: "0 */12 * * *" # Every 12 hours (https://crontab.guru/every-12-hours)
   class: "LicenseExpirationsWorker"
 
 check_for_license_overdue_check_ins:
-  cron: "0 3 * * *" # Every day at 3am
+  cron: "0 */12 * * *" # Every 12 hours
   class: "LicenseOverdueCheckInsWorker"
