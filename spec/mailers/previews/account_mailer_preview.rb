@@ -1,5 +1,9 @@
 class AccountMailerPreview < ActionMailer::Preview
 
+  def pricing_change
+    AccountMailer.pricing_change account: account
+  end
+
   def beta_ending_today
     AccountMailer.beta_ending_today account: account
   end

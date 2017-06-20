@@ -2,6 +2,16 @@ class AccountMailer < ApplicationMailer
   default from: "Zeke from Keygen <zeke@keygen.sh>"
   layout "account_mailer"
 
+  def pricing_change(account:)
+    @account = account
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "Update: we've simplified our pricing"
+    end
+  end
+
   def beta_ending_today(account:)
     @account = account
 
