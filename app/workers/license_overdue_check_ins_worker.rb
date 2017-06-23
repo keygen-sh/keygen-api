@@ -14,7 +14,7 @@ class LicenseOverdueCheckInsWorker
                 license.last_check_in_event_sent_at > 24.hours.ago
         # Stop sending events after 12 hours have passed (allowing at max 2 events to be sent in total)
         next if !license.next_check_in_at.nil? &&
-                license.next_check_in_at < 24.hours.ago
+                license.next_check_in_at < 12.hours.ago
 
         CreateWebhookEventService.new(
           event: "license.check-in-overdue",
