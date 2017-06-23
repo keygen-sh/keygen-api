@@ -9,8 +9,8 @@ class LicenseExpirationsWorker
       when license.expired?
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_expiration_event_sent_at.nil? &&
-                license.last_expiration_event_sent_at > 12.hours.ago
-        # Stop sending events after 12 hours have passed (allowing 1-2 events to be sent total)
+                license.last_expiration_event_sent_at > 24.hours.ago
+        # Stop sending events after 12 hours have passed (allowing at max 2 events to be sent in total)
         next if license.expiry < 12.hours.ago
 
         CreateWebhookEventService.new(
@@ -23,7 +23,7 @@ class LicenseExpirationsWorker
       when license.expiry < 3.days.from_now
         # Limit number of events we dispatch for each license to a daily interval
         next if !license.last_expiration_event_sent_at.nil? &&
-                license.last_expiration_event_sent_at > 12.hours.ago
+                license.last_expiration_event_sent_at > 24.hours.ago
 
         CreateWebhookEventService.new(
           event: "license.expiring-soon",
