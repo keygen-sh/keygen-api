@@ -22,8 +22,8 @@ class LicenseExpirationsWorker
         license.update last_expiration_event_sent_at: Time.current
       when license.expiry < 3.days.from_now
         # Limit number of events we dispatch for each license to a daily interval
-        next if !license.last_expiration_event_sent_at.nil? &&
-                license.last_expiration_event_sent_at > 24.hours.ago
+        next if !license.last_expiring_soon_event_sent_at.nil? &&
+                license.last_expiring_soon_event_sent_at > 24.hours.ago
 
         CreateWebhookEventService.new(
           event: "license.expiring-soon",
@@ -31,7 +31,7 @@ class LicenseExpirationsWorker
           resource: license
         ).execute
 
-        license.update last_expiration_event_sent_at: Time.current
+        license.update last_expiring_soon_event_sent_at: Time.current
       end
     end
   end
