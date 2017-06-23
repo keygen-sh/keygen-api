@@ -129,19 +129,21 @@ end
 #
 # Table name: licenses
 #
-#  id                            :uuid             not null, primary key
-#  key                           :string
-#  expiry                        :datetime
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  metadata                      :jsonb
-#  user_id                       :uuid
-#  policy_id                     :uuid
-#  account_id                    :uuid
-#  suspended                     :boolean          default(FALSE)
-#  last_check_in_at              :datetime
-#  last_expiration_event_sent_at :datetime
-#  last_check_in_event_sent_at   :datetime
+#  id                               :uuid             not null, primary key
+#  key                              :string
+#  expiry                           :datetime
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  metadata                         :jsonb
+#  user_id                          :uuid
+#  policy_id                        :uuid
+#  account_id                       :uuid
+#  suspended                        :boolean          default(FALSE)
+#  last_check_in_at                 :datetime
+#  last_expiration_event_sent_at    :datetime
+#  last_check_in_event_sent_at      :datetime
+#  last_expiring_soon_event_sent_at :datetime
+#  last_check_in_soon_event_sent_at :datetime
 #
 # Indexes
 #
