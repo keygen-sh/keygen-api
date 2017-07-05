@@ -1,14 +1,16 @@
 module Billings
   class UpdateCustomerService < BaseService
 
-    def initialize(customer:, token:)
+    def initialize(customer:, token:, coupon:)
       @customer = customer
       @token    = token
+      @coupon   = coupon
     end
 
     def execute
       c = Billings::BaseService::Customer.retrieve customer
-      c.card = token
+      c.card   = token unless token.nil?
+      c.coupon = coupon unless coupon.nil?
       c.save
     rescue Billings::BaseService::Error
       nil
@@ -16,6 +18,6 @@ module Billings
 
     private
 
-    attr_reader :customer, :token
+    attr_reader :customer, :token, :coupon
   end
 end

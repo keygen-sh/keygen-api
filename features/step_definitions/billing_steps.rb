@@ -32,6 +32,10 @@ end
 Given /^I have a valid payment token/ do
 end
 
+Given /^I have a valid coupon/ do
+  StripeHelper.create_coupon id: "COUPON_CODE"
+end
+
 Given /^I have a payment token with an? "([^\"]*)" error$/ do |error|
   StripeHelper.prepare_card_error(
     case error
