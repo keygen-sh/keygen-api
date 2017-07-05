@@ -99,3 +99,87 @@ Feature: Account billing relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin applies a coupon to their account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    And I have a valid coupon
+    When I send a PATCH request to "/accounts/test1/billing" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "coupon": "COUPON_CODE"
+          }
+        }
+      }
+      """
+    Then the response status should be "202"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Product attempts to apply a coupon to their account
+    Given the account "test1" is subscribed
+    And the account "test1" has 1 "product"
+    And I am a product of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    And I have a valid coupon
+    When I send a PATCH request to "/accounts/test1/billing" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "coupon": "COUPON_CODE"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin attempts to apply a coupon to another account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test2"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    And I have a valid coupon
+    When I send a PATCH request to "/accounts/test1/billing" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "coupon": "COUPON_CODE"
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin applies an invalid coupon to their account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/billing" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "coupon": "INVALID_COUPON_CODE"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs

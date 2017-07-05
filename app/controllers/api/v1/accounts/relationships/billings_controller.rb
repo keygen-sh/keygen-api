@@ -20,7 +20,8 @@ module Api::V1::Accounts::Relationships
 
       status = Billings::UpdateCustomerService.new(
         customer: @billing.customer_id,
-        token: billing_params[:token]
+        token: billing_params[:token],
+        coupon: billing_params[:coupon]
       ).execute
 
       if status
@@ -50,7 +51,8 @@ module Api::V1::Accounts::Relationships
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[billing billings]
           param :attributes, type: :hash do
-            param :token, type: :string
+            param :token, type: :string, optional: true
+            param :coupon, type: :string, optional: true
           end
         end
       end
