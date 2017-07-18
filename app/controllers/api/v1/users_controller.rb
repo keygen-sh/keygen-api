@@ -69,7 +69,11 @@ module Api::V1
         resource: @user
       ).execute
 
-      @user.destroy
+      if @user.destroy
+        head :no_content
+      else
+        render_unprocessable_resource @user
+      end
     end
 
     private

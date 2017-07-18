@@ -64,3 +64,23 @@ Feature: Delete user
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin attempts to delete themself when they're not the only admin
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "admin"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$current"
+    Then the response status should be "204"
+    And the current account should have 1 "admin"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin attempts to delete themself when they're the only admin
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$current"
+    Then the response status should be "422"
+    And the current account should have 1 "admin"

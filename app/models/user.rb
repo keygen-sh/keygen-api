@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  MINIMUM_ADMIN_COUNT = 1
+
   include PasswordResetable
   include Limitable
   include Pageable
@@ -15,6 +17,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :role
 
+  before_destroy :enforce_admin_minimum_on_account
   before_save -> { self.email = email.downcase }
   after_create :set_role, if: -> { role.nil? }
 
@@ -34,6 +37,14 @@ class User < ApplicationRecord
 
   def set_role
     grant :user
+  end
+
+  def enforce_admin_minimum_on_account
+    return if account.admins.size >= MINIMUM_ADMIN_COUNT
+
+    errors.add :account, "account must have at least one admin user"
+
+    throw :abort
   end
 end
 
