@@ -63,13 +63,13 @@ module Api::V1
     def destroy
       authorize @user
 
-      CreateWebhookEventService.new(
-        event: "user.deleted",
-        account: current_account,
-        resource: @user
-      ).execute
-
       if @user.destroy
+        CreateWebhookEventService.new(
+          event: "user.deleted",
+          account: current_account,
+          resource: @user
+        ).execute
+
         head :no_content
       else
         render_unprocessable_resource @user
