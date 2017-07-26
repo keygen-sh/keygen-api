@@ -28,6 +28,7 @@ Feature: Create product
           "type": "products",
           "attributes": {
             "name": "Cool App",
+            "url": "http://example.com",
             "platforms": ["iOS", "Android"]
           }
         }
@@ -36,6 +37,28 @@ Feature: Create product
     Then the response status should be "201"
     And sidekiq should have 4 "webhook" jobs
     And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a product with an invalid URL for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 4 "webhook-endpoints"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "url": "file:///boom.sh",
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
 
   Scenario: Admin attempts to create an incomplete product for their account
     Given I am an admin of account "test1"

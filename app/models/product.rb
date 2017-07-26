@@ -16,6 +16,7 @@ class Product < ApplicationRecord
 
   validates :account, presence: { message: "must exist" }
   validates :name, presence: true
+  validates :url, url: { protocols: %w[https http] }, allow_nil: true
 
   private
 
@@ -35,6 +36,7 @@ end
 #  platforms  :jsonb
 #  metadata   :jsonb
 #  account_id :uuid
+#  url        :string
 #
 # Indexes
 #

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170623141428) do
+ActiveRecord::Schema.define(version: 20170726144233) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -152,6 +152,7 @@ ActiveRecord::Schema.define(version: 20170623141428) do
     t.jsonb    "platforms"
     t.jsonb    "metadata"
     t.uuid     "account_id"
+    t.string   "url"
     t.index ["created_at", "account_id"], name: "index_products_on_created_at_and_account_id", using: :btree
     t.index ["created_at", "id"], name: "index_products_on_created_at_and_id", unique: true, using: :btree
   end
