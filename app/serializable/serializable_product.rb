@@ -2,6 +2,7 @@ class SerializableProduct < SerializableBase
   type :products
 
   attribute :name
+  attribute :url
   attribute :platforms
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
