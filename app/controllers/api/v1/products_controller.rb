@@ -97,7 +97,7 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :url, type: :string, optional: true
+            param :url, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
             param :platforms, type: :array, optional: true, allow_nil: true do
               items type: :string

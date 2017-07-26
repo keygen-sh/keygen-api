@@ -63,6 +63,35 @@ Feature: Update product
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin updates a product with a nil URL for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      {
+        "url": "https://example.com"
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "id": "$products[0].id",
+          "attributes": {
+            "url": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "product" with a nil url
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin updates a product with an invalid URL for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
