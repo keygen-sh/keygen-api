@@ -1,5 +1,5 @@
 class AccountMailer < ApplicationMailer
-  default from: "Keygen <noreply@keygen.sh>"
+  default from: "Keygen Support <support@keygen.sh>"
   layout "account_mailer"
 
   def pricing_change(account:)
