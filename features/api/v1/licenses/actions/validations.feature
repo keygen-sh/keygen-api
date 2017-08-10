@@ -17,6 +17,31 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
 
+  Scenario: Anonymous validates a check-in license that is valid
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": "$time.now"
+      }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin validates a check-in license that is valid
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -378,9 +403,8 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates a valid license by key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates a valid license by key
+    Given the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And the current account has 1 "webhook-endpoint"
@@ -391,7 +415,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -408,9 +431,8 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates an invalid license by key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates an invalid license by key
+    Given the current account is "test1"
     And the current account has 1 "policies"
     And the current account has 1 "license"
     And the current account has 1 "webhook-endpoint"
@@ -421,7 +443,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.ago"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -438,9 +459,8 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin validates an encrypted license by key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates an encrypted license by key
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 encrypted "license"
@@ -451,7 +471,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -469,9 +488,8 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates an encrypted license key as an unencrypted key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates an encrypted license key as an unencrypted key
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 encrypted "license"
@@ -482,7 +500,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -500,9 +517,8 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin validates an unencrypted license key as an encrypted key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates an unencrypted license key as an encrypted key
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "license"
@@ -513,7 +529,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -531,9 +546,8 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin validates a valid license by key from a pool
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates a valid license by key from a pool
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
@@ -550,7 +564,6 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -567,9 +580,8 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates a valid license that used a pre-determined key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Anonymous validates a valid license that used a pre-determined key
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
     And the current account has 1 "license"
@@ -581,7 +593,6 @@ Feature: License validation actions
         "key": "a"
       }
       """
-    And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
