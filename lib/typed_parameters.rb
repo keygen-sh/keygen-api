@@ -157,7 +157,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(key, type:, optional: false, coerce: false, allow_nil: false, inclusion: [], transform: nil, &block)
+    def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, inclusion: [], transform: nil, &block)
       return if optional && !context.params.key?(key.to_s)
 
       real_type = VALID_TYPES.fetch type.to_sym, nil
@@ -195,6 +195,8 @@ class TypedParameters
         raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
       when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
         raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
+      when value.blank? && !allow_blank
+        raise InvalidParameterError.new(pointer: keys.join("/")), "cannot be blank"
       end
 
       transforms.merge! key => transform if transform.present?

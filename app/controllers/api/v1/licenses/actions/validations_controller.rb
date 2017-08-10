@@ -48,7 +48,7 @@ module Api::V1::Licenses::Actions
 
       on :validate_by_key do
         param :meta, type: :hash do
-          param :key, type: :string
+          param :key, type: :string, allow_blank: false
           param :encrypted, type: :boolean, optional: true
         end
       end
