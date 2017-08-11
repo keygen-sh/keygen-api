@@ -29,6 +29,7 @@ module Api::V1::Licenses::Actions
         account: current_account,
         encrypted: validation_params[:meta][:encrypted] == true,
         key: validation_params[:meta][:key],
+        scope: validation_params[:meta][:scope]
       ).execute
 
       valid, detail = LicenseValidationService.new(license: @license).execute
@@ -50,6 +51,9 @@ module Api::V1::Licenses::Actions
         param :meta, type: :hash do
           param :key, type: :string, allow_blank: false
           param :encrypted, type: :boolean, optional: true
+          param :scope, type: :hash, optional: true do
+            param :product, type: :string, optional: true
+          end
         end
       end
     end
