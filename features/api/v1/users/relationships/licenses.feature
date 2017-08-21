@@ -148,6 +148,23 @@ Feature: User licenses relationship
     When I send a GET request to "/accounts/test1/users/$2/licenses"
     Then the response status should be "403"
 
+  Scenario: Anonymous attempts to retrieve licenses for a user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the current account has 2 "users"
+    And the current account has 5 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[2]", "policyId": "$policies[0]" }
+      """
+    When I send a GET request to "/accounts/test1/users/$2/licenses"
+    Then the response status should be "401"
+
   Scenario: Admin attempts to retrieve the licenses for a user of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
