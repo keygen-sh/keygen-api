@@ -4,6 +4,7 @@ module Api::V1
     has_scope :product
     has_scope :policy
     has_scope :user
+    has_scope :machine
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

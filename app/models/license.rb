@@ -28,6 +28,7 @@ class License < ApplicationRecord
   scope :policy, -> (id) { where policy: id }
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
+  scope :machine, -> (id) { joins(:machines).where machines: { id: id } }
 
   delegate :requires_check_in?, to: :policy
   delegate :check_in_interval, to: :policy
