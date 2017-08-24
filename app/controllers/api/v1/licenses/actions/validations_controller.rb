@@ -54,6 +54,7 @@ module Api::V1::Licenses::Actions
           param :scope, type: :hash, optional: true do
             param :product, type: :string, optional: true
             param :machine, type: :string, optional: true
+            param :fingerprint, type: :string, optional: true
           end
         end
       end
