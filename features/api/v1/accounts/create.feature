@@ -44,6 +44,78 @@ Feature: Create account
     And the account should receive a "welcome" email
     And the account "google" should have 1 "admin"
 
+  Scenario: Anonymous creates an account with a UUID slug with dashes
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Hacker",
+            "slug": "ace6b050-6dc0-4cb5-85e9-ad87f629255f"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Elliot",
+                    "lastName": "Alderson",
+                    "email": "elliot@allsafe.com",
+                    "password": "mr.robot"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+
+  Scenario: Anonymous creates an account with a UUID slug without dashes
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Hacker",
+            "slug": "ace6b0506dc04cb585e9ad87f629255f"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Elliot",
+                    "lastName": "Alderson",
+                    "email": "elliot@allsafe.com",
+                    "password": "mr.robot"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+
   # NOTE: This is really just a test to make sure endpoints are valid even when
   #       we're authenticated as another account
   Scenario: Admin of an account creates another account
