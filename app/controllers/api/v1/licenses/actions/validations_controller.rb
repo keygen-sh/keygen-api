@@ -53,6 +53,7 @@ module Api::V1::Licenses::Actions
           param :encrypted, type: :boolean, optional: true
           param :scope, type: :hash, optional: true do
             param :product, type: :string, optional: true
+            param :policy, type: :string, optional: true
             param :machine, type: :string, optional: true
             param :fingerprint, type: :string, optional: true
           end
