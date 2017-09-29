@@ -6,7 +6,7 @@ class WebhookWorker
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
 
-  sidekiq_options queue: :webhooks
+  sidekiq_options queue: :webhooks, retry: 15
 
   def perform(endpoint, payload)
     request = Request.post(endpoint, {
