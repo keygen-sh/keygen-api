@@ -1,7 +1,7 @@
 require "httparty"
 
 class WebhookWorker
-  ACCEPTABLE_STATUSES = [200, 201, 202, 204].freeze
+  ACCEPTABLE_STATUSES = (200..299).freeze
 
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
