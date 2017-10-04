@@ -111,6 +111,17 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users?limit=-10"
     Then the response status should be "400"
 
+  Scenario: Product retrieves all users scoped to a specific product
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 20 "users"
+    And the first product has 15 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?product=$products[0]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "users"
+
   Scenario: Product retrieves all users for their product
     Given the current account is "test1"
     And the current account has 1 "product"

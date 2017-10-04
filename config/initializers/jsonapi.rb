@@ -6,7 +6,6 @@ Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
   text/x-json
 ]
 
-
 # Register parameter parser for JSON API mime-type to transform param keys from
 # camel case to snake case
 ActionDispatch::Request.parameter_parsers[:json]    =
@@ -17,8 +16,7 @@ ActionDispatch::Request.parameter_parsers[:jsonapi] = -> (raw_post) {
   data.with_indifferent_access
 }
 
-# Make sure jsonapi/rails doesn't overwrite our registrations
+# Update jsonapi-rails configuration to not render jsonapi version
 JSONAPI::Rails.configure do |config|
-  config.register_parameter_parser = false
-  config.register_mime_type = false
+  config.jsonapi_object = nil
 end

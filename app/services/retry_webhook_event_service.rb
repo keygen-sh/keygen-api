@@ -12,9 +12,26 @@ class RetryWebhookEventService < BaseService
       event: event.event
     )
 
-    payload = JSONAPI::Serializable::Renderer.render(webhook_event, expose: {
-      url_helpers: Rails.application.routes.url_helpers
-    })
+    payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, {
+      expose: { url_helpers: Rails.application.routes.url_helpers },
+      class: {
+        Account: SerializableAccount,
+        Token: SerializableToken,
+        Product: SerializableProduct,
+        Policy: SerializablePolicy,
+        User: SerializableUser,
+        Role: SerializableRole,
+        License: SerializableLicense,
+        Machine: SerializableMachine,
+        Key: SerializableKey,
+        Billing: SerializableBilling,
+        Plan: SerializablePlan,
+        WebhookEndpoint: SerializableWebhookEndpoint,
+        WebhookEvent: SerializableWebhookEvent,
+        Metric: SerializableMetric,
+        Error: SerializableError
+      }
+    }).to_json
 
     jid = WebhookWorker.perform_async(
       event.endpoint,

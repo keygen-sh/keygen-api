@@ -1,11 +1,11 @@
 require "jsonapi/serializable/resource/conditional_fields"
-require "jsonapi/serializable/resource/key_transform"
+require "jsonapi/serializable/resource/key_format"
 
 class SerializableBase < JSONAPI::Serializable::Resource
-  prepend JSONAPI::Serializable::Resource::ConditionalFields
-  prepend JSONAPI::Serializable::Resource::KeyTransform
+  extend JSONAPI::Serializable::Resource::ConditionalFields
+  extend JSONAPI::Serializable::Resource::KeyFormat
 
-  self.key_transform = -> (key) { key.to_s.camelize :lower }
+  key_format { |key| key.to_s.camelize :lower }
 
   id { @object.id }
 end
