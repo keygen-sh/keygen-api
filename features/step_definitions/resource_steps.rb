@@ -74,7 +74,6 @@ Given /^the current account has (\d+) encrypted "([^\"]*)"$/ do |count, resource
 end
 
 Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
-  finders  = %w[first second third fourth fifth]
   resource = resource.pluralize.underscore
 
   model =
@@ -84,7 +83,7 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
       @account.send resource
     end
 
-  model.limit(count.to_i).all.each_with_index do |r, i|
+  model.limit(count.to_i).all.each_with_index do |r|
     ref = (r.class.reflect_on_association(:products) rescue false) ||
           (r.class.reflect_on_association(:product) rescue false)
 
@@ -98,9 +97,56 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
     rescue
       case
       when ref&.options[:through] && ref.options[:through].to_s.pluralize == ref.options[:through].to_s
-        r.send(ref.options[:through]).send(finders[i])&.product = @bearer
+        r.send(ref.options[:through]).first&.product = @bearer
       when ref&.options[:through] && ref.options[:through].to_s.singularize == ref.options[:through].to_s
         r.send(ref.options[:through])&.product = @bearer
+      end
+    end
+
+    r.save
+  end
+end
+
+Given /^the ((?!current)\w+) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
+  resource = resource.pluralize.underscore
+  numbers = {
+    "first"   => 1,
+    "second"  => 2,
+    "third"   => 3,
+    "fourth"  => 4,
+    "fifth"   => 5,
+    "sixth"   => 6,
+    "seventh" => 7,
+    "eigth"   => 8,
+    "ninth"   => 9
+  }
+
+  product = @account.products.limit(numbers[i]).last
+
+  model =
+    if resource == "users"
+      @account.send(resource).roles :user
+    else
+      @account.send resource
+    end
+
+  model.limit(count.to_i).all.each_with_index do |r|
+    ref = (r.class.reflect_on_association(:products) rescue false) ||
+          (r.class.reflect_on_association(:product) rescue false)
+
+    begin
+      case
+      when ref.name.to_s.pluralize == ref.name.to_s
+        r.products << product
+      when ref.name.to_s.singularize == ref.name.to_s
+        r.product = product
+      end
+    rescue
+      case
+      when ref&.options[:through] && ref.options[:through].to_s.pluralize == ref.options[:through].to_s
+        r.send(ref.options[:through]).first&.product = product
+      when ref&.options[:through] && ref.options[:through].to_s.singularize == ref.options[:through].to_s
+        r.send(ref.options[:through])&.product = product
       end
     end
 

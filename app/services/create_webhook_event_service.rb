@@ -8,7 +8,24 @@ class CreateWebhookEventService < BaseService
 
   def execute
     options = {
-      expose: { url_helpers: Rails.application.routes.url_helpers }
+      expose: { url_helpers: Rails.application.routes.url_helpers },
+      class: {
+        Account: SerializableAccount,
+        Token: SerializableToken,
+        Product: SerializableProduct,
+        Policy: SerializablePolicy,
+        User: SerializableUser,
+        Role: SerializableRole,
+        License: SerializableLicense,
+        Machine: SerializableMachine,
+        Key: SerializableKey,
+        Billing: SerializableBilling,
+        Plan: SerializablePlan,
+        WebhookEndpoint: SerializableWebhookEndpoint,
+        WebhookEvent: SerializableWebhookEvent,
+        Metric: SerializableMetric,
+        Error: SerializableError
+      }
     }
 
     # TODO: Move this out of the webhook event service
@@ -34,14 +51,10 @@ class CreateWebhookEventService < BaseService
       )
 
       # Serialize the event and decode so we can use in webhook job
-      payload = ActiveSupport::JSON.decode(
-        JSONAPI::Serializable::Renderer.render(webhook_event, options)
-      )
+      payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, options)
 
       # Set the payload attr of the webhook payload (since it's incomplete at the moment)
-      payload["data"]["attributes"]["payload"] = ActiveSupport::JSON.decode(
-        JSONAPI::Serializable::Renderer.render(resource, options)
-      )
+      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, options)
 
       # Enqueue the worker, which will fire off the webhook
       jid = WebhookWorker.perform_async(
@@ -51,7 +64,7 @@ class CreateWebhookEventService < BaseService
 
       # Update the event to contain the payload and job identifier
       webhook_event.update(
-        payload: payload.dig("data", "attributes", "payload").to_json,
+        payload: payload.dig(:data, :attributes, :payload).to_json,
         jid: jid
       )
     end

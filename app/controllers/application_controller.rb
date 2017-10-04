@@ -125,23 +125,24 @@ class ApplicationController < ActionController::API
   def render_unprocessable_resource(resource)
     skip_authorization
 
-    render jsonapi_error: resource.errors.to_hash.map { |src, errors|
-      errors.map do |error|
-        Class.new(SerializableError) do
-          title "Unprocessable resource"
-          detail error
-          source do
-            pointer(
+    errors = resource.errors.to_hash.map { |src, errs|
+      errs.map do |err|
+        {
+          title: "Unprocessable resource",
+          detail: err,
+          source: {
+            pointer:
               if resource.class.reflect_on_association(src)
                 "/data/relationships/#{src.to_s.camelize :lower}"
               else
                 "/data/attributes/#{src.to_s.camelize :lower}"
               end
-            )
-          end
-        end
+          }
+        }
       end
-    }.flatten.map(&:new), status: :unprocessable_entity
+    }.flatten
+
+    render json: { errors: errors }, status: :unprocessable_entity
   end
 
   def force_jsonapi_response_format
