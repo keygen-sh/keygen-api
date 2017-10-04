@@ -9,7 +9,7 @@ module Api::V1::Licenses::Actions
       @license = current_account.licenses.find params[:id]
       authorize @license
 
-      valid, detail = LicenseValidationService.new(license: @license).execute
+      valid, detail, constant = LicenseValidationService.new(license: @license).execute
       if @license.present?
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render_meta valid: valid, detail: detail
+      render_meta valid: valid, detail: detail, constant: constant
     end
 
     # POST /licenses/validate-key
@@ -32,7 +32,7 @@ module Api::V1::Licenses::Actions
         scope: validation_params[:meta][:scope]
       ).execute
 
-      valid, detail = LicenseValidationService.new(license: @license).execute
+      valid, detail, constant = LicenseValidationService.new(license: @license).execute
       if @license.present?
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -41,7 +41,7 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render_meta valid: valid, detail: detail
+      render_meta valid: valid, detail: detail, constant: constant
     end
 
     typed_parameters do
