@@ -13,6 +13,9 @@ class SerializableLicense < SerializableBase
   attribute :encrypted do
     @object.policy.encrypted?
   end
+  attribute :max_machines do
+    @object.policy.max_machines
+  end
   attribute :last_check_in do
     @object.last_check_in_at
   end
