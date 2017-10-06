@@ -5,7 +5,7 @@ class LicenseValidationService < BaseService
   end
 
   def execute
-    return [false, "does not exist", :NOT_FOUND] if license.nil?
+    return [false, "does not exist within provided scope", :NOT_FOUND] if license.nil?
     # Check if license is overdue for check in
     return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
     # Check if license is suspended

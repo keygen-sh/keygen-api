@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render_meta valid: valid, detail: detail, constant: constant
+      render jsonapi: @license, meta: { valid: valid, detail: detail, constant: constant }
     end
 
     # POST /licenses/validate-key
@@ -41,7 +41,7 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render_meta valid: valid, detail: detail, constant: constant
+      render jsonapi: @license, meta: { valid: valid, detail: detail, constant: constant }
     end
 
     typed_parameters do

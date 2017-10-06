@@ -66,7 +66,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -97,7 +98,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
       """
@@ -134,7 +136,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -172,7 +175,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "is suspended", "constant": "SUSPENDED" }
       """
@@ -210,7 +214,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
       """
@@ -247,7 +252,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
       """
@@ -284,7 +290,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -313,7 +320,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -343,7 +351,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "must have at least 1 associated machine", "constant": "NO_MACHINES" }
       """
@@ -373,7 +382,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "must have exactly 1 associated machine", "constant": "NO_MACHINE" }
       """
@@ -396,7 +406,8 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
       """
@@ -424,7 +435,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -452,9 +464,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -481,7 +494,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -510,9 +524,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -539,9 +554,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -573,7 +589,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -602,7 +619,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -666,7 +684,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -705,9 +724,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -751,7 +771,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -791,9 +812,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -837,7 +859,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -877,9 +900,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -916,7 +940,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -955,9 +980,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -1002,7 +1028,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
@@ -1049,9 +1076,10 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -1086,7 +1114,8 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should be meta with the following:
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
