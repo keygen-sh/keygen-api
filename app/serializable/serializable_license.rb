@@ -22,6 +22,9 @@ class SerializableLicense < SerializableBase
   attribute :max_machines do
     @object.policy.max_machines
   end
+  attribute :require_check_in do
+    @object.policy.require_check_in
+  end
   attribute :last_check_in do
     @object.last_check_in_at
   end
