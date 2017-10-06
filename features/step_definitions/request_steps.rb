@@ -61,101 +61,107 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
-Then /^the response status should be "([^\"]*)"$/ do |status|
+Then /^the response status should (?:contain|be) "([^\"]*)"$/ do |status|
   expect(last_response.status).to eq status.to_i
 end
 
-Then /^the response status should not be "([^\"]*)"$/ do |status|
+Then /^the response status should not (?:contain|be) "([^\"]*)"$/ do |status|
   expect(last_response.status).to_not eq status.to_i
 end
 
-Then /^the JSON response should be an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
+Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"]*)"$/ do |count, name|
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
 end
 
-Then /^the JSON response should be an array of "([^\"]*)"$/ do |name|
+Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
 end
 
-Then /^the JSON response should be an empty array$/ do
+Then /^the JSON response should (?:contain|be) an empty array$/ do
   json = JSON.parse last_response.body
 
   expect(json["data"].empty?).to be true
 end
 
-Then /^the JSON response should be an? "([^\"]*)"$/ do |name|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]).to be nil
+end
+
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with a (\w+)(?: that is not nil)?$/ do |resource, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+)(?: that is not nil)?$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to_not eq nil
 end
 
-Then /^the JSON response should be an? "([^\"]*)" that is (\w+)$/ do |name, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
   expect(name.pluralize).to eq json["data"]["type"]
 
   expect(json["data"]["attributes"][attribute]).to be true
 end
 
-Then /^the JSON response should be an? "([^\"]*)" that is not (\w+)$/ do |name, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is not (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
   expect(json["data"]["attributes"][attribute]).to be false
 end
 
-Then /^the JSON response should be an? "([^\"]*)" with the following "([^\"]*)":$/ do |name, attribute, body|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |name, attribute, body|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq name.pluralize
   expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
 end
 
-Then /^the JSON response should be an? "(?:[^\"]*)" with the following attributes:$/ do |body|
+Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following attributes:$/ do |body|
   parse_placeholders! body
   json = JSON.parse last_response.body
 
   expect(json["data"]["attributes"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should be an? "(?:[^\"]*)" with the following meta:$/ do |body|
+Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following meta:$/ do |body|
   parse_placeholders! body
   json = JSON.parse last_response.body
 
   expect(json["data"]["meta"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should be meta with the following:$/ do |body|
+Then /^the JSON response should (?:contain|be) meta with the following:$/ do |body|
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to eq JSON.parse(body)
 end
 
-Then /^the JSON response should be an array of (\d+) errors?$/ do |count|
+Then /^the JSON response should (?:contain|be) an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
 
   expect(json["errors"].length).to eq count.to_i
