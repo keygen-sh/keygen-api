@@ -602,6 +602,9 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
+        "requireCheckIn": true,
+        "checkInInterval": "month",
+        "checkInIntervalCount": 3,
         "protected": true
       }
       """
@@ -634,6 +637,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
