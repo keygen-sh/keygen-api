@@ -198,6 +198,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
@@ -292,7 +295,7 @@ Feature: Create license
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "encrypted": true }
+      { "encrypted": true, "strict": true }
       """
     And the current account has 1 "user"
     And I use an authentication token
@@ -430,7 +433,8 @@ Feature: Create license
     And all "policies" have the following attributes:
       """
       {
-        "usePool": true
+        "usePool": true,
+        "strict": true
       }
       """
     And the current account has 4 "keys"
@@ -467,6 +471,8 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And the current account should have 3 "keys"
+    And the JSON response should be a "license" that is not floating
+    And the JSON response should be a "license" that is strict
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
@@ -554,7 +560,8 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "protected": true
+        "protected": true,
+        "floating": true
       }
       """
     And the current account has 1 "user"
@@ -583,6 +590,8 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 

@@ -13,6 +13,12 @@ class SerializableLicense < SerializableBase
   attribute :encrypted do
     @object.policy.encrypted?
   end
+  attribute :strict do
+    @object.policy.strict?
+  end
+  attribute :floating do
+    @object.policy.floating?
+  end
   attribute :max_machines do
     @object.policy.max_machines
   end
