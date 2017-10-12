@@ -168,6 +168,42 @@ Feature: Update machine
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: User updates a machine that belongs to a license with a protected policy
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]", "userId": "$users[1]" }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Office Mac"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+
   Scenario: User updates a machine's fingerprint for their license
     Given the current account is "test1"
     And the current account has 1 "user"
