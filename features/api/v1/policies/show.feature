@@ -26,6 +26,43 @@ Feature: Show policy
     Then the response status should be "200"
     And the JSON response should be a "policy"
 
+  Scenario: Admin retrieves a policy for their account with correct relationship data
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "usePool": true }
+      """
+    And the current account has 122 "keys"
+    And all "keys" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 9 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with the following relationships:
+      """
+      {
+        "pool": {
+          "links": { "related": "/v1/accounts/$accounts[0]/policies/$policies[0]/pool" },
+          "meta": { "count": 122 }
+        },
+        "licenses": {
+          "links": { "related": "/v1/accounts/$accounts[0]/policies/$policies[0]/licenses" },
+          "meta": { "count": 9 }
+        }
+      }
+      """
+
   Scenario: Admin retrieves an invalid policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

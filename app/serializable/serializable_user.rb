@@ -28,20 +28,32 @@ class SerializableUser < SerializableBase
     link :related do
       @url_helpers.v1_account_user_products_path @object.account, @object
     end
+    meta do
+      { count: @object.products.count }
+    end
   end
   relationship :licenses do
     link :related do
       @url_helpers.v1_account_user_licenses_path @object.account, @object
+    end
+    meta do
+      { count: @object.licenses.count }
     end
   end
   relationship :machines do
     link :related do
       @url_helpers.v1_account_user_machines_path @object.account, @object
     end
+    meta do
+      { count: @object.machines.count }
+    end
   end
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_user_tokens_path @object.account, @object
+    end
+    meta do
+      { count: @object.tokens.count }
     end
   end
 
