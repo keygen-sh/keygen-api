@@ -125,6 +125,46 @@ Feature: Create machine
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: User creates a machine for their license with a protected policy
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "license"
+    And the current user has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
