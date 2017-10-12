@@ -38,16 +38,10 @@ class SerializablePolicy < SerializableBase
     link :related do
       @url_helpers.v1_account_policy_keys_path @object.account, @object
     end
-    meta do
-      { count: @object.pool.count }
-    end
   end
   relationship :licenses do
     link :related do
       @url_helpers.v1_account_policy_licenses_path @object.account, @object
-    end
-    meta do
-      { count: @object.licenses.count }
     end
   end
 

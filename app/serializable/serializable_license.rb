@@ -69,9 +69,6 @@ class SerializableLicense < SerializableBase
     link :related do
       @url_helpers.v1_account_license_machines_path @object.account, @object
     end
-    meta do
-      { count: @object.machines.count }
-    end
   end
 
   link :self do

@@ -27,72 +27,45 @@ class SerializableAccount < SerializableBase
     link :related do
       @url_helpers.v1_account_webhook_endpoints_path @object
     end
-    meta do
-      { count: @object.webhook_endpoints.count }
-    end
   end
   relationship :webhook_events do
     link :related do
       @url_helpers.v1_account_webhook_events_path @object
-    end
-    meta do
-      { count: @object.webhook_events.count }
     end
   end
   relationship :products do
     link :related do
       @url_helpers.v1_account_products_path @object
     end
-    meta do
-      { count: @object.products.count }
-    end
   end
   relationship :policies do
     link :related do
       @url_helpers.v1_account_policies_path @object
-    end
-    meta do
-      { count: @object.policies.count }
     end
   end
   relationship :users do
     link :related do
       @url_helpers.v1_account_users_path @object
     end
-    meta do
-      { count: @object.users.count }
-    end
   end
   relationship :keys do
     link :related do
       @url_helpers.v1_account_keys_path @object
-    end
-    meta do
-      { count: @object.keys.count }
     end
   end
   relationship :licenses do
     link :related do
       @url_helpers.v1_account_licenses_path @object
     end
-    meta do
-      { count: @object.licenses.count }
-    end
   end
   relationship :machines do
     link :related do
       @url_helpers.v1_account_machines_path @object
     end
-    meta do
-      { count: @object.machines.count }
-    end
   end
   relationship :tokens do
     link :related do
       @url_helpers.v1_account_tokens_path @object
-    end
-    meta do
-      { count: @object.tokens.count }
     end
   end
 

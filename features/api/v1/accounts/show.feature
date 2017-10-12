@@ -20,42 +20,6 @@ Feature: Show account
     Then the response status should be "200"
     And the JSON response should be an "account"
 
-  Scenario: Admin retrieves their account
-    Given I am an admin of account "test1"
-    And the account "test1" has 1 "webhook-endpoint"
-    And the account "test1" has 3 "products"
-    And the account "test1" has 9 "policies"
-    And the account "test1" has 110 "users"
-    And the account "test1" has 151 "licenses"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1"
-    Then the response status should be "200"
-    And the JSON response should be a "account" with the following relationships:
-      """
-      {
-        "webhookEndpoints": {
-          "links": { "related": "/v1/accounts/$accounts[0]/webhook-endpoints" },
-          "meta": { "count": 1 }
-        },
-        "products": {
-          "links": { "related": "/v1/accounts/$accounts[0]/products" },
-          "meta": { "count": 3 }
-        },
-        "policies": {
-          "links": { "related": "/v1/accounts/$accounts[0]/policies" },
-          "meta": { "count": 9 }
-        },
-        "licenses": {
-          "links": { "related": "/v1/accounts/$accounts[0]/licenses" },
-          "meta": { "count": 151 }
-        },
-        "users": {
-          "links": { "related": "/v1/accounts/$accounts[0]/users" },
-          "meta": { "count": 111 }
-        }
-      }
-      """
-
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
     And I use an authentication token
