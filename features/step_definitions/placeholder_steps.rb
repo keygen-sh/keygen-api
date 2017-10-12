@@ -35,7 +35,7 @@ def parse_placeholders!(str)
           Time.current
         end
       else
-        if @account and resource.singularize != "account"
+        if @account
           @account.send(resource.underscore)
             .all
             .send(*(index.nil? ? [:sample] : [:[], index.to_i]))

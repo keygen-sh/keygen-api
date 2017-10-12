@@ -26,42 +26,6 @@ Feature: Show product
     Then the response status should be "200"
     And the JSON response should be a "product"
 
-  Scenario: Admin retrieves a product for their account with correct relationship data
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "products"
-    And the current account has 1 "policy"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 2 "users"
-    And the current account has 31 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]", "userId": "$users[1]" }
-      """
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0"
-    Then the response status should be "200"
-    And the JSON response should be a "product" with the following relationships:
-      """
-      {
-        "policies": {
-          "links": { "related": "/v1/accounts/$accounts[0]/products/$products[0]/policies" },
-          "meta": { "count": 1 }
-        },
-        "licenses": {
-          "links": { "related": "/v1/accounts/$accounts[0]/products/$products[0]/licenses" },
-          "meta": { "count": 31 }
-        },
-        "users": {
-          "links": { "related": "/v1/accounts/$accounts[0]/products/$products[0]/users" },
-          "meta": { "count": 1 }
-        }
-      }
-      """
-
   Scenario: Admin retrieves an invalid product for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -25,46 +25,6 @@ Feature: Show user
     Then the response status should be "200"
     And the JSON response should be a "user"
 
-  Scenario: Admin retrieves a user for their account with correct relationship data
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "users"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "protected": true }
-      """
-    And the current account has 2 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]", "userId": "$users[0]" }
-      """
-    And the current account has 4 "machines"
-    And all "machines" have the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/$0"
-    Then the response status should be "200"
-    And the JSON response should be a "user" with the following relationships:
-      """
-      {
-        "licenses": {
-          "links": { "related": "/v1/accounts/$accounts[0]/users/$users[0]/licenses" },
-          "meta": { "count": 2 }
-        },
-        "machines": {
-          "links": { "related": "/v1/accounts/$accounts[0]/users/$users[0]/machines" },
-          "meta": { "count": 4 }
-        },
-        "tokens": {
-          "links": { "related": "/v1/accounts/$accounts[0]/users/$users[0]/tokens" },
-          "meta": { "count": 1 }
-        }
-      }
-      """
-
   Scenario: Admin retrieves an invalid user for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

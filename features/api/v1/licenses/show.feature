@@ -26,28 +26,6 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
-  Scenario: Admin retrieves a license for their account with correct relationship data
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "licenses"
-    And the current account has 21 "machines"
-    And all "machines" have the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0"
-    Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
-      """
-      {
-        "machines": {
-          "links": { "related": "/v1/accounts/$accounts[0]/licenses/$licenses[0]/machines" },
-          "meta": { "count": 21 }
-        }
-      }
-      """
-
   Scenario: Admin retrieves an invalid license for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

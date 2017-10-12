@@ -148,13 +148,6 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
   expect(json["data"]["attributes"]).to include JSON.parse(body)
 end
 
-Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following relationships:$/ do |body|
-  parse_placeholders! body
-  json = JSON.parse last_response.body
-
-  expect(json["data"]["relationships"]).to include JSON.parse(body)
-end
-
 Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following meta:$/ do |body|
   parse_placeholders! body
   json = JSON.parse last_response.body
