@@ -67,7 +67,7 @@ end
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  lock_version            :integer          default(0), not null
-#  max_machines            :integer          default(1)
+#  max_machines            :integer
 #  encrypted               :boolean          default(FALSE)
 #  protected               :boolean          default(FALSE)
 #  metadata                :jsonb

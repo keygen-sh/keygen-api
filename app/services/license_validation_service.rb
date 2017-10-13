@@ -21,7 +21,7 @@ class LicenseValidationService < BaseService
     # When floating, license should have at least 1 activation
     return [false, "must have at least 1 associated machine", :NO_MACHINES] if license.policy.floating? && license.machines.count == 0
     # When floating, license's machine count should not surpass what policy allows
-    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.policy.floating? && license.machines.count > license.policy.max_machines
+    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.policy.floating? && !license.policy.max_machines.nil? && license.machines.count > license.policy.max_machines
     # All good
     return [true, "is valid", :VALID]
   end

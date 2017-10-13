@@ -29,7 +29,6 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Premium Add-On",
-            "maxMachines": 5,
             "floating": true,
             "strict": false,
             "encrypted": true,
@@ -47,6 +46,10 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "policy" with a nil maxMachines
+    And the JSON response should be a "policy" that is not strict
+    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 

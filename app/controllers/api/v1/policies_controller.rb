@@ -90,7 +90,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            param :max_machines, type: :integer, optional: true
+            param :max_machines, type: :integer, optional: true, allow_nil: true
             param :require_check_in, type: :boolean, optional: true
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
@@ -117,7 +117,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            param :max_machines, type: :integer, optional: true
+            param :max_machines, type: :integer, optional: true, allow_nil: true
             param :require_check_in, type: :boolean, optional: true
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
