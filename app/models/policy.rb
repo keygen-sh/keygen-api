@@ -7,6 +7,8 @@ class Policy < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
 
+  before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
+
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }
 
@@ -37,7 +39,7 @@ class Policy < ApplicationRecord
   end
 
   def protected?
-    account.protected? || protected
+    protected
   end
 
   def requires_check_in?
@@ -69,7 +71,7 @@ end
 #  lock_version            :integer          default(0), not null
 #  max_machines            :integer
 #  encrypted               :boolean          default(FALSE)
-#  protected               :boolean          default(FALSE)
+#  protected               :boolean
 #  metadata                :jsonb
 #  product_id              :uuid
 #  account_id              :uuid

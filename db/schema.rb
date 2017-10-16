@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171013161238) do
+ActiveRecord::Schema.define(version: 20171016142634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -133,7 +133,7 @@ ActiveRecord::Schema.define(version: 20171013161238) do
     t.integer  "lock_version",            default: 0,     null: false
     t.integer  "max_machines"
     t.boolean  "encrypted",               default: false
-    t.boolean  "protected",               default: false
+    t.boolean  "protected"
     t.jsonb    "metadata"
     t.uuid     "product_id"
     t.uuid     "account_id"
