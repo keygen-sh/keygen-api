@@ -53,6 +53,144 @@ Feature: Create policy
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates a policy that inherits from a protected account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Actionsack Map Pack"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" that is protected
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a policy that inherits from an unprotected account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": false }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Actionsack Map Pack 2"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" that is not protected
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a protected policy that inherits from an unprotected account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": false }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Actionsack Map Pack 2",
+            "protected": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" that is protected
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates an unprotected policy that inherits from a protected account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Actionsack Map Pack 2",
+            "protected": false
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" that is not protected
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin attempts to create an incomplete policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
