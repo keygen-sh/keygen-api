@@ -104,6 +104,9 @@ Feature: Create machine
       {
         "data": {
           "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
           "relationships": {
             "license": {
               "data": {
@@ -115,7 +118,7 @@ Feature: Create machine
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
@@ -190,6 +193,101 @@ Feature: Create machine
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
+
+  Scenario: Product creates a machine associated to a license they don't own
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]"
+      }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[1]"
+      }
+      """
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  # FIXME(ezekg) I'm still unsure how this happened, but this happened in the production
+  #              env. I'm assuming that the policy had been queued for deletion, but
+  #              maybe wasn't fully deleted at the time they attempted to create a new
+  #              machine? Either way, somehow they managed to cause a license to not
+  #              have a valid policy associated with it.
+  Scenario: User creates a machine associated with a license that has an invalid policy
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "policy"
+    And the current account has 1 "license"
+    And the current user has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
 
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
