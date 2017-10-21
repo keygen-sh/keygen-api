@@ -93,6 +93,32 @@ Feature: Create machine
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin creates a machine with an invalid license UUID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$users[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: User creates a machine for their license
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"

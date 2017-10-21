@@ -9,7 +9,7 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
-    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
+    bearer.role? :admin or ((resource.policy.nil? or !resource.policy.protected?) and resource.user == bearer) or resource.product == bearer
   end
 
   def update?
