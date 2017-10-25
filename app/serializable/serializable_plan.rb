@@ -4,6 +4,7 @@ class SerializablePlan < SerializableBase
   attribute :name
   attribute :price
   attribute :trial_duration
+  attribute :max_reqs
   attribute :max_users
   attribute :max_policies
   attribute :max_licenses

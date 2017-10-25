@@ -32,6 +32,7 @@ end
 #  plan_id        :string
 #  private        :boolean          default(FALSE)
 #  trial_duration :integer
+#  max_reqs       :integer
 #
 # Indexes
 #
