@@ -33,6 +33,7 @@ end
 #  private        :boolean          default(FALSE)
 #  trial_duration :integer
 #  max_reqs       :integer
+#  max_admins     :integer
 #
 # Indexes
 #
