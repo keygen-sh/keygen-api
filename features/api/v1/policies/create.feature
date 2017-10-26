@@ -245,6 +245,17 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot be encrypted and use a pool",
+        "source": {
+          "pointer": "/data/attributes/encrypted"
+        }
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 

@@ -11,7 +11,7 @@ class Account < ApplicationRecord
   has_many :webhook_events, dependent: :destroy
   has_many :metrics, dependent: :destroy
   has_many :tokens, dependent: :destroy
-  has_many :users, dependent: :destroy
+  has_many :users, index_errors: true, dependent: :destroy
   has_many :products, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :keys, dependent: :destroy

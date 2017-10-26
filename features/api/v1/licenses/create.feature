@@ -326,6 +326,17 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot specify key for encrypted license",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
@@ -549,6 +560,14 @@ Feature: Create license
       """
     Then the response status should be "401"
     And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request"
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
