@@ -117,7 +117,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Service unavailable",
-        detail: "We're having a really bad day"
+        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact hello@keygen.sh with any questions."
       }.merge(opts)]
     }, status: :service_unavailable
   end
