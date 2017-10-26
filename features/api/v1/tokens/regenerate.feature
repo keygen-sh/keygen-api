@@ -43,6 +43,14 @@ Feature: Regenerate authentication token
       """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "must be a valid token"
+      }
+      """
 
   Scenario: Product resets their current token
     Given the current account is "test1"

@@ -66,8 +66,7 @@ module Api::V1
         render jsonapi: tok and return
       end
 
-      render_unauthorized detail: "must be a valid token", source: {
-        pointer: "/data/relationships/token" }
+      render_unauthorized detail: "must be a valid token"
     end
 
     # PUT /tokens/1

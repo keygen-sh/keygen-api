@@ -108,6 +108,14 @@ Feature: Update license
       }
       """
     Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: key"
+      }
+      """
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" jobs
 

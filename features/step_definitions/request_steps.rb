@@ -167,6 +167,26 @@ Then /^the JSON response should (?:contain|be) an array of (\d+) errors?$/ do |c
   expect(json["errors"].length).to eq count.to_i
 end
 
+Given /^the (\w+) error should have the following properties:$/ do |i, body|
+  parse_placeholders! body
+
+  json = JSON.parse last_response.body
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+
+  err = json["errors"].send :[], numbers[i]
+  expect(err).to eq JSON.parse(body)
+end
+
 Then /^the JSON response should contain the following links:$/ do |body|
   json = JSON.parse last_response.body
 
