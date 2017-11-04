@@ -60,7 +60,7 @@ class License < ApplicationRecord
   def check_in!
     return false unless requires_check_in?
 
-    self.last_check_in_at = Time.now
+    self.last_check_in_at = Time.current
     save
   end
 
@@ -84,7 +84,7 @@ class License < ApplicationRecord
   private
 
   def set_first_check_in
-    self.last_check_in_at = Time.now
+    self.last_check_in_at = Time.current
   end
 
   def set_key
