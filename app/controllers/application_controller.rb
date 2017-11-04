@@ -170,7 +170,7 @@ class ApplicationController < ActionController::API
     period = data[:period].to_i
     count = data[:count].to_i
     limit = data[:limit].to_i
-    now = Time.now
+    now = Time.current
 
     response.headers["X-RateLimit-Limit"] = limit.to_s
     response.headers["X-RateLimit-Remaining"] = [0, limit - count].max.to_s

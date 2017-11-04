@@ -19,7 +19,7 @@ class Rack::Attack
     match_data = env["rack.attack.match_data"] || {}
     period = match_data[:period].to_i
     limit = match_data[:limit].to_i
-    now = Time.now
+    now = Time.current
 
     [
       429,
