@@ -39,4 +39,5 @@ end
 #  index_keys_on_created_at_and_account_id  (created_at,account_id)
 #  index_keys_on_created_at_and_id          (created_at,id) UNIQUE
 #  index_keys_on_created_at_and_policy_id   (created_at,policy_id)
+#  index_keys_on_id                         (id) UNIQUE
 #

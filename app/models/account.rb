@@ -60,11 +60,11 @@ end
 #
 # Table name: accounts
 #
+#  id         :uuid             not null, primary key
 #  name       :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  slug       :string
-#  id         :uuid             not null, primary key
 #  plan_id    :uuid
 #  protected  :boolean          default(FALSE)
 #
@@ -73,5 +73,6 @@ end
 #  index_accounts_on_created_at_and_id_and_slug  (created_at,id,slug) UNIQUE
 #  index_accounts_on_created_at_and_plan_id      (created_at,plan_id)
 #  index_accounts_on_created_at_and_slug         (created_at,slug) UNIQUE
+#  index_accounts_on_id                          (id) UNIQUE
 #  index_accounts_on_slug                        (slug) UNIQUE
 #
