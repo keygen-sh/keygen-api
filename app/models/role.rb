@@ -21,4 +21,5 @@ end
 #  index_roles_on_created_at_and_id                             (created_at,id) UNIQUE
 #  index_roles_on_created_at_and_name                           (created_at,name)
 #  index_roles_on_created_at_and_resource_id_and_resource_type  (created_at,resource_id,resource_type)
+#  index_roles_on_id                                            (id) UNIQUE
 #
