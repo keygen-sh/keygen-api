@@ -1,10 +1,10 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+# # This file should contain all the record creation needed to seed the database with its default values.
+# # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
+# #
+# # Examples:
+# #
+# #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
+# #   Character.create(name: 'Luke', movie: movies.first)
 # Plan.create(
 #   plan_id: "beta",
 #   name: "Beta",
@@ -14,7 +14,7 @@
 #   max_licenses: 1_000,
 #   max_policies: 1_000
 # )
-#
+
 # Plan.create([{
 #   plan_id: "weekender",
 #   name: "Weekender",
@@ -40,10 +40,10 @@
 #   max_licenses: 25_000,
 #   max_policies: 25
 # }])
-#
+
 # account = Account.create(
 #   name: "Account",
-#   slug: "account",
+#   slug: SecureRandom.hex,
 #   plan: Plan.first,
 #   users_attributes: [{
 #     first_name: "Admin",
@@ -52,39 +52,36 @@
 #     password: "password"
 #   }]
 # )
-#
+
 # account.webhook_endpoints.create(
 #   url: "https://keygen.sh"
 # )
-#
+
 # product = account.products.create(
 #   name: "App"
 # )
-#
+
 # policy = account.policies.create(
 #   name: "Premium Add-On",
-#   price: 1_99,
 #   product: product,
 #   floating: true,
 #   duration: 2.weeks
 # )
 # pool_policy = account.policies.create(
 #   name: "Premium Add-On",
-#   price: 4_99,
 #   product: product,
 #   use_pool: true,
 #   duration: 4.weeks
 # )
 # enc_policy = account.policies.create(
 #   name: "Secret Add-On",
-#   price: 9_99,
 #   product: product,
 #   floating: true,
 #   encrypted: true,
 #   duration: 1.month
 # )
-#
-# 1_000.times do
+
+# 10_000.times do
 #   account.keys.create(
 #     key: SecureRandom.hex.scan(/.{4}/).join("-"),
 #     policy: pool_policy
@@ -97,14 +94,14 @@
 #     key: SecureRandom.hex.scan(/.{4}/).join("-"),
 #     policy: pool_policy
 #   )
-#
+
 #   user = account.users.create(
 #     first_name: "#{SecureRandom.hex}",
 #     last_name: "#{SecureRandom.hex}",
 #     email: "#{SecureRandom.hex}@keygen.sh",
 #     password: "password"
 #   )
-#
+
 #   license = account.licenses.create(
 #     policy: policy,
 #     user: user
@@ -117,7 +114,7 @@
 #     policy: enc_policy,
 #     user: user
 #   )
-#
+
 #   account.machines.create(
 #     fingerprint: SecureRandom.hex.scan(/.{2}/).join(":"),
 #     license: license
@@ -131,7 +128,7 @@
 #     license: enc_license
 #   )
 # end
-#
+
 # User.find_each do |user|
 #   token = user.tokens.create account: user.account
 #   token.generate!

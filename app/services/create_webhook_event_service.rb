@@ -1,9 +1,10 @@
 class CreateWebhookEventService < BaseService
 
-  def initialize(event:, account:, resource:)
+  def initialize(event:, account:, resource:, meta: nil)
     @event    = event
     @account  = account
     @resource = resource
+    @meta     = meta
   end
 
   def execute
@@ -53,8 +54,12 @@ class CreateWebhookEventService < BaseService
       # Serialize the event and decode so we can use in webhook job
       payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, options)
 
+      # Append meta to options for resource payload
+      opts = options
+      opts.merge! meta: @meta.transform_keys { |k| k.to_s.camelize :lower } unless @meta.nil?
+
       # Set the payload attr of the webhook payload (since it's incomplete at the moment)
-      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, options)
+      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, opts)
 
       # Enqueue the worker, which will fire off the webhook
       jid = WebhookWorker.perform_async(
@@ -74,5 +79,5 @@ class CreateWebhookEventService < BaseService
 
   private
 
-  attr_reader :event, :account, :resource
+  attr_reader :event, :account, :resource, :meta
 end
