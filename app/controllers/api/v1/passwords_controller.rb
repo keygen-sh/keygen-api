@@ -6,8 +6,22 @@ module Api::V1
     # POST /passwords
     def reset_password
       skip_authorization
+      return unless @user
 
-      @user.send_password_reset_email if @user
+      token = @user.generate_password_reset_token
+
+      CreateWebhookEventService.new(
+        event: "user.password-reset",
+        account: current_account,
+        resource: @user,
+        meta: {
+          password_reset_token: token
+        }
+      ).execute
+
+      if password_params[:meta][:deliver] != false # nil or true = send email
+        @user.send_password_reset_email token: token
+      end
     end
 
     private
@@ -21,6 +35,7 @@ module Api::V1
 
       on :reset_password do
         param :meta, type: :hash do
+          param :deliver, type: :boolean, optional: true
           param :email, type: :string
         end
       end
