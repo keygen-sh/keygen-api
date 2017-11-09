@@ -19,7 +19,6 @@ end
 #
 # Indexes
 #
-#  index_receipts_on_created_at_and_billing_id  (created_at,billing_id)
-#  index_receipts_on_created_at_and_id          (created_at,id) UNIQUE
-#  index_receipts_on_id                         (id) UNIQUE
+#  index_receipts_on_billing_id_and_created_at  (billing_id,created_at)
+#  index_receipts_on_id_and_created_at          (id,created_at) UNIQUE
 #

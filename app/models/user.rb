@@ -66,8 +66,7 @@ end
 #
 # Indexes
 #
-#  index_users_on_created_at_and_account_id            (created_at,account_id)
-#  index_users_on_created_at_and_account_id_and_email  (created_at,account_id,email)
-#  index_users_on_created_at_and_id                    (created_at,id) UNIQUE
-#  index_users_on_id                                   (id) UNIQUE
+#  index_users_on_account_id_and_created_at            (account_id,created_at)
+#  index_users_on_email_and_account_id_and_created_at  (email,account_id,created_at)
+#  index_users_on_id_and_created_at_and_account_id     (id,created_at,account_id) UNIQUE
 #
