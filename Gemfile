@@ -8,6 +8,9 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'rack-attack'
 gem 'rack-cors'
 
+# Redis for caching and background jobs
+gem 'redis-rails'
+
 # JSON API serializers
 gem 'jsonapi-rails', '0.3.1'
 

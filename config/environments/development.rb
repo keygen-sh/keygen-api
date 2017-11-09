@@ -19,16 +19,14 @@ Rails.application.configure do
   config.action_controller.action_on_unpermitted_parameters = :raise
 
   # Enable/disable caching. By default caching is disabled.
-  if Rails.root.join('tmp/caching-dev.txt').exist?
+  if ENV['REDIS_URL']
     config.action_controller.perform_caching = true
-
+    config.cache_store = :redis_store
+  elsif Rails.root.join('tmp/caching-dev.txt').exist?
+    config.action_controller.perform_caching = true
     config.cache_store = :memory_store
-    config.public_file_server.headers = {
-      'Cache-Control' => 'public, max-age=172800'
-    }
   else
     config.action_controller.perform_caching = false
-
     config.cache_store = :null_store
   end
 
