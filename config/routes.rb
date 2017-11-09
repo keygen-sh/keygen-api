@@ -9,7 +9,12 @@ Rails.application.routes.draw do
       post "stripe", to: "stripe#receive_webhook"
 
       # Health check
-      get "health", to: -> (*) { [204, {}, []] }
+      health_route = proc { [204, {}, []] }.tap do |proc|
+        def proc.inspect
+          'api/v1/health' # Workaround: https://github.com/ctran/annotate_models/issues/369
+        end
+      end
+      get "health", to: health_route
 
       resources "plans", only: [:index, :show]
 
@@ -141,7 +146,7 @@ end
 #
 #                           Prefix Verb   URI Pattern                                                          Controller#Action
 #                        v1_stripe POST   /v1/stripe(.:format)                                                 api/v1/stripe#receive_webhook {:subdomain=>"api", :format=>"jsonapi"}
-#                        v1_health GET    /v1/health(.:format)                                                 #<Proc:0x007fd1aae24a68@/Users/gabrielse/code/keygen/api/config/routes.rb:12 (lambda)> {:subdomain=>"api", :format=>"jsonapi"}
+#                        v1_health GET    /v1/health(.:format)                                                 api/v1/health {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_plans GET    /v1/plans(.:format)                                                  api/v1/plans#index {:subdomain=>"api", :format=>"jsonapi"}
 #                          v1_plan GET    /v1/plans/:id(.:format)                                              api/v1/plans#show {:subdomain=>"api", :format=>"jsonapi"}
 #               v1_account_billing GET    /v1/accounts/:account_id/billing(.:format)                           api/v1/accounts/relationships/billings#show {:subdomain=>"api", :format=>"jsonapi"}
