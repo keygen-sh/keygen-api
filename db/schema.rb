@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171107210504) do
+ActiveRecord::Schema.define(version: 20171109155034) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -246,6 +246,7 @@ ActiveRecord::Schema.define(version: 20171107210504) do
     t.index ["created_at", "id"], name: "index_webhook_events_on_created_at_and_id", unique: true, using: :btree
     t.index ["created_at", "jid"], name: "index_webhook_events_on_created_at_and_jid", using: :btree
     t.index ["id"], name: "index_webhook_events_on_id", unique: true, using: :btree
+    t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token", using: :btree
   end
 
 end

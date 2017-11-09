@@ -35,4 +35,5 @@ end
 #  index_webhook_events_on_created_at_and_id          (created_at,id) UNIQUE
 #  index_webhook_events_on_created_at_and_jid         (created_at,jid)
 #  index_webhook_events_on_id                         (id) UNIQUE
+#  index_webhook_events_on_idempotency_token          (idempotency_token)
 #
