@@ -124,9 +124,8 @@ end
 #
 # Indexes
 #
-#  index_billings_on_created_at_and_account_id       (created_at,account_id)
-#  index_billings_on_created_at_and_customer_id      (created_at,customer_id)
-#  index_billings_on_created_at_and_id               (created_at,id) UNIQUE
-#  index_billings_on_created_at_and_subscription_id  (created_at,subscription_id)
-#  index_billings_on_id                              (id) UNIQUE
+#  index_billings_on_account_id_and_created_at       (account_id,created_at)
+#  index_billings_on_customer_id_and_created_at      (customer_id,created_at)
+#  index_billings_on_id_and_created_at               (id,created_at) UNIQUE
+#  index_billings_on_subscription_id_and_created_at  (subscription_id,created_at)
 #

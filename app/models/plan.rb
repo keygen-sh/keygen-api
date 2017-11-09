@@ -37,7 +37,6 @@ end
 #
 # Indexes
 #
-#  index_plans_on_created_at_and_id       (created_at,id) UNIQUE
-#  index_plans_on_created_at_and_plan_id  (created_at,plan_id)
-#  index_plans_on_id                      (id) UNIQUE
+#  index_plans_on_id_and_created_at       (id,created_at) UNIQUE
+#  index_plans_on_plan_id_and_created_at  (plan_id,created_at)
 #

@@ -36,8 +36,7 @@ end
 #
 # Indexes
 #
-#  index_keys_on_created_at_and_account_id  (created_at,account_id)
-#  index_keys_on_created_at_and_id          (created_at,id) UNIQUE
-#  index_keys_on_created_at_and_policy_id   (created_at,policy_id)
-#  index_keys_on_id                         (id) UNIQUE
+#  index_keys_on_account_id_and_created_at         (account_id,created_at)
+#  index_keys_on_id_and_created_at_and_account_id  (id,created_at,account_id) UNIQUE
+#  index_keys_on_policy_id_and_created_at          (policy_id,created_at)
 #
