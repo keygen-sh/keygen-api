@@ -13,7 +13,7 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-  config.cache_store = :redis_store
+  config.cache_store = :redis_store, ENV['REDIS_URL']
 
   # Route exceptions to error controller.
   config.exceptions_app = self.routes
