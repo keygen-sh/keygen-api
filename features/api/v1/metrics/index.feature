@@ -52,6 +52,14 @@ Feature: List metrics
     Then the response status should be "200"
     And the JSON response should be an array with 0 "metrics"
 
+  Scenario: Admin retrieves a list of metrics within a date range that's too far
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "metrics"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics?date[start]=2017-1-1&date[end]=2017-02-02"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves a list of metrics within a date range that's invalid
     Given I am an admin of account "test1"
     And the current account is "test1"
