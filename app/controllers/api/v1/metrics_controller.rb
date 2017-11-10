@@ -11,11 +11,19 @@ module Api::V1
     # GET /metrics
     def index
       @metrics = Rails.cache.fetch cache_key, expires_in: 5.minutes do
-        policy_scope apply_scopes(current_account.metrics).all
+        metrics = policy_scope apply_scopes(current_account.metrics).all
+        JSONAPI::Serializable::Renderer.new.render(metrics, {
+          expose: { url_helpers: Rails.application.routes.url_helpers },
+          class: {
+            Account: SerializableAccount,
+            Metric: SerializableMetric,
+            Error: SerializableError
+          }
+        })
       end
-      authorize @metrics
+      authorize Metric
 
-      render jsonapi: @metrics
+      render json: @metrics
     end
 
     # GET /metrics/1
@@ -31,8 +39,8 @@ module Api::V1
       @metric = current_account.metrics.find params[:id]
     end
 
-    def cache_key(id = nil)
-      [current_account.id, current_bearer.id, "metrics", id, request.query_string.parameterize].reject { |s| s.nil? || s.empty? }.join "/"
+    def cache_key
+      [:metrics, current_account.id, current_bearer.id, request.query_string.parameterize].select(&:present?).join "/"
     end
   end
 end

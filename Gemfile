@@ -10,6 +10,7 @@ gem 'rack-cors'
 
 # Redis for caching and background jobs
 gem 'redis-rails'
+gem 'redis', '~> 3.3.3'
 
 # JSON API serializers
 gem 'jsonapi-rails', '0.3.1'
