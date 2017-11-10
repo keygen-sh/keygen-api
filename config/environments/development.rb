@@ -18,10 +18,10 @@ Rails.application.configure do
   # Raise errors on unpermitted params.
   config.action_controller.action_on_unpermitted_parameters = :raise
 
-  # Enable/disable caching. By default caching is disabled.
-  if ENV['REDIS_URL']
+  # Enable/disable caching with redis.
+  if ENV['REDIS_URL'].present?
     config.action_controller.perform_caching = true
-    config.cache_store = :redis_store
+    config.cache_store = :redis_store, ENV['REDIS_URL']
   elsif Rails.root.join('tmp/caching-dev.txt').exist?
     config.action_controller.perform_caching = true
     config.cache_store = :memory_store
