@@ -36,7 +36,8 @@ class Account < ApplicationRecord
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
 
   validate on: [:create, :update] do
-    errors.add :slug, "cannot resemble a UUID" if slug =~ UUID_REGEX
+    clean_slug = "#{slug}".tr "-", ""
+    errors.add :slug, "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
   end
 
   scope :plan, -> (id) { where plan: id }

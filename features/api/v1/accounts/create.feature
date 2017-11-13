@@ -138,6 +138,53 @@ Feature: Create account
       }
       """
 
+  Scenario: Anonymous creates an account with a UUID slug with oddly placed dashes
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Hacker",
+            "slug": "ace-6b0506d-c04cb5-85e9a-d87f62-9255f"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Elliot",
+                    "lastName": "Alderson",
+                    "email": "elliot@allsafe.com",
+                    "password": "mr.robot"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot resemble a UUID",
+        "source": {
+          "pointer": "/data/attributes/slug"
+        }
+      }
+      """
+
   # NOTE: This is really just a test to make sure endpoints are valid even when
   #       we're authenticated as another account
   Scenario: Admin of an account creates another account
