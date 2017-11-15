@@ -17,6 +17,8 @@ class WebhookWorker
     if !ACCEPTABLE_STATUSES.include?(request.code)
       raise FailedRequestError
     end
+  rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
+    nil
   end
 
   class FailedRequestError < StandardError; end
