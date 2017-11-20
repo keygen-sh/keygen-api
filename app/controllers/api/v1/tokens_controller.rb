@@ -28,7 +28,7 @@ module Api::V1
       skip_authorization
 
       authenticate_with_http_basic do |email, password|
-        user = current_account.users.find_by email: email
+        user = current_account.users.find_by email: "#{email}".downcase
 
         if user&.authenticate(password)
           token = TokenGeneratorService.new(
