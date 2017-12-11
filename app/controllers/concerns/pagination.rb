@@ -6,7 +6,7 @@ module Pagination
     def render(args)
       super args.merge links: pagination_links(args[:jsonapi])
     rescue => e # TODO: Let's not catch everything here
-      Raygun.track_exception e
+      Raygun.track_exception e, format: request.format, method: request.method, url: request.url rescue nil
 
       super args unless performed? # Avoid double render
     end
