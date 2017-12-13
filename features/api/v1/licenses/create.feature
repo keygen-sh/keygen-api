@@ -119,6 +119,37 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin creates a license with a pre-determined key that conflicts with a license ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "$licenses[2].id"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 3 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin creates a duplicate license of another account with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
