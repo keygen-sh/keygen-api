@@ -19,6 +19,7 @@ class License < ApplicationRecord
   validates :policy, presence: { message: "must exist" }
 
   validate on: :create do
+    errors.add :key, "cannot specify key that conflicts with another license's ID" if account.licenses.exists? key
     errors.add :key, "cannot specify key for encrypted license" if key.present? && policy.encrypted?
   end
 
