@@ -140,7 +140,7 @@ Feature: List machines
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
-  Scenario: User attempts to retrieve machines for their account scoped by fingerprint
+  Scenario: User attempts to retrieve machines for their account scoped by a fingerprint that exists
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license"
@@ -162,3 +162,68 @@ Feature: List machines
     When I send a GET request to "/accounts/test1/machines?fingerprint=test"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
+
+  Scenario: User attempts to retrieve machines for their account scoped by a fingerprint that doesn't exist
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I am a user of account "test1"
+    And the current account has 5 "machines"
+    And 5 "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And the third "machine" has the following attributes:
+      """
+      { "fingerprint": "test" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?fingerprint=invalid"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
+
+  Scenario: User attempts to retrieve machines for their account scoped by a license key that exists
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "key": "a-license-key" }
+      """
+    And I am a user of account "test1"
+    And the current account has 5 "machines"
+    And 3 "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?key=a-license-key"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+
+Scenario: User attempts to retrieve machines for their account scoped by a license key that doesn't exist
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "key": "a-license-key" }
+      """
+    And I am a user of account "test1"
+    And the current account has 5 "machines"
+    And 5 "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And the third "machine" has the following attributes:
+      """
+      { "fingerprint": "test" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?key=invalid"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
