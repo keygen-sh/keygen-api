@@ -77,7 +77,13 @@ module Api::V1
     private
 
     def set_license
-      @license = current_account.licenses.find params[:id]
+      # FIXME(ezekg) This allows the license to be looked up by ID or
+      #              key, but this is pretty messy.
+      id = params[:id] if params[:id] =~ UUID_REGEX # Only include when it's a UUID (else pg throws an err)
+      key = params[:id]
+
+      @license = current_account.licenses.where("id = ? OR key = ?", id, key).first
+      raise ActiveRecord::RecordNotFound if @license.nil?
     end
 
     typed_parameters transform: true do

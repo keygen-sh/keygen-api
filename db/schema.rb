@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171109165056) do
+ActiveRecord::Schema.define(version: 20171213213747) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 20171109165056) do
     t.datetime "last_check_in_soon_event_sent_at"
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true, using: :btree
+    t.index ["key", "created_at", "account_id"], name: "index_licenses_on_key_and_created_at_and_account_id", using: :btree
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at", using: :btree
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at", using: :btree
   end

@@ -26,6 +26,19 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
+  Scenario: Admin retrieves a license for their account by key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "key": "a-license-key" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/a-license-key"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+
   Scenario: Admin retrieves an invalid license for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -41,6 +54,19 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
     And the JSON response should be a "license" with a nil key
+
+  Scenario: Admin attempts to retrieve an encrypted license for their account by key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 encrypted "licenses"
+    And the first "license" has the following attributes:
+      # Hashed 'a-license-key' using Bcrypt
+      """
+      { "key": "\$2a\$10\$UcRHfYqf3DayM7iF/44pqOm0X9/UoEBcBRv3O4xFhJbXDIamHVBe." }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/a-license-key"
+    Then the response status should be "404"
 
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
