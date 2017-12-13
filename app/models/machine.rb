@@ -15,6 +15,7 @@ class Machine < ApplicationRecord
 
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :license, -> (id) { where license: id }
+  scope :key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
 end

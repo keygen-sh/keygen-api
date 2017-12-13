@@ -3,6 +3,7 @@ module Api::V1
     has_scope :fingerprint
     has_scope :product
     has_scope :license
+    has_scope :key
     has_scope :user
 
     before_action :scope_to_current_account!
