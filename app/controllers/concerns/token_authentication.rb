@@ -29,7 +29,8 @@ module TokenAuthentication
     tok&.bearer
   end
 
-  def request_http_token_authentication(realm = "Application", message = nil)
-    render_unauthorized
+  def request_http_token_authentication(realm = "Keygen", message = nil)
+    headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+    raise Keygen::Error::UnauthorizedError
   end
 end

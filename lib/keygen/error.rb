@@ -1,5 +1,6 @@
 module Keygen
   module Error
+    class UnauthorizedError < StandardError; end
     class InvalidScopeError < StandardError
       attr_reader :source
 
