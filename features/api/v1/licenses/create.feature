@@ -315,6 +315,59 @@ Feature: Create license
       }
       """
     Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title":"Bad request",
+        "detail": "is missing",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
+      }
+      """
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin attempts to create a license with an invalid policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            },
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
+      }
+      """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
