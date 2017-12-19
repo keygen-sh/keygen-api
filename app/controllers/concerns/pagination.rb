@@ -4,7 +4,7 @@ module Pagination
   # Overload render method to append pagination links to response
   included do
     def render(args)
-      super args.merge links: pagination_links(args[:jsonapi]) # unless performed?
+      super args.merge links: pagination_links(args[:jsonapi]) unless performed?
     rescue => e # TODO: Let's not catch everything here
       Raygun.track_exception e, request.env.to_h.slice(
         "REQUEST_METHOD",
