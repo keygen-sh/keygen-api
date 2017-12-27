@@ -28,11 +28,13 @@ module Api::V1::Licenses::Actions
       @license = LicenseKeyLookupService.new(
         account: current_account,
         encrypted: validation_params[:meta][:encrypted] == true,
-        key: validation_params[:meta][:key],
-        scope: validation_params[:meta][:scope]
+        key: validation_params[:meta][:key]
       ).execute
 
-      valid, detail, constant = LicenseValidationService.new(license: @license).execute
+      valid, detail, constant = LicenseValidationService.new(
+        license: @license,
+        scope: validation_params[:meta][:scope]
+      ).execute
       if @license.present?
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",

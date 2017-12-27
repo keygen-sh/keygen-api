@@ -60,24 +60,28 @@ end
 #
 # Table name: policies
 #
-#  id                      :uuid             not null, primary key
-#  name                    :string
-#  duration                :integer
-#  strict                  :boolean          default(FALSE)
-#  floating                :boolean          default(FALSE)
-#  use_pool                :boolean          default(FALSE)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  lock_version            :integer          default(0), not null
-#  max_machines            :integer
-#  encrypted               :boolean          default(FALSE)
-#  protected               :boolean
-#  metadata                :jsonb
-#  product_id              :uuid
-#  account_id              :uuid
-#  check_in_interval       :string
-#  check_in_interval_count :integer
-#  require_check_in        :boolean          default(FALSE)
+#  id                        :uuid             not null, primary key
+#  name                      :string
+#  duration                  :integer
+#  strict                    :boolean          default(FALSE)
+#  floating                  :boolean          default(FALSE)
+#  use_pool                  :boolean          default(FALSE)
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  lock_version              :integer          default(0), not null
+#  max_machines              :integer
+#  encrypted                 :boolean          default(FALSE)
+#  protected                 :boolean
+#  metadata                  :jsonb
+#  product_id                :uuid
+#  account_id                :uuid
+#  check_in_interval         :string
+#  check_in_interval_count   :integer
+#  require_check_in          :boolean          default(FALSE)
+#  require_product_scope     :boolean          default(FALSE)
+#  require_policy_scope      :boolean          default(FALSE)
+#  require_machine_scope     :boolean          default(FALSE)
+#  require_fingerprint_scope :boolean          default(FALSE)
 #
 # Indexes
 #

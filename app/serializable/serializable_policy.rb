@@ -9,6 +9,10 @@ class SerializablePolicy < SerializableBase
   attribute :max_machines
   attribute :encrypted
   attribute :protected
+  attribute :require_product_scope
+  attribute :require_policy_scope
+  attribute :require_machine_scope
+  attribute :require_fingerprint_scope
   attribute :require_check_in
   attribute :check_in_interval
   attribute :check_in_interval_count
