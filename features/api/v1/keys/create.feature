@@ -83,6 +83,34 @@ Feature: Create key
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin creates a key for a non-existent policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/keys" with the following:
+      """
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$users[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin creates a duplicate key for a pooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"

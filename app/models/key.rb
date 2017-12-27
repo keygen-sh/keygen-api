@@ -12,7 +12,7 @@ class Key < ApplicationRecord
   validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }
 
   validate on: :create do
-    errors.add :policy, "cannot add key to an unpooled policy" unless policy.pool?
+    errors.add :policy, "cannot add key to an unpooled policy" if !policy.nil? && !policy.pool?
   end
 
   validate on: [:create, :update] do
