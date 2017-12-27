@@ -467,7 +467,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -527,7 +527,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -557,7 +557,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -692,7 +692,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an invalid license key scoped to a specific product
+  Scenario: Anonymous validates a license key scoped to a mismatched product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -724,10 +724,50 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: Anonymous validates an non-existent license key scoped to a specific product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "non-existent-key",
+          "scope": {
+            "product": "$products[1]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -779,7 +819,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an invalid license key scoped to a specific machine
+  Scenario: Anonymous validates a license key scoped to a mismatched machine
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -812,13 +852,13 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should not contain a "license"
+    And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "machine scope does not match", "constant": "MACHINE_SCOPE_MISMATCH" }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
 
   Scenario: Anonymous validates a valid license key scoped to a specific machine fingerprint
     Given the current account is "test1"
@@ -867,7 +907,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an invalid license key scoped to a machine fingerprint
+  Scenario: Anonymous validates a license key scoped to a mismatched machine fingerprint
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -900,10 +940,51 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: Anonymous validates an non-existent license key scoped to a machine fingerprint
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    And the current account has 1 "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "non-existent-key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -948,7 +1029,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an invalid license key scoped to a machine fingerprint
+  Scenario: Anonymous validates an license key scoped to a mismatched policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -980,10 +1061,50 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "policy scope does not match", "constant": "POLICY_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: Anonymous validates a non-existent license key scoped to a policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "non-existent-key",
+          "scope": {
+            "policy": "$policies[1]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -1076,13 +1197,13 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
-    And the JSON response should not contain a "license"
+    And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "does not exist within provided scope", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
 
   Scenario: Anonymous validates a valid license key with an empty scope
     Given the current account is "test1"
@@ -1118,6 +1239,158 @@ Feature: License validation actions
     And the JSON response should contain meta with the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Anonymous validates a valid license key that requires a product scope
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "requireProductScope": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "product scope is required", "constant": "PRODUCT_SCOPE_REQUIRED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Anonymous validates a valid license key that requires a policy scope
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "requirePolicyScope": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "policy scope is required", "constant": "POLICY_SCOPE_REQUIRED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Anonymous validates a valid license key that requires a machine scope
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "requireMachineScope": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "machine scope is required", "constant": "MACHINE_SCOPE_REQUIRED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Anonymous validates a valid license key that requires a fingerprint scope
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "requireFingerprintScope": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "fingerprint scope is required", "constant": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171213213747) do
+ActiveRecord::Schema.define(version: 20171227201645) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,21 +129,25 @@ ActiveRecord::Schema.define(version: 20171213213747) do
   create_table "policies", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
     t.integer  "duration"
-    t.boolean  "strict",                  default: false
-    t.boolean  "floating",                default: false
-    t.boolean  "use_pool",                default: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "lock_version",            default: 0,     null: false
+    t.boolean  "strict",                    default: false
+    t.boolean  "floating",                  default: false
+    t.boolean  "use_pool",                  default: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.integer  "lock_version",              default: 0,     null: false
     t.integer  "max_machines"
-    t.boolean  "encrypted",               default: false
+    t.boolean  "encrypted",                 default: false
     t.boolean  "protected"
     t.jsonb    "metadata"
     t.uuid     "product_id"
     t.uuid     "account_id"
     t.string   "check_in_interval"
     t.integer  "check_in_interval_count"
-    t.boolean  "require_check_in",        default: false
+    t.boolean  "require_check_in",          default: false
+    t.boolean  "require_product_scope",     default: false
+    t.boolean  "require_policy_scope",      default: false
+    t.boolean  "require_machine_scope",     default: false
+    t.boolean  "require_fingerprint_scope", default: false
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at", using: :btree

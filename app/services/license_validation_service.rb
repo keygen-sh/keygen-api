@@ -1,11 +1,36 @@
 class LicenseValidationService < BaseService
 
-  def initialize(license:)
+  def initialize(license:, scope: nil)
     @license = license
+    @scope   = scope
   end
 
   def execute
-    return [false, "does not exist within provided scope", :NOT_FOUND] if license.nil?
+    return [false, "does not exist", :NOT_FOUND] if license.nil?
+    # Check against product scope requirements
+    if scope.present? && scope.key?(:product)
+      return [false, "product scope does not match", :PRODUCT_SCOPE_MISMATCH] if license.product.id != scope[:product]
+    else
+      return [false, "product scope is required", :PRODUCT_SCOPE_REQUIRED] if license.policy.require_product_scope?
+    end
+    # Check against policy scope requirements
+    if scope.present? && scope.key?(:policy)
+      return [false, "policy scope does not match", :POLICY_SCOPE_MISMATCH] if license.policy.id != scope[:policy]
+    else
+      return [false, "policy scope is required", :POLICY_SCOPE_REQUIRED] if license.policy.require_policy_scope?
+    end
+    # Check against machine scope requirements
+    if scope.present? && scope.key?(:machine)
+      return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
+    else
+      return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
+    end
+    # Check agaisnt fingerprint scope requirements
+    if scope.present? && scope.key?(:fingerprint)
+      return [false, "fingerprint scope does not match", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(scope[:fingerprint]).empty?
+    else
+      return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
+    end
     # Check if license is overdue for check in
     return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
     # Check if license is suspended
@@ -28,5 +53,5 @@ class LicenseValidationService < BaseService
 
   private
 
-  attr_reader :license
+  attr_reader :license, :scope
 end
