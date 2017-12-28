@@ -81,7 +81,8 @@ Rails.application.routes.draw do
           end
           member do
             scope "actions", module: "licenses/actions" do
-              get "validate", to: "validations#validate_by_id"
+              get "validate", to: "validations#quick_validate_by_id"
+              post "validate", to: "validations#validate_by_id"
               delete "revoke", to: "permits#revoke"
               post "renew", to: "permits#renew"
               post "suspend", to: "permits#suspend"
