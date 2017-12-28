@@ -17,7 +17,7 @@ Feature: License permit actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "403"
 
-  Scenario: Admin checks in a license
+  Scenario: Admin checks in a license by key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -31,15 +31,16 @@ Feature: License permit actions
       }
       """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the first "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "lastCheckInAt": null
+        "lastCheckInAt": null,
+        "key": "test-key"
       }
       """
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
+    When I send a POST request to "/accounts/test1/licenses/test-key/actions/check-in"
     Then the response status should be "200"
     And the JSON response should be a "license" with a lastCheckIn that is not nil
     And the JSON response should be a "license" with a nextCheckIn that is not nil
@@ -213,7 +214,7 @@ Feature: License permit actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin suspends a license that implements a protected policy
+  Scenario: Admin suspends a license by key that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -226,14 +227,15 @@ Feature: License permit actions
       }
       """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the first "license" has the following attributes:
       """
       {
-        "policyId": "$policies[0]"
+        "policyId": "$policies[0]",
+        "key": "test-key"
       }
       """
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
+    When I send a POST request to "/accounts/test1/licenses/test-key/actions/suspend"
     Then the response status should be "200"
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 1 "webhook" job
