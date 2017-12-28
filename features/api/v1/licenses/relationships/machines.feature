@@ -21,13 +21,17 @@ Feature: License machines relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "key": "test-key" }
+      """
     And the current account has 3 "machines"
     And all "machines" have the following attributes:
       """
       { "licenseId": "$licenses[0]" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/machines"
+    When I send a GET request to "/accounts/test1/licenses/test-key/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
