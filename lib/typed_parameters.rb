@@ -124,9 +124,10 @@ class TypedParameters
 
       # Get the difference of current param segment and schema's params
       segment ||= context.params
-      unpermitted = segment.keys - params.keys
+      keys = segment.keys - params.keys
+      unpermitted = keys.map { |k| k.to_s.camelize :lower }.join ", "
 
-      raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted.join ", "}" if unpermitted.any?
+      raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted}" if keys.any?
     end
 
     def transform!
