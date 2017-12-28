@@ -391,7 +391,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin quick validates a license that is expired
+  Scenario: Admin quick validates a license by key that is expired
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"
@@ -401,11 +401,12 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.ago"
+        "expiry": "$time.1.day.ago",
+        "key": "foobar"
       }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    When I send a GET request to "/accounts/test1/licenses/foobar/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
@@ -895,7 +896,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin validates a strict license that has not been used
+  Scenario: Admin validates a strict license by key that has not been used
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"
@@ -912,11 +913,12 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
+        "expiry": "$time.1.day.from_now",
+        "key": "a-b-c-d-e"
       }
       """
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    When I send a POST request to "/accounts/test1/licenses/a-b-c-d-e/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
