@@ -57,7 +57,10 @@ class TypedParameters
       parser = ActionDispatch::Request.parameter_parsers[:jsonapi]
       raise InvalidRequestError, "Request's content type and/or accept headers are unsupported (expected application/vnd.api+json)" if parser.nil?
 
-      segment = parser.call context.request.raw_post
+      body = context.request.raw_post
+      body = '{}' unless body.present?
+
+      segment = parser.call body
       schema.validate! segment
     end
     schema.transform!
