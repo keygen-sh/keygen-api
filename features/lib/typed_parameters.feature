@@ -54,12 +54,19 @@ Feature: Typed parameters
           "type": "products",
           "attributes": {
             "name": "Self-driving Car",
-            "unpermitted": "parameter"
+            "unpermitted_param": "parameter"
           }
         }
       }
       """
     Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: unpermittedParam"
+      }
+      """
 
   Scenario: User sends a request with unpermitted parameters that match other permitted keys
     When I send a POST request to "/v1/accounts" with the following:
