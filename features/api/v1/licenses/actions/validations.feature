@@ -416,6 +416,72 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": false
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
   Scenario: An admin quick validates a valid license that requires a product scope
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1099,14 +1165,20 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
-    And the current account has 1 "machine"
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
       """
       {
         "meta": {
           "scope": {
-            "machine": "$machines[0]"
+            "machine": "$machines[1]"
           }
         }
       }
@@ -1187,6 +1259,54 @@ Feature: License validation actions
         "expiry": "$time.1.year.from_now"
       }
       """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[1].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
     And the current account has 1 "machine"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
@@ -1203,7 +1323,49 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": false
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
@@ -1977,6 +2139,54 @@ Feature: License validation actions
         "key": "some-key"
       }
       """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "machine": "$machines[1]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "machine scope does not match", "constant": "MACHINE_SCOPE_MISMATCH" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: Anonymous validates a node-locked license key scoped to a machine, but the license has no machines
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": false
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
     And the current account has 1 "machine"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
@@ -1993,7 +2203,49 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta with the following:
       """
-      { "valid": false, "detail": "machine scope does not match", "constant": "MACHINE_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+
+  Scenario: Anonymous validates a floating license key scoped to a machine, but the license has no machines
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "floating": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    And the current account has 1 "machine"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "machine": "$machines[0]"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
@@ -2065,14 +2317,20 @@ Feature: License validation actions
         "key": "some-key"
       }
       """
-    And the current account has 1 "machine"
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
         "meta": {
           "key": "some-key",
           "scope": {
-            "fingerprint": "$machines[0].fingerprint"
+            "fingerprint": "$machines[1].fingerprint"
           }
         }
       }

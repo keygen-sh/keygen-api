@@ -7,8 +7,8 @@ class LicenseValidationService < BaseService
 
   def execute
     return [false, "does not exist", :NOT_FOUND] if license.nil?
-    # Check against product scope requirements
     if scope != false
+      # Check against product scope requirements
       if scope.present? && scope.key?(:product)
         return [false, "product scope does not match", :PRODUCT_SCOPE_MISMATCH] if license.product.id != scope[:product]
       else
@@ -22,13 +22,27 @@ class LicenseValidationService < BaseService
       end
       # Check against machine scope requirements
       if scope.present? && scope.key?(:machine)
-        return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
+        case
+        when !license.policy.floating? && license.machines.count == 0
+          return [false, "has no associated machine", :NO_MACHINE]
+        when license.policy.floating? && license.machines.count == 0
+          return [false, "has no associated machines", :NO_MACHINES]
+        else
+          return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
+        end
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
       end
       # Check agaisnt fingerprint scope requirements
       if scope.present? && scope.key?(:fingerprint)
-        return [false, "fingerprint scope does not match", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(scope[:fingerprint]).empty?
+        case
+        when !license.policy.floating? && license.machines.count == 0
+          return [false, "has no associated machine", :NO_MACHINE]
+        when license.policy.floating? && license.machines.count == 0
+          return [false, "has no associated machines", :NO_MACHINES]
+        else
+          return [false, "fingerprint scope does not match", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(scope[:fingerprint]).empty?
+        end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
       end
