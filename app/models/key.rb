@@ -12,11 +12,11 @@ class Key < ApplicationRecord
   validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }
 
   validate on: :create do
-    errors.add :policy, "cannot add key to an unpooled policy" if !policy.nil? && !policy.pool?
+    errors.add :policy, "cannot be added to an unpooled policy" if !policy.nil? && !policy.pool?
   end
 
   validate on: [:create, :update] do
-    errors.add :key, "a license already exists with this key" if account.licenses.exists? key: key
+    errors.add :key, "is already being used as a license's key" if account.licenses.exists? key: key
   end
 
   scope :policy, -> (id) { where policy: id }
