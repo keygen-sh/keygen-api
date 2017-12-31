@@ -415,7 +415,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot specify key for encrypted license",
+        "detail": "cannot be specified for an encrypted license",
         "source": {
           "pointer": "/data/attributes/key"
         }
