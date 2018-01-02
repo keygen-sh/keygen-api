@@ -19,6 +19,9 @@ class SerializableLicense < SerializableBase
   attribute :floating do
     @object.policy.floating?
   end
+  attribute :concurrent do
+    @object.policy.concurrent?
+  end
   attribute :max_machines do
     @object.policy.max_machines
   end
