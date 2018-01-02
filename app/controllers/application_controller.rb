@@ -135,7 +135,7 @@ class ApplicationController < ActionController::API
         pointer = nil
 
         if resource.class.reflect_on_association(path.first)
-          if err != "must exist"
+          if err != "must exist" && src.size > 1
             src.insert 1, :data # Make sure our pointer is JSONAPI compliant
             src.insert -2, :attributes
           end
@@ -145,6 +145,8 @@ class ApplicationController < ActionController::API
           src[0] = "admins" if resource.is_a?(Account) && path.first == "users" && action_name == "create"
 
           pointer = "/data/relationships/#{src.join '/'}"
+        elsif path.first == "base"
+          pointer = "/data"
         else
           pointer = "/data/attributes/#{src.join '/'}"
         end

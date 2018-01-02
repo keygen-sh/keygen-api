@@ -7,6 +7,7 @@ class SerializablePolicy < SerializableBase
   attribute :floating
   attribute :use_pool
   attribute :max_machines
+  attribute :concurrent
   attribute :encrypted
   attribute :protected
   attribute :require_product_scope

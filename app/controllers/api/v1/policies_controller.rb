@@ -90,6 +90,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
+            param :concurrent, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
@@ -121,6 +122,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
+            param :concurrent, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
