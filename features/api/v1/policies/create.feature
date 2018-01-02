@@ -84,6 +84,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" that is protected
+    And the JSON response should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
@@ -103,7 +104,8 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Actionsack Map Pack 2"
+            "name": "Actionsack Map Pack 2",
+            "concurrent": false
           },
           "relationships": {
             "product": {
@@ -118,6 +120,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" that is not protected
+    And the JSON response should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 

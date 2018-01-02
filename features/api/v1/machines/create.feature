@@ -374,3 +374,118 @@ Feature: Create machine
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates a machine for a concurrent license that has already reached its limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxMachines": 5,
+        "concurrent": true,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 5 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a machine for a non-concurrent license that has already reached its limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxMachines": 5,
+        "concurrent": false,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 5 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has reached maximum allowed by current policy (5)",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" job

@@ -28,7 +28,7 @@ class Account < ApplicationRecord
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
   # validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
-  #   next unless account.send(record).size > account.plan.send("max_#{record}")
+  #   next unless account.send(record).count > account.plan.send("max_#{record}")
   #   account.errors.add record, "count has reached maximum allowed by current plan"
   # end
 

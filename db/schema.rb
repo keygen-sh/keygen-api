@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171227201645) do
+ActiveRecord::Schema.define(version: 20180102202231) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -148,6 +148,7 @@ ActiveRecord::Schema.define(version: 20171227201645) do
     t.boolean  "require_policy_scope",      default: false
     t.boolean  "require_machine_scope",     default: false
     t.boolean  "require_fingerprint_scope", default: false
+    t.boolean  "concurrent",                default: true
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at", using: :btree

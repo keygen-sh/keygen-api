@@ -35,6 +35,7 @@ Feature: Update policy
           "id": "$policies[0].id",
           "attributes": {
             "requireFingerprintScope": true,
+            "concurrent": false,
             "name": "Trial"
           }
         }
@@ -43,6 +44,7 @@ Feature: Update policy
     Then the response status should be "200"
     And the JSON response should be a "policy" with a duration that is not nil
     And the JSON response should be a "policy" with a requireFingerprintScope
+    And the JSON response should be a "policy" that is not concurrent
     And the JSON response should be a "policy" with the name "Trial"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
