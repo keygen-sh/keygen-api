@@ -608,6 +608,131 @@ Feature: License policy relationship
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: User changes an unprotected license's policy relationship to a new protected policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "protected": false
+      }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: User changes a protected license's policy relationship to a new unprotected policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "protected": true
+      }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "protected": false
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: User changes an unprotected license's policy relationship to a non-existent policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "protected": false
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$licenses[0]"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: User changes a license's policy relationship to a new policy for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

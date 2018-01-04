@@ -36,6 +36,9 @@ module Api::V1::Licenses::Relationships
           detail: "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
         )
         return
+      when current_bearer.role?(:user) && new_policy&.protected?
+        render_forbidden
+        return
       end
 
       if @license.update(policy: new_policy)
