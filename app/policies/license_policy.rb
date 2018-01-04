@@ -51,4 +51,8 @@ class LicensePolicy < ApplicationPolicy
   def validate_by_key?
     true
   end
+
+  def upgrade?
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
+  end
 end

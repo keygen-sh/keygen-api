@@ -76,7 +76,7 @@ Rails.application.routes.draw do
           scope module: "licenses/relationships" do
             resources "machines", only: [:index, :show]
             resource "product", only: [:show]
-            resource "policy", only: [:show]
+            resource "policy", only: [:show, :update]
             resource "user", only: [:show]
           end
           member do
