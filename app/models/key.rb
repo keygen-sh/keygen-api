@@ -16,6 +16,7 @@ class Key < ApplicationRecord
   end
 
   validate on: [:create, :update] do
+    errors.add :key, "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
     errors.add :key, "is already being used as a license's key" if account.licenses.exists? key: key
   end
 
