@@ -17,6 +17,34 @@ Feature: License machines relationship
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "403"
 
+  Scenario: Admin retrieves a paginated list of machines for a license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "key": "test-key" }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/machines?page[number]=1&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "machines"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
+        "prev": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
+        "next": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
+        "first": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
+        "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5"
+      }
+      """
+
   Scenario: Admin retrieves the machines for a license
     Given I am an admin of account "test1"
     And the current account is "test1"

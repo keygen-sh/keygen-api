@@ -22,20 +22,14 @@ module Pagination
   private
 
   def pagination_links(resource)
-    return {} unless resource.respond_to?(:total_pages) && resource.total_pages > 1
+    return {} unless resource.respond_to?(:total_pages)
 
     {}.tap do |page|
-      page[:self] = pagination_link resource.current_page, resource.limit_value
-
-      if resource.current_page > 1
-        page[:first] = pagination_link 1, resource.limit_value
-        page[:prev]  = pagination_link resource.prev_page, resource.limit_value
-      end
-
-      if resource.current_page < resource.total_pages
-        page[:next] = pagination_link resource.next_page, resource.limit_value
-        page[:last] = pagination_link resource.total_pages, resource.limit_value
-      end
+      page[:self]  = pagination_link resource.current_page, resource.limit_value
+      page[:prev]  = pagination_link resource.prev_page, resource.limit_value
+      page[:next]  = pagination_link resource.next_page, resource.limit_value
+      page[:first] = pagination_link 1, resource.limit_value
+      page[:last]  = pagination_link resource.total_pages, resource.limit_value
     end
   end
 
@@ -44,7 +38,7 @@ module Pagination
   end
 
   def pagination_query_params(number, size)
-    request.query_parameters.merge(page: { number: number, size: size }).to_query
+    request.query_parameters.merge(page: { number: number || 1, size: size }).to_query
   end
 
   def pagination_resource_path
