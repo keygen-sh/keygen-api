@@ -195,6 +195,8 @@ Given /^the (\w+) error should have the following properties:$/ do |i, body|
 end
 
 Then /^the JSON response should contain the following links:$/ do |body|
+  parse_placeholders! body
+
   json = JSON.parse last_response.body
 
   expect(json["links"]&.transform_values { |l| URI.decode(l) }).to include JSON.parse(body)
