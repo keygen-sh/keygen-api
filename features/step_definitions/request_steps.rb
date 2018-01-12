@@ -199,5 +199,5 @@ Then /^the JSON response should contain the following links:$/ do |body|
 
   json = JSON.parse last_response.body
 
-  expect(json["links"]&.transform_values { |l| URI.decode(l) }).to include JSON.parse(body)
+  expect(json["links"]&.transform_values { |l| l.nil? ? l : URI.decode(l) }).to include JSON.parse(body)
 end
