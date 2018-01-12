@@ -34,6 +34,8 @@ module Pagination
   end
 
   def pagination_link(number, size)
+    return if number.nil?
+
     "#{pagination_resource_path}?#{pagination_query_params(number, size)}"
   end
 
