@@ -2,6 +2,8 @@ class Key < ApplicationRecord
   include Limitable
   include Pageable
 
+  EXCLUDED_KEYS = %w[actions action].freeze
+
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
@@ -9,7 +11,7 @@ class Key < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
-  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }
+  validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
 
   validate on: :create do
     errors.add :policy, "cannot be added to an unpooled policy" if !policy.nil? && !policy.pool?
