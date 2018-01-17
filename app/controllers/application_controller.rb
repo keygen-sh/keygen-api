@@ -171,7 +171,7 @@ class ApplicationController < ActionController::API
     )
 
     content_type = request.headers["Accept"]
-    if content_type.nil?
+    if content_type.nil? || content_type == "*/*"
       response.headers["Content-Type"] = accepted_content_types[:jsonapi]
       return
     end
