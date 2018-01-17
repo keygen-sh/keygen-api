@@ -201,3 +201,9 @@ Then /^the JSON response should contain the following links:$/ do |body|
 
   expect(json["links"]&.transform_values { |l| l.nil? ? l : URI.decode(l) }).to include JSON.parse(body)
 end
+
+Then /^the response should contain the following headers:$/ do |body|
+  parse_placeholders! body
+
+  expect(last_response.headers).to include JSON.parse(body)
+end
