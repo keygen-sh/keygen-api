@@ -40,3 +40,75 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/invalid"
     Then the response status should be "404"
+
+  Scenario: Admin retrieves their account, accepting no content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": null }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json" }
+      """
+
+  Scenario: Admin retrieves their account, accepting JSONAPI content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "application/vnd.api+json" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json" }
+      """
+
+  Scenario: Admin retrieves their account, accepting JSON content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "application/json" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/json" }
+      """
+
+  Scenario: Admin retrieves their account, accepting XML content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "application/xml" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves their account, accepting HTML content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "text/html" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves their account, accepting plain-text content-type
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Accept": "text/plain" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"

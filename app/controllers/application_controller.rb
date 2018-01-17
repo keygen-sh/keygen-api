@@ -165,7 +165,22 @@ class ApplicationController < ActionController::API
   end
 
   def force_jsonapi_response_format
-    response.headers["Content-Type"] = Mime::Type.lookup_by_extension(:jsonapi).to_s
+    accepted_content_types = HashWithIndifferentAccess.new(
+      jsonapi: Mime::Type.lookup_by_extension(:jsonapi).to_s,
+      json: Mime::Type.lookup_by_extension(:json).to_s
+    )
+
+    content_type = request.headers["Accept"]
+    if content_type.nil?
+      response.headers["Content-Type"] = accepted_content_types[:jsonapi]
+      return
+    end
+
+    if accepted_content_types.values.include?(content_type)
+      response.headers["Content-Type"] = content_type
+    else
+      render_bad_request detail: "Unsupported accept header: #{content_type}"
+    end
   end
 
   def send_rate_limiting_headers
