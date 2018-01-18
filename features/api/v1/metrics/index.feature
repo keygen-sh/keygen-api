@@ -26,6 +26,15 @@ Feature: List metrics
     Then the response status should be "200"
     And the JSON response should be an array with 3 "metrics"
 
+  Scenario: Admin retrieves a list of metrics, hitting the hard query limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 200 "metrics"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
+    Then the response status should be "200"
+    And the JSON response should be an array with 100 "metrics"
+
   Scenario: Admin retrieves an unsupported paginated list of metrics
     Given I am an admin of account "test1"
     And the current account is "test1"

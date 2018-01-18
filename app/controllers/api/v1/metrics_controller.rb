@@ -12,7 +12,7 @@ module Api::V1
     def index
       @metrics = Rails.cache.fetch cache_key, expires_in: 5.minutes do
         metrics = policy_scope apply_scopes(current_account.metrics).all
-        JSONAPI::Serializable::Renderer.new.render(metrics, {
+        JSONAPI::Serializable::Renderer.new.render(metrics[0...100], {
           expose: { url_helpers: Rails.application.routes.url_helpers },
           class: {
             Account: SerializableAccount,
