@@ -1,6 +1,7 @@
 module Api::V1
   class MetricsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index
+    has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
     has_scope :metrics, type: :array
 
     before_action :scope_to_current_account!
@@ -10,20 +11,10 @@ module Api::V1
 
     # GET /metrics
     def index
-      @metrics = Rails.cache.fetch cache_key, expires_in: 5.minutes do
-        metrics = policy_scope apply_scopes(current_account.metrics).all
-        JSONAPI::Serializable::Renderer.new.render(metrics[0...100], {
-          expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: {
-            Account: SerializableAccount,
-            Metric: SerializableMetric,
-            Error: SerializableError
-          }
-        })
-      end
-      authorize Metric
+      @metrics = policy_scope apply_scopes(current_account.metrics).all
+      authorize @metrics
 
-      render json: @metrics
+      render jsonapi: @metrics
     end
 
     # GET /metrics/1
@@ -37,10 +28,6 @@ module Api::V1
 
     def set_metric
       @metric = current_account.metrics.find params[:id]
-    end
-
-    def cache_key
-      [:metrics, current_account.id, current_bearer.id, request.query_string.parameterize].select(&:present?).join "/"
     end
   end
 end

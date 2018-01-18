@@ -26,14 +26,28 @@ Feature: List metrics
     Then the response status should be "200"
     And the JSON response should be an array with 3 "metrics"
 
-  Scenario: Admin retrieves a list of metrics, hitting the hard query limit
+  Scenario: Admin retrieves a list of metrics that is automatically paginated
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 200 "metrics"
+    And the current account has 250 "metrics"
+    And 50 "metrics" have the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
     And the JSON response should be an array with 100 "metrics"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
+        "prev": null,
+        "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
+        "first": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
+        "last": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
+      }
+      """
 
   Scenario: Admin retrieves an unsupported paginated list of metrics
     Given I am an admin of account "test1"
@@ -41,7 +55,18 @@ Feature: List metrics
     And the current account has 20 "metrics"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=5"
-    Then the response status should be "400"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "metrics"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=5",
+        "prev": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
+        "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=5",
+        "first": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
+        "last": "/v1/accounts/test1/metrics?page[number]=4&page[size]=5"
+      }
+      """
 
   Scenario: Admin retrieves a list of metrics within a date range that's full
     Given I am an admin of account "test1"
@@ -75,49 +100,6 @@ Feature: List metrics
     And the current account has 20 "metrics"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=foo&date[end]=bar"
-    Then the response status should be "400"
-
-  Scenario: Admin retrieves all metrics without a limit for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 20 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics"
-    Then the response status should be "200"
-    And the JSON response should be an array with 10 "metrics"
-
-  Scenario: Admin retrieves all metrics with a low limit for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 10 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?limit=5"
-    Then the response status should be "200"
-    And the JSON response should be an array with 5 "metrics"
-
-  Scenario: Admin retrieves all metrics with a high limit for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 20 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?limit=20"
-    Then the response status should be "200"
-    And the JSON response should be an array with 20 "metrics"
-
-  Scenario: Admin retrieves all metrics with a limit that is too high
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 20 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?limit=900"
-    Then the response status should be "400"
-
-  Scenario: Admin retrieves all metrics with a limit that is too low
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 20 "metrics"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?limit=-10"
     Then the response status should be "400"
 
   Scenario: Admin retrieves filters metrics by metric type

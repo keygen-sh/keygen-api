@@ -15,7 +15,7 @@ module DateRangeable
           raise Keygen::Error::InvalidScopeError.new(parameter: "date"), "date range must be between #{MIN_RANGE} and #{MAX_RANGE} days (got #{diff})"
         end
 
-        limit(nil).where created_at: (date_start..date_end)
+        where created_at: (date_start..date_end)
       rescue ArgumentError
         raise Keygen::Error::InvalidScopeError.new(parameter: "date"), "invalid date range"
       end
