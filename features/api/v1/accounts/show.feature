@@ -69,6 +69,21 @@ Feature: Show account
       { "Content-Type": "application/vnd.api+json" }
       """
 
+  Scenario: Admin retrieves their account, accepting any content-type with metadata
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      # This is the accept header Stripe sends us
+      """
+      { "Accept": "*/*; q=0.5, application/xml" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+    Then the response should contain the following headers:
+      """
+      { "Content-Type": "application/vnd.api+json" }
+      """
+
   Scenario: Admin retrieves their account, accepting JSONAPI content-type
     Given I am an admin of account "test1"
     And I use an authentication token
