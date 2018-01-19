@@ -184,7 +184,7 @@ class ApplicationController < ActionController::API
   end
 
   def send_rate_limiting_headers
-    data = (request.env["rack.attack.throttle_data"] || {})["req/ip"]
+    data = (request.env["rack.attack.throttle_data"] || {})["req/ip/burst"]
     return unless data.present?
 
     period = data[:period].to_i
