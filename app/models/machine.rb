@@ -13,8 +13,12 @@ class Machine < ApplicationRecord
 
   # Disallow machine overages when the policy is not set to concurrent
   validate on: :create do |machine|
-    next unless !machine.policy&.concurrent && machine.license&.machines&.any? &&
-                machine.license&.machines&.count >= machine.policy&.max_machines
+    next if machine.policy.nil? ||
+            machine.policy.concurrent ||
+            machine.license.nil? ||
+            machine.license.machines.empty? ||
+            machine.policy.max_machines.nil? ||
+            machine.license.machines.count < machine.policy.max_machines
 
     machine.errors.add :base, "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines})"
   end
