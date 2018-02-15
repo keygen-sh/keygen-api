@@ -16,11 +16,11 @@ class Machine < ApplicationRecord
     next if machine.policy.nil? ||
             machine.policy.concurrent ||
             machine.license.nil? ||
-            machine.license.machines.empty? ||
-            machine.policy.max_machines.nil? ||
-            machine.license.machines.count < machine.policy.max_machines
+            machine.license.machines.empty?
 
-    machine.errors.add :base, "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines})"
+    next unless machine.license.machines.count >= machine.policy.max_machines rescue false
+
+    machine.errors.add :base, "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
