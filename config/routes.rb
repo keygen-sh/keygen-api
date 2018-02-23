@@ -205,8 +205,11 @@ end
 #       v1_account_license_machine GET    /v1/accounts/:account_id/licenses/:license_id/machines/:id(.:format) api/v1/licenses/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi"}
 #       v1_account_license_product GET    /v1/accounts/:account_id/licenses/:license_id/product(.:format)      api/v1/licenses/relationships/products#show {:subdomain=>"api", :format=>"jsonapi"}
 #        v1_account_license_policy GET    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)       api/v1/licenses/relationships/policies#show {:subdomain=>"api", :format=>"jsonapi"}
+#                                  PATCH  /v1/accounts/:account_id/licenses/:license_id/policy(.:format)       api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi"}
+#                                  PUT    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)       api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi"}
 #          v1_account_license_user GET    /v1/accounts/:account_id/licenses/:license_id/user(.:format)         api/v1/licenses/relationships/users#show {:subdomain=>"api", :format=>"jsonapi"}
-#      validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)     api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
+#      validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)     api/v1/licenses/actions/validations#quick_validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
+#                                  POST   /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)     api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
 #        revoke_v1_account_license DELETE /v1/accounts/:account_id/licenses/:id/actions/revoke(.:format)       api/v1/licenses/actions/permits#revoke {:subdomain=>"api", :format=>"jsonapi"}
 #         renew_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/renew(.:format)        api/v1/licenses/actions/permits#renew {:subdomain=>"api", :format=>"jsonapi"}
 #       suspend_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/suspend(.:format)      api/v1/licenses/actions/permits#suspend {:subdomain=>"api", :format=>"jsonapi"}
