@@ -42,10 +42,17 @@ module Api::V1::Accounts::Relationships
           render_unprocessable_resource @account
         end
       else
-        render_unprocessable_entity(
-          detail: "failed to update #{@account.billing.state} subscription",
-          source: { pointer: "/data/relationships/billing" }
-        )
+        if @account.billing.card.nil?
+          render_unprocessable_entity(
+            detail: "failed to update plan because a payment method is missing",
+            source: { pointer: "/data/relationships/billing" }
+          )
+        else
+          render_unprocessable_entity(
+            detail: "failed to update #{@account.billing.state} plan",
+            source: { pointer: "/data/relationships/billing" }
+          )
+        end
       end
     end
 
