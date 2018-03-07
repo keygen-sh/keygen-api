@@ -15,6 +15,7 @@ class Policy < ApplicationRecord
   validates :name, presence: true
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
+  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   validate do
     errors.add :encrypted, "cannot be encrypted and use a pool" if pool? && encrypted?
