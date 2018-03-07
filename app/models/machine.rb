@@ -24,6 +24,7 @@ class Machine < ApplicationRecord
   end
 
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
+  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :license, -> (id) { where license: id }

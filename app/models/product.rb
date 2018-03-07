@@ -17,6 +17,7 @@ class Product < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
+  validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   private
 
