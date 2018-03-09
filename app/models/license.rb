@@ -25,8 +25,16 @@ class License < ApplicationRecord
     errors.add :key, "cannot be specified for an encrypted license" if key.present? && policy.encrypted?
   end
 
+  validate on: :update do |license|
+    next if license&.uses.nil? || license.policy&.max_uses.nil?
+    next if license.uses <= license.policy.max_uses
+
+    license.errors.add :uses, "usage count has reached maximum allowed by current policy (#{license.policy.max_uses})"
+  end
+
   validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+  validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :policy, -> (id) { where policy: id }
@@ -150,6 +158,7 @@ end
 #  last_check_in_event_sent_at      :datetime
 #  last_expiring_soon_event_sent_at :datetime
 #  last_check_in_soon_event_sent_at :datetime
+#  uses                             :integer          default(0)
 #
 # Indexes
 #

@@ -218,9 +218,13 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
             @account.send(resource.pluralize.underscore).all
           end
 
-  model.send(:[], numbers[i]).update(
+  m = model.send(:[], numbers[i])
+
+  m.assign_attributes(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
+
+  m.save validate: false
 end
 
 Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
@@ -239,9 +243,13 @@ Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following 
     "ninth"   => 8
   }
 
-  account.send(resource.pluralize.underscore).all.send(:[], numbers[i]).update(
+  m = account.send(resource.pluralize.underscore).all.send(:[], numbers[i])
+
+  m.assign_attributes(
     JSON.parse(body).deep_transform_keys! &:underscore
   )
+
+  m.save validate: false
 end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|

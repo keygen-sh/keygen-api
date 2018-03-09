@@ -36,7 +36,8 @@ Feature: Update policy
           "attributes": {
             "requireFingerprintScope": true,
             "concurrent": false,
-            "name": "Trial"
+            "name": "Trial",
+            "maxUses": 3
           }
         }
       }
@@ -46,6 +47,7 @@ Feature: Update policy
     And the JSON response should be a "policy" with a requireFingerprintScope
     And the JSON response should be a "policy" that is not concurrent
     And the JSON response should be a "policy" with the name "Trial"
+    And the JSON response should be a "policy" with the maxUses "3"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 

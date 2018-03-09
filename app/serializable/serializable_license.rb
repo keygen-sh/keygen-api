@@ -9,6 +9,7 @@ class SerializableLicense < SerializableBase
     end
   end
   attribute :expiry
+  attribute :uses
   attribute :suspended
   attribute :encrypted do
     @object.policy.encrypted?
@@ -24,6 +25,9 @@ class SerializableLicense < SerializableBase
   end
   attribute :max_machines do
     @object.policy.max_machines
+  end
+  attribute :max_uses do
+    @object.policy.max_uses
   end
   attribute :require_check_in do
     @object.policy.require_check_in

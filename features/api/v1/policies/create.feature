@@ -47,6 +47,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with a nil maxMachines
+    And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" that is floating
@@ -69,7 +70,8 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Actionsack Map Pack"
+            "name": "Actionsack Map Pack",
+            "maxUses": 5
           },
           "relationships": {
             "product": {
@@ -83,6 +85,8 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Actionsack Map Pack"
+    And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs

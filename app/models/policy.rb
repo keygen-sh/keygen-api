@@ -84,6 +84,7 @@ end
 #  require_machine_scope     :boolean          default(FALSE)
 #  require_fingerprint_scope :boolean          default(FALSE)
 #  concurrent                :boolean          default(TRUE)
+#  max_uses                  :integer
 #
 # Indexes
 #
