@@ -20,10 +20,10 @@ class Rack::Attack
     req.ip
   end
 
-  # Allow an IP address to make up to 1000 requests every hour
-  throttle("req/ip/hour", limit: 1000, period: 1.hour) do |req|
-    req.ip
-  end
+  # # Allow an IP address to make up to 1000 requests every hour
+  # throttle("req/ip/hour", limit: 1000, period: 1.hour) do |req|
+  #   req.ip
+  # end
 
   # Send the following response to throttled clients
   self.throttled_response = -> (env) {
