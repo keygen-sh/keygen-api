@@ -1,8 +1,18 @@
 class Rack::Attack
+  WHITELISTED_DOMAINS = %w[
+    dist.keygen.sh
+    api.keygen.sh
+    keygen.sh
+  ]
 
   # Allow all local traffic
   safelist("allow-localhost") do |req|
     "127.0.0.1" == req.ip || "::1" == req.ip
+  end
+
+  # All all internal traffic
+  safelist("allow-internal") do |req|
+    WHITELISTED_DOMAINS.include?(req.host)
   end
 
   # Allow an IP address to make up to 100 requests every 10 seconds
