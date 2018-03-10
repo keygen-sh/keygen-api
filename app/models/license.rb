@@ -29,7 +29,7 @@ class License < ApplicationRecord
     next if license&.uses.nil? || license.policy&.max_uses.nil?
     next if license.uses <= license.policy.max_uses
 
-    license.errors.add :uses, "usage count has reached maximum allowed by current policy (#{license.policy.max_uses})"
+    license.errors.add :uses, "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
   validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
