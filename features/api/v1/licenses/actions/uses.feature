@@ -65,6 +65,107 @@ Feature: License usage actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin increments the usage count for a license by 100
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 100 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage" with the following:
+      """
+      {
+        "meta": {
+          "increment": 100
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "uses": 100 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin increments the usage count for a license by 100 for a policy that only allows 99
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 99 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage" with the following:
+      """
+      {
+        "meta": {
+          "increment": 100
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin increments the usage count for a license by a int larger than max int
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": null }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage" with the following:
+      """
+      {
+        "meta": {
+          "increment": 46116860184273879031
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "integer is too large",
+        "source": {
+          "pointer": "/meta/increment"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin increments the usage count for a license that has no usage limit
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -328,6 +429,40 @@ Feature: License usage actions
     And the JSON response should be a "license" with the following attributes:
       """
       { "uses": 1 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin decrements the usage count for a license by 50
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "maxUses": 100 }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "uses": 75
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage" with the following:
+      """
+      {
+        "meta": {
+          "decrement": 50
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "uses": 25 }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
