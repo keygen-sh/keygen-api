@@ -9,19 +9,25 @@ module Api::V1::Licenses::Actions
     def increment
       authorize @license
 
-      @license.increment :uses, use_params.dig(:meta, :increment) || 1
-
-      if @license.save
-        CreateWebhookEventService.new(
-          event: "license.usage.incremented",
-          account: current_account,
-          resource: @license
-        ).execute
-
-        render jsonapi: @license
-      else
-        render_unprocessable_resource @license
+      @license.with_lock 'FOR UPDATE NOWAIT' do
+        @license.increment :uses, increment_param
+        @license.save!
       end
+
+      CreateWebhookEventService.new(
+        event: "license.usage.incremented",
+        account: current_account,
+        resource: @license
+      ).execute
+
+      render jsonapi: @license
+    rescue ActiveRecord::RecordNotSaved,
+           ActiveRecord::RecordInvalid
+      render_unprocessable_resource @license
+    rescue ActiveRecord::StaleObjectError,
+           ActiveRecord::StatementInvalid
+      render_conflict detail: "failed to increment due to another conflicting update",
+        source: { pointer: "/data/attributes/uses" }
     rescue ActiveModel::RangeError
       render_bad_request detail: "integer is too large", source: {
         pointer: "/meta/increment" }
@@ -31,19 +37,25 @@ module Api::V1::Licenses::Actions
     def decrement
       authorize @license
 
-      @license.decrement :uses, use_params.dig(:meta, :decrement) || 1
-
-      if @license.save
-        CreateWebhookEventService.new(
-          event: "license.usage.decremented",
-          account: current_account,
-          resource: @license
-        ).execute
-
-        render jsonapi: @license
-      else
-        render_unprocessable_resource @license
+      @license.with_lock 'FOR UPDATE NOWAIT' do
+        @license.decrement :uses, decrement_param
+        @license.save!
       end
+
+      CreateWebhookEventService.new(
+        event: "license.usage.decremented",
+        account: current_account,
+        resource: @license
+      ).execute
+
+      render jsonapi: @license
+    rescue ActiveRecord::RecordNotSaved,
+           ActiveRecord::RecordInvalid
+      render_unprocessable_resource @license
+    rescue ActiveRecord::StaleObjectError,
+           ActiveRecord::StatementInvalid
+      render_conflict detail: "failed to increment due to another conflicting update",
+        source: { pointer: "/data/attributes/uses" }
     rescue ActiveModel::RangeError
       render_bad_request detail: "integer is too large", source: {
         pointer: "/meta/decrement" }
@@ -76,6 +88,14 @@ module Api::V1::Licenses::Actions
 
       @license = current_account.licenses.where("id = ? OR key = ?", id, key).first
       raise ActiveRecord::RecordNotFound if @license.nil?
+    end
+
+    def increment_param
+      use_params.dig(:meta, :increment) || 1
+    end
+
+    def decrement_param
+      use_params.dig(:meta, :decrement) || 1
     end
 
     typed_parameters do
