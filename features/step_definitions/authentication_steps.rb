@@ -27,6 +27,17 @@ Given /^I send the following headers:$/ do |body|
   end
 end
 
+Given /^I send the following raw headers:$/ do |body|
+  parse_placeholders! body
+  headers = body.split /\n/
+
+  headers.each do |raw|
+    key, value = raw.split ":"
+
+    header key, value
+  end
+end
+
 Given /^I use an authentication token$/ do
   token = @bearer.tokens.first_or_create account: @bearer.account
   token.regenerate!
