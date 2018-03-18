@@ -42,6 +42,8 @@ module Api::V1
       end
 
       render_unauthorized detail: "credentials must be valid"
+    rescue ArgumentError
+      render_bad_request
     end
 
     # PUT /tokens
