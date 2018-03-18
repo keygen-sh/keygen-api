@@ -42,7 +42,7 @@ module Api::V1
       end
 
       render_unauthorized detail: "credentials must be valid"
-    rescue ArgumentError
+    rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
       render_bad_request
     end
 
