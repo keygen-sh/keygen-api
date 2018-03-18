@@ -25,6 +25,7 @@ Feature: List webhook endpoints
     When I send a GET request to "/accounts/test1/webhook-endpoints"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "webhook-endpoints"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a paginated list of webhook endpoints
     Given I am an admin of account "test1"

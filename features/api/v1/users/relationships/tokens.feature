@@ -24,6 +24,7 @@ Feature: User tokens relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$3/tokens"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be an array of 1 "token"
 
   Scenario: Product requests tokens for one of their users

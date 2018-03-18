@@ -44,6 +44,7 @@ Feature: License machines relationship
         "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5"
       }
       """
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a paginated list of machines for a license with other pages
     Given I am an admin of account "test1"

@@ -41,6 +41,10 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the JSON response should be an "account" with the name "Google"
+    And the JSON response should be an "account" with the following meta:
+      """
+      { "publicKey": $!accounts[0].public_key }
+      """
     And the account should receive a "welcome" email
     And the account "google" should have 1 "admin"
 

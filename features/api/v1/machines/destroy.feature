@@ -25,6 +25,7 @@ Feature: Delete machine
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/machines/$2"
     Then the response status should be "204"
+    And the response should contain a valid signature header for "test1"
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job

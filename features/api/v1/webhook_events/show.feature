@@ -24,6 +24,7 @@ Feature: Show webhook event
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events/$0"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be a "webhook-event"
 
   Scenario: Admin retrieves an invalid webhook event for their account

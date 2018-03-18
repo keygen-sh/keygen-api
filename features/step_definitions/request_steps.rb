@@ -207,3 +207,15 @@ Then /^the response should contain the following headers:$/ do |body|
 
   expect(last_response.headers).to include JSON.parse(body)
 end
+
+Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
+  pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
+  digest = OpenSSL::Digest::SHA512.new
+
+  sig = Base64.decode64 last_response.headers['X-Signature']
+  body = last_response.body.to_s
+
+  res = pub.verify digest, sig, body rescue false
+
+  expect(res).to be true
+end
