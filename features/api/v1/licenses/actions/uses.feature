@@ -62,6 +62,7 @@ Feature: License usage actions
       """
       { "uses": 1 }
       """
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 

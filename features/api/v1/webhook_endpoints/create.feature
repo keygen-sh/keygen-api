@@ -33,6 +33,7 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "201"
     And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint with missing url
     Given I am an admin of account "test1"

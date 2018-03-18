@@ -29,6 +29,7 @@ Feature: License user relationship
     When I send a GET request to "/accounts/test1/licenses/test-key/user"
     Then the response status should be "200"
     And the JSON response should be a "user"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Product retrieves the user for a license
     Given the current account is "test1"

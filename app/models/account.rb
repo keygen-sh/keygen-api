@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  RSA_KEY_SIZE = 2048
+
   include ActiveModel::Validations
   include Welcomeable
   include Sluggable
@@ -22,6 +24,8 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users
 
   before_create -> { self.slug = slug.downcase }
+  before_create :generate_keys
+
   after_create :set_founding_users_roles
 
   validates :plan, presence: { message: "must exist" }
@@ -50,6 +54,23 @@ class Account < ApplicationRecord
     users.admins
   end
 
+  def generate_keys
+    priv = if private_key.nil?
+             OpenSSL::PKey::RSA.generate RSA_KEY_SIZE
+           else
+             OpenSSL::PKey::RSA.new private_key
+           end
+    pub = priv.public_key
+
+    self.private_key = priv.to_pem
+    self.public_key = pub.to_pem
+  end
+
+  def generate_keys!
+    generate_keys
+    save
+  end
+
   private
 
   def set_founding_users_roles
@@ -61,13 +82,15 @@ end
 #
 # Table name: accounts
 #
-#  id         :uuid             not null, primary key
-#  name       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  slug       :string
-#  plan_id    :uuid
-#  protected  :boolean          default(FALSE)
+#  id          :uuid             not null, primary key
+#  name        :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  slug        :string
+#  plan_id     :uuid
+#  protected   :boolean          default(FALSE)
+#  public_key  :text
+#  private_key :text
 #
 # Indexes
 #

@@ -25,6 +25,7 @@ Feature: Machine user relationship
     When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
     And the JSON response should be a "user"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Product retrieves the user for a machine
     Given the current account is "test1"

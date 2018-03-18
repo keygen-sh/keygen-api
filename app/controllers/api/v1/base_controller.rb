@@ -6,5 +6,6 @@ module Api::V1
     include CurrentAccountScope
     include SharedScopes
     include Pagination
+    include SignatureHeader
   end
 end

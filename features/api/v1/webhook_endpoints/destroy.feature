@@ -25,6 +25,7 @@ Feature: Delete webhook endpoint
     When I send a DELETE request to "/accounts/test1/webhook-endpoints/$2"
     Then the response status should be "204"
     And the current account should have 2 "webhook-endpoints"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: User attempts to delete a webhook endpoint for their account
     Given the current account is "test1"

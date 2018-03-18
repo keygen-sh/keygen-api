@@ -42,6 +42,7 @@ Feature: List license
         "first": "/v1/accounts/test1/licenses?page[number]=1&page[size]=5"
       }
       """
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a paginated list of licenses with a page size that is too high
     Given I am an admin of account "test1"

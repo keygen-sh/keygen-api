@@ -19,6 +19,10 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
     And the JSON response should be an "account"
+    And the JSON response should be an "account" with the following meta:
+      """
+      { "publicKey": $!accounts[0].public_key }
+      """
 
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"

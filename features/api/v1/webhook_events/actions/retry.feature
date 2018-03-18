@@ -36,6 +36,7 @@ Feature: Retry webhook events
         "idempotencyToken": "$webhook-events[0].idempotency_token"
       }
       """
+    And the response should contain a valid signature header for "test1"
     And the current account should have 4 "webhook-events"
 
   Scenario: Admin retries a webhook event for another account

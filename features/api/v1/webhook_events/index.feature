@@ -24,6 +24,7 @@ Feature: List webhook events
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be an array with 3 "webhook-events"
 
   Scenario: Admin retrieves a paginated list of webhook events
