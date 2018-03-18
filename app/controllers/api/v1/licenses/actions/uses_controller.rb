@@ -25,7 +25,7 @@ module Api::V1::Licenses::Actions
            ActiveRecord::RecordInvalid
       render_unprocessable_resource @license
     rescue ActiveRecord::StaleObjectError,
-           ActiveRecord::StatementInvalid
+           ActiveRecord::StatementInvalid # Thrown when update is attempted on locked row i.e. from FOR UPDATE NOWAIT
       render_conflict detail: "failed to increment due to another conflicting update",
         source: { pointer: "/data/attributes/uses" }
     rescue ActiveModel::RangeError
