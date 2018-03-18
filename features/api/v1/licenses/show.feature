@@ -25,6 +25,7 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
     And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a license for their account by key
     Given I am an admin of account "test1"

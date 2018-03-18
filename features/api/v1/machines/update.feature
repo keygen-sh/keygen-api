@@ -37,6 +37,7 @@ Feature: Update machine
       """
     Then the response status should be "200"
     And the JSON response should be a "machine" with the name "Home iMac"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 

@@ -43,6 +43,7 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 

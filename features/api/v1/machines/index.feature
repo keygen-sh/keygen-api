@@ -25,6 +25,7 @@ Feature: List machines
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a paginated list of machines
     Given I am an admin of account "test1"

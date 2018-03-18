@@ -25,6 +25,7 @@ Feature: Show machine
     When I send a GET request to "/accounts/test1/machines/$0"
     Then the response status should be "200"
     And the JSON response should be a "machine"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves an invalid machine for their account
     Given I am an admin of account "test1"

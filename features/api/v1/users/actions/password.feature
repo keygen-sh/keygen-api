@@ -30,6 +30,7 @@ Feature: User password actions
         }
       }
       """
+    And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
 
   Scenario: User attempts to update password with missing parameters

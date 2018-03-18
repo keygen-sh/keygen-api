@@ -34,6 +34,7 @@ Feature: Update user
       """
     Then the response status should be "200"
     And the JSON response should be a "user" with the firstName "Elliot"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin updates a user for their account

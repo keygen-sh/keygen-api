@@ -36,6 +36,7 @@ Feature: Update webhook endpoint
       """
     Then the response status should be "200"
     And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: User attempts to update a webhook endpoint for their account
     Given the current account is "test1"

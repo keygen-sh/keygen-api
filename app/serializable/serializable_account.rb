@@ -72,4 +72,8 @@ class SerializableAccount < SerializableBase
   link :self do
     @url_helpers.v1_account_path @object
   end
+
+  meta do
+    { publicKey: @object.public_key }
+  end
 end
