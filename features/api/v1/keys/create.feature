@@ -47,6 +47,7 @@ Feature: Create key
       """
     Then the response status should be "201"
     And the JSON response should be a "key" with the key "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
