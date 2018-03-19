@@ -37,6 +37,7 @@ Feature: Update key
       """
     Then the response status should be "200"
     And the JSON response should be a "key" with the key "KTDCQ3RmtKaYewE2LpEtpbjrHwF6jB"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
