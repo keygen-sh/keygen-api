@@ -74,6 +74,6 @@ class SerializableAccount < SerializableBase
   end
 
   meta do
-    { publicKey: @object.public_key }
+    { publicKey: Base64.strict_encode64(@object.public_key) }
   end
 end
