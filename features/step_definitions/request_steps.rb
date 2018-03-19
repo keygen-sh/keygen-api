@@ -210,7 +210,7 @@ end
 
 Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
   pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
-  digest = OpenSSL::Digest::SHA512.new
+  digest = OpenSSL::Digest::SHA256.new
 
   sig = Base64.decode64 last_response.headers['X-Signature']
   body = last_response.body.to_s
