@@ -66,11 +66,6 @@ class Account < ApplicationRecord
     self.public_key = pub.to_pem
   end
 
-  def generate_keys!
-    generate_keys
-    save
-  end
-
   private
 
   def set_founding_users_roles

@@ -1,5 +1,6 @@
 module SignatureHeader
   extend ActiveSupport::Concern
+  include Signable
 
   included do
     after_action :add_signature_header
@@ -8,11 +9,9 @@ module SignatureHeader
   def add_signature_header
     return if current_account.nil?
 
-    priv = OpenSSL::PKey::RSA.new current_account.private_key
-    sig = priv.sign OpenSSL::Digest::SHA256.new, response.body
-
-    response.headers["X-Signature"] = Base64.encode64 sig
-  rescue => e
-    Raygun.track_exception e
+    response.headers["X-Signature"] = sign(
+      key: current_account.private_key,
+      data: response.body
+    )
   end
 end
