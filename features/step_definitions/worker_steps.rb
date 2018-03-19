@@ -1,8 +1,16 @@
 World Rack::Test::Methods
 
 Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
-  worker = "#{resource.singularize.underscore}_worker".classify.constantize
-  expect(worker.jobs.size).to eq count.to_i
+  worker = nil
+
+  case resource.singularize
+  when "webhook"
+    worker = "signed_#{resource.singularize.underscore}_worker"
+  else
+    worker = "#{resource.singularize.underscore}_worker"
+  end
+
+  expect(worker.classify.constantize.jobs.size).to eq count.to_i
 end
 
 Then /^the (?:account|user) should receive an? "([^\"]*)" email$/ do |mailer|

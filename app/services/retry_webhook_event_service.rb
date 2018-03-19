@@ -5,7 +5,8 @@ class RetryWebhookEventService < BaseService
   end
 
   def execute
-    webhook_event = event.account.webhook_events.create(
+    account = event.account
+    webhook_event = account.webhook_events.create(
       idempotency_token: event.idempotency_token,
       endpoint: event.endpoint,
       payload: event.payload,
@@ -33,8 +34,9 @@ class RetryWebhookEventService < BaseService
       }
     }).to_json
 
-    jid = WebhookWorker.perform_async(
-      event.endpoint,
+    jid = SignedWebhookWorker.perform_async(
+      account.id,
+      event.id,
       payload
     )
 
