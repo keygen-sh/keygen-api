@@ -21,7 +21,7 @@ Feature: Show account
     And the JSON response should be an "account"
     And the JSON response should be an "account" with the following meta:
       """
-      { "publicKey": $!accounts[0].public_key }
+      { "publicKey": "$~accounts[0].public_key" }
       """
 
   Scenario: Admin attempts to retrieve another account
