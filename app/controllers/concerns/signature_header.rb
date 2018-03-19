@@ -9,7 +9,7 @@ module SignatureHeader
     return if current_account.nil?
 
     priv = OpenSSL::PKey::RSA.new current_account.private_key
-    sig = priv.sign OpenSSL::Digest::SHA512.new, response.body
+    sig = priv.sign OpenSSL::Digest::SHA256.new, response.body
 
     response.headers["X-Signature"] = Base64.encode64 sig
   rescue => e
