@@ -10,10 +10,10 @@ class SignedWebhookWorker
   sidekiq_options queue: :webhooks, retry: 15
 
   def perform(account_id, endpoint_id, payload)
-    account = Account.find account_id
+    account = Account.find_by id: account_id
     return if account.nil?
 
-    endpoint = account.webhook_endpoints.find endpoint_id
+    endpoint = account.webhook_endpoints.find_by id: endpoint_id
     return if endpoint.nil?
 
     res = Request.post(endpoint.url, {
