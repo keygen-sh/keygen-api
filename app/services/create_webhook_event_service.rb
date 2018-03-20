@@ -59,7 +59,7 @@ class CreateWebhookEventService < BaseService
       opts.merge! meta: @meta.transform_keys { |k| k.to_s.camelize :lower } unless @meta.nil?
 
       # Set the payload attr of the webhook payload (since it's incomplete at the moment)
-      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, opts)
+      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, opts).to_json
 
       # Enqueue the worker, which will fire off the webhook
       jid = SignedWebhookWorker.perform_async(
@@ -70,7 +70,7 @@ class CreateWebhookEventService < BaseService
 
       # Update the event to contain the payload and job identifier
       webhook_event.update(
-        payload: payload.dig(:data, :attributes, :payload).to_json,
+        payload: payload.dig(:data, :attributes, :payload),
         jid: jid
       )
     end
