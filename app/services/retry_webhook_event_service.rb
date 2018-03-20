@@ -6,6 +6,11 @@ class RetryWebhookEventService < BaseService
 
   def execute
     account = event.account
+
+    # FIXME(ezekg) Add an association so we don't have to do this stupid lookup
+    endpoint = account.webhook_endpoints.find_by url: event.endpoint
+    return if endpoint.nil?
+
     new_event = account.webhook_events.create(
       idempotency_token: event.idempotency_token,
       endpoint: event.endpoint,
@@ -36,7 +41,7 @@ class RetryWebhookEventService < BaseService
 
     jid = SignedWebhookWorker.perform_async(
       account.id,
-      new_event.id,
+      endpoint.id,
       payload
     )
 

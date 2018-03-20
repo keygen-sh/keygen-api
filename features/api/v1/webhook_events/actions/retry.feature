@@ -20,7 +20,16 @@ Feature: Retry webhook events
   Scenario: Admin retries a webhook event for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "url": "https://example.com/webhooks" }
+      """
     And the current account has 3 "webhook-events"
+    And all "webhook-events" have the following attributes:
+      """
+      { "endpoint": "https://example.com/webhooks" }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "201"
@@ -39,10 +48,33 @@ Feature: Retry webhook events
     And the response should contain a valid signature header for "test1"
     And the current account should have 4 "webhook-events"
 
+  Scenario: Admin retries a webhook event for their account that is no longer available
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-events"
+    And all "webhook-events" have the following attributes:
+      """
+      { "endpoint": "https://example.com/webhooks" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "422"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 3 "webhook-events"
+
   Scenario: Admin retries a webhook event for another account
     Given I am an admin of account "test2"
     And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "url": "https://example.com/webhooks" }
+      """
     And the current account has 3 "webhook-events"
+    And all "webhook-events" have the following attributes:
+      """
+      { "endpoint": "https://example.com/webhooks" }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
     Then the response status should be "401"
@@ -53,6 +85,11 @@ Feature: Retry webhook events
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "url": "https://example.com/webhooks" }
+      """
     And the current account has 3 "webhook-events"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
