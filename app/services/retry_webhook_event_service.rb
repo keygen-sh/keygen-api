@@ -6,14 +6,14 @@ class RetryWebhookEventService < BaseService
 
   def execute
     account = event.account
-    webhook_event = account.webhook_events.create(
+    new_event = account.webhook_events.create(
       idempotency_token: event.idempotency_token,
       endpoint: event.endpoint,
       payload: event.payload,
       event: event.event
     )
 
-    payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, {
+    payload = JSONAPI::Serializable::Renderer.new.render(new_event, {
       expose: { url_helpers: Rails.application.routes.url_helpers },
       class: {
         Account: SerializableAccount,
@@ -36,15 +36,15 @@ class RetryWebhookEventService < BaseService
 
     jid = SignedWebhookWorker.perform_async(
       account.id,
-      event.id,
+      new_event.id,
       payload
     )
 
-    webhook_event.update(
+    new_event.update(
       jid: jid
     )
 
-    webhook_event
+    new_event
   rescue Redis::CannotConnectError
     false
   end
