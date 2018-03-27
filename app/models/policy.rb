@@ -13,6 +13,7 @@ class Policy < ApplicationRecord
   validates :product, presence: { message: "must exist" }
 
   validates :name, presence: true
+  validates :duration, numericality: { greater_than_or_equal_to: 1.day.to_i, message: "must be greater than or equal to 86400 (1 day)" }, allow_nil: true
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }

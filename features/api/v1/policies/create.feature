@@ -224,6 +224,36 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin attempts to create an policy for their account with too short of a duration
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Day Pass",
+            "duration": $time.23.hours
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin attempts to create a policy that is encrypted and uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
