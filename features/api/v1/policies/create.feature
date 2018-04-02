@@ -410,7 +410,8 @@ Feature: Create policy
           "attributes": {
             "name": "Premium Add-On",
             "requireFingerprintScope": true,
-            "requireProductScope": true
+            "requireProductScope": true,
+            "duration": null
           },
           "relationships": {
             "product": {
