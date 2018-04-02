@@ -74,7 +74,8 @@ Feature: Update policy
           "attributes": {
             "requireCheckIn": false,
             "checkInInterval": null,
-            "checkInIntervalCount": null
+            "checkInIntervalCount": null,
+            "duration": null
           }
         }
       }
