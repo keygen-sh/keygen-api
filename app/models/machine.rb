@@ -10,15 +10,7 @@ class Machine < ApplicationRecord
   has_one :user, through: :license
 
   search(
-    attributes: [
-      :id,
-      :fingerprint,
-      :name,
-      :hostname,
-      :ip,
-      :platform,
-      :metadata
-    ],
+    attributes: [:id, :fingerprint, :metadata],
     relationships: {
       product: [:id, :name],
       policy: [:id, :name],

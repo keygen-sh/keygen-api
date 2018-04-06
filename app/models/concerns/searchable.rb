@@ -6,12 +6,20 @@ module Searchable
 
     def self.search(attributes:, relationships: {})
       attributes.each do |attribute|
-        pg_search_scope "search_#{attribute}", against: attribute
+        pg_search_scope "search_#{attribute}",
+          against: attribute,
+          using: {
+            tsearch: { any_word: true, prefix: true }
+          }
       end
       relationships.each do |relationship, attributes|
-        pg_search_scope "search_#{relationship}", associated_against: {
-          relationship => attributes
-        }
+        pg_search_scope "search_#{relationship}",
+          associated_against: {
+            relationship => attributes
+          },
+          using: {
+            tsearch: { any_word: true, prefix: true }
+          }
       end
     end
   end
