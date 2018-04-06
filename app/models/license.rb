@@ -18,6 +18,7 @@ class License < ApplicationRecord
   search(
     attributes: [:id, :key, :metadata],
     relationships: {
+      product: [:id, :name],
       policy: [:id, :name],
       user: [:id, :email]
     }
