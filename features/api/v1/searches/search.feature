@@ -19,7 +19,7 @@ Feature: Create policy
   Scenario: Admin performs a search by user type with an empty query
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 10 "users"
+    And the current account has 15 "users"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """
@@ -31,7 +31,34 @@ Feature: Create policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 11 "users"
+    And the JSON response should be an array with 10 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by user type with an empty query using pagination
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search?page[size]=5&page[number]=1" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {}
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "users"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/search?page[number]=1&page[size]=5",
+        "next": "/v1/accounts/test1/search?page[number]=2&page[size]=5",
+        "last": "/v1/accounts/test1/search?page[number]=3&page[size]=5"
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
