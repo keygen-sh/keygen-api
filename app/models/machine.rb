@@ -1,12 +1,31 @@
 class Machine < ApplicationRecord
   include Limitable
   include Pageable
+  include Searchable
 
   belongs_to :account
   belongs_to :license
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
+
+  search(
+    attributes: [
+      :id,
+      :fingerprint,
+      :name,
+      :hostname,
+      :ip,
+      :platform,
+      :metadata
+    ],
+    relationships: {
+      product: [:id, :name],
+      policy: [:id, :name],
+      license: [:id, :key],
+      user: [:id, :email]
+    }
+  )
 
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }

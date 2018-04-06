@@ -34,6 +34,10 @@ class ApplicationPolicy
     false
   end
 
+  def search?
+    bearer.role? :admin
+  end
+
   def scope
     Pundit.policy_scope! bearer, resource.class
   end

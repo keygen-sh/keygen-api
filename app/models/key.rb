@@ -1,12 +1,21 @@
 class Key < ApplicationRecord
   include Limitable
   include Pageable
+  include Searchable
 
   EXCLUDED_KEYS = %w[actions action].freeze
 
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
+
+  search(
+    attributes: [:id, :key],
+    relationships: {
+      product: [:id, :name],
+      policy: [:id, :name]
+    }
+  )
 
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }

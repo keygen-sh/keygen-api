@@ -2,6 +2,7 @@ class Product < ApplicationRecord
   include Limitable
   include Pageable
   include Roleable
+  include Searchable
 
   belongs_to :account
   has_many :policies, dependent: :destroy
@@ -11,6 +12,10 @@ class Product < ApplicationRecord
   has_many :users, -> { distinct }, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
+
+  search(
+    attributes: [:id, :name, :metadata]
+  )
 
   after_create :set_role
 
