@@ -2,7 +2,7 @@ module SharedScopes
   extend ActiveSupport::Concern
 
   included do
-    has_scope :limit, default: 10, only: :index do |controller, resource, limit|
+    has_scope :limit, default: 10, only: [:index, :search] do |controller, resource, limit|
       if resource.respond_to?(:lim)
         resource.lim limit
       else
@@ -23,7 +23,7 @@ module SharedScopes
 
     # Kaminari's pagination will override any limit that was set previously,
     # so we're placing it after the limit scope.
-    has_scope :page, type: :hash, using: [:number, :size], only: :index do |controller, resource, *args|
+    has_scope :page, type: :hash, using: [:number, :size], only: [:index, :search] do |controller, resource, *args|
       if resource.respond_to?(:page)
         resource.page *args
       else
