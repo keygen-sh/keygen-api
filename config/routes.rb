@@ -145,6 +145,7 @@ Rails.application.routes.draw do
         end
 
         resources "metrics", only: [:index, :show]
+        post "search", to: "searches#search"
       end
     end
   end
@@ -284,6 +285,7 @@ end
 #                                    DELETE /v1/accounts/:account_id/webhook-events/:id(.:format)                   api/v1/webhook_events#destroy {:subdomain=>"api", :format=>"jsonapi"}
 #                 v1_account_metrics GET    /v1/accounts/:account_id/metrics(.:format)                              api/v1/metrics#index {:subdomain=>"api", :format=>"jsonapi"}
 #                  v1_account_metric GET    /v1/accounts/:account_id/metrics/:id(.:format)                          api/v1/metrics#show {:subdomain=>"api", :format=>"jsonapi"}
+#                  v1_account_search POST   /v1/accounts/:account_id/search(.:format)                               api/v1/searches#search {:subdomain=>"api", :format=>"jsonapi"}
 #                        v1_accounts POST   /v1/accounts(.:format)                                                  api/v1/accounts#create {:subdomain=>"api", :format=>"jsonapi"}
 #                         v1_account GET    /v1/accounts/:id(.:format)                                              api/v1/accounts#show {:subdomain=>"api", :format=>"jsonapi"}
 #                                    PATCH  /v1/accounts/:id(.:format)                                              api/v1/accounts#update {:subdomain=>"api", :format=>"jsonapi"}
