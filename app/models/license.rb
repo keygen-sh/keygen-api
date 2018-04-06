@@ -3,6 +3,7 @@ class License < ApplicationRecord
   include Tokenable
   include Pageable
   include Roleable
+  include Searchable
 
   EXCLUDED_KEYS = %w[actions action].freeze
 
@@ -13,6 +14,14 @@ class License < ApplicationRecord
   has_many :machines, dependent: :destroy
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
+
+  search(
+    attributes: [:id, :key, :metadata],
+    relationships: {
+      policy: [:id, :name],
+      user: [:id, :email]
+    }
+  )
 
   attr_reader :raw
 

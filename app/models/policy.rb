@@ -1,11 +1,19 @@
 class Policy < ApplicationRecord
   include Limitable
   include Pageable
+  include Searchable
 
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
+
+  search(
+    attributes: [:id, :name, :metadata],
+    relationships: {
+      product: [:id, :name]
+    }
+  )
 
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
 

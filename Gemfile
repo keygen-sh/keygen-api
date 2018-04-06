@@ -25,6 +25,9 @@ gem 'pundit'
 gem 'has_scope'
 gem 'kaminari'
 
+# Search
+gem 'pg_search'
+
 # Background jobs
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'

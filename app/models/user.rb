@@ -5,6 +5,7 @@ class User < ApplicationRecord
   include Limitable
   include Pageable
   include Roleable
+  include Searchable
 
   has_secure_password
 
@@ -14,6 +15,19 @@ class User < ApplicationRecord
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
+
+  search(
+    attributes: [
+      :id,
+      :email,
+      :first_name,
+      :last_name,
+      :metadata
+    ],
+    relationships: {
+      role: [:name]
+    }
+  )
 
   accepts_nested_attributes_for :role
 
