@@ -130,6 +130,33 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin performs a search by user type on the first name attribute that is misspelled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "firstName": "John"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "firstName": "Jonh"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin performs a search by user type on the last name attribute
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -240,6 +267,60 @@ Feature: Create policy
           "type": "licenses",
           "query": {
             "key": "some-license-key"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by license type using a partial ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "id": "e1fbdc0e-ff25-490b-a92f-93880a21723b"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "query": {
+            "id": "e1fbdc0e"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by license type on the key attribute using a partial key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "some-license-key"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "query": {
+            "key": "some-license"
           }
         }
       }
