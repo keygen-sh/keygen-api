@@ -45,10 +45,14 @@ end
 #  id         :uuid             not null, primary key
 #  policy_id  :uuid
 #  account_id :uuid
+#  tsv_id     :tsvector
+#  tsv_key    :tsvector
 #
 # Indexes
 #
 #  index_keys_on_account_id_and_created_at         (account_id,created_at)
 #  index_keys_on_id_and_created_at_and_account_id  (id,created_at,account_id) UNIQUE
 #  index_keys_on_policy_id_and_created_at          (policy_id,created_at)
+#  index_keys_on_tsv_id                            (tsv_id)
+#  index_keys_on_tsv_key                           (tsv_key)
 #

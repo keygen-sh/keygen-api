@@ -179,6 +179,9 @@ end
 #  last_expiring_soon_event_sent_at :datetime
 #  last_check_in_soon_event_sent_at :datetime
 #  uses                             :integer          default(0)
+#  tsv_id                           :tsvector
+#  tsv_key                          :tsvector
+#  tsv_metadata                     :tsvector
 #
 # Indexes
 #
@@ -186,5 +189,8 @@ end
 #  index_licenses_on_id_and_created_at_and_account_id   (id,created_at,account_id) UNIQUE
 #  index_licenses_on_key_and_created_at_and_account_id  (key,created_at,account_id)
 #  index_licenses_on_policy_id_and_created_at           (policy_id,created_at)
+#  index_licenses_on_tsv_id                             (tsv_id)
+#  index_licenses_on_tsv_key                            (tsv_key)
+#  index_licenses_on_tsv_metadata                       (tsv_metadata)
 #  index_licenses_on_user_id_and_created_at             (user_id,created_at)
 #
