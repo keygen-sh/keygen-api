@@ -9,16 +9,27 @@ module Searchable
         pg_search_scope "search_#{attribute}",
           against: attribute,
           using: {
-            tsearch: { any_word: true, prefix: true }
+            tsearch: {
+              tsvector_column: "tsv_#{attribute}",
+              dictionary: 'simple',
+              any_word: true,
+              prefix: true
+            }
           }
       end
+
+      # I believe it will be impossible to speed up these searches with database
+      # indexes. May want to revisit this in the future, as it is very slow.
       relationships.each do |relationship, attributes|
         pg_search_scope "search_#{relationship}",
           associated_against: {
             relationship => attributes
           },
           using: {
-            tsearch: { any_word: true, prefix: true }
+            tsearch: {
+              any_word: true,
+              prefix: true
+            }
           }
       end
     end
