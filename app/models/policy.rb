@@ -100,10 +100,16 @@ end
 #  require_fingerprint_scope :boolean          default(FALSE)
 #  concurrent                :boolean          default(TRUE)
 #  max_uses                  :integer
+#  tsv_id                    :tsvector
+#  tsv_name                  :tsvector
+#  tsv_metadata              :tsvector
 #
 # Indexes
 #
 #  index_policies_on_account_id_and_created_at         (account_id,created_at)
 #  index_policies_on_id_and_created_at_and_account_id  (id,created_at,account_id) UNIQUE
 #  index_policies_on_product_id_and_created_at         (product_id,created_at)
+#  index_policies_on_tsv_id                            (tsv_id)
+#  index_policies_on_tsv_metadata                      (tsv_metadata)
+#  index_policies_on_tsv_name                          (tsv_name)
 #
