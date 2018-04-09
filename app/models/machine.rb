@@ -10,7 +10,7 @@ class Machine < ApplicationRecord
   has_one :user, through: :license
 
   search(
-    attributes: [:id, :fingerprint, :metadata],
+    attributes: [:id, :fingerprint, :name, :metadata],
     relationships: {
       product: [:id, :name],
       policy: [:id, :name],
@@ -61,6 +61,7 @@ end
 #  license_id      :uuid
 #  tsv_id          :tsvector
 #  tsv_fingerprint :tsvector
+#  tsv_name        :tsvector
 #  tsv_metadata    :tsvector
 #
 # Indexes
@@ -71,4 +72,5 @@ end
 #  index_machines_on_tsv_fingerprint                   (tsv_fingerprint)
 #  index_machines_on_tsv_id                            (tsv_id)
 #  index_machines_on_tsv_metadata                      (tsv_metadata)
+#  index_machines_on_tsv_name                          (tsv_name)
 #

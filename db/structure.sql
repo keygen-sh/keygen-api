@@ -145,6 +145,15 @@ CREATE FUNCTION update_machines_metadata_tsvector() RETURNS trigger
 
 
 --
+-- Name: update_machines_name_tsvector(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION update_machines_name_tsvector() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$ BEGIN new.tsv_name := to_tsvector('pg_catalog.simple', coalesce(new.name::TEXT, '')); RETURN new; END $$;
+
+
+--
 -- Name: update_policies_id_tsvector(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -358,6 +367,7 @@ CREATE TABLE machines (
     license_id uuid,
     tsv_id tsvector,
     tsv_fingerprint tsvector,
+    tsv_name tsvector,
     tsv_metadata tsvector
 );
 
@@ -886,6 +896,13 @@ CREATE INDEX index_machines_on_tsv_metadata ON machines USING gin (tsv_metadata)
 
 
 --
+-- Name: index_machines_on_tsv_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_machines_on_tsv_name ON machines USING gin (tsv_name);
+
+
+--
 -- Name: index_metrics_on_account_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1198,6 +1215,13 @@ CREATE TRIGGER tsvector_trigger_machines_id BEFORE INSERT OR UPDATE OF id ON mac
 --
 
 CREATE TRIGGER tsvector_trigger_machines_metadata BEFORE INSERT OR UPDATE OF metadata ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_metadata_tsvector();
+
+
+--
+-- Name: machines tsvector_trigger_machines_name; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvector_trigger_machines_name BEFORE INSERT OR UPDATE OF name ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_name_tsvector();
 
 
 --
