@@ -127,11 +127,11 @@ Feature: Create policy
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Bad request",
         "detail": "unsupported search attribute 'foo' for resource type 'users'",
         "source": {
           "pointer": "/meta/query/foo"
