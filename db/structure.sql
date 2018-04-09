@@ -252,11 +252,11 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE accounts (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
-    slug character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    slug character varying,
     plan_id uuid,
     protected boolean DEFAULT false,
     public_key text,
@@ -281,6 +281,7 @@ CREATE TABLE ar_internal_metadata (
 --
 
 CREATE TABLE billings (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     customer_id character varying,
     subscription_status character varying,
     created_at timestamp without time zone NOT NULL,
@@ -292,7 +293,6 @@ CREATE TABLE billings (
     card_brand character varying,
     card_last4 character varying,
     state character varying,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid
 );
 
@@ -302,10 +302,10 @@ CREATE TABLE billings (
 --
 
 CREATE TABLE keys (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     key character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     policy_id uuid,
     account_id uuid,
     tsv_id tsvector,
@@ -318,12 +318,12 @@ CREATE TABLE keys (
 --
 
 CREATE TABLE licenses (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     key character varying,
     expiry timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     metadata jsonb,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     user_id uuid,
     policy_id uuid,
     account_id uuid,
@@ -345,6 +345,7 @@ CREATE TABLE licenses (
 --
 
 CREATE TABLE machines (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     fingerprint character varying,
     ip character varying,
     hostname character varying,
@@ -353,7 +354,6 @@ CREATE TABLE machines (
     updated_at timestamp without time zone NOT NULL,
     name character varying,
     metadata jsonb,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     license_id uuid,
     tsv_id tsvector,
@@ -381,6 +381,7 @@ CREATE TABLE metrics (
 --
 
 CREATE TABLE plans (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     price integer,
     max_users integer,
@@ -390,7 +391,6 @@ CREATE TABLE plans (
     updated_at timestamp without time zone NOT NULL,
     max_products integer,
     plan_id character varying,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     private boolean DEFAULT false,
     trial_duration integer,
     max_reqs integer,
@@ -403,6 +403,7 @@ CREATE TABLE plans (
 --
 
 CREATE TABLE policies (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     duration integer,
     strict boolean DEFAULT false,
@@ -415,7 +416,6 @@ CREATE TABLE policies (
     encrypted boolean DEFAULT false,
     protected boolean,
     metadata jsonb,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     product_id uuid,
     account_id uuid,
     check_in_interval character varying,
@@ -438,12 +438,12 @@ CREATE TABLE policies (
 --
 
 CREATE TABLE products (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     platforms jsonb,
     metadata jsonb,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     url character varying,
     tsv_id tsvector,
@@ -457,12 +457,12 @@ CREATE TABLE products (
 --
 
 CREATE TABLE receipts (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     invoice_id character varying,
     amount integer,
     paid boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     billing_id uuid
 );
 
@@ -472,11 +472,11 @@ CREATE TABLE receipts (
 --
 
 CREATE TABLE roles (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     resource_type character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     resource_id uuid
 );
 
@@ -495,12 +495,12 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE tokens (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     digest character varying,
     bearer_type character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     expiry timestamp without time zone,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     bearer_id uuid,
     account_id uuid
 );
@@ -511,6 +511,7 @@ CREATE TABLE tokens (
 --
 
 CREATE TABLE users (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     email character varying,
     password_digest character varying,
     created_at timestamp without time zone NOT NULL,
@@ -518,7 +519,6 @@ CREATE TABLE users (
     password_reset_token character varying,
     password_reset_sent_at timestamp without time zone,
     metadata jsonb,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     first_name character varying,
     last_name character varying,
@@ -535,10 +535,10 @@ CREATE TABLE users (
 --
 
 CREATE TABLE webhook_endpoints (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     url character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid
 );
 
@@ -548,12 +548,12 @@ CREATE TABLE webhook_endpoints (
 --
 
 CREATE TABLE webhook_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     payload text,
     jid character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     endpoint character varying,
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     idempotency_token character varying,
     event character varying
@@ -1148,133 +1148,133 @@ CREATE INDEX index_webhook_events_on_jid_and_created_at_and_account_id ON webhoo
 -- Name: keys tsvector_trigger_keys_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_keys_id BEFORE INSERT OR UPDATE ON keys FOR EACH ROW EXECUTE PROCEDURE update_keys_id_tsvector();
+CREATE TRIGGER tsvector_trigger_keys_id BEFORE INSERT OR UPDATE OF id ON keys FOR EACH ROW EXECUTE PROCEDURE update_keys_id_tsvector();
 
 
 --
 -- Name: keys tsvector_trigger_keys_key; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_keys_key BEFORE INSERT OR UPDATE ON keys FOR EACH ROW EXECUTE PROCEDURE update_keys_key_tsvector();
+CREATE TRIGGER tsvector_trigger_keys_key BEFORE INSERT OR UPDATE OF key ON keys FOR EACH ROW EXECUTE PROCEDURE update_keys_key_tsvector();
 
 
 --
 -- Name: licenses tsvector_trigger_licenses_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_licenses_id BEFORE INSERT OR UPDATE ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_id_tsvector();
+CREATE TRIGGER tsvector_trigger_licenses_id BEFORE INSERT OR UPDATE OF id ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_id_tsvector();
 
 
 --
 -- Name: licenses tsvector_trigger_licenses_key; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_licenses_key BEFORE INSERT OR UPDATE ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_key_tsvector();
+CREATE TRIGGER tsvector_trigger_licenses_key BEFORE INSERT OR UPDATE OF key ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_key_tsvector();
 
 
 --
 -- Name: licenses tsvector_trigger_licenses_metadata; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_licenses_metadata BEFORE INSERT OR UPDATE ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_metadata_tsvector();
+CREATE TRIGGER tsvector_trigger_licenses_metadata BEFORE INSERT OR UPDATE OF metadata ON licenses FOR EACH ROW EXECUTE PROCEDURE update_licenses_metadata_tsvector();
 
 
 --
 -- Name: machines tsvector_trigger_machines_fingerprint; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_machines_fingerprint BEFORE INSERT OR UPDATE ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_fingerprint_tsvector();
+CREATE TRIGGER tsvector_trigger_machines_fingerprint BEFORE INSERT OR UPDATE OF fingerprint ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_fingerprint_tsvector();
 
 
 --
 -- Name: machines tsvector_trigger_machines_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_machines_id BEFORE INSERT OR UPDATE ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_id_tsvector();
+CREATE TRIGGER tsvector_trigger_machines_id BEFORE INSERT OR UPDATE OF id ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_id_tsvector();
 
 
 --
 -- Name: machines tsvector_trigger_machines_metadata; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_machines_metadata BEFORE INSERT OR UPDATE ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_metadata_tsvector();
+CREATE TRIGGER tsvector_trigger_machines_metadata BEFORE INSERT OR UPDATE OF metadata ON machines FOR EACH ROW EXECUTE PROCEDURE update_machines_metadata_tsvector();
 
 
 --
 -- Name: policies tsvector_trigger_policies_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_policies_id BEFORE INSERT OR UPDATE ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_id_tsvector();
+CREATE TRIGGER tsvector_trigger_policies_id BEFORE INSERT OR UPDATE OF id ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_id_tsvector();
 
 
 --
 -- Name: policies tsvector_trigger_policies_metadata; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_policies_metadata BEFORE INSERT OR UPDATE ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_metadata_tsvector();
+CREATE TRIGGER tsvector_trigger_policies_metadata BEFORE INSERT OR UPDATE OF metadata ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_metadata_tsvector();
 
 
 --
 -- Name: policies tsvector_trigger_policies_name; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_policies_name BEFORE INSERT OR UPDATE ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_name_tsvector();
+CREATE TRIGGER tsvector_trigger_policies_name BEFORE INSERT OR UPDATE OF name ON policies FOR EACH ROW EXECUTE PROCEDURE update_policies_name_tsvector();
 
 
 --
 -- Name: products tsvector_trigger_products_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_products_id BEFORE INSERT OR UPDATE ON products FOR EACH ROW EXECUTE PROCEDURE update_products_id_tsvector();
+CREATE TRIGGER tsvector_trigger_products_id BEFORE INSERT OR UPDATE OF id ON products FOR EACH ROW EXECUTE PROCEDURE update_products_id_tsvector();
 
 
 --
 -- Name: products tsvector_trigger_products_metadata; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_products_metadata BEFORE INSERT OR UPDATE ON products FOR EACH ROW EXECUTE PROCEDURE update_products_metadata_tsvector();
+CREATE TRIGGER tsvector_trigger_products_metadata BEFORE INSERT OR UPDATE OF metadata ON products FOR EACH ROW EXECUTE PROCEDURE update_products_metadata_tsvector();
 
 
 --
 -- Name: products tsvector_trigger_products_name; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_products_name BEFORE INSERT OR UPDATE ON products FOR EACH ROW EXECUTE PROCEDURE update_products_name_tsvector();
+CREATE TRIGGER tsvector_trigger_products_name BEFORE INSERT OR UPDATE OF name ON products FOR EACH ROW EXECUTE PROCEDURE update_products_name_tsvector();
 
 
 --
 -- Name: users tsvector_trigger_users_email; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_users_email BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users_email_tsvector();
+CREATE TRIGGER tsvector_trigger_users_email BEFORE INSERT OR UPDATE OF email ON users FOR EACH ROW EXECUTE PROCEDURE update_users_email_tsvector();
 
 
 --
 -- Name: users tsvector_trigger_users_first_name; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_users_first_name BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users_first_name_tsvector();
+CREATE TRIGGER tsvector_trigger_users_first_name BEFORE INSERT OR UPDATE OF first_name ON users FOR EACH ROW EXECUTE PROCEDURE update_users_first_name_tsvector();
 
 
 --
 -- Name: users tsvector_trigger_users_id; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_users_id BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users_id_tsvector();
+CREATE TRIGGER tsvector_trigger_users_id BEFORE INSERT OR UPDATE OF id ON users FOR EACH ROW EXECUTE PROCEDURE update_users_id_tsvector();
 
 
 --
 -- Name: users tsvector_trigger_users_last_name; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_users_last_name BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users_last_name_tsvector();
+CREATE TRIGGER tsvector_trigger_users_last_name BEFORE INSERT OR UPDATE OF last_name ON users FOR EACH ROW EXECUTE PROCEDURE update_users_last_name_tsvector();
 
 
 --
 -- Name: users tsvector_trigger_users_metadata; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER tsvector_trigger_users_metadata BEFORE INSERT OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_users_metadata_tsvector();
+CREATE TRIGGER tsvector_trigger_users_metadata BEFORE INSERT OR UPDATE OF metadata ON users FOR EACH ROW EXECUTE PROCEDURE update_users_metadata_tsvector();
 
 
 --
