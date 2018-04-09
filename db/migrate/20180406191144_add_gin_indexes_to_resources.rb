@@ -3,7 +3,7 @@ class AddGinIndexesToResources < ActiveRecord::Migration[5.0]
     products: ['id', 'name', 'metadata'],
     policies: ['id', 'name', 'metadata'],
     licenses: ['id', 'key', 'metadata'],
-    machines: ['id', 'fingerprint', 'metadata'],
+    machines: ['id', 'fingerprint', 'name', 'metadata'],
     users: ['id', 'email', 'first_name', 'last_name', 'metadata'],
     keys: ['id', 'key']
   }
