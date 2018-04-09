@@ -15,7 +15,7 @@ module Api::V1
         res = current_account.send type.pluralize
         query.each do |attribute, text|
           if !res.respond_to?("search_#{attribute}")
-            return render_unprocessable_entity(
+            return render_bad_request(
               detail: "unsupported search attribute '#{attribute.camelize(:lower)}' for resource type '#{type.camelize(:lower)}'",
               source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
             )
