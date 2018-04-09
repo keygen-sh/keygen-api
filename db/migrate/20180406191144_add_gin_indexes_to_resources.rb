@@ -24,7 +24,7 @@ class AddGinIndexesToResources < ActiveRecord::Migration[5.0]
           END
           $$ LANGUAGE plpgsql;
 
-          CREATE TRIGGER tsvector_trigger_#{table}_#{column} BEFORE INSERT OR UPDATE
+          CREATE TRIGGER tsvector_trigger_#{table}_#{column} BEFORE INSERT OR UPDATE OF #{column}
             ON #{table} FOR EACH ROW EXECUTE PROCEDURE
             update_#{table}_#{column}_tsvector();
         SQL
