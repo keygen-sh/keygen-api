@@ -83,6 +83,62 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin performs a search by an unsearchable type "accounts"
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "accounts",
+          "query": {}
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unsupported search type 'accounts'",
+        "source": {
+          "pointer": "/meta/type"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by an unsearchable type "tokens"
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "tokens",
+          "query": {}
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unsupported search type 'tokens'",
+        "source": {
+          "pointer": "/meta/type"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin performs a search by an unknown type
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -132,7 +188,7 @@ Feature: Create policy
       """
       {
         "title": "Bad request",
-        "detail": "unsupported search attribute 'foo' for resource type 'users'",
+        "detail": "unsupported search query 'foo' for resource type 'users'",
         "source": {
           "pointer": "/meta/query/foo"
         }
