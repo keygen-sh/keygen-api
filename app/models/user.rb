@@ -7,6 +7,13 @@ class User < ApplicationRecord
   include Roleable
   include Searchable
 
+  SEARCH_ATTRIBUTES = %i[id email first_name last_name metadata].freeze
+  SEARCH_RELATIONSHIPS = {
+    role: %i[name]
+  }.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
   has_secure_password
 
   belongs_to :account
@@ -15,19 +22,6 @@ class User < ApplicationRecord
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
-
-  search(
-    attributes: [
-      :id,
-      :email,
-      :first_name,
-      :last_name,
-      :metadata
-    ],
-    relationships: {
-      role: [:name]
-    }
-  )
 
   accepts_nested_attributes_for :role
 
