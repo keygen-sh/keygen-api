@@ -6,6 +6,14 @@ class License < ApplicationRecord
   include Searchable
 
   EXCLUDED_KEYS = %w[actions action].freeze
+  SEARCH_ATTRIBUTES = %i[id key metadata].freeze
+  SEARCH_RELATIONSHIPS = {
+    product: %i[id name],
+    policy: %i[id name],
+    user: %i[id email]
+  }
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   belongs_to :user
@@ -14,15 +22,6 @@ class License < ApplicationRecord
   has_many :machines, dependent: :destroy
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
-
-  search(
-    attributes: [:id, :key, :metadata],
-    relationships: {
-      product: [:id, :name],
-      policy: [:id, :name],
-      user: [:id, :email]
-    }
-  )
 
   attr_reader :raw
 

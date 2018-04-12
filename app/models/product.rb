@@ -4,6 +4,10 @@ class Product < ApplicationRecord
   include Roleable
   include Searchable
 
+  SEARCH_ATTRIBUTES = %i[id name metadata].freeze
+
+  search attributes: SEARCH_ATTRIBUTES
+
   belongs_to :account
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
@@ -12,10 +16,6 @@ class Product < ApplicationRecord
   has_many :users, -> { distinct }, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
-
-  search(
-    attributes: [:id, :name, :metadata]
-  )
 
   after_create :set_role
 

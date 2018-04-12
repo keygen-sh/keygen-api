@@ -14,9 +14,10 @@ module Api::V1
 
         res = current_account.send type.pluralize
         query.each do |attribute, text|
-          if !res.respond_to?("search_#{attribute}")
+          if !res.respond_to?("search_#{attribute}") || (!model::SEARCH_ATTRIBUTES.include?(attribute.to_sym) &&
+            !model::SEARCH_RELATIONSHIPS.key?(attribute.to_sym))
             return render_bad_request(
-              detail: "unsupported search attribute '#{attribute.camelize(:lower)}' for resource type '#{type.camelize(:lower)}'",
+              detail: "unsupported search query '#{attribute.camelize(:lower)}' for resource type '#{type.camelize(:lower)}'",
               source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
             )
           end

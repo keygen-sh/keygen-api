@@ -4,18 +4,17 @@ class Key < ApplicationRecord
   include Searchable
 
   EXCLUDED_KEYS = %w[actions action].freeze
+  SEARCH_ATTRIBUTES = %i[id key].freeze
+  SEARCH_RELATIONSHIPS = {
+    product: %i[id name],
+    policy: %i[id name]
+  }.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
-
-  search(
-    attributes: [:id, :key],
-    relationships: {
-      product: [:id, :name],
-      policy: [:id, :name]
-    }
-  )
 
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }

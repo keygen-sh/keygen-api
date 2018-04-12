@@ -3,17 +3,17 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
+  SEARCH_ATTRIBUTES = %i[id name metadata].freeze
+  SEARCH_RELATIONSHIPS = {
+    product: %i[id name]
+  }.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
-
-  search(
-    attributes: [:id, :name, :metadata],
-    relationships: {
-      product: [:id, :name]
-    }
-  )
 
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
 

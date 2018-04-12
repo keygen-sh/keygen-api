@@ -3,21 +3,21 @@ class Machine < ApplicationRecord
   include Pageable
   include Searchable
 
+  SEARCH_ATTRIBUTES = %i[id fingerprint name metadata].freeze
+  SEARCH_RELATIONSHIPS = {
+    product: %i[id name],
+    policy: %i[id name],
+    license: %i[id key],
+    user: %i[id email]
+  }.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
   belongs_to :account
   belongs_to :license
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
-
-  search(
-    attributes: [:id, :fingerprint, :name, :metadata],
-    relationships: {
-      product: [:id, :name],
-      policy: [:id, :name],
-      license: [:id, :key],
-      user: [:id, :email]
-    }
-  )
 
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
