@@ -4,6 +4,9 @@ FactoryGirl.define do
     bearer nil
 
     before :create do |token|
+      if token.bearer.nil?
+        token.bearer = create :user
+      end
       token.account = token.bearer.account
     end
   end

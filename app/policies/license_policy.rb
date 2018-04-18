@@ -71,4 +71,8 @@ class LicensePolicy < ApplicationPolicy
   def transfer?
     bearer.role? :admin or resource.product == bearer
   end
+
+  def generate?
+    bearer.role? :admin or resource.product == bearer
+  end
 end

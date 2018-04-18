@@ -54,15 +54,19 @@ class ApplicationPolicy
       case
       when bearer.role?(:admin)
         scope.all
-      when scope.respond_to?(:bearer) && (bearer.role?(:product) || bearer.role?(:user))
+      when scope.respond_to?(:bearer) && (bearer.role?(:product) || bearer.role?(:user) || bearer.role?(:license))
         scope.bearer bearer.id
       when bearer.role?(:product)
         scope.product bearer.id
       when bearer.role?(:user)
         scope.user bearer.id
+      when scope.respond_to?(:license) && bearer.role?(:license)
+        scope.license bearer.id
+      else
+        scope.none
       end
     rescue NoMethodError
-      scope
+      scope.none
     end
   end
 end
