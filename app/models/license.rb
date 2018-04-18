@@ -2,20 +2,24 @@ class License < ApplicationRecord
   include Limitable
   include Tokenable
   include Pageable
+  include Roleable
 
   EXCLUDED_KEYS = %w[actions action].freeze
 
   belongs_to :account
   belongs_to :user
   belongs_to :policy
+  has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :destroy
   has_one :product, through: :policy
+  has_one :role, as: :resource, dependent: :destroy
 
   attr_reader :raw
 
   before_create :set_first_check_in, if: -> { requires_check_in? }
   before_create :set_expiry, unless: -> { policy.nil? }
   after_create :set_key, unless: -> { key.present? || policy.nil? }
+  after_create :set_role
 
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
@@ -96,6 +100,10 @@ class License < ApplicationRecord
   end
 
   private
+
+  def set_role
+    grant :license
+  end
 
   def set_first_check_in
     self.last_check_in_at = Time.current
