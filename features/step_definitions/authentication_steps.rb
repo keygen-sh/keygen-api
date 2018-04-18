@@ -1,6 +1,6 @@
 World Rack::Test::Methods
 
-Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, slug|
+Given /^I am an? (user|admin|product|license) of account "([^\"]*)"$/ do |role, slug|
   account = Account.find slug
   @bearer =
     case role
@@ -8,6 +8,8 @@ Given /^I am an? (user|admin|product) of account "([^\"]*)"$/ do |role, slug|
       account.users.roles(role).first
     when "product"
       account.products.first
+    when "license"
+      account.licenses.first
     end
 end
 

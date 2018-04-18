@@ -77,6 +77,11 @@ class SerializableLicense < SerializableBase
       @url_helpers.v1_account_license_machines_path @object.account, @object
     end
   end
+  relationship :tokens do
+    link :related do
+      @url_helpers.v1_account_license_tokens_path @object.account, @object
+    end
+  end
 
   link :self do
     @url_helpers.v1_account_license_path @object.account, @object
