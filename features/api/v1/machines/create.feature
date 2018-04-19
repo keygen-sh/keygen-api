@@ -195,6 +195,110 @@ Feature: Create machine
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
 
+  Scenario: License creates a machine for their license
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "licenses"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    # NOTE(ezekg) The additional token is for our account's admin user
+    And the current account should have 3 "tokens"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: License creates a machine for their license with a protected policy
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+    # NOTE(ezekg) The additional token is for our account's admin user
+    And the current account should have 1 "token"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: License creates a machine for another license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "oD:aP:3o:GD:vi:H3:Zw:up:h8:3a:hC:MD:2e:4d:cr"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    # NOTE(ezekg) The additional token is for our account's admin user
+    And the current account should have 4 "tokens"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Product creates a machine associated to a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
