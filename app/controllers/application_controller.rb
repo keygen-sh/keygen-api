@@ -23,6 +23,7 @@ class ApplicationController < ActionController::API
 
   attr_accessor :current_account
   attr_accessor :current_bearer
+  attr_accessor :current_token
 
   def pundit_user
     current_bearer
