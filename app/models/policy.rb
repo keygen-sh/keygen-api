@@ -13,6 +13,8 @@ class Policy < ApplicationRecord
   validates :product, presence: { message: "must exist" }
 
   validates :name, presence: true
+  validates :max_machines, numericality: { greater_than_or_equal_to: 1, message: "must be greater than or equal to 1 for floating policy" }, allow_nil: true, if: :floating?
+  validates :max_machines, numericality: { equal_to: 1, message: "must be equal to 1 for non-floating policy" }, allow_nil: true, if: :node_locked?
   validates :duration, numericality: { greater_than_or_equal_to: 1.day.to_i, message: "must be greater than or equal to 86400 (1 day)" }, allow_nil: true
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
@@ -34,6 +36,10 @@ class Policy < ApplicationRecord
 
   def floating?
     floating
+  end
+
+  def node_locked?
+    !floating
   end
 
   def encrypted?

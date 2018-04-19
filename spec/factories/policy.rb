@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :policy do
     name { Faker::Company.buzzword }
-    max_machines { Faker::Number.between 1, 5000 }
+    max_machines { nil }
     duration { 2.weeks }
     strict false
     floating false
