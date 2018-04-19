@@ -517,7 +517,7 @@ Feature: Create policy
           "attributes": {
             "name": "Node-Locked",
             "floating": false,
-            "maxMachines": 0
+            "maxMachines": 5
           },
           "relationships": {
             "product": {
