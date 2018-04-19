@@ -49,7 +49,10 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "machines" do
+        # NOTE(ezekg) By default, Rails does not allow dots inside our routes, but
+        #             we want to support dots since our machines are queryable by
+        #             their fingerprint attr, which can be an arbitrary string.
+        resources "machines", constraints: { id: /[^\/]*/ } do
           scope module: "machines/relationships" do
             resource "product", only: [:show]
             resource "license", only: [:show]
@@ -57,7 +60,8 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "users" do
+        # NOTE(ezekg) Users are queryable by email attr.
+        resources "users", constraints: { id: /[^\/]*/ } do
           scope module: "users/relationships" do
             resources "products", only: [:index, :show]
             resources "licenses", only: [:index, :show]
@@ -72,7 +76,9 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "licenses" do
+        # NOTE(ezekg) Licenses are queryable by their key attr, which can be an
+        #             arbitrary string.
+        resources "licenses", constraints: { id: /[^\/]*/ } do
           scope module: "licenses/relationships" do
             resources "machines", only: [:index, :show]
             resource "product", only: [:show]
