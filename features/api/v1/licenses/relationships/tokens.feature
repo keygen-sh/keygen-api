@@ -26,7 +26,7 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be a "token" with a nil expiry
 
-  Scenario: Product geerates a license token
+  Scenario: Product generates a license token
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "licenses"
@@ -72,6 +72,26 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
+  Scenario: Product requests a license's tokens
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "licenses"
+    And I am a product of account "test1"
+    And the current product has 3 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/tokens"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
+
+  Scenario: Product attempts to request tokens for a license it doesn't own
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "licenses"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$1/tokens"
+    Then the response status should be "403"
+
   Scenario: License requests their tokens
     Given the current account is "test1"
     And the current account has 3 "licenses"
@@ -88,9 +108,6 @@ Feature: Generate authentication token for license
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
     Then the response status should be "403"
 
-  # FIXME(ezekg) Tokens are currently being scoped to the user, which is not
-  #              expected behavior. (The scoping is happening inside of the
-  #              main application policy.)
   Scenario: User requests all tokens for their license
     Given the current account is "test1"
     And the current account has 1 "user"
@@ -99,8 +116,7 @@ Feature: Generate authentication token for license
     And the current account has 3 "licenses"
     And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
-    Then the response status should be "200"
-    And the JSON response should be an array of 1 "token"
+    Then the response status should be "403"
 
   Scenario: User requests all tokens for another user's license
     Given the current account is "test1"

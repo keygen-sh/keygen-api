@@ -56,9 +56,9 @@ class ApplicationPolicy
         scope.all
       when scope.respond_to?(:bearer) && (bearer.role?(:product) || bearer.role?(:user) || bearer.role?(:license))
         scope.bearer bearer.id
-      when bearer.role?(:product)
+      when scope.respond_to?(:product) && bearer.role?(:product)
         scope.product bearer.id
-      when bearer.role?(:user)
+      when scope.respond_to?(:user) && bearer.role?(:user)
         scope.user bearer.id
       when scope.respond_to?(:license) && bearer.role?(:license)
         scope.license bearer.id
