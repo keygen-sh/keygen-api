@@ -16,17 +16,16 @@ module TokenAuthentication
   def authenticator(token, options)
     account = current_account || Account.find(params[:account_id] || params[:id])
 
-    tok = TokenAuthenticationService.new(
+    @current_token = TokenAuthenticationService.new(
       account: account,
       token: token
     ).execute
 
-    if tok&.expired?
-      render_unauthorized detail: "is expired", source: {
-        pointer: "/data/relationships/tokens" } and return
+    if current_token&.expired?
+      render_unauthorized detail: "Token is expired" and return
     end
 
-    tok&.bearer
+    current_token&.bearer
   end
 
   def request_http_token_authentication(realm = "Keygen", message = nil)
