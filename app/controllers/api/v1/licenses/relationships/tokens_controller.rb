@@ -7,7 +7,7 @@ module Api::V1::Licenses::Relationships
 
     # POST /licenses/1/tokens
     def generate
-      authorize @license
+      authorize @license, :generate_token?
 
       token = TokenGeneratorService.new(
         account: current_account,
@@ -20,9 +20,13 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/tokens
     def index
-      authorize @license, :show?
+      authorize @license, :list_tokens?
 
-      @tokens = policy_scope apply_scopes(@license.tokens).all
+      # FIXME(ezekg) Skipping the policy scope here so that products can see
+      #              tokens which belong to licenses they own. Current behavior
+      #              is that non-admin bearers can only see their own tokens.
+      #              The scoping is happening within the main app policy.
+      @tokens = apply_scopes(@license.tokens).all
       authorize @tokens
 
       render jsonapi: @tokens
@@ -30,7 +34,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/tokens/1
     def show
-      authorize @license
+      authorize @license, :view_token?
 
       @token = @license.tokens.find params[:id]
       authorize @token
