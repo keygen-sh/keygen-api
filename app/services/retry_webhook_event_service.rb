@@ -39,8 +39,9 @@ class RetryWebhookEventService < BaseService
       }
     }).to_json
 
-    jid = SignedWebhookWorker.perform_async(
+    jid = WebhookWorker.perform_async(
       account.id,
+      new_event.id,
       endpoint.id,
       payload
     )

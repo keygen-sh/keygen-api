@@ -185,55 +185,55 @@ end
 #                                    PATCH  /v1/accounts/:account_id/keys/:id(.:format)                             api/v1/keys#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                    PUT    /v1/accounts/:account_id/keys/:id(.:format)                             api/v1/keys#update {:subdomain=>"api", :format=>"jsonapi"}
 #                                    DELETE /v1/accounts/:account_id/keys/:id(.:format)                             api/v1/keys#destroy {:subdomain=>"api", :format=>"jsonapi"}
-#         v1_account_machine_product GET    /v1/accounts/:account_id/machines/:machine_id/product(.:format)         api/v1/machines/relationships/products#show {:subdomain=>"api", :format=>"jsonapi"}
-#         v1_account_machine_license GET    /v1/accounts/:account_id/machines/:machine_id/license(.:format)         api/v1/machines/relationships/licenses#show {:subdomain=>"api", :format=>"jsonapi"}
-#            v1_account_machine_user GET    /v1/accounts/:account_id/machines/:machine_id/user(.:format)            api/v1/machines/relationships/users#show {:subdomain=>"api", :format=>"jsonapi"}
+#         v1_account_machine_product GET    /v1/accounts/:account_id/machines/:machine_id/product(.:format)         api/v1/machines/relationships/products#show {:subdomain=>"api", :format=>"jsonapi", :machine_id=>/[^\/]*/}
+#         v1_account_machine_license GET    /v1/accounts/:account_id/machines/:machine_id/license(.:format)         api/v1/machines/relationships/licenses#show {:subdomain=>"api", :format=>"jsonapi", :machine_id=>/[^\/]*/}
+#            v1_account_machine_user GET    /v1/accounts/:account_id/machines/:machine_id/user(.:format)            api/v1/machines/relationships/users#show {:subdomain=>"api", :format=>"jsonapi", :machine_id=>/[^\/]*/}
 #                v1_account_machines GET    /v1/accounts/:account_id/machines(.:format)                             api/v1/machines#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                    POST   /v1/accounts/:account_id/machines(.:format)                             api/v1/machines#create {:subdomain=>"api", :format=>"jsonapi"}
-#                 v1_account_machine GET    /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#show {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PATCH  /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PUT    /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    DELETE /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#destroy {:subdomain=>"api", :format=>"jsonapi"}
-#           v1_account_user_products GET    /v1/accounts/:account_id/users/:user_id/products(.:format)              api/v1/users/relationships/products#index {:subdomain=>"api", :format=>"jsonapi"}
-#            v1_account_user_product GET    /v1/accounts/:account_id/users/:user_id/products/:id(.:format)          api/v1/users/relationships/products#show {:subdomain=>"api", :format=>"jsonapi"}
-#           v1_account_user_licenses GET    /v1/accounts/:account_id/users/:user_id/licenses(.:format)              api/v1/users/relationships/licenses#index {:subdomain=>"api", :format=>"jsonapi"}
-#            v1_account_user_license GET    /v1/accounts/:account_id/users/:user_id/licenses/:id(.:format)          api/v1/users/relationships/licenses#show {:subdomain=>"api", :format=>"jsonapi"}
-#           v1_account_user_machines GET    /v1/accounts/:account_id/users/:user_id/machines(.:format)              api/v1/users/relationships/machines#index {:subdomain=>"api", :format=>"jsonapi"}
-#            v1_account_user_machine GET    /v1/accounts/:account_id/users/:user_id/machines/:id(.:format)          api/v1/users/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi"}
-#             v1_account_user_tokens GET    /v1/accounts/:account_id/users/:user_id/tokens(.:format)                api/v1/users/relationships/tokens#index {:subdomain=>"api", :format=>"jsonapi"}
-#              v1_account_user_token GET    /v1/accounts/:account_id/users/:user_id/tokens/:id(.:format)            api/v1/users/relationships/tokens#show {:subdomain=>"api", :format=>"jsonapi"}
-#    update_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/update-password(.:format)    api/v1/users/actions/password#update_password {:subdomain=>"api", :format=>"jsonapi"}
-#     reset_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/reset-password(.:format)     api/v1/users/actions/password#reset_password {:subdomain=>"api", :format=>"jsonapi"}
+#                 v1_account_machine GET    /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PATCH  /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PUT    /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    DELETE /v1/accounts/:account_id/machines/:id(.:format)                         api/v1/machines#destroy {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#           v1_account_user_products GET    /v1/accounts/:account_id/users/:user_id/products(.:format)              api/v1/users/relationships/products#index {:subdomain=>"api", :format=>"jsonapi", :user_id=>/[^\/]*/}
+#            v1_account_user_product GET    /v1/accounts/:account_id/users/:user_id/products/:id(.:format)          api/v1/users/relationships/products#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/, :user_id=>/[^\/]*/}
+#           v1_account_user_licenses GET    /v1/accounts/:account_id/users/:user_id/licenses(.:format)              api/v1/users/relationships/licenses#index {:subdomain=>"api", :format=>"jsonapi", :user_id=>/[^\/]*/}
+#            v1_account_user_license GET    /v1/accounts/:account_id/users/:user_id/licenses/:id(.:format)          api/v1/users/relationships/licenses#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/, :user_id=>/[^\/]*/}
+#           v1_account_user_machines GET    /v1/accounts/:account_id/users/:user_id/machines(.:format)              api/v1/users/relationships/machines#index {:subdomain=>"api", :format=>"jsonapi", :user_id=>/[^\/]*/}
+#            v1_account_user_machine GET    /v1/accounts/:account_id/users/:user_id/machines/:id(.:format)          api/v1/users/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/, :user_id=>/[^\/]*/}
+#             v1_account_user_tokens GET    /v1/accounts/:account_id/users/:user_id/tokens(.:format)                api/v1/users/relationships/tokens#index {:subdomain=>"api", :format=>"jsonapi", :user_id=>/[^\/]*/}
+#              v1_account_user_token GET    /v1/accounts/:account_id/users/:user_id/tokens/:id(.:format)            api/v1/users/relationships/tokens#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/, :user_id=>/[^\/]*/}
+#    update_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/update-password(.:format)    api/v1/users/actions/password#update_password {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#     reset_password_v1_account_user POST   /v1/accounts/:account_id/users/:id/actions/reset-password(.:format)     api/v1/users/actions/password#reset_password {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
 #                   v1_account_users GET    /v1/accounts/:account_id/users(.:format)                                api/v1/users#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                    POST   /v1/accounts/:account_id/users(.:format)                                api/v1/users#create {:subdomain=>"api", :format=>"jsonapi"}
-#                    v1_account_user GET    /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#show {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PATCH  /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PUT    /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    DELETE /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#destroy {:subdomain=>"api", :format=>"jsonapi"}
-#        v1_account_license_machines GET    /v1/accounts/:account_id/licenses/:license_id/machines(.:format)        api/v1/licenses/relationships/machines#index {:subdomain=>"api", :format=>"jsonapi"}
-#         v1_account_license_machine GET    /v1/accounts/:account_id/licenses/:license_id/machines/:id(.:format)    api/v1/licenses/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi"}
-#         v1_account_license_product GET    /v1/accounts/:account_id/licenses/:license_id/product(.:format)         api/v1/licenses/relationships/products#show {:subdomain=>"api", :format=>"jsonapi"}
-#          v1_account_license_policy GET    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#show {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PATCH  /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PUT    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi"}
-#            v1_account_license_user GET    /v1/accounts/:account_id/licenses/:license_id/user(.:format)            api/v1/licenses/relationships/users#show {:subdomain=>"api", :format=>"jsonapi"}
-#        validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#quick_validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
-#                                    POST   /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi"}
-#          revoke_v1_account_license DELETE /v1/accounts/:account_id/licenses/:id/actions/revoke(.:format)          api/v1/licenses/actions/permits#revoke {:subdomain=>"api", :format=>"jsonapi"}
-#           renew_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/renew(.:format)           api/v1/licenses/actions/permits#renew {:subdomain=>"api", :format=>"jsonapi"}
-#         suspend_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/suspend(.:format)         api/v1/licenses/actions/permits#suspend {:subdomain=>"api", :format=>"jsonapi"}
-#       reinstate_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reinstate(.:format)       api/v1/licenses/actions/permits#reinstate {:subdomain=>"api", :format=>"jsonapi"}
-#        check_in_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/check-in(.:format)        api/v1/licenses/actions/permits#check_in {:subdomain=>"api", :format=>"jsonapi"}
-# increment_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/increment-usage(.:format) api/v1/licenses/actions/uses#increment {:subdomain=>"api", :format=>"jsonapi"}
-# decrement_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/decrement-usage(.:format) api/v1/licenses/actions/uses#decrement {:subdomain=>"api", :format=>"jsonapi"}
-#     reset_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reset-usage(.:format)     api/v1/licenses/actions/uses#reset {:subdomain=>"api", :format=>"jsonapi"}
+#                    v1_account_user GET    /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PATCH  /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PUT    /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    DELETE /v1/accounts/:account_id/users/:id(.:format)                            api/v1/users#destroy {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#        v1_account_license_machines GET    /v1/accounts/:account_id/licenses/:license_id/machines(.:format)        api/v1/licenses/relationships/machines#index {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#         v1_account_license_machine GET    /v1/accounts/:account_id/licenses/:license_id/machines/:id(.:format)    api/v1/licenses/relationships/machines#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/, :license_id=>/[^\/]*/}
+#         v1_account_license_product GET    /v1/accounts/:account_id/licenses/:license_id/product(.:format)         api/v1/licenses/relationships/products#show {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#          v1_account_license_policy GET    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#show {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#                                    PATCH  /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#                                    PUT    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#            v1_account_license_user GET    /v1/accounts/:account_id/licenses/:license_id/user(.:format)            api/v1/licenses/relationships/users#show {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#        validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#quick_validate_by_id {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    POST   /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#          revoke_v1_account_license DELETE /v1/accounts/:account_id/licenses/:id/actions/revoke(.:format)          api/v1/licenses/actions/permits#revoke {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#           renew_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/renew(.:format)           api/v1/licenses/actions/permits#renew {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#         suspend_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/suspend(.:format)         api/v1/licenses/actions/permits#suspend {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#       reinstate_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reinstate(.:format)       api/v1/licenses/actions/permits#reinstate {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#        check_in_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/check-in(.:format)        api/v1/licenses/actions/permits#check_in {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+# increment_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/increment-usage(.:format) api/v1/licenses/actions/uses#increment {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+# decrement_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/decrement-usage(.:format) api/v1/licenses/actions/uses#decrement {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#     reset_usage_v1_account_license POST   /v1/accounts/:account_id/licenses/:id/actions/reset-usage(.:format)     api/v1/licenses/actions/uses#reset {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
 #   validate_key_v1_account_licenses POST   /v1/accounts/:account_id/licenses/actions/validate-key(.:format)        api/v1/licenses/actions/validations#validate_by_key {:subdomain=>"api", :format=>"jsonapi"}
 #                v1_account_licenses GET    /v1/accounts/:account_id/licenses(.:format)                             api/v1/licenses#index {:subdomain=>"api", :format=>"jsonapi"}
 #                                    POST   /v1/accounts/:account_id/licenses(.:format)                             api/v1/licenses#create {:subdomain=>"api", :format=>"jsonapi"}
-#                 v1_account_license GET    /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#show {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PATCH  /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    PUT    /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi"}
-#                                    DELETE /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#destroy {:subdomain=>"api", :format=>"jsonapi"}
+#                 v1_account_license GET    /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#show {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PATCH  /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    PUT    /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#update {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
+#                                    DELETE /v1/accounts/:account_id/licenses/:id(.:format)                         api/v1/licenses#destroy {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
 #         pop_v1_account_policy_keys DELETE /v1/accounts/:account_id/policies/:policy_id/pool(.:format)             api/v1/policies/relationships/pool#pop {:subdomain=>"api", :format=>"jsonapi"}
 #             v1_account_policy_keys GET    /v1/accounts/:account_id/policies/:policy_id/pool(.:format)             api/v1/policies/relationships/pool#index {:subdomain=>"api", :format=>"jsonapi"}
 #              v1_account_policy_key GET    /v1/accounts/:account_id/policies/:policy_id/pool/:id(.:format)         api/v1/policies/relationships/pool#show {:subdomain=>"api", :format=>"jsonapi"}
