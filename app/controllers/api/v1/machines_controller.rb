@@ -40,7 +40,7 @@ module Api::V1
 
         # License tokens are one-time use tokens *only* for machine activation
         if current_bearer.role?(:license)
-          current_token.destroy if current_token.is_a? Token
+          current_token.redeem!
         end
 
         render jsonapi: @machine, status: :created, location: v1_account_machine_url(@machine.account, @machine)
