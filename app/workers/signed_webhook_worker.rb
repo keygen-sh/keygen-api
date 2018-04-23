@@ -1,5 +1,8 @@
 require "httparty"
 
+###
+# DEPRECATED(ezekg) Use WebhookWorker instead
+###
 class SignedWebhookWorker
   ACCEPTABLE_STATUSES = (200..299).freeze
 

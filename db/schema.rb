@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180318024935) do
+ActiveRecord::Schema.define(version: 20180423205146) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,9 +19,9 @@ ActiveRecord::Schema.define(version: 20180318024935) do
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
+    t.string   "slug"
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
-    t.string   "slug"
     t.uuid     "plan_id"
     t.boolean  "protected",   default: false
     t.text     "public_key"
@@ -233,12 +233,14 @@ ActiveRecord::Schema.define(version: 20180318024935) do
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text     "payload"
     t.string   "jid"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
     t.string   "endpoint"
     t.uuid     "account_id"
     t.string   "idempotency_token"
     t.string   "event"
+    t.integer  "last_response_code"
+    t.text     "last_response_body"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token", using: :btree
