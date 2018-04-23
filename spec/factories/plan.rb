@@ -9,16 +9,13 @@ FactoryGirl.define do
     plan_id nil
 
     transient do
-      stripe_plan {
-        StripeHelper.create_plan(
-          id: SecureRandom.hex,
-          trial_period_days: 7,
-          amount: price
-        )
-      }
+      stripe_plan do
+        StripeHelper.create_plan(id: SecureRandom.hex, amount: price, trial_period_days: 7) rescue nil
+      end
     end
 
     after :create do |plan, evaluator|
+      next if evaluator.stripe_plan.nil?
       plan.plan_id = evaluator.stripe_plan.id if plan.plan_id.nil?
       plan.save
     end

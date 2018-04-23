@@ -62,8 +62,9 @@ class CreateWebhookEventService < BaseService
       payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, opts).to_json
 
       # Enqueue the worker, which will fire off the webhook
-      jid = SignedWebhookWorker.perform_async(
+      jid = WebhookWorker.perform_async(
         account.id,
+        webhook_event.id,
         endpoint.id,
         payload.to_json
       )
