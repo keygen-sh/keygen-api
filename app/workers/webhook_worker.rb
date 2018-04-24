@@ -48,7 +48,10 @@ class WebhookWorker
       Raygun.track_exception e
     end
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
-    nil
+    event.update(
+      last_response_code: nil,
+      last_response_body: 'DNS_ERROR'
+    )
   end
 
   class FailedRequestError < StandardError; end
