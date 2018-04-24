@@ -5,6 +5,8 @@ class SerializableWebhookEvent < SerializableBase
   attribute :payload
   attribute :event
   attribute :status
+  attribute :last_response_code
+  attribute :last_response_body
   attribute :created do
     @object.created_at
   end

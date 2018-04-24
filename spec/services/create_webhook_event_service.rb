@@ -108,8 +108,10 @@ describe CreateWebhookEventService do
   end
 
   it 'should attempt to deliver the event' do
-    allow(WebhookWorker::Request).to receive(:post) { |url, opts|
-      OpenStruct.new(url: url, code: 200, **opts)
+    allow_any_instance_of(WebhookEvent).to receive(:last_response_code).and_return 200
+    allow_any_instance_of(WebhookEvent).to receive(:last_response_body).and_return 'OK'
+    allow(WebhookWorker::Request).to receive(:post) {
+      OpenStruct.new(code: 200, body: 'OK')
     }
 
     event = create_webhook_event!
