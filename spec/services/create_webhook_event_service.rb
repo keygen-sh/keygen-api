@@ -1,6 +1,9 @@
 require 'rails_helper'
 require 'spec_helper'
+require 'database_cleaner'
 require 'sidekiq/testing'
+
+DatabaseCleaner.strategy = :truncation
 
 describe CreateWebhookEventService do
 
@@ -60,6 +63,7 @@ describe CreateWebhookEventService do
 
   after do
     Sidekiq::Worker.clear_all
+    DatabaseCleaner.clean
   end
 
   it 'should create a new webhook event' do
