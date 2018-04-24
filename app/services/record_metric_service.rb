@@ -14,8 +14,6 @@ class RecordMetricService < BaseService
       account.id,
       data.to_json
     )
-  rescue Redis::CannotConnectError
-    false
   end
 
   private

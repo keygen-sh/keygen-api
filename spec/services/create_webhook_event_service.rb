@@ -40,8 +40,6 @@ describe CreateWebhookEventService do
   before do
     Sidekiq::Testing.inline!
 
-    # TODO(ezekg) Ensure Redis is running locally otherwise the tests will fail
-
     @account = create :account
     @endpoint = create :webhook_endpoint, account: @account
     @resource = create :license, account: @account

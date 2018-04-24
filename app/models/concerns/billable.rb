@@ -24,7 +24,5 @@ module Billable
 
   def initialize_billing
     InitializeBillingWorker.perform_async id
-  rescue Redis::CannotConnectError
-    false
   end
 end

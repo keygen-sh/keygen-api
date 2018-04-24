@@ -51,8 +51,6 @@ class RetryWebhookEventService < BaseService
     )
 
     new_event
-  rescue Redis::CannotConnectError
-    false
   end
 
   private
