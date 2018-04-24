@@ -75,8 +75,6 @@ class CreateWebhookEventService < BaseService
         jid: jid
       )
     end
-  rescue Redis::CannotConnectError
-    false
   end
 
   private
