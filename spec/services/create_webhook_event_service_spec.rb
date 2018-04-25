@@ -136,11 +136,27 @@ describe CreateWebhookEventService do
     expect { create_webhook_event! }.to_not raise_error
   end
 
-  it 'should retry when event delivery fails' do
+  it 'should raise when event delivery fails' do
     allow(WebhookWorker::Request).to receive(:post) {
       OpenStruct.new(code: 500)
     }
 
     expect { create_webhook_event! }.to raise_error WebhookWorker::FailedRequestError
+  end
+
+  it 'should skip when event delivery fails due to SSL error' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      raise OpenSSL::SSL::SSLError.new
+    }
+
+    expect { create_webhook_event! }.to_not raise_error
+  end
+
+  it 'should skip when event delivery fails due to DNS error' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      raise SocketError.new
+    }
+
+    expect { create_webhook_event! }.to_not raise_error
   end
 end
