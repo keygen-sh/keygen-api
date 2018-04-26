@@ -152,11 +152,27 @@ describe CreateWebhookEventService do
     expect { create_webhook_event! }.to_not raise_error
   end
 
+  it 'should skip when event delivery fails due to timeout error' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      raise Net::ReadTimeout.new
+    }
+
+    expect { create_webhook_event! }.to_not raise_error
+  end
+
   it 'should skip when event delivery fails due to DNS error' do
     allow(WebhookWorker::Request).to receive(:post) {
       raise SocketError.new
     }
 
     expect { create_webhook_event! }.to_not raise_error
+  end
+
+  it 'should not skip when event delivery fails due to an exception' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      raise Exception.new
+    }
+
+    expect { create_webhook_event! }.to raise_error Exception
   end
 end
