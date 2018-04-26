@@ -39,14 +39,15 @@ class WebhookWorker
       raise FailedRequestError
     end
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
-    begin
-      event.update(
-        last_response_code: nil,
-        last_response_body: 'SSL_ERROR'
-      )
-    rescue => e
-      Raygun.track_exception e
-    end
+    event.update(
+      last_response_code: nil,
+      last_response_body: 'SSL_ERROR'
+    )
+  rescue Net::ReadTimeout # Our request to the endpoint timed out
+    event.update(
+      last_response_code: nil,
+      last_response_body: 'REQ_TIMEOUT'
+    )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
     event.update(
       last_response_code: nil,
