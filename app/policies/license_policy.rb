@@ -67,4 +67,8 @@ class LicensePolicy < ApplicationPolicy
   def upgrade?
     bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
   end
+
+  def transfer?
+    bearer.role? :admin or resource.product == bearer
+  end
 end
