@@ -13,7 +13,7 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def destroy?
-    bearer.role? :admin
+    false
   end
 
   def pause?

@@ -17,13 +17,20 @@ Feature: Delete account
     Given I am an admin of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1"
-    Then the response status should be "204"
+    Then the response status should be "403"
 
   Scenario: Admin attempts to delete another account
     Given I am an admin of account "test2"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1"
     Then the response status should be "401"
+
+  Scenario: Product attempts to delete an account
+    Given the account "test1" has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1"
+    Then the response status should be "403"
 
   Scenario: User attempts to delete an account
     Given the account "test1" has 1 "user"
