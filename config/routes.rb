@@ -132,7 +132,7 @@ Rails.application.routes.draw do
         end
 
         resources "webhook_endpoints", path: "webhook-endpoints"
-        resources "webhook_events", path: "webhook-events", only: [:index, :show] do
+        resources "webhook_events", path: "webhook-events", only: [:index, :show, :destroy] do
           member do
             scope "actions", module: "webhook_events/actions" do
               post "retry", to: "retries#retry"
