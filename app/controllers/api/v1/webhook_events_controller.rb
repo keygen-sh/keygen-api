@@ -5,7 +5,7 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_event, only: [:show]
+    before_action :set_event, only: [:show, :destroy]
 
     # GET /webhook-events
     def index
@@ -20,6 +20,13 @@ module Api::V1
       authorize @event
 
       render jsonapi: @event
+    end
+
+    # DELETE /webhook-events/1
+    def destroy
+      authorize @event
+
+      @event.destroy
     end
 
     private
