@@ -66,6 +66,8 @@ class License < ApplicationRecord
   end
 
   def next_check_in_at
+    return nil unless requires_check_in?
+
     last_check_in_at + check_in_interval_count.send(check_in_interval) rescue nil
   end
 
