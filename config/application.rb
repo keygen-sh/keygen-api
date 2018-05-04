@@ -37,8 +37,8 @@ module Keygen
     # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
 
-    # We're using tsvector indexes which aren't supported in the
-    # default schema format
+    # We're using triggers and tsvector indexes which aren't supported
+    # in the default schema format
     config.active_record.schema_format = :sql
 
     # Use Sidekiq for background jobs
