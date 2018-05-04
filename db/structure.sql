@@ -261,11 +261,11 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE accounts (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
+    slug character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    slug character varying,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     plan_id uuid,
     protected boolean DEFAULT false,
     public_key text,
@@ -290,7 +290,6 @@ CREATE TABLE ar_internal_metadata (
 --
 
 CREATE TABLE billings (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     customer_id character varying,
     subscription_status character varying,
     created_at timestamp without time zone NOT NULL,
@@ -302,6 +301,7 @@ CREATE TABLE billings (
     card_brand character varying,
     card_last4 character varying,
     state character varying,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid
 );
 
@@ -311,10 +311,10 @@ CREATE TABLE billings (
 --
 
 CREATE TABLE keys (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     key character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     policy_id uuid,
     account_id uuid,
     tsv_id tsvector,
@@ -327,12 +327,12 @@ CREATE TABLE keys (
 --
 
 CREATE TABLE licenses (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     key character varying,
     expiry timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     metadata jsonb,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     user_id uuid,
     policy_id uuid,
     account_id uuid,
@@ -354,7 +354,6 @@ CREATE TABLE licenses (
 --
 
 CREATE TABLE machines (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     fingerprint character varying,
     ip character varying,
     hostname character varying,
@@ -363,6 +362,7 @@ CREATE TABLE machines (
     updated_at timestamp without time zone NOT NULL,
     name character varying,
     metadata jsonb,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     license_id uuid,
     tsv_id tsvector,
@@ -391,7 +391,6 @@ CREATE TABLE metrics (
 --
 
 CREATE TABLE plans (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     price integer,
     max_users integer,
@@ -401,6 +400,7 @@ CREATE TABLE plans (
     updated_at timestamp without time zone NOT NULL,
     max_products integer,
     plan_id character varying,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     private boolean DEFAULT false,
     trial_duration integer,
     max_reqs integer,
@@ -413,7 +413,6 @@ CREATE TABLE plans (
 --
 
 CREATE TABLE policies (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     duration integer,
     strict boolean DEFAULT false,
@@ -426,6 +425,7 @@ CREATE TABLE policies (
     encrypted boolean DEFAULT false,
     protected boolean,
     metadata jsonb,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     product_id uuid,
     account_id uuid,
     check_in_interval character varying,
@@ -448,12 +448,12 @@ CREATE TABLE policies (
 --
 
 CREATE TABLE products (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     platforms jsonb,
     metadata jsonb,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     url character varying,
     tsv_id tsvector,
@@ -467,12 +467,12 @@ CREATE TABLE products (
 --
 
 CREATE TABLE receipts (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     invoice_id character varying,
     amount integer,
     paid boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     billing_id uuid
 );
 
@@ -482,11 +482,11 @@ CREATE TABLE receipts (
 --
 
 CREATE TABLE roles (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying,
     resource_type character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     resource_id uuid
 );
 
@@ -505,12 +505,12 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE tokens (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     digest character varying,
     bearer_type character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     expiry timestamp without time zone,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     bearer_id uuid,
     account_id uuid
 );
@@ -521,7 +521,6 @@ CREATE TABLE tokens (
 --
 
 CREATE TABLE users (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     email character varying,
     password_digest character varying,
     created_at timestamp without time zone NOT NULL,
@@ -529,6 +528,7 @@ CREATE TABLE users (
     password_reset_token character varying,
     password_reset_sent_at timestamp without time zone,
     metadata jsonb,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     first_name character varying,
     last_name character varying,
@@ -545,10 +545,10 @@ CREATE TABLE users (
 --
 
 CREATE TABLE webhook_endpoints (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     url character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid
 );
 
@@ -558,15 +558,17 @@ CREATE TABLE webhook_endpoints (
 --
 
 CREATE TABLE webhook_events (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     payload text,
     jid character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     endpoint character varying,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     account_id uuid,
     idempotency_token character varying,
-    event character varying
+    event character varying,
+    last_response_code integer,
+    last_response_body text
 );
 
 
@@ -1448,6 +1450,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20180309035015'),
 ('20180318024935'),
 ('20180406189154'),
-('20180406191144');
+('20180406191144'),
+('20180423205146');
 
 
