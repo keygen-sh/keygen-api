@@ -1,4 +1,7 @@
 class Account < ApplicationRecord
+  CURRENT_COMMS_REV = 1525708867
+  CURRENT_TOS_REV = 1525708867
+  CURRENT_PP_REV = 1525708867
   RSA_KEY_SIZE = 2048
 
   include ActiveModel::Validations
@@ -38,6 +41,18 @@ class Account < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
+
+  validates :accepted_comms, presence: { message: "must consent to email communication" }
+  validates :accepted_comms_at, presence: { message: "consent timestamp cannot be blank" }
+  validates :accepted_comms_rev, presence: true, numericality: { greater_than_or_equal_to: CURRENT_COMMS_REV, message: "must consent to the latest email communication revision" }
+
+  validates :accepted_tos, presence: { message: "must consent to our terms of service" }
+  validates :accepted_tos_at, presence: { message: "consent timestamp cannot be blank" }
+  validates :accepted_tos_rev, presence: true, numericality: { greater_than_or_equal_to: CURRENT_TOS_REV, message: "must consent to the latest terms of service revision" }
+
+  validates :accepted_pp, presence: { message: "must consent to our privacy policy" }
+  validates :accepted_pp_at, presence: { message: "consent timestamp cannot be blank" }
+  validates :accepted_pp_rev, presence: true, numericality: { greater_than_or_equal_to: CURRENT_PP_REV, message: "must consent to the latest privacy policy revision" }
 
   validate on: [:create, :update] do
     clean_slug = "#{slug}".tr "-", ""

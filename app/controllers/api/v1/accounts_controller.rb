@@ -64,6 +64,15 @@ module Api::V1
             param :name, type: :string
             param :slug, type: :string
             param :protected, type: :boolean, optional: true
+            param :accepted_comms, type: :boolean, optional: true
+            param :accepted_comms_at, type: :datetime, optional: true, coerce: true
+            param :accepted_comms_rev, type: :integer, optional: true
+            param :accepted_tos, type: :boolean, optional: true
+            param :accepted_tos_at, type: :datetime, optional: true, coerce: true
+            param :accepted_tos_rev, type: :integer, optional: true
+            param :accepted_pp, type: :boolean, optional: true
+            param :accepted_pp_at, type: :datetime, optional: true, coerce: true
+            param :accepted_pp_rev, type: :integer, optional: true
           end
           param :relationships, type: :hash do
             param :plan, type: :hash do
@@ -97,6 +106,15 @@ module Api::V1
             param :name, type: :string, optional: true
             param :slug, type: :string, optional: true
             param :protected, type: :boolean, optional: true
+            param :accepted_comms, type: :boolean, optional: true
+            param :accepted_comms_at, type: :datetime, optional: true, coerce: true
+            param :accepted_comms_rev, type: :integer, optional: true
+            param :accepted_tos, type: :boolean, optional: true
+            param :accepted_tos_at, type: :datetime, optional: true, coerce: true
+            param :accepted_tos_rev, type: :integer, optional: true
+            param :accepted_pp, type: :boolean, optional: true
+            param :accepted_pp_at, type: :datetime, optional: true, coerce: true
+            param :accepted_pp_rev, type: :integer, optional: true
           end
         end
       end

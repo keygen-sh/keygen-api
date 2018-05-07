@@ -19,8 +19,12 @@ end
 Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
   parse_placeholders! body
 
-  attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.find(slug).update attributes
+  account = Account.find slug
+  account.assign_attributes(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
+
+  account.save validate: false
 end
 
 Given /^I have the following attributes:$/ do |body|
