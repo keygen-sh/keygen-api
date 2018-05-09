@@ -125,6 +125,16 @@ Feature: License user relationship
       }
       """
     Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "user must exist",
+        "source": {
+          "pointer": "/data/relationships/user"
+        }
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 

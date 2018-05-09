@@ -23,17 +23,26 @@ module Api::V1::Licenses::Relationships
       case
       when new_policy.present? && old_policy.product != new_policy.product
         render_unprocessable_entity(
-          detail: "cannot change to a policy for another product"
+          detail: "cannot change to a policy for another product",
+          source: {
+            pointer: "/data/relationships/policy"
+          }
         )
         return
       when new_policy.present? && old_policy.encrypted? != new_policy.encrypted?
         render_unprocessable_entity(
-          detail: "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)"
+          detail: "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
+          source: {
+            pointer: "/data/relationships/policy"
+          }
         )
         return
       when new_policy.present? && old_policy.pool? != new_policy.pool?
         render_unprocessable_entity(
-          detail: "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
+          detail: "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
+          source: {
+            pointer: "/data/relationships/policy"
+          }
         )
         return
       when current_bearer.role?(:user) && new_policy&.protected?

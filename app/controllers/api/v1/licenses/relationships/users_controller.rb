@@ -22,7 +22,7 @@ module Api::V1::Licenses::Relationships
         return render_unprocessable_entity(
           detail: "user must exist",
           source: {
-            pointer: "/data/id"
+            pointer: "/data/relationships/user"
           }
         )
       end

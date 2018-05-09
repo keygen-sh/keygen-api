@@ -178,7 +178,10 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change to a policy for another product"
+        "detail": "cannot change to a policy for another product",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -227,7 +230,10 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)"
+        "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -276,7 +282,10 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)"
+        "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -325,7 +334,10 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
+        "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -374,7 +386,10 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
+        "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs
