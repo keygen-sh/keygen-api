@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180423205146) do
+ActiveRecord::Schema.define(version: 20180507155625) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,12 +20,21 @@ ActiveRecord::Schema.define(version: 20180423205146) do
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
     t.string   "slug"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.uuid     "plan_id"
-    t.boolean  "protected",   default: false
+    t.boolean  "protected",          default: false
     t.text     "public_key"
     t.text     "private_key"
+    t.boolean  "accepted_comms"
+    t.datetime "accepted_comms_at"
+    t.integer  "accepted_comms_rev"
+    t.boolean  "accepted_tos"
+    t.datetime "accepted_tos_at"
+    t.integer  "accepted_tos_rev"
+    t.boolean  "accepted_pp"
+    t.datetime "accepted_pp_at"
+    t.integer  "accepted_pp_rev"
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true, using: :btree
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at", using: :btree
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true, using: :btree

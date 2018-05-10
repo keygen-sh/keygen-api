@@ -4,6 +4,15 @@ class SerializableAccount < SerializableBase
   attribute :name
   attribute :slug
   attribute :protected
+  attribute :accepted_comms
+  attribute :accepted_comms_at
+  attribute :accepted_comms_rev
+  attribute :accepted_tos
+  attribute :accepted_tos_at
+  attribute :accepted_tos_rev
+  attribute :accepted_pp
+  attribute :accepted_pp_at
+  attribute :accepted_pp_rev
   attribute :created do
     @object.created_at
   end

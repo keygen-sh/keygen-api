@@ -38,7 +38,7 @@ Feature: Update account
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin updates the name for their account
+  Scenario: Admin updates the slug for their account
     Given I am an admin of account "test1"
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
@@ -48,14 +48,105 @@ Feature: Update account
         "data": {
           "type": "accounts",
           "attributes": {
-            "slug": "new-name"
+            "slug": "new-slug"
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "account" with the slug "new-name"
+    And the JSON response should be an "account" with the slug "new-slug"
     And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin updates the slug for their account without providing any consent
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And the account "test1" has the following attributes:
+      """
+      {
+        "acceptedComms": false,
+        "acceptedTos": false,
+        "acceptedPp": false
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "new-slug"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 3 errors
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin updates their account while consenting to latest terms of service revision
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And the account "test1" has the following attributes:
+      """
+      {
+        "acceptedTosRev": 1494174568
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "new-slug",
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin attempts to update their account without consenting to latest terms of service revision
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And the account "test1" has the following attributes:
+      """
+      {
+        "acceptedTosRev": 1494174568
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "slug": "new-slug"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must consent to the latest terms of service revision",
+        "source": {
+          "pointer": "/data/attributes/acceptedTosRev"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin attempts to update another account

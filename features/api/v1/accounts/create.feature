@@ -13,7 +13,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -56,7 +65,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Hacker",
-            "slug": "ace6b050-6dc0-4cb5-85e9-ad87f629255f"
+            "slug": "ace6b050-6dc0-4cb5-85e9-ad87f629255f",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -103,7 +121,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Hacker",
-            "slug": "ace6b0506dc04cb585e9ad87f629255f"
+            "slug": "ace6b0506dc04cb585e9ad87f629255f",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -150,7 +177,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Hacker",
-            "slug": "ace-6b0506d-c04cb5-85e9a-d87f62-9255f"
+            "slug": "ace-6b0506d-c04cb5-85e9a-d87f62-9255f",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -204,7 +240,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -243,7 +288,16 @@ Feature: Create account
           "attributes": {
             "name": "Google",
             "slug": "google",
-            "protected": true
+            "protected": true,
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -302,7 +356,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -357,7 +420,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Forbidden",
-            "slug": "actions"
+            "slug": "actions",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -404,7 +476,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "admins": {
@@ -445,7 +526,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -511,7 +601,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -536,7 +635,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Test1",
-            "slug": "test1"
+            "slug": "test1",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -573,7 +681,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "Invalid_\$lug/Is;here"
+            "slug": "Invalid_\$lug/Is;here",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -620,7 +737,16 @@ Feature: Create account
           "type": "accounts",
           "attributes": {
             "name": "Google",
-            "slug": "google"
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
           },
           "relationships": {
             "plan": {
@@ -658,3 +784,207 @@ Feature: Create account
         }
       }
       """
+
+  Scenario: Anonymous attempts to create an account without consenting to email communication
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google",
+            "acceptedComms": false,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Larry",
+                    "lastName": "Page",
+                    "email": "lpage@google.com",
+                    "password": "goog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must consent to email communication",
+        "source": {
+          "pointer": "/data/attributes/acceptedComms"
+        }
+      }
+      """
+
+  Scenario: Anonymous attempts to create an account without consenting to terms of service
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": false,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": true,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Larry",
+                    "lastName": "Page",
+                    "email": "lpage@google.com",
+                    "password": "goog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must consent to our terms of service",
+        "source": {
+          "pointer": "/data/attributes/acceptedTos"
+        }
+      }
+      """
+
+  Scenario: Anonymous attempts to create an account without consenting to privacy policy
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google",
+            "acceptedComms": true,
+            "acceptedCommsAt": "2018-05-07T22:53:37.000Z",
+            "acceptedCommsRev": 1525709739,
+            "acceptedTos": true,
+            "acceptedTosAt": "2018-05-07T22:53:37.000Z",
+            "acceptedTosRev": 1525709739,
+            "acceptedPp": false,
+            "acceptedPpAt": "2018-05-07T22:53:37.000Z",
+            "acceptedPpRev": 1525709739
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Larry",
+                    "lastName": "Page",
+                    "email": "lpage@google.com",
+                    "password": "goog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must consent to our privacy policy",
+        "source": {
+          "pointer": "/data/attributes/acceptedPp"
+        }
+      }
+      """
+
+  Scenario: Anonymous attempts to create an account without consenting to anything
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "google"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Larry",
+                    "lastName": "Page",
+                    "email": "lpage@google.com",
+                    "password": "goog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"

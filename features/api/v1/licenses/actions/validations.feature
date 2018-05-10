@@ -43,9 +43,83 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Anonymous quick validates a check-in license that is valid but the account has not given any consent
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      {
+        "acceptedComms": false,
+        "acceptedTos": false,
+        "acceptedPp": false
+      }
+      """
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": "$time.now"
+      }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin quick validates a check-in license that is valid
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": "$time.now"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin quick validates a check-in license that is valid but the account has not given any consent
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      {
+        "acceptedComms": false,
+        "acceptedTos": false,
+        "acceptedPp": false
+      }
+      """
     And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
     And all "policies" have the following attributes:
