@@ -12,7 +12,7 @@ module Api::V1::Products::Relationships
       token = TokenGeneratorService.new(
         account: current_account,
         bearer: @product,
-        expiry: false
+        expiry: nil
       ).execute
 
       render jsonapi: token

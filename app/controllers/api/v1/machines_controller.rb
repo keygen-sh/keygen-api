@@ -32,16 +32,26 @@ module Api::V1
       authorize @machine
 
       if @machine.save
+        if current_token.activation_token?
+          begin
+            current_token.with_lock "FOR UPDATE NOWAIT" do
+              current_token.increment :activations
+              current_token.save!
+            end
+          rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordInvalid
+            return render_unprocessable_resource current_token
+          rescue ActiveRecord::StaleObjectError, ActiveRecord::StatementInvalid # Thrown when update is attempted on locked row i.e. from FOR UPDATE NOWAIT
+            return render_conflict detail: "failed to increment due to another conflicting activation", source: { pointer: "/data/attributes/activations" }
+          rescue ActiveModel::RangeError
+            return render_bad_request detail: "integer is too large", source: { pointer: "/data/attributes/activations" }
+          end
+        end
+
         CreateWebhookEventService.new(
           event: "machine.created",
           account: current_account,
           resource: @machine
         ).execute
-
-        # License tokens are one-time use tokens *only* for machine activation
-        if current_bearer.role?(:license)
-          current_token.redeem!
-        end
 
         render jsonapi: @machine, status: :created, location: v1_account_machine_url(@machine.account, @machine)
       else
@@ -69,6 +79,21 @@ module Api::V1
     # DELETE /machines/1
     def destroy
       authorize @machine
+
+      if current_token.activation_token?
+        begin
+          current_token.with_lock "FOR UPDATE NOWAIT" do
+            current_token.increment :deactivations
+            current_token.save!
+          end
+        rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordInvalid
+          return render_unprocessable_resource current_token
+        rescue ActiveRecord::StaleObjectError, ActiveRecord::StatementInvalid
+          return render_conflict detail: "failed to increment due to another conflicting deactivation", source: { pointer: "/data/attributes/deactivations" }
+        rescue ActiveModel::RangeError
+          return render_bad_request detail: "integer is too large", source: { pointer: "/data/attributes/deactivations" }
+        end
+      end
 
       CreateWebhookEventService.new(
         event: "machine.deleted",

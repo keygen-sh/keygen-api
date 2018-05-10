@@ -195,11 +195,15 @@ ActiveRecord::Schema.define(version: 20180511152944) do
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "digest"
     t.string   "bearer_type"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.datetime "expiry"
     t.uuid     "bearer_id"
     t.uuid     "account_id"
+    t.integer  "max_activations"
+    t.integer  "max_deactivations"
+    t.integer  "activations",       default: 0
+    t.integer  "deactivations",     default: 0
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at", using: :btree
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at", using: :btree
     t.index ["digest", "created_at", "account_id"], name: "index_tokens_on_digest_and_created_at_and_account_id", unique: true, using: :btree

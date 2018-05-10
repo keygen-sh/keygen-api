@@ -222,8 +222,12 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
-    # NOTE(ezekg) The additional token is for our account's admin user
-    And the current account should have 3 "tokens"
+    And the current token should have the following attributes:
+      """
+      {
+        "activations": 1
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
@@ -263,10 +267,69 @@ Feature: Create machine
       """
     Then the response status should be "201"
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
-    # NOTE(ezekg) The additional token is for our account's admin user
-    And the current account should have 1 "token"
+    And the current token should have the following attributes:
+      """
+      {
+        "activations": 1
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+
+  Scenario: License creates a machine for their license but they've hit their activation limit
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    And the current token has the following attributes:
+      """
+      {
+        "maxActivations": 1,
+        "activations": 1
+      }
+      """
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "exceeds maximum allowed (1)",
+        "source": {
+          "pointer": "/data/attributes/activations"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: License creates a machine for another license
     Given the current account is "test1"
@@ -294,8 +357,12 @@ Feature: Create machine
       }
       """
     Then the response status should be "403"
-    # NOTE(ezekg) The additional token is for our account's admin user
-    And the current account should have 4 "tokens"
+    And the current token should have the following attributes:
+      """
+      {
+        "activations": 0
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
