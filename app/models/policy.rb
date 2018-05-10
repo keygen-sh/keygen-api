@@ -68,7 +68,6 @@ end
 #
 # Table name: policies
 #
-#  id                        :uuid             not null, primary key
 #  name                      :string
 #  duration                  :integer
 #  strict                    :boolean          default(FALSE)
@@ -81,6 +80,7 @@ end
 #  encrypted                 :boolean          default(FALSE)
 #  protected                 :boolean
 #  metadata                  :jsonb
+#  id                        :uuid             not null, primary key
 #  product_id                :uuid
 #  account_id                :uuid
 #  check_in_interval         :string

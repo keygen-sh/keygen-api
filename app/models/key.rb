@@ -30,10 +30,10 @@ end
 #
 # Table name: keys
 #
-#  id         :uuid             not null, primary key
 #  key        :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  id         :uuid             not null, primary key
 #  policy_id  :uuid
 #  account_id :uuid
 #

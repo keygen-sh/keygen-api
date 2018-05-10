@@ -6,6 +6,10 @@ class SerializableToken < SerializableBase
     @object.raw
   end
   attribute :expiry
+  attribute :max_activations, if: -> { @object.activation_token? }
+  attribute :activations, if: -> { @object.activation_token? }
+  attribute :max_deactivations, if: -> { @object.activation_token? }
+  attribute :deactivations, if: -> { @object.activation_token? }
   attribute :created do
     @object.created_at
   end
