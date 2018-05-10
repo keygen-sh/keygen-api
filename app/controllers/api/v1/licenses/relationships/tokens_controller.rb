@@ -9,10 +9,16 @@ module Api::V1::Licenses::Relationships
     def generate
       authorize @license, :generate_token?
 
+      kwargs = token_params.transform_keys(&:to_sym).slice(
+        :max_activations,
+        :max_deactivations,
+        :expiry
+      )
+
       token = TokenGeneratorService.new(
         account: current_account,
         bearer: @license,
-        expiry: false
+        **kwargs
       ).execute
 
       render jsonapi: token
@@ -46,6 +52,21 @@ module Api::V1::Licenses::Relationships
 
     def set_license
       @license = current_account.licenses.find params[:license_id] || params[:id]
+    end
+
+    typed_parameters transform: true do
+      options strict: true
+
+      on :generate do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[token tokens]
+          param :attributes, type: :hash do
+            param :expiry, type: :datetime, optional: true, coerce: true
+            param :max_activations, type: :integer, optional: true
+            param :max_deactivations, type: :integer, optional: true
+          end
+        end
+      end
     end
   end
 end

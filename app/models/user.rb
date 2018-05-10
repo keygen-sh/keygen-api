@@ -53,7 +53,6 @@ end
 #
 # Table name: users
 #
-#  id                     :uuid             not null, primary key
 #  email                  :string
 #  password_digest        :string
 #  created_at             :datetime         not null
@@ -61,6 +60,7 @@ end
 #  password_reset_token   :string
 #  password_reset_sent_at :datetime
 #  metadata               :jsonb
+#  id                     :uuid             not null, primary key
 #  account_id             :uuid
 #  first_name             :string
 #  last_name              :string

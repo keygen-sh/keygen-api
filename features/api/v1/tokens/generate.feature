@@ -26,7 +26,13 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
-    And the JSON response should be a "token" with a nil expiry
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "name": "admin-token",
+        "expiry": null
+      }
+      """
 
   Scenario: User generates a new token via basic authentication
     Given the current account is "test1"
@@ -40,6 +46,10 @@ Feature: Generate authentication token
     Then the response status should be "201"
     And the JSON response should be a "token" with a token
     And the JSON response should be a "token" with a expiry
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "user-token" }
+      """
 
   Scenario: User attempts to generate a new token but fails to authenticate
     Given the current account is "test1"

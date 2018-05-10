@@ -30,6 +30,13 @@ Given /^I have the following attributes:$/ do |body|
   @bearer.update attributes
 end
 
+Then /^the current token has the following attributes:$/ do |body|
+  parse_placeholders! body
+
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+  @token.update attributes
+end
+
 Given /^the current account is "([^\"]*)"$/ do |slug|
   @account = Account.find slug
 end
@@ -295,4 +302,12 @@ Then /^the account "([^\"]*)" should have the following attributes:$/ do |slug, 
   account = Account.find(slug)
 
   expect(account.attributes).to include attributes
+end
+
+Then /^the current token should have the following attributes:$/ do |body|
+  parse_placeholders! body
+
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+
+  expect(@token.reload.attributes).to include attributes
 end

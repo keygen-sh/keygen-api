@@ -26,6 +26,111 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be a "token" with a nil expiry
 
+  Scenario: Admin generates a license token with a max activation count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "maxActivations": 1
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "name": "activation-token",
+        "maxActivations": 1,
+        "maxDeactivations": null,
+        "activations": 0,
+        "deactivations": 0
+      }
+      """
+
+  Scenario: Admin generates a license token with a set expiry
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "name": "activation-token",
+        "expiry": "2016-10-05T22:53:37.000Z",
+        "maxActivations": null,
+        "maxDeactivations": null,
+        "activations": 0,
+        "deactivations": 0
+      }
+      """
+
+  Scenario: Admin generates a license token with a max deactivation count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "maxDeactivations": 1
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "name": "activation-token",
+        "maxActivations": null,
+        "maxDeactivations": 1,
+        "activations": 0,
+        "deactivations": 0
+      }
+      """
+
+  Scenario: Admin generates a license token but sends invalid attributes
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "bearerId": "$users[0]",
+            "bearerType": "users"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+
   Scenario: Product generates a license token
     Given the current account is "test1"
     And the current account has 1 "product"

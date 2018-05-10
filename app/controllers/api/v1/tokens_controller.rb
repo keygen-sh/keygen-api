@@ -31,10 +31,18 @@ module Api::V1
         user = current_account.users.find_by email: "#{email}".downcase
 
         if user&.authenticate(password)
+          kwargs = {
+            expiry: if user.role?(:user)
+                      Time.current + Token::TOKEN_DURATION
+                    else
+                      nil # Admin tokens don't expire
+                    end
+          }
+
           token = TokenGeneratorService.new(
             account: current_account,
             bearer: user,
-            expiry: user.role?(:admin) ? false : nil # Admin tokens don't expire
+            **kwargs
           ).execute
 
           render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return

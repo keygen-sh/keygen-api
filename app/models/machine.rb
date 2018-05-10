@@ -37,7 +37,6 @@ end
 #
 # Table name: machines
 #
-#  id          :uuid             not null, primary key
 #  fingerprint :string
 #  ip          :string
 #  hostname    :string
@@ -46,6 +45,7 @@ end
 #  updated_at  :datetime         not null
 #  name        :string
 #  metadata    :jsonb
+#  id          :uuid             not null, primary key
 #  account_id  :uuid
 #  license_id  :uuid
 #

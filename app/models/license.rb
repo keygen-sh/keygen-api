@@ -153,12 +153,12 @@ end
 #
 # Table name: licenses
 #
-#  id                               :uuid             not null, primary key
 #  key                              :string
 #  expiry                           :datetime
 #  created_at                       :datetime         not null
 #  updated_at                       :datetime         not null
 #  metadata                         :jsonb
+#  id                               :uuid             not null, primary key
 #  user_id                          :uuid
 #  policy_id                        :uuid
 #  account_id                       :uuid
