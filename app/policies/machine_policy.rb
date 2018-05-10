@@ -17,6 +17,6 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def destroy?
-    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer or resource.license == bearer
   end
 end

@@ -30,7 +30,7 @@ Feature: Delete machine
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: User attempts to delete a machine for their account
+  Scenario: User attempts to delete a machine that belongs to another user
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 3 "machines"
@@ -57,6 +57,44 @@ Feature: Delete machine
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+
+  Scenario: License deletes a machine for their license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the current account has 1 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "204"
+    And the current account should have 0 "machines"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: License deletes a machine that belongs to another license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "licenses"
+    And the current account has 1 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "403"
+    And the current account should have 1 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Anonymous user attempts to delete a machine for their account
     Given the current account is "test1"
