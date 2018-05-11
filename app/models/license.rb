@@ -110,7 +110,7 @@ class License < ApplicationRecord
         errors.add :policy, "pool is empty"
       end
     when policy.encrypted?
-      @raw, enc = generate_encrypted_token :key do |token|
+      @raw, enc = generate_hashed_token :key, version: "v1" do |token|
         # Replace first n characters with our id so that we can do a lookup
         # on the encrypted key
         token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))

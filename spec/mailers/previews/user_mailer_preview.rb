@@ -1,7 +1,7 @@
 class UserMailerPreview < ActionMailer::Preview
 
   def password_reset
-    token, enc = user.generate_encrypted_token :password_reset_token do |token|
+    token, enc = user.generate_hashed_token :password_reset_token, version: "v1" do |token|
       "#{user.account.id}.#{user.id}.#{token}"
     end
 
