@@ -15,7 +15,7 @@ class LicenseKeyLookupService < BaseService
 
       license = licenses.find_by id: $1
 
-      if license&.compare_encrypted_token(:key, key)
+      if license&.compare_hashed_token(:key, key, version: "v1")
         license
       else
         nil

@@ -1,38 +1,58 @@
 module Tokenable
-  ALGO_VERSION = "v1"
+  ALGO_VERSION = "v2"
 
   extend ActiveSupport::Concern
 
-  def generate_token(attribute, length: 64)
+  def generate_token(attribute, length: 64, version: ALGO_VERSION)
     loop do
-      token = SecureRandom.hex(length).gsub /.{#{ALGO_VERSION.length}}\z/, ALGO_VERSION
+      token = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
       token = yield token if block_given?
       break token unless self.class.exists? attribute => token
     end
   end
 
-  def generate_encrypted_token(attribute, length: 64)
+  def generate_hashed_token(attribute, length: 64, version: ALGO_VERSION)
     loop do
-      raw = SecureRandom.hex(length).gsub /.{#{ALGO_VERSION.length}}\z/, ALGO_VERSION
-      raw = yield raw if block_given?
-      # We're hashing with SHA256 first so that we can bypass Bcrypt's 72 max
-      # length, since the first 66 chars of our string consist of the account
-      # and the bearer's UUID. This lets us use larger tokens (as seen here)
-      # and avoid the nasty truncation.
-      enc = ::BCrypt::Password.create Digest::SHA256.digest(raw)
+      raw = nil
+      enc = nil
+
+      case version
+      when "v1"
+        raw = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
+        raw = yield raw if block_given?
+
+        # We're hashing with SHA256 first so that we can bypass Bcrypt's 72 max
+        # length, since the first 66 chars of our string consist of the account
+        # and the bearer's UUID. This lets us use larger tokens (as seen here)
+        # and avoid the nasty truncation.
+        enc = BCrypt::Password.create Digest::SHA256.digest(raw)
+      when "v2"
+        raw = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
+        raw = yield raw if block_given?
+
+        enc = OpenSSL::HMAC.hexdigest "SHA256", account.private_key, raw
+      end
+
       break [raw, enc] unless self.class.exists? attribute => enc
     end
   end
 
   # See: https://github.com/plataformatec/devise/blob/88724e10adaf9ffd1d8dbfbaadda2b9d40de756a/lib/devise/encryptor.rb?ts=2#L12
-  def compare_encrypted_token(attribute, token)
+  def compare_hashed_token(attribute, token, version: ALGO_VERSION)
     return false if token.blank?
 
-    hashed_token = self.send attribute
-    bcrypt = ::BCrypt::Password.new hashed_token
-    token = ::BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
+    a = self.send attribute
+    b = nil
 
-    secure_compare token, hashed_token
+    case version
+    when "v1"
+      bcrypt = BCrypt::Password.new a
+      b = BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
+    when "v2"
+      b = OpenSSL::HMAC.hexdigest "SHA256", account.private_key, token
+    end
+
+    secure_compare a, b
   rescue
     false
   end
@@ -47,6 +67,7 @@ module Tokenable
 
     res = 0
     b.each_byte { |byte| res |= byte ^ l.shift }
+
     res == 0
   end
 end

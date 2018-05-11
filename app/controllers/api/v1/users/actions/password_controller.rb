@@ -25,7 +25,7 @@ module Api::V1::Users::Actions
     def reset_password
       skip_authorization
 
-      if @user.compare_encrypted_token(:password_reset_token, password_params[:meta][:password_reset_token])
+      if @user.compare_hashed_token(:password_reset_token, password_params[:meta][:password_reset_token], version: "v1")
 
         if @user.password_reset_sent_at < 24.hours.ago
           render_unauthorized detail: "is expired", source: {
