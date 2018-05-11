@@ -217,6 +217,8 @@ end
 #                                    PATCH  /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
 #                                    PUT    /v1/accounts/:account_id/licenses/:license_id/policy(.:format)          api/v1/licenses/relationships/policies#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
 #            v1_account_license_user GET    /v1/accounts/:account_id/licenses/:license_id/user(.:format)            api/v1/licenses/relationships/users#show {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#                                    PATCH  /v1/accounts/:account_id/licenses/:license_id/user(.:format)            api/v1/licenses/relationships/users#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
+#                                    PUT    /v1/accounts/:account_id/licenses/:license_id/user(.:format)            api/v1/licenses/relationships/users#update {:subdomain=>"api", :format=>"jsonapi", :license_id=>/[^\/]*/}
 #        validate_v1_account_license GET    /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#quick_validate_by_id {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
 #                                    POST   /v1/accounts/:account_id/licenses/:id/actions/validate(.:format)        api/v1/licenses/actions/validations#validate_by_id {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
 #          revoke_v1_account_license DELETE /v1/accounts/:account_id/licenses/:id/actions/revoke(.:format)          api/v1/licenses/actions/permits#revoke {:subdomain=>"api", :format=>"jsonapi", :id=>/[^\/]*/}
@@ -272,6 +274,7 @@ end
 #     retry_v1_account_webhook_event POST   /v1/accounts/:account_id/webhook-events/:id/actions/retry(.:format)     api/v1/webhook_events/actions/retries#retry {:subdomain=>"api", :format=>"jsonapi"}
 #          v1_account_webhook_events GET    /v1/accounts/:account_id/webhook-events(.:format)                       api/v1/webhook_events#index {:subdomain=>"api", :format=>"jsonapi"}
 #           v1_account_webhook_event GET    /v1/accounts/:account_id/webhook-events/:id(.:format)                   api/v1/webhook_events#show {:subdomain=>"api", :format=>"jsonapi"}
+#                                    DELETE /v1/accounts/:account_id/webhook-events/:id(.:format)                   api/v1/webhook_events#destroy {:subdomain=>"api", :format=>"jsonapi"}
 #                 v1_account_metrics GET    /v1/accounts/:account_id/metrics(.:format)                              api/v1/metrics#index {:subdomain=>"api", :format=>"jsonapi"}
 #                  v1_account_metric GET    /v1/accounts/:account_id/metrics/:id(.:format)                          api/v1/metrics#show {:subdomain=>"api", :format=>"jsonapi"}
 #                        v1_accounts POST   /v1/accounts(.:format)                                                  api/v1/accounts#create {:subdomain=>"api", :format=>"jsonapi"}

@@ -1,6 +1,7 @@
 class SerializableToken < SerializableBase
   type :tokens
 
+  attribute :kind
   attribute :token, if: -> { @object.raw.present? } do
     @object.raw
   end

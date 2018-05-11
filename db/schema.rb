@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180423205146) do
+ActiveRecord::Schema.define(version: 20180511152944) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -202,6 +202,7 @@ ActiveRecord::Schema.define(version: 20180423205146) do
     t.uuid     "account_id"
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at", using: :btree
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at", using: :btree
+    t.index ["digest", "created_at", "account_id"], name: "index_tokens_on_digest_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_tokens_on_id_and_created_at_and_account_id", unique: true, using: :btree
   end
 

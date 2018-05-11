@@ -3,7 +3,7 @@ module PasswordResetable
   include Tokenable
 
   def generate_password_reset_token
-    token, enc = generate_encrypted_token :password_reset_token do |token|
+    token, enc = generate_hashed_token :password_reset_token, version: "v1" do |token|
       "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
     end
 
