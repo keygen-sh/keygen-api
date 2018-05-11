@@ -43,7 +43,7 @@ Given /^I use an authentication token$/ do
 
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to
-  # make sure we're backwards compatibile.
+  # make sure we're backwards compatible.
   token.regenerate! version: %w[v1 v2].sample
 
   header "Authorization", "Bearer #{token.raw}"
