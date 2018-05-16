@@ -29,7 +29,7 @@ Feature: Generate authentication token
     And the JSON response should be a "token" with the following attributes:
       """
       {
-        "name": "admin-token",
+        "kind": "admin-token",
         "expiry": null
       }
       """
@@ -48,7 +48,7 @@ Feature: Generate authentication token
     And the JSON response should be a "token" with a expiry
     And the JSON response should be a "token" with the following attributes:
       """
-      { "name": "user-token" }
+      { "kind": "user-token" }
       """
 
   Scenario: User attempts to generate a new token but fails to authenticate

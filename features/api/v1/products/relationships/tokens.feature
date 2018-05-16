@@ -27,7 +27,7 @@ Feature: Generate authentication token for product
     And the JSON response should be a "token" with the following attributes:
       """
       {
-        "name": "product-token",
+        "kind": "product-token",
         "expiry": null
       }
       """
