@@ -328,6 +328,12 @@ Feature: Create machine
         }
       }
       """
+    And the current token should have the following attributes:
+      """
+      {
+        "activations": 1
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
