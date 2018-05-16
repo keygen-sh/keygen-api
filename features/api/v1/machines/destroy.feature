@@ -135,6 +135,12 @@ Feature: Delete machine
     When I send a DELETE request to "/accounts/test1/machines/$0"
     Then the response status should be "403"
     And the current account should have 1 "machine"
+    And the current token should have the following attributes:
+      """
+      {
+        "deactivations": 0
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
