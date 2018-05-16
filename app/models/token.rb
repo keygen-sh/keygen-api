@@ -32,7 +32,7 @@ class Token < ApplicationRecord
 
   scope :bearer, -> (id) { where bearer: id }
 
-  def generate!(expiry: TOKEN_DURATION, version: Tokenable::ALGO_VERSION)
+  def generate!(version: Tokenable::ALGO_VERSION)
     @raw, enc = generate_hashed_token :digest, version: version do |token|
       case version
       when "v1"
