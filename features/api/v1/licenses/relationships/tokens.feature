@@ -46,7 +46,7 @@ Feature: Generate authentication token for license
     And the JSON response should be a "token" with the following attributes:
       """
       {
-        "name": "activation-token",
+        "kind": "activation-token",
         "maxActivations": 1,
         "maxDeactivations": null,
         "activations": 0,
@@ -74,7 +74,7 @@ Feature: Generate authentication token for license
     And the JSON response should be a "token" with the following attributes:
       """
       {
-        "name": "activation-token",
+        "kind": "activation-token",
         "expiry": "2016-10-05T22:53:37.000Z",
         "maxActivations": null,
         "maxDeactivations": null,
@@ -103,7 +103,7 @@ Feature: Generate authentication token for license
     And the JSON response should be a "token" with the following attributes:
       """
       {
-        "name": "activation-token",
+        "kind": "activation-token",
         "maxActivations": null,
         "maxDeactivations": 1,
         "activations": 0,
