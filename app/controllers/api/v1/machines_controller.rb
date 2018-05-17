@@ -31,22 +31,22 @@ module Api::V1
       @machine = current_account.machines.new machine_params
       authorize @machine
 
-      if @machine.save
-        if current_token.activation_token?
-          begin
-            current_token.with_lock "FOR UPDATE NOWAIT" do
-              current_token.increment :activations
-              current_token.save!
-            end
-          rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordInvalid
-            return render_unprocessable_resource current_token
-          rescue ActiveRecord::StaleObjectError, ActiveRecord::StatementInvalid # Thrown when update is attempted on locked row i.e. from FOR UPDATE NOWAIT
-            return render_conflict detail: "failed to increment due to another conflicting activation", source: { pointer: "/data/attributes/activations" }
-          rescue ActiveModel::RangeError
-            return render_bad_request detail: "integer is too large", source: { pointer: "/data/attributes/activations" }
+      if @machine.valid? && current_token.activation_token?
+        begin
+          current_token.with_lock "FOR UPDATE NOWAIT" do
+            current_token.increment :activations
+            current_token.save!
           end
+        rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordInvalid
+          return render_unprocessable_resource current_token
+        rescue ActiveRecord::StaleObjectError, ActiveRecord::StatementInvalid # Thrown when update is attempted on locked row i.e. from FOR UPDATE NOWAIT
+          return render_conflict detail: "failed to increment due to another conflicting activation", source: { pointer: "/data/attributes/activations" }
+        rescue ActiveModel::RangeError
+          return render_bad_request detail: "integer is too large", source: { pointer: "/data/attributes/activations" }
         end
+      end
 
+      if @machine.save
         CreateWebhookEventService.new(
           event: "machine.created",
           account: current_account,
