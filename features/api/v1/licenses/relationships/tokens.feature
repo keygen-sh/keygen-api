@@ -24,7 +24,17 @@ Feature: Generate authentication token for license
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
-    And the JSON response should be a "token" with a nil expiry
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "activation-token",
+        "expiry": null,
+        "maxActivations": null,
+        "maxDeactivations": null,
+        "activations": 0,
+        "deactivations": 0
+      }
+      """
 
   Scenario: Admin generates a license token with a max activation count
     Given I am an admin of account "test1"
@@ -47,6 +57,7 @@ Feature: Generate authentication token for license
       """
       {
         "kind": "activation-token",
+        "expiry": null,
         "maxActivations": 1,
         "maxDeactivations": null,
         "activations": 0,
@@ -104,6 +115,7 @@ Feature: Generate authentication token for license
       """
       {
         "kind": "activation-token",
+        "expiry": null,
         "maxActivations": null,
         "maxDeactivations": 1,
         "activations": 0,
