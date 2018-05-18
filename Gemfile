@@ -50,6 +50,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'timecop'
   gem 'annotate'
+  gem 'solargraph'
 end
 
 group :development do
