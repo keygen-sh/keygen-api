@@ -20,18 +20,40 @@ Feature: Regenerate authentication token
     Given the current account is "test1"
     And I am an admin of account "test1"
     And I use an authentication token
+    And the current token has the following attributes:
+      """
+      { "expiry": null }
+      """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "admin-token",
+        "expiry": null
+      }
+      """
 
   Scenario: User resets their current token
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
+    And the current token has the following attributes:
+      """
+      { "expiry": "2050-01-01T00:00:00.000Z" }
+      """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "user-token",
+        "expiry": "2050-01-15T00:00:00.000Z"
+      }
+      """
 
   Scenario: User resets their current token with a bad reset token
     Given the current account is "test1"
@@ -57,9 +79,40 @@ Feature: Regenerate authentication token
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
+    And the current token has the following attributes:
+      """
+      { "expiry": null }
+      """
     When I send a PUT request to "/accounts/test1/tokens"
     Then the response status should be "200"
     And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "product-token",
+        "expiry": null
+      }
+      """
+
+  Scenario: License resets their current token
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And the current token has the following attributes:
+      """
+      { "expiry": "2050-01-01T00:00:00.000Z" }
+      """
+    When I send a PUT request to "/accounts/test1/tokens"
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "activation-token",
+        "expiry": "2050-01-15T00:00:00.000Z"
+      }
+      """
 
   Scenario: Admin resets their token by id
     Given the current account is "test1"
