@@ -29,6 +29,8 @@ def parse_placeholders!(str)
         Date.send(attribute).to_s
       when "time"
         case attribute
+        when /(\d+)\.(\w+)\.(\w+).iso/
+          $1.to_i.send($2).send($3).iso8601 3
         when /(\d+)\.(\w+)\.(\w+)/
           $1.to_i.send($2).send $3
         when /(\d+)\.(\w+)/
