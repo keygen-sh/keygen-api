@@ -99,11 +99,26 @@ Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
   expect(json["data"]).to be nil
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|a) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
+end
+
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:a|an) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
+  parse_placeholders! value
+
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+
+  # FIXME(ezekg) This is really hacky, but can't figure out another way to
+  #              do this type of time validation in a reproducible way.
+  a = json["data"]["attributes"][attribute].to_time.change sec: 0, nsec: 0
+  b = value.to_time.change sec: 0, nsec: 0
+
+  expect(a).to eq b
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/ do |resource, attribute|

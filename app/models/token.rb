@@ -49,7 +49,7 @@ class Token < ApplicationRecord
   end
 
   def regenerate!(**kwargs)
-    self.expiry += Token::TOKEN_DURATION if expiry.present?
+    self.expiry = Time.current + TOKEN_DURATION if expiry.present?
 
     generate! **kwargs
   end
