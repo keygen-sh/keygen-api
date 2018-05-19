@@ -47,7 +47,12 @@ class Token < ApplicationRecord
 
     raw
   end
-  alias_method :regenerate!, :generate!
+
+  def regenerate!(**kwargs)
+    self.expiry += Token::TOKEN_DURATION if expiry.present?
+
+    generate! **kwargs
+  end
 
   def expired?
     return false if expiry.nil?
