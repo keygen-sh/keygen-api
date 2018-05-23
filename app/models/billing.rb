@@ -103,29 +103,3 @@ class Billing < ApplicationRecord
     ).execute
   end
 end
-
-# == Schema Information
-#
-# Table name: billings
-#
-#  id                        :uuid             not null, primary key
-#  customer_id               :string
-#  subscription_status       :string
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  subscription_id           :string
-#  subscription_period_start :datetime
-#  subscription_period_end   :datetime
-#  card_expiry               :datetime
-#  card_brand                :string
-#  card_last4                :string
-#  state                     :string
-#  account_id                :uuid
-#
-# Indexes
-#
-#  index_billings_on_account_id_and_created_at       (account_id,created_at)
-#  index_billings_on_customer_id_and_created_at      (customer_id,created_at)
-#  index_billings_on_id_and_created_at               (id,created_at) UNIQUE
-#  index_billings_on_subscription_id_and_created_at  (subscription_id,created_at)
-#

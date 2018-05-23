@@ -157,39 +157,3 @@ class License < ApplicationRecord
     end
   end
 end
-
-# == Schema Information
-#
-# Table name: licenses
-#
-#  key                              :string
-#  expiry                           :datetime
-#  created_at                       :datetime         not null
-#  updated_at                       :datetime         not null
-#  metadata                         :jsonb
-#  id                               :uuid             not null, primary key
-#  user_id                          :uuid
-#  policy_id                        :uuid
-#  account_id                       :uuid
-#  suspended                        :boolean          default(FALSE)
-#  last_check_in_at                 :datetime
-#  last_expiration_event_sent_at    :datetime
-#  last_check_in_event_sent_at      :datetime
-#  last_expiring_soon_event_sent_at :datetime
-#  last_check_in_soon_event_sent_at :datetime
-#  uses                             :integer          default(0)
-#  tsv_id                           :tsvector
-#  tsv_key                          :tsvector
-#  tsv_metadata                     :tsvector
-#
-# Indexes
-#
-#  index_licenses_on_account_id_and_created_at          (account_id,created_at)
-#  index_licenses_on_id_and_created_at_and_account_id   (id,created_at,account_id) UNIQUE
-#  index_licenses_on_key_and_created_at_and_account_id  (key,created_at,account_id)
-#  index_licenses_on_policy_id_and_created_at           (policy_id,created_at)
-#  index_licenses_on_tsv_id                             (tsv_id)
-#  index_licenses_on_tsv_key                            (tsv_key)
-#  index_licenses_on_tsv_metadata                       (tsv_metadata)
-#  index_licenses_on_user_id_and_created_at             (user_id,created_at)
-#

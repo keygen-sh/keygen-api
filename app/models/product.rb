@@ -30,28 +30,3 @@ class Product < ApplicationRecord
     grant :product
   end
 end
-
-# == Schema Information
-#
-# Table name: products
-#
-#  id           :uuid             not null, primary key
-#  name         :string
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  platforms    :jsonb
-#  metadata     :jsonb
-#  account_id   :uuid
-#  url          :string
-#  tsv_id       :tsvector
-#  tsv_name     :tsvector
-#  tsv_metadata :tsvector
-#
-# Indexes
-#
-#  index_products_on_account_id_and_created_at         (account_id,created_at)
-#  index_products_on_id_and_created_at_and_account_id  (id,created_at,account_id) UNIQUE
-#  index_products_on_tsv_id                            (tsv_id)
-#  index_products_on_tsv_metadata                      (tsv_metadata)
-#  index_products_on_tsv_name                          (tsv_name)
-#
