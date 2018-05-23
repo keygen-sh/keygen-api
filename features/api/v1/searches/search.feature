@@ -835,11 +835,17 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin performs a search by machine type on the name attribute
+  Scenario: Admin performs a search by machine type on the name attribute using an exact match
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
     And the current account has 10 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "name": "Sara's MacBook Pro"
+      }
+      """
     And the first "machine" has the following attributes:
       """
       {
@@ -860,6 +866,40 @@ Feature: Create policy
       """
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by machine type on the name attribute using a suffix
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 10 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "name": "Sara's MacBook Pro"
+      }
+      """
+    And the first "machine" has the following attributes:
+      """
+      {
+        "name": "John's MacBook Pro"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "machines",
+          "query": {
+            "name": "MacBook Pro"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
