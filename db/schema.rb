@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180516223746) do
+ActiveRecord::Schema.define(version: 20180523141902) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
   enable_extension "pg_stat_statements"
+  enable_extension "btree_gin"
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
@@ -57,6 +58,8 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.datetime "updated_at", null: false
     t.uuid     "policy_id"
     t.uuid     "account_id"
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "keys_tsv_key_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["policy_id", "created_at"], name: "index_keys_on_policy_id_and_created_at", using: :btree
@@ -78,6 +81,9 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.datetime "last_expiring_soon_event_sent_at"
     t.datetime "last_check_in_soon_event_sent_at"
     t.integer  "uses",                             default: 0
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "licenses_tsv_key_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["key", "created_at", "account_id"], name: "index_licenses_on_key_and_created_at_and_account_id", using: :btree
@@ -96,6 +102,10 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.jsonb    "metadata"
     t.uuid     "account_id"
     t.uuid     "license_id"
+    t.index "to_tsvector('simple'::regconfig, COALESCE((fingerprint)::text, ''::text))", name: "machines_tsv_fingerprint_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at", using: :btree
@@ -153,6 +163,9 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.boolean  "require_fingerprint_scope", default: false
     t.boolean  "concurrent",                default: true
     t.integer  "max_uses"
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at", using: :btree
@@ -166,6 +179,9 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.jsonb    "metadata"
     t.uuid     "account_id"
     t.string   "url"
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true, using: :btree
   end
@@ -221,6 +237,11 @@ ActiveRecord::Schema.define(version: 20180516223746) do
     t.uuid     "account_id"
     t.string   "first_name"
     t.string   "last_name"
+    t.index "to_tsvector('simple'::regconfig, COALESCE((email)::text, ''::text))", name: "users_tsv_email_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at", using: :btree
     t.index ["email", "account_id", "created_at"], name: "index_users_on_email_and_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_users_on_id_and_created_at_and_account_id", unique: true, using: :btree

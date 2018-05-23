@@ -10,7 +10,6 @@ module Searchable
           against: attribute,
           using: {
             tsearch: {
-              tsvector_column: "tsv_#{attribute}",
               dictionary: 'simple',
               any_word: true,
               prefix: true
