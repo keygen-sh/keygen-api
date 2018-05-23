@@ -1,5 +1,7 @@
 module Api::V1
   class SearchesController < Api::V1::BaseController
+    MINIMUM_SEARCH_QUERY_SIZE = 3
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -22,7 +24,14 @@ module Api::V1
             )
           end
 
-          res = res.send "search_#{attribute}", text
+          if text.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
+            return render_bad_request(
+              detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+              source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
+            )
+          end
+
+          res = res.send "search_#{attribute}", text.to_s
         end
 
         @search = policy_scope apply_scopes(res).all
