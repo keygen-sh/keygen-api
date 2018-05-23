@@ -11,7 +11,6 @@ module Searchable
           using: {
             tsearch: {
               dictionary: 'simple',
-              any_word: true,
               prefix: true
             }
           }
@@ -26,7 +25,6 @@ module Searchable
           },
           using: {
             tsearch: {
-              any_word: true,
               prefix: true
             }
           }
