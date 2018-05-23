@@ -11,6 +11,7 @@ module Searchable
           using: {
             tsearch: {
               dictionary: 'simple',
+              any_word: attribute == :metadata,
               prefix: true
             }
           }
