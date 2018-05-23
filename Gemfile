@@ -52,8 +52,6 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop'
-  gem 'annotate'
-  gem 'solargraph'
 end
 
 group :development do

@@ -72,25 +72,3 @@ class Account < ApplicationRecord
     users.each { |u| u.grant :admin }
   end
 end
-
-# == Schema Information
-#
-# Table name: accounts
-#
-#  id          :uuid             not null, primary key
-#  name        :string
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  slug        :string
-#  plan_id     :uuid
-#  protected   :boolean          default(FALSE)
-#  public_key  :text
-#  private_key :text
-#
-# Indexes
-#
-#  index_accounts_on_id_and_created_at       (id,created_at) UNIQUE
-#  index_accounts_on_plan_id_and_created_at  (plan_id,created_at)
-#  index_accounts_on_slug                    (slug) UNIQUE
-#  index_accounts_on_slug_and_created_at     (slug,created_at) UNIQUE
-#

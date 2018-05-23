@@ -56,36 +56,3 @@ class User < ApplicationRecord
     throw :abort
   end
 end
-
-# == Schema Information
-#
-# Table name: users
-#
-#  email                  :string
-#  password_digest        :string
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  password_reset_token   :string
-#  password_reset_sent_at :datetime
-#  metadata               :jsonb
-#  id                     :uuid             not null, primary key
-#  account_id             :uuid
-#  first_name             :string
-#  last_name              :string
-#  tsv_id                 :tsvector
-#  tsv_email              :tsvector
-#  tsv_first_name         :tsvector
-#  tsv_last_name          :tsvector
-#  tsv_metadata           :tsvector
-#
-# Indexes
-#
-#  index_users_on_account_id_and_created_at            (account_id,created_at)
-#  index_users_on_email_and_account_id_and_created_at  (email,account_id,created_at)
-#  index_users_on_id_and_created_at_and_account_id     (id,created_at,account_id) UNIQUE
-#  index_users_on_tsv_email                            (tsv_email)
-#  index_users_on_tsv_first_name                       (tsv_first_name)
-#  index_users_on_tsv_id                               (tsv_id)
-#  index_users_on_tsv_last_name                        (tsv_last_name)
-#  index_users_on_tsv_metadata                         (tsv_metadata)
-#

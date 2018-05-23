@@ -43,34 +43,3 @@ class Machine < ApplicationRecord
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
 end
-
-# == Schema Information
-#
-# Table name: machines
-#
-#  id              :uuid             not null, primary key
-#  fingerprint     :string
-#  ip              :string
-#  hostname        :string
-#  platform        :string
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  name            :string
-#  metadata        :jsonb
-#  account_id      :uuid
-#  license_id      :uuid
-#  tsv_id          :tsvector
-#  tsv_fingerprint :tsvector
-#  tsv_name        :tsvector
-#  tsv_metadata    :tsvector
-#
-# Indexes
-#
-#  index_machines_on_account_id_and_created_at         (account_id,created_at)
-#  index_machines_on_id_and_created_at_and_account_id  (id,created_at,account_id) UNIQUE
-#  index_machines_on_license_id_and_created_at         (license_id,created_at)
-#  index_machines_on_tsv_fingerprint                   (tsv_fingerprint)
-#  index_machines_on_tsv_id                            (tsv_id)
-#  index_machines_on_tsv_metadata                      (tsv_metadata)
-#  index_machines_on_tsv_name                          (tsv_name)
-#
