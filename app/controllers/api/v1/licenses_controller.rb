@@ -119,7 +119,7 @@ module Api::V1
           param :type, type: :string, inclusion: %w[license licenses]
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
-            param :expiry, type: :datetime, optional: true, coerce: true
+            param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
             param :suspended, type: :boolean, optional: true
             param :metadata, type: :hash, optional: true
           end
