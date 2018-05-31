@@ -250,6 +250,28 @@ Feature: Update license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin updates a license expiry to a nil value
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with a nil expiry
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Product updates a license expiry for their product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
