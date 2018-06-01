@@ -7,12 +7,19 @@ class User < ApplicationRecord
   include Roleable
   include Searchable
 
-  SEARCH_ATTRIBUTES = %i[id email first_name last_name metadata].freeze
+  SEARCH_ATTRIBUTES = %i[id email first_name last_name full_name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     role: %i[name]
   }.freeze
 
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS do |key|
+    case key
+    when :full_name
+      { full_name: [:first_name, :last_name] }
+    else
+      key
+    end
+  end
 
   has_secure_password
 

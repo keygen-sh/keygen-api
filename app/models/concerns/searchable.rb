@@ -4,14 +4,28 @@ module Searchable
   included do
     include PgSearch
 
-    def self.search(attributes:, relationships: {})
+    def self.search(attributes:, relationships: {}, &block)
       attributes.each do |attribute|
-        pg_search_scope "search_#{attribute}",
-          against: attribute,
+        scope, against = nil
+
+        # Apply transformations
+        attribute = yield attribute if block_given?
+
+        case attribute
+        when Hash
+          scope, against = attribute.first
+        when Symbol
+          scope = against = attribute
+        else
+          throw InvalidSearchAttribute.new("invalid search attribute type '#{attribute.class.name.underscore}' for '#{self.class.name.underscore}")
+        end
+
+        pg_search_scope "search_#{scope}",
+          against: against,
           using: {
             tsearch: {
               dictionary: 'simple',
-              any_word: attribute == :metadata,
+              any_word: scope == :metadata,
               prefix: true
             }
           }
@@ -32,4 +46,6 @@ module Searchable
       end
     end
   end
+
+  class InvalidSearchAttribute < StandardError; end
 end
