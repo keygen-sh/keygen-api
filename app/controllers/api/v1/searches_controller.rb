@@ -14,10 +14,13 @@ module Api::V1
       if model.respond_to?(:search) && current_account.respond_to?(type.pluralize)
         authorize model
 
+        search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
+        search_rels = model::SEARCH_RELATIONSHIPS
+
         res = current_account.send type.pluralize
         query.each do |attribute, text|
-          if !res.respond_to?("search_#{attribute}") || (!model::SEARCH_ATTRIBUTES.include?(attribute.to_sym) &&
-            !model::SEARCH_RELATIONSHIPS.key?(attribute.to_sym))
+          if !res.respond_to?("search_#{attribute}") || (!search_attrs.include?(attribute.to_sym) &&
+            !search_rels.key?(attribute.to_sym))
             return render_bad_request(
               detail: "unsupported search query '#{attribute.camelize(:lower)}' for resource type '#{type.camelize(:lower)}'",
               source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
