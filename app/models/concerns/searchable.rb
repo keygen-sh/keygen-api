@@ -14,7 +14,7 @@ module Searchable
         when Symbol
           scope = against = attribute
         else
-          throw InvalidSearchAttribute.new("invalid search attribute type '#{attribute.class.name.underscore}' for '#{self.class.name.underscore}")
+          throw InvalidSearchAttribute.new("invalid search attribute type '#{attribute.class.name.underscore}' for '#{self.name.underscore}'")
         end
 
         pg_search_scope "search_#{scope}",
