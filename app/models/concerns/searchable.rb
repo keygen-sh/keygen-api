@@ -4,12 +4,9 @@ module Searchable
   included do
     include PgSearch
 
-    def self.search(attributes:, relationships: {}, &block)
+    def self.search(attributes:, relationships: {})
       attributes.each do |attribute|
         scope, against = nil
-
-        # Apply transformations
-        attribute = yield attribute if block_given?
 
         case attribute
         when Hash
