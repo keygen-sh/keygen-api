@@ -25,7 +25,6 @@ module Searchable
           using: {
             tsearch: {
               dictionary: 'simple',
-              any_word: scope == :metadata,
               prefix: true
             }
           }

@@ -234,6 +234,35 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
   m.save validate: false
 end
 
+Given /^the ((?!account)\w+) "([^\"]*)" has the following metadata:$/ do |i, resource, body|
+  parse_placeholders! body
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+
+  model = if resource.singularize == "plan"
+            Plan.all
+          else
+            @account.send(resource.pluralize.underscore).all
+          end
+
+  m = model.send(:[], numbers[i])
+
+  m.assign_attributes(
+    metadata: JSON.parse(body)
+  )
+
+  m.save validate: false
+end
+
 Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
   parse_placeholders! body
 
@@ -254,6 +283,31 @@ Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following 
 
   m.assign_attributes(
     JSON.parse(body).deep_transform_keys! &:underscore
+  )
+
+  m.save validate: false
+end
+
+Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, slug, body|
+  parse_placeholders! body
+
+  account = Account.find slug
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+
+  m = account.send(resource.pluralize.underscore).all.send(:[], numbers[i])
+
+  m.assign_attributes(
+    metadata: JSON.parse(body)
   )
 
   m.save validate: false

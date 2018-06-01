@@ -51,6 +51,48 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates a license with metadata for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "metadata": {
+              "fooBarBaz": "Qux"
+            }
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      {
+        "metadata": {
+          "fooBarBaz": "Qux"
+        }
+      }
+      """
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin creates a license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
