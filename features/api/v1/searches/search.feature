@@ -256,6 +256,34 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin performs a search by user type on the full name attribute
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "fullName": "John Doe"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin performs a search by user type on the first name attribute that is misspelled
     Given I am an admin of account "test1"
     And the current account is "test1"
