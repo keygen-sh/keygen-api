@@ -142,18 +142,23 @@ describe TypedParameters do
 
     it "should allow requests that contain a hash with scalar values" do
       params = lambda {
-        ctx = request hash: { key: "value" }
+        ctx = request hash: { key1: "value", key2: 1, key3: true, key4: false }
 
         TypedParameters.build ctx do
           on(:create) { param :hash, type: :hash }
         end
       }
-      expect(params.call).to eq "hash" => { "key" => "value" }
+      expect(params.call).to eq "hash" => {
+        "key1" => "value",
+        "key2" => 1,
+        "key3" => true,
+        "key4" => false
+      }
     end
 
     it "should disallow requests that contain a hash with non-scalar values" do
       params = lambda {
-        ctx = request hash: { nested: { key: "value" } }
+        ctx = request hash: { key1: "value", key2: 1, key3: true, key4: false, nested: { key: "value" } }
 
         TypedParameters.build ctx do
           on(:create) { param :hash, type: :hash }
