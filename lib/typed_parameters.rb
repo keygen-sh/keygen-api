@@ -161,7 +161,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, inclusion: [], transform: nil, &block)
+    def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, allow_non_scalars: false, inclusion: [], transform: nil, &block)
       return if optional && !context.params.key?(key.to_s)
 
       real_type = VALID_TYPES.fetch type.to_sym, nil
@@ -222,8 +222,37 @@ class TypedParameters
           params.merge! key => child.params
         else
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
-            raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected hash of scalar types)"
+            if allow_non_scalars
+              value.each do |k, v|
+                if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
+                  next
+                end
+
+                keys << k.to_s.camelize(:lower)
+
+                # FIXME(ezekg) This is very, very dirty…
+                case v
+                when Hash
+                  v.each do |k, v|
+                    if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
+                      next
+                    end
+                    raise InvalidParameterError.new(pointer: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested hash of scalar types)"
+                  end
+                when Array
+                  v.each_with_index do |v, i|
+                    if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
+                      next
+                    end
+                    raise InvalidParameterError.new(pointer: (keys << i).join("/")), "unpermitted type (expected nested array of scalar types)"
+                  end
+                end
+              end
+            else
+              raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected hash of scalar types)"
+            end
           end
+
           params.merge! key => value
         end
       when :array

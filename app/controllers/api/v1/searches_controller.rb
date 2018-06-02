@@ -18,7 +18,7 @@ module Api::V1
         search_rels = model::SEARCH_RELATIONSHIPS
 
         res = current_account.send type.pluralize
-        query.each do |attribute, text|
+        query.each do |attribute, value|
           if !res.respond_to?("search_#{attribute}") || (!search_attrs.include?(attribute.to_sym) &&
             !search_rels.key?(attribute.to_sym))
             return render_bad_request(
@@ -27,14 +27,36 @@ module Api::V1
             )
           end
 
-          if text.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
-            return render_bad_request(
-              detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
-              source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
-            )
-          end
+          case attribute.to_sym
+          when :metadata
+            if !value.is_a?(Hash)
+              return render_bad_request(
+                detail: "search query for 'metadata' must be a hash of key/value search terms",
+                source: { pointer: "/meta/query/metadata" }
+              )
+            end
 
-          res = res.send "search_#{attribute}", text.to_s
+            # Transform our metadata query into a query with snakecased keys
+            value.each do |k, v|
+              if v.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
+                return render_bad_request(
+                  detail: "search query for '#{k.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+                  source: { pointer: "/meta/query/metadata/#{k.camelize(:lower)}" }
+                )
+              end
+
+              res = res.send "search_metadata", "#{k.underscore}:#{v}"
+            end
+          else
+            if value.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
+              return render_bad_request(
+                detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+                source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
+              )
+            end
+
+            res = res.send "search_#{attribute}", value.to_s
+          end
         end
 
         @search = policy_scope apply_scopes(res).all
@@ -56,7 +78,7 @@ module Api::V1
       on :search do
         param :meta, type: :hash do
           param :type, type: :string
-          param :query, type: :hash
+          param :query, type: :hash, allow_non_scalars: true
         end
       end
     end
