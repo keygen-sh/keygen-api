@@ -257,7 +257,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following metadata:$/ do |i, res
   m = model.send(:[], numbers[i])
 
   m.assign_attributes(
-    metadata: JSON.parse(body)
+    metadata: JSON.parse(body).deep_transform_keys!(&:underscore)
   )
 
   m.save validate: false
@@ -307,7 +307,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following 
   m = account.send(resource.pluralize.underscore).all.send(:[], numbers[i])
 
   m.assign_attributes(
-    metadata: JSON.parse(body)
+    metadata: JSON.parse(body).deep_transform_keys!(&:underscore)
   )
 
   m.save validate: false
