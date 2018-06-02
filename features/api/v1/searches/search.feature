@@ -113,6 +113,38 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin performs a search with a metadata query that is too small
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "query": {
+            "metadata": {
+              "key": "ab"
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "search query for 'key' is too small (minimum 3 characters)",
+        "source": {
+          "pointer": "/meta/query/metadata/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin performs a search by an unsearchable type "accounts"
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -374,7 +406,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin performs a search by user type on the metadata attribute
+  Scenario: Admin performs a search by user type on the metadata attribute using an exact query
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "users"
@@ -391,7 +423,9 @@ Feature: Create policy
         "meta": {
           "type": "users",
           "query": {
-            "metadata": "abfdcc31-d5dd-4a20-b982-a81b9d89dec6"
+            "metadata": {
+              "customerId": "abfdcc31-d5dd-4a20-b982-a81b9d89dec6"
+            }
           }
         }
       }
@@ -401,7 +435,45 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin performs a search by license type on the metadata attribute using a nested query
+  Scenario: Admin performs a search by user type on the metadata attribute using an array of terms
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following metadata:
+      """
+      {
+        "customerId": "abfdcc31-d5dd-4a20-b982-a81b9d89dec6"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "metadata": [
+              "abfdcc31-d5dd-4a20-b982-a81b9d89dec6"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "search query for 'metadata' must be a hash of key/value search terms",
+        "source": {
+          "pointer": "/meta/query/metadata"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin performs a search by license type on the metadata attribute using a snakecased metadata key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "licenses"
@@ -418,7 +490,9 @@ Feature: Create policy
         "meta": {
           "type": "license",
           "query": {
-            "metadata": "customerId: abfdcc31"
+            "metadata": {
+              "customer_id": "abfdcc31"
+            }
           }
         }
       }
@@ -445,7 +519,9 @@ Feature: Create policy
         "meta": {
           "type": "users",
           "query": {
-            "metadata": "customerId: abfdcc31"
+            "metadata": {
+              "customerId": "abfdcc31"
+            }
           }
         }
       }
@@ -473,7 +549,10 @@ Feature: Create policy
         "meta": {
           "type": "users",
           "query": {
-            "metadata": "customerId: abfdcc31"
+            "metadata": {
+              "customerId": "abfdcc31-d5dd-4a20-b982-a81b9d89dec6",
+              "payloadId": "51e9a648-6f25-4d43-a6e6-9673a91e2088"
+            }
           }
         }
       }
