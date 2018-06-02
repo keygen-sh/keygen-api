@@ -38,7 +38,7 @@ module Api::V1
 
             # Transform our metadata query into a query with snakecased keys
             value.each do |k, v|
-              if v.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
+              if v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE
                 return render_bad_request(
                   detail: "search query for '#{k.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
                   source: { pointer: "/meta/query/metadata/#{k.camelize(:lower)}" }
@@ -48,7 +48,7 @@ module Api::V1
               res = res.send "search_metadata", "#{k.underscore}:#{v}"
             end
           else
-            if value.to_s.size < MINIMUM_SEARCH_QUERY_SIZE
+            if value.is_a?(String) && value.size < MINIMUM_SEARCH_QUERY_SIZE
               return render_bad_request(
                 detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
                 source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
