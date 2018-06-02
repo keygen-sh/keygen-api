@@ -18,6 +18,8 @@ class TypedParameters
     integer: Integer,
     float: Float,
     decimal: BigDecimal,
+    true_class: TrueClass,
+    false_class: FalseClass,
     boolean: Boolean,
     symbol: Symbol,
     string: String,
