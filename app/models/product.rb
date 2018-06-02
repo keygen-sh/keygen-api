@@ -5,6 +5,7 @@ class Product < ApplicationRecord
   include Searchable
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
+  SEARCH_RELATIONSHIPS = {}.freeze
 
   search attributes: SEARCH_ATTRIBUTES
 
