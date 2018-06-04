@@ -31,7 +31,7 @@ module Api::V1
           when :metadata
             if !value.is_a?(Hash)
               return render_bad_request(
-                detail: "search query for 'metadata' must be a hash of key/value search terms",
+                detail: "search query for 'metadata' must be a hash of key-value search terms",
                 source: { pointer: "/meta/query/metadata" }
               )
             end
