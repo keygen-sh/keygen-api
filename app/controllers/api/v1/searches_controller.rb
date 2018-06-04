@@ -45,7 +45,7 @@ module Api::V1
                 )
               end
 
-              res = res.send "search_metadata", "#{k.underscore}:#{v}"
+              res = res.search_metadata "#{k.underscore}:#{v}"
             end
           else
             if value.is_a?(String) && value.size < MINIMUM_SEARCH_QUERY_SIZE
