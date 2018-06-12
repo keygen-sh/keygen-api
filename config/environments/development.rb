@@ -22,15 +22,18 @@ Rails.application.configure do
   if ENV['REDIS_URL'].present?
     config.action_controller.perform_caching = true
     config.cache_store = :redis_store, ENV['REDIS_URL']
-  elsif Rails.root.join('tmp/caching-dev.txt').exist?
-    config.action_controller.perform_caching = true
-    config.cache_store = :memory_store
   else
     config.action_controller.perform_caching = false
-    config.cache_store = :null_store
+    config.cache_store = :memory_store
   end
 
-  # Using Rspec for tests
+  # Update default logger.
+  logger = ActiveSupport::Logger.new(STDOUT)
+  logger.formatter = config.log_formatter
+
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
+  # Using Rspec for tests.
   config.action_mailer.preview_path = 'spec/mailers/previews'
 
   # Don't care if the mailer can't send.
