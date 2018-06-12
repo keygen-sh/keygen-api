@@ -1,8 +1,6 @@
 class Rack::Attack
   WHITELISTED_DOMAINS = %w[
     dist.keygen.sh
-    api.keygen.sh
-    keygen.sh
   ]
 
   # Allow all local traffic
