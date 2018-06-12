@@ -3,25 +3,17 @@ class Rack::Attack
     dist.keygen.sh
   ]
 
-  # Allow all local traffic
   safelist("allow-localhost") do |req|
     "127.0.0.1" == req.ip || "::1" == req.ip
   end
 
-  # All all internal traffic
   safelist("allow-internal") do |req|
     WHITELISTED_DOMAINS.include?(req.host)
   end
 
-  # Allow an IP address to make up to 100 requests every 10 seconds
-  throttle("req/ip/burst", limit: 100, period: 10.seconds) do |req|
+  throttle("req/ip/burst", limit: 100, period: 60.seconds) do |req|
     req.ip
   end
-
-  # # Allow an IP address to make up to 1000 requests every hour
-  # throttle("req/ip/hour", limit: 1000, period: 1.hour) do |req|
-  #   req.ip
-  # end
 
   # Send the following response to throttled clients
   self.throttled_response = -> (env) {
