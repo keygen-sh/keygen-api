@@ -98,7 +98,7 @@ Feature: Show license
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: License retrieves thier license
+  Scenario: License retrieves their license
     Given the current account is "test1"
     And the current account has 1 "license"
     And I am a license of account "test1"

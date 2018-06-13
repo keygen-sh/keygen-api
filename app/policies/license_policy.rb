@@ -41,11 +41,11 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def quick_validate_by_id?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.user == bearer or resource.product == bearer or resource == bearer
   end
 
   def validate_by_id?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.user == bearer or resource.product == bearer or resource == bearer
   end
 
   def validate_by_key?
