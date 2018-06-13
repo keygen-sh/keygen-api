@@ -16,6 +16,7 @@ test: &test
 
 production:
   <<: *default
+  pool: <%= ENV['DB_POOL'] || ENV['RAILS_MAX_THREADS'] || 5 %>
   database: keygen_prod
 
 cucumber:
