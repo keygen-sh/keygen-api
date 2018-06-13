@@ -5,7 +5,7 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.user == bearer or resource.product == bearer or resource == bearer
   end
 
   def create?
