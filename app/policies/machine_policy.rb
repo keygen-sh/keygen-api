@@ -1,11 +1,11 @@
 class MachinePolicy < ApplicationPolicy
 
   def index?
-    bearer.role? :admin or bearer.role? :product or bearer.role? :user
+    bearer.role? :admin or bearer.role? :product or bearer.role? :user or bearer.role? :license
   end
 
   def show?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.user == bearer or resource.product == bearer or resource.license == bearer
   end
 
   def create?

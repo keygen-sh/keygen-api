@@ -228,3 +228,27 @@ Scenario: User attempts to retrieve machines for their account scoped by a licen
     When I send a GET request to "/accounts/test1/machines?key=invalid"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "machines"
+
+  Scenario: License retrieves all machines for their license with matches
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 5 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
+  Scenario: License retrieves all machines for their license with no matches
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 5 "machines"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "machines"
