@@ -42,4 +42,5 @@ class Machine < ApplicationRecord
   scope :key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
+  scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 end
