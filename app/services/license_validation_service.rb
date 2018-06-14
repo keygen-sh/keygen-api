@@ -7,6 +7,13 @@ class LicenseValidationService < BaseService
 
   def execute
     return [false, "does not exist", :NOT_FOUND] if license.nil?
+    # Check if license is suspended
+    return [false, "is suspended", :SUSPENDED] if license.suspended?
+    # Check if license is expired (move along if it has no expiry)
+    return [false, "is expired", :EXPIRED] if license.expired?
+    # Check if license is overdue for check in
+    return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
+    # Scope validations (quick validation skips this by setting explicitly to false)
     if scope != false
       # Check against product scope requirements
       if scope.present? && scope.key?(:product)
@@ -47,12 +54,6 @@ class LicenseValidationService < BaseService
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
       end
     end
-    # Check if license is overdue for check in
-    return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
-    # Check if license is suspended
-    return [false, "is suspended", :SUSPENDED] if license.suspended?
-    # Check if license is expired (move along if it has no expiry)
-    return [false, "is expired", :EXPIRED] if license.expired?
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
     return [true, "is valid", :VALID] if !license.policy.strict?
     # Check if license policy allows floating and if not, should have single activation
