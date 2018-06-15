@@ -323,6 +323,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "exceeds maximum allowed (1)",
+        "code": "ACTIVATIONS_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/attributes/activations"
         }
@@ -393,6 +394,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "has already been taken",
+        "code": "FINGERPRINT_TAKEN",
         "source": {
           "pointer": "/data/attributes/fingerprint"
         }
@@ -455,6 +457,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "can't be blank",
+        "code": "FINGERPRINT_BLANK",
         "source": {
           "pointer": "/data/attributes/fingerprint"
         }
@@ -793,6 +796,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "machine count has reached maximum allowed by current policy (5)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
         }
@@ -908,6 +912,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "machine count has reached maximum allowed by current policy (1)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
         }

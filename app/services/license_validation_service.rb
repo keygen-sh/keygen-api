@@ -40,7 +40,7 @@ class LicenseValidationService < BaseService
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
       end
-      # Check agaisnt fingerprint scope requirements
+      # Check against fingerprint scope requirements
       if scope.present? && scope.key?(:fingerprint)
         case
         when !license.policy.floating? && license.machines.count == 0

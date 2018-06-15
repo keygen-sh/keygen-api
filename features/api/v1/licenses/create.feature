@@ -452,6 +452,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
+        "code": "POLICY_BLANK",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -494,6 +495,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "is reserved",
+        "code": "KEY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/key"
         }
@@ -546,6 +548,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "cannot be specified for an encrypted license",
+        "code": "KEY_NOT_SUPPORTED",
         "source": {
           "pointer": "/data/attributes/key"
         }
@@ -739,6 +742,17 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "pool is empty",
+        "code": "POLICY_POOL_EMPTY",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
+      }
+      """
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

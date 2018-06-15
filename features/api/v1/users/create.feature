@@ -107,6 +107,37 @@ Feature: Create user
     Then the response status should be "400"
     And the JSON response should be an array of 1 error
 
+  Scenario: Anonymous attempts to create a user with an invalid email
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "email": "foo.com",
+            "password": "lois"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a valid email",
+        "code": "EMAIL_INVALID",
+        "source": {
+          "pointer": "/data/attributes/email"
+        }
+      }
+      """
+
   Scenario: Admin creates a user for their protected account
     Given I am an admin of account "test1"
     And the current account is "test1"

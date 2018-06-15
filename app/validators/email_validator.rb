@@ -1,7 +1,7 @@
 class EmailValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
-    record.errors.add attribute, "must be a valid email" unless valid_email?(value)
+    record.errors.add attribute, :invalid, message: "must be a valid email" unless valid_email?(value)
   end
 
   private

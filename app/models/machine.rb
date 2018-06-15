@@ -31,7 +31,7 @@ class Machine < ApplicationRecord
 
     next unless machine.license.machines.count >= machine.policy.max_machines rescue false
 
-    machine.errors.add :base, "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
+    machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }

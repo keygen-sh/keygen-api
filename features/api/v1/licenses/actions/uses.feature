@@ -277,6 +277,7 @@ Feature: License usage actions
       {
         "title": "Unprocessable resource",
         "detail": "usage exceeds maximum allowed by current policy (5)",
+        "code": "USES_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/attributes/uses"
         }
@@ -312,6 +313,7 @@ Feature: License usage actions
       {
         "title": "Unprocessable resource",
         "detail": "usage exceeds maximum allowed by current policy (5)",
+        "code": "USES_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/attributes/uses"
         }
@@ -350,6 +352,7 @@ Feature: License usage actions
       {
         "title": "Unprocessable resource",
         "detail": "usage exceeds maximum allowed by current policy (5)",
+        "code": "USES_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/attributes/uses"
         }
@@ -547,6 +550,7 @@ Feature: License usage actions
       {
         "title": "Unprocessable resource",
         "detail": "must be greater than or equal to 0",
+        "code": "USES_INVALID",
         "source": {
           "pointer": "/data/attributes/uses"
         }

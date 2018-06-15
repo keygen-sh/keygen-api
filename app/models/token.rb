@@ -20,14 +20,14 @@ class Token < ApplicationRecord
     next if token&.activations.nil? || token.max_activations.nil?
     next if token.activations <= token.max_activations
 
-    token.errors.add :activations, "exceeds maximum allowed (#{token.max_activations})"
+    token.errors.add :activations, :limit_exceeded, message: "exceeds maximum allowed (#{token.max_activations})"
   end
 
   validate on: :update, if: :activation_token? do |token|
     next if token&.deactivations.nil? || token.max_deactivations.nil?
     next if token.deactivations <= token.max_deactivations
 
-    token.errors.add :deactivations, "exceeds maximum allowed (#{token.max_deactivations})"
+    token.errors.add :deactivations, :limit_exceeded, message: "exceeds maximum allowed (#{token.max_deactivations})"
   end
 
   scope :bearer, -> (id) { where bearer: id }
