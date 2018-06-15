@@ -34,15 +34,15 @@ class License < ApplicationRecord
   validates :policy, presence: { message: "must exist" }
 
   validate on: :create do
-    errors.add :key, "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
-    errors.add :key, "cannot be specified for an encrypted license" if key.present? && policy.encrypted?
+    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
+    errors.add :key, :not_supported, message: "cannot be specified for an encrypted license" if key.present? && policy.encrypted?
   end
 
   validate on: :update do |license|
     next if license&.uses.nil? || license.policy&.max_uses.nil?
     next if license.uses <= license.policy.max_uses
 
-    license.errors.add :uses, "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
+    license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
   validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
@@ -124,7 +124,7 @@ class License < ApplicationRecord
       if item = policy.pop!
         self.key = item.key
       else
-        errors.add :policy, "pool is empty"
+        errors.add :policy, :pool_empty, message: "pool is empty"
       end
     when policy.encrypted?
       @raw, enc = generate_hashed_token :key, version: "v1" do |token|

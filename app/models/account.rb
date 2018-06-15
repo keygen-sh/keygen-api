@@ -31,17 +31,12 @@ class Account < ApplicationRecord
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
-  # validates_each :users, :products, :policies, :licenses, if: :active? do |account, record|
-  #   next unless account.send(record).count > account.plan.send("max_#{record}")
-  #   account.errors.add record, "count has reached maximum allowed by current plan"
-  # end
-
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
 
   validate on: [:create, :update] do
     clean_slug = "#{slug}".tr "-", ""
-    errors.add :slug, "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
+    errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
   end
 
   scope :plan, -> (id) { where plan: id }

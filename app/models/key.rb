@@ -22,12 +22,12 @@ class Key < ApplicationRecord
   validates :key, presence: true, blank: false, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
 
   validate on: :create do
-    errors.add :policy, "cannot be added to an unpooled policy" if !policy.nil? && !policy.pool?
+    errors.add :policy, :not_supported, message: "cannot be added to an unpooled policy" if !policy.nil? && !policy.pool?
   end
 
   validate on: [:create, :update] do
-    errors.add :key, "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
-    errors.add :key, "is already being used as a license's key" if account.licenses.exists? key: key
+    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
+    errors.add :key, :conflict, message: "is already being used as a license's key" if account.licenses.exists? key: key
   end
 
   scope :policy, -> (id) { where policy: id }

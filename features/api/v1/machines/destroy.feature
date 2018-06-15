@@ -111,6 +111,7 @@ Feature: Delete machine
       {
         "title": "Unprocessable resource",
         "detail": "exceeds maximum allowed (1)",
+        "code": "DEACTIVATIONS_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data/attributes/deactivations"
         }

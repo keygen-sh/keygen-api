@@ -123,7 +123,7 @@ class ApplicationController < ActionController::API
     render json: {
       errors: [{
         title: "Service unavailable",
-        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact hello@keygen.sh with any questions."
+        detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions."
       }.merge(opts)]
     }, status: :service_unavailable
   end
@@ -132,7 +132,9 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     errors = resource.errors.to_hash.map { |attr, errs|
-      errs.map do |err|
+      details = resource.errors.details[attr]
+
+      errs.each_with_index.map do |err, i|
         # Transform users[0].email into [users, 0, email] so that we can put it
         # back together as a proper pointer: users/data/0/attributes/email
         path = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
@@ -156,13 +158,50 @@ class ApplicationController < ActionController::API
           pointer = "/data/attributes/#{src.join '/'}"
         end
 
-        {
+        res = {
           title: "Unprocessable resource",
           detail: err,
           source: {
             pointer: pointer
           }
         }
+
+        # Provide more detailed error codes for resources other than account
+        # resources (which are not needed and leaks our validations)
+        begin
+          detail = details[i][:error] rescue nil
+
+          if detail.present? && !resource.is_a?(Account)
+            subject =
+              case attr
+              when :base
+                resource.class.name.underscore
+              else
+                attr.to_s
+              end
+            code =
+              case detail
+              when :greater_than_or_equal_to,
+                  :less_than_or_equal_to,
+                  :greater_than,
+                  :less_than,
+                  :equal_to,
+                  :other_than
+                "invalid"
+              when :inclusion,
+                   :exclusion
+                "not_allowed"
+              else
+                detail.to_s
+              end
+
+            res.merge! code: "#{subject}_#{code}".parameterize.underscore.upcase
+          end
+        rescue => e
+          Raygun.track_exception e
+        end
+
+        res
       end
     }.flatten
 
