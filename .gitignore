@@ -23,7 +23,8 @@
 # Ignore environment files
 /.env*
 
-# Ignore Redis DB dumps
+# Ignore Redis/DB dumps
+/*.dump
 /*.rdb
 
 # Compilation caches
