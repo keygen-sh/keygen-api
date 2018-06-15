@@ -29,7 +29,7 @@ class Policy < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   validate do
-    errors.add :encrypted, "cannot be encrypted and use a pool" if pool? && encrypted?
+    errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
   end
 
   scope :product, -> (id) { where product: id }

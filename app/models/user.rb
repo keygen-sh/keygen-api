@@ -49,7 +49,7 @@ class User < ApplicationRecord
   def enforce_admin_minimum_on_account
     return if account.admins.size >= MINIMUM_ADMIN_COUNT
 
-    errors.add :account, "account must have at least one admin user"
+    errors.add :account, :admins_required, message: "account must have at least one admin user"
 
     throw :abort
   end

@@ -288,6 +288,7 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "cannot be encrypted and use a pool",
+        "code": "ENCRYPTED_NOT_SUPPORTED",
         "source": {
           "pointer": "/data/attributes/encrypted"
         }
@@ -462,6 +463,60 @@ Feature: Create policy
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates a policy for their account that requires license check-in that is not valid
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Add-On",
+            "requireCheckIn": true,
+            "checkInInterval": "millennium",
+            "checkInIntervalCount": 0
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be one of: day, week, month, year",
+        "code": "CHECK_IN_INTERVAL_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/checkInInterval"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a number between 1 and 365 inclusive",
+        "code": "CHECK_IN_INTERVAL_COUNT_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/checkInIntervalCount"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+
   Scenario: Admin creates a floating policy for their account that is not valid
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -495,6 +550,7 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "must be greater than or equal to 1 for floating policy",
+        "code": "MAX_MACHINES_INVALID",
         "source": {
           "pointer": "/data/attributes/maxMachines"
         }
@@ -536,6 +592,7 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "must be equal to 1 for non-floating policy",
+        "code": "MAX_MACHINES_INVALID",
         "source": {
           "pointer": "/data/attributes/maxMachines"
         }

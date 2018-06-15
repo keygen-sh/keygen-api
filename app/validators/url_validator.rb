@@ -1,7 +1,7 @@
 class UrlValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
-    record.errors.add attribute, "must be a valid URL using one of the following protocols: #{options[:protocols].join ", "}" unless valid_url?(value)
+    record.errors.add attribute, :invalid, message: "must be a valid URL using one of the following protocols: #{options[:protocols].join ", "}" unless valid_url?(value)
   end
 
   private
