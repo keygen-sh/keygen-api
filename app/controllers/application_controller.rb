@@ -14,9 +14,17 @@ class ApplicationController < ActionController::API
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
   rescue_from ActiveRecord::StatementInvalid, with: -> (err) {
-    Raygun.track_exception(err) # Invalid UUIDs, non-base64'd creds, etc.
+    # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
+    case err
+    when PG::CharacterNotInRepertoire
+      render_bad_request detail: 'invalid character encoding'
+    when PG::InvalidTextRepresentation
+      render_bad_request detail: 'invalid format'
+    else
+      Raygun.track_exception(err)
 
-    render_bad_request
+      render_bad_request
+    end
   }
   rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
   rescue_from ActiveRecord::RecordNotFound, with: -> { render_not_found }
