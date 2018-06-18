@@ -81,6 +81,6 @@ Feature: Generate authentication token
     #   """
     #   {
     #     "title": "Bad request",
-    #     "detail": "string contains null byte"
+    #     "detail": "invalid character encoding"
     #   }
     #   """
