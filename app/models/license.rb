@@ -33,6 +33,9 @@ class License < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :policy, presence: { message: "must exist" }
 
+   # Validate this association only if we've been given a user (because it's optional)
+  validates :user, presence: { message: "must exist" }, unless: -> { user_id.nil? }
+
   validate on: :create do
     errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
     errors.add :key, :not_supported, message: "cannot be specified for an encrypted license" if key.present? && policy&.encrypted?
