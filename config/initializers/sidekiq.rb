@@ -6,7 +6,7 @@ Sidekiq.configure_client do |config|
   config.redis = { size: 1 }
 
   config.client_middleware do |chain|
-    chain.add Sidekiq::Status::ClientMiddleware, expiration: 30.days
+    chain.add Sidekiq::Status::ClientMiddleware, expiration: 24.hours
   end
 end
 
@@ -18,10 +18,10 @@ Sidekiq.configure_server do |config|
   end
 
   config.server_middleware do |chain|
-    chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.days
+    chain.add Sidekiq::Status::ServerMiddleware, expiration: 24.hours
   end
 
   config.client_middleware do |chain|
-    chain.add Sidekiq::Status::ClientMiddleware, expiration: 30.days
+    chain.add Sidekiq::Status::ClientMiddleware, expiration: 24.hours
   end
 end
