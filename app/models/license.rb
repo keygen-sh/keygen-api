@@ -35,7 +35,7 @@ class License < ApplicationRecord
 
   validate on: :create do
     errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
-    errors.add :key, :not_supported, message: "cannot be specified for an encrypted license" if key.present? && policy.encrypted?
+    errors.add :key, :not_supported, message: "cannot be specified for an encrypted license" if key.present? && policy&.encrypted?
   end
 
   validate on: :update do |license|
