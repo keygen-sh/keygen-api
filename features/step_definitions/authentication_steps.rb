@@ -29,6 +29,22 @@ Given /^I send the following headers:$/ do |body|
   end
 end
 
+Given /^I send the following badly encoded headers:$/ do |body|
+  parse_placeholders! body
+  headers = JSON.parse body
+
+  # Base64 encode basic credentials
+  if headers.key? "Authorization"
+    /Basic "([.@\w\d]+):(.+)"/ =~ headers["Authorization"]
+    credentials = Base64.encode64 "#{128.chr + $1}:#{128.chr + $2}"
+    headers["Authorization"] = "Basic \"#{credentials}\""
+  end
+
+  headers.each do |name, value|
+    header name, value
+  end
+end
+
 Given /^I send the following raw headers:$/ do |body|
   parse_placeholders! body
   headers = body.split /\n/

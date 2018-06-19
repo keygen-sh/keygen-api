@@ -15,13 +15,13 @@ class ApplicationController < ActionController::API
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
   rescue_from ActiveRecord::StatementInvalid, with: -> (err) {
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
-    case err
-    when PG::CharacterNotInRepertoire
-      render_bad_request detail: 'invalid character encoding'
+    case err.cause
     when PG::InvalidTextRepresentation
-      render_bad_request detail: 'invalid format'
+      render_bad_request detail: 'Request data is badly formatted'
+    when PG::CharacterNotInRepertoire
+      render_bad_request detail: 'Request data is badly encoded'
     else
-      Raygun.track_exception(err)
+      Raygun.track_exception err
 
       render_bad_request
     end
