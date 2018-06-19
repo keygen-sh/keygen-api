@@ -81,6 +81,22 @@ Feature: Generate authentication token
     #   """
     #   {
     #     "title": "Bad request",
-    #     "detail": "invalid character encoding"
+    #     "detail": "Request data is badly encoded"
     #   }
     #   """
+
+  Scenario: Anonymous attempts to send a badly encoded email address
+    Given the current account is "test1"
+    And I send the following badly encoded headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Request data is badly encoded"
+      }
+      """
