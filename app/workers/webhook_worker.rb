@@ -43,7 +43,7 @@ class WebhookWorker
       last_response_code: nil,
       last_response_body: 'SSL_ERROR'
     )
-  rescue Net::ReadTimeout # Our request to the endpoint timed out
+  rescue Net::ReadTimeout, Net::OpenTimeout # Our request to the endpoint timed out
     event.update(
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT'
