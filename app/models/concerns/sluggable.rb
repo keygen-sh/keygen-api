@@ -6,7 +6,12 @@ module Sluggable
   included do
     # Redefine finder to search by slug and id
     def self.find(id)
-      where(id: id).or(where(slug: id.downcase)).first or super
+      record = where(id: id).or(where(slug: "#{id}".downcase)).first
+      if record.nil?
+        raise ActiveRecord::RecordNotFound
+      end
+
+      record
     end
   end
 end
