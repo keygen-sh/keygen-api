@@ -12,10 +12,10 @@ class TokenAuthenticationService < BaseService
 
     case version
     when "v1"
-      token =~ TOKEN_ID_REGEX # Run regex against token
-      return nil unless account.id.delete("-") == $1
+      matches = TOKEN_ID_REGEX.match token
+      return nil unless account.id.delete("-") == matches[1]
 
-      tok = account.tokens.find_by id: $2
+      tok = account.tokens.find_by id: matches[2]
 
       if tok&.compare_hashed_token(:digest, token, version: "v1")
         tok

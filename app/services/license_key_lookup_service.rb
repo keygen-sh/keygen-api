@@ -11,9 +11,8 @@ class LicenseKeyLookupService < BaseService
     licenses = account.licenses
 
     if encrypted
-      key =~ ENCRYPTED_KEY_REGEX # Run regex against key
-
-      license = licenses.find_by id: $1
+      matches = ENCRYPTED_KEY_REGEX.match key
+      license = licenses.find_by id: matches[1]
 
       if license&.compare_hashed_token(:key, key, version: "v1")
         license
