@@ -38,6 +38,8 @@ def parse_placeholders!(str)
         when /now/, /current/
           Time.current
         end
+      when "null_byte"
+        "foo-\\u0000-bar"
       else
         if @account
           @account.send(resource.underscore)
