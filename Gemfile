@@ -48,6 +48,9 @@ gem 'sass-rails'
 # Exception reporting
 gem 'raygun4ruby', "~> 1.1.11"
 
+# Monitoring/APM
+gem 'newrelic_rpm'
+
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
