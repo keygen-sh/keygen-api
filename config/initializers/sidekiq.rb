@@ -2,6 +2,9 @@ require 'sidekiq'
 require 'sidekiq-status'
 require 'sidekiq-cron'
 
+SIDEKIQ_MAX_QUEUE_LATENCY =
+  (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
+
 Sidekiq.configure_client do |config|
   config.redis = { size: 1 }
 
