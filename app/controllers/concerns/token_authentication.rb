@@ -22,7 +22,7 @@ module TokenAuthentication
     ).execute
 
     if current_token&.expired?
-      render_unauthorized detail: "Token is expired" and return
+      render_unauthorized code: 'TOKEN_EXPIRED', detail: "Token is expired" and return
     end
 
     current_token&.bearer
