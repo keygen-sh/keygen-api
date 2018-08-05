@@ -26,8 +26,13 @@ FactoryGirl.define do
       encrypted true
     end
 
-    trait :encrypted do
-      encryption_scheme Policy::DEFAULT_ENCRYPTION_SCHEME
+    trait :rsa_2048_encrypted do
+      encryption_scheme 'RSA_2048_ENCRYPT'
+      encrypted true
+    end
+
+    trait :rsa_2048_signed do
+      encryption_scheme 'RSA_2048_SIGNED'
       encrypted true
     end
 
