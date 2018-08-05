@@ -28,7 +28,7 @@ class License < ApplicationRecord
 
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { requires_check_in? }
-  before_create :set_expiry, unless: -> { policy.nil? }
+  before_create :set_expiry, unless: -> { expiry.present? || policy.nil? }
   after_create :set_key, unless: -> { key.present? || policy.nil? }
   after_create :set_role
 
