@@ -95,6 +95,7 @@ module Api::V1
           param :attributes, type: :hash, optional: true do
             param :key, type: :string, optional: true
             param :protected, type: :boolean, optional: true
+            param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
             param :suspended, type: :boolean, optional: true
             param :metadata, type: :hash, optional: true
           end
