@@ -74,6 +74,12 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
+Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, resource|
+  count.to_i.times do
+    @crypt << create(resource.singularize.underscore, :legacy_encrypted, account: @account)
+  end
+end
+
 Given /^the current account has (\d+) encrypted "([^\"]*)"$/ do |count, resource|
   count.to_i.times do
     @crypt << create(resource.singularize.underscore, :encrypted, account: @account)

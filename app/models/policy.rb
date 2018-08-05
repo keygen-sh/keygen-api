@@ -3,6 +3,9 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
+  DEFAULT_ENCRYPTION_SCHEME = 'RSA-2048'.freeze
+  ENCRYPTION_SCHEMES = %w[RSA-2048].freeze
+
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name]
@@ -27,6 +30,7 @@ class Policy < ApplicationRecord
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+  validates :encryption_scheme, inclusion: { in: ENCRYPTION_SCHEMES, message: "unsupported encryption scheme" }, allow_nil: true, if: :encrypted?
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?

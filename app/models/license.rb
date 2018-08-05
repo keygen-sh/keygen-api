@@ -6,6 +6,7 @@ class License < ApplicationRecord
   include Searchable
 
   EXCLUDED_KEYS = %w[actions action].freeze
+
   SEARCH_ATTRIBUTES = %i[id key metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name],
@@ -37,9 +38,14 @@ class License < ApplicationRecord
    # Validate this association only if we've been given a user (because it's optional)
   validates :user, presence: { message: "must exist" }, unless: -> { user_id.nil? }
 
-  validate on: :create do
+  validate on: :create, unless: -> { policy.nil? } do
     errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
-    errors.add :key, :not_supported, message: "cannot be specified for an encrypted license" if key.present? && policy&.encrypted?
+
+    # This is for our original "encrypted" keys only (encryption scheme = nil)
+    errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && encrypted? && encryption_scheme.nil?
+
+    # This is for our new key encryption scheme
+    errors.add :key, :blank, message: "must be specified for an encrypted license" if key.nil? && encrypted? && encryption_scheme.present?
   end
 
   validate on: :update do |license|
@@ -63,6 +69,8 @@ class License < ApplicationRecord
   delegate :requires_check_in?, to: :policy
   delegate :check_in_interval, to: :policy
   delegate :check_in_interval_count, to: :policy
+  delegate :encrypted?, to: :policy
+  delegate :encryption_scheme, to: :policy
 
   def protected?
     return policy.protected? if protected.nil?
@@ -131,12 +139,40 @@ class License < ApplicationRecord
   def set_key
     case
     when policy.pool?
-      if item = policy.pop!
-        self.key = item.key
-      else
-        errors.add :policy, :pool_empty, message: "pool is empty"
-      end
+      generate_pooled_key!
     when policy.encrypted?
+      generate_encrypted_key!
+    else
+      generate_unencrypted_key!
+    end
+
+    # We're raising a RecordInvalid exception so that the transaction will be
+    # halted and rolled back (since our record is invalid without a key)
+    raise ActiveRecord::RecordInvalid if key.nil?
+
+    save
+  end
+
+  def generate_pooled_key!
+    if item = policy.pop!
+      self.key = item.key
+    else
+      errors.add :policy, :pool_empty, message: "pool is empty"
+    end
+  end
+
+  def generate_encrypted_key!
+    case policy.encryption_scheme
+    when "RSA-2048"
+      if key.bytes.size <= RSA_MAX_BYTE_SIZE
+        priv = OpenSSL::PKey::RSA.new account.private_key
+        enc = priv.private_encrypt key
+
+        @raw = self.key = Base64.strict_encode64 enc
+      else
+        errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
+      end
+    else
       @raw, enc = generate_hashed_token :key, version: "v1" do |token|
         # Replace first n characters with our id so that we can do a lookup
         # on the encrypted key
@@ -145,18 +181,14 @@ class License < ApplicationRecord
       end
 
       self.key = enc
-    else
-      self.key = generate_token :key do |token|
-        token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
-             .scan(/.{#{UUID_LENGTH}}/).join "-"
-      end
     end
+  end
 
-    # We're raising a RecordInvalid exception so that the transaction will be
-    # halted and rolled back (since our record is invalid without a key)
-    raise ActiveRecord::RecordInvalid if key.nil?
-
-    save
+  def generate_unencrypted_key!
+    self.key = generate_token :key do |token|
+      token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
+           .scan(/.{#{UUID_LENGTH}}/).join "-"
+    end
   end
 
   def set_expiry
