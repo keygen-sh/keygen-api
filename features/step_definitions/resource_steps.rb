@@ -80,9 +80,14 @@ Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, r
   end
 end
 
-Given /^the current account has (\d+) encrypted "([^\"]*)"$/ do |count, resource|
+Given /^the current account has (\d+) encrypted "([^\"]*)" using "([^\"]*)"$/ do |count, resource, scheme|
   count.to_i.times do
-    @crypt << create(resource.singularize.underscore, :encrypted, account: @account)
+    case scheme
+    when 'RSA_2048_ENCRYPT'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_encrypted, account: @account)
+    when 'RSA_2048_SIGN'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_signed, account: @account)
+    end
   end
 end
 

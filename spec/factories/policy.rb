@@ -32,7 +32,7 @@ FactoryGirl.define do
     end
 
     trait :rsa_2048_signed do
-      encryption_scheme 'RSA_2048_SIGNED'
+      encryption_scheme 'RSA_2048_SIGN'
       encrypted true
     end
 
