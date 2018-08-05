@@ -1,8 +1,8 @@
 class SerializableLicense < SerializableBase
   type :licenses
 
-  attribute :key, unless: -> { @object.policy.encrypted? && @object.raw.nil? } do
-    if @object.policy.encrypted?
+  attribute :key, unless: -> { @object.legacy_encrypted? && @object.raw.nil? } do
+    if @object.legacy_encrypted?
       @object.raw
     else
       @object.key

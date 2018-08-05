@@ -57,6 +57,10 @@ class Policy < ApplicationRecord
     encrypted
   end
 
+  def legacy_encrypted?
+    encrypted? && encryption_scheme.nil?
+  end
+
   def protected?
     protected
   end

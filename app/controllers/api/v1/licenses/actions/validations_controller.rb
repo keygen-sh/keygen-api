@@ -46,8 +46,11 @@ module Api::V1::Licenses::Actions
 
       @license = LicenseKeyLookupService.new(
         account: current_account,
-        encrypted: validation_params[:meta][:encrypted] == true,
-        key: validation_params[:meta][:key]
+        key: validation_params[:meta][:key],
+        # Since we've added new encryption schemes, we only want to alter
+        # the lookup for legacy encrypted licenses.
+        legacy_encrypted: validation_params[:meta][:legacy_encrypted] == true ||
+                          validation_params[:meta][:encrypted] == true
       ).execute
 
       valid, detail, constant = LicenseValidationService.new(
@@ -94,6 +97,7 @@ module Api::V1::Licenses::Actions
       on :validate_by_key do
         param :meta, type: :hash do
           param :key, type: :string, allow_blank: false
+          param :legacy_encrypted, type: :boolean, optional: true
           param :encrypted, type: :boolean, optional: true
           param :scope, type: :hash, optional: true do
             param :product, type: :string, optional: true
