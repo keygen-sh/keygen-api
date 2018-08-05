@@ -3,7 +3,7 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  ENCRYPTION_SCHEMES = %w[RSA_2048_ENCRYPT RSA_2048_SIGN].freeze
+  ENCRYPTION_SCHEMES = %w[LEGACY RSA_2048_ENCRYPT RSA_2048_SIGN].freeze
   SIGNING_SCHEMES = %w[RSA_2048_SIGN].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
@@ -30,7 +30,7 @@ class Policy < ApplicationRecord
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
-  validates :encryption_scheme, inclusion: { in: ENCRYPTION_SCHEMES, message: "unsupported encryption scheme" }, allow_nil: true, if: :encrypted?
+  validates :encryption_scheme, inclusion: { in: ENCRYPTION_SCHEMES, message: "unsupported encryption scheme" }, if: :encrypted?
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -58,12 +58,12 @@ class Policy < ApplicationRecord
     encrypted
   end
 
-  def legacy_encrypted?
-    encrypted? && encryption_scheme.nil?
-  end
-
   def signed?
     encrypted? && SIGNING_SCHEMES.include?(encryption_scheme)
+  end
+
+  def legacy_encrypted?
+    encrypted? && encryption_scheme == 'LEGACY'
   end
 
   def protected?
