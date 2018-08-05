@@ -1,6 +1,4 @@
 class Account < ApplicationRecord
-  RSA_KEY_SIZE = 2048
-
   include ActiveModel::Validations
   include Welcomeable
   include Sluggable

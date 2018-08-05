@@ -167,19 +167,19 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/invalid"
     Then the response status should be "404"
 
-  Scenario: Admin retrieves an encrypted license for their account
+  Scenario: Admin retrieves a legacy encrypted license for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 encrypted "licenses"
+    And the current account has 3 legacy encrypted "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
     And the JSON response should be a "license" with a nil key
 
-  Scenario: Admin attempts to retrieve an encrypted license for their account by key
+  Scenario: Admin attempts to retrieve a legacy encrypted license for their account by key
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 encrypted "licenses"
+    And the current account has 3 legacy encrypted "licenses"
     And the first "license" has the following attributes:
       # Hashed 'a-license-key' using Bcrypt
       """

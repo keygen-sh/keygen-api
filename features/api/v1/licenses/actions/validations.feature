@@ -1773,11 +1773,11 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Anonymous validates an encrypted license by key
+  Scenario: Anonymous validates a legacy encrypted license by key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
-    And the current account has 1 encrypted "license"
+    And the current account has 1 legacy encrypted "license"
     And the first "license" has the following attributes:
       """
       {
@@ -1803,11 +1803,11 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an encrypted license key as an unencrypted key
+  Scenario: Anonymous validates a legacy encrypted license key as an unencrypted key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
-    And the current account has 1 encrypted "license"
+    And the current account has 1 legacy encrypted "license"
     And the first "license" has the following attributes:
       """
       {
@@ -1833,7 +1833,7 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Anonymous validates an unencrypted license key as an encrypted key
+  Scenario: Anonymous validates an unencrypted license key as a legacy encrypted key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"

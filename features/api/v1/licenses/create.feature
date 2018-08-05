@@ -407,7 +407,7 @@ Feature: Create license
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
 
-  Scenario: Admin creates an encrypted license for a user of their account
+  Scenario: Admin creates a legacy encrypted license for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -629,7 +629,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an encrypted license with a pre-determined key
+  Scenario: Admin creates a legacy encrypted license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -672,7 +672,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot be specified for an encrypted license",
+        "detail": "cannot be specified for a legacy encrypted license",
         "code": "KEY_NOT_SUPPORTED",
         "source": {
           "pointer": "/data/attributes/key"
