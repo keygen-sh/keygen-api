@@ -1,6 +1,7 @@
 class SerializableLicense < SerializableBase
   type :licenses
 
+  attribute :signature, if: -> { @object.signed? }
   attribute :key, unless: -> { @object.legacy_encrypted? && @object.raw.nil? } do
     if @object.legacy_encrypted?
       @object.raw
@@ -11,6 +12,7 @@ class SerializableLicense < SerializableBase
   attribute :expiry
   attribute :uses
   attribute :suspended
+  attribute :encryption_scheme
   attribute :encrypted do
     @object.policy.encrypted?
   end

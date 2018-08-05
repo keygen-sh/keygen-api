@@ -9,8 +9,8 @@ class SerializablePolicy < SerializableBase
   attribute :max_machines
   attribute :max_uses
   attribute :concurrent
-  attribute :encrypted
   attribute :encryption_scheme
+  attribute :encrypted
   attribute :protected
   attribute :require_product_scope
   attribute :require_policy_scope
