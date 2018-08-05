@@ -24,8 +24,10 @@ class License < ApplicationRecord
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
 
+  # Used for legacy encrypted licenses
   attr_reader :raw
 
+  before_validation :encrypt_key, unless: -> { key.nil? || policy.nil? || !encrypted? || legacy_encrypted? }
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { requires_check_in? }
   before_create :set_expiry, unless: -> { expiry.present? || policy.nil? }
@@ -45,7 +47,7 @@ class License < ApplicationRecord
     errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && encrypted? && encryption_scheme.nil?
 
     # This is for our new key encryption scheme
-    errors.add :key, :blank, message: "must be specified for an encrypted license" if key.nil? && encrypted? && encryption_scheme.present?
+    errors.add :key, :blank, message: "must be specified for an encrypted license using #{encryption_scheme}" if key.nil? && encrypted? && encryption_scheme.present?
   end
 
   validate on: :update do |license|
@@ -70,7 +72,9 @@ class License < ApplicationRecord
   delegate :check_in_interval, to: :policy
   delegate :check_in_interval_count, to: :policy
   delegate :encrypted?, to: :policy
+  delegate :legacy_encrypted?, to: :policy
   delegate :encryption_scheme, to: :policy
+  delegate :pool?, to: :policy
 
   def protected?
     return policy.protected? if protected.nil?
@@ -137,11 +141,13 @@ class License < ApplicationRecord
   end
 
   def set_key
+    return if key.present? || (encrypted? && !legacy_encrypted?)
+
     case
-    when policy.pool?
+    when legacy_encrypted?
+      generate_legacy_encrypted_key!
+    when pool?
       generate_pooled_key!
-    when policy.encrypted?
-      generate_encrypted_key!
     else
       generate_unencrypted_key!
     end
@@ -153,6 +159,29 @@ class License < ApplicationRecord
     save
   end
 
+  def encrypt_key
+    return unless key.present?
+
+    case encryption_scheme
+    when "RSA_2048_ENCRYPT"
+      if key.bytes.size <= RSA_MAX_BYTE_SIZE
+        priv = OpenSSL::PKey::RSA.new account.private_key
+        enc = priv.private_encrypt key
+
+        self.key = Base64.strict_encode64 enc
+      else
+        errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
+      end
+    when "RSA_2048_SIGN"
+      priv = OpenSSL::PKey::RSA.new account.private_key
+      sig = priv.sign OpenSSL::Digest::SHA256.new, key
+
+      self.key = Base64.strict_encode64 sig
+    end
+
+    raise ActiveRecord::RecordInvalid if key.nil?
+  end
+
   def generate_pooled_key!
     if item = policy.pop!
       self.key = item.key
@@ -161,32 +190,15 @@ class License < ApplicationRecord
     end
   end
 
-  def generate_encrypted_key!
-    case policy.encryption_scheme
-    when "RSA_2048_ENCRYPT"
-      if key.bytes.size <= RSA_MAX_BYTE_SIZE
-        priv = OpenSSL::PKey::RSA.new account.private_key
-        enc = priv.private_encrypt key
-
-        @raw = self.key = Base64.strict_encode64 enc
-      else
-        errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
-      end
-    when "RSA_2048_SIGN"
-      priv = OpenSSL::PKey::RSA.new account.private_key
-      sig = priv.sign OpenSSL::Digest::SHA256.new, key
-
-      @raw = self.key = Base64.strict_encode64 sig
-    else
-      @raw, enc = generate_hashed_token :key, version: "v1" do |token|
-        # Replace first n characters with our id so that we can do a lookup
-        # on the encrypted key
-        token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
-             .scan(/.{#{UUID_LENGTH}}/).join "-"
-      end
-
-      self.key = enc
+  def generate_legacy_encrypted_key!
+    @raw, enc = generate_hashed_token :key, version: "v1" do |token|
+      # Replace first n characters with our id so that we can do a lookup
+      # on the encrypted key
+      token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
+            .scan(/.{#{UUID_LENGTH}}/).join "-"
     end
+
+    self.key = enc
   end
 
   def generate_unencrypted_key!
