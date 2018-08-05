@@ -4,6 +4,7 @@ class Policy < ApplicationRecord
   include Searchable
 
   ENCRYPTION_SCHEMES = %w[RSA_2048_ENCRYPT RSA_2048_SIGN].freeze
+  SIGNING_SCHEMES = %w[RSA_2048_SIGN].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
@@ -59,6 +60,10 @@ class Policy < ApplicationRecord
 
   def legacy_encrypted?
     encrypted? && encryption_scheme.nil?
+  end
+
+  def signed?
+    encrypted? && SIGNING_SCHEMES.include?(encryption_scheme)
   end
 
   def protected?
