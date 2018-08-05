@@ -21,7 +21,13 @@ FactoryGirl.define do
       )
     end
 
+    trait :legacy_encrypted do
+      encryption_scheme nil
+      encrypted true
+    end
+
     trait :encrypted do
+      encryption_scheme Policy::DEFAULT_ENCRYPTION_SCHEME
       encrypted true
     end
 

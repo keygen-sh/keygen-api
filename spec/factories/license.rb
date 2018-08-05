@@ -25,6 +25,10 @@ FactoryGirl.define do
       association :policy, :encrypted
     end
 
+    trait :legacy_encrypted do
+      association :policy, :legacy_encrypted
+    end
+
     after :create do |license|
       create :token, bearer: license
     end
