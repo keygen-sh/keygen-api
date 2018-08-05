@@ -3,8 +3,7 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  DEFAULT_ENCRYPTION_SCHEME = 'RSA-2048'.freeze
-  ENCRYPTION_SCHEMES = %w[RSA-2048].freeze
+  ENCRYPTION_SCHEMES = %w[RSA_2048_ENCRYPT RSA_2048_SIGN].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {

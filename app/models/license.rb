@@ -163,7 +163,7 @@ class License < ApplicationRecord
 
   def generate_encrypted_key!
     case policy.encryption_scheme
-    when "RSA-2048"
+    when "RSA_2048_ENCRYPT"
       if key.bytes.size <= RSA_MAX_BYTE_SIZE
         priv = OpenSSL::PKey::RSA.new account.private_key
         enc = priv.private_encrypt key
@@ -172,6 +172,11 @@ class License < ApplicationRecord
       else
         errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
       end
+    when "RSA_2048_SIGN"
+      priv = OpenSSL::PKey::RSA.new account.private_key
+      sig = priv.sign OpenSSL::Digest::SHA256.new, key
+
+      @raw = self.key = Base64.strict_encode64 sig
     else
       @raw, enc = generate_hashed_token :key, version: "v1" do |token|
         # Replace first n characters with our id so that we can do a lookup
