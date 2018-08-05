@@ -44,10 +44,10 @@ class License < ApplicationRecord
     errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
 
     # This is for our original "encrypted" keys only (encryption scheme = nil)
-    errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && encrypted? && encryption_scheme.nil?
+    errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && legacy_encrypted?
 
     # This is for our new key encryption scheme
-    errors.add :key, :blank, message: "must be specified for an encrypted license using #{encryption_scheme}" if key.nil? && encrypted? && encryption_scheme.present?
+    errors.add :key, :blank, message: "must be specified for an encrypted license using #{encryption_scheme}" if key.nil? && encrypted? && !legacy_encrypted?
   end
 
   validate on: :update do |license|
