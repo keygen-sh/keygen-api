@@ -13,7 +13,7 @@ class TokenAuthenticationService < BaseService
     case version
     when "v1"
       matches = TOKEN_ID_REGEX.match token
-      return nil unless matches.present? ||
+      return nil unless matches.present? &&
                         "#{account.id}".delete("-") == matches[1]
 
       tok = account.tokens.find_by id: matches[2]
