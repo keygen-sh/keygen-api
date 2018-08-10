@@ -642,6 +642,62 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT with a key that is too large
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-payload-that-is-too-large-for-encrypting-with-rsa-2048-3dd00576de47b1994e893e5ad0fd9365a574afaff388d8c8363546fa537ac6806b834be964b1ae5ae4aea3650ec8e7c3a65a014a80b82ad71242ae8946bddcba6b6744b01b570d791f605ee5ae5ce06d1f13846119da9efb3da4461d2acf31ff0d624de3b50c621629a979cca9865aa195e89b47beed3d4804aa3ee3a237ddfab7a67905282117d1b34b023ce3ff6518b2fd729547e5a7fae65b6094ba94bf5a768ff4bf668ecc8bb17e5458bc8e36982bc3a366f7560a9d266aa1ad391fe84cad07c92283858cf42a460a1f83450b376b0b58089288cc918991909586d8726a94f0075fdc76e383556be744748991d48cf87aff3a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+     Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "key exceeds maximum byte length (max size of 245 bytes)",
+        "code": "KEY_BYTE_SIZE_EXCEEDED",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin creates an RSA encrypted license using RSA_2048_SIGN for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
