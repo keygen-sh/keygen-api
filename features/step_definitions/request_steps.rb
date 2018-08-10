@@ -126,7 +126,7 @@ Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
   expect(json["data"]).to be nil
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|a) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -139,7 +139,35 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|a) 
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:a|an) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encrypted (\w+) (?:of )?"([^\"]*)" using "([^\"]*)"$/ do |resource, attribute, value, scheme|
+  json = JSON.parse last_response.body
+
+  case scheme
+  when "RSA_2048_ENCRYPT"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+
+    val = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    dec = pub.public_decrypt val rescue nil
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(dec).to eq value.to_s
+  when "RSA_2048_SIGN"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    sig = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    val = value.to_s
+
+    res = pub.verify digest, sig, val rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(res).to be true
+  else
+    raise "unknown encryption scheme"
+  end
+end
+
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
   parse_placeholders! value
 
   json = JSON.parse last_response.body
@@ -332,7 +360,7 @@ Then /^the response should contain a valid signature header for "(\w+)"$/ do |sl
   pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
   digest = OpenSSL::Digest::SHA256.new
 
-  sig = Base64.decode64 last_response.headers['X-Signature']
+  sig = Base64.strict_decode64 last_response.headers['X-Signature']
   body = last_response.body.to_s
 
   res = pub.verify digest, sig, body rescue false
