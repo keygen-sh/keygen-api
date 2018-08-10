@@ -84,9 +84,9 @@ Given /^the current account has (\d+) encrypted "([^\"]*)" using "([^\"]*)"$/ do
   count.to_i.times do
     case scheme
     when 'RSA_2048_ENCRYPT'
-      @crypt << create(resource.singularize.underscore, :rsa_2048_encrypted, account: @account)
+      @crypt << create(resource.singularize.underscore, :rsa_2048_encrypted, account: @account, key: SecureRandom.hex)
     when 'RSA_2048_SIGN'
-      @crypt << create(resource.singularize.underscore, :rsa_2048_signed, account: @account)
+      @crypt << create(resource.singularize.underscore, :rsa_2048_signed, account: @account, key: SecureRandom.hex)
     end
   end
 end
