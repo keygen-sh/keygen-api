@@ -22,7 +22,7 @@ FactoryGirl.define do
     end
 
     trait :legacy_encrypted do
-      encryption_scheme nil
+      encryption_scheme 'LEGACY'
       encrypted true
     end
 
