@@ -263,6 +263,37 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates a license with a pre-determined expiry
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2016-09-05T22:53:37.000Z"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with an expiry "2016-09-05T22:53:37.000Z"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin creates a license with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -414,7 +445,10 @@ Feature: Create license
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "encrypted": true }
+      {
+        "encryptionScheme": "LEGACY",
+        "encrypted": true
+      }
       """
     And the current account has 1 "user"
     And I use an authentication token
@@ -442,6 +476,279 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" with the encryptionScheme "LEGACY"
+    And the JSON response should be a "license" that is encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a legacy encrypted license with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "LEGACY",
+        "encrypted": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "a"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot be specified for a legacy encrypted license",
+        "code": "KEY_NOT_SUPPORTED",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+     Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be specified for an encrypted license using RSA_2048_ENCRYPT",
+        "code": "KEY_BLANK",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-encrypted-payload-here"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_ENCRYPT"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_ENCRYPT"
+    And the JSON response should be a "license" that is encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_SIGN for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_SIGN",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+     Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 2 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be specified for an encrypted license using RSA_2048_SIGN",
+        "code": "KEY_BLANK",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "failed to generate key signature",
+        "source": {
+          "pointer": "/data/attributes/signature"
+        },
+        "code": "SIGNATURE_BLANK"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_SIGN with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_SIGN",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-signed-payload-here"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_SIGN"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_SIGN"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
@@ -621,59 +928,6 @@ Feature: Create license
         "title": "Unprocessable resource",
         "detail": "is reserved",
         "code": "KEY_NOT_ALLOWED",
-        "source": {
-          "pointer": "/data/attributes/key"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-
-  Scenario: Admin creates a legacy encrypted license with a pre-determined key
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "encrypted": true, "strict": true }
-      """
-    And the current account has 1 "user"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses" with the following:
-      """
-      {
-        "data": {
-          "type": "licenses",
-          "attributes": {
-            "key": "a"
-          },
-          "relationships": {
-            "policy": {
-              "data": {
-                "type": "policies",
-                "id": "$policies[0]"
-              }
-            },
-            "user": {
-              "data": {
-                "type": "users",
-                "id": "$users[1]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "cannot be specified for a legacy encrypted license",
-        "code": "KEY_NOT_SUPPORTED",
         "source": {
           "pointer": "/data/attributes/key"
         }
