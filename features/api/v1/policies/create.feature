@@ -880,7 +880,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Unknown Encryption Scheme",
+            "name": "Default Scheme",
             "encrypted": true
           },
           "relationships": {
@@ -894,17 +894,9 @@ Feature: Create policy
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "can't be blank",
-        "source": {
-          "pointer": "/data/attributes/encryptionScheme"
-        },
-        "code": "ENCRYPTION_SCHEME_BLANK"
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the encryptionScheme "LEGACY"
+    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the name "Default Scheme"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job

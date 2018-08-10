@@ -18,6 +18,8 @@ class Policy < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :pool, class_name: "Key", dependent: :destroy
 
+  # Default to legacy encryption scheme so that we don't break backwards compat
+  before_validation -> { self.encryption_scheme = 'LEGACY' }, on: :create, if: -> { encrypted? && encryption_scheme.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
 
   validates :account, presence: { message: "must exist" }
