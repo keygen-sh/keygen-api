@@ -225,15 +225,35 @@ Feature: Generate authentication token for license
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
     Then the response status should be "403"
 
-  Scenario: User requests all tokens for their license
+  Scenario: User requests all tokens for their protected license
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 3 "licenses"
     And the current user has 3 "licenses"
+    And all "policies" have the following attributes:
+      """
+      { "protected": true }
+      """
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
+
+  Scenario: User requests all tokens for their unprotected license
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current account has 3 "licenses"
+    And the current user has 3 "licenses"
+    And all "policies" have the following attributes:
+      """
+      { "protected": false }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/tokens"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
 
   Scenario: User requests all tokens for another user's license
     Given the current account is "test1"
