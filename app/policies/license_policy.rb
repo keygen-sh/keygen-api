@@ -77,10 +77,10 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def list_tokens?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.product == bearer
   end
 
   def show_token?
-    bearer.role? :admin or resource.user == bearer or resource.product == bearer
+    bearer.role? :admin or resource.product == bearer
   end
 end
