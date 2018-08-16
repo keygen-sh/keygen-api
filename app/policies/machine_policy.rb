@@ -9,14 +9,14 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
-    bearer.role? :admin or ((resource.policy.nil? or !resource.policy.protected?) and resource.user == bearer) or resource.product == bearer or resource.license == bearer
+    bearer.role? :admin or ((resource.license.nil? or !resource.license.protected?) and resource.user == bearer) or resource.product == bearer or resource.license == bearer
   end
 
   def update?
-    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
+    bearer.role? :admin or (!resource.license.protected? and resource.user == bearer) or resource.product == bearer
   end
 
   def destroy?
-    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer or resource.license == bearer
+    bearer.role? :admin or (!resource.license.protected? and resource.user == bearer) or resource.product == bearer or resource.license == bearer
   end
 end
