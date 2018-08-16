@@ -471,6 +471,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "license" that is not protected
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -961,6 +962,148 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is protected
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a protected license using a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": true,
+        "floating": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "protected": true
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" that is protected
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a protected license using an unprotected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": false,
+        "floating": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "protected": true
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" that is protected
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates an unprotected license using a protected policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "protected": true,
+        "floating": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "protected": false
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" that is not protected
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is floating
     And sidekiq should have 1 "webhook" job
@@ -1008,6 +1151,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is protected
     And the JSON response should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
