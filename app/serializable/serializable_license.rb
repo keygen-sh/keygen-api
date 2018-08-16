@@ -23,6 +23,9 @@ class SerializableLicense < SerializableBase
   attribute :concurrent do
     @object.policy.concurrent?
   end
+  attribute :protected do
+    @object.protected?
+  end
   attribute :max_machines do
     @object.policy.max_machines
   end

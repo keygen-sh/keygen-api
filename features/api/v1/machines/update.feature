@@ -137,14 +137,14 @@ Feature: Update machine
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: User updates a machine's name for their license
+  Scenario: User updates a machine's name that belongs to a unprotected license
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
-      { "userId": "$users[1]" }
+      { "userId": "$users[1]", "protected": false }
       """
     And the current account has 1 "machine"
     And all "machines" have the following attributes:
@@ -169,20 +169,15 @@ Feature: Update machine
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: User updates a machine that belongs to a license with a protected policy
+  Scenario: User updates a machine's name that belongs to a protected license
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
     And I am a user of account "test1"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "protected": true }
-      """
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
-      { "policyId": "$policies[0]", "userId": "$users[1]" }
+      { "userId": "$users[1]", "protected": true }
       """
     And the current account has 1 "machine"
     And all "machines" have the following attributes:
