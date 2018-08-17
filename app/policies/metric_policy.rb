@@ -7,4 +7,8 @@ class MetricPolicy < ApplicationPolicy
   def show?
     bearer.role? :admin
   end
+
+  def count?
+    bearer.role? :admin
+  end
 end

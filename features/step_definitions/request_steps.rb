@@ -178,6 +178,7 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
 end
 
 Then /^the JSON response should (?:contain|be) meta with the following:$/ do |body|
+  parse_placeholders! body
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to eq JSON.parse(body)

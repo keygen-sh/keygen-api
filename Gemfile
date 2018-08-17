@@ -23,6 +23,7 @@ gem 'pundit'
 
 # Scopes and pagination
 gem 'has_scope'
+gem 'groupdate'
 gem 'kaminari'
 
 # Search
