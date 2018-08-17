@@ -26,7 +26,12 @@ def parse_placeholders!(str)
         @crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .send attribute
       when "date"
-        Date.send(attribute).to_s
+        case attribute
+        when "format"
+          Time.current.strftime "%Y-%m-%d"
+        else
+          Date.send(attribute).to_s
+        end
       when "time"
         case attribute
         when /(\d+)\.(\w+)\.(\w+).iso/

@@ -96,6 +96,8 @@ GEM
     gherkin (4.0.0)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
+    groupdate (4.0.1)
+      activesupport (>= 4.2)
     haml (4.0.7)
       tilt
     haml-rails (0.9.0)
@@ -317,6 +319,7 @@ DEPENDENCIES
   dotenv-rails
   factory_girl_rails
   faker (~> 1.6.3)
+  groupdate
   haml-rails
   has_scope
   httparty
