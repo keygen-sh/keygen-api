@@ -143,7 +143,14 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "metrics", only: [:index, :show]
+        resources "metrics", only: [:index, :show] do
+          collection do
+            scope "actions", module: "metrics/actions" do
+              get "count", to: "counts#count"
+            end
+          end
+        end
+
         post "search", to: "searches#search"
       end
     end
