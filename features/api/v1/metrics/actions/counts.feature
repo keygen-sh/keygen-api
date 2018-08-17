@@ -31,6 +31,26 @@ Feature: Metric counts
       }
       """
 
+  Scenario: Admin retrieves metric counts for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 52 "metrics"
+    And the first 19 "metrics" have the following attributes:
+      """
+      {
+        "metric": "license.validation.succeeded"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics/actions/count?metrics[]=license.validation.succeeded"
+    Then the response status should be "200"
+    And the JSON response should contain meta with the following:
+      """
+      {
+        "$date.format": 19
+      }
+      """
+
   Scenario: User attempts to retrieve metric counts for their account
     Given the current account is "test1"
     And the current account has 1 "user"

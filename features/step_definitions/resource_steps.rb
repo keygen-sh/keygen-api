@@ -198,6 +198,13 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   )
 end
 
+Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
+  parse_placeholders! body
+  @account.send(resource.pluralize.underscore).limit(count).update_all(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
+end
+
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
   parse_placeholders! body
   @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
