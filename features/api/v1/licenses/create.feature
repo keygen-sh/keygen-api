@@ -804,6 +804,7 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_SIGN"
+    And the JSON response should be a "license" with the encoded key of "some-signed-payload-here" using "BASE64"
     And the JSON response should be a "license" with the encryptionScheme "RSA_2048_SIGN"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
