@@ -179,6 +179,7 @@ class License < ApplicationRecord
       sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
       self.signature = Base64.strict_encode64 sig
+      self.key = Base64.strict_encode64 key
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?

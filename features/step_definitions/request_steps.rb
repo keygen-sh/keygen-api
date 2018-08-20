@@ -167,6 +167,20 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
   end
 end
 
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encoded (\w+) (?:of )?"([^\"]*)" using "([^\"]*)"$/ do |resource, attribute, value, scheme|
+  json = JSON.parse last_response.body
+
+  case scheme
+  when "BASE64"
+    dec = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(dec).to eq value.to_s
+  else
+    raise "unknown encoding scheme"
+  end
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
   parse_placeholders! value
 
