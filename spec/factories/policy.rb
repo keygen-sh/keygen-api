@@ -26,13 +26,13 @@ FactoryGirl.define do
       encrypted true
     end
 
-    trait :rsa_2048_encrypted do
-      encryption_scheme 'RSA_2048_ENCRYPT'
+    trait :rsa_2048_pkcs1_encrypted do
+      encryption_scheme 'RSA_2048_PKCS1_ENCRYPT'
       encrypted true
     end
 
-    trait :rsa_2048_signed do
-      encryption_scheme 'RSA_2048_SIGN'
+    trait :rsa_2048_pkcs1_signed do
+      encryption_scheme 'RSA_2048_PKCS1_SIGN'
       encrypted true
     end
 

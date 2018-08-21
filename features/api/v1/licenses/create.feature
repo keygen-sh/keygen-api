@@ -540,7 +540,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT for a user of their account
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_ENCRYPT for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -548,7 +548,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
         "encrypted": true
       }
       """
@@ -583,7 +583,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be specified for an encrypted license using RSA_2048_ENCRYPT",
+        "detail": "must be specified for an encrypted license using RSA_2048_PKCS1_ENCRYPT",
         "code": "KEY_BLANK",
         "source": {
           "pointer": "/data/attributes/key"
@@ -593,7 +593,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT with a pre-determined key
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_ENCRYPT with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -601,7 +601,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
         "encrypted": true
       }
       """
@@ -634,15 +634,15 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_ENCRYPT"
-    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_ENCRYPT"
+    And the JSON response should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_PKCS1_ENCRYPT"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_PKCS1_ENCRYPT"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an RSA encrypted license using RSA_2048_ENCRYPT with a key that is too large
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_ENCRYPT with a key that is too large
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -650,7 +650,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
         "encrypted": true
       }
       """
@@ -698,7 +698,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an RSA encrypted license using RSA_2048_SIGN for a user of their account
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_SIGN for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -706,7 +706,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_SIGN",
+        "encryptionScheme": "RSA_2048_PKCS1_SIGN",
         "encrypted": true
       }
       """
@@ -741,7 +741,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be specified for an encrypted license using RSA_2048_SIGN",
+        "detail": "must be specified for an encrypted license using RSA_2048_PKCS1_SIGN",
         "code": "KEY_BLANK",
         "source": {
           "pointer": "/data/attributes/key"
@@ -762,7 +762,7 @@ Feature: Create license
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an RSA encrypted license using RSA_2048_SIGN with a pre-determined key
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_SIGN with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -770,7 +770,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_SIGN",
+        "encryptionScheme": "RSA_2048_PKCS1_SIGN",
         "encrypted": true
       }
       """
@@ -803,9 +803,9 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_SIGN"
+    And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "license" with the encoded key of "some-signed-payload-here" using "BASE64"
-    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_SIGN"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
