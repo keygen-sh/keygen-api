@@ -31,8 +31,6 @@ Feature: Create policy
             "name": "Premium Add-On",
             "floating": true,
             "strict": false,
-            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
-            "encrypted": true,
             "duration": $time.2.weeks
           },
           "relationships": {
@@ -50,8 +48,8 @@ Feature: Create policy
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with a nil encryptionScheme
+    And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -755,6 +753,40 @@ Feature: Create policy
     And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "RSA Signed"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_PSS_SIGN for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "RSA Probabilistic Signature Scheme",
+            "encryptionScheme": "RSA_2048_PKCS1_PSS_SIGN",
+            "encrypted": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
