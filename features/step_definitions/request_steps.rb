@@ -162,6 +162,17 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(res).to be true
+  when "RSA_2048_PKCS1_PSS_SIGN"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    sig = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    val = value.to_s
+
+    res = pub.verify_pss digest, sig, val, salt_length: :auto, mgf1_hash: "SHA256" rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(res).to be true
   else
     raise "unknown encryption scheme"
   end

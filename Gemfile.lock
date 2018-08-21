@@ -163,6 +163,7 @@ GEM
     parallel (1.12.1)
     parallel_tests (2.21.2)
       parallel
+    openssl (2.1.1)
     pg (0.19.0)
     pg_search (2.1.2)
       activerecord (>= 4.2)
@@ -340,6 +341,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   newrelic_rpm
   parallel_tests
+  openssl
   pg
   pg_search
   premailer-rails

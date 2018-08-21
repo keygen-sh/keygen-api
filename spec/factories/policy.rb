@@ -36,6 +36,11 @@ FactoryGirl.define do
       encrypted true
     end
 
+    trait :rsa_2048_pkcs1_pss_signed do
+      encryption_scheme 'RSA_2048_PKCS1_PSS_SIGN'
+      encrypted true
+    end
+
     trait :pooled do
       use_pool true
     end
