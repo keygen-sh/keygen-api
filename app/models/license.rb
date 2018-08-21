@@ -180,6 +180,12 @@ class License < ApplicationRecord
 
       self.signature = Base64.strict_encode64 sig
       self.key = Base64.strict_encode64 key
+    when "RSA_2048_PKCS1_PSS_SIGN"
+      priv = OpenSSL::PKey::RSA.new account.private_key
+      sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
+
+      self.signature = Base64.strict_encode64 sig
+      self.key = Base64.strict_encode64 key
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?

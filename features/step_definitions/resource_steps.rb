@@ -87,6 +87,8 @@ Given /^the current account has (\d+) encrypted "([^\"]*)" using "([^\"]*)"$/ do
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_encrypted, account: @account, key: SecureRandom.hex)
     when 'RSA_2048_PKCS1_SIGN'
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_signed, account: @account, key: SecureRandom.hex)
+    when 'RSA_2048_PKCS1_PSS_SIGN'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_signed, account: @account, key: SecureRandom.hex)
     end
   end
 end
