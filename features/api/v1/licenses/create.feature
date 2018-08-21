@@ -812,6 +812,120 @@ Feature: Create license
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_PSS_SIGN for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_PKCS1_PSS_SIGN",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 2 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be specified for an encrypted license using RSA_2048_PKCS1_PSS_SIGN",
+        "code": "KEY_BLANK",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "failed to generate key signature",
+        "source": {
+          "pointer": "/data/attributes/signature"
+        },
+        "code": "SIGNATURE_BLANK"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_PKCS1_PSS_SIGN with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_PKCS1_PSS_SIGN",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-signed-payload-here"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN"
+    And the JSON response should be a "license" with the encoded key of "some-signed-payload-here" using "BASE64"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the JSON response should be a "license" that is encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"

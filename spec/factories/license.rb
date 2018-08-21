@@ -33,6 +33,10 @@ FactoryGirl.define do
       association :policy, :rsa_2048_pkcs1_signed
     end
 
+    trait :rsa_2048_pkcs1_pss_signed do
+      association :policy, :rsa_2048_pkcs1_pss_signed
+    end
+
     after :create do |license|
       create :token, bearer: license
     end
