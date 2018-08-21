@@ -143,7 +143,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
   json = JSON.parse last_response.body
 
   case scheme
-  when "RSA_2048_ENCRYPT"
+  when "RSA_2048_PKCS1_ENCRYPT"
     pub = OpenSSL::PKey::RSA.new @account.public_key
 
     val = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
@@ -151,7 +151,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(dec).to eq value.to_s
-  when "RSA_2048_SIGN"
+  when "RSA_2048_PKCS1_SIGN"
     pub = OpenSSL::PKey::RSA.new @account.public_key
     digest = OpenSSL::Digest::SHA256.new
 

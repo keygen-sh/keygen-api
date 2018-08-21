@@ -31,7 +31,7 @@ Feature: Create policy
             "name": "Premium Add-On",
             "floating": true,
             "strict": false,
-            "encryptionScheme": "RSA_2048_SIGN",
+            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
             "encrypted": true,
             "duration": $time.2.weeks
           },
@@ -50,7 +50,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_SIGN"
+    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
@@ -301,7 +301,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_ENCRYPT and uses a pool
+  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_PKCS1_ENCRYPT and uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -314,7 +314,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "RSA_2048_ENCRYPT",
+            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
             "encrypted": true,
             "usePool": true
           },
@@ -345,7 +345,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_SIGN and uses a pool
+  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_PKCS1_SIGN and uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -358,7 +358,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "RSA_2048_SIGN",
+            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
             "encrypted": true,
             "usePool": true
           },
@@ -438,7 +438,7 @@ Feature: Create policy
             "maxMachines": 1,
             "floating": false,
             "strict": true,
-            "encryptionScheme": "RSA_2048_ENCRYPT",
+            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
             "encrypted": true,
             "duration": $time.2.weeks
           },
@@ -724,7 +724,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_SIGN for their account
+  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_SIGN for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -737,7 +737,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "RSA Signed",
-            "encryptionScheme": "RSA_2048_SIGN",
+            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
             "encrypted": true
           },
           "relationships": {
@@ -752,13 +752,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_SIGN"
+    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_ENCRYPT for their account
+  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_ENCRYPT for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -771,7 +771,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "RSA Encrypted",
-            "encryptionScheme": "RSA_2048_ENCRYPT",
+            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
             "encrypted": true
           },
           "relationships": {
@@ -786,7 +786,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_ENCRYPT"
+    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_ENCRYPT"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs

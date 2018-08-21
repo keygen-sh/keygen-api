@@ -25,12 +25,12 @@ FactoryGirl.define do
       association :policy, :legacy_encrypted
     end
 
-    trait :rsa_2048_encrypted do
-      association :policy, :rsa_2048_encrypted
+    trait :rsa_2048_pkcs1_encrypted do
+      association :policy, :rsa_2048_pkcs1_encrypted
     end
 
-    trait :rsa_2048_signed do
-      association :policy, :rsa_2048_signed
+    trait :rsa_2048_pkcs1_signed do
+      association :policy, :rsa_2048_pkcs1_signed
     end
 
     after :create do |license|
