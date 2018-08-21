@@ -1737,7 +1737,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: An admin validates an encrypted license using RSA_2048_ENCRYPT
+  Scenario: An admin validates an encrypted license using RSA_2048_PKCS1_ENCRYPT
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -1745,7 +1745,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_ENCRYPT",
+        "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
         "encrypted": true
       }
       """
@@ -1768,7 +1768,7 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: An admin validates an encrypted license using RSA_2048_SIGN
+  Scenario: An admin validates an encrypted license using RSA_2048_PKCS1_SIGN
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -1776,7 +1776,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "RSA_2048_SIGN",
+        "encryptionScheme": "RSA_2048_PKCS1_SIGN",
         "encrypted": true
       }
       """
@@ -1955,10 +1955,10 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Anonymous validates an encrypted license using RSA_2048_ENCRYPT by key
+  Scenario: Anonymous validates an encrypted license using RSA_2048_PKCS1_ENCRYPT by key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 encrypted "license" using "RSA_2048_ENCRYPT"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_ENCRYPT"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -1977,10 +1977,10 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an encrypted license using RSA_2048_ENCRYPT by key using the legacy encrypted flag
+  Scenario: Anonymous validates an encrypted license using RSA_2048_PKCS1_ENCRYPT by key using the legacy encrypted flag
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 encrypted "license" using "RSA_2048_ENCRYPT"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_ENCRYPT"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -1999,10 +1999,10 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Anonymous validates an encrypted license using RSA_2048_SIGN by key
+  Scenario: Anonymous validates an encrypted license using RSA_2048_PKCS1_SIGN by key
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 encrypted "license" using "RSA_2048_SIGN"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_SIGN"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {
@@ -2021,10 +2021,10 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: Anonymous validates an encrypted license using RSA_2048_SIGN by key using the legacy encrypted flag
+  Scenario: Anonymous validates an encrypted license using RSA_2048_PKCS1_SIGN by key using the legacy encrypted flag
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 encrypted "license" using "RSA_2048_SIGN"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_SIGN"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {

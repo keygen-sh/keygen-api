@@ -165,7 +165,7 @@ class License < ApplicationRecord
     return unless key.present?
 
     case encryption_scheme
-    when "RSA_2048_ENCRYPT"
+    when "RSA_2048_PKCS1_ENCRYPT"
       if key.bytes.size <= RSA_MAX_BYTE_SIZE
         priv = OpenSSL::PKey::RSA.new account.private_key
         enc = priv.private_encrypt key
@@ -174,7 +174,7 @@ class License < ApplicationRecord
       else
         errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
       end
-    when "RSA_2048_SIGN"
+    when "RSA_2048_PKCS1_SIGN"
       priv = OpenSSL::PKey::RSA.new account.private_key
       sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
