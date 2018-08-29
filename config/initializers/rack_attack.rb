@@ -8,7 +8,7 @@ Rack::Attack.safelist("allow-internal") do |req|
   WHITELISTED_DOMAINS.include?(req.host)
 end
 
-Rack::Attack.throttle("req/ip/burst", limit: 100, period: 10.seconds) do |req|
+Rack::Attack.throttle("req/ip/burst", limit: 50, period: 10.seconds) do |req|
   matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
   account = matches[1] unless matches.nil?
 
