@@ -9,7 +9,14 @@ Rack::Attack.safelist("allow-internal") do |req|
 end
 
 Rack::Attack.throttle("req/ip/burst", limit: 100, period: 10.seconds) do |req|
-  req.ip
+  matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
+  account = matches[1] unless matches.nil?
+
+  if account.present?
+    "#{account}/#{req.ip}"
+  else
+    req.ip
+  end
 end
 
 Rack::Attack.blocklist("block/ip") do |req|
