@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20180816022827) do
-=======
-ActiveRecord::Schema.define(version: 20180805201053) do
->>>>>>> adjust rsa signing scheme
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -85,8 +81,8 @@ ActiveRecord::Schema.define(version: 20180805201053) do
     t.datetime "last_expiring_soon_event_sent_at"
     t.datetime "last_check_in_soon_event_sent_at"
     t.integer  "uses",                             default: 0
-    t.boolean  "protected"
     t.string   "signature"
+    t.boolean  "protected"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "licenses_tsv_key_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
