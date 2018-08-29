@@ -34,6 +34,7 @@ gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
 gem 'sidekiq-status'
 gem 'sidekiq-cron'
+gem 'sidekiq-throttled'
 
 # HTTP requests
 gem 'httparty'
