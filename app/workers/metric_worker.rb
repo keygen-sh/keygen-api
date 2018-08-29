@@ -1,6 +1,7 @@
 class MetricWorker
   include Sidekiq::Worker
 
+  sidekiq_throttle concurrency: { limit: 10 )
   sidekiq_options queue: :metrics
 
   def perform(metric, account_id, data)

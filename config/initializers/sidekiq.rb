@@ -1,6 +1,7 @@
 require 'sidekiq'
 require 'sidekiq-status'
 require 'sidekiq-cron'
+require "sidekiq/throttled"
 
 SIDEKIQ_MAX_QUEUE_LATENCY =
   (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
@@ -28,3 +29,5 @@ Sidekiq.configure_server do |config|
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 24.hours
   end
 end
+
+Sidekiq::Throttled.setup!
