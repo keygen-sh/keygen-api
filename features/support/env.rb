@@ -1,5 +1,6 @@
 require 'cucumber/rspec/doubles'
 require 'cucumber/rails'
+require 'bullet'
 require 'faker'
 
 ActionController::Base.allow_rescue = false
