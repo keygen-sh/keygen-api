@@ -52,32 +52,40 @@ class SerializableLicense < SerializableBase
   end
 
   relationship :account do
-    linkage always: true
+    linkage always: true do
+      { type: :accounts, id: @object.account_id }
+    end
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
   relationship :product do
-    linkage always: true
+    linkage always: true do
+      { type: :products, id: @object.policy&.product_id }
+    end
     link :related do
-      @url_helpers.v1_account_license_product_path @object.account, @object
+      @url_helpers.v1_account_license_product_path @object.account_id, @object
     end
   end
   relationship :policy do
-    linkage always: true
+    linkage always: true do
+      { type: :policies, id: @object.policy_id }
+    end
     link :related do
-      @url_helpers.v1_account_license_policy_path @object.account, @object
+      @url_helpers.v1_account_license_policy_path @object.account_id, @object
     end
   end
   relationship :user do
-    linkage always: true
+    linkage always: true do
+      { type: :users, id: @object.user_id }
+    end
     link :related do
-      @url_helpers.v1_account_license_user_path @object.account, @object
+      @url_helpers.v1_account_license_user_path @object.account_id, @object
     end
   end
   relationship :machines do
     link :related do
-      @url_helpers.v1_account_license_machines_path @object.account, @object
+      @url_helpers.v1_account_license_machines_path @object.account_id, @object
     end
     meta do
       { count: @object.machines.count }
@@ -85,11 +93,11 @@ class SerializableLicense < SerializableBase
   end
   relationship :tokens do
     link :related do
-      @url_helpers.v1_account_license_tokens_path @object.account, @object
+      @url_helpers.v1_account_license_tokens_path @object.account_id, @object
     end
   end
 
   link :self do
-    @url_helpers.v1_account_license_path @object.account, @object
+    @url_helpers.v1_account_license_path @object.account_id, @object
   end
 end

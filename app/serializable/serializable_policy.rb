@@ -29,29 +29,33 @@ class SerializablePolicy < SerializableBase
   end
 
   relationship :account do
-    linkage always: true
+    linkage always: true do
+      { type: :accounts, id: @object.account_id }
+    end
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
   relationship :product do
-    linkage always: true
+    linkage always: true do
+      { type: :products, id: @object.product_id }
+    end
     link :related do
-      @url_helpers.v1_account_policy_product_path @object.account, @object
+      @url_helpers.v1_account_policy_product_path @object.account_id, @object
     end
   end
   relationship :pool do
     link :related do
-      @url_helpers.v1_account_policy_keys_path @object.account, @object
+      @url_helpers.v1_account_policy_keys_path @object.account_id, @object
     end
   end
   relationship :licenses do
     link :related do
-      @url_helpers.v1_account_policy_licenses_path @object.account, @object
+      @url_helpers.v1_account_policy_licenses_path @object.account_id, @object
     end
   end
 
   link :self do
-    @url_helpers.v1_account_policy_path @object.account, @object
+    @url_helpers.v1_account_policy_path @object.account_id, @object
   end
 end

@@ -43,7 +43,7 @@ class ApplicationPolicy
   end
 
   def account
-    resource.account || bearer.account
+    resource.account rescue bearer.account
   end
 
   class Scope

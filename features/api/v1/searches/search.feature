@@ -1,3 +1,4 @@
+@skip/bullet
 @api/v1
 Feature: Create policy
 
