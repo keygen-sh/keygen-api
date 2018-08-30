@@ -57,6 +57,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
   gem 'timecop'
+  gem 'bullet'
 end
 
 group :development do

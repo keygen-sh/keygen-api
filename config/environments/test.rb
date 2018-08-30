@@ -1,3 +1,5 @@
+require 'bullet'
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -44,4 +46,11 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Configure Bullet for performance tests
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.raise = true # Raise an error if e.g. an n+1 query occurs
+  end
 end
