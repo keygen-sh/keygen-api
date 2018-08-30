@@ -12,15 +12,19 @@ class SerializableAccount < SerializableBase
   end
 
   relationship :billing, unless: -> { @object.billing.nil? } do
-    linkage always: true
+    linkage always: true do
+      { type: :billings, id: @object.billing }
+    end
     link :related do
       @url_helpers.v1_account_billing_path @object if @object.billing.present?
     end
   end
-  relationship :plan, unless: -> { @object.plan.nil? } do
-    linkage always: true
+  relationship :plan, unless: -> { @object.plan_id.nil? } do
+    linkage always: true do
+      { type: :plans, id: @object.plan_id }
+    end
     link :related do
-      @url_helpers.v1_account_plan_path @object if @object.plan.present?
+      @url_helpers.v1_account_plan_path @object if @object.plan_id.present?
     end
   end
   relationship :webhook_endpoints do

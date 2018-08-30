@@ -10,13 +10,15 @@ class SerializableWebhookEndpoint < SerializableBase
   end
 
   relationship :account do
-    linkage always: true
+    linkage always: true do
+      { type: :accounts, id: @object.account_id }
+    end
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
 
   link :self do
-    @url_helpers.v1_account_webhook_endpoint_path @object.account, @object
+    @url_helpers.v1_account_webhook_endpoint_path @object.account_id, @object
   end
 end

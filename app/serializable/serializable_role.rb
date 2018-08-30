@@ -11,7 +11,7 @@ class SerializableRole < SerializableBase
 
   relationship :account do
     linkage always: true do
-      { type: "accounts", id: @object.resource.account.id }
+      { type: :accounts, id: @object.resource.account_id }
     end
     link :related do
       @url_helpers.v1_account_path @object.resource.account

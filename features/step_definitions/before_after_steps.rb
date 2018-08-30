@@ -4,6 +4,11 @@ Before "@api/v1" do
   @api_version = "v1"
 end
 
+# FIXME(ezekg) This is super hacky but there's no easy way to disable
+#              bullet outside of adding controller filters
+Before("@skip/bullet") { Bullet.instance_variable_set :@enable, false }
+After("@skip/bullet") { Bullet.instance_variable_set :@enable, true }
+
 Before do
   Bullet.start_request if Bullet.enable?
 
@@ -14,14 +19,16 @@ Before do
   @crypt = []
 end
 
-After do |s|
+After do |scenario|
   Bullet.perform_out_of_channel_notifications if Bullet.enable? && Bullet.notification?
   Bullet.end_request if Bullet.enable?
 
   StripeHelper.stop
 
   # Tell Cucumber to quit if a scenario fails
-  if s.failed?
+  if scenario.failed?
+    Cucumber.wants_to_quit = true
+
     puts JSON.pretty_generate(
       request: {
         url: last_request.url,
@@ -36,6 +43,5 @@ After do |s|
         body: (JSON.parse(last_response.body) rescue nil)
       }
     )
-    Cucumber.wants_to_quit = true
   end
 end

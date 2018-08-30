@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /tokens
     def index
-      @tokens = policy_scope apply_scopes(current_account.tokens).all
+      @tokens = policy_scope apply_scopes(current_account.tokens.preload(bearer: [:role])).all
       authorize @tokens
 
       render jsonapi: @tokens

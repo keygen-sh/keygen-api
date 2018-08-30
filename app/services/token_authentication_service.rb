@@ -16,7 +16,7 @@ class TokenAuthenticationService < BaseService
       return nil unless matches.present? &&
                         "#{account.id}".delete("-") == matches[1]
 
-      tok = account.tokens.find_by id: matches[2]
+      tok = account.tokens.preload(bearer: [:role]).find_by id: matches[2]
 
       if tok&.compare_hashed_token(:digest, token, version: "v1")
         tok

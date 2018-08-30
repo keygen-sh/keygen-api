@@ -19,33 +19,35 @@ class SerializableUser < SerializableBase
   end
 
   relationship :account do
-    linkage always: true
+    linkage always: true do
+      { type: :accounts, id: @object.account_id }
+    end
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
   relationship :products do
     link :related do
-      @url_helpers.v1_account_user_products_path @object.account, @object
+      @url_helpers.v1_account_user_products_path @object.account_id, @object
     end
   end
   relationship :licenses do
     link :related do
-      @url_helpers.v1_account_user_licenses_path @object.account, @object
+      @url_helpers.v1_account_user_licenses_path @object.account_id, @object
     end
   end
   relationship :machines do
     link :related do
-      @url_helpers.v1_account_user_machines_path @object.account, @object
+      @url_helpers.v1_account_user_machines_path @object.account_id, @object
     end
   end
   relationship :tokens do
     link :related do
-      @url_helpers.v1_account_user_tokens_path @object.account, @object
+      @url_helpers.v1_account_user_tokens_path @object.account_id, @object
     end
   end
 
   link :self do
-    @url_helpers.v1_account_user_path @object.account, @object
+    @url_helpers.v1_account_user_path @object.account_id, @object
   end
 end

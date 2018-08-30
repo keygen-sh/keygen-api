@@ -47,10 +47,19 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # Disable colored logs in test env
+  config.colorize_logging = false
+
   # Configure Bullet for performance tests
   config.after_initialize do
     Bullet.enable = true
     Bullet.bullet_logger = true
-    Bullet.raise = true # Raise an error if e.g. an n+1 query occurs
+
+    # Raise an error if e.g. an n+1 query is detected
+    Bullet.raise = true
+
+    # FIXME(ezekg) For some reason, we're seeing failures even though
+    #              we're not eager loading anything.
+    Bullet.unused_eager_loading_enable = false
   end
 end
