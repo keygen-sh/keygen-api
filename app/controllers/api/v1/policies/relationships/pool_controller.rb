@@ -7,7 +7,7 @@ module Api::V1::Policies::Relationships
 
     # GET /policies/1/pool
     def index
-      @pool = policy_scope apply_scopes(@policy.pool).all
+      @pool = policy_scope apply_scopes(@policy.pool.preload(:product)).all
       authorize @pool
 
       render jsonapi: @pool

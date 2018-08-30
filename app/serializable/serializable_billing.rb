@@ -18,17 +18,17 @@ class SerializableBilling < SerializableBase
   relationship :account do
     linkage always: true
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
   relationship :plan do
     linkage always: true
     link :related do
-      @url_helpers.v1_plan_path @object.account.plan
+      @url_helpers.v1_plan_path @object.account.plan_id
     end
   end
 
   link :self do
-    @url_helpers.v1_account_billing_path @object.account
+    @url_helpers.v1_account_billing_path @object.account_id
   end
 end

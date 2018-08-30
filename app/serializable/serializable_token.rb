@@ -18,7 +18,9 @@ class SerializableToken < SerializableBase
   end
 
   relationship :account do
-    linkage always: true
+    linkage always: true do
+      { type: :accounts, id: @object.account_id }
+    end
     link :related do
       @url_helpers.v1_account_path @object.account
     end

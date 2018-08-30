@@ -11,7 +11,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/machines
     def index
-      @machines = policy_scope apply_scopes(@license.machines).all
+      @machines = policy_scope apply_scopes(@license.machines.preload(:product)).all
       authorize @machines
 
       render jsonapi: @machines
@@ -35,6 +35,7 @@ module Api::V1::Licenses::Relationships
 
       @license = current_account.licenses.where("id = ? OR key = ?", id, key).first
       raise ActiveRecord::RecordNotFound if @license.nil?
+
       authorize @license, :show?
     end
   end

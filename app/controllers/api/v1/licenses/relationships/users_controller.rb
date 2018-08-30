@@ -50,6 +50,7 @@ module Api::V1::Licenses::Relationships
 
       @license = current_account.licenses.where("id = ? OR key = ?", id, key).first
       raise ActiveRecord::RecordNotFound if @license.nil?
+
       authorize @license, :show?
     end
 
