@@ -73,6 +73,14 @@ Then /^the JSON response should (?:contain|be) an array (?:with|of) (\d+) "([^\"
   json = JSON.parse last_response.body
 
   expect(json["data"].select { |d| d["type"] == name.pluralize }.length).to eq count.to_i
+
+  if @account.present?
+    json["data"].all? do |data|
+      account_id =  data["relationships"]["account"]["data"]["id"]
+
+      expect(account_id).to eq @account.id
+    end
+  end
 end
 
 Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name|
@@ -80,11 +88,10 @@ Then /^the JSON response should (?:contain|be) an array of "([^\"]*)"$/ do |name
 
   json["data"].each { |d| expect(d["type"]).to eq name.pluralize }
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -92,13 +99,6 @@ Then /^the JSON response should (?:contain|be) an empty array$/ do
   json = JSON.parse last_response.body
 
   expect(json["data"].empty?).to be true
-
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
-
-    expect(account_id).to eq @account.id
-  rescue
-  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)"$/ do |name|
@@ -106,11 +106,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)"$/ do |name|
 
   expect(json["data"]["type"]).to eq name.pluralize
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -126,11 +125,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|a) 
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -148,11 +146,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:a|an) (\w+
 
   expect(a).to eq b
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -162,11 +159,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq nil
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -176,11 +172,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+)(?: th
   expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to_not eq nil
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -190,11 +185,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is (\w+)$/ do
 
   expect(json["data"]["attributes"][attribute]).to be true
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -204,11 +198,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is not (\w+)$
   expect(json["data"]["type"]).to eq name.pluralize
   expect(json["data"]["attributes"][attribute]).to be false
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -218,11 +211,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   expect(json["data"]["type"]).to eq name.pluralize
   expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -232,11 +224,10 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
 
   expect(json["data"]["attributes"]).to include JSON.parse(body)
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
@@ -246,11 +237,10 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
 
   expect(json["data"]["relationships"]).to include JSON.parse(body)
 
-  begin
-    account_id = json["data"]["relationships"]["accounts"]["data"]["id"]
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
 
     expect(account_id).to eq @account.id
-  rescue
   end
 end
 
