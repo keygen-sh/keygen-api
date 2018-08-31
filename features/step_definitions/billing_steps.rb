@@ -30,10 +30,19 @@ Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
   end
 end
 
-Given /^I have a valid payment token/ do
+Given /^the account does have a card on file$/ do
+  # Default
 end
 
-Given /^I have a valid coupon/ do
+Given /^the account does not have a card on file$/ do
+  @billing.update card_brand: nil, card_last4: nil, card_expiry: nil
+end
+
+Given /^I have a valid payment token$/ do
+  # Default
+end
+
+Given /^I have a valid coupon$/ do
   StripeHelper.create_coupon id: "COUPON_CODE"
 end
 
