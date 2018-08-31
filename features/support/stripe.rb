@@ -1,3 +1,5 @@
+require 'stripe_mock'
+
 class StripeHelper
   attr_accessor :helper
 
