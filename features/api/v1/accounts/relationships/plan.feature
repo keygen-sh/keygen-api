@@ -47,7 +47,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """
@@ -66,7 +66,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """
@@ -85,7 +85,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """
@@ -104,7 +104,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """
@@ -123,7 +123,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """
@@ -161,7 +161,7 @@ Feature: Account plan relationship
       {
         "data": {
           "type": "plans",
-          "id": "$plans[0]"
+          "id": "$plans[1]"
         }
       }
       """

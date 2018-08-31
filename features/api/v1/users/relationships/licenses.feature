@@ -35,8 +35,7 @@ Feature: User licenses relationship
     When I send a GET request to "/accounts/test1/users/$1/licenses"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    # TODO: Additional license is added in user factory
-    And the JSON response should be an array with 4 "licenses"
+    And the JSON response should be an array with 3 "licenses"
 
   Scenario: Product retrieves the licenses for a user
     Given the current account is "test1"

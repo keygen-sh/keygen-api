@@ -44,8 +44,18 @@ Feature: License product relationship
 
   Scenario: Product retrieves the product for a license of another product
     Given the current account is "test1"
-    And the current account has 3 "licenses"
-    And the current account has 1 "product"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[2]" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/product"
