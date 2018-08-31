@@ -5,11 +5,18 @@ FactoryGirl.define do
     email { [SecureRandom.hex, Faker::Internet.safe_email].join }
     password "password"
 
-    account
+    association :account
+
+    after :build do |user, evaluator|
+      account = evaluator.account or create :account
+
+      user.assign_attributes(
+        account: account
+      )
+    end
 
     after :create do |user|
       user.role = create :role, :user, resource: user
-      create_list :license, 1, user: user
       create :token, bearer: user
     end
 

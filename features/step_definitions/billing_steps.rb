@@ -4,10 +4,11 @@ Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
   account = Account.find slug
 
   # Set up a fake subscription
+  customer = create :customer, :with_card
   plan = create :plan
-  customer = create :customer
   subscription = create :subscription, customer: customer.id, plan: plan.plan_id
 
+  account.update plan: plan
   account.billing.update(
     customer_id: customer.id,
     subscription_id: subscription.id,

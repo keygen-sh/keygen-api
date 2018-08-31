@@ -3,6 +3,6 @@ FactoryGirl.define do
 
   factory :subscription, class: Stripe::Subscription do
     customer { create(:customer).id }
-    plan nil
+    plan { nil }
   end
 end

@@ -94,13 +94,13 @@ Feature: License machines relationship
 
   Scenario: Product retrieves the machines for a license
     Given the current account is "test1"
+    And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "machines"
     And all "machines" have the following attributes:
       """
       { "licenseId": "$licenses[0]" }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And the current product has 1 "license"
     And I use an authentication token
@@ -124,13 +124,22 @@ Feature: License machines relationship
 
   Scenario: Product retrieves a machine for a license
     Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
     And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And the current account has 3 "machines"
     And all "machines" have the following attributes:
       """
       { "licenseId": "$licenses[0]" }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And the current product has 1 "license"
     And I use an authentication token
@@ -140,7 +149,17 @@ Feature: License machines relationship
 
   Scenario: Product retrieves the machines for a license of another product
     Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
     And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And the current account has 3 "machines"
     And all "machines" have the following attributes:
       """
@@ -152,7 +171,7 @@ Feature: License machines relationship
     When I send a GET request to "/accounts/test1/licenses/$0/machines"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the machines for a license
+  Scenario: User attempts to retrieve the machines for a license they own
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 3 "machines"
@@ -161,6 +180,25 @@ Feature: License machines relationship
       { "licenseId": "$licenses[0]" }
       """
     And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/machines"
+    Then the response status should be "200"
+
+  Scenario: User attempts to retrieve the machines for a license they don't own
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/machines"

@@ -40,8 +40,23 @@ Feature: Machine product relationship
 
   Scenario: Product retrieves the product for a machine of another product
     Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And the current account has 3 "machines"
-    And the current account has 1 "product"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/product"

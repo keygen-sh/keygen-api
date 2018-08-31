@@ -44,18 +44,29 @@ Feature: License policy relationship
 
   Scenario: Product retrieves the policy for a license of another product
     Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[3]" }
+      """
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
-    And the current account has 1 "product"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the policy for a license
+  Scenario: User attempts to retrieve the policy for a license they own
     Given the current account is "test1"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
     Then the response status should be "403"
@@ -758,15 +769,16 @@ Feature: License policy relationship
       """
       { "productId": "$products[0]" }
       """
+    And the current account has 2 "users"
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
         "policyId": "$policies[0]",
+        "userId": "$users[2]",
         "expiry": "$time.1.day.from_now"
       }
       """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
