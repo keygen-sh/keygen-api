@@ -38,6 +38,8 @@ class Machine < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
+  scope :hostname, -> (hostname) { where hostname: hostname }
+  scope :ip, -> (ip_address) { where ip: ip_address }
   scope :license, -> (id) { where license: id }
   scope :key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
