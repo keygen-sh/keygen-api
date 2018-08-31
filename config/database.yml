@@ -12,7 +12,7 @@ development:
 # Do not set this db to the same as development or production.
 test: &test
   <<: *default
-  database: keygen_test
+  database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
 
 production:
   <<: *default
