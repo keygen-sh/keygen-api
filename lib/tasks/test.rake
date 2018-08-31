@@ -5,8 +5,8 @@ begin
 
   desc 'run test suite'
   task 'test': %i[
-    spec
-    cucumber
+    parallel:spec
+    parallel:features
   ]
 rescue LoadError
   # NOTE(ezekg) Wrapping this in a rescue clause so that we can use our
