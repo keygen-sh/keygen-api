@@ -233,8 +233,17 @@ Feature: Update machine
   Scenario: User attempts to update a machine for another user
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 3 "machines"
-    And the current account has 1 "user"
+    And the current account has 2 "users"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
