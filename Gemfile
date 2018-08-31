@@ -58,6 +58,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'timecop'
   gem 'bullet'
+  gem 'parallel_tests'
 end
 
 group :development do
