@@ -122,6 +122,45 @@ Feature: List machines
     When I send a GET request to "/accounts/test1/machines?limit=0"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves all machines filtered by fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "foo:bar:baz:qux" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?fingerprint=foo:bar:baz:qux"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
+  Scenario: Admin retrieves all machines filtered by IP
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "ip": "127.0.1.1" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?ip=127.0.1.1"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
+  Scenario: Admin retrieves all machines filtered by hostname
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "hostname": "SomeHostname" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?hostname=SomeHostname"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
   Scenario: Product retrieves all machines for their product
     Given the current account is "test1"
     And the current account has 1 "product"
