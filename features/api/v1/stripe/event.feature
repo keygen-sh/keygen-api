@@ -102,6 +102,14 @@ Feature: Process Stripe webhook events
 
   Scenario: We receive a "customer.subscription.trial_will_end" event
     Given there is an incoming "customer.subscription.trial_will_end" event
+    And the account does have a card on file
+    When the event is received at "/stripe"
+    Then the account should not receive a "payment method missing" email
+    And the response status should be "202"
+
+  Scenario: We receive a "customer.subscription.trial_will_end" event
+    Given there is an incoming "customer.subscription.trial_will_end" event
+    And the account does not have a card on file
     When the event is received at "/stripe"
     Then the account should receive a "payment method missing" email
     And the response status should be "202"
