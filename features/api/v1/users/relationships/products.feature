@@ -35,8 +35,7 @@ Feature: User products relationship
     When I send a GET request to "/accounts/test1/users/$1/products"
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
-    # TODO: Additional product is added in user factory via licenses relationship
-    And the JSON response should be an array with 2 "products"
+    And the JSON response should be an array with 1 "product"
 
   Scenario: Product retrieves the products for a user
     Given the current account is "test1"

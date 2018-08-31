@@ -8,9 +8,18 @@ FactoryGirl.define do
     use_pool false
     encrypted false
     protected false
-    pool []
-    account
-    product
+
+    association :account
+    association :product
+
+    after :build do |policy, evaluator|
+      account = evaluator.account or create :account
+
+      policy.assign_attributes(
+        product: create(:product, account: account),
+        account: account
+      )
+    end
 
     trait :encrypted do
       encrypted true

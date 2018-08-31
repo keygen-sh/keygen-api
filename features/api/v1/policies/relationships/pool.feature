@@ -78,10 +78,14 @@ Feature: Policy pool relationship
 
   Scenario: Product retrieves the pool for a policy
     Given the current account is "test1"
+    And the current account has 2 "products"
     And the current account has 3 "policies"
     And all "policies" have the following attributes:
       """
-      { "usePool": true }
+      {
+        "productId": "$products[0]",
+        "usePool": true
+      }
       """
     And the current account has 5 "keys"
     And all "keys" have the following attributes:
@@ -90,7 +94,6 @@ Feature: Policy pool relationship
         "policyId": "$policies[0]"
       }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And the current product has 3 "policies"
     And I use an authentication token
@@ -100,10 +103,14 @@ Feature: Policy pool relationship
 
   Scenario: Product retrieves the pool for a policy of another product
     Given the current account is "test1"
+    And the current account has 2 "products"
     And the current account has 1 "policy"
     And all "policies" have the following attributes:
       """
-      { "usePool": true }
+      {
+        "productId": "$products[1]",
+        "usePool": true
+      }
       """
     And the current account has 3 "keys"
     And all "keys" have the following attributes:
@@ -112,7 +119,6 @@ Feature: Policy pool relationship
         "policyId": "$policies[0]"
       }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
@@ -217,10 +223,14 @@ Feature: Policy pool relationship
 
   Scenario: Product pops a key from a pool
     Given the current account is "test1"
+    And the current account has 2 "products"
     And the current account has 3 "policies"
     And all "policies" have the following attributes:
       """
-      { "usePool": true }
+      {
+        "productId": "$products[0]",
+        "usePool": true
+      }
       """
     And the current account has 5 "keys"
     And all "keys" have the following attributes:
@@ -229,7 +239,6 @@ Feature: Policy pool relationship
         "policyId": "$policies[0]"
       }
       """
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And the current product has 3 "policies"
     And I use an authentication token
@@ -240,9 +249,16 @@ Feature: Policy pool relationship
 
   Scenario: Product attempts to pop a key from a pool for a policy of another product
     Given the current account is "test1"
+    And the current account has 2 "products"
     And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      {
+        "productId": "$products[1]",
+        "usePool": true
+      }
+      """
     And the current account has 3 "keys"
-    And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"

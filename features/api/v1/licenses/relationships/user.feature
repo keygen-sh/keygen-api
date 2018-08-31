@@ -33,31 +33,68 @@ Feature: License user relationship
 
   Scenario: Product retrieves the user for a license
     Given the current account is "test1"
-    And the current account has 3 "licenses"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
     And the current account has 1 "user"
-    And I am a user of account "test1"
-    And the current user has 3 "licenses"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "200"
     And the JSON response should be a "user"
 
-  Scenario: Product retrieves the user for a license of another user
+  Scenario: Product retrieves the user for a license of another product
     Given the current account is "test1"
-    And the current account has 3 "licenses"
+    And the current account has 3 "products"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "productId": "$products[2]" }
+      """
+    And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
-    And I am a user of account "test1"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/user"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the user for a license
+  Scenario: User attempts to retrieve the user for a license they own
+    Given the current account is "test1"
+    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
+  Scenario: User attempts to retrieve the user for a license they don't own
     Given the current account is "test1"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$2/user"
     Then the response status should be "403"
 
   Scenario: Admin attempts to retrieve the user for a license of another account

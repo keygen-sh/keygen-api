@@ -110,7 +110,7 @@ Feature: License permit actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
-  Scenario: User checks in one of their licenses
+  Scenario: User checks in one of their licenses for an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policies"
@@ -119,7 +119,8 @@ Feature: License permit actions
       {
         "requireCheckIn": true,
         "checkInInterval": "day",
-        "checkInIntervalCount": 1
+        "checkInIntervalCount": 1,
+        "protected": false
       }
       """
     And the current account has 1 "license"
@@ -132,11 +133,44 @@ Feature: License permit actions
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with a lastCheckIn that is not nil
+    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: User checks in one of their licenses for a protected policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1,
+        "protected": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": null
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
     Then the response status should be "403"
-    And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
 
   Scenario: Admin suspends a license
     Given I am an admin of account "test1"
