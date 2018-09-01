@@ -4,7 +4,7 @@ class LicenseOverdueCheckInsWorker
   sidekiq_options queue: :cron, unique: :until_executed
 
   def perform
-    License.joins(:policy).where(policies: { require_check_in: true }).find_each do |license|
+    License.reorder(nil).includes(:policy).where(policies: { require_check_in: true }).find_each do |license|
       next if license.expired?
 
       case
