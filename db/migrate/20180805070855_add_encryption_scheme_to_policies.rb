@@ -4,6 +4,6 @@ class AddEncryptionSchemeToPolicies < ActiveRecord::Migration[5.0]
 
     # Mark all older policies with the legacy scheme
     legacy_policies = Policy.where encrypted: true, encryption_scheme: nil
-    legacy_policies.update_all encryption_scheme: 'LEGACY'
+    legacy_policies.update_all encryption_scheme: 'LEGACY_ENCRYPT'
   end
 end

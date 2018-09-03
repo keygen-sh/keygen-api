@@ -186,6 +186,19 @@ class License < ApplicationRecord
 
       self.signature = Base64.strict_encode64 sig
       self.key = Base64.strict_encode64 key
+    when "RSA_2048_JWT_RS256"
+      priv = OpenSSL::PKey::RSA.new account.private_key
+      begin
+        payload = JSON.parse key
+        jwt = JWT.encode payload, priv, 'RS256'
+
+        self.key = jwt
+      rescue JSON::GeneratorError,
+             JSON::ParserError
+        errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (must be a valid JSON encoded string)"
+      rescue JWT::InvalidPayload => e
+        errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (#{e.message})"
+      end
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?

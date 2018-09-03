@@ -21,8 +21,9 @@ gem 'stripe'
 # Authorization
 gem 'pundit'
 
-# Cyrptography
+# Cryptography
 gem 'openssl'
+gem 'jwt'
 
 # Scopes and pagination
 gem 'has_scope'

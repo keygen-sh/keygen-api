@@ -446,7 +446,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "LEGACY",
+        "encryptionScheme": "LEGACY_ENCRYPT",
         "encrypted": true
       }
       """
@@ -476,7 +476,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the encryptionScheme "LEGACY"
+    And the JSON response should be a "license" with the encryptionScheme "LEGACY_ENCRYPT"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
@@ -491,7 +491,7 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "LEGACY",
+        "encryptionScheme": "LEGACY_ENCRYPT",
         "encrypted": true,
         "strict": true
       }
@@ -920,6 +920,220 @@ Feature: Create license
     And the JSON response should be a "license" with the encrypted signature of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN"
     And the JSON response should be a "license" with the encoded key of "some-signed-payload-here" using "BASE64"
     And the JSON response should be a "license" with the encryptionScheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the JSON response should be a "license" that is encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_JWT_RS256 for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_JWT_RS256",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be specified for an encrypted license using RSA_2048_JWT_RS256",
+        "code": "KEY_BLANK",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_JWT_RS256 with an invalid payload
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_JWT_RS256",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-non-json-payload"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "key is not a valid JWT payload (must be a valid JSON encoded string)",
+        "code": "KEY_JWT_PAYLOAD_INVALID",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_JWT_RS256 with an invalid JWT exp
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_JWT_RS256",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{\"exp\":\"foo\"}"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "key is not a valid JWT payload (exp claim must be an integer)",
+        "code": "KEY_JWT_PAYLOAD_INVALID",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates an RSA encrypted license using RSA_2048_JWT_RS256 with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "encryptionScheme": "RSA_2048_JWT_RS256",
+        "encrypted": true
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{ \"exp\": 4691671952 }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the encrypted key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
+    And the JSON response should be a "license" with the encryptionScheme "RSA_2048_JWT_RS256"
     And the JSON response should be a "license" that is encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
