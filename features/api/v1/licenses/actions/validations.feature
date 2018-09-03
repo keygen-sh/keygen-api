@@ -1715,7 +1715,7 @@ Feature: License validation actions
     And the first "policy" has the following attributes:
       """
       {
-        "encryptionScheme": "LEGACY",
+        "encryptionScheme": "LEGACY_ENCRYPT",
         "encrypted": true
       }
       """
@@ -1776,6 +1776,23 @@ Feature: License validation actions
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_PSS_SIGN"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: An admin validates an encrypted license using RSA_2048_JWT_RS256
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 1 encrypted "license" using "RSA_2048_JWT_RS256"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
@@ -2057,6 +2074,50 @@ Feature: License validation actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_PSS_SIGN"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "encrypted": true
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should not contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Anonymous validates an encrypted license using RSA_2048_JWT_RS256 by key
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 encrypted "license" using "RSA_2048_JWT_RS256"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "encrypted": false
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta with the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Anonymous validates an encrypted license using RSA_2048_JWT_RS256 by key using the legacy encrypted flag
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 encrypted "license" using "RSA_2048_JWT_RS256"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
       """
       {

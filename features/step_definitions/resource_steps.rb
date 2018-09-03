@@ -76,7 +76,7 @@ end
 
 Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, resource|
   count.to_i.times do
-    @crypt << create(resource.singularize.underscore, :legacy_encrypted, account: @account)
+    @crypt << create(resource.singularize.underscore, :legacy_encrypt, account: @account)
   end
 end
 
@@ -84,11 +84,13 @@ Given /^the current account has (\d+) encrypted "([^\"]*)" using "([^\"]*)"$/ do
   count.to_i.times do
     case scheme
     when 'RSA_2048_PKCS1_ENCRYPT'
-      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_encrypted, account: @account, key: SecureRandom.hex)
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_encrypt, account: @account, key: SecureRandom.hex)
     when 'RSA_2048_PKCS1_SIGN'
-      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_signed, account: @account, key: SecureRandom.hex)
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_sign, account: @account, key: SecureRandom.hex)
     when 'RSA_2048_PKCS1_PSS_SIGN'
-      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_signed, account: @account, key: SecureRandom.hex)
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_sign, account: @account, key: SecureRandom.hex)
+    when 'RSA_2048_JWT_RS256'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_jwt_rs256, account: @account, key: JSON.generate(key: SecureRandom.hex))
     end
   end
 end

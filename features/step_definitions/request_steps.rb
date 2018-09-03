@@ -139,8 +139,11 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encrypted (\w+) (?:of )?"([^\"]*)" using "([^\"]*)"$/ do |resource, attribute, value, scheme|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encrypted (\w+) (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, attribute, v1, v2, scheme|
   json = JSON.parse last_response.body
+
+  # Double quotes vs single quotes
+  value = v1 || v2
 
   case scheme
   when "RSA_2048_PKCS1_ENCRYPT"
@@ -173,6 +176,16 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(res).to be true
+  when "RSA_2048_JWT_RS256"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    jwt = json["data"]["attributes"][attribute].to_s
+    dec = JWT.decode jwt, pub, true, algorithm: 'RS256'
+    payload = JSON.parse value
+    val, alg = dec
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(alg).to eq "alg" => "RS256"
+    expect(val).to eq payload
   else
     raise "unknown encryption scheme"
   end
