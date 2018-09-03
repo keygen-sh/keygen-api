@@ -14,9 +14,9 @@ ActiveRecord::Schema.define(version: 20180816022827) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "uuid-ossp"
-  enable_extension "pg_stat_statements"
   enable_extension "btree_gin"
+  enable_extension "pg_stat_statements"
+  enable_extension "uuid-ossp"
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "name"
@@ -81,8 +81,8 @@ ActiveRecord::Schema.define(version: 20180816022827) do
     t.datetime "last_expiring_soon_event_sent_at"
     t.datetime "last_check_in_soon_event_sent_at"
     t.integer  "uses",                             default: 0
-    t.string   "signature"
     t.boolean  "protected"
+    t.string   "signature"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "licenses_tsv_key_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin

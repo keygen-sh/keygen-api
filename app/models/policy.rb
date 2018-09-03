@@ -3,8 +3,14 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  ENCRYPTION_SCHEMES = %w[LEGACY RSA_2048_PKCS1_ENCRYPT RSA_2048_PKCS1_SIGN RSA_2048_PKCS1_PSS_SIGN].freeze
   SIGNING_SCHEMES = %w[RSA_2048_PKCS1_SIGN RSA_2048_PKCS1_PSS_SIGN].freeze
+  ENCRYPTION_SCHEMES = %w[
+    LEGACY_ENCRYPT
+    RSA_2048_PKCS1_ENCRYPT
+    RSA_2048_PKCS1_SIGN
+    RSA_2048_PKCS1_PSS_SIGN
+    RSA_2048_JWT_RS256
+  ].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
@@ -19,7 +25,7 @@ class Policy < ApplicationRecord
   has_many :pool, class_name: "Key", dependent: :destroy
 
   # Default to legacy encryption scheme so that we don't break backwards compat
-  before_validation -> { self.encryption_scheme = 'LEGACY' }, on: :create, if: -> { encrypted? && encryption_scheme.nil? }
+  before_validation -> { self.encryption_scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && encryption_scheme.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
 
   validates :account, presence: { message: "must exist" }
@@ -65,7 +71,7 @@ class Policy < ApplicationRecord
   end
 
   def legacy_encrypted?
-    encrypted? && encryption_scheme == 'LEGACY'
+    encrypted? && encryption_scheme == 'LEGACY_ENCRYPT'
   end
 
   def protected?
