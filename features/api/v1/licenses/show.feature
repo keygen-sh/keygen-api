@@ -189,6 +189,38 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/a-license-key"
     Then the response status should be "404"
 
+  Scenario: Admin attempts to retrieve an encrypted license for their account by key using RSA_2048_PKCS1_ENCRYPT
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_ENCRYPT"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
+  Scenario: Admin attempts to retrieve an encrypted license for their account by key using RSA_2048_PKCS1_SIGN
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_SIGN"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
+  Scenario: Admin attempts to retrieve an encrypted license for their account by key using RSA_2048_PKCS1_PSS_SIGN
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 encrypted "license" using "RSA_2048_PKCS1_PSS_SIGN"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
+  Scenario: Admin attempts to retrieve an encrypted license for their account by key using RSA_2048_JWT_RS256
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 encrypted "license" using "RSA_2048_JWT_RS256"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
     And the current account has 1 "product"
