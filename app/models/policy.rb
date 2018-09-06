@@ -3,7 +3,6 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  SIGNING_SCHEMES = %w[RSA_2048_PKCS1_SIGN RSA_2048_PKCS1_PSS_SIGN].freeze
   ENCRYPTION_SCHEMES = %w[
     LEGACY_ENCRYPT
     RSA_2048_PKCS1_ENCRYPT
@@ -64,10 +63,6 @@ class Policy < ApplicationRecord
 
   def encrypted?
     encrypted
-  end
-
-  def signed?
-    encrypted? && SIGNING_SCHEMES.include?(encryption_scheme)
   end
 
   def legacy_encrypted?
