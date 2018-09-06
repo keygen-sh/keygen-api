@@ -149,7 +149,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
   when "RSA_2048_PKCS1_ENCRYPT"
     pub = OpenSSL::PKey::RSA.new @account.public_key
 
-    key = Base64.strict_decode64 json["data"]["attributes"]["key"].to_s
+    key = Base64.urlsafe_decode64 json["data"]["attributes"]["key"].to_s
     dec = pub.public_decrypt key rescue nil
 
     expect(json["data"]["type"]).to eq resource.pluralize
@@ -159,11 +159,11 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
     digest = OpenSSL::Digest::SHA256.new
 
     encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
-    key = Base64.strict_decode64 encoded_key
-    sig = Base64.strict_decode64 encoded_sig
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
     val = value.to_s
 
-    res = pub.verify digest, sig, val rescue false
+    res = pub.verify digest, sig, key rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
@@ -173,11 +173,11 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
     digest = OpenSSL::Digest::SHA256.new
 
     encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
-    key = Base64.strict_decode64 encoded_key
-    sig = Base64.strict_decode64 encoded_sig
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
     val = value.to_s
 
-    res = pub.verify_pss digest, sig, val, salt_length: :auto, mgf1_hash: "SHA256" rescue false
+    res = pub.verify_pss digest, sig, key, salt_length: :auto, mgf1_hash: "SHA256" rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
@@ -202,7 +202,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
 
   case scheme
   when "BASE64"
-    dec = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    dec = Base64.urlsafe_decode64 json["data"]["attributes"][attribute].to_s
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(dec).to eq value.to_s
