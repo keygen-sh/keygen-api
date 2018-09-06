@@ -168,7 +168,7 @@ class License < ApplicationRecord
         priv = OpenSSL::PKey::RSA.new account.private_key
         enc = priv.private_encrypt key
 
-        self.key = Base64.strict_encode64 enc
+        self.key = Base64.urlsafe_encode64 enc
       else
         errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
       end
@@ -176,12 +176,18 @@ class License < ApplicationRecord
       priv = OpenSSL::PKey::RSA.new account.private_key
       sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
-      self.key = [Base64.strict_encode64(key), Base64.strict_encode64(sig)].join '.'
+      encoded_key = Base64.urlsafe_encode64 key
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      self.key = "#{encoded_key}.#{encoded_sig}"
     when "RSA_2048_PKCS1_PSS_SIGN"
       priv = OpenSSL::PKey::RSA.new account.private_key
       sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
 
-      self.key = [Base64.strict_encode64(key), Base64.strict_encode64(sig)].join '.'
+      encoded_key = Base64.urlsafe_encode64 key
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      self.key = "#{encoded_key}.#{encoded_sig}"
     when "RSA_2048_JWT_RS256"
       priv = OpenSSL::PKey::RSA.new account.private_key
       begin
