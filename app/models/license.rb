@@ -57,7 +57,6 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
-  validates :signature, presence: { message: "failed to generate key signature" }, if: -> { policy.present? && signed? }
   validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
@@ -74,7 +73,6 @@ class License < ApplicationRecord
   delegate :check_in_interval_count, to: :policy
   delegate :encrypted?, to: :policy
   delegate :legacy_encrypted?, to: :policy
-  delegate :signed?, to: :policy
   delegate :encryption_scheme, to: :policy
   delegate :pool?, to: :policy
 
@@ -178,19 +176,17 @@ class License < ApplicationRecord
       priv = OpenSSL::PKey::RSA.new account.private_key
       sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
-      self.signature = Base64.strict_encode64 sig
-      self.key = Base64.strict_encode64 key
+      self.key = [Base64.strict_encode64(key), Base64.strict_encode64(sig)].join '.'
     when "RSA_2048_PKCS1_PSS_SIGN"
       priv = OpenSSL::PKey::RSA.new account.private_key
       sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
 
-      self.signature = Base64.strict_encode64 sig
-      self.key = Base64.strict_encode64 key
+      self.key = [Base64.strict_encode64(key), Base64.strict_encode64(sig)].join '.'
     when "RSA_2048_JWT_RS256"
       priv = OpenSSL::PKey::RSA.new account.private_key
       begin
         payload = JSON.parse key
-        jwt = JWT.encode payload, priv, 'RS256'
+        jwt = JWT.encode payload, priv, "RS256"
 
         self.key = jwt
       rescue JSON::GeneratorError,

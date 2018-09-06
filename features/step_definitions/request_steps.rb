@@ -139,7 +139,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encrypted (\w+) (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, attribute, v1, v2, scheme|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) encrypted key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
   json = JSON.parse last_response.body
 
   # Double quotes vs single quotes
@@ -149,8 +149,8 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
   when "RSA_2048_PKCS1_ENCRYPT"
     pub = OpenSSL::PKey::RSA.new @account.public_key
 
-    val = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
-    dec = pub.public_decrypt val rescue nil
+    key = Base64.strict_decode64 json["data"]["attributes"]["key"].to_s
+    dec = pub.public_decrypt key rescue nil
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(dec).to eq value.to_s
@@ -158,28 +158,34 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
     pub = OpenSSL::PKey::RSA.new @account.public_key
     digest = OpenSSL::Digest::SHA256.new
 
-    sig = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    key = Base64.strict_decode64 encoded_key
+    sig = Base64.strict_decode64 encoded_sig
     val = value.to_s
 
     res = pub.verify digest, sig, val rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
+    expect(key).to eq val
     expect(res).to be true
   when "RSA_2048_PKCS1_PSS_SIGN"
     pub = OpenSSL::PKey::RSA.new @account.public_key
     digest = OpenSSL::Digest::SHA256.new
 
-    sig = Base64.strict_decode64 json["data"]["attributes"][attribute].to_s
+    encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    key = Base64.strict_decode64 encoded_key
+    sig = Base64.strict_decode64 encoded_sig
     val = value.to_s
 
     res = pub.verify_pss digest, sig, val, salt_length: :auto, mgf1_hash: "SHA256" rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
+    expect(key).to eq val
     expect(res).to be true
   when "RSA_2048_JWT_RS256"
     pub = OpenSSL::PKey::RSA.new @account.public_key
-    jwt = json["data"]["attributes"][attribute].to_s
-    dec = JWT.decode jwt, pub, true, algorithm: 'RS256'
+    jwt = json["data"]["attributes"]["key"].to_s
+    dec = JWT.decode jwt, pub, true, algorithm: "RS256"
     payload = JSON.parse value
     val, alg = dec
 
