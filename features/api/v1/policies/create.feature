@@ -49,7 +49,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
     And the JSON response should be a "policy" with a nil scheme
-    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" without an encrypted attribute
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -802,7 +802,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" without an encrypted attribute
     And the JSON response should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -835,7 +835,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
-    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" without an encrypted attribute
     And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -868,7 +868,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_ENCRYPT"
-    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" without an encrypted attribute
     And the JSON response should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -901,7 +901,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the scheme "RSA_2048_JWT_RS256"
-    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" without an encrypted attribute
     And the JSON response should be a "policy" with the name "JWT RS256"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
