@@ -80,7 +80,7 @@ Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, r
   end
 end
 
-Given /^the current account has (\d+) encrypted "([^\"]*)" using "([^\"]*)"$/ do |count, resource, scheme|
+Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, resource, scheme|
   count.to_i.times do
     case scheme
     when 'RSA_2048_PKCS1_ENCRYPT'

@@ -7,8 +7,8 @@ FactoryGirl.define do
     after :build do |license, evaluator|
       account = evaluator.account or create :account
       policy =
-        if evaluator.policy.encrypted?
-          scheme = evaluator.policy.encryption_scheme.downcase.to_sym
+        if evaluator.policy.scheme?
+          scheme = evaluator.policy.scheme.downcase.to_sym
 
           create :policy, scheme, account: account
         else

@@ -48,7 +48,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with a nil encryptionScheme
+    And the JSON response should be a "policy" with a nil scheme
     And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
@@ -214,7 +214,7 @@ Feature: Create policy
             "maxMachines": 5,
             "floating": true,
             "strict": false,
-            "encryptionScheme": "LEGACY_ENCRYPT",
+            "scheme": "LEGACY_ENCRYPT",
             "encrypted": true,
             "duration": $time.2.weeks
           }
@@ -255,7 +255,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is legacy encrypted and uses a pool
+  Scenario: Admin attempts to create a policy that is legacy encrypted that uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -268,7 +268,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "LEGACY_ENCRYPT",
+            "scheme": "LEGACY_ENCRYPT",
             "encrypted": true,
             "usePool": true
           },
@@ -284,7 +284,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "422"
-    And the JSON response should be an array of 1 error
+    And the JSON response should be an array of 2 errors
     And the first error should have the following properties:
       """
       {
@@ -293,13 +293,24 @@ Feature: Create policy
         "code": "ENCRYPTED_NOT_SUPPORTED",
         "source": {
           "pointer": "/data/attributes/encrypted"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot use a scheme and use a pool",
+        "code": "SCHEME_NOT_SUPPORTED",
+        "source": {
+          "pointer": "/data/attributes/scheme"
         }
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_PKCS1_ENCRYPT and uses a pool
+  Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_ENCRYPT that uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -312,8 +323,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
-            "encrypted": true,
+            "scheme": "RSA_2048_PKCS1_ENCRYPT",
             "usePool": true
           },
           "relationships": {
@@ -333,17 +343,17 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot be encrypted and use a pool",
-        "code": "ENCRYPTED_NOT_SUPPORTED",
+        "detail": "cannot use a scheme and use a pool",
+        "code": "SCHEME_NOT_SUPPORTED",
         "source": {
-          "pointer": "/data/attributes/encrypted"
+          "pointer": "/data/attributes/scheme"
         }
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_PKCS1_SIGN and uses a pool
+  Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_SIGN that uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -356,8 +366,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
-            "encrypted": true,
+            "scheme": "RSA_2048_PKCS1_SIGN",
             "usePool": true
           },
           "relationships": {
@@ -377,17 +386,17 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot be encrypted and use a pool",
-        "code": "ENCRYPTED_NOT_SUPPORTED",
+        "detail": "cannot use a scheme and use a pool",
+        "code": "SCHEME_NOT_SUPPORTED",
         "source": {
-          "pointer": "/data/attributes/encrypted"
+          "pointer": "/data/attributes/scheme"
         }
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin attempts to create a policy that is encrypted using RSA_2048_JWT_RS256 and uses a pool
+  Scenario: Admin attempts to create a policy using scheme RSA_2048_JWT_RS256 that uses a pool
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -400,8 +409,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Invalid",
-            "encryptionScheme": "RSA_2048_JWT_RS256",
-            "encrypted": true,
+            "scheme": "RSA_2048_JWT_RS256",
             "usePool": true
           },
           "relationships": {
@@ -421,10 +429,10 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "cannot be encrypted and use a pool",
-        "code": "ENCRYPTED_NOT_SUPPORTED",
+        "detail": "cannot use a scheme and use a pool",
+        "code": "SCHEME_NOT_SUPPORTED",
         "source": {
-          "pointer": "/data/attributes/encrypted"
+          "pointer": "/data/attributes/scheme"
         }
       }
       """
@@ -480,7 +488,7 @@ Feature: Create policy
             "maxMachines": 1,
             "floating": false,
             "strict": true,
-            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
+            "scheme": "LEGACY_ENCRYPT",
             "encrypted": true,
             "duration": $time.2.weeks
           },
@@ -766,7 +774,7 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_SIGN for their account
+  Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_SIGN for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -779,8 +787,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "RSA Signed",
-            "encryptionScheme": "RSA_2048_PKCS1_SIGN",
-            "encrypted": true
+            "scheme": "RSA_2048_PKCS1_SIGN"
           },
           "relationships": {
             "product": {
@@ -794,13 +801,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_SIGN"
-    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN"
+    And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_PSS_SIGN for their account
+  Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_PSS_SIGN for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -813,8 +820,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "RSA Probabilistic Signature Scheme",
-            "encryptionScheme": "RSA_2048_PKCS1_PSS_SIGN",
-            "encrypted": true
+            "scheme": "RSA_2048_PKCS1_PSS_SIGN"
           },
           "relationships": {
             "product": {
@@ -828,13 +834,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_PSS_SIGN"
-    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
+    And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_PKCS1_ENCRYPT for their account
+  Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_ENCRYPT for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -847,8 +853,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "RSA Encrypted",
-            "encryptionScheme": "RSA_2048_PKCS1_ENCRYPT",
-            "encrypted": true
+            "scheme": "RSA_2048_PKCS1_ENCRYPT"
           },
           "relationships": {
             "product": {
@@ -862,13 +867,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_PKCS1_ENCRYPT"
-    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_ENCRYPT"
+    And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using RSA_2048_JWT_RS256 for their account
+  Scenario: Admin creates a policy using scheme RSA_2048_JWT_RS256 for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -881,8 +886,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "JWT RS256",
-            "encryptionScheme": "RSA_2048_JWT_RS256",
-            "encrypted": true
+            "scheme": "RSA_2048_JWT_RS256"
           },
           "relationships": {
             "product": {
@@ -896,13 +900,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "RSA_2048_JWT_RS256"
-    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the scheme "RSA_2048_JWT_RS256"
+    And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" with the name "JWT RS256"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using LEGACY_ENCRYPT for their account
+  Scenario: Admin creates a legacy encrypted policy using scheme LEGACY_ENCRYPT for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -915,7 +919,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Legacy Encrypted",
-            "encryptionScheme": "LEGACY_ENCRYPT",
+            "scheme": "LEGACY_ENCRYPT",
             "encrypted": true
           },
           "relationships": {
@@ -930,13 +934,13 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "LEGACY_ENCRYPT"
+    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
-  Scenario: Admin creates an encrypted policy using AES_SHA256 for their account
+  Scenario: Admin creates a legacy encrypted policy without a scheme for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -948,8 +952,82 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "AES SHA256 Encrypted",
-            "encryptionScheme": "AES_SHA256",
+            "name": "Legacy Encrypted",
+            "encrypted": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
+    And the JSON response should be a "policy" that is encrypted
+    And the JSON response should be a "policy" with the name "Legacy Encrypted"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a policy using scheme LEGACY_ENCRYPT for their account without encryption
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Legacy Encrypted",
+            "scheme": "LEGACY_ENCRYPT"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be encrypted when using LEGACY_ENCRYPT scheme",
+        "code": "SCHEME_INVALID",
+        "source": {
+          "pointer": "/data/attributes/scheme"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates a policy using an unsupported encryption scheme RSA_2048_PKCS1_SIGN for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Unsupported Encryption Scheme",
+            "scheme": "RSA_2048_PKCS1_SIGN",
             "encrypted": true
           },
           "relationships": {
@@ -968,11 +1046,53 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "unsupported encryption scheme",
+        "detail": "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)",
+        "code": "SCHEME_NOT_ALLOWED",
         "source": {
-          "pointer": "/data/attributes/encryptionScheme"
+          "pointer": "/data/attributes/scheme"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin creates a policy using scheme AES_SHA256 for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "AES SHA256 Encrypted",
+            "scheme": "AES_SHA256",
+            "encrypted": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)",
+        "source": {
+          "pointer": "/data/attributes/scheme"
         },
-        "code": "ENCRYPTION_SCHEME_NOT_ALLOWED"
+        "code": "SCHEME_NOT_ALLOWED"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1005,7 +1125,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the encryptionScheme "LEGACY_ENCRYPT"
+    And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "Default Scheme"
     And sidekiq should have 2 "webhook" jobs
