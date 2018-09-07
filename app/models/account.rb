@@ -22,7 +22,7 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users
 
   before_create -> { self.slug = slug.downcase }
-  before_create :generate_keys
+  before_create :generate_keys!
 
   after_create :set_founding_users_roles
 
@@ -47,7 +47,13 @@ class Account < ApplicationRecord
     users.admins
   end
 
-  def generate_keys
+  private
+
+  def set_founding_users_roles
+    users.each { |u| u.grant :admin }
+  end
+
+  def generate_keys!
     priv = if private_key.nil?
              OpenSSL::PKey::RSA.generate RSA_KEY_SIZE
            else
@@ -58,10 +64,5 @@ class Account < ApplicationRecord
     self.private_key = priv.to_pem
     self.public_key = pub.to_pem
   end
-
-  private
-
-  def set_founding_users_roles
-    users.each { |u| u.grant :admin }
-  end
+  alias_method :regenerate_keys!, :generate_keys!
 end
