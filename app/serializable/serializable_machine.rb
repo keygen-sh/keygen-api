@@ -42,8 +42,8 @@ class SerializableMachine < SerializableBase
   end
   relationship :user do
     linkage always: true do
-      if @object.user_id.present?
-        { type: :users, id: @object.user_id }
+      if @object.license.user_id.present?
+        { type: :users, id: @object.license.user_id }
       else
         nil
       end
