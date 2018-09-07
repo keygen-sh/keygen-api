@@ -42,7 +42,11 @@ class SerializableMachine < SerializableBase
   end
   relationship :user do
     linkage always: true do
-      { type: :users, id: @object.license.user_id }
+      if @object.user_id.present?
+        { type: :users, id: @object.user_id }
+      else
+        nil
+      end
     end
     link :related do
       @url_helpers.v1_account_machine_user_path @object.account_id, @object

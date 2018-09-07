@@ -27,6 +27,53 @@ Feature: Show license
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin retrieves a license for their account that has a user
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": { "type": "users", "id": "$users[1]" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a license for their account that doesn't have a user
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "user": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+          "data": null
+        }
+      }
+      """
+
   Scenario: Admin retrieves a license for their account by key
     Given I am an admin of account "test1"
     And the current account is "test1"
