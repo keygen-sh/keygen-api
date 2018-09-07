@@ -1069,8 +1069,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "AES SHA256 Encrypted",
-            "scheme": "AES_SHA256",
-            "encrypted": true
+            "scheme": "AES_SHA256"
           },
           "relationships": {
             "product": {
@@ -1088,7 +1087,7 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)",
+        "detail": "unsupported encryption scheme",
         "source": {
           "pointer": "/data/attributes/scheme"
         },
