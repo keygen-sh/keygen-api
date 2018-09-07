@@ -174,7 +174,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
-    And the JSON response should be a "license" with a nil key
+    And the JSON response should be a "license" without a key attribute
 
   Scenario: Admin attempts to retrieve a legacy encrypted license for their account by key
     Given I am an admin of account "test1"
