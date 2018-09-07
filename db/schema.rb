@@ -164,7 +164,7 @@ ActiveRecord::Schema.define(version: 20180816022827) do
     t.boolean  "require_fingerprint_scope", default: false
     t.boolean  "concurrent",                default: true
     t.integer  "max_uses"
-    t.string   "encryption_scheme"
+    t.string   "scheme"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gin

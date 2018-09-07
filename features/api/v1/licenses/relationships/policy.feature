@@ -302,6 +302,58 @@ Feature: License policy relationship
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin changes a license's policy relationship to a new policy with a different scheme
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "scheme": "RSA_2048_JWT_RS256"
+      }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "scheme": "RSA_2048_PKCS1_ENCRYPT"
+      }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "cannot change to a policy with a different scheme",
+        "source": {
+          "pointer": "/data/relationships/policy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin changes a pooled license's policy relationship to a new unpooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"

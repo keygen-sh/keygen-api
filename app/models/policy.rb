@@ -3,7 +3,7 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  ENCRYPTION_SCHEMES = %w[
+  CRYPTO_SCHEMES = %w[
     LEGACY_ENCRYPT
     RSA_2048_PKCS1_ENCRYPT
     RSA_2048_PKCS1_SIGN
@@ -24,7 +24,7 @@ class Policy < ApplicationRecord
   has_many :pool, class_name: "Key", dependent: :destroy
 
   # Default to legacy encryption scheme so that we don't break backwards compat
-  before_validation -> { self.encryption_scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && encryption_scheme.nil? }
+  before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
 
   validates :account, presence: { message: "must exist" }
@@ -37,10 +37,13 @@ class Policy < ApplicationRecord
   validates :check_in_interval, inclusion: { in: %w[day week month year], message: "must be one of: day, week, month, year" }, if: :requires_check_in?
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
-  validates :encryption_scheme, presence: true, inclusion: { in: ENCRYPTION_SCHEMES, message: "unsupported encryption scheme" }, if: :encrypted?
+  validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
+  validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
+    errors.add :scheme, :not_supported, message: "cannot use a scheme and use a pool" if pool? && scheme?
+    errors.add :scheme, :invalid, message: "must be encrypted when using LEGACY_ENCRYPT scheme" if !encrypted? && legacy_scheme?
   end
 
   scope :product, -> (id) { where product: id }
@@ -65,8 +68,16 @@ class Policy < ApplicationRecord
     encrypted
   end
 
+  def scheme?
+    scheme.present?
+  end
+
   def legacy_encrypted?
-    encrypted? && encryption_scheme == 'LEGACY_ENCRYPT'
+    encrypted? && legacy_scheme?
+  end
+
+  def legacy_scheme?
+    scheme == 'LEGACY_ENCRYPT'
   end
 
   def protected?

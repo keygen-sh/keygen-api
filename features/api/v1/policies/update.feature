@@ -153,6 +153,27 @@ Feature: Update policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin updates a policy's scheme attribute for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "scheme": "RSA_2048_PKCS1_SIGN"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin updates a policy's encrypted attribute for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
