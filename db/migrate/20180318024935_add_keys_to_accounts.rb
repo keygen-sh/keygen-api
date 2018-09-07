@@ -7,7 +7,7 @@ class AddKeysToAccounts < ActiveRecord::Migration[5.0]
       next if account.private_key.present? ||
               account.public_key.present?
 
-      account.generate_keys
+      account.send :generate_keys! # Private method
       account.save! validate: false
     end
   end
