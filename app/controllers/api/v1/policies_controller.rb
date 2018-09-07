@@ -83,7 +83,7 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[policy policies]
           param :attributes, type: :hash do
-            param :encryption_scheme, type: :string, optional: true
+            param :scheme, type: :string, optional: true
             param :encrypted, type: :boolean, optional: true
             param :use_pool, type: :boolean, optional: true
             param :name, type: :string, optional: true

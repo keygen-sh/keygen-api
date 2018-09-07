@@ -22,28 +22,28 @@ FactoryGirl.define do
     end
 
     trait :legacy_encrypt do
-      encryption_scheme 'LEGACY_ENCRYPT'
+      scheme 'LEGACY_ENCRYPT'
       encrypted true
     end
 
     trait :rsa_2048_pkcs1_encrypt do
-      encryption_scheme 'RSA_2048_PKCS1_ENCRYPT'
-      encrypted true
+      scheme 'RSA_2048_PKCS1_ENCRYPT'
+      encrypted false
     end
 
     trait :rsa_2048_pkcs1_sign do
-      encryption_scheme 'RSA_2048_PKCS1_SIGN'
-      encrypted true
+      scheme 'RSA_2048_PKCS1_SIGN'
+      encrypted false
     end
 
     trait :rsa_2048_pkcs1_pss_sign do
-      encryption_scheme 'RSA_2048_PKCS1_PSS_SIGN'
-      encrypted true
+      scheme 'RSA_2048_PKCS1_PSS_SIGN'
+      encrypted false
     end
 
     trait :rsa_2048_jwt_rs256 do
-      encryption_scheme 'RSA_2048_JWT_RS256'
-      encrypted true
+      scheme 'RSA_2048_JWT_RS256'
+      encrypted false
     end
 
     trait :pooled do

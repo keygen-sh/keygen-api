@@ -11,7 +11,7 @@ class SerializableLicense < SerializableBase
   attribute :expiry
   attribute :uses
   attribute :suspended
-  attribute :encryption_scheme
+  attribute :scheme
   attribute :encrypted do
     @object.policy.encrypted?
   end
