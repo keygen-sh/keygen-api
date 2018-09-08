@@ -1266,3 +1266,39 @@ Feature: Create license
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin uses an invalid token while attempting to create a license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I send the following headers:
+      """
+      { "Authorization": "Bearer prod-4TzUcN9xMV2cUVT3AuDbPx8XWXnDRF4TzUcN9xMV2cUVT3AuDbPx8XWXnDRFnReibxxgBxXaY2gpb7DRDkUmZpyYi2sXzYfyVL4buWtbgyFD9zbd1319f14b90de1cv2" }
+      """
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "You must be authenticated to complete the request"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
