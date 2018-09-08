@@ -18,7 +18,7 @@ Given /^I send the following headers:$/ do |body|
   headers = JSON.parse body
 
   # Base64 encode basic credentials
-  if headers.key? "Authorization"
+  if headers["Authorization"]&.starts_with? "Basic"
     /Basic "([.@\w\d]+):(.+)"/ =~ headers["Authorization"]
     credentials = Base64.encode64 "#{$1}:#{$2}"
     headers["Authorization"] = "Basic \"#{credentials}\""
