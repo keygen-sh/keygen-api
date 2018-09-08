@@ -1229,3 +1229,40 @@ Feature: Create license
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Admin uses an invalid token that looks like a UUID while attempting to create a license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I send the following headers:
+      """
+      { "Authorization": "Bearer 852da78f-1444-4462-8863-d7b9fff9e003" }
+      """
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "Token format is invalid (make sure the token begins with a proper prefix e.g. 'prod-XXX' or 'acti-XXX', and that it's not a token UUID)",
+        "code": "TOKEN_FORMAT_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
