@@ -1,7 +1,7 @@
 module Keygen
   module Middleware
     class CatchJsonParseErrors
-      ACCEPTED_CONTENT_TYPES_REGEX = /(?:application\/json)|(?:application\/vnd\.api\+json)/
+      ACCEPTED_CONTENT_TYPES_REGEX = /application\/(vnd\.api\+)?json/
 
       def initialize(app)
         @app = app
@@ -10,7 +10,7 @@ module Keygen
       def call(env)
         @app.call(env)
       rescue ActionDispatch::ParamsParser::ParseError => e
-        raise e unless env['HTTP_ACCEPT'] =~ ACCEPTED_CONTENT_TYPES_REGEX
+        raise e unless env["HTTP_ACCEPT"] =~ ACCEPTED_CONTENT_TYPES_REGEX
 
         [
           400,
@@ -20,7 +20,8 @@ module Keygen
           [{
             errors: [{
               title: "Bad request",
-              detail: "The request could not be completed because it contains invalid JSON"
+              detail: "The request could not be completed because it contains invalid JSON",
+              code: "JSON_INVALID"
             }]
           }.to_json]
         ]
