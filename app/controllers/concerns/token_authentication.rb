@@ -16,6 +16,12 @@ module TokenAuthentication
   def authenticator(token, options)
     account = current_account || Account.find(params[:account_id] || params[:id])
 
+    # Make sure token matches our expected format. This is also here to help users
+    # who may be mistakenly using a UUID as a token, which is a common mistake.
+    if token.present? && token =~ UUID_REGEX
+      render_unauthorized code: 'TOKEN_FORMAT_INVALID', detail: "Token format is invalid (make sure the token begins with a proper prefix e.g. 'prod-XXX' or 'acti-XXX', and that it's not a token UUID)" and return
+    end
+
     @current_token = TokenAuthenticationService.new(
       account: account,
       token: token
@@ -30,6 +36,7 @@ module TokenAuthentication
 
   def request_http_token_authentication(realm = "Keygen", message = nil)
     headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+
     raise Keygen::Error::UnauthorizedError
   end
 end
