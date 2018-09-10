@@ -24,8 +24,8 @@ class TokenAuthenticationService < BaseService
         nil
       end
     when "v2"
-      hmac = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
-      tok = account.tokens.find_by digest: hmac
+      digest = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
+      tok = account.tokens.find_by digest: digest
 
       tok
     end

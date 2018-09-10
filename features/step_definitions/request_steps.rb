@@ -192,10 +192,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is (\w+)$/ do
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is not (\w+)$/ do |name, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is not (\w+)$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
-  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to be false
 
   if @account.present?
@@ -205,10 +205,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that is not (\w+)$
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |name, attribute, body|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|
   json = JSON.parse last_response.body
 
-  expect(json["data"]["type"]).to eq name.pluralize
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"][attribute]).to eq JSON.parse(body)
 
   if @account.present?
@@ -218,10 +218,11 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following attributes:$/ do |body|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following attributes:$/ do |resource, body|
   parse_placeholders! body
   json = JSON.parse last_response.body
 
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["attributes"]).to include JSON.parse(body)
 
   if @account.present?
@@ -231,10 +232,11 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following relationships:$/ do |body|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following relationships:$/ do |resource, body|
   parse_placeholders! body
   json = JSON.parse last_response.body
 
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["relationships"]).to include JSON.parse(body)
 
   if @account.present?
@@ -244,11 +246,19 @@ Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the followi
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "(?:[^\"]*)" with the following meta:$/ do |body|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
   parse_placeholders! body
   json = JSON.parse last_response.body
 
+  expect(json["data"]["type"]).to eq resource.pluralize
   expect(json["data"]["meta"]).to include JSON.parse(body)
+end
+
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with no meta$/ do |resource|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  expect(json["data"].key?("meta")).to be false
 end
 
 Then /^the JSON response should (?:contain|be) meta with the following:$/ do |body|

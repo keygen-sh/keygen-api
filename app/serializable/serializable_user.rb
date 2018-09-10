@@ -50,4 +50,12 @@ class SerializableUser < SerializableBase
   link :self do
     @url_helpers.v1_account_user_path @object.account_id, @object
   end
+
+  meta do
+    next unless @object.role? :admin
+
+    {
+      intercomId: @object.intercom_id
+    }
+  end
 end
