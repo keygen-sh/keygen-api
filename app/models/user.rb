@@ -40,6 +40,12 @@ class User < ApplicationRecord
     [first_name, last_name].join " "
   end
 
+  def intercom_id
+    return unless role? :admin
+
+    OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue nil
+  end
+
   private
 
   def set_role

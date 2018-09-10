@@ -14,7 +14,7 @@ module Tokenable
   def generate_hashed_token(attribute, length: 64, version: ALGO_VERSION)
     loop do
       raw = nil
-      enc = nil
+      res = nil
 
       case version
       when "v1"
@@ -25,15 +25,15 @@ module Tokenable
         # length, since the first 66 chars of our string consist of the account
         # and the bearer's UUID. This lets us use larger tokens (as seen here)
         # and avoid the nasty truncation.
-        enc = BCrypt::Password.create Digest::SHA256.digest(raw)
+        res = BCrypt::Password.create Digest::SHA256.digest(raw)
       when "v2"
         raw = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
         raw = yield raw if block_given?
 
-        enc = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, raw
+        res = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, raw
       end
 
-      break [raw, enc] unless self.class.exists? attribute => enc
+      break [raw, res] unless self.class.exists? attribute => res
     end
   end
 
