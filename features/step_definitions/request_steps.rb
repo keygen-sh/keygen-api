@@ -41,6 +41,13 @@ When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
+When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
+  parse_path_placeholders! path
+  parse_placeholders! body
+
+  post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
+end
+
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
   parse_path_placeholders! path
   parse_placeholders! body

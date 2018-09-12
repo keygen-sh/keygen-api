@@ -340,3 +340,33 @@ Feature: Create user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+
+  Scenario: Anonymous attempts to create an admin for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "String in CP1252 encoding: \xE4\xF6\xFC\xDF",
+            "lastName": "Partly valid\xE4 UTF-8 encoding: äöüß",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Request data contained an invalid byte sequence (check encoding)"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
