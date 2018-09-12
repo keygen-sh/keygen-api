@@ -31,6 +31,8 @@ class ApplicationController < ActionController::API
   rescue_from JSON::ParserError, with: -> { render_bad_request }
   rescue_from ArgumentError, with: -> (err) {
     case err.message
+    when 'invalid byte sequence in UTF-8'
+      render_bad_request detail: 'Request data contained an invalid byte sequence (check encoding)'
     when 'string contains null byte'
       render_bad_request detail: 'Request data contained an unexpected null byte (check encoding)'
     else
