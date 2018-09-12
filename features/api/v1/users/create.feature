@@ -341,7 +341,7 @@ Feature: Create user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
-  Scenario: Anonymous attempts to create an admin for an account
+  Scenario: Anonymous attempts to send a request containing an invalid byte sequence (bad UTF-8 encoding)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
