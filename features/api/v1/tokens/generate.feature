@@ -69,21 +69,21 @@ Feature: Generate authentication token
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "401"
 
-  Scenario: Anonymous attempts to send a null byte within the auth header
-    Given the current account is "test1"
-    And I send the following raw headers:
-      """
-      Authorization: Basic dABlAHMAdABAAHQAZQBzAHQALgBjAG8AbQA6AFAAYQBzAHMAdwBvMA=
-      """
-    When I send a POST request to "/accounts/test1/tokens"
-    Then the response status should be "400"
-    # And the first error should have the following properties:
-    #   """
-    #   {
-    #     "title": "Bad request",
-    #     "detail": "Request data is badly encoded"
-    #   }
-    #   """
+  # Scenario: Anonymous attempts to send a null byte within the auth header
+  #   Given the current account is "test1"
+  #   And I send the following raw headers:
+  #     """
+  #     Authorization: Basic dABlAHMAdABAAHQAZQBzAHQALgBjAG8AbQA6AFAAYQBzAHMAdwBvMA=
+  #     """
+  #   When I send a POST request to "/accounts/test1/tokens"
+  #   Then the response status should be "400"
+  #   # And the first error should have the following properties:
+  #   #   """
+  #   #   {
+  #   #     "title": "Bad request",
+  #   #     "detail": "Request data is badly encoded"
+  #   #   }
+  #   #   """
 
   Scenario: Anonymous attempts to send a badly encoded email address
     Given the current account is "test1"
