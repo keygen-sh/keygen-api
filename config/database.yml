@@ -13,6 +13,7 @@ development:
 test: &test
   <<: *default
   database: keygen_test<%= ENV['TEST_ENV_NUMBER'] %>
+  prepared_statements: false
 
 production:
   <<: *default
