@@ -234,7 +234,7 @@ class ApplicationController < ActionController::API
       json: Mime::Type.lookup_by_extension(:json).to_s
     )
 
-    content_type = request.headers["Accept"]
+    content_type = request.headers["Accept"]&.strip
     if content_type.nil? || content_type.include?("*/*")
       response.headers["Content-Type"] = accepted_content_types[:jsonapi]
     elsif !(accepted_content_types.values & content_type.split(/,\s*/)).empty?

@@ -55,6 +55,25 @@ Feature: Show license
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin retrieves a license for their account with an unsupported accept header
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And I send the following raw headers:
+    """
+    Accept: text/plain, text/html
+    """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unsupported accept header: text/plain, text/html"
+      }
+      """
+
   Scenario: Admin retrieves a license for their account that has a user
     Given I am an admin of account "test1"
     And the current account is "test1"
