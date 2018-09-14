@@ -315,6 +315,19 @@ Then /^the response should contain the following headers:$/ do |body|
   expect(last_response.headers).to include JSON.parse(body)
 end
 
+Then /^the response should contain the following raw headers:$/ do |body|
+  parse_placeholders! body
+
+  headers = body.split /\n/
+
+  headers.each do |raw|
+    key, value = raw.split ":"
+
+    expect(last_response.headers).to include key => value.strip
+  end
+
+end
+
 Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
   pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
   digest = OpenSSL::Digest::SHA256.new

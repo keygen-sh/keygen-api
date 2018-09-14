@@ -27,18 +27,40 @@ Feature: Show license
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin retrieves a license for their account with a valid accept header
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And I send the following raw headers:
+      """
+      Accept: application/json
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/json
+      """
+    And the response should contain a valid signature header for "test1"
+
   Scenario: Admin retrieves a license for their account with a wildcard accept header
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I send the following raw headers:
-    """
-    Accept: application/json, text/plain, */*
-    """
+      """
+      Accept: application/json, text/plain, */*
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
     And the JSON response should be a "license"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/vnd.api+json
+      """
     And the response should contain a valid signature header for "test1"
 
   Scenario: Admin retrieves a license for their account with a mixed accept header
@@ -46,12 +68,16 @@ Feature: Show license
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I send the following raw headers:
-    """
-    Accept: text/plain, application/json
-    """
+      """
+      Accept: text/plain, application/vnd.api+json, application/json
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
+    And the response should contain the following raw headers:
+      """
+      Content-Type: application/vnd.api+json
+      """
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
@@ -60,9 +86,9 @@ Feature: Show license
     And the current account is "test1"
     And the current account has 3 "licenses"
     And I send the following raw headers:
-    """
-    Accept: text/plain, text/html
-    """
+      """
+      Accept: text/plain, text/html
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "400"

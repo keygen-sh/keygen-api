@@ -235,10 +235,16 @@ class ApplicationController < ActionController::API
     )
 
     content_type = request.headers["Accept"]&.strip
+    accepted = if content_type.present?
+                 accepted_content_types.values & content_type.split(/,\s*/)
+               else
+                 []
+               end
+
     if content_type.nil? || content_type.include?("*/*")
       response.headers["Content-Type"] = accepted_content_types[:jsonapi]
-    elsif !(accepted_content_types.values & content_type.split(/,\s*/)).empty?
-      response.headers["Content-Type"] = content_type
+    elsif !accepted.empty?
+      response.headers["Content-Type"] = accepted.first.strip
     else
       render_bad_request detail: "Unsupported accept header: #{content_type}"
     end
