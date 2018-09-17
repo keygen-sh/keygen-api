@@ -10,7 +10,7 @@ class SerializablePolicy < SerializableBase
   attribute :max_uses
   attribute :concurrent
   attribute :scheme
-  attribute :encrypted, if: -> { @object.encrypted? }
+  attribute :encrypted
   attribute :protected
   attribute :require_product_scope
   attribute :require_policy_scope

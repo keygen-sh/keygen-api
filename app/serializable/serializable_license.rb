@@ -12,7 +12,7 @@ class SerializableLicense < SerializableBase
   attribute :uses
   attribute :suspended
   attribute :scheme
-  attribute :encrypted, if: -> { @object.policy.encrypted? } do
+  attribute :encrypted do
     @object.policy.encrypted?
   end
   attribute :strict do
