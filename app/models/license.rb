@@ -244,16 +244,14 @@ class License < ApplicationRecord
 
   def generate_jwt_rs256_key!
     priv = OpenSSL::PKey::RSA.new account.private_key
-    begin
-      payload = JSON.parse key
-      jwt = JWT.encode payload, priv, "RS256"
+    payload = JSON.parse key
+    jwt = JWT.encode payload, priv, "RS256"
 
-      self.key = jwt
-    rescue JSON::GeneratorError,
-            JSON::ParserError
-      errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (must be a valid JSON encoded string)"
-    rescue JWT::InvalidPayload => e
-      errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (#{e.message})"
-    end
+    self.key = jwt
+  rescue JSON::GeneratorError,
+         JSON::ParserError
+    errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (must be a valid JSON encoded string)"
+  rescue JWT::InvalidPayload => e
+    errors.add :key, :jwt_payload_invalid, message: "key is not a valid JWT payload (#{e.message})"
   end
 end
