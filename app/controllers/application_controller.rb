@@ -26,12 +26,23 @@ class ApplicationController < ActionController::API
       render_bad_request
     end
   }
+  rescue_from PG::Error, with: -> (err) {
+    case err.message
+    when 'incomplete multibyte character'
+      render_bad_request detail: 'Request data is badly encoded'
+    else
+      Raygun.track_exception err
+
+      render_internal_server_error
+    end
+  }
   rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
   rescue_from ActiveRecord::RecordNotFound, with: -> { render_not_found }
   rescue_from JSON::ParserError, with: -> { render_bad_request }
   rescue_from ArgumentError, with: -> (err) {
     case err.message
-    when 'invalid byte sequence in UTF-8'
+    when 'invalid byte sequence in UTF-8',
+         'incomplete multibyte character'
       render_bad_request detail: 'Request data contained an invalid byte sequence (check encoding)'
     when 'string contains null byte'
       render_bad_request detail: 'Request data contained an unexpected null byte (check encoding)'
