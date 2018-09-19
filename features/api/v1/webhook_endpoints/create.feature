@@ -33,7 +33,130 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "201"
     And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      ["*"]
+      """
     And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for their account that subscribes to certain events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "subscriptions": [
+              "license.created",
+              "license.created",
+              "license.updated",
+              "license.deleted"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      [
+        "license.created",
+        "license.updated",
+        "license.deleted"
+      ]
+      """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for their account that subscribes to no events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "subscriptions": []
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must have at least 1 webhook event subscription",
+        "source": {
+          "pointer": "/data/attributes/subscriptions"
+        },
+        "code": "SUBSCRIPTIONS_TOO_SHORT"
+      }
+      """
+
+  Scenario: Admin creates a webhook endpoint for their account that subscribes to all events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "subscriptions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
+      """
+      ["*"]
+      """
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for their account that subscribes to non-existent events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "subscriptions": [
+              "license.created",
+              "foo.bar",
+              "baz.qux"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported webhook event type for subscription",
+        "source": {
+          "pointer": "/data/attributes/subscriptions"
+        },
+        "code": "SUBSCRIPTIONS_NOT_ALLOWED"
+      }
+      """
 
   Scenario: Admin creates a webhook endpoint with missing url
     Given I am an admin of account "test1"

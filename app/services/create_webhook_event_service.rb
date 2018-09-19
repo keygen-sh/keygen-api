@@ -45,6 +45,8 @@ class CreateWebhookEventService < BaseService
     end
 
     account&.webhook_endpoints.find_each do |endpoint|
+      next unless endpoint.subscribed? event
+
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create(
         endpoint: endpoint.url,
