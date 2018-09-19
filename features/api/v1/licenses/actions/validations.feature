@@ -46,8 +46,14 @@ Feature: License validation actions
   Scenario: Admin quick validates a check-in license that is valid
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["*"]
+      }
+      """
+    And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
       {
@@ -79,8 +85,14 @@ Feature: License validation actions
   Scenario: Admin quick validates a check-in license that is overdue
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["license.validation.succeeded"]
+      }
+      """
+    And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
       {
@@ -105,14 +117,20 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
       """
-    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin quick validates a strict license that is valid
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["license.validation.succeeded"]
+      }
+      """
+    And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
       {
@@ -149,8 +167,14 @@ Feature: License validation actions
   Scenario: Admin quick validates a suspended license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["license.validation.failed"]
+      }
+      """
+    And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
       {
@@ -188,8 +212,14 @@ Feature: License validation actions
   Scenario: Admin quick validates a strict floating license that has too many machines
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 1 "policies"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": []
+      }
+      """
+    And the current account has 1 "policies"
     And all "policies" have the following attributes:
       """
       {
@@ -221,7 +251,7 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
       """
-    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin quick validates a strict license that has too many machines

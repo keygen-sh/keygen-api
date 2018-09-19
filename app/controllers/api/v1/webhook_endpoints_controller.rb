@@ -64,6 +64,9 @@ module Api::V1
           param :type, type: :string, inclusion: %w[webhookEndpoint webhookEndpoints webhook-endpoint webhook-endpoints webhook_endpoint webhook_endpoints]
           param :attributes, type: :hash do
             param :url, type: :string
+            param :subscriptions, type: :array, optional: true do
+              items type: :string
+            end
           end
         end
       end
@@ -74,6 +77,9 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :url, type: :string, optional: true
+            param :subscriptions, type: :array, optional: true do
+              items type: :string
+            end
           end
         end
       end

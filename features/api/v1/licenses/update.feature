@@ -278,6 +278,12 @@ Feature: Update license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["user.created", "license.created"]
+      }
+      """
     And the current account has 1 "license"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
@@ -295,7 +301,7 @@ Feature: Update license
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And the JSON response should be a "license" that is suspended
-    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin updates a license expiry to a nil value

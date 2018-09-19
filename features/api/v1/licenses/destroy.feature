@@ -33,6 +33,12 @@ Feature: Delete license
   Scenario: User attempts to delete one of their licenses
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["license.deleted"]
+      }
+      """
     And the current account has 1 "user"
     And the current account has 3 "licenses"
     And all "licenses" have the following attributes:
