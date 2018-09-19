@@ -19,6 +19,12 @@ Feature: Create user
   Scenario: Anonymous creates a user for an account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["user.created", "user.updated"]
+      }
+      """
     And the current account has 1 "user"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -145,8 +151,14 @@ Feature: Create user
       """
       { "protected": true }
       """
-    And I use an authentication token
     And the current account has 2 "webhook-endpoints"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": []
+      }
+      """
+    And I use an authentication token
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -162,7 +174,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin creates an admin for their account
@@ -170,6 +182,12 @@ Feature: Create user
     And the current account is "test1"
     And I use an authentication token
     And the current account has 3 "webhook-endpoints"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      {
+        "subscriptions": ["user.created"]
+      }
+      """
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -247,7 +265,13 @@ Feature: Create user
     And the current account has 1 "product"
     And I am a product of account "test1"
     And I use an authentication token
-    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "webhook-endpoints"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      {
+        "subscriptions": []
+      }
+      """
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -263,7 +287,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
-    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
   Scenario: User attempts to create an admin for their account

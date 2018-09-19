@@ -250,9 +250,10 @@ ActiveRecord::Schema.define(version: 20180921153258) do
 
   create_table "webhook_endpoints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string   "url"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.uuid     "account_id"
+    t.jsonb    "subscriptions", default: ["*"]
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_webhook_endpoints_on_id_and_created_at_and_account_id", unique: true, using: :btree
   end

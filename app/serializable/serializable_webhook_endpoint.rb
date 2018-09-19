@@ -2,6 +2,7 @@ class SerializableWebhookEndpoint < SerializableBase
   type "webhook-endpoints"
 
   attribute :url
+  attribute :subscriptions
   attribute :created do
     @object.created_at
   end

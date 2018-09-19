@@ -1,8 +1,6 @@
 module Keygen
   module Middleware
     class CatchJsonParseErrors
-      ACCEPTED_CONTENT_TYPES_REGEX = /application\/(vnd\.api\+)?json/
-
       def initialize(app)
         @app = app
       end
@@ -10,7 +8,7 @@ module Keygen
       def call(env)
         @app.call(env)
       rescue ActionDispatch::ParamsParser::ParseError => e
-        raise e unless env["HTTP_ACCEPT"] =~ ACCEPTED_CONTENT_TYPES_REGEX
+        raise e unless env["HTTP_ACCEPT"] =~ /application\/(vnd\.api\+)?json/
 
         [
           400,

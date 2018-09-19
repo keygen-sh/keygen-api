@@ -1061,6 +1061,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": []
+      }
+      """
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
@@ -1102,7 +1108,7 @@ Feature: Create license
     And the JSON response should be a "license" that is not encrypted
     And the JSON response should be a "license" that is not strict
     And the JSON response should be a "license" that is not floating
-    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
   Scenario: Admin creates a license without a user
@@ -1189,7 +1195,7 @@ Feature: Create license
     And the first error should have the following properties:
       """
       {
-        "title":"Bad request",
+        "title": "Bad request",
         "detail": "is missing",
         "source": {
           "pointer": "/data/relationships/policy"
