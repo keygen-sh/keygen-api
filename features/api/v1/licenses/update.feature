@@ -30,13 +30,15 @@ Feature: Update license
           "type": "licenses",
           "id": "$licenses[0].id",
           "attributes": {
-            "expiry": "2016-09-05T22:53:37.000Z"
+            "expiry": "2016-09-05T22:53:37.000Z",
+            "name": "Some Name"
           }
         }
       }
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
+    And the JSON response should be a "license" with the name "Some Name"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -417,6 +419,29 @@ Feature: Update license
           "type": "licenses",
           "attributes": {
             "expiry": "2016-10-05T22:53:37.000Z"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
+  Scenario: User attempts to update a license name for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 3 "licenses"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Test Name"
           }
         }
       }
