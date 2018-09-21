@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180816022827) do
+ActiveRecord::Schema.define(version: 20180921153258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,7 +87,6 @@ ActiveRecord::Schema.define(version: 20180816022827) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true, using: :btree
-    t.index ["key", "created_at", "account_id"], name: "index_licenses_on_key_and_created_at_and_account_id", using: :btree
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at", using: :btree
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at", using: :btree
   end
