@@ -27,7 +27,7 @@ class License < ApplicationRecord
   # Used for legacy encrypted licenses
   attr_reader :raw
 
-  before_validation :encrypt_key, unless: -> { key.nil? || policy.nil? || !scheme? || legacy_encrypted? }
+  before_validation :encrypt_key, on: :create, unless: -> { key.nil? || policy.nil? || !scheme? || legacy_encrypted? }
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { requires_check_in? }
   before_create :set_expiry, unless: -> { expiry.present? || policy.nil? }
