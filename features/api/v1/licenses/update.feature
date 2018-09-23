@@ -89,6 +89,36 @@ Feature: Update license
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
 
+  # Making sure schemed licenses do not re-encrypt/sign their key on update
+  Scenario: Admin updates a license using scheme RSA_2048_PKCS1_PSS_SIGN to protected
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license" using "RSA_2048_PKCS1_PSS_SIGN"
+    And the first "license" has the following attributes:
+      """
+      { "key": "test" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "protected": false
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" that is not protected
+    And the JSON response should be a "license" with the key "test"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
   Scenario: Admin updates a license policy
     Given I am an admin of account "test1"
     And the current account is "test1"
