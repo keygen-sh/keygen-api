@@ -7,7 +7,7 @@ class License < ApplicationRecord
 
   EXCLUDED_KEYS = %w[actions action].freeze
 
-  SEARCH_ATTRIBUTES = %i[id key metadata].freeze
+  SEARCH_ATTRIBUTES = %i[id key name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name],
     policy: %i[id name],
