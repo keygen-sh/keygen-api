@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(version: 20180927172712) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "licenses_tsv_key_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at", using: :btree
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at", using: :btree
