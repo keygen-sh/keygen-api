@@ -16,7 +16,45 @@ Feature: Create policy
     When I send a POST request to "/accounts/test1/policies"
     Then the response status should be "403"
 
-  Scenario: Admin creates a policy for their account
+  Scenario: Admin creates a node-locked policy for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Add-On",
+            "floating": false,
+            "strict": false,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the maxMachines "1"
+    And the JSON response should be a "policy" with a nil maxUses
+    And the JSON response should be a "policy" that is not strict
+    And the JSON response should be a "policy" with a nil scheme
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" that is not floating
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a floating policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -46,6 +84,45 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with a nil maxMachines
+    And the JSON response should be a "policy" with a nil maxUses
+    And the JSON response should be a "policy" that is not strict
+    And the JSON response should be a "policy" with a nil scheme
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" that is floating
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+
+  Scenario: Admin creates a floating policy for their account with a max machines attribute
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Premium Add-On",
+            "maxMachines": 3,
+            "floating": true,
+            "strict": false,
+            "duration": $time.2.weeks
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the maxMachines "3"
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
     And the JSON response should be a "policy" with a nil scheme
