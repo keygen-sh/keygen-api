@@ -26,6 +26,7 @@ class Policy < ApplicationRecord
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
+  before_create -> { self.max_machines = 1 }, if: :node_locked?
 
   validates :account, presence: { message: "must exist" }
   validates :product, presence: { message: "must exist" }

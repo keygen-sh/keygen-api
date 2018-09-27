@@ -29,7 +29,7 @@ class Machine < ApplicationRecord
             machine.license.nil? ||
             machine.license.machines.empty?
 
-    next unless machine.license.machines.count >= machine.policy.max_machines rescue false
+    next unless (machine.license.machines.count >= machine.policy.max_machines rescue false)
 
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
