@@ -95,9 +95,11 @@ module Api::V1
           param :attributes, type: :hash, optional: true do
             param :name, type: :string, optional: true
             param :key, type: :string, optional: true
-            param :protected, type: :boolean, optional: true
-            param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
-            param :suspended, type: :boolean, optional: true
+            if current_bearer&.role? :admin or current_bearer&.role? :product
+              param :protected, type: :boolean, optional: true
+              param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
+              param :suspended, type: :boolean, optional: true
+            end
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
@@ -123,10 +125,12 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
-            param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
-            param :protected, type: :boolean, optional: true
-            param :suspended, type: :boolean, optional: true
-            param :metadata, type: :hash, optional: true
+            if current_bearer&.role? :admin or current_bearer&.role? :product
+              param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
+              param :protected, type: :boolean, optional: true
+              param :suspended, type: :boolean, optional: true
+              param :metadata, type: :hash, optional: true
+            end
           end
         end
       end
