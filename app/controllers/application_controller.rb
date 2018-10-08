@@ -28,7 +28,7 @@ class ApplicationController < ActionController::API
   }
   rescue_from PG::Error, with: -> (err) {
     case err.message
-    when 'incomplete multibyte character'
+    when /incomplete multibyte character/
       render_bad_request detail: 'Request data is badly encoded'
     else
       Raygun.track_exception err
@@ -41,10 +41,10 @@ class ApplicationController < ActionController::API
   rescue_from JSON::ParserError, with: -> { render_bad_request }
   rescue_from ArgumentError, with: -> (err) {
     case err.message
-    when 'invalid byte sequence in UTF-8',
-         'incomplete multibyte character'
+    when /invalid byte sequence in UTF-8/,
+         /incomplete multibyte character/
       render_bad_request detail: 'Request data contained an invalid byte sequence (check encoding)'
-    when 'string contains null byte'
+    when /string contains null byte/
       render_bad_request detail: 'Request data contained an unexpected null byte (check encoding)'
     else
       Raygun.track_exception err
