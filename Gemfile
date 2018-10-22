@@ -55,6 +55,7 @@ gem 'sass-rails'
 gem 'raygun4ruby', "~> 1.1.11"
 
 # Monitoring/APM
+gem 'rails_autoscale_agent'
 gem 'newrelic_rpm'
 
 group :development, :test do
