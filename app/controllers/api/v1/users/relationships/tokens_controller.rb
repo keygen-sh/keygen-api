@@ -7,7 +7,7 @@ module Api::V1::Users::Relationships
 
     # GET /users/1/tokens
     def index
-      @tokens = policy_scope apply_scopes(@user.tokens).all
+      @tokens = policy_scope apply_scopes(@user.tokens)
       authorize @tokens
 
       render jsonapi: @tokens
