@@ -7,7 +7,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/policies
     def index
-      @policies = policy_scope apply_scopes(@product.policies).all
+      @policies = policy_scope apply_scopes(@product.policies)
       authorize @policies
 
       render jsonapi: @policies

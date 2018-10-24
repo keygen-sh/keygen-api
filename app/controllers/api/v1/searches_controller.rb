@@ -59,7 +59,7 @@ module Api::V1
           end
         end
 
-        @search = policy_scope apply_scopes(res).all
+        @search = policy_scope apply_scopes(res)
 
         render jsonapi: @search
       else

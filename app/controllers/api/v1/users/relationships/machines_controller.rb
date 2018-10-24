@@ -11,7 +11,7 @@ module Api::V1::Users::Relationships
 
     # GET /users/1/machines
     def index
-      @machines = policy_scope apply_scopes(@user.machines.preload(:product)).all
+      @machines = policy_scope apply_scopes(@user.machines.preload(:product))
       authorize @machines
 
       render jsonapi: @machines

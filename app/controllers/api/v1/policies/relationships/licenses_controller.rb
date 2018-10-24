@@ -11,7 +11,7 @@ module Api::V1::Policies::Relationships
 
     # GET /policies/1/licenses
     def index
-      @licenses = policy_scope apply_scopes(@policy.licenses).all
+      @licenses = policy_scope apply_scopes(@policy.licenses)
       authorize @licenses
 
       render jsonapi: @licenses

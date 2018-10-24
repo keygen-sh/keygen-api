@@ -11,7 +11,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/machines
     def index
-      @machines = policy_scope apply_scopes(@license.machines.preload(:product)).all
+      @machines = policy_scope apply_scopes(@license.machines.preload(:product))
       authorize @machines
 
       render jsonapi: @machines

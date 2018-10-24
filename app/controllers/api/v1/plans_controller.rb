@@ -4,7 +4,7 @@ module Api::V1
 
     # GET /plans
     def index
-      @plans = apply_scopes(Plan.visible).reorder(price: :asc).all
+      @plans = apply_scopes(Plan.visible).reorder(price: :asc)
 
       authorize @plans
 

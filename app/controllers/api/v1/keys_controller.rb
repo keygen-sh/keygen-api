@@ -10,7 +10,7 @@ module Api::V1
 
     # GET /keys
     def index
-      @keys = policy_scope apply_scopes(current_account.keys.preload(:product)).all
+      @keys = policy_scope apply_scopes(current_account.keys.preload(:product))
       authorize @keys
 
       render jsonapi: @keys
