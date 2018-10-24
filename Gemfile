@@ -56,7 +56,7 @@ gem 'raygun4ruby', "~> 1.1.11"
 
 # Monitoring/APM
 gem 'rails_autoscale_agent'
-gem 'newrelic_rpm'
+gem 'scout_apm'
 
 group :development, :test do
   gem 'byebug', platform: :mri
