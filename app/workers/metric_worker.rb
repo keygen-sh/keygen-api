@@ -1,3 +1,4 @@
+# FIXME(ezekg) Deprecated in favor of RecordMetricWorker
 class MetricWorker
   include Sidekiq::Worker
   include Sidekiq::Throttled::Worker

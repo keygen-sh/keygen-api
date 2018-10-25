@@ -1,10 +1,14 @@
 World Rack::Test::Methods
 
 Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
-  worker = "#{resource.singularize.underscore}_worker"
-  if resource == "webhook"
+  case resource
+  when "webhook"
     CreateWebhookEventsWorker.drain # Make sure our webhooks are created
+  when "metric"
+    resource = "record_metric" # We renamed this worker
   end
+
+  worker = "#{resource.singularize.underscore}_worker"
 
   expect(worker.classify.constantize.jobs.size).to eq count.to_i
 end

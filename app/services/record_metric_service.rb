@@ -1,22 +1,23 @@
 class RecordMetricService < BaseService
 
-  def initialize(metric:, account:, data:)
+  def initialize(metric:, account:, resource:)
     @metric   = metric
     @account  = account
-    @data     = data
+    @resource = resource
   end
 
   def execute
     return if /^account/ =~ metric # We don't care about account events
 
-    MetricWorker.perform_async(
+    RecordMetricWorker.perform_async(
       metric,
       account.id,
-      data.to_json
+      resource.class.name,
+      resource.id
     )
   end
 
   private
 
-  attr_reader :metric, :account, :data
+  attr_reader :metric, :account, :resource
 end
