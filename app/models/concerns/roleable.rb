@@ -12,7 +12,7 @@ module Roleable
   end
 
   def revoke(name)
-    role.destroy if role.name == name.to_s
+    role.destroy_async if role.name == name.to_s
   end
 
   def role?(name)

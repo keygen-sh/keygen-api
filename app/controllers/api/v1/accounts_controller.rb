@@ -45,7 +45,7 @@ module Api::V1
     def destroy
       authorize @account
 
-      @account.destroy
+      @account.destroy_async
     end
 
     private

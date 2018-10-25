@@ -63,7 +63,7 @@ module Api::V1
     def destroy
       authorize @user
 
-      if @user.destroy
+      if @user.destroy_async
         CreateWebhookEventService.new(
           event: "user.deleted",
           account: current_account,

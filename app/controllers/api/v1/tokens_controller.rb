@@ -92,7 +92,7 @@ module Api::V1
     def revoke
       authorize @token
 
-      @token.destroy
+      @token.destroy_async
     end
 
     private

@@ -23,7 +23,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :role
 
-  before_destroy :enforce_admin_minimum_on_account
+  before_destroy :enforce_admin_minimum_on_account!
   before_save -> { self.email = email.downcase }
   after_create :set_role, if: -> { role.nil? }
 
@@ -46,16 +46,28 @@ class User < ApplicationRecord
     OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue nil
   end
 
+  # Our async destroy logic needs to be a bit different to prevent accounts
+  # from going under the minimum admin threshold
+  def destroy_async
+    if role?(:admin) && account.admins.count <= MINIMUM_ADMIN_COUNT
+      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
+
+      return false
+    end
+
+    super
+  end
+
   private
 
   def set_role
     grant :user
   end
 
-  def enforce_admin_minimum_on_account
-    return if account.admins.size >= MINIMUM_ADMIN_COUNT
+  def enforce_admin_minimum_on_account!
+    return if !role?(:admin) || account.admins.count >= MINIMUM_ADMIN_COUNT
 
-    errors.add :account, :admins_required, message: "account must have at least one admin user"
+    errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
     throw :abort
   end

@@ -67,7 +67,7 @@ module Api::V1
         resource: @policy
       ).execute
 
-      @policy.destroy
+      @policy.destroy_async
     end
 
     private

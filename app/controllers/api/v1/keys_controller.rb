@@ -68,7 +68,7 @@ module Api::V1
         resource: @key
       ).execute
 
-      @key.destroy
+      @key.destroy_async
     end
 
     private

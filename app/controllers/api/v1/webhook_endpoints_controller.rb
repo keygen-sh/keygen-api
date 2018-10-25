@@ -47,7 +47,7 @@ module Api::V1
     def destroy
       authorize @endpoint
 
-      @endpoint.destroy
+      @endpoint.destroy_async
     end
 
     private

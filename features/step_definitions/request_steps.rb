@@ -66,6 +66,9 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+
+  # Wait for all async deletion workers to finish
+  DestroyModelWorker.drain
 end
 
 Then /^the response status should (?:contain|be) "([^\"]*)"$/ do |status|
