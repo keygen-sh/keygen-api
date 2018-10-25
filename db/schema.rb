@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180927172712) do
+ActiveRecord::Schema.define(version: 20181025150012) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -137,6 +137,7 @@ ActiveRecord::Schema.define(version: 20180927172712) do
     t.integer  "trial_duration"
     t.integer  "max_reqs"
     t.integer  "max_admins"
+    t.string   "interval"
     t.index ["id", "created_at"], name: "index_plans_on_id_and_created_at", unique: true, using: :btree
     t.index ["plan_id", "created_at"], name: "index_plans_on_plan_id_and_created_at", using: :btree
   end

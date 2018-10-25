@@ -3,6 +3,7 @@ class SerializablePlan < SerializableBase
 
   attribute :name
   attribute :price
+  attribute :interval
   attribute :trial_duration
   attribute :max_reqs
   attribute :max_admins
