@@ -16,6 +16,6 @@ module Roleable
   end
 
   def role?(name)
-    role.name == name.to_s
+    role&.name == name.to_s
   end
 end
