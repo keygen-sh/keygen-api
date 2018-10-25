@@ -71,7 +71,7 @@ module Api::V1
         resource: @license
       ).execute
 
-      @license.destroy
+      @license.destroy_async
     end
 
     private

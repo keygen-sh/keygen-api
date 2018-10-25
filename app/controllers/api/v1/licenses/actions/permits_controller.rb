@@ -58,7 +58,7 @@ module Api::V1::Licenses::Actions
         resource: @license
       ).execute
 
-      @license.destroy
+      @license.destroy_async
     end
 
     # POST /licenses/1/suspend
