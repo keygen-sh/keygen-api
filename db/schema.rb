@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181025150012) do
+ActiveRecord::Schema.define(version: 20181025164052) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 20181025150012) do
     t.integer  "uses",                             default: 0
     t.boolean  "protected"
     t.string   "name"
+    t.integer  "machines_count",                   default: 0
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "licenses_tsv_key_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
