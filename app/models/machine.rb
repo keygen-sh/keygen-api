@@ -14,7 +14,7 @@ class Machine < ApplicationRecord
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
-  belongs_to :license
+  belongs_to :license, counter_cache: true
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
@@ -24,12 +24,14 @@ class Machine < ApplicationRecord
 
   # Disallow machine overages when the policy is not set to concurrent
   validate on: :create do |machine|
+    machines_count = machine.license&.machines&.count || 0
+
     next if machine.policy.nil? ||
             machine.policy.concurrent ||
             machine.license.nil? ||
-            machine.license.machines.empty?
+            machines_count == 0
 
-    next unless (machine.license.machines.count >= machine.policy.max_machines rescue false)
+    next unless (machines_count >= machine.policy.max_machines rescue false)
 
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
