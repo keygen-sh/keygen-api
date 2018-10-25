@@ -44,39 +44,16 @@ class CreateWebhookEventService < BaseService
       # noop
     end
 
-    account&.webhook_endpoints.find_each do |endpoint|
-      next unless endpoint.subscribed? event
+    # Append meta to options for resource payload and serialize
+    # for the async event creation worker
+    options.merge! meta: @meta.transform_keys { |k| k.to_s.camelize :lower } unless @meta.nil?
+    payload = JSONAPI::Serializable::Renderer.new.render(resource, options).to_json
 
-      # Create a partial event (we'll complete it after the job is fired)
-      webhook_event = account.webhook_events.create(
-        endpoint: endpoint.url,
-        event: event
-      )
-
-      # Serialize the event and decode so we can use in webhook job
-      payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, options)
-
-      # Append meta to options for resource payload
-      opts = options
-      opts.merge! meta: @meta.transform_keys { |k| k.to_s.camelize :lower } unless @meta.nil?
-
-      # Set the payload attr of the webhook payload (since it's incomplete at the moment)
-      payload[:data][:attributes][:payload] = JSONAPI::Serializable::Renderer.new.render(resource, opts).to_json
-
-      # Enqueue the worker, which will fire off the webhook
-      jid = WebhookWorker.perform_async(
-        account.id,
-        webhook_event.id,
-        endpoint.id,
-        payload.to_json
-      )
-
-      # Update the event to contain the payload and job identifier
-      webhook_event.update(
-        payload: payload.dig(:data, :attributes, :payload),
-        jid: jid
-      )
-    end
+    CreateWebhookEventsWorker.perform_async(
+      event,
+      account.id,
+      payload
+    )
   end
 
   private
