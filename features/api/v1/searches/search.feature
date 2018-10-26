@@ -590,6 +590,33 @@ Feature: Create policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
 
+  Scenario: Admin performs a search by license type on a large key attribute
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "T1RjZ09Ua2dNR1VnWVRFZ016RWdNREFnTnpRZ1ltSWdOMlVnWkRnZ1lqY2daRFFnWkRVZ09Ea2daVEFnWXpJZ05UUWdaRGdnWld"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "licenses",
+          "query": {
+            "key": "T1RjZ09U"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+
   Scenario: Admin performs a search by license type using a partial ID
     Given I am an admin of account "test1"
     And the current account is "test1"
