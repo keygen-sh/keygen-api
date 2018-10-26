@@ -38,6 +38,36 @@ Feature: Update webhook endpoint
     And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin updates a webhook endpoint's url to localhosts
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "id": "$webhook-endpoints[0].id",
+          "attributes": {
+            "url": "https://localhost/foo-bar-baz"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a URL with a valid host",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_HOST_INVALID"
+      }
+      """
+
   Scenario: User attempts to update a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"

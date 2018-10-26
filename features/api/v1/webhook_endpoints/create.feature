@@ -101,6 +101,122 @@ Feature: Create webhook endpoint
       }
       """
 
+  Scenario: Admin creates a webhook endpoint for their account with an invalid domain
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://invalid",
+            "subscriptions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a URL with a valid host",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_HOST_INVALID"
+      }
+      """
+
+  Scenario: Admin creates a webhook endpoint for their account with a forbidden domain
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://api.keygen.sh/v1/accounts/demo/webhook-events",
+            "subscriptions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a URL with a valid host",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_HOST_INVALID"
+      }
+      """
+
+  Scenario: Admin creates a webhook endpoint for their account with an invalid URI
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "1230-12e9 c0ascka-ff.a!",
+            "subscriptions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a valid URL",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_INVALID"
+      }
+      """
+
+  Scenario: Admin creates a localhost webhook endpoint for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://localhost",
+            "subscriptions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a URL with a valid host",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_HOST_INVALID"
+      }
+      """
+
   Scenario: Admin creates a webhook endpoint for their account that subscribes to all events
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -189,6 +305,17 @@ Feature: Create webhook endpoint
       }
       """
     Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a valid URL using one of the following protocols: https",
+        "source": {
+          "pointer": "/data/attributes/url"
+        },
+        "code": "URL_PROTOCOL_INVALID"
+      }
+      """
 
   Scenario: Admin creates a webhook endpoint with an invalid url protocol
     Given I am an admin of account "test1"
