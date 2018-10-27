@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181026200210) do
+ActiveRecord::Schema.define(version: 20181027145359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 20181026200210) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at", using: :btree
+    t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true, using: :btree
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at", using: :btree
   end
