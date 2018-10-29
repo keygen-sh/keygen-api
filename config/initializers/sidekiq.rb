@@ -1,4 +1,5 @@
 require 'sidekiq'
+require 'sidekiq-unique-jobs'
 require 'sidekiq-status'
 require 'sidekiq-cron'
 require "sidekiq/throttled"
@@ -28,6 +29,10 @@ Sidekiq.configure_server do |config|
   config.client_middleware do |chain|
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 24.hours
   end
+end
+
+SidekiqUniqueJobs.configure do |config|
+  config.enabled = !Rails.env.test?
 end
 
 Sidekiq::Throttled.setup!
