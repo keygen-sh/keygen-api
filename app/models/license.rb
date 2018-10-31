@@ -138,6 +138,8 @@ class License < ApplicationRecord
   end
 
   def set_first_check_in
+    return if last_check_in_at.present?
+
     self.last_check_in_at = Time.current
   end
 

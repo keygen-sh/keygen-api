@@ -152,7 +152,7 @@ describe LicenseExpirationsWorker do
     end
 
     it 'should not mark the license with the expiring soon event time' do
-      license = create :license, expiry: 4.day.from_now
+      license = create :license, expiry: 4.days.from_now
 
       worker.perform_async
       worker.drain
