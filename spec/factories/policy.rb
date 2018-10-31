@@ -8,6 +8,15 @@ FactoryGirl.define do
     use_pool false
     encrypted false
     protected false
+    require_check_in false
+    check_in_interval nil
+    check_in_interval_count nil
+    require_product_scope false
+    require_policy_scope false
+    require_machine_scope false
+    require_fingerprint_scope false
+    max_uses nil
+    scheme nil
 
     association :account
     association :product
@@ -44,6 +53,30 @@ FactoryGirl.define do
     trait :rsa_2048_jwt_rs256 do
       scheme 'RSA_2048_JWT_RS256'
       encrypted false
+    end
+
+    trait :day_check_in do
+      require_check_in true
+      check_in_interval 'day'
+      check_in_interval_count 1
+    end
+
+    trait :week_check_in do
+      require_check_in true
+      check_in_interval 'week'
+      check_in_interval_count 1
+    end
+
+    trait :month_check_in do
+      require_check_in true
+      check_in_interval 'month'
+      check_in_interval_count 1
+    end
+
+    trait :year_check_in do
+      require_check_in true
+      check_in_interval 'year'
+      check_in_interval_count 1
     end
 
     trait :pooled do
