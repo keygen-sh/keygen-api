@@ -27,7 +27,7 @@ Feature: Product users relationship
       { "productId": "$products[0]" }
       """
     And the current account has 3 "users"
-    And the current account has 3 "licenses"
+    And the current account has 4 "licenses"
     And the first "license" has the following attributes:
       """
       { "userId": "$users[1]", "policyId": "$policies[0]" }
@@ -39,6 +39,10 @@ Feature: Product users relationship
     And the third "license" has the following attributes:
       """
       { "userId": "$users[3]", "policyId": "$policies[0]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[0]" }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/users"
