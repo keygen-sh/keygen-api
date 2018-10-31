@@ -17,7 +17,7 @@ class LicenseOverdueCheckInsWorker
         :end_date
     ]
 
-    License.includes(:account, :policy).joins(:policy).where(query, require_check_in: true, start_date: 3.days.ago, end_date: 3.days.from_now).find_each do |license|
+    License.preload(:account, :policy).joins(:policy).where(query, require_check_in: true, start_date: 3.days.ago, end_date: 3.days.from_now).find_each do |license|
       next if license.expired?
 
       case
