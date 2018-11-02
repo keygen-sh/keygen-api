@@ -1,6 +1,7 @@
 require "httparty"
 
 class WebhookWorker
+  MAX_RESPONSE_BODY_BYTE_SIZE = 2048
   ACCEPTABLE_CODES = (200..299).freeze
 
   include Sidekiq::Worker
@@ -27,9 +28,16 @@ class WebhookWorker
 
     # TODO(ezekg) Remove this error handling after we know everything is working
     begin
+      body =
+        if "#{res.body}".bytesize > MAX_RESPONSE_BODY_BYTE_SIZE
+          'RES_BODY_TOO_LARGE'
+        else
+          res.body
+        end
+
       event.update(
         last_response_code: res.code,
-        last_response_body: res.body
+        last_response_body: body
       )
     rescue => e
       Raygun.track_exception e
