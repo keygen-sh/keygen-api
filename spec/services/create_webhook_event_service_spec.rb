@@ -14,7 +14,9 @@ describe CreateWebhookEventService do
       resource: @resource
     ).execute
 
-    @account.webhook_events.last
+    @event = @account.webhook_events.last
+
+    @event
   end
 
   def jsonapi_render(model)
@@ -93,7 +95,7 @@ describe CreateWebhookEventService do
 
   it 'the event should contain the last response code' do
     allow(WebhookWorker::Request).to receive(:post) {
-      OpenStruct.new(code: 204)
+      OpenStruct.new(code: 204, body: nil)
     }
 
     event = create_webhook_event!
@@ -109,6 +111,16 @@ describe CreateWebhookEventService do
     event = create_webhook_event!
 
     expect(event.last_response_body).to eq 'OK'
+  end
+
+  it 'the event should not store large response bodies' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      OpenStruct.new(code: 200, body: SecureRandom.hex(8092))
+    }
+
+    event = create_webhook_event!
+
+    expect(event.last_response_body).to eq 'RES_BODY_TOO_LARGE'
   end
 
   it 'should attempt to deliver the event' do
@@ -130,7 +142,7 @@ describe CreateWebhookEventService do
 
   it 'should succeed when event delivery is ok' do
     allow(WebhookWorker::Request).to receive(:post) {
-      OpenStruct.new(code: 204)
+      OpenStruct.new(code: 204, body: nil)
     }
 
     expect { create_webhook_event! }.to_not raise_error
@@ -138,7 +150,7 @@ describe CreateWebhookEventService do
 
   it 'should raise when event delivery fails' do
     allow(WebhookWorker::Request).to receive(:post) {
-      OpenStruct.new(code: 500)
+      OpenStruct.new(code: 500, body: nil)
     }
 
     expect { create_webhook_event! }.to raise_error WebhookWorker::FailedRequestError
@@ -150,6 +162,8 @@ describe CreateWebhookEventService do
     }
 
     expect { create_webhook_event! }.to_not raise_error
+
+    expect(@event.last_response_body).to eq 'SSL_ERROR'
   end
 
   it 'should skip when event delivery fails due to read timeout error' do
@@ -158,6 +172,8 @@ describe CreateWebhookEventService do
     }
 
     expect { create_webhook_event! }.to_not raise_error
+
+    expect(@event.last_response_body).to eq 'REQ_TIMEOUT'
   end
 
   it 'should skip when event delivery fails due to open timeout error' do
@@ -166,6 +182,8 @@ describe CreateWebhookEventService do
     }
 
     expect { create_webhook_event! }.to_not raise_error
+
+    expect(@event.last_response_body).to eq 'REQ_TIMEOUT'
   end
 
   it 'should skip when event delivery fails due to DNS error' do
@@ -174,6 +192,8 @@ describe CreateWebhookEventService do
     }
 
     expect { create_webhook_event! }.to_not raise_error
+
+    expect(@event.last_response_body).to eq 'DNS_ERROR'
   end
 
   it 'should not skip when event delivery fails due to an exception' do

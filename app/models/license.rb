@@ -214,7 +214,7 @@ class License < ApplicationRecord
   end
 
   def generate_pkcs1_encrypted_key!
-    if key.bytes.size <= RSA_MAX_BYTE_SIZE
+    if key.bytesize <= RSA_MAX_BYTE_SIZE
       priv = OpenSSL::PKey::RSA.new account.private_key
       enc = priv.private_encrypt key
 
