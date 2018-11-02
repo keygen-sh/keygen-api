@@ -17,9 +17,10 @@ test: &test
 
 production:
   <<: *default
+  url: <%= ENV['DATABASE_CONNECTION_POOL_URL'] || ENV['DATABASE_URL'] %>
   pool: <%= ENV['DB_POOL'] || ENV['RAILS_MAX_THREADS'] || 5 %>
   timeout: <%= ENV['DB_TIMEOUT'] || 5000 %>
-  database: keygen_prod
+  prepared_statements: false
 
 cucumber:
   <<: *test
