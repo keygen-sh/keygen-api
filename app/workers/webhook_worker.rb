@@ -9,6 +9,9 @@ class WebhookWorker
   include Signable
 
   sidekiq_options queue: :webhooks, retry: 15
+  sidekiq_retry_in do |count|
+    (count ** 4) + 10.minutes.to_i
+  end
 
   def perform(account_id, event_id, endpoint_id, payload)
     account = Account.find account_id
