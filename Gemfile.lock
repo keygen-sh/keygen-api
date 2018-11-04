@@ -179,7 +179,7 @@ GEM
       actionmailer (>= 3, < 6)
       premailer (~> 1.7, >= 1.7.9)
     public_suffix (2.0.5)
-    puma (3.6.2)
+    puma (3.12.0)
     pundit (1.1.0)
       activesupport (>= 3.0.0)
     rack (2.0.1)
@@ -353,7 +353,7 @@ DEPENDENCIES
   pg
   pg_search
   premailer-rails
-  puma (~> 3.0)
+  puma (~> 3.12)
   pundit
   rack-attack (~> 5.2)
   rack-cors
