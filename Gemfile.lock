@@ -42,6 +42,9 @@ GEM
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
+    barnes (0.0.7)
+      multi_json (~> 1)
+      statsd-ruby (~> 1.1)
     bcrypt (3.1.11)
     builder (3.2.2)
     bullet (5.7.6)
@@ -300,6 +303,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    statsd-ruby (1.4.0)
     stripe (1.57.1)
       rest-client (>= 1.4, < 4.0)
     stripe-ruby-mock (2.3.1)
@@ -327,6 +331,7 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
+  barnes
   bcrypt (~> 3.1.7)
   bullet
   byebug
