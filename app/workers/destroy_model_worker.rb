@@ -7,6 +7,6 @@ class DestroyModelWorker
     klass = "#{type}".classify.constantize
     model = klass.find id
 
-    model.destroy
+    model.destroy!
   end
 end
