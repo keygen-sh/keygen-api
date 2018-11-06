@@ -533,7 +533,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month
+        "duration": $time.30.days
       }
       """
     And the current account has 1 "license"
