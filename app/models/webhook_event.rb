@@ -11,6 +11,6 @@ class WebhookEvent < ApplicationRecord
   scope :events, -> (*events) { where event: events }
 
   def status
-    Sidekiq::Status.status(jid) || :unavailable rescue :queued
+    Sidekiq::Status.status(jid) rescue :queued
   end
 end
