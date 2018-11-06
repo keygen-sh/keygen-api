@@ -13,7 +13,6 @@ class TypedParameters
   TRUTHY_VALUES = [true, 1, "1", "true", "TRUE"].freeze
 
   VALID_TYPES = {
-    fixnum: Fixnum,
     number: Numeric,
     integer: Integer,
     float: Float,

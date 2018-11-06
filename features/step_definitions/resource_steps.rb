@@ -129,7 +129,7 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Given /^the ((?!current)\w+) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
   resource = resource.pluralize.underscore
   numbers = {
     "first"   => 1,
@@ -227,7 +227,7 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   end
 end
 
-Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
   parse_placeholders! body
   numbers = {
     "first"   => 0,
@@ -256,7 +256,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following attributes:$/ do |i, r
   m.save validate: false
 end
 
-Given /^the ((?!account)\w+) "([^\"]*)" has the following metadata:$/ do |i, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |i, resource, body|
   parse_placeholders! body
   numbers = {
     "first"   => 0,
@@ -285,7 +285,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" has the following metadata:$/ do |i, res
   m.save validate: false
 end
 
-Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
   parse_placeholders! body
 
   account = Account.find slug
@@ -310,7 +310,7 @@ Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following 
   m.save validate: false
 end
 
-Given /^the ((?!account)\w+) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, slug, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, slug, body|
   parse_placeholders! body
 
   account = Account.find slug

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
-ruby '2.3.1'
+ruby '2.5.3'
 
-gem 'rails', '~> 5.0'
+gem 'rails', '~> 5.2'
 gem 'pg'
 gem 'puma', '~> 3.12'
 gem 'bcrypt', '~> 3.1.7'
@@ -78,7 +78,7 @@ group :test do
   gem 'cucumber-rails', require: false
   gem 'rspec-rails', '~> 3.5'
   gem 'rspec-expectations'
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', '4.8.0'
   gem 'database_cleaner'
   gem 'faker', '~> 1.6.3'
 end

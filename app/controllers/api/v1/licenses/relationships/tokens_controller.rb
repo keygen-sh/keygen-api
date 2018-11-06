@@ -9,7 +9,7 @@ module Api::V1::Licenses::Relationships
     def generate
       authorize @license, :generate_token?
 
-      kwargs = token_params.transform_keys(&:to_sym).slice(
+      kwargs = token_params.to_h.symbolize_keys.slice(
         :max_activations,
         :max_deactivations,
         :expiry
