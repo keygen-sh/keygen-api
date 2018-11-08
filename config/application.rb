@@ -30,11 +30,14 @@ module Keygen
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    # Protect against DDOS and other abuses
+    config.middleware.use Rack::Attack
+
     # Catch JSON parse errors and return a better error message
     config.middleware.use Keygen::Middleware::CatchJsonParseErrors
 
-    # Protect against DDOS and other abuses
-    config.middleware.use Rack::Attack
+    # Log Rack request/response to datebase
+    config.middleware.use Keygen::Middleware::RequestLogger
 
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq

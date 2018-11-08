@@ -3,6 +3,7 @@
   - [cleanup, 1]
   - [default, 2]
   - [metrics, 2]
+  - [logs, 2]
   - [mailers, 3]
   - [webhooks, 4]
   - [cron, 5]
