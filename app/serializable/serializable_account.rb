@@ -13,7 +13,7 @@ class SerializableAccount < SerializableBase
 
   relationship :billing, unless: -> { @object.billing.nil? } do
     linkage always: true do
-      { type: :billings, id: @object.billing }
+      { type: :billings, id: @object.billing&.id }
     end
     link :related do
       @url_helpers.v1_account_billing_path @object if @object.billing.present?
