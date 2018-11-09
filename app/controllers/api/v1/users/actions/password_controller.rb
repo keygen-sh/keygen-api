@@ -46,16 +46,13 @@ module Api::V1::Users::Actions
     private
 
     def set_user
-      # FIXME(ezekg) This allows the user to be looked up by ID or email, but
-      #              this is pretty dirty. Maybe move to sluggable concern?
-      #              Could allow the "slug" column to be customizable.
-      if params[:id] =~ UUID_REGEX
-        id = params[:id]
-      else
-        email = params[:id].downcase
-      end
+      @user =
+        if params[:id] =~ UUID_REGEX
+          current_account.users.find_by id: params[:id]
+        else
+          current_account.users.find_by email: params[:id].downcase
+        end
 
-      @user = current_account.users.where("id = ? OR email = ?", id, email).first
       raise ActiveRecord::RecordNotFound if @user.nil?
     end
 
