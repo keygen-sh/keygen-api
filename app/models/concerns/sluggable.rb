@@ -5,23 +5,17 @@ module Sluggable
 
   included do
     # Redefine finder to search by slug and id
-    def self.find(account_id)
-      raise ActiveRecord::RecordNotFound if account_id.nil?
+    def self.find(id)
+      raise ActiveRecord::RecordNotFound if id.nil?
 
       # FIXME(ezekg) Decouple this from the account model
-      if account_id =~ UUID_REGEX
-        id = account_id
-      else
-        slug = account_id.downcase
-      end
-
-      record = includes(:billing)
-                 .where(
-                   'accounts.id = :id OR accounts.slug = :slug',
-                    id: id,
-                    slug: slug
-                  )
-                 .first
+      scope = includes :billing
+      record =
+        if id =~ UUID_REGEX
+          scope.find_by id: id
+        else
+          scope.find_by slug: id.downcase
+        end
 
       if record.nil?
         raise ActiveRecord::RecordNotFound
