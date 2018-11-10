@@ -55,7 +55,7 @@ module Keygen
       end
 
       def call(env)
-        @app.call(env)
+        @app.call env
       rescue ActionDispatch::Http::Parameters::ParseError => e
         raise e unless env["HTTP_ACCEPT"] =~ /application\/(vnd\.api\+)?json/ ||
                        env["HTTP_ACCEPT"] == "*/*"
