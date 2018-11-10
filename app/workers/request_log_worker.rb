@@ -10,7 +10,7 @@ class RequestLogWorker
 
     account.request_logs.create(
       request_id: req['request_id'],
-      endpoint: req['endpoint'],
+      url: req['url'],
       method: req['method'],
       ip: req['ip'],
       user_agent: req['user_agent'],
