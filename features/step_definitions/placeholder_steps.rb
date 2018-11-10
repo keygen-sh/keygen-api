@@ -93,8 +93,10 @@ def parse_path_placeholders!(str)
       else
         if @account
           case resource.underscore
+          when "logs"
+            @account.request_logs.send(:[], index.to_i).id
           when "billing"
-            @account.send(resource.underscore).id
+            @account.billing.id
           when "pool"
             @account.keys
               .all
