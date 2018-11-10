@@ -1,6 +1,14 @@
 module Keygen
   module Middleware
     class RequestLogger
+      IGNORED_HOSTS = %w[app.keygen.sh].freeze
+      IGNORED_RESOURCES = %w[
+        webhook_endpoints
+        webhook_events
+        request_logs
+        metrics
+      ].freeze
+
       def initialize(app)
         @app = app
       end
@@ -8,13 +16,24 @@ module Keygen
       def call(env)
         req = ActionDispatch::Request.new env
         status, headers, res = @app.call env
+
+        if IGNORED_HOSTS.include?(req.headers['host'])
+          return [status, headers, res]
+        end
+
         account_id = req.params[:account_id] || req.params[:id]
+        route = Rails.application.routes.recognize_path req.url, method: req.method
+        controller = route[:controller]
+
+        if controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
+          return [status, headers, res]
+        end
 
         RequestLogWorker.perform_async(
           account_id,
           {
             request_id: req.request_id,
-            endpoint: req.path,
+            url: req.path,
             method: req.method,
             ip: req.ip,
             user_agent: req.user_agent
@@ -25,6 +44,8 @@ module Keygen
         )
 
         [status, headers, res]
+      rescue => e
+        Raygun.track_exception e
       end
     end
 

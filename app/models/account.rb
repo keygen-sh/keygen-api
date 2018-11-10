@@ -9,6 +9,7 @@ class Account < ApplicationRecord
   belongs_to :plan
   has_many :webhook_endpoints, dependent: :destroy
   has_many :webhook_events, dependent: :destroy
+  has_many :request_logs, dependent: :destroy
   has_many :metrics, dependent: :destroy
   has_many :tokens, dependent: :destroy
   has_many :users, index_errors: true, dependent: :destroy

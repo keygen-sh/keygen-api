@@ -222,9 +222,9 @@ end
 
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
-    r.update JSON.parse(body).deep_transform_keys! &:underscore
-  end
+  @account.send(resource.pluralize.underscore).limit(count).update_all(
+    JSON.parse(body).deep_transform_keys! &:underscore
+  )
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
