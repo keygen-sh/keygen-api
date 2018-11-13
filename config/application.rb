@@ -38,10 +38,10 @@ module Keygen
     config.middleware.use Rack::Attack
 
     # Log Rack request/response to datebase
-    config.middleware.use Keygen::Middleware::RequestLogger
+    config.middleware.insert_before Rack::Runtime, Keygen::Middleware::RequestLogger
 
     # Catch JSON parse errors and return a better error message
-    config.middleware.use Keygen::Middleware::CatchJsonParseErrors
+    config.middleware.insert_before Rack::Runtime, Keygen::Middleware::CatchJsonParseErrors
 
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
