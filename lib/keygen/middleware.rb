@@ -46,6 +46,8 @@ module Keygen
         [status, headers, res]
       rescue => e
         Raygun.track_exception e
+
+        raise e
       end
     end
 
