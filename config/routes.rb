@@ -1,19 +1,11 @@
-require 'sidekiq/api'
-
 Rails.application.routes.draw do
   scope module: "api", constraints: { subdomain: "api", format: "jsonapi" } do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
 
       # Health checks
-      get "health", to: proc { [204, {}, []] }
-      get "health/webhooks" => proc {
-        process_ok = Sidekiq::ProcessSet.new.size > 0
-        latency_ok = Sidekiq::Queue.new.latency < SIDEKIQ_MAX_QUEUE_LATENCY
-        status = process_ok && latency_ok ? 204 : 500
-
-        [status, {}, []]
-      }
+      get "health", to: "health#general_health"
+      get "health/webhooks", to: "health#webhook_health"
 
       resources "plans", only: [:index, :show]
 
