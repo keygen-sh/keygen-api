@@ -7,6 +7,7 @@ module Keygen
         webhook_events
         request_logs
         metrics
+        health
       ].freeze
 
       def initialize(app)
