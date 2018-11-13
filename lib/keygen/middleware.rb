@@ -25,10 +25,11 @@ module Keygen
         route = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
 
-        if controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
+        if account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
           return [status, headers, res]
         end
 
+        # TODO(ezekg) Log the current bearer's ID and type
         RequestLogWorker.perform_async(
           account_id,
           {
