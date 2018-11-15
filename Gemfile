@@ -59,6 +59,9 @@ gem 'rails_autoscale_agent'
 gem 'scout_apm'
 gem 'barnes'
 
+# Dyno management
+gem 'whacamole'
+
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
