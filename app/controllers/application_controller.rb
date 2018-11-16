@@ -74,6 +74,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Access denied",
         detail: "You do not have permission to complete the request"
@@ -86,6 +87,7 @@ class ApplicationController < ActionController::API
 
     self.headers["WWW-Authenticate"] = %(Token realm="Keygen")
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Unauthorized",
         detail: "You must be authenticated to complete the request"
@@ -97,6 +99,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Unprocessable entity",
         detail: "The request could not be completed"
@@ -108,6 +111,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Not found",
         detail: "The requested resource was not found"
@@ -119,6 +123,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Bad request",
         detail: "The request could not be completed"
@@ -130,6 +135,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Conflict",
         detail: "The request could not be completed because of a conflict"
@@ -141,6 +147,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Internal server error",
         detail: "Looks like something went wrong!"
@@ -152,6 +159,7 @@ class ApplicationController < ActionController::API
     skip_authorization
 
     render json: {
+      meta: { id: request.request_id },
       errors: [{
         title: "Service unavailable",
         detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions."
@@ -236,7 +244,10 @@ class ApplicationController < ActionController::API
       end
     }.flatten
 
-    render json: { errors: errors }, status: :unprocessable_entity
+    render json: {
+      meta: { id: request.request_id },
+      errors: errors
+    }, status: :unprocessable_entity
   end
 
   def force_jsonapi_response_format
