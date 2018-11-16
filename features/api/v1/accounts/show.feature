@@ -23,6 +23,7 @@ Feature: Show account
       """
       { "publicKey": "$~accounts[0].public_key" }
       """
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
@@ -30,6 +31,7 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to retrieve an account
     Given the account "test1" has 1 "user"
@@ -37,6 +39,7 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/test1"
     Then the response status should be "403"
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to retrieve an invalid account
     Given the account "test1" has 1 "user"

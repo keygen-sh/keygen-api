@@ -12,6 +12,7 @@ Feature: Delete account
     Given the account "test1" is canceled
     When I send a DELETE request to "/accounts/test1"
     Then the response status should not be "403"
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin deletes their account
     Given I am an admin of account "test1"
@@ -24,6 +25,7 @@ Feature: Delete account
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1"
     Then the response status should be "401"
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to delete an account
     Given the account "test1" has 1 "product"

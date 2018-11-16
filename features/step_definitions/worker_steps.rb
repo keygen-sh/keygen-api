@@ -6,6 +6,8 @@ Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
     CreateWebhookEventsWorker.drain # Make sure our webhooks are created
   when "metric"
     resource = "record_metric" # We renamed this worker
+  when "log"
+    resource = "request_log"
   end
 
   worker = "#{resource.singularize.underscore}_worker"

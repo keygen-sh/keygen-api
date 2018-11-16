@@ -42,6 +42,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a check-in license that is valid
     Given I am an admin of account "test1"
@@ -81,6 +82,7 @@ Feature: License validation actions
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a check-in license that is overdue
     Given I am an admin of account "test1"
@@ -119,6 +121,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a strict license that is valid
     Given I am an admin of account "test1"
@@ -163,6 +166,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a suspended license
     Given I am an admin of account "test1"
@@ -208,6 +212,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a strict floating license that has too many machines
     Given I am an admin of account "test1"
@@ -253,6 +258,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a strict license that has too many machines
     Given I am an admin of account "test1"
@@ -291,6 +297,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a non-strict license that has too many machines
     Given I am an admin of account "test1"
@@ -329,6 +336,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a license that has not been used
     Given I am an admin of account "test1"
@@ -359,6 +367,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a strict floating license that has not been used
     Given I am an admin of account "test1"
@@ -390,6 +399,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a strict license that has not been used
     Given I am an admin of account "test1"
@@ -421,6 +431,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin quick validates a license by key that is expired
     Given I am an admin of account "test1"
@@ -446,6 +457,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
     Given I am an admin of account "test1"
@@ -478,7 +490,8 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
     Given I am an admin of account "test1"
@@ -511,7 +524,8 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin quick validates a valid license that requires a product scope
     Given I am an admin of account "test1"
@@ -544,6 +558,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin quick validates a valid license that requires a policy scope
     Given I am an admin of account "test1"
@@ -576,6 +591,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin quick validates a valid license that requires a machine scope
     Given I am an admin of account "test1"
@@ -608,6 +624,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin quick validates a valid license that requires a fingerprint scope
     Given I am an admin of account "test1"
@@ -640,6 +657,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   # License validation
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -675,6 +693,7 @@ Feature: License validation actions
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a check-in license that is valid
     Given I am an admin of account "test1"
@@ -707,6 +726,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a check-in license that is overdue
     Given I am an admin of account "test1"
@@ -739,6 +759,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a strict license that is valid
     Given I am an admin of account "test1"
@@ -777,6 +798,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a suspended license
     Given I am an admin of account "test1"
@@ -816,6 +838,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a strict floating license that has too many machines
     Given I am an admin of account "test1"
@@ -855,6 +878,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
@@ -893,6 +917,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a non-strict license that has too many machines
     Given I am an admin of account "test1"
@@ -931,6 +956,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a license that has not been used
     Given I am an admin of account "test1"
@@ -961,6 +987,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a strict floating license that has not been used
     Given I am an admin of account "test1"
@@ -992,6 +1019,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a strict license by key that has not been used
     Given I am an admin of account "test1"
@@ -1024,6 +1052,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin validates a license that is expired
     Given I am an admin of account "test1"
@@ -1048,6 +1077,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license scoped to a specific product
     Given I am an admin of account "test1"
@@ -1088,6 +1118,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license scoped to a mismatched product
     Given I am an admin of account "test1"
@@ -1127,7 +1158,8 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license scoped to a specific machine
     Given I am an admin of account "test1"
@@ -1175,6 +1207,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license scoped to a mismatched machine
     Given I am an admin of account "test1"
@@ -1221,7 +1254,8 @@ Feature: License validation actions
       { "valid": false, "detail": "machine scope does not match", "constant": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license scoped to a specific machine fingerprint
     Given I am an admin of account "test1"
@@ -1269,6 +1303,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license scoped to a mismatched machine fingerprint
     Given I am an admin of account "test1"
@@ -1315,7 +1350,8 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
     Given I am an admin of account "test1"
@@ -1357,7 +1393,8 @@ Feature: License validation actions
       { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
     Given I am an admin of account "test1"
@@ -1399,7 +1436,8 @@ Feature: License validation actions
       { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license scoped to a specific policy
     Given I am an admin of account "test1"
@@ -1440,6 +1478,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates an license scoped to a mismatched policy
     Given I am an admin of account "test1"
@@ -1480,7 +1519,8 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope does not match", "constant": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license scoped to a specific product and machine
     Given I am an admin of account "test1"
@@ -1529,6 +1569,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates an invalid license scoped to a specific product and machine
     Given I am an admin of account "test1"
@@ -1576,7 +1617,8 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license without a request body
     Given I am an admin of account "test1"
@@ -1608,6 +1650,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license that requires a product scope
     Given I am an admin of account "test1"
@@ -1640,6 +1683,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license that requires a policy scope
     Given I am an admin of account "test1"
@@ -1672,6 +1716,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license that requires a machine scope
     Given I am an admin of account "test1"
@@ -1704,6 +1749,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a valid license that requires a fingerprint scope
     Given I am an admin of account "test1"
@@ -1736,6 +1782,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a legacy encrypted license
     Given I am an admin of account "test1"
@@ -1766,6 +1813,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_ENCRYPT
     Given I am an admin of account "test1"
@@ -1783,6 +1831,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_SIGN
     Given I am an admin of account "test1"
@@ -1800,6 +1849,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_PKCS1_PSS_SIGN
     Given I am an admin of account "test1"
@@ -1816,6 +1866,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: An admin validates a license using scheme RSA_2048_JWT_RS256
     Given I am an admin of account "test1"
@@ -1833,6 +1884,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   # Key validation
   Scenario: Key validation endpoint should be inaccessible when account is disabled
@@ -1870,6 +1922,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an invalid license by key
     Given the current account is "test1"
@@ -1899,6 +1952,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a legacy encrypted license by key
     Given the current account is "test1"
@@ -1929,6 +1983,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a legacy encrypted license key as an unencrypted key
     Given the current account is "test1"
@@ -1959,6 +2014,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an unencrypted license key as a legacy encrypted key
     Given the current account is "test1"
@@ -1989,6 +2045,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_ENCRYPT by key
     Given the current account is "test1"
@@ -2011,6 +2068,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_ENCRYPT by key using the legacy encrypted flag
     Given the current account is "test1"
@@ -2033,6 +2091,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN by key
     Given the current account is "test1"
@@ -2055,6 +2114,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_SIGN by key using the legacy encrypted flag
     Given the current account is "test1"
@@ -2077,6 +2137,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN by key
     Given the current account is "test1"
@@ -2099,6 +2160,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_PKCS1_PSS_SIGN by key using the legacy encrypted flag
     Given the current account is "test1"
@@ -2121,6 +2183,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_JWT_RS256 by key
     Given the current account is "test1"
@@ -2143,6 +2206,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license using scheme RSA_2048_JWT_RS256 by key using the legacy encrypted flag
     Given the current account is "test1"
@@ -2165,6 +2229,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license by key from a pool
     Given the current account is "test1"
@@ -2200,6 +2265,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license that used a pre-determined key
     Given the current account is "test1"
@@ -2230,6 +2296,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a blank license key
     Given the current account is "test1"
@@ -2255,6 +2322,7 @@ Feature: License validation actions
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific product
     Given the current account is "test1"
@@ -2295,6 +2363,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched product
     Given the current account is "test1"
@@ -2334,7 +2403,8 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an non-existent license key scoped to a specific product
     Given the current account is "test1"
@@ -2375,6 +2445,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific machine
     Given the current account is "test1"
@@ -2422,6 +2493,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched machine
     Given the current account is "test1"
@@ -2468,7 +2540,8 @@ Feature: License validation actions
       { "valid": false, "detail": "machine scope does not match", "constant": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a node-locked license key scoped to a machine, but the license has no machines
     Given the current account is "test1"
@@ -2510,7 +2583,8 @@ Feature: License validation actions
       { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a floating license key scoped to a machine, but the license has no machines
     Given the current account is "test1"
@@ -2552,7 +2626,8 @@ Feature: License validation actions
       { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific machine fingerprint
     Given the current account is "test1"
@@ -2600,6 +2675,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a license key scoped to a mismatched machine fingerprint
     Given the current account is "test1"
@@ -2646,7 +2722,8 @@ Feature: License validation actions
       { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an non-existent license key scoped to a machine fingerprint
     Given the current account is "test1"
@@ -2688,6 +2765,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific policy
     Given the current account is "test1"
@@ -2728,6 +2806,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an license key scoped to a mismatched policy
     Given the current account is "test1"
@@ -2767,7 +2846,8 @@ Feature: License validation actions
       { "valid": false, "detail": "policy scope does not match", "constant": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a non-existent license key scoped to a policy
     Given the current account is "test1"
@@ -2808,6 +2888,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key scoped to a specific product and machine
     Given the current account is "test1"
@@ -2856,6 +2937,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates an invalid license key scoped to a specific product and machine
     Given the current account is "test1"
@@ -2903,7 +2985,8 @@ Feature: License validation actions
       { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key with an empty scope
     Given the current account is "test1"
@@ -2942,6 +3025,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key that requires a product scope
     Given the current account is "test1"
@@ -2980,6 +3064,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key that requires a policy scope
     Given the current account is "test1"
@@ -3018,6 +3103,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key that requires a machine scope
     Given the current account is "test1"
@@ -3056,6 +3142,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous validates a valid license key that requires a fingerprint scope
     Given the current account is "test1"
@@ -3094,6 +3181,7 @@ Feature: License validation actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: License quick validates their license
     Given the current account is "test1"

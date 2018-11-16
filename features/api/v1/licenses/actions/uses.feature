@@ -37,6 +37,7 @@ Feature: License usage actions
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license by key
     Given I am an admin of account "test1"
@@ -65,6 +66,7 @@ Feature: License usage actions
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license by 100
     Given I am an admin of account "test1"
@@ -98,6 +100,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license by 100 for a policy that only allows 99
     Given I am an admin of account "test1"
@@ -127,6 +130,7 @@ Feature: License usage actions
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license by a int larger than max int
     Given I am an admin of account "test1"
@@ -166,6 +170,7 @@ Feature: License usage actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license that has no usage limit
     Given I am an admin of account "test1"
@@ -193,6 +198,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product increments the usage count for a license
     Given the current account is "test1"
@@ -222,6 +228,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User increments the usage count for a license
     Given the current account is "test1"
@@ -251,6 +258,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin increments the usage count for a license that is at its usage limit
     Given I am an admin of account "test1"
@@ -285,6 +293,7 @@ Feature: License usage actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product increments the usage count for a license that is at its usage limit
     Given the current account is "test1"
@@ -321,6 +330,7 @@ Feature: License usage actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User increments the usage count for an unprotected license that is at its usage limit
     Given the current account is "test1"
@@ -360,6 +370,7 @@ Feature: License usage actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User increments the usage count for a protected license that is at its usage limit
     Given the current account is "test1"
@@ -388,6 +399,7 @@ Feature: License usage actions
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous decrements the usage count for a license
     Given the current account is "test1"
@@ -409,6 +421,7 @@ Feature: License usage actions
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin decrements the usage count for a license
     Given I am an admin of account "test1"
@@ -436,6 +449,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin decrements the usage count for a license by 50
     Given I am an admin of account "test1"
@@ -470,6 +484,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product decrements the usage count for a license
     Given the current account is "test1"
@@ -499,6 +514,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User decrements the usage count for a license
     Given the current account is "test1"
@@ -523,7 +539,8 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/decrement-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin decrements the usage count for a license that is at 0
     Given I am an admin of account "test1"
@@ -558,6 +575,7 @@ Feature: License usage actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous resets the usage count for a license
     Given the current account is "test1"
@@ -579,6 +597,7 @@ Feature: License usage actions
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin resets the usage count for a license
     Given I am an admin of account "test1"
@@ -606,6 +625,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product resets the usage count for a license
     Given the current account is "test1"
@@ -635,6 +655,7 @@ Feature: License usage actions
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User resets the usage count for a license
     Given the current account is "test1"
@@ -659,4 +680,5 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/reset-usage"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" job
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job

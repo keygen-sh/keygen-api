@@ -185,6 +185,7 @@ Feature: Policy pool relationship
     And the JSON response should be a "key"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to pop a key from an empty pool
     Given I am an admin of account "test1"
@@ -199,6 +200,7 @@ Feature: Policy pool relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to pop a key from a policy that doesn't use a pool
     Given I am an admin of account "test1"
@@ -220,6 +222,7 @@ Feature: Policy pool relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product pops a key from a pool
     Given the current account is "test1"
@@ -246,6 +249,7 @@ Feature: Policy pool relationship
     Then the response status should be "200"
     And the JSON response should be a "key"
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to pop a key from a pool for a policy of another product
     Given the current account is "test1"
