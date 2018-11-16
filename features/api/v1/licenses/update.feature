@@ -42,6 +42,7 @@ Feature: Update license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license name
     Given I am an admin of account "test1"
@@ -66,6 +67,7 @@ Feature: Update license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license to protected
     Given I am an admin of account "test1"
@@ -90,6 +92,7 @@ Feature: Update license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license to protected
     Given I am an admin of account "test1"
@@ -114,6 +117,7 @@ Feature: Update license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   # Making sure schemed licenses do not re-encrypt/sign their key on update
   Scenario: Admin updates a license using scheme RSA_2048_PKCS1_PSS_SIGN to protected
@@ -144,6 +148,7 @@ Feature: Update license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license policy
     Given I am an admin of account "test1"
@@ -171,6 +176,7 @@ Feature: Update license
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
@@ -192,6 +198,7 @@ Feature: Update license
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product updates a license for their product
     Given the current account is "test1"
@@ -223,6 +230,7 @@ Feature: Update license
       """
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to update a license for another product
     Given the current account is "test1"
@@ -245,6 +253,7 @@ Feature: Update license
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to update a license for their account
     Given the current account is "test1"
@@ -268,6 +277,7 @@ Feature: Update license
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous user attempts to update a license for their account
     Given the current account is "test1"
@@ -287,6 +297,7 @@ Feature: Update license
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to update a license for another account
     Given I am an admin of account "test2"
@@ -308,6 +319,7 @@ Feature: Update license
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license key
     Given I am an admin of account "test1"
@@ -329,6 +341,7 @@ Feature: Update license
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license expiry
     Given I am an admin of account "test1"
@@ -359,6 +372,7 @@ Feature: Update license
     And the JSON response should be a "license" that is suspended
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates a license expiry to a nil value
     Given I am an admin of account "test1"
@@ -381,6 +395,7 @@ Feature: Update license
     And the JSON response should be a "license" with a nil expiry
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product updates a license expiry for their product
     Given the current account is "test1"
@@ -405,6 +420,7 @@ Feature: Update license
     And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to update a license expiry for another product
     Given the current account is "test1"
@@ -427,6 +443,7 @@ Feature: Update license
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to update a license expiry for their account
     Given the current account is "test1"
@@ -450,6 +467,7 @@ Feature: Update license
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to update a license name for their account
     Given the current account is "test1"
@@ -473,3 +491,4 @@ Feature: Update license
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job

@@ -119,6 +119,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a license's policy relationship to a non-existent policy
     Given I am an admin of account "test1"
@@ -151,6 +152,7 @@ Feature: License policy relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy that belongs to another product
     Given I am an admin of account "test1"
@@ -197,6 +199,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a encrypted license's policy relationship to a new unencrypted policy
     Given I am an admin of account "test1"
@@ -249,6 +252,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes an unencrypted license's policy relationship to a new encrypted policy
     Given I am an admin of account "test1"
@@ -301,6 +305,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy with a different scheme
     Given I am an admin of account "test1"
@@ -353,6 +358,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a pooled license's policy relationship to a new unpooled policy
     Given I am an admin of account "test1"
@@ -405,6 +411,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes an unpooled license's policy relationship to a new pooled policy
     Given I am an admin of account "test1"
@@ -457,6 +464,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes a license's policy relationship to a new policy for another account
     Given I am an admin of account "test1"
@@ -489,6 +497,7 @@ Feature: License policy relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product changes a license's policy relationship to a new policy
     Given the current account is "test1"
@@ -530,6 +539,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product changes a license's policy relationship to a new policy they don't own
     Given the current account is "test1"
@@ -571,6 +581,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Product changes a license's policy relationship to a new policy for a license they don't own
     Given the current account is "test1"
@@ -603,6 +614,7 @@ Feature: License policy relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes a license's policy relationship to a new policy for an unprotected policy
     Given the current account is "test1"
@@ -649,6 +661,7 @@ Feature: License policy relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes a license's policy relationship to a new policy for a protected policy
     Given the current account is "test1"
@@ -686,6 +699,7 @@ Feature: License policy relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes an unprotected license's policy relationship to a new protected policy
     Given the current account is "test1"
@@ -730,6 +744,7 @@ Feature: License policy relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes a protected license's policy relationship to a new unprotected policy
     Given the current account is "test1"
@@ -774,6 +789,7 @@ Feature: License policy relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes an unprotected license's policy relationship to a non-existent policy
     Given the current account is "test1"
@@ -811,6 +827,7 @@ Feature: License policy relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User changes a license's policy relationship to a new policy for a license they don't own
     Given the current account is "test1"
@@ -845,6 +862,7 @@ Feature: License policy relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous changes a license's policy relationship to a new policy
     Given the current account is "test1"
@@ -875,3 +893,4 @@ Feature: License policy relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job

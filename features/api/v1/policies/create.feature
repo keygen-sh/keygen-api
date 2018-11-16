@@ -53,6 +53,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is not floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a floating policy for their account
     Given I am an admin of account "test1"
@@ -91,6 +92,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a floating policy for their account with a max machines attribute
     Given I am an admin of account "test1"
@@ -130,6 +132,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is floating
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy that inherits from a protected account
     Given I am an admin of account "test1"
@@ -168,6 +171,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy that inherits from an unprotected account
     Given I am an admin of account "test1"
@@ -204,6 +208,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a protected policy that inherits from an unprotected account
     Given I am an admin of account "test1"
@@ -239,6 +244,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is protected
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates an unprotected policy that inherits from a protected account
     Given I am an admin of account "test1"
@@ -274,6 +280,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is not protected
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create an incomplete policy for their account
     Given I am an admin of account "test1"
@@ -301,6 +308,7 @@ Feature: Create policy
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create an policy for their account with too short of a duration
     Given I am an admin of account "test1"
@@ -331,6 +339,7 @@ Feature: Create policy
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create a policy that is legacy encrypted that uses a pool
     Given I am an admin of account "test1"
@@ -386,6 +395,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_ENCRYPT that uses a pool
     Given I am an admin of account "test1"
@@ -429,6 +439,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_PKCS1_SIGN that uses a pool
     Given I am an admin of account "test1"
@@ -472,6 +483,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create a policy using scheme RSA_2048_JWT_RS256 that uses a pool
     Given I am an admin of account "test1"
@@ -515,6 +527,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to create a policy for another account
     Given I am an admin of account "test2"
@@ -548,6 +561,7 @@ Feature: Create policy
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to create a policy for their product
     Given the current account is "test1"
@@ -583,6 +597,7 @@ Feature: Create policy
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to create a policy for their account
     Given the current account is "test1"
@@ -616,6 +631,7 @@ Feature: Create policy
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy for their account that requires certain scopes
     Given I am an admin of account "test1"
@@ -650,6 +666,7 @@ Feature: Create policy
     And the JSON response should be a "policy" that is requireProductScope
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy for their account that requires license check-in
     Given I am an admin of account "test1"
@@ -682,6 +699,7 @@ Feature: Create policy
     Then the response status should be "201"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy for their account that requires license check-in that is not valid
     Given I am an admin of account "test1"
@@ -735,7 +753,8 @@ Feature: Create policy
       }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a floating policy for their account that is not valid
     Given I am an admin of account "test1"
@@ -778,6 +797,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a node-locked policy for their account that is not valid
     Given I am an admin of account "test1"
@@ -820,6 +840,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates an incomplete policy for their account that requires license check-in
     Given I am an admin of account "test1"
@@ -850,6 +871,7 @@ Feature: Create policy
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_SIGN for their account
     Given I am an admin of account "test1"
@@ -883,6 +905,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "RSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_PSS_SIGN for their account
     Given I am an admin of account "test1"
@@ -916,6 +939,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_ENCRYPT for their account
     Given I am an admin of account "test1"
@@ -949,6 +973,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "RSA Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme RSA_2048_JWT_RS256 for their account
     Given I am an admin of account "test1"
@@ -982,6 +1007,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "JWT RS256"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a legacy encrypted policy using scheme LEGACY_ENCRYPT for their account
     Given I am an admin of account "test1"
@@ -1016,6 +1042,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a legacy encrypted policy without a scheme for their account
     Given I am an admin of account "test1"
@@ -1049,6 +1076,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "Legacy Encrypted"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme LEGACY_ENCRYPT for their account without encryption
     Given I am an admin of account "test1"
@@ -1090,6 +1118,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using an unsupported encryption scheme RSA_2048_PKCS1_SIGN for their account
     Given I am an admin of account "test1"
@@ -1132,6 +1161,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates a policy using scheme AES_SHA256 for their account
     Given I am an admin of account "test1"
@@ -1173,6 +1203,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin creates an encrypted policy without a scheme for their account
     Given I am an admin of account "test1"
@@ -1206,3 +1237,4 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "Default Scheme"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job

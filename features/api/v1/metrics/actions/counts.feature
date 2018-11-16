@@ -16,6 +16,7 @@ Feature: Metric counts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics/actions/count"
     Then the response status should be "403"
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin retrieves metric counts for their account
     Given I am an admin of account "test1"
@@ -30,6 +31,7 @@ Feature: Metric counts
         "$date.format": 52
       }
       """
+      And sidekiq should have 0 "log" jobs
 
   Scenario: Admin retrieves metric counts for their account
     Given I am an admin of account "test1"
@@ -50,6 +52,7 @@ Feature: Metric counts
         "$date.format": 19
       }
       """
+      And sidekiq should have 0 "log" jobs
 
   Scenario: User attempts to retrieve metric counts for their account
     Given the current account is "test1"
@@ -60,3 +63,4 @@ Feature: Metric counts
     When I send a GET request to "/accounts/test1/metrics/actions/count"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
+    And sidekiq should have 0 "log" jobs

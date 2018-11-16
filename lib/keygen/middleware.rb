@@ -6,6 +6,7 @@ module Keygen
         webhook_endpoints
         webhook_events
         request_logs
+        searches
         metrics
         health
       ].freeze
