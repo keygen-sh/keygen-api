@@ -20,7 +20,7 @@ Feature: Account billing relationship
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should be "200"
     And the JSON response should be a "billing"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Product attempts to retrieve the billing info for their account
     Given the account "test1" is subscribed
@@ -29,7 +29,7 @@ Feature: Account billing relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should be "403"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin attempts to retrieve the billing info for another account
     Given the account "test1" is subscribed
@@ -37,7 +37,7 @@ Feature: Account billing relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should be "401"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin updates the billing info for their account
     Given the account "test1" is subscribed
@@ -59,7 +59,7 @@ Feature: Account billing relationship
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Product attempts to update the billing info for their account
     Given the account "test1" is subscribed
@@ -82,7 +82,7 @@ Feature: Account billing relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin attempts to update the billing info for another account
     Given the account "test1" is subscribed
@@ -104,7 +104,7 @@ Feature: Account billing relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin applies a coupon to their account
     Given the account "test1" is subscribed
@@ -126,7 +126,7 @@ Feature: Account billing relationship
     Then the response status should be "202"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Product attempts to apply a coupon to their account
     Given the account "test1" is subscribed
@@ -149,7 +149,7 @@ Feature: Account billing relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin attempts to apply a coupon to another account
     Given the account "test1" is subscribed
@@ -171,7 +171,7 @@ Feature: Account billing relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
 
   Scenario: Admin applies an invalid coupon to their account
     Given the account "test1" is subscribed
@@ -192,4 +192,4 @@ Feature: Account billing relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 0 "log" jobs
