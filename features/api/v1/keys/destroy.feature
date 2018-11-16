@@ -28,6 +28,7 @@ Feature: Delete key
     And the current account should have 2 "keys"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to delete a key for their account
     Given the current account is "test1"
@@ -42,6 +43,7 @@ Feature: Delete key
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Anonymous user attempts to delete a key for their account
     Given the current account is "test1"
@@ -53,6 +55,7 @@ Feature: Delete key
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to delete a key for another account
     Given I am an admin of account "test2"
@@ -66,3 +69,4 @@ Feature: Delete key
     And the current account should have 3 "keys"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job

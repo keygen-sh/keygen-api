@@ -37,6 +37,7 @@ Feature: Update account
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin updates the name for their account
     Given I am an admin of account "test1"
@@ -57,6 +58,7 @@ Feature: Update account
     And the JSON response should be an "account" with the slug "new-name"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to update another account
     Given I am an admin of account "test2"
@@ -76,6 +78,7 @@ Feature: Update account
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: User attempts to update an account
     Given the account "test1" has 1 "user"
@@ -96,3 +99,4 @@ Feature: Update account
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job

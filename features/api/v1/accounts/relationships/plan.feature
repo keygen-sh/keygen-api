@@ -20,6 +20,7 @@ Feature: Account plan relationship
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "200"
     And the JSON response should be a "plan"
+    And sidekiq should have 1 "log" job
 
   Scenario: Product attempts to retrieve the plan for their account
     Given the account "test1" is subscribed
@@ -28,6 +29,7 @@ Feature: Account plan relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "403"
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to retrieve the plan for another account
     Given the account "test1" is subscribed
@@ -35,6 +37,7 @@ Feature: Account plan relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "401"
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes subscribed account to a new plan
     Given the account "test1" is subscribed
@@ -54,6 +57,7 @@ Feature: Account plan relationship
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes trialing account to a new plan
     Given the account "test1" is trialing
@@ -73,6 +77,7 @@ Feature: Account plan relationship
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes pending account to a new plan
     Given the account "test1" is pending
@@ -92,6 +97,7 @@ Feature: Account plan relationship
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes paused account to a new plan
     Given the account "test1" is paused
@@ -111,6 +117,7 @@ Feature: Account plan relationship
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin changes canceled account to a new plan
     Given the account "test1" is canceled
@@ -130,6 +137,7 @@ Feature: Account plan relationship
     Then the response status should be "200"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to change to an invalid plan
     Given the account "test1" is subscribed
@@ -149,6 +157,7 @@ Feature: Account plan relationship
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
 
   Scenario: Admin attempts to change plan for another account
     Given the account "test1" is subscribed
@@ -168,3 +177,4 @@ Feature: Account plan relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "log" job
