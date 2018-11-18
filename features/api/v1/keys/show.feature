@@ -26,7 +26,7 @@ Feature: Show key
     Then the response status should be "200"
     And the JSON response should be a "key"
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin retrieves an invalid key for their account
     Given I am an admin of account "test1"
@@ -34,7 +34,7 @@ Feature: Show key
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/invalid"
     Then the response status should be "404"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product retrieves a key for their product
     Given the current account is "test1"
@@ -46,7 +46,7 @@ Feature: Show key
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "200"
     And the JSON response should be a "key"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to retrieve a key for another product
     Given the current account is "test1"
@@ -56,7 +56,7 @@ Feature: Show key
     And the current account has 1 "key"
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "403"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to retrieve a key for another account
     Given I am an admin of account "test2"
@@ -66,4 +66,4 @@ Feature: Show key
     When I send a GET request to "/accounts/test1/keys/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

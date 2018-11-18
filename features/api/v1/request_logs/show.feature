@@ -14,7 +14,7 @@ Feature: Show metric
     And the current account is "test1"
     And the current account has 1 "request-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/logs/$0"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "403"
 
   Scenario: Admin retrieves a log for their account
@@ -22,15 +22,15 @@ Feature: Show metric
     And the current account is "test1"
     And the current account has 3 "request-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/logs/$0"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "200"
-    And the JSON response should be a "log"
+    And the JSON response should be a "request-log"
 
   Scenario: Admin retrieves an invalid log for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/logs/invalid"
+    When I send a GET request to "/accounts/test1/request-logs/invalid"
     Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve a log for another account
@@ -38,6 +38,6 @@ Feature: Show metric
     But the current account is "test1"
     And the account "test1" has 3 "request-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/logs/$0"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error

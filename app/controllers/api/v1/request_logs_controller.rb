@@ -8,7 +8,7 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_request_log, only: [:show]
 
-    # GET /logs
+    # GET /request-logs
     def index
       authorize RequestLog
 
@@ -31,7 +31,7 @@ module Api::V1
       render json: json
     end
 
-    # GET /logs/1
+    # GET /request-logs/1
     def show
       authorize @request_log
 

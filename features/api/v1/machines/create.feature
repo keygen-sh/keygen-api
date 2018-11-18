@@ -46,7 +46,7 @@ Feature: Create machine
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with missing fingerprint
     Given I am an admin of account "test1"
@@ -73,7 +73,7 @@ Feature: Create machine
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with missing license
     Given I am an admin of account "test1"
@@ -95,7 +95,7 @@ Feature: Create machine
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine with an invalid license UUID
     Given I am an admin of account "test1"
@@ -125,7 +125,7 @@ Feature: Create machine
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license
     Given the current account is "test1"
@@ -158,7 +158,7 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for their license with a protected policy
     Given the current account is "test1"
@@ -194,7 +194,7 @@ Feature: Create machine
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for an unprotected license
     Given the current account is "test1"
@@ -231,7 +231,7 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license
     Given the current account is "test1"
@@ -268,7 +268,7 @@ Feature: Create machine
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for a protected license
     Given the current account is "test1"
@@ -310,7 +310,7 @@ Feature: Create machine
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for a protected license but they've hit their activation limit
     Given the current account is "test1"
@@ -369,7 +369,7 @@ Feature: Create machine
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license with a duplicate fingerprint
     Given the current account is "test1"
@@ -436,7 +436,7 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for their license with a blank fingerprint
     Given the current account is "test1"
@@ -496,7 +496,7 @@ Feature: Create machine
     And the current account should have 0 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License creates a machine for another license
     Given the current account is "test1"
@@ -532,7 +532,7 @@ Feature: Create machine
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product creates a machine associated to a license they don't own
     Given the current account is "test1"
@@ -588,7 +588,7 @@ Feature: Create machine
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   # FIXME(ezekg) I'm still unsure how this happened, but this happened in the production
   #              env. I'm assuming that the policy had been queued for deletion, but
@@ -629,7 +629,7 @@ Feature: Create machine
     Then the response status should be "201"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User creates a machine for another user's license
     Given the current account is "test1"
@@ -660,7 +660,7 @@ Feature: Create machine
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Unauthenticated user attempts to create a machine
     Given the current account is "test1"
@@ -688,7 +688,7 @@ Feature: Create machine
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin of another account attempts to create a machine
     Given I am an admin of account "test2"
@@ -718,7 +718,7 @@ Feature: Create machine
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a concurrent floating license that has already reached its limit
     Given I am an admin of account "test1"
@@ -772,7 +772,7 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a non-concurrent floating license that does not have a limit
     Given I am an admin of account "test1"
@@ -826,7 +826,7 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a non-concurrent floating license that has already reached its limit
     Given I am an admin of account "test1"
@@ -890,7 +890,7 @@ Feature: Create machine
       """
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a concurrent node-locked license that has already reached its limit
     Given I am an admin of account "test1"
@@ -944,7 +944,7 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a non-concurrent node-locked license that has already reached its limit
     Given I am an admin of account "test1"
@@ -1008,7 +1008,7 @@ Feature: Create machine
       """
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for a non-concurrent node-locked license that does not have a limit
     Given I am an admin of account "test1"
@@ -1062,4 +1062,4 @@ Feature: Create machine
     And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

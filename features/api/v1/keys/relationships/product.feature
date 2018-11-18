@@ -26,7 +26,7 @@ Feature: Key product relationship
     Then the response status should be "200"
     And the JSON response should be a "product"
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product retrieves the product for a key
     Given the current account is "test1"
@@ -38,7 +38,7 @@ Feature: Key product relationship
     When I send a GET request to "/accounts/test1/keys/$0/product"
     Then the response status should be "200"
     And the JSON response should be a "product"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product retrieves the product for a key of another product
     Given the current account is "test1"
@@ -57,7 +57,7 @@ Feature: Key product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/$0/product"
     Then the response status should be "403"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to retrieve the product for a key
     Given the current account is "test1"
@@ -67,7 +67,7 @@ Feature: Key product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/$0/product"
     Then the response status should be "403"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to retrieve the product for a key of another account
     Given I am an admin of account "test2"
@@ -76,4 +76,4 @@ Feature: Key product relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/$0/product"
     Then the response status should be "401"
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

@@ -4,7 +4,7 @@ module Api::V1::RequestLogs::Actions
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 
-    # GET /logs/actions/count
+    # GET /request-logs/actions/count
     def count
       authorize RequestLog
 

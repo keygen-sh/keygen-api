@@ -1,5 +1,5 @@
 class SerializableRequestLog < SerializableBase
-  type :logs
+  type "request-logs"
 
   attribute :request_id
   attribute :url

@@ -35,7 +35,7 @@ Feature: Create policy
     And the JSON response should be an array with 10 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type with an empty query using pagination
     Given I am an admin of account "test1"
@@ -63,7 +63,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the role relationship
     Given I am an admin of account "test1"
@@ -85,7 +85,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a query that is too small
     Given I am an admin of account "test1"
@@ -116,7 +116,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search with a metadata query that is too small
     Given I am an admin of account "test1"
@@ -149,7 +149,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unsearchable type "accounts"
     Given I am an admin of account "test1"
@@ -178,7 +178,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unsearchable type "tokens"
     Given I am an admin of account "test1"
@@ -207,7 +207,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unknown type
     Given I am an admin of account "test1"
@@ -236,7 +236,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by an unknown attribute
     Given I am an admin of account "test1"
@@ -267,7 +267,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the first and last name attributes
     Given I am an admin of account "test1"
@@ -297,7 +297,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the full name attribute
     Given I am an admin of account "test1"
@@ -326,7 +326,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the first name attribute that is misspelled
     Given I am an admin of account "test1"
@@ -354,7 +354,7 @@ Feature: Create policy
     And the JSON response should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the last name attribute
     Given I am an admin of account "test1"
@@ -397,7 +397,7 @@ Feature: Create policy
     And the JSON response should be an array with 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the email attribute
     Given I am an admin of account "test1"
@@ -419,7 +419,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using an exact query
     Given I am an admin of account "test1"
@@ -449,7 +449,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using an array of terms
     Given I am an admin of account "test1"
@@ -488,7 +488,7 @@ Feature: Create policy
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the metadata attribute using a snakecased metadata key
     Given I am an admin of account "test1"
@@ -518,7 +518,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using a nested query that doesn't match
     Given I am an admin of account "test1"
@@ -548,7 +548,7 @@ Feature: Create policy
     And the JSON response should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by user type on the metadata attribute using a nested query that loosely matches
     Given I am an admin of account "test1"
@@ -580,7 +580,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "user"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the key attribute
     Given I am an admin of account "test1"
@@ -608,7 +608,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on a large key attribute
     Given I am an admin of account "test1"
@@ -636,7 +636,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type using a partial ID
     Given I am an admin of account "test1"
@@ -664,7 +664,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the key attribute using a partial key
     Given I am an admin of account "test1"
@@ -692,7 +692,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to perform a search by license type on the key attribute for another account
     Given I am an admin of account "test1"
@@ -720,7 +720,7 @@ Feature: Create policy
     And the JSON response should be an array with 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the name attribute
     Given I am an admin of account "test1"
@@ -748,7 +748,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the policy relationship by ID
     Given I am an admin of account "test1"
@@ -789,7 +789,7 @@ Feature: Create policy
     And the JSON response should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the policy relationship by name
     Given I am an admin of account "test1"
@@ -836,7 +836,7 @@ Feature: Create policy
     And the JSON response should be an array with 2 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the user relationship by ID
     Given I am an admin of account "test1"
@@ -859,7 +859,7 @@ Feature: Create policy
     And the JSON response should be an array with 7 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by license type on the user relationship by email
     Given I am an admin of account "test1"
@@ -882,7 +882,7 @@ Feature: Create policy
     And the JSON response should be an array with 5 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by policy type on the product relationship by ID
     Given I am an admin of account "test1"
@@ -911,7 +911,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "policy"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by policy type on the product relationship by name
     Given I am an admin of account "test1"
@@ -958,7 +958,7 @@ Feature: Create policy
     And the JSON response should be an array with 2 "policies"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the license relationship by ID
     Given I am an admin of account "test1"
@@ -987,7 +987,7 @@ Feature: Create policy
     And the JSON response should be an array with 5 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the fingerprint attribute
     Given I am an admin of account "test1"
@@ -1009,7 +1009,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the user relationship by email
     Given I am an admin of account "test1"
@@ -1051,7 +1051,7 @@ Feature: Create policy
     And the JSON response should be an array with 2 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the name attribute using an exact match
     Given I am an admin of account "test1"
@@ -1086,7 +1086,7 @@ Feature: Create policy
     And the JSON response should be an array with 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin performs a search by machine type on the name attribute using a suffix
     Given I am an admin of account "test1"
@@ -1121,7 +1121,7 @@ Feature: Create policy
     And the JSON response should be an array with 10 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product performs a search
     Given the current account is "test1"
@@ -1140,7 +1140,7 @@ Feature: Create policy
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: User performs a search
     Given the current account is "test1"
@@ -1159,7 +1159,7 @@ Feature: Create policy
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous performs a search
     Given the current account is "test1"
@@ -1175,4 +1175,4 @@ Feature: Create policy
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs

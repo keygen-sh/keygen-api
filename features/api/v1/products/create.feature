@@ -37,7 +37,7 @@ Feature: Create product
     Then the response status should be "201"
     And sidekiq should have 4 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a product with an invalid URL for their account
     Given I am an admin of account "test1"
@@ -60,7 +60,7 @@ Feature: Create product
     Then the response status should be "422"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create an incomplete product for their account
     Given I am an admin of account "test1"
@@ -81,7 +81,7 @@ Feature: Create product
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a product for another account
     Given I am an admin of account "test2"
@@ -102,7 +102,7 @@ Feature: Create product
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to create a product for their account
     Given the current account is "test1"
@@ -125,4 +125,4 @@ Feature: Create product
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

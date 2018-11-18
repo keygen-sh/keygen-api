@@ -47,7 +47,7 @@ Feature: Create account
       """
     And the account should receive a "welcome" email
     And the account "google" should have 1 "admin"
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous creates an account with a UUID slug with dashes
     When I send a POST request to "/accounts" with the following:
