@@ -4,7 +4,7 @@ class LicenseExpirationsWorker
   sidekiq_options queue: :cron, unique: :until_executed
 
   def perform
-    License.includes(:account).reorder(nil).where.not(expiry: nil).where(expiry: [3.days.ago..3.days.from_now]).find_each do |license|
+    License.includes(:account, :policy).reorder(nil).where.not(expiry: nil).where(expiry: [3.days.ago..3.days.from_now]).find_each do |license|
       case
       when license.expired?
         # Limit number of events we dispatch for each license to a daily interval
