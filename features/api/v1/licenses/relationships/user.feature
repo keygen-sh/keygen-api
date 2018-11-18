@@ -139,7 +139,7 @@ Feature: License user relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's policy relationship to a non-existent user
     Given I am an admin of account "test1"
@@ -175,7 +175,7 @@ Feature: License user relationship
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's user relationship to a user for another account
     Given I am an admin of account "test1"
@@ -202,7 +202,7 @@ Feature: License user relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's user relationship to another user
     Given the current account is "test1"
@@ -252,7 +252,7 @@ Feature: License user relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's user relationship to a new user they don't own
     Given the current account is "test1"
@@ -294,7 +294,7 @@ Feature: License user relationship
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's user relationship to a new user for a license they don't own
     Given the current account is "test1"
@@ -326,7 +326,7 @@ Feature: License user relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to change a license's user relationship
     Given the current account is "test1"
@@ -364,7 +364,7 @@ Feature: License user relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User changes a license's user relationship to another user for a license they don't own
     Given the current account is "test1"
@@ -397,7 +397,7 @@ Feature: License user relationship
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous changes a license's user relationship to a different user
     Given the current account is "test1"
@@ -428,4 +428,4 @@ Feature: License user relationship
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

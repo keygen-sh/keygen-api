@@ -36,7 +36,7 @@ Feature: Update user
     And the JSON response should be a "user" with the firstName "Elliot"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a user for their account
     Given I am an admin of account "test1"
@@ -59,7 +59,7 @@ Feature: Update user
     And the JSON response should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a user for their account including the wrong id
     Given I am an admin of account "test1"
@@ -82,7 +82,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a user for another account
     Given I am an admin of account "test2"
@@ -101,7 +101,7 @@ Feature: Update user
       """
     Then the response status should be "401"
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin promotes a user to admin for their account
     Given I am an admin of account "test1"
@@ -123,7 +123,7 @@ Feature: Update user
     And the JSON response should be a "user"
     And the account "test1" should have 2 "admins"
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin promotes a user with an invalid role name for their account
     Given I am an admin of account "test1"
@@ -145,7 +145,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin promotes a user to a product role for their account
     Given I am an admin of account "test1"
@@ -167,7 +167,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User updates attempts to promote themself to admin
     Given I am an admin of account "test1"
@@ -190,7 +190,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
     And the account "test1" should have 1 "admin"
 
   Scenario: Admin updates a users metadata
@@ -219,7 +219,7 @@ Feature: Update user
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin updates a users metadata with a nested hash
     Given I am an admin of account "test1"
@@ -439,7 +439,7 @@ Feature: Update user
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product promotes a user's role to admin
     Given the current account is "test1"
@@ -463,7 +463,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User updates their metadata
     Given the current account is "test1"
@@ -487,7 +487,7 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product updates a user for their product
     Given the current account is "test1"
@@ -512,7 +512,7 @@ Feature: Update user
     And the JSON response should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to update a user for another product
     Given the current account is "test1"
@@ -536,7 +536,7 @@ Feature: Update user
     And the JSON response should be a "user" with the firstName "Mr. Robot"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to update their password
    Given the current account is "test1"
@@ -558,7 +558,7 @@ Feature: Update user
    Then the response status should be "400"
    And sidekiq should have 0 "webhook" jobs
    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a users password
     Given I am an admin of account "test1"
@@ -580,4 +580,4 @@ Feature: Update user
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

@@ -29,7 +29,7 @@ Feature: Delete license
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete one of their licenses
     Given the current account is "test1"
@@ -53,7 +53,7 @@ Feature: Delete license
     And the current account should have 2 "licenses"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a license for their account
     Given the current account is "test1"
@@ -68,7 +68,7 @@ Feature: Delete license
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a license for their account
     Given the current account is "test1"
@@ -80,7 +80,7 @@ Feature: Delete license
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a license for another account
     Given I am an admin of account "test2"
@@ -94,4 +94,4 @@ Feature: Delete license
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

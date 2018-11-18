@@ -16,7 +16,7 @@ Feature: Show metric
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics/$0"
     Then the response status should be "403"
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a metric for their account
     Given I am an admin of account "test1"
@@ -26,7 +26,7 @@ Feature: Show metric
     When I send a GET request to "/accounts/test1/metrics/$0"
     Then the response status should be "200"
     And the JSON response should be a "metric"
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves an invalid metric for their account
     Given I am an admin of account "test1"
@@ -34,7 +34,7 @@ Feature: Show metric
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics/invalid"
     Then the response status should be "404"
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to retrieve a metric for another account
     Given I am an admin of account "test2"
@@ -44,4 +44,4 @@ Feature: Show metric
     When I send a GET request to "/accounts/test1/metrics/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
-    And sidekiq should have 0 "log" jobs
+    And sidekiq should have 0 "request-log" jobs
