@@ -10,6 +10,7 @@ module Keygen
         searches
         metrics
         health
+        plans
       ].freeze
 
       def initialize(app)
