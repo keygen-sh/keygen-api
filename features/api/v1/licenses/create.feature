@@ -2112,7 +2112,10 @@ Feature: Create license
     And the current account has 1 "policies"
     And I send the following headers:
       """
-      { "Authorization": "Bearer 852da78f-1444-4462-8863-d7b9fff9e003" }
+      {
+        "Authorization": "Bearer 852da78f-1444-4462-8863-d7b9fff9e003",
+        "Origin": "https://app.keygen.sh"
+      }
       """
     When I send a POST request to "/accounts/test1/licenses" with the following:
       """
@@ -2142,7 +2145,7 @@ Feature: Create license
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin uses an invalid token while attempting to create a license
     Given the current account is "test1"
