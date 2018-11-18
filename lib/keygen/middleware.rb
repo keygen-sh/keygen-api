@@ -10,6 +10,7 @@ module Keygen
         searches
         metrics
         health
+        stripe
         plans
       ].freeze
 
