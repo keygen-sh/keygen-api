@@ -28,7 +28,7 @@ Feature: Delete policy
     And the current account should have 2 "policies"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a policy for another account
     Given I am an admin of account "test2"
@@ -42,4 +42,4 @@ Feature: Delete policy
     And the current account should have 3 "policies"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

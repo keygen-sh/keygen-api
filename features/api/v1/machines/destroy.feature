@@ -29,7 +29,7 @@ Feature: Delete machine
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete a machine that belongs to another user
     Given the current account is "test1"
@@ -44,7 +44,7 @@ Feature: Delete machine
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their unprotected license
     Given the current account is "test1"
@@ -68,7 +68,7 @@ Feature: Delete machine
     And the current account should have 0 "machines"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User deletes a machine for their protected license
     Given the current account is "test1"
@@ -92,7 +92,7 @@ Feature: Delete machine
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine for their license
     Given the current account is "test1"
@@ -118,7 +118,7 @@ Feature: Delete machine
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine for their license but they've hit their deactivation limit
     Given the current account is "test1"
@@ -156,7 +156,7 @@ Feature: Delete machine
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: License deletes a machine that belongs to another license
     Given the current account is "test1"
@@ -182,7 +182,7 @@ Feature: Delete machine
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous user attempts to delete a machine for their account
     Given the current account is "test1"
@@ -194,7 +194,7 @@ Feature: Delete machine
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a machine for another account
     Given I am an admin of account "test2"
@@ -208,4 +208,4 @@ Feature: Delete machine
     And the current account should have 3 "machines"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job

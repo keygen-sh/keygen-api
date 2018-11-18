@@ -34,7 +34,7 @@ Feature: Delete user
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete a user for another account
     Given I am an admin of account "test2"
@@ -58,7 +58,7 @@ Feature: Delete user
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to delete themself
     Given the current account is "test1"
@@ -73,7 +73,7 @@ Feature: Delete user
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete themself when they're not the only admin
     Given I am an admin of account "test1"
@@ -86,7 +86,7 @@ Feature: Delete user
     And the current account should have 1 "admin"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "log" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to delete themself when they're the only admin
     Given I am an admin of account "test1"

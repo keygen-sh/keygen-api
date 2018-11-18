@@ -135,7 +135,7 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "request_logs", path: "logs", only: [:index, :show]  do
+        resources "request_logs", path: "request-logs", only: [:index, :show]  do
           collection do
             scope "actions", module: "request_logs/actions" do
               get "count", to: "counts#count"
