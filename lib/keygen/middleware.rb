@@ -1,7 +1,7 @@
 module Keygen
   module Middleware
     class RequestLogger
-      IGNORED_HOSTS = %w[app.keygen.sh].freeze
+      IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
       IGNORED_RESOURCES = %w[
         webhook_endpoints
         webhook_events
@@ -20,7 +20,7 @@ module Keygen
         req = ActionDispatch::Request.new env
         status, headers, res = @app.call env
 
-        if IGNORED_HOSTS.include?(req.headers['host'])
+        if IGNORED_ORIGINS.include?(req.headers['origin'])
           return [status, headers, res]
         end
 
