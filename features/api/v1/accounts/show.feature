@@ -47,6 +47,13 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested account 'invalid' was not found"
+      }
+      """
 
   Scenario: Admin retrieves their account, accepting no content-type
     Given I am an admin of account "test1"

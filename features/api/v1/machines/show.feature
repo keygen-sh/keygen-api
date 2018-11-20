@@ -90,6 +90,13 @@ Feature: Show machine
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested machine 'invalid' was not found"
+      }
+      """
 
   Scenario: Product retrieves a machine for their product
     Given the current account is "test1"

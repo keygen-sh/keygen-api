@@ -32,6 +32,13 @@ Feature: Show policy
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested policy 'invalid' was not found"
+      }
+      """
 
   Scenario: Product retrieves a policy for their product
     Given the current account is "test1"

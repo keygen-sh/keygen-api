@@ -6,7 +6,7 @@ module Sluggable
   included do
     # Redefine finder to search by slug and id
     def self.find(id)
-      raise ActiveRecord::RecordNotFound if id.nil?
+      raise Keygen::Error::NotFoundError.new(model: self.name, id: id) if id.nil?
 
       # FIXME(ezekg) Decouple this from the account model
       scope = includes :billing
@@ -18,7 +18,7 @@ module Sluggable
         end
 
       if record.nil?
-        raise ActiveRecord::RecordNotFound
+        raise Keygen::Error::NotFoundError.new(model: self.name, id: id)
       end
 
       record

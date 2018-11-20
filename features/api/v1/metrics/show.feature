@@ -34,6 +34,13 @@ Feature: Show metric
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested metric 'invalid' was not found"
+      }
+      """
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin attempts to retrieve a metric for another account

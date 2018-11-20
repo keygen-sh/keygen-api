@@ -155,6 +155,13 @@ Feature: Account plan relationship
       }
       """
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested plan 'invalid' was not found"
+      }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs

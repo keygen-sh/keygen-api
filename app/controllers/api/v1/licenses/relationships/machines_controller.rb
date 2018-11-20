@@ -35,7 +35,7 @@ module Api::V1::Licenses::Relationships
           current_account.licenses.find_by key: params[:license_id]
         end
 
-      raise ActiveRecord::RecordNotFound if @license.nil?
+      raise Keygen::Error::NotFoundError.new(model: License.name, id: params[:license_id]) if @license.nil?
 
       authorize @license, :show?
     end
