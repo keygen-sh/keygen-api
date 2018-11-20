@@ -1,0 +1,19 @@
+%h3 Usage report for #{@date.strftime "%m/%d/%Y"}
+
+- if @reports.any?
+  %ul
+    - @reports.each do |report|
+      %li
+        %strong Account ID:
+        %span #{report.account.id} / #{report.account.slug}
+        %br
+        %strong Contact:
+        %span #{report.admin.full_name} / #{link_to report.admin.email, report.admin.email}
+        %br
+        %strong Requests:
+        %span #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
+        %br
+        %strong Plan:
+        %span #{report.account.plan.name}
+- else
+  %p Nothing to report

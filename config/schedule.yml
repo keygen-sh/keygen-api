@@ -5,3 +5,7 @@ check_for_license_expirations:
 check_for_license_overdue_check_ins:
   cron: "*/10 * * * *" # Every 10 mins
   class: "LicenseOverdueCheckInsWorker"
+
+report_account_request_limits:
+  cron: "0 0 * * *" # Every day at midnight
+  class: "RequestLimitsReportWorker"
