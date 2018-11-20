@@ -32,6 +32,13 @@ Feature: Show metric
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested request log 'invalid' was not found"
+      }
+      """
 
   Scenario: Admin attempts to retrieve a log for another account
     Given I am an admin of account "test2"

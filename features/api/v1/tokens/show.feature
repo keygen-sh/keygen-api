@@ -30,6 +30,13 @@ Feature: Show authentication token
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested token 'invalid' was not found"
+      }
+      """
 
   Scenario: Product requests a token while authenticated
     Given the current account is "test1"

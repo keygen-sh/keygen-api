@@ -34,6 +34,13 @@ Feature: Show key
     And I use an authentication token
     When I send a GET request to "/accounts/test1/keys/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested key 'invalid' was not found"
+      }
+      """
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product retrieves a key for their product

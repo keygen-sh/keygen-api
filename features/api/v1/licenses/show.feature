@@ -166,6 +166,13 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested license 'invalid' was not found"
+      }
+      """
 
   Scenario: Admin retrieves a legacy encrypted license for their account
     Given I am an admin of account "test1"
@@ -188,6 +195,13 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/a-license-key"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested license 'a-license-key' was not found"
+      }
+      """
 
   Scenario: Admin attempts to retrieve a license for their account by key using scheme RSA_2048_PKCS1_ENCRYPT
     Given I am an admin of account "test1"

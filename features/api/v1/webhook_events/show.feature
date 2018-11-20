@@ -33,6 +33,13 @@ Feature: Show webhook event
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events/invalid"
     Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "The requested webhook event 'invalid' was not found"
+      }
+      """
 
   Scenario: Admin attempts to retrieve a webhook event for another account
     Given I am an admin of account "test2"

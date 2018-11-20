@@ -88,7 +88,7 @@ module Api::V1::Licenses::Actions
           current_account.licenses.find_by key: params[:id]
         end
 
-      raise ActiveRecord::RecordNotFound if @license.nil?
+      raise Keygen::Error::NotFoundError.new(model: License.name, id: params[:id]) if @license.nil?
     end
 
     def increment_param

@@ -53,7 +53,7 @@ module Api::V1::Users::Actions
           current_account.users.find_by email: params[:id].downcase
         end
 
-      raise ActiveRecord::RecordNotFound if @user.nil?
+        raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
     end
 
     typed_parameters do
