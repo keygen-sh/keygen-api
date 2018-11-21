@@ -3,15 +3,17 @@
 - if @reports.any?
   %ul
     - @reports.each do |report|
+      - request_limit_exceeded = (report.request_count > report.request_limit) rescue false
       %li
         %strong Account ID:
         %span #{report.account.id} / #{report.account.slug}
         %br
         %strong Contact:
-        %span #{report.admin.full_name} / #{link_to report.admin.email, report.admin.email}
+        %span #{report.admin.full_name} / #{mail_to report.admin.email}
         %br
         %strong Requests:
-        %span #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
+        %span(style="color: #{request_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+          #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
         %br
         %strong Plan:
         %span #{report.account.plan.name}
