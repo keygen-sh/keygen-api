@@ -39,7 +39,8 @@ module Keygen
     # Log Rack request/response to datebase
     config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
 
-    # Catch JSON parse errors and return a better error message
+    # Catch JSON/URI parse errors and return a better error message
+    config.middleware.insert_before 0, Keygen::Middleware::CatchBadUriErrors
     config.middleware.use Keygen::Middleware::CatchJsonParseErrors
 
     # Protect against DDOS and other abuses
