@@ -33,15 +33,17 @@ module Keygen
     # Remove unneeded Rack middleware
     config.middleware.delete Rack::ConditionalGet
     config.middleware.delete Rack::ETag
+    config.middleware.delete Rack::Sendfile
+    config.middleware.delete Rack::Runtime
+
+    # Log Rack request/response to datebase
+    config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
+
+    # Catch JSON parse errors and return a better error message
+    config.middleware.use Keygen::Middleware::CatchJsonParseErrors
 
     # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
-
-    # Log Rack request/response to datebase
-    config.middleware.insert_before Rack::Runtime, Keygen::Middleware::RequestLogger
-
-    # Catch JSON parse errors and return a better error message
-    config.middleware.insert_before Rack::Runtime, Keygen::Middleware::CatchJsonParseErrors
 
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
