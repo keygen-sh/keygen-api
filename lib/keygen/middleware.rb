@@ -109,5 +109,28 @@ module Keygen
         ]
       end
     end
+
+    class CatchRoutingErrors
+      def initialize(app)
+        @app = app
+      end
+
+      def call(env)
+        @app.call env
+      rescue ActionController::RoutingError => e
+        [
+          404,
+          {
+            "Content-Type" => "application/vnd.api+json",
+          },
+          [{
+            errors: [{
+              title: "Not found",
+              detail: "The requested resource was not found"
+            }]
+          }.to_json]
+        ]
+      end
+    end
   end
 end

@@ -41,6 +41,7 @@ module Keygen
 
     # Catch JSON/URI parse errors and return a better error message
     config.middleware.insert_before 0, Keygen::Middleware::CatchBadUriErrors
+    config.middleware.insert_before 0, Keygen::Middleware::CatchRoutingErrors
     config.middleware.use Keygen::Middleware::CatchJsonParseErrors
 
     # Protect against DDOS and other abuses
