@@ -7,6 +7,9 @@ Rails.application.routes.draw do
       get "health", to: "health#general_health"
       get "health/webhooks", to: "health#webhook_health"
 
+      # Ping checks
+      get "ping", to: "health#general_health"
+
       resources "plans", only: [:index, :show]
 
       resources "accounts", except: [:index] do
