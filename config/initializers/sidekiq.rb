@@ -8,7 +8,7 @@ SIDEKIQ_MAX_QUEUE_LATENCY =
   (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
 
 Sidekiq.configure_client do |config|
-  config.redis = { size: 1 }
+  config.redis = { size: 5, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
 
   config.client_middleware do |chain|
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 3.days
@@ -16,6 +16,8 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq.configure_server do |config|
+  config.redis = { size: 25, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
+
   schedule_file = Rails.root.join 'config', 'schedule.yml'
 
   if File.exist?(schedule_file)
