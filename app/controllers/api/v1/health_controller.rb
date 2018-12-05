@@ -17,5 +17,11 @@ module Api::V1
 
       render status: status
     end
+
+    def general_ping
+      skip_authorization
+
+      render status: 200
+    end
   end
 end
