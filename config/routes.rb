@@ -6,9 +6,7 @@ Rails.application.routes.draw do
       # Health checks
       get "health", to: "health#general_health"
       get "health/webhooks", to: "health#webhook_health"
-
-      # Ping checks
-      get "ping", to: "health#general_health"
+      get "ping", to: "health#general_ping"
 
       resources "plans", only: [:index, :show]
 
