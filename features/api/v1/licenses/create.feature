@@ -278,7 +278,8 @@ Feature: Create license
             "metadata": {
               "example_key_1": 1,
               "ExampleKey2": 2,
-              "exampleKey3": 3
+              "exampleKey3": 3,
+              "example key 4": 4
             }
           },
           "relationships": {
@@ -300,7 +301,8 @@ Feature: Create license
         "metadata": {
           "exampleKey1": 1,
           "exampleKey2": 2,
-          "exampleKey3": 3
+          "exampleKey3": 3,
+          "exampleKey4": 4
         }
       }
       """
