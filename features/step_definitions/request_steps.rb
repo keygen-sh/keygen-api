@@ -363,6 +363,13 @@ Then /^the JSON response should (?:contain|be) meta with the following:$/ do |bo
   expect(json["meta"]).to eq JSON.parse(body)
 end
 
+Then /^the JSON response should (?:contain|be) meta which includes the following:$/ do |body|
+  parse_placeholders! body
+  json = JSON.parse last_response.body
+
+  expect(json["meta"]).to include JSON.parse(body)
+end
+
 Then /^the JSON response should (?:contain|be) an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
 

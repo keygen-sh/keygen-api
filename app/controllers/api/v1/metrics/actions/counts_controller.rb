@@ -14,7 +14,7 @@ module Api::V1::Metrics::Actions
         metrics = policy_scope(apply_scopes(current_account.metrics))
                     .current_period
                     .unscope(:order)
-                    .group_by_day(:created_at)
+                    .group_by_day(:created_at, last: 14)
                     .count
 
         {

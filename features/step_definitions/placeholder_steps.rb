@@ -34,6 +34,8 @@ def parse_placeholders!(str)
         end
       when "time"
         case attribute
+        when /(\d+)\.(\w+)\.(\w+).format/
+          $1.to_i.send($2).send($3).strftime "%Y-%m-%d"
         when /(\d+)\.(\w+)\.(\w+).iso/
           $1.to_i.send($2).send($3).iso8601 3
         when /(\d+)\.(\w+)\.(\w+)/
