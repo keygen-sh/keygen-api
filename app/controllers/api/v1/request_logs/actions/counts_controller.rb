@@ -12,7 +12,7 @@ module Api::V1::RequestLogs::Actions
         logs = policy_scope(apply_scopes(current_account.request_logs))
                     .current_period
                     .unscope(:order)
-                    .group_by_day(:created_at)
+                    .group_by_day(:created_at, last: 14)
                     .count
 
         {

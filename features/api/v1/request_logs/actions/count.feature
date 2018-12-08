@@ -22,16 +22,35 @@ Feature: Metric counts
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 52 "request-logs"
+    And the first 10 "request-logs" have the following attributes:
+      """
+      {
+        "createdAt": "$time.8.days.ago"
+      }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/actions/count"
     Then the response status should be "200"
     And the JSON response should contain meta with the following:
       """
       {
-        "$date.format": 52
+        "$time.13.days.ago.format": 0,
+        "$time.12.days.ago.format": 0,
+        "$time.11.days.ago.format": 0,
+        "$time.10.days.ago.format": 0,
+        "$time.9.days.ago.format": 0,
+        "$time.8.days.ago.format": 10,
+        "$time.7.days.ago.format": 0,
+        "$time.6.days.ago.format": 0,
+        "$time.5.days.ago.format": 0,
+        "$time.4.days.ago.format": 0,
+        "$time.3.days.ago.format": 0,
+        "$time.2.days.ago.format": 0,
+        "$time.1.day.ago.format": 0,
+        "$date.format": 42
       }
       """
-      And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: User attempts to retrieve log counts for their account
     Given the current account is "test1"
