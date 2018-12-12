@@ -18,7 +18,12 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render jsonapi: @license, meta: { valid: valid, detail: detail, constant: constant }
+      render jsonapi: @license, meta: {
+        ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
+        valid: valid,
+        detail: detail,
+        constant: constant,
+      }
     end
 
     # POST /licenses/1/validate
@@ -37,7 +42,12 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render jsonapi: @license, meta: { valid: valid, detail: detail, constant: constant }
+      render jsonapi: @license, meta: {
+        ts: Time.current,
+        valid: valid,
+        detail: detail,
+        constant: constant,
+      }
     end
 
     # POST /licenses/validate-key
@@ -65,7 +75,12 @@ module Api::V1::Licenses::Actions
         ).execute
       end
 
-      render jsonapi: @license, meta: { valid: valid, detail: detail, constant: constant }
+      render jsonapi: @license, meta: {
+        ts: Time.current,
+        valid: valid,
+        detail: detail,
+        constant: constant,
+      }
     end
 
     private
