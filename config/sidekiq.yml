@@ -1,4 +1,4 @@
-:concurrency: 25
+:concurrency: 15
 :queues:
   - [cleanup, 1]
   - [logs, 1]
