@@ -196,6 +196,16 @@ describe CreateWebhookEventService do
     expect(@event.last_response_body).to eq 'DNS_ERROR'
   end
 
+  it 'should skip when event delivery fails due to connection refused error' do
+    allow(WebhookWorker::Request).to receive(:post) {
+      raise Errno::ECONNREFUSED.new
+    }
+
+    expect { create_webhook_event! }.to_not raise_error
+
+    expect(@event.last_response_body).to eq 'CONN_REFUSED'
+  end
+
   it 'should not skip when event delivery fails due to an exception' do
     allow(WebhookWorker::Request).to receive(:post) {
       raise Exception.new

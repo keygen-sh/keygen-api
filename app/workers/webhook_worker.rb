@@ -59,6 +59,11 @@ class WebhookWorker
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT'
     )
+  rescue Errno::ECONNREFUSED # Stop sending requests when the connection is refused
+    event.update(
+      last_response_code: nil,
+      last_response_body: 'CONN_REFUSED'
+    )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
     event.update(
       last_response_code: nil,
