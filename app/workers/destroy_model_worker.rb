@@ -1,7 +1,7 @@
 class DestroyModelWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :default
+  sidekiq_options queue: :deletes
 
   def perform(type, id)
     klass = "#{type}".classify.constantize
