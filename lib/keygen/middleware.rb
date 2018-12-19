@@ -1,5 +1,23 @@
+require_relative './store'
+
 module Keygen
   module Middleware
+    class RequestStore
+      def initialize(app)
+        @app = app
+      end
+
+      def call(env)
+        Keygen::Store::Request.initialize!
+
+        status, headers, res = @app.call env
+
+        Keygen::Store::Request.clear!
+
+        [status, headers, res]
+      end
+    end
+
     class RequestLogger
       IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
       IGNORED_RESOURCES = %w[
@@ -26,6 +44,8 @@ module Keygen
           return [status, headers, res]
         end
 
+        # TODO(ezekg) Use current account from request store? Has the side effect of not
+        #             counting invalid requests e.g. 400 and 404 errors.
         account_id = req.params[:account_id] || req.params[:id]
         route = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
@@ -34,10 +54,13 @@ module Keygen
           return [status, headers, res]
         end
 
-        # TODO(ezekg) Log the current bearer's ID and type
+        requestor = Keygen::Store::Request.store[:current_bearer]
+
         RequestLogWorker.perform_async(
           account_id,
           {
+            requestor_type: requestor&.class&.name,
+            requestor_id: requestor&.id,
             request_id: req.request_id,
             url: req.path,
             method: req.method,

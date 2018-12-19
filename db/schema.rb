@@ -215,6 +215,8 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "requestor_type"
+    t.uuid "requestor_id"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_request_logs_on_id_and_created_at", unique: true
   end

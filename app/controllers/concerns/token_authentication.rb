@@ -27,9 +27,13 @@ module TokenAuthentication
       token: token
     ).execute
 
+    Keygen::Store::Request.store[:current_token] = current_token
+
     if current_token&.expired?
       render_unauthorized code: 'TOKEN_EXPIRED', detail: "Token is expired" and return
     end
+
+    Keygen::Store::Request.store[:current_bearer] = current_token&.bearer
 
     current_token&.bearer
   end
