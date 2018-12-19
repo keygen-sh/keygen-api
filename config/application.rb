@@ -38,6 +38,7 @@ module Keygen
 
     # Log Rack request/response to datebase
     config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
+    config.middleware.insert_before 0, Keygen::Middleware::RequestStore
 
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and

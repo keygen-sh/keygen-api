@@ -7,6 +7,8 @@ module CurrentAccountScope
       Account.find account_id
     end
 
+    Keygen::Store::Request.store[:current_account] = account
+
     @current_account = account
   end
 end
