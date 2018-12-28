@@ -226,7 +226,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Large Usage Policy",
+            "name": "Larger Usage Policy",
             "maxUses": 2147483647
           },
           "relationships": {
@@ -240,21 +240,11 @@ Feature: Create policy
         }
       }
       """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "must be less than 2147483647",
-        "code": "MAX_USES_INVALID",
-        "source": {
-          "pointer": "/data/attributes/maxUses"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Larger Usage Policy"
+    And the JSON response should be a "policy" with the maxUses "2147483647"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a policy that has a max uses that exceeds the max value of a 4 byte integer
@@ -273,7 +263,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Large Usage Policy",
+            "name": "Largest Usage Policy",
             "maxUses": 2147483648
           },
           "relationships": {
@@ -293,7 +283,7 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be less than 2147483647",
+        "detail": "must be less than or equal to 2147483647",
         "code": "MAX_USES_INVALID",
         "source": {
           "pointer": "/data/attributes/maxUses"
