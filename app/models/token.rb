@@ -32,6 +32,26 @@ class Token < ApplicationRecord
 
   scope :bearer, -> (id) { where bearer: id }
 
+  # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
+  #              store the raw token value.
+  after_commit :clear_cache!, on: [:update, :destroy]
+
+  def self.cache_key(token)
+    hash = Digest::SHA256.hexdigest token
+
+    [:tokens, hash].join ":"
+  end
+
+  def self.clear_cache!(token)
+    key = Token.cache_key token
+
+    Rails.cache.delete key
+  end
+
+  def clear_cache!
+    Token.clear_cache! digest
+  end
+
   def generate!(version: Tokenable::ALGO_VERSION)
     @raw, enc = generate_hashed_token :digest, version: version do |token|
       case version
