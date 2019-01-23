@@ -40,6 +40,22 @@ class Account < ApplicationRecord
 
   scope :plan, -> (id) { where plan: id }
 
+  after_commit :clear_cache!, on: [:update, :destroy]
+
+  def self.cache_key(id)
+    [:accounts, id].join ":"
+  end
+
+  def self.clear_cache!(id)
+    key = Account.cache_key id
+
+    Rails.cache.delete key
+  end
+
+  def clear_cache!
+    Account.clear_cache! id
+  end
+
   def protected?
     protected
   end

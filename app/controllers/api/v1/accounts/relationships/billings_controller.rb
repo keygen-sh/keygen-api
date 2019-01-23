@@ -1,5 +1,6 @@
 module Api::V1::Accounts::Relationships
   class BillingsController < Api::V1::BaseController
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_billing
 
@@ -40,7 +41,7 @@ module Api::V1::Accounts::Relationships
     private
 
     def set_billing
-      @account = Account.find params[:account_id]
+      @account = @current_account
       @billing = @account&.billing
     end
 
