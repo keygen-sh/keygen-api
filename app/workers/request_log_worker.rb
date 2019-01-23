@@ -6,7 +6,9 @@ class RequestLogWorker
   sidekiq_options queue: :logs
 
   def perform(account_id, req, res)
-    account = Account.find account_id
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+      Account.find account_id
+    end
 
     account.request_logs.create(
       request_id: req['request_id'],

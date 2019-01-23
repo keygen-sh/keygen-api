@@ -14,7 +14,10 @@ class WebhookWorker
   end
 
   def perform(account_id, event_id, endpoint_id, payload)
-    account = Account.find account_id
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+      Account.find account_id
+    end
+
     endpoint = account.webhook_endpoints.find endpoint_id
     event = account.webhook_events.find event_id
 

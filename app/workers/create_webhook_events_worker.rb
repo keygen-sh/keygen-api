@@ -4,7 +4,10 @@ class CreateWebhookEventsWorker
   sidekiq_options queue: :webhooks
 
   def perform(event, account_id, data)
-    account = Account.find account_id
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+      Account.find account_id
+    end
+
     options = {
       expose: { url_helpers: Rails.application.routes.url_helpers },
       class: {

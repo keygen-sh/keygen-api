@@ -6,7 +6,9 @@ class RecordMetricWorker
   sidekiq_options queue: :metrics
 
   def perform(metric, account_id, resource_type, resource_id)
-    account = Account.find account_id
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+      Account.find account_id
+    end
 
     # TODO(ezekg) Should probably scope this to the account
     resource = resource_type.classify.constantize.find_by id: resource_id
