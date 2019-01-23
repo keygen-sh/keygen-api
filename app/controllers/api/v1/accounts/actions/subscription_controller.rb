@@ -1,5 +1,6 @@
 module Api::V1::Accounts::Actions
   class SubscriptionController < Api::V1::BaseController
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_account
 
@@ -78,7 +79,7 @@ module Api::V1::Accounts::Actions
     private
 
     def set_account
-      @account = Account.find params[:id]
+      @account = @current_account
     end
   end
 end

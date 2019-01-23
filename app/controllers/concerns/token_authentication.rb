@@ -14,7 +14,7 @@ module TokenAuthentication
   private
 
   def authenticator(token, options)
-    account = current_account || Account.find(params[:account_id] || params[:id])
+    return if current_account.nil?
 
     # Make sure token matches our expected format. This is also here to help users
     # who may be mistakenly using a UUID as a token, which is a common mistake.
@@ -23,7 +23,7 @@ module TokenAuthentication
     end
 
     @current_token = TokenAuthenticationService.new(
-      account: account,
+      account: current_account,
       token: token
     ).execute
 

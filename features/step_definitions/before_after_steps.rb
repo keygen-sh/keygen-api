@@ -44,4 +44,14 @@ After do |scenario|
       }
     )
   end
+
+  # Clear redis cache keys
+  begin
+    Rails.cache.clear
+  rescue => e
+    puts e
+  end
+
+  @account = nil
+  @token = nil
 end

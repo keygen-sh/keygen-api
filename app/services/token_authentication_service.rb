@@ -16,6 +16,9 @@ class TokenAuthenticationService < BaseService
       return nil unless matches.present? &&
                         "#{account.id}".delete("-") == matches[1]
 
+      # FIXME(ezekg) Can't figure out a clean way to cache v1 tokens since we don't
+      #              store the raw token value anywhere, which makes invalidation
+      #              harder on revocation.
       tok = account.tokens.preload(bearer: [:role]).find_by id: matches[2]
 
       if tok&.compare_hashed_token(:digest, token, version: "v1")
@@ -25,7 +28,9 @@ class TokenAuthenticationService < BaseService
       end
     when "v2"
       digest = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
-      tok = account.tokens.find_by digest: digest
+      tok = Rails.cache.fetch(cache_key(digest), expires_in: 1.minute) do
+        account.tokens.find_by digest: digest
+      end
 
       tok
     end
@@ -34,4 +39,8 @@ class TokenAuthenticationService < BaseService
   private
 
   attr_reader :account, :token
+
+  def cache_key(t)
+    Token.cache_key t
+  end
 end
