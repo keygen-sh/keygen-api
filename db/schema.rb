@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_10_174744) do
+ActiveRecord::Schema.define(version: 2019_01_25_192607) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -124,6 +124,7 @@ ActiveRecord::Schema.define(version: 2018_11_10_174744) do
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_metrics_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_metrics_on_id_and_created_at", unique: true
+    t.index ["metric", "account_id", "created_at"], name: "index_metrics_on_metric_and_account_id_and_created_at"
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
