@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_25_192607) do
+ActiveRecord::Schema.define(version: 2019_01_28_201532) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -171,6 +171,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.boolean "concurrent", default: true
     t.integer "max_uses"
     t.string "scheme"
+    t.string "fingerprint_policy", default: "UNIQUE_PER_LICENSE"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gin

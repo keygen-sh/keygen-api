@@ -36,7 +36,8 @@ class Machine < ApplicationRecord
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
-  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
+  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :account_id }, if: :uniq_per_account?
+  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }, if: :uniq_per_license?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
@@ -47,4 +48,18 @@ class Machine < ApplicationRecord
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
+
+  private
+
+  def uniq_per_account?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_account?
+  end
+
+  def uniq_per_license?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_license?
+  end
 end
