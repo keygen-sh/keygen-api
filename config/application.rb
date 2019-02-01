@@ -43,6 +43,7 @@ module Keygen
     config.middleware.insert_before 0, Keygen::Middleware::CatchBadUriErrors
     config.middleware.insert_before 0, Keygen::Middleware::CatchRoutingErrors
     config.middleware.use Keygen::Middleware::CatchJsonParseErrors
+    config.middleware.use Keygen::Middleware::DefaultContentType
 
     # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
