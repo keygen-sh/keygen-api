@@ -84,32 +84,6 @@ module Keygen
       end
     end
 
-    class CatchBadUriErrors
-      def initialize(app)
-        @app = app
-      end
-
-      def call(env)
-        @app.call env
-      rescue ActionController::RoutingError => e
-        raise e unless e.message =~ /bad URI\(is not URI\?\)/
-
-        [
-          400,
-          {
-            "Content-Type" => "application/vnd.api+json",
-          },
-          [{
-            errors: [{
-              title: "Bad request",
-              detail: "The request could not be completed because the URI was invalid (please ensure non-URL safe chars are properly encoded)",
-              code: "URI_INVALID"
-            }]
-          }.to_json]
-        ]
-      end
-    end
-
     class CatchRoutingErrors
       def initialize(app)
         @app = app
@@ -118,18 +92,34 @@ module Keygen
       def call(env)
         @app.call env
       rescue ActionController::RoutingError => e
-        [
-          404,
-          {
-            "Content-Type" => "application/vnd.api+json",
-          },
-          [{
-            errors: [{
-              title: "Not found",
-              detail: "The requested resource was not found"
-            }]
-          }.to_json]
-        ]
+        if e.message =~ /bad URI\(is not URI\?\)/
+          [
+            400,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Bad request",
+                detail: "The request could not be completed because the URI was invalid (please ensure non-URL safe chars are properly encoded)",
+                code: "URI_INVALID"
+              }]
+            }.to_json]
+          ]
+        else
+          [
+            404,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Not found",
+                detail: "The requested resource was not found (please ensure your API endpoint is correct)"
+              }]
+            }.to_json]
+          ]
+        end
       end
     end
 
