@@ -40,7 +40,6 @@ module Keygen
     config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
 
     # Catch JSON/URI parse errors and return a better error message
-    config.middleware.insert_before 0, Keygen::Middleware::CatchBadUriErrors
     config.middleware.insert_before 0, Keygen::Middleware::CatchRoutingErrors
     config.middleware.use Keygen::Middleware::CatchJsonParseErrors
     config.middleware.use Keygen::Middleware::DefaultContentType
