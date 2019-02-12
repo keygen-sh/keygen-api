@@ -49,6 +49,8 @@ class Token < ApplicationRecord
   end
 
   def clear_cache!
+    return if digest.nil?
+
     Token.clear_cache! digest
   end
 
@@ -106,6 +108,8 @@ class Token < ApplicationRecord
       "user-token"
     when activation_token?
       "activation-token"
+    else
+      "token"
     end
   end
 end
