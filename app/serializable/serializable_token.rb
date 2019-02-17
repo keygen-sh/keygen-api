@@ -22,14 +22,14 @@ class SerializableToken < SerializableBase
       { type: :accounts, id: @object.account_id }
     end
     link :related do
-      @url_helpers.v1_account_path @object.account
+      @url_helpers.v1_account_path @object.account_id
     end
   end
   relationship :bearer do
     linkage always: true
     link :related do
-      @url_helpers.send "v1_account_#{@object.bearer.class.name.demodulize.underscore}_path",
-                        @object.account, @object.bearer
+      @url_helpers.send "v1_account_#{@object.bearer_type.underscore}_path",
+                        @object.account_id, @object.bearer_id
     end
   end
 

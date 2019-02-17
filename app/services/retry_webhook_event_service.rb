@@ -26,7 +26,6 @@ class RetryWebhookEventService < BaseService
         Product: SerializableProduct,
         Policy: SerializablePolicy,
         User: SerializableUser,
-        Role: SerializableRole,
         License: SerializableLicense,
         Machine: SerializableMachine,
         Key: SerializableKey,
