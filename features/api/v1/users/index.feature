@@ -28,7 +28,7 @@ Feature: List users
   Scenario: Admin retrieves a paginated list of users
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "users"
+    And the current account has 21 "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?page[number]=2&page[size]=5"
     Then the response status should be "200"
@@ -40,7 +40,11 @@ Feature: List users
         "next": "/v1/accounts/test1/users?page[number]=3&page[size]=5",
         "prev": "/v1/accounts/test1/users?page[number]=1&page[size]=5",
         "first": "/v1/accounts/test1/users?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/users?page[number]=4&page[size]=5"
+        "last": "/v1/accounts/test1/users?page[number]=5&page[size]=5",
+        "meta": {
+          "pages": 5,
+          "count": 21
+        }
       }
       """
     And the response should contain a valid signature header for "test1"

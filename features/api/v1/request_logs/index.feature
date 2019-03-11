@@ -45,7 +45,11 @@ Feature: List metrics
         "prev": null,
         "next": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
         "first": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
-        "last": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
+        "last": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
+        "meta": {
+          "pages": 2,
+          "count": 200
+        }
       }
       """
 
@@ -64,7 +68,11 @@ Feature: List metrics
         "prev": "/v1/accounts/test1/request-logs?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/request-logs?page[number]=3&page[size]=5",
         "first": "/v1/accounts/test1/request-logs?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/request-logs?page[number]=4&page[size]=5"
+        "last": "/v1/accounts/test1/request-logs?page[number]=4&page[size]=5",
+        "meta": {
+          "pages": 4,
+          "count": 20
+        }
       }
       """
 
