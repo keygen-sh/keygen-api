@@ -58,7 +58,11 @@ Feature: Create policy
       {
         "self": "/v1/accounts/test1/search?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/search?page[number]=2&page[size]=5",
-        "last": "/v1/accounts/test1/search?page[number]=3&page[size]=5"
+        "last": "/v1/accounts/test1/search?page[number]=3&page[size]=5",
+        "meta": {
+          "pages": 3,
+          "count": 11
+        }
       }
       """
     And sidekiq should have 0 "webhook" jobs

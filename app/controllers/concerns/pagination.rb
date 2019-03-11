@@ -30,6 +30,10 @@ module Pagination
       page[:next]  = pagination_link resource.next_page, resource.limit_value
       page[:first] = pagination_link 1, resource.limit_value
       page[:last]  = pagination_link resource.total_pages, resource.limit_value
+      page[:meta]  = {
+        pages: resource.total_pages,
+        count: resource.total_count
+      }
     end
   end
 

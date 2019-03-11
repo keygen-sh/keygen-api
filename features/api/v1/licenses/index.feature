@@ -39,7 +39,11 @@ Feature: List license
       {
         "self": "/v1/accounts/test1/licenses?page[number]=4&page[size]=5",
         "prev": "/v1/accounts/test1/licenses?page[number]=3&page[size]=5",
-        "first": "/v1/accounts/test1/licenses?page[number]=1&page[size]=5"
+        "first": "/v1/accounts/test1/licenses?page[number]=1&page[size]=5",
+        "meta": {
+          "pages": 4,
+          "count": 20
+        }
       }
       """
     And the response should contain a valid signature header for "test1"

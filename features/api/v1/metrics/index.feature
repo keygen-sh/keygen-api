@@ -31,7 +31,7 @@ Feature: List metrics
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 250 "metrics"
-    And 50 "metrics" have the following attributes:
+    And 52 "metrics" have the following attributes:
       """
       { "createdAt": "$time.1.year.ago" }
       """
@@ -46,7 +46,11 @@ Feature: List metrics
         "prev": null,
         "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
         "first": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
-        "last": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
+        "last": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
+        "meta": {
+          "pages": 2,
+          "count": 198
+        }
       }
       """
       And sidekiq should have 0 "request-log" jobs
@@ -54,7 +58,7 @@ Feature: List metrics
   Scenario: Admin retrieves an unsupported paginated list of metrics
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "metrics"
+    And the current account has 24 "metrics"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=5"
     Then the response status should be "200"
@@ -66,7 +70,11 @@ Feature: List metrics
         "prev": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=5",
         "first": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/metrics?page[number]=4&page[size]=5"
+        "last": "/v1/accounts/test1/metrics?page[number]=5&page[size]=5",
+        "meta": {
+          "pages": 5,
+          "count": 24
+        }
       }
       """
       And sidekiq should have 0 "request-log" jobs

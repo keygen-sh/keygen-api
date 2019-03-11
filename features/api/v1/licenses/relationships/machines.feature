@@ -41,7 +41,11 @@ Feature: License machines relationship
         "prev": null,
         "next": null,
         "first": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5"
+        "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
+        "meta": {
+          "pages": 1,
+          "count": 2
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -70,7 +74,11 @@ Feature: License machines relationship
         "prev": null,
         "next": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=2&page[size]=5",
         "first": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=4&page[size]=5"
+        "last": "/v1/accounts/test1/licenses/$licenses[0]/machines?page[number]=4&page[size]=5",
+        "meta": {
+          "pages": 4,
+          "count": 20
+        }
       }
       """
 

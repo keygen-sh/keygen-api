@@ -39,7 +39,11 @@ Feature: List products
       {
         "self": "/v1/accounts/test1/products?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/products?page[number]=2&page[size]=5",
-        "last": "/v1/accounts/test1/products?page[number]=4&page[size]=5"
+        "last": "/v1/accounts/test1/products?page[number]=4&page[size]=5",
+        "meta": {
+          "pages": 4,
+          "count": 20
+        }
       }
       """
 
