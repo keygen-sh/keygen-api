@@ -538,7 +538,7 @@ Feature: Update user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to update their password
+  Scenario: User attempts to update their password directly
    Given the current account is "test1"
    And the current account has 2 "webhook-endpoints"
    And the current account has 3 "users"
@@ -550,7 +550,7 @@ Feature: Update user
        "data": {
         "type": "users",
          "attributes": {
-           "password": "new-password"
+           "password": "1n53cur3!"
          }
        }
      }
@@ -558,9 +558,31 @@ Feature: Update user
    Then the response status should be "400"
    And sidekiq should have 0 "webhook" jobs
    And sidekiq should have 0 "metric" jobs
+  And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update another user's password
+   Given the current account is "test1"
+   And the current account has 2 "webhook-endpoints"
+   And the current account has 3 "users"
+   And I am a user of account "test1"
+   And I use an authentication token
+   When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+     """
+     {
+       "data": {
+        "type": "users",
+         "attributes": {
+           "password": "h4ck3d!"
+         }
+       }
+     }
+     """
+   Then the response status should be "403"
+   And sidekiq should have 0 "webhook" jobs
+   And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to update a users password
+  Scenario: Admin attempts to update a user's password
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -572,12 +594,35 @@ Feature: Update user
         "data": {
           "type": "users",
           "attributes": {
-            "password": "h4ck3d!"
+            "password": "new-password"
           }
         }
       }
       """
-    Then the response status should be "400"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to update a user's password
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current account has 2 "users"
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "password": "new-password"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

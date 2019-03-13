@@ -119,6 +119,7 @@ module Api::V1
             param :last_name, type: :string, optional: true
             param :email, type: :string, optional: true
             if current_bearer&.role? :admin or current_bearer&.role? :product
+              param :password, type: :string, optional: true
               param :metadata, type: :hash, optional: true
             end
             if current_bearer&.role? :admin
