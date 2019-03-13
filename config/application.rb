@@ -39,9 +39,16 @@ module Keygen
     # Log Rack request/response to datebase
     config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
 
-    # Catch JSON/URI parse errors and return a better error message
+    # Catch routing errors and return better error messages
     config.middleware.insert_before 0, Keygen::Middleware::CatchRoutingErrors
+
+    # FIXME(ezekg) Catch any JSON/URI parse errors. We're inserting this middleware
+    #              twice because Rails is stupid and emits this error at multiple
+    #              layers in the stack, resulting in this hack.
     config.middleware.insert_before 0, Keygen::Middleware::CatchJsonParseErrors
+    config.middleware.use Keygen::Middleware::CatchJsonParseErrors
+
+    # Add a default JSON content type
     config.middleware.use Keygen::Middleware::DefaultContentType
 
     # Protect against DDOS and other abuses
