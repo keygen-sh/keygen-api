@@ -56,6 +56,38 @@ class Account < ApplicationRecord
     Account.clear_cache! id
   end
 
+  def daily_request_count_cache_key
+    now = Time.current
+
+    [:req, :limits, :daily, id, now.beginning_of_day.to_i].join ':'
+  end
+
+  def daily_request_count=(count)
+    Rails.cache.write daily_request_count_cache_key, count, raw: true
+  end
+
+  def daily_request_count
+    count = Rails.cache.read daily_request_count_cache_key, raw: true
+
+    count.to_i
+  end
+
+  def daily_request_limit
+    plan&.max_reqs
+  end
+
+  def daily_request_limit_exceeded?
+    return false if daily_request_limit.nil?
+
+    daily_request_count > daily_request_limit
+  end
+
+  def trialing_or_free_tier?
+    return true if billing.nil?
+
+    billing.trialing? || plan.free?
+  end
+
   def protected?
     protected
   end

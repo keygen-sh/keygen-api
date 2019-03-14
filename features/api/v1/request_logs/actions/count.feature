@@ -1,5 +1,5 @@
 @api/v1
-Feature: Metric counts
+Feature: Request log counts
 
   Background:
     Given the following "accounts" exist:

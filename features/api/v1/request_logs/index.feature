@@ -1,5 +1,5 @@
 @api/v1
-Feature: List metrics
+Feature: List request logs
 
   Background:
     Given the following "accounts" exist:
