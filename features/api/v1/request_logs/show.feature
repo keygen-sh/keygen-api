@@ -1,5 +1,5 @@
 @api/v1
-Feature: Show metric
+Feature: Show request logs
 
   Background:
     Given the following "accounts" exist:

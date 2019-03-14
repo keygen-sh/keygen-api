@@ -45,19 +45,16 @@ Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
 end
 
-Given /^the account "([^\"]*)" has not been invited$/ do |slug|
+Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |slug|
   account = Account.find slug
-  account.update invite_state: :uninvited
+
+  account.daily_request_count = account.plan.max_reqs * 2
 end
 
-Given /^the account "([^\"]*)" has been invited$/ do |slug|
+Given /^the account "([^\"]*)" is on a free tier$/ do |slug|
   account = Account.find slug
-  account.update invite_state: :invited
-end
 
-Given /^the account "([^\"]*)" has accepted an invitation$/ do |slug|
-  account = Account.find slug
-  account.update invite_state: :accepted
+  account.plan.update! price: 0
 end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|

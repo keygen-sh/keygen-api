@@ -14,4 +14,12 @@ class Plan < ApplicationRecord
   def public?
     !private
   end
+
+  def free?
+    price.nil? || price.zero?
+  end
+
+  def paid?
+    !free?
+  end
 end
