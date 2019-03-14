@@ -149,6 +149,18 @@ class ApplicationController < ActionController::API
     }, status: :conflict
   end
 
+  def render_payment_required(opts ={})
+    skip_authorization
+
+    render json: {
+      meta: { id: request.request_id },
+      errors: [{
+        title: "Payment required",
+        detail: "The request could not be completed"
+      }.merge(opts)]
+    }, status: :payment_required
+  end
+
   def render_internal_server_error(opts = {})
     skip_authorization
 

@@ -2,6 +2,21 @@ class AccountMailer < ApplicationMailer
   default from: "Keygen Support <support@keygen.sh>"
   layout "account_mailer"
 
+  def request_limit_exceeded(account:, plan:, request_count:, request_limit:)
+    @account = account
+    @plan = plan
+    @report = OpenStruct.new(
+      request_count: request_count,
+      request_limit: request_limit
+    )
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "You've exceeded the daily API request limit of your Keygen account"
+    end
+  end
+
   def pricing_change(account:)
     @account = account
 
@@ -78,7 +93,7 @@ class AccountMailer < ApplicationMailer
     account.admins.each do |admin|
       @user = admin
 
-      mail to: admin.email, subject: "Welcome to Keygen!"
+      mail to: admin.email, subject: "Welcome to Keygen, #{account.name}!"
     end
   end
 end

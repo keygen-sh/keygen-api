@@ -1,6 +1,6 @@
 @skip/bullet
 @api/v1
-Feature: Create policy
+Feature: Search
 
   Background:
     Given the following "accounts" exist:

@@ -1,0 +1,20 @@
+%p
+  I’m reaching out because your Keygen account has exceeded your tier's daily request limit of
+  #{number_with_delimiter @report.request_limit} API requests per-day. Over the past 24 hours,
+  #{number_with_delimiter @report.request_count} API requests were made to your Keygen account.
+  If you foresee this trend continuing, I recommend that you upgrade from "#{@plan.name}"
+  to the next available tier. You can upgrade your account here: #{link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription'}.
+  If this request count seems off or unexpected, please ensure that your software is working
+  as intended and is not making superfluous API requests.
+%p
+  Here are a few tips that may help:
+%ul
+  %li Reduce the number of API requests by #{link_to 'caching validation requests', 'https://github.com/keygen-sh/example-validation-caching'} locally, when possible.
+  %li If you're currently running #{link_to 'automated CI/CD tests', 'https://keygen.sh/docs/api/#testing'} against our API, mock our API instead.
+  %li Lower the frequency at which you revalidate licenses, when possible.
+  %li Talk to us about a separate sandbox account, for development purposes.
+%p
+  If we see this usage trend continue over the next few weeks, we will automatically upgrade your
+  account to the next appropriate tier.
+%p
+  Let me know if you have any questions about this!

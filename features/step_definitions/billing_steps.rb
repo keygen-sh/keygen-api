@@ -5,7 +5,8 @@ Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
 
   # Set up a fake subscription
   customer = create :customer, :with_card
-  plan = create :plan
+  plan = account.plan
+  plan = create :plan if plan.nil?
   subscription = create :subscription, customer: customer.id, plan: plan.plan_id
 
   account.update plan: plan

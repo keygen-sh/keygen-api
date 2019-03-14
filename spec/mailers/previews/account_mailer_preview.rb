@@ -1,5 +1,21 @@
 class AccountMailerPreview < ActionMailer::Preview
 
+  def request_limit_exceeded
+    report = OpenStruct.new(
+      request_count: 16_384,
+      request_limit: 10_000,
+      account: account,
+      plan: account.plan
+    )
+
+    AccountMailer.request_limit_exceeded(
+      account: report.account,
+      plan: report.plan,
+      request_count: report.request_count,
+      request_limit: report.request_limit
+    )
+  end
+
   def pricing_change
     AccountMailer.pricing_change account: account
   end

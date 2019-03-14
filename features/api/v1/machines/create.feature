@@ -15,6 +15,10 @@ Feature: Create machine
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines"
     Then the response status should be "403"
+    And the current account should have 0 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a machine for their account
     Given I am an admin of account "test1"
