@@ -48,14 +48,16 @@ module Api::V1
 
         billing.save
       when "customer.source.created", "customer.source.updated"
-        card = event.data.object
-        billing = Billing.find_by customer_id: card.customer
+        source = event.data.object
+        return unless source.type == 'card'
+
+        billing = Billing.find_by customer_id: source.customer
         return unless billing
 
         billing.update(
-          card_expiry: DateTime.new(card.exp_year.to_i, card.exp_month.to_i),
-          card_brand: card.brand,
-          card_last4: card.last4
+          card_expiry: DateTime.new(source.exp_year.to_i, source.exp_month.to_i),
+          card_brand: source.brand,
+          card_last4: source.last4
         )
       when "customer.subscription.trial_will_end"
         subscription = event.data.object
