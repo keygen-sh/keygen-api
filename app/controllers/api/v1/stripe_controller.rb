@@ -49,7 +49,8 @@ module Api::V1
         billing.save
       when "customer.source.created", "customer.source.updated"
         source = event.data.object
-        return unless source.type == 'card'
+        return unless source.object == 'card' ||
+                      source.type == 'card'
 
         billing = Billing.find_by customer_id: source.customer
         return unless billing
