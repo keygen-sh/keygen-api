@@ -73,6 +73,8 @@ class Account < ApplicationRecord
   end
 
   def daily_request_limit
+    return 1_000 if billing.trialing?
+
     plan&.max_reqs
   end
 
