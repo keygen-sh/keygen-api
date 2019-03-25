@@ -62,6 +62,13 @@ class License < ApplicationRecord
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
+  scope :expired, -> (status = true) {
+    if status
+      where 'expiry < ?', Time.current
+    else
+      where 'expiry >= ?', Time.current
+    end
+  }
   scope :policy, -> (id) { where policy: id }
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }

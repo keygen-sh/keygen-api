@@ -1,6 +1,7 @@
 module Api::V1
   class LicensesController < Api::V1::BaseController
     has_scope :suspended
+    has_scope :expired
     has_scope :product
     has_scope :policy
     has_scope :user
