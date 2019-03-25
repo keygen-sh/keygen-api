@@ -2213,10 +2213,33 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains invalid JSON",
+        "detail": "The request could not be completed because it contains invalid JSON (check encoding)",
         "code": "JSON_INVALID"
       }
       """
+    And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  # Scenario: Admin sends a badly encoded URL query parameter when attempting to create a license
+  #   Given I am an admin of account "test1"
+  #   And the current account is "test1"
+  #   And the current account has 1 "webhook-endpoint"
+  #   And the current account has 1 "policies"
+  #   And I use an authentication token
+  #   When I send a POST request to "/accounts/test1/licenses?meta=%7B+++++%4"
+  #   Then the response status should be "400"
+  #   And the JSON response should be an array of 1 error
+  #   And the first error should have the following properties:
+  #     """
+  #     {
+  #       "title": "Bad request",
+  #       "detail": "The request could not be completed because it contains invalid query parameters (check encoding)",
+  #       "code": "PARAMETERS_INVALID"
+  #     }
+  #     """
+  #   And the current account should have 0 "licenses"
+  #   And sidekiq should have 0 "webhook" jobs
+  #   And sidekiq should have 0 "metric" jobs
+  #   And sidekiq should have 1 "request-log" job

@@ -47,6 +47,8 @@ class WebhookWorker
       )
     rescue => e
       Raygun.track_exception e
+
+      raise e
     end
 
     if !ACCEPTABLE_CODES.include?(res.code)

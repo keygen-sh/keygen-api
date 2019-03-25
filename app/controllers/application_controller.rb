@@ -256,6 +256,8 @@ class ApplicationController < ActionController::API
           end
         rescue => e
           Raygun.track_exception e
+
+          raise e
         end
 
         res
@@ -304,5 +306,7 @@ class ApplicationController < ActionController::API
     response.headers["X-RateLimit-Reset"] = (now + (period - now.to_i % period)).to_i.to_s
   rescue => e
     Raygun.track_exception e
+
+    raise e
   end
 end

@@ -157,7 +157,7 @@ Rails.application.routes.draw do
     end
   end
 
-  %w[400 404 422 500 503].each do |code|
+  %w[500 503].each do |code|
     match code, to: "errors#show", code: code.to_i, via: :all
   end
 
