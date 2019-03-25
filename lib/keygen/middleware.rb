@@ -57,40 +57,49 @@ module Keygen
       end
     end
 
-    class CatchJsonParseErrors
+    class RequestErrorWrapper
       def initialize(app)
         @app = app
       end
 
       def call(env)
         @app.call env
-      rescue ActionDispatch::Http::Parameters::ParseError => e
-        raise e unless env["HTTP_ACCEPT"] =~ /application\/(vnd\.api\+)?json/ ||
-                       env["HTTP_ACCEPT"] == "*/*"
-
-        [
-          400,
-          {
-            "Content-Type" => "application/vnd.api+json",
-          },
-          [{
-            errors: [{
-              title: "Bad request",
-              detail: "The request could not be completed because it contains invalid JSON",
-              code: "JSON_INVALID"
-            }]
-          }.to_json]
-        ]
-      end
-    end
-
-    class CatchRoutingErrors
-      def initialize(app)
-        @app = app
-      end
-
-      def call(env)
-        @app.call env
+      rescue ActionDispatch::Http::Parameters::ParseError,
+             Rack::QueryParser::InvalidParameterError,
+             Rack::QueryParser::ParameterTypeError,
+             # I have no idea why this is a bad request error - it should
+             # be one of the above Rack errors, but for some reason, by the
+             # time it propagates here, it's a different error.
+             ActionController::BadRequest => e
+        if e.message =~ /query parameters/
+          [
+            400,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Bad request",
+                detail: "The request could not be completed because it contains invalid query parameters (check encoding)",
+                code: "PARAMETERS_INVALID"
+              }]
+            }.to_json]
+          ]
+        else
+          [
+            400,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Bad request",
+                detail: "The request could not be completed because it contains invalid JSON (check encoding)",
+                code: "JSON_INVALID"
+              }]
+            }.to_json]
+          ]
+        end
       rescue ActionController::RoutingError => e
         if e.message =~ /bad URI\(is not URI\?\)/
           [

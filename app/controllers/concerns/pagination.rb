@@ -13,7 +13,7 @@ module Pagination
         "CONTENT_LENGTH",
         "CONTENT_TYPE",
         "HTTP_ACCEPT"
-      ) rescue nil
+      )
 
       super args unless performed? # Avoid double render
     end

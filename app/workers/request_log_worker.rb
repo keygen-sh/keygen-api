@@ -37,6 +37,8 @@ class RequestLogWorker
     end
   rescue => e
     Raygun.track_exception e
+
+    raise e
   end
 
   def cache
