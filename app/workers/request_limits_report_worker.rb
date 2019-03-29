@@ -18,7 +18,7 @@ class RequestLimitsReportWorker
       admin = account.admins.first
       plan = account.plan
       request_limit = plan.max_reqs
-      request_limit_exceeded = (request_count > request_limit * 1.1) rescue false
+      request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
       report = OpenStruct.new(
         request_count: request_count,
         request_limit: request_limit,
