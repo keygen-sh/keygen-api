@@ -10,44 +10,47 @@ module Api::V1::Licenses::Actions
       authorize @license
 
       valid, detail, constant = LicenseValidationService.new(license: @license, scope: false).execute
-      if @license.present?
-        CreateWebhookEventService.new(
-          event: valid ? "license.validation.succeeded" : "license.validation.failed",
-          account: current_account,
-          resource: @license
-        ).execute
-      end
-
-      render jsonapi: @license, meta: {
+      meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
         valid: valid,
         detail: detail,
         constant: constant,
       }
+
+      if @license.present?
+        CreateWebhookEventService.new(
+          event: valid ? "license.validation.succeeded" : "license.validation.failed",
+          account: current_account,
+          resource: @license,
+          meta: meta
+        ).execute
+      end
+
+      render jsonapi: @license, meta: meta
     end
 
     # POST /licenses/1/validate
     def validate_by_id
       authorize @license
 
-      valid, detail, constant = LicenseValidationService.new(
-        license: @license,
-        scope: validation_params.dig(:meta, :scope)
-      ).execute
-      if @license.present?
-        CreateWebhookEventService.new(
-          event: valid ? "license.validation.succeeded" : "license.validation.failed",
-          account: current_account,
-          resource: @license
-        ).execute
-      end
-
-      render jsonapi: @license, meta: {
+      valid, detail, constant = LicenseValidationService.new(license: @license, scope: validation_params.dig(:meta, :scope)).execute
+      meta = {
         ts: Time.current,
         valid: valid,
         detail: detail,
         constant: constant,
       }
+
+      if @license.present?
+        CreateWebhookEventService.new(
+          event: valid ? "license.validation.succeeded" : "license.validation.failed",
+          account: current_account,
+          resource: @license,
+          meta: meta
+        ).execute
+      end
+
+      render jsonapi: @license, meta: meta
     end
 
     # POST /licenses/validate-key
@@ -63,24 +66,24 @@ module Api::V1::Licenses::Actions
                           validation_params[:meta][:encrypted] == true
       ).execute
 
-      valid, detail, constant = LicenseValidationService.new(
-        license: @license,
-        scope: validation_params[:meta][:scope]
-      ).execute
-      if @license.present?
-        CreateWebhookEventService.new(
-          event: valid ? "license.validation.succeeded" : "license.validation.failed",
-          account: current_account,
-          resource: @license
-        ).execute
-      end
-
-      render jsonapi: @license, meta: {
+      valid, detail, constant = LicenseValidationService.new(license: @license, scope: validation_params[:meta][:scope]).execute
+      meta = {
         ts: Time.current,
         valid: valid,
         detail: detail,
         constant: constant,
       }
+
+      if @license.present?
+        CreateWebhookEventService.new(
+          event: valid ? "license.validation.succeeded" : "license.validation.failed",
+          account: current_account,
+          resource: @license,
+          meta: meta
+        ).execute
+      end
+
+      render jsonapi: @license, meta: meta
     end
 
     private
