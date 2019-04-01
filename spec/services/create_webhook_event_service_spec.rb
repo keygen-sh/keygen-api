@@ -19,8 +19,21 @@ describe CreateWebhookEventService do
     @event
   end
 
-  def jsonapi_render(model)
-    JSONAPI::Serializable::Renderer.new.render(model, {
+  def create_validation_webhook_event!(meta)
+    CreateWebhookEventService.new(
+      event: 'license.validation.succeeded',
+      account: @account,
+      resource: @resource,
+      meta: meta
+    ).execute
+
+    @event = @account.webhook_events.last
+
+    @event
+  end
+
+  def jsonapi_render(model, options = nil)
+    opts = {
       expose: { url_helpers: Rails.application.routes.url_helpers },
       class: {
         Account: SerializableAccount,
@@ -38,7 +51,11 @@ describe CreateWebhookEventService do
         Metric: SerializableMetric,
         Error: SerializableError
       }
-    }).to_json
+    }
+
+    opts.merge! options unless options.nil?
+
+    JSONAPI::Serializable::Renderer.new.render(model, opts).to_json
   end
 
   before do
@@ -88,6 +105,20 @@ describe CreateWebhookEventService do
   it 'the event payload should contain a snapshot of the resource' do
     payload = jsonapi_render @resource
     event = create_webhook_event!
+
+    expect(event.payload).to eq payload
+  end
+
+  it 'the event payload should contain a snapshot of the resource meta' do
+    meta = {
+      ts: Time.current,
+      valid: false,
+      detail: 'is expired',
+      constant: 'EXPIRED',
+    }
+
+    payload = jsonapi_render @resource, meta: meta
+    event = create_validation_webhook_event! meta
 
     expect(event.payload).to eq payload
   end
