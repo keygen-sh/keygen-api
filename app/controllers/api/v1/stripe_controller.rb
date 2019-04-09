@@ -49,11 +49,15 @@ module Api::V1
         billing.save
       when "customer.source.created", "customer.source.updated"
         source = event.data.object
-        return unless source.object == 'card' ||
-                      source.type == 'card'
+        return unless (source.respond_to?(:object) && source.object == 'card') ||
+                      (source.respond_to?(:type) && source.type == 'card')
 
-        card = source.card
-        return unless card
+        # When an ACH bank source is added, it uses a newer webhook structure
+        card = if source.respond_to?(:card)
+                 source.card
+               else
+                 source
+               end
 
         billing = Billing.find_by customer_id: source.customer
         return unless billing
