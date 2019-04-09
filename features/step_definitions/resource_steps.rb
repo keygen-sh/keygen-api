@@ -48,7 +48,7 @@ end
 Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |slug|
   account = Account.find slug
 
-  account.daily_request_count = account.plan.max_reqs * 2
+  account.daily_request_count = 1_000_000_000
 end
 
 Given /^the account "([^\"]*)" is on a free tier$/ do |slug|
