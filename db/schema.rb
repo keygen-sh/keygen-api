@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_11_144835) do
+ActiveRecord::Schema.define(version: 2019_04_11_155242) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -220,6 +220,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_144835) do
     t.uuid "token_id"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_request_logs_on_id_and_created_at", unique: true
+    t.index ["request_id", "created_at"], name: "index_request_logs_on_request_id_and_created_at"
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
