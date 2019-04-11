@@ -4,6 +4,8 @@ class RequestLog < ApplicationRecord
   include Pageable
 
   belongs_to :account
+  belongs_to :requestor, polymorphic: true
+  belongs_to :token
 
   validates :account, presence: { message: "must exist" }
 
