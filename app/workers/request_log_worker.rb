@@ -13,6 +13,7 @@ class RequestLogWorker
     account.request_logs.create(
       requestor_type: req['requestor_type'],
       requestor_id: req['requestor_id'],
+      token_id: req['token_id'],
       request_id: req['request_id'],
       url: req['url'],
       method: req['method'],

@@ -55,12 +55,14 @@ module Keygen
         end
 
         requestor = Keygen::Store::Request.store[:current_bearer]
+        token = Keygen::Store::Request.store[:current_token]
 
         RequestLogWorker.perform_async(
           account_id,
           {
             requestor_type: requestor&.class&.name,
             requestor_id: requestor&.id,
+            token_id: token&.id,
             request_id: req.request_id,
             url: req.path,
             method: req.method,

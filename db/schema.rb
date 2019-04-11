@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_25_192607) do
+ActiveRecord::Schema.define(version: 2019_04_11_144835) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -217,6 +217,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.datetime "updated_at", null: false
     t.string "requestor_type"
     t.uuid "requestor_id"
+    t.uuid "token_id"
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_request_logs_on_id_and_created_at", unique: true
   end
