@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.5.3'
+ruby '2.6.3'
 
 gem 'rails', '~> 5.2'
 gem 'pg'
@@ -11,7 +11,7 @@ gem 'rack-cors'
 
 # Redis for caching and background jobs
 gem 'redis-rails'
-gem 'redis', '~> 3.3.3'
+gem 'redis'
 
 # JSON API serializers
 gem 'jsonapi-rails', '0.3.1'
