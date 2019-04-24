@@ -152,6 +152,19 @@ module Keygen
             }.to_json]
           ]
         end
+      rescue Rack::Timeout::Error
+        [
+          408,
+          {
+            "Content-Type" => "application/vnd.api+json",
+          },
+          [{
+            errors: [{
+              title: "Request timeout",
+              detail: "The request timed out because the server took too long to respond"
+            }]
+          }.to_json]
+        ]
       end
     end
 
