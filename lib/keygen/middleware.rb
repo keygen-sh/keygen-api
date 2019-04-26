@@ -154,7 +154,7 @@ module Keygen
         end
       rescue Rack::Timeout::Error
         [
-          408,
+          503,
           {
             "Content-Type" => "application/vnd.api+json",
           },
