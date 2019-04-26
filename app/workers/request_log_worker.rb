@@ -31,7 +31,7 @@ class RequestLogWorker
   attr_reader :account
 
   def increment_daily_request_count!
-    cache.increment account.daily_request_count_cache_key
+    cache.increment account.daily_request_count_cache_key, 1, expires_in: 1.day
   rescue => e
     Raygun.track_exception e
 
