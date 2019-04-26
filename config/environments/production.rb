@@ -16,7 +16,16 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-  config.cache_store = :redis_store, ENV['REDIS_URL']
+  config.cache_store = :redis_cache_store, {
+    url: ENV['REDIS_URL'],
+    connect_timeout: 5,
+    read_timeout: 1,
+    write_timeout: 1,
+    reconnect_attempts: 1,
+    error_handler: -> (method:, returning:, exception:) {
+      Raygun.track_exception exception, method: method, returning: returning
+    },
+  }
 
   # Route exceptions to error controller.
   config.exceptions_app = self.routes

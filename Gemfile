@@ -10,8 +10,8 @@ gem 'rack-attack', '~> 5.2'
 gem 'rack-cors'
 
 # Redis for caching and background jobs
-gem 'redis-rails'
 gem 'redis'
+gem 'hiredis'
 
 # JSON API serializers
 gem 'jsonapi-rails', '0.3.1'

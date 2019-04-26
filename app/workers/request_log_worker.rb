@@ -31,12 +31,7 @@ class RequestLogWorker
   attr_reader :account
 
   def increment_daily_request_count!
-    # FIXME(ezekg) Workaround for Rails 5 not supporting :expires_in for cache#increment
-    # if !cache.exist?(account.daily_request_count_cache_key, raw: true)
-    #   cache.write account.daily_request_count_cache_key, 1, raw: true, expires_in: 1.day
-    # else
-    #   cache.increment account.daily_request_count_cache_key
-    # end
+    cache.increment account.daily_request_count_cache_key
   rescue => e
     Raygun.track_exception e
 
