@@ -25,6 +25,8 @@ Rails.application.configure do
     config.action_controller.perform_caching = true
     config.cache_store = :redis_cache_store, {
       url: ENV['REDIS_URL'],
+      pool_size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
+      pool_timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
       connect_timeout: 5,
       read_timeout: 1,
       write_timeout: 1,
