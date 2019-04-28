@@ -12,7 +12,25 @@ class ReportMailerPreview < ActionMailer::Preview
         request_limit: 5_000,
         account: Account.new(id: SecureRandom.uuid, name: 'Bar', slug: 'bar', plan: Plan.new(name: 'Business'), billing: Billing.new(state: 'trialing')),
         admin: User.new(first_name: 'Jane', last_name: 'Doe', email: 'jane@example.com')
-      )
+      ),
+      OpenStruct.new(
+        request_count: 42,
+        request_limit: 5_000,
+        account: Account.new(id: SecureRandom.uuid, name: 'Bar', slug: 'bar', plan: Plan.new(name: 'Business'), billing: Billing.new(state: 'trialing')),
+        admin: User.new(first_name: 'Will', last_name: 'Doe', email: 'will@example.com')
+      ),
+      OpenStruct.new(
+        request_count: 103,
+        request_limit: 500,
+        account: Account.new(id: SecureRandom.uuid, name: 'Bar', slug: 'bar', plan: Plan.new(name: 'Micro'), billing: Billing.new(state: 'subscribed')),
+        admin: User.new(first_name: 'Eliot', last_name: 'Doe', email: 'eliot@example.com')
+      ),
+      OpenStruct.new(
+        request_count: 230_456,
+        request_limit: 100_000,
+        account: Account.new(id: SecureRandom.uuid, name: 'Bar', slug: 'bar', plan: Plan.new(name: 'Enterprise'), billing: Billing.new(state: 'subscribed')),
+        admin: User.new(first_name: 'Pete', last_name: 'Doe', email: 'pete@example.com')
+        )
     ]
   end
 end
