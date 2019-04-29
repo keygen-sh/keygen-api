@@ -37,7 +37,7 @@ module TokenAuthentication
       bearer_id = current_bearer.id
       token_id = current_token.id
 
-      Rails.logger.info "[authentication] token_id=#{token_id} bearer_type=#{bearer_type} bearer_id#{bearer_id}"
+      Rails.logger.info "[authentication] token_id=#{token_id} bearer_type=#{bearer_type} bearer_id=#{bearer_id}"
     end
 
     if current_token&.expired?
