@@ -1,6 +1,7 @@
 module Api::V1
   class UsersController < Api::V1::BaseController
     has_scope :roles, type: :array, default: [:user]
+    has_scope :active
     has_scope :product
 
     before_action :scope_to_current_account!
