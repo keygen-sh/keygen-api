@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_25_192607) do
+ActiveRecord::Schema.define(version: 2019_04_29_150805) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.boolean "protected", default: false
     t.text "public_key"
     t.text "private_key"
+    t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true
@@ -47,6 +48,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.string "state"
     t.uuid "account_id"
     t.index ["account_id", "created_at"], name: "index_billings_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_billings_on_created_at", order: :desc
     t.index ["customer_id", "created_at"], name: "index_billings_on_customer_id_and_created_at"
     t.index ["id", "created_at"], name: "index_billings_on_id_and_created_at", unique: true
     t.index ["subscription_id", "created_at"], name: "index_billings_on_subscription_id_and_created_at"
@@ -61,6 +63,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "keys_tsv_key_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_keys_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true
     t.index ["policy_id", "created_at"], name: "index_keys_on_policy_id_and_created_at"
   end
@@ -89,6 +92,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "licenses_tsv_key_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at"
@@ -111,6 +115,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_machines_on_created_at", order: :desc
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
@@ -142,6 +147,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.integer "max_reqs"
     t.integer "max_admins"
     t.string "interval"
+    t.index ["created_at"], name: "index_plans_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_plans_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_plans_on_plan_id_and_created_at"
   end
@@ -175,6 +181,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_policies_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at"
   end
@@ -191,6 +198,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_products_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true
   end
 
@@ -202,6 +210,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.datetime "updated_at", null: false
     t.uuid "billing_id"
     t.index ["billing_id", "created_at"], name: "index_receipts_on_billing_id_and_created_at"
+    t.index ["created_at"], name: "index_receipts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_receipts_on_id_and_created_at", unique: true
   end
 
@@ -227,6 +236,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.uuid "resource_id"
+    t.index ["created_at"], name: "index_roles_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
     t.index ["name", "created_at"], name: "index_roles_on_name_and_created_at"
     t.index ["resource_id", "resource_type", "created_at"], name: "index_roles_on_resource_id_and_resource_type_and_created_at"
@@ -246,6 +256,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.integer "deactivations", default: 0
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
+    t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc
     t.index ["digest", "created_at", "account_id"], name: "index_tokens_on_digest_and_created_at_and_account_id", unique: true
     t.index ["id", "created_at", "account_id"], name: "index_tokens_on_id_and_created_at_and_account_id", unique: true
   end
@@ -267,6 +278,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id", "created_at"], name: "index_users_on_email_and_account_id_and_created_at"
     t.index ["id", "created_at", "account_id"], name: "index_users_on_id_and_created_at_and_account_id", unique: true
   end
@@ -278,6 +290,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.uuid "account_id"
     t.jsonb "subscriptions", default: ["*"]
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_webhook_endpoints_on_id_and_created_at_and_account_id", unique: true
   end
 
@@ -293,6 +306,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_192607) do
     t.integer "last_response_code"
     t.text "last_response_body"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
+    t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"

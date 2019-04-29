@@ -18,7 +18,12 @@ FactoryGirl.define do
         else
           create :policy, account: account
         end
-      user = create :user, account: account
+      user =
+        if evaluator.user != false
+          create :user, account: account
+        else
+          nil
+        end
 
       license.assign_attributes(
         account: account,
@@ -61,6 +66,12 @@ FactoryGirl.define do
 
     trait :year_check_in do
       association :policy, :year_check_in
+    end
+
+    trait :userless do |license|
+      # FIXME(ezekg) This kind of acts as a sentinel value to not create a user
+      #              in the factory's create hook (above)
+      user false
     end
 
     after :create do |license|

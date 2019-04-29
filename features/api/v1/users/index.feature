@@ -148,6 +148,46 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 2 "users"
 
+ Scenario: Admin retrieves all active users
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 9 "users"
+    And the current account has 3 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?active=true"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "users"
+
+  Scenario: Admin retrieves all inactive users
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 9 "users"
+    And the current account has 2 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?active=false"
+    Then the response status should be "200"
+    And the JSON response should be an array with 7 "users"
+
   Scenario: Product retrieves all users for their product
     Given the current account is "test1"
     And the current account has 2 "products"

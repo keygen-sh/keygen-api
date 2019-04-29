@@ -154,7 +154,7 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
 
-  Scenario: Admin retrieves all non-suspended licenses
+  Scenario: Admin retrieves all non-expired licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "licenses"

@@ -35,6 +35,15 @@ class User < ApplicationRecord
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :admins, -> { roles :admin }
+  scope :active, -> (status = true) {
+    sub_query = License.where('"licenses"."user_id" = "users"."id"').select(1).arel.exists
+
+    if ActiveRecord::Type::Boolean.new.cast(status)
+      where(sub_query)
+    else
+      where.not(sub_query)
+    end
+  }
 
   def full_name
     [first_name, last_name].join " "
