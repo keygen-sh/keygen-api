@@ -27,13 +27,22 @@ module TokenAuthentication
       token: token
     ).execute
 
+    current_bearer = current_token&.bearer
+
     Keygen::Store::Request.store[:current_token] = current_token
+    Keygen::Store::Request.store[:current_bearer] = current_bearer
+
+    if !current_bearer.nil?
+      bearer_type = current_bearer.class.name.underscore
+      bearer_id = current_bearer.id
+      token_id = current_token.id
+
+      Rails.logger.info "[authentication] token_id=#{token_id} bearer_type=#{bearer_type} bearer_id#{bearer_id}"
+    end
 
     if current_token&.expired?
       render_unauthorized code: 'TOKEN_EXPIRED', detail: "Token is expired" and return
     end
-
-    Keygen::Store::Request.store[:current_bearer] = current_token&.bearer
 
     current_token&.bearer
   end
