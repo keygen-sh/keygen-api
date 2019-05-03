@@ -6,7 +6,7 @@ class RecordMetricWorker
   sidekiq_options queue: :metrics
 
   def perform(metric, account_id, resource_type, resource_id)
-    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
       Account.find account_id
     end
 
