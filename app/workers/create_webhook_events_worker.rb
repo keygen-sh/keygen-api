@@ -4,7 +4,7 @@ class CreateWebhookEventsWorker
   sidekiq_options queue: :webhooks
 
   def perform(event, account_id, data)
-    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 1.minute) do
+    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
       Account.find account_id
     end
 
