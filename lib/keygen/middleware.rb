@@ -27,6 +27,7 @@ module Keygen
         accounts
         searches
         metrics
+        analytics
         health
         stripe
         plans
