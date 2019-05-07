@@ -19,7 +19,12 @@ def parse_placeholders!(str)
     value =
       case resource.underscore
       when "account"
-        @account.send attribute
+        case attribute
+        when /(\w+)\.(\w+)/
+          @account.send($1).send $2
+        else
+          @account.send attribute
+        end
       when "current"
         @bearer.send attribute
       when "crypt"

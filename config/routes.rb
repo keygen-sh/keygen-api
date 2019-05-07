@@ -158,6 +158,14 @@ Rails.application.routes.draw do
           end
         end
 
+        resources "analytics", only: [] do
+          collection do
+            scope "actions", module: "analytics/actions" do
+              get "count", to: "counts#count"
+            end
+          end
+        end
+
         post "search", to: "searches#search"
       end
     end
