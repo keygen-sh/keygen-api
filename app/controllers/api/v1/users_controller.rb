@@ -12,7 +12,7 @@ module Api::V1
 
     # GET /users
     def index
-      @users = policy_scope apply_scopes(current_account.users.preload(:role))
+      @users = policy_scope apply_scopes(current_account.users.includes(:role))
       authorize @users
 
       render jsonapi: @users
