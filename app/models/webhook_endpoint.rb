@@ -43,6 +43,9 @@ class WebhookEndpoint < ApplicationRecord
     machine.created
     machine.updated
     machine.deleted
+    machine.heartbeat.ping
+    machine.heartbeat.pong
+    machine.heartbeat.dead
     key.created
     key.updated
     key.deleted
