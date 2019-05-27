@@ -35,7 +35,7 @@ class SerializableLicense < SerializableBase
     @object.policy.max_uses
   end
   attribute :require_check_in do
-    @object.policy.require_check_in
+    @object.requires_check_in?
   end
   attribute :last_check_in do
     @object.last_check_in_at

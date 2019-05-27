@@ -50,6 +50,12 @@ Rails.application.routes.draw do
             resource "license", only: [:show]
             resource "user", only: [:show]
           end
+          member do
+            scope "actions", module: "machines/actions" do
+              post "reset-heartbeat", to: "heartbeats#reset_heartbeat"
+              post "ping-heartbeat", to: "heartbeats#ping_heartbeat"
+            end
+          end
         end
 
         # NOTE(ezekg) Users are queryable by email attr.
