@@ -31,6 +31,7 @@ describe MachineHeartbeatWorker do
   end
 
   context 'when there is a machine that does not require heartbeats' do
+    let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
     let(:event) { 'machine.heartbeat.pong' }
     let(:heartbeat_at) { nil }
 
@@ -38,24 +39,21 @@ describe MachineHeartbeatWorker do
       allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
       expect_any_instance_of(CreateWebhookEventService).not_to receive(:execute)
 
-      machine = create :machine, last_heartbeat_at: heartbeat_at
+      worker.perform_async machine.id
+      worker.drain
+    end
 
+    it 'should not deactivate the machine' do
       worker.perform_async machine.id
       worker.drain
 
       expect(Machine.count).to eq 1
     end
-
-    it 'should not deactivate the machine' do
-      machine = create :machine, last_heartbeat_at: heartbeat_at
-
-      worker.perform_async machine.id
-      worker.drain
-    end
   end
 
   context 'when there is a machine that does require heartbeats' do
     context 'when heartbeat is alive' do
+      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
       let(:event) { 'machine.heartbeat.pong' }
       let(:heartbeat_at) { Time.current }
 
@@ -65,8 +63,6 @@ describe MachineHeartbeatWorker do
         allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
         expect_any_instance_of(CreateWebhookEventService).to receive(:execute) { events += 1 }
 
-        machine = create :machine, last_heartbeat_at: heartbeat_at
-
         worker.perform_async machine.id
         worker.drain
 
@@ -74,8 +70,6 @@ describe MachineHeartbeatWorker do
       end
 
       it 'should not deactivate the machine' do
-        machine = create :machine, last_heartbeat_at: heartbeat_at
-
         worker.perform_async machine.id
         worker.drain
 
@@ -84,6 +78,7 @@ describe MachineHeartbeatWorker do
     end
 
     context 'when heartbeat is dead' do
+      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
       let(:event) { 'machine.heartbeat.dead' }
       let(:heartbeat_at) { 1.hour.ago }
 
@@ -93,8 +88,6 @@ describe MachineHeartbeatWorker do
         allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
         expect_any_instance_of(CreateWebhookEventService).to receive(:execute) { events += 1 }
 
-        machine = create :machine, last_heartbeat_at: heartbeat_at
-
         worker.perform_async machine.id
         worker.drain
 
@@ -102,8 +95,6 @@ describe MachineHeartbeatWorker do
       end
 
       it 'should deactivate the machine' do
-        machine = create :machine, last_heartbeat_at: heartbeat_at
-
         worker.perform_async machine.id
         worker.drain
 
