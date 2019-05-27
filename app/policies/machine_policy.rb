@@ -19,4 +19,12 @@ class MachinePolicy < ApplicationPolicy
   def destroy?
     bearer.role? :admin or (!resource.license.protected? and resource.user == bearer) or resource.product == bearer or resource.license == bearer
   end
+
+  def ping_heartbeat?
+    bearer.role? :admin or (!resource.license.protected? and resource.user == bearer) or resource.product == bearer or resource.license == bearer
+  end
+
+  def reset_heartbeat?
+    bearer.role? :admin or resource.product == bearer
+  end
 end

@@ -91,6 +91,10 @@ class Policy < ApplicationRecord
     require_check_in
   end
 
+  def deactivate_dead_machines?
+    true
+  end
+
   def pop!
     return nil if pool.empty?
     key = pool.first.destroy

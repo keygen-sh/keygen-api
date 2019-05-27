@@ -3,6 +3,9 @@ class Machine < ApplicationRecord
   include Pageable
   include Searchable
 
+  HEARTBEAT_DRIFT = 30.seconds
+  HEARTBEAT_TTL = 10.minutes
+
   SEARCH_ATTRIBUTES = %i[id fingerprint name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name],
@@ -47,4 +50,46 @@ class Machine < ApplicationRecord
   scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
+
+  def heartbeat_not_started?
+    return false unless requires_heartbeat?
+
+    heartbeat_status == :NOT_STARTED
+  end
+
+  def heartbeat_alive?
+    return false unless requires_heartbeat?
+
+    heartbeat_status == :ALIVE
+  end
+
+  def heartbeat_dead?
+    return false unless requires_heartbeat?
+
+    heartbeat_status == :DEAD
+  end
+
+  def heartbeat_ok?
+    heartbeat_not_started? || heartbeat_alive?
+  end
+
+  def next_heartbeat_at
+    return nil if last_heartbeat_at.nil?
+
+    last_heartbeat_at + HEARTBEAT_TTL
+  end
+
+  def requires_heartbeat?
+    !last_heartbeat_at.nil?
+  end
+
+  def heartbeat_status
+    return :NOT_STARTED unless requires_heartbeat?
+
+    if next_heartbeat_at >= Time.current
+      :ALIVE
+    else
+      :DEAD
+    end
+  end
 end

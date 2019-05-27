@@ -6,6 +6,12 @@ class SerializableMachine < SerializableBase
   attribute :hostname
   attribute :platform
   attribute :name
+  attribute :require_heartbeat do
+    @object.requires_heartbeat?
+  end
+  attribute :heartbeat_status
+  attribute :last_heartbeat_at
+  attribute :next_heartbeat_at
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_29_150805) do
+ActiveRecord::Schema.define(version: 2019_05_27_161025) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 2019_04_29_150805) do
     t.jsonb "metadata"
     t.uuid "account_id"
     t.uuid "license_id"
+    t.datetime "last_heartbeat_at"
     t.index "to_tsvector('simple'::regconfig, COALESCE((fingerprint)::text, ''::text))", name: "machines_tsv_fingerprint_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gin
