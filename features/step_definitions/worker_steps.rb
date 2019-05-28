@@ -8,6 +8,8 @@ Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
     resource = "record_metric" # We renamed this worker
   when "request-log"
     resource = "request_log"
+  when "heartbeat"
+    resource = "machine_heartbeat"
   end
 
   worker = "#{resource.singularize.underscore}_worker"
