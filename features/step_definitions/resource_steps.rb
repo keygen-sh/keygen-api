@@ -132,6 +132,40 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
+Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
+  resource = resource.pluralize.underscore
+
+  model =
+    if resource == "users"
+      @account.send(resource).roles :user
+    else
+      @account.send resource
+    end
+
+  model.limit(count.to_i).all.each_with_index do |r|
+    ref = (r.class.reflect_on_association(:licenses) rescue false) ||
+          (r.class.reflect_on_association(:license) rescue false)
+
+    begin
+      case
+      when ref.name.to_s.pluralize == ref.name.to_s
+        r.licenses << @bearer
+      when ref.name.to_s.singularize == ref.name.to_s
+        r.license = @bearer
+      end
+    rescue
+      case
+      when ref&.options[:through] && ref.options[:through].to_s.pluralize == ref.options[:through].to_s
+        r.send(ref.options[:through]).first&.license = @bearer
+      when ref&.options[:through] && ref.options[:through].to_s.singularize == ref.options[:through].to_s
+        r.send(ref.options[:through])&.license = @bearer
+      end
+    end
+
+    r.save
+  end
+end
+
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
   resource = resource.pluralize.underscore
   numbers = {
