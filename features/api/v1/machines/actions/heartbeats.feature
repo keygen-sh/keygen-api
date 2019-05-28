@@ -26,6 +26,7 @@ Feature: License heartbeat actions
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
     Then the response status should be "403"
 
+  # Sanity checks
   Scenario: Admin requests a machine whose heartbeat has not started
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -89,6 +90,18 @@ Feature: License heartbeat actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  # Pings
+  Scenario: Anonymous pings a machine's heartbeat for the first time
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "401"
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin pings a machine's heartbeat for the first time
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -106,6 +119,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
     And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
     And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -127,6 +141,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
     And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
     And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -153,6 +168,281 @@ Feature: License heartbeat actions
         }
       }
       """
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product pings a machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the current product has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product pings a machine's heartbeat that doesn't belong to them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License pings a machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the current license has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License pings a machine's heartbeat that doesn't belong to them
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User pings an unprotected machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "protected": false }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "lastHeartbeatAt": null
+      }
+      """
+    And the current user has 1 "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User pings a protected machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "lastHeartbeatAt": null
+      }
+      """
+    And the current user has 1 "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User pings a machine's heartbeat that doesn't belong to them
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": null }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  # Reset
+  Scenario: Anonymous resets a machine's heartbeat
+    Given the current account is "test1"
+    And I am a license of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin resets a machine's heartbeat
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does not requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the JSON response should be a "machine" with a nil lastHeartbeatAt
+    And the JSON response should be a "machine" with a nil nextHeartbeatAt
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product resets a machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the current product has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does not requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
+    And the JSON response should be a "machine" with a nil lastHeartbeatAt
+    And the JSON response should be a "machine" with a nil nextHeartbeatAt
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product resets a machine's heartbeat that doesn't belong to them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License resets a machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the current license has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User resets a machine's heartbeat
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the current user has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "lastHeartbeatAt": "$time.1.hour.ago" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
