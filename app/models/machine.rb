@@ -52,20 +52,14 @@ class Machine < ApplicationRecord
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
   def heartbeat_not_started?
-    return false unless requires_heartbeat?
-
     heartbeat_status == :NOT_STARTED
   end
 
   def heartbeat_alive?
-    return false unless requires_heartbeat?
-
     heartbeat_status == :ALIVE
   end
 
   def heartbeat_dead?
-    return false unless requires_heartbeat?
-
     heartbeat_status == :DEAD
   end
 
