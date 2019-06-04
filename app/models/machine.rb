@@ -25,8 +25,10 @@ class Machine < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
-  # Disallow machine overages when the policy is not set to concurrent
   validate on: :create do |machine|
+    errors.add :fingerprint, :conflict, message: "must not conflict with another machine's identifier (UUID)" if account.machines.exists? fingerprint
+
+    # Disallow machine overages when the policy is not set to concurrent
     machines_count = machine.license&.machines&.count || 0
 
     next if machine.policy.nil? ||
@@ -39,7 +41,7 @@ class Machine < ApplicationRecord
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
-  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }
+  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }

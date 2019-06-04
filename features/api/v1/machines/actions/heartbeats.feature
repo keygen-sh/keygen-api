@@ -124,6 +124,32 @@ Feature: License heartbeat actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin pings a machine's heartbeat for the first time by fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC",
+        "lastHeartbeatAt": null
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
+    And the JSON response should be a "machine" with a lastHeartbeatAt that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeatAt that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin pings an alive machine's heartbeat
     Given I am an admin of account "test1"
     And the current account is "test1"

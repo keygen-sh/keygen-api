@@ -21,8 +21,28 @@ Feature: Show machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0"
+    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    Then the response status should be "200"
+    And the JSON response should be a "machine"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin retrieves a machine for their account by fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+    And the JSON response should be a "machine" with the fingerprint "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
     Then the response status should be "200"
     And the JSON response should be a "machine"
     And the response should contain a valid signature header for "test1"
