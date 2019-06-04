@@ -47,6 +47,21 @@ Feature: Show machine
     And the JSON response should be a "machine"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin retrieves a machine for their account by UUID fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "a06b4343-d2cf-45e7-b9a2-b11c618993f3" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/a06b4343-d2cf-45e7-b9a2-b11c618993f3"
+    And the JSON response should be a "machine" with the fingerprint "a06b4343-d2cf-45e7-b9a2-b11c618993f3"
+    Then the response status should be "200"
+    And the JSON response should be a "machine"
+    And the response should contain a valid signature header for "test1"
+
   Scenario: Admin retrieves a license for their account that has a user
     Given I am an admin of account "test1"
     And the current account is "test1"
