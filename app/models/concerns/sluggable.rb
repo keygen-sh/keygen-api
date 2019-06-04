@@ -17,34 +17,34 @@ module Sluggable
         @sluggable_attributes = attributes
         @sluggable_scope = scope
         @sluggable_model = association_base_model ||
-                           self.name
+                           self
 
         # Support for sluggable finders on associations and collection proxies
         if Object.const_defined? "#{self.name}::ActiveRecord_AssociationRelation"
           delegate = "#{self.name}::ActiveRecord_AssociationRelation".constantize
 
           delegate.send(:include, Sluggable)
-          delegate.send(:sluggable, attributes: attributes, scope: scope, association_base_model: self.name)
+          delegate.send(:sluggable, attributes: attributes, scope: scope, association_base_model: self)
         end
 
         if Object.const_defined? "#{self.name}::ActiveRecord_Associations_CollectionProxy"
           delegate = "#{self.name}::ActiveRecord_Associations_CollectionProxy".constantize
 
           delegate.send(:include, Sluggable)
-          delegate.send(:sluggable, attributes: attributes, scope: scope, association_base_model: self.name)
+          delegate.send(:sluggable, attributes: attributes, scope: scope, association_base_model: self)
         end
       end
 
       # Redefine finder to search by sluggable attributes
       def find(slug, scope: self)
-        raise Keygen::Error::NotFoundError.new(model: sluggable_model, id: slug) if slug.nil?
+        raise Keygen::Error::NotFoundError.new(model: sluggable_model.name, id: slug) if slug.nil?
 
         # Strip out ID attribute if the finder doesn't resemble a UUID (pg will throw)
         attrs = sluggable_attributes.dup
         attrs.reject! { |a| a == :id } unless slug =~ UUID_REGEX
 
         if attrs.empty?
-          raise Keygen::Error::NotFoundError.new(model: sluggable_model, id: slug)
+          raise Keygen::Error::NotFoundError.new(model: sluggable_model.name, id: slug)
         end
 
         scope =
@@ -57,22 +57,22 @@ module Sluggable
         # Generates a query resembling the following:
         #
         #   SELECT
-        #     *
+        #     "accounts".*
         #   FROM
-        #     accounts
+        #     "accounts"
         #   WHERE
-        #     id   = :slug OR
-        #     slug = :slug
+        #     "accounts"."id"   = :slug OR
+        #     "accounts"."slug" = :slug
         record = scope
           .where(
-            attrs.map { |a| "#{a} = :slug" }.join(" OR "),
+            attrs.map { |column| "#{Arel.sql("\"#{sluggable_model.table_name}\".\"#{column}\"")} = :slug" }.join(" OR "),
             slug: slug
           )
           .limit(1)
           .first
 
         if record.nil?
-          raise Keygen::Error::NotFoundError.new(model: sluggable_model, id: slug)
+          raise Keygen::Error::NotFoundError.new(model: sluggable_model.name, id: slug)
         end
 
         record
