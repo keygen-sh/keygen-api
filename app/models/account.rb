@@ -6,6 +6,8 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
+  sluggable attributes: %i[id slug], scope: -> (s) { s.includes :billing }
+
   belongs_to :plan
   has_many :webhook_endpoints, dependent: :destroy
   has_many :webhook_events, dependent: :destroy

@@ -1,4 +1,5 @@
 class License < ApplicationRecord
+  include Sluggable
   include Limitable
   include Tokenable
   include Pageable
@@ -15,6 +16,8 @@ class License < ApplicationRecord
   }
 
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
+  sluggable attributes: %i[id key]
 
   belongs_to :account
   belongs_to :user
