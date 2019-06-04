@@ -46,14 +46,7 @@ module Api::V1::Users::Actions
     private
 
     def set_user
-      @user =
-        if params[:id] =~ UUID_REGEX
-          current_account.users.find_by id: params[:id]
-        else
-          current_account.users.find_by email: params[:id].downcase
-        end
-
-      raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
+      @user = current_account.users.find params[:id]
     end
 
     typed_parameters do
