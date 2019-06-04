@@ -479,6 +479,51 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a duplicate license of another account with a pre-determined UUID key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the account "test2" has 1 "policy"
+    And the account "test2" has 1 "license"
+    And the first "license" of account "test2" has the following attributes:
+      """
+      {
+        "id": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+    And the current account has 1 "policy"
+    And the first "policy" of account "test1" has the following attributes:
+      """
+      { "maxMachines": 3 }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "977f1752-d6a9-4669-a6af-b039154ec40f"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with key "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the JSON response should be a "license" with maxMachines "3"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate license of another account with a pre-determined key
     Given I am an admin of account "test1"
     And the current account is "test1"
