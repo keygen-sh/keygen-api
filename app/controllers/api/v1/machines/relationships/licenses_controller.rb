@@ -16,7 +16,15 @@ module Api::V1::Machines::Relationships
     private
 
     def set_machine
-      @machine = current_account.machines.find params[:machine_id]
+      @machine =
+        if params[:machine_id] =~ UUID_REGEX
+          current_account.machines.find_by id: params[:machine_id]
+        else
+          current_account.machines.find_by fingerprint: params[:machine_id]
+        end
+
+      raise Keygen::Error::NotFoundError.new(model: Machine.name, id: params[:machine_id]) if @machine.nil?
+
       authorize @machine, :show?
     end
   end
