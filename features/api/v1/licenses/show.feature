@@ -160,6 +160,64 @@ Feature: Show license
     Then the response status should be "200"
     And the JSON response should be a "license"
 
+  Scenario: Admin retrieves a license for their account by UUID key that matches another account license by ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test2" has 1 "license"
+    And the first "license" of account "test2" has the following attributes:
+      """
+      {
+        "id": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "id": "a9ad138d-a603-4309-85d0-764585bba99b",
+        "key": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/977f1752-d6a9-4669-a6af-b039154ec40f"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the id "a9ad138d-a603-4309-85d0-764585bba99b"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      {
+        "key": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+
+  Scenario: Admin retrieves a license for their account by UUID that matches another account license by UUID key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test2" has 1 "license"
+    And the first "license" of account "test2" has the following attributes:
+      """
+      {
+        "key": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "a9ad138d-a603-4309-85d0-764585bba99b",
+        "id": "977f1752-d6a9-4669-a6af-b039154ec40f"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/977f1752-d6a9-4669-a6af-b039154ec40f"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the id "977f1752-d6a9-4669-a6af-b039154ec40f"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      {
+        "key": "a9ad138d-a603-4309-85d0-764585bba99b"
+      }
+      """
+
   Scenario: Admin retrieves an invalid license for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

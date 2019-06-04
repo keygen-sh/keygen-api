@@ -133,7 +133,12 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
-  expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
+  case attribute
+  when "id"
+    expect(json["data"]["id"]).to eq value.to_s
+  else
+    expect(json["data"]["attributes"][attribute].to_s).to eq value.to_s
+  end
 
   if @account.present?
     account_id = json["data"]["relationships"]["account"]["data"]["id"]
