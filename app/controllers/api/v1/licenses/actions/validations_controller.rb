@@ -89,14 +89,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license =
-        if params[:id] =~ UUID_REGEX
-          current_account.licenses.find_by id: params[:id]
-        else
-          current_account.licenses.find_by key: params[:id]
-        end
-
-      raise Keygen::Error::NotFoundError.new(model: License.name, id: params[:id]) if @license.nil?
+      @license = current_account.licenses.find params[:id]
     end
 
     typed_parameters do

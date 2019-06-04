@@ -28,15 +28,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license =
-        if params[:license_id] =~ UUID_REGEX
-          current_account.licenses.find_by id: params[:license_id]
-        else
-          current_account.licenses.find_by key: params[:license_id]
-        end
-
-      raise Keygen::Error::NotFoundError.new(model: License.name, id: params[:license_id]) if @license.nil?
-
+      @license = current_account.licenses.find params[:license_id]
       authorize @license, :show?
     end
   end

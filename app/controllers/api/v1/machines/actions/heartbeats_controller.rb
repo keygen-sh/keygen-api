@@ -52,14 +52,7 @@ module Api::V1::Machines::Actions
     private
 
     def set_machine
-      @machine =
-        if params[:id] =~ UUID_REGEX
-          current_account.machines.find_by id: params[:id]
-        else
-          current_account.machines.find_by fingerprint: params[:id]
-        end
-
-      raise Keygen::Error::NotFoundError.new(model: Machine.name, id: params[:id]) if @machine.nil?
+      @machine = current_account.machines.find params[:id]
     end
   end
 end

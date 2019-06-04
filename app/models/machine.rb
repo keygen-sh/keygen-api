@@ -1,4 +1,5 @@
 class Machine < ApplicationRecord
+  include Sluggable
   include Limitable
   include Pageable
   include Searchable
@@ -15,6 +16,8 @@ class Machine < ApplicationRecord
   }.freeze
 
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
+  sluggable attributes: %i[id fingerprint]
 
   belongs_to :account
   belongs_to :license, counter_cache: true
