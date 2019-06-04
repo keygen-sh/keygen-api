@@ -31,6 +31,42 @@ Feature: Delete machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin deletes one of their machines by fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "foo-bar-baz" }
+      """
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/foo-bar-baz"
+    Then the response status should be "204"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "machines"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their machines by UUID fingerprint
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "fingerprint": "a06b4343-d2cf-45e7-b9a2-b11c618993f3" }
+      """
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/a06b4343-d2cf-45e7-b9a2-b11c618993f3"
+    Then the response status should be "204"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "machines"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User attempts to delete a machine that belongs to another user
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
