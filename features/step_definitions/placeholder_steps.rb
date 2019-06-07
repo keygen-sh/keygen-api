@@ -1,4 +1,30 @@
+# FIXME(ezekg) This is incredibly dirty, hacky and down right bad, but
+#              *it works* for quicking writing integration tests.
 World Rack::Test::Methods
+
+PLACEHOLDERS = %w[
+  account
+  billing
+  key
+  license
+  machine
+  metric
+  plan
+  policy
+  product
+  receipt
+  request_log
+  role
+  token
+  user
+  webhook_endpoint
+  webhook_event
+  current
+  crypt
+  date
+  time
+  null_byte
+]
 
 # Matches:
 # $resource[0].attribute (where 0 is an index)
@@ -7,6 +33,11 @@ World Rack::Test::Methods
 def parse_placeholders!(str)
   str.dup.scan /((?<!\\)\$(!)?(~)?([-\w]+)(?:\[(\w+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
     escape, encode, resource, index, attribute = matches
+
+    # Return the raw string if this isn't a placeholder (e.g. $foo), as we
+    # can assume that this isn't supposed to be a placeholder and is
+    # probably just a string containing a $ symbol.
+    next unless PLACEHOLDERS.include? resource.singularize.underscore
 
     attribute =
       case attribute&.underscore

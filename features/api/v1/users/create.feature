@@ -399,9 +399,10 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "Request data contained an invalid byte sequence (check encoding)"
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+        "code": "ENCODING_INVALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "request-log" job

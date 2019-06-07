@@ -88,6 +88,40 @@ module Keygen
 
       def call(env)
         @app.call env
+      rescue ArgumentError => e
+        case e.message
+        when /invalid byte sequence in UTF-8/,
+             /incomplete multibyte character/
+          [
+            400,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Bad request",
+                detail: "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+                code: "ENCODING_INVALID"
+              }]
+            }.to_json]
+          ]
+        when /string contains null byte/
+          [
+            400,
+            {
+              "Content-Type" => "application/vnd.api+json",
+            },
+            [{
+              errors: [{
+                title: "Bad request",
+                detail: "The request could not be completed because it contains an unexpected null byte (check encoding)",
+                code: "ENCODING_INVALID"
+              }]
+            }.to_json]
+          ]
+        else
+          raise e
+        end
       rescue ActionDispatch::Http::Parameters::ParseError,
              Rack::QueryParser::InvalidParameterError,
              Rack::QueryParser::ParameterTypeError,

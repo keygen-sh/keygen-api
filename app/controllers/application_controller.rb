@@ -17,9 +17,9 @@ class ApplicationController < ActionController::API
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case err.cause
     when PG::InvalidTextRepresentation
-      render_bad_request detail: 'Request data is badly formatted'
+      render_bad_request detail: 'The request could not be completed because it contains badly formatted data (check encoding)', code: 'ENCODING_INVALID'
     when PG::CharacterNotInRepertoire
-      render_bad_request detail: 'Request data is badly encoded'
+      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
 
@@ -29,7 +29,7 @@ class ApplicationController < ActionController::API
   rescue_from PG::Error, with: -> (err) {
     case err.message
     when /incomplete multibyte character/
-      render_bad_request detail: 'Request data is badly encoded'
+      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
 
@@ -49,9 +49,9 @@ class ApplicationController < ActionController::API
     case err.message
     when /invalid byte sequence in UTF-8/,
          /incomplete multibyte character/
-      render_bad_request detail: 'Request data contained an invalid byte sequence (check encoding)'
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
     when /string contains null byte/
-      render_bad_request detail: 'Request data contained an unexpected null byte (check encoding)'
+      render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
 
