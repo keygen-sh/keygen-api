@@ -25,15 +25,20 @@ module Pagination
     return {} unless resource.respond_to?(:total_pages)
 
     {}.tap do |page|
+      count = resource.total_count rescue nil
+
       page[:self]  = pagination_link resource.current_page, resource.limit_value
       page[:prev]  = pagination_link resource.prev_page, resource.limit_value
       page[:next]  = pagination_link resource.next_page, resource.limit_value
-      page[:first] = pagination_link 1, resource.limit_value
-      page[:last]  = pagination_link resource.total_pages, resource.limit_value
-      page[:meta]  = {
-        pages: resource.total_pages,
-        count: resource.total_count
-      }
+
+      if !count.nil?
+        page[:first] = pagination_link 1, resource.limit_value
+        page[:last]  = pagination_link resource.total_pages, resource.limit_value
+        page[:meta]  = {
+          pages: resource.total_pages,
+          count: resource.total_count
+        }
+      end
     end
   end
 
