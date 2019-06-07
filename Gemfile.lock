@@ -199,6 +199,7 @@ GEM
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     numerizer (0.1.1)
+    oj (3.7.12)
     openssl (2.1.2)
     parallel (1.12.1)
     parallel_tests (2.26.2)
@@ -380,6 +381,7 @@ DEPENDENCIES
   jwt
   kaminari
   listen (~> 3.0.5)
+  oj
   openssl
   parallel_tests
   pg

@@ -248,7 +248,7 @@ Feature: Show license
     And the first "license" has the following attributes:
       # Hashed 'a-license-key' using Bcrypt
       """
-      { "key": "\$2a\$10\$UcRHfYqf3DayM7iF/44pqOm0X9/UoEBcBRv3O4xFhJbXDIamHVBe." }
+      { "key": "$2a$10$UcRHfYqf3DayM7iF/44pqOm0X9/UoEBcBRv3O4xFhJbXDIamHVBe." }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/a-license-key"

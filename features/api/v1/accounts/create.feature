@@ -566,7 +566,7 @@ Feature: Create account
     Then the response status should be "422"
     And the JSON response should be an array of 2 errors
 
-  Scenario: Anonymous attempts to create an account with an invalid slug
+  Scenario: Anonymous attempts to create an account with invalid JSON (escaping)
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -575,6 +575,51 @@ Feature: Create account
           "attributes": {
             "name": "Google",
             "slug": "Invalid_\$lug/Is;here"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "firstName": "Larry",
+                    "lastName": "Page",
+                    "email": "lpage@keygen.sh",
+                    "password": "goog"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains invalid JSON (check encoding)",
+        "code": "JSON_INVALID"
+      }
+      """
+
+  Scenario: Anonymous attempts to create an account with an invalid slug
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Google",
+            "slug": "@Invalid_slug/Is;here"
           },
           "relationships": {
             "plan": {
