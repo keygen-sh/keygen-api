@@ -47,7 +47,7 @@ Feature: List metrics
         "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
       }
       """
-      And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves an unsupported paginated list of metrics
     Given I am an admin of account "test1"
@@ -65,7 +65,7 @@ Feature: List metrics
         "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=5"
       }
       """
-      And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics with an out of range page number
     Given I am an admin of account "test1"
@@ -83,7 +83,7 @@ Feature: List metrics
         "next": null
       }
       """
-      And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves a list of metrics within a date range that's full
     Given I am an admin of account "test1"
