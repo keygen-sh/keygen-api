@@ -126,7 +126,7 @@ Feature: User password actions
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "\$2a\$10\$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
+      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
@@ -146,7 +146,7 @@ Feature: User password actions
     And I have the following attributes:
       """
       {
-        "passwordResetToken": "\$2a\$10\$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS",
+        "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS",
         "passwordResetSentAt": "$time.23.hours.ago",
         "email": "user@example.com"
       }
@@ -170,7 +170,7 @@ Feature: User password actions
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "\$2a\$10\$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
+      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
       """
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
@@ -188,7 +188,7 @@ Feature: User password actions
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      { "passwordResetToken": "\$2a\$10\$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.25.hours.ago" }
+      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.25.hours.ago" }
       """
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """

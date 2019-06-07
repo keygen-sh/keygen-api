@@ -92,42 +92,51 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  # Scenario: Admin creates a license for a user of their account with a key that contains a null byte
-  #   Given I am an admin of account "test1"
-  #   And the current account is "test1"
-  #   And the current account has 1 "webhook-endpoint"
-  #   And the current account has 1 "policies"
-  #   And the current account has 1 "user"
-  #   And I use an authentication token
-  #   When I send a POST request to "/accounts/test1/licenses" with the following:
-  #     """
-  #     {
-  #       "data": {
-  #         "type": "licenses",
-  #         "attributes": {
-  #           "key": "$null_byte"
-  #         },
-  #         "relationships": {
-  #           "policy": {
-  #             "data": {
-  #               "type": "policies",
-  #               "id": "$policies[0]"
-  #             }
-  #           },
-  #           "user": {
-  #             "data": {
-  #               "type": "users",
-  #               "id": "$users[1]"
-  #             }
-  #           }
-  #         }
-  #       }
-  #     }
-  #     """
-  #   Then the response status should be "400"
-  #   And the current account should have 0 "licenses"
-  #   And sidekiq should have 0 "webhook" jobs
-  #   And sidekiq should have 0 "metric" jobs
+  Scenario: Admin creates a license for a user of their account with a key that contains a null byte
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "$null_byte"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains an unexpected null byte (check encoding)",
+        "code": "ENCODING_INVALID"
+      }
+      """
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license with an invalid policy for a user of their account

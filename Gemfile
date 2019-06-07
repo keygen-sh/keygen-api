@@ -15,6 +15,7 @@ gem 'hiredis'
 
 # JSON API serializers
 gem 'jsonapi-rails', '0.3.1'
+gem 'oj'
 
 # Billing and subscriptions
 gem 'stripe'
