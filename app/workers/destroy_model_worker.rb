@@ -5,7 +5,7 @@ class DestroyModelWorker
 
   def perform(type, id)
     klass = "#{type}".classify.constantize
-    model = klass.find id
+    model = klass.find_by! id: id
 
     model.destroy!
   end
