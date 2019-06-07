@@ -44,13 +44,7 @@ Feature: List metrics
       {
         "self": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
         "prev": null,
-        "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
-        "first": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
-        "last": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100",
-        "meta": {
-          "pages": 2,
-          "count": 198
-        }
+        "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
       }
       """
       And sidekiq should have 0 "request-log" jobs
@@ -68,13 +62,25 @@ Feature: List metrics
       {
         "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=5",
         "prev": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
-        "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=5",
-        "first": "/v1/accounts/test1/metrics?page[number]=1&page[size]=5",
-        "last": "/v1/accounts/test1/metrics?page[number]=5&page[size]=5",
-        "meta": {
-          "pages": 5,
-          "count": 24
-        }
+        "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=5"
+      }
+      """
+      And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves a list of metrics with an out of range page number
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "metrics"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics?page[number]=2&page[size]=100"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "metrics"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=100",
+        "prev": null,
+        "next": null
       }
       """
       And sidekiq should have 0 "request-log" jobs
