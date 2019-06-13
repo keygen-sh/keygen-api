@@ -10,8 +10,12 @@ class SerializableMachine < SerializableBase
     @object.requires_heartbeat?
   end
   attribute :heartbeat_status
-  attribute :last_heartbeat_at
-  attribute :next_heartbeat_at
+  attribute :last_heartbeat do
+    @object.last_heartbeat_at
+  end
+  attribute :next_heartbeat do
+    @object.next_heartbeat_at
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
