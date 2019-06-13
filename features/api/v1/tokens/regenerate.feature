@@ -50,6 +50,18 @@ Feature: Regenerate authentication token
     And the JSON response should be a "token" with an expiry within seconds of "$time.2.weeks.from_now.iso"
     And the JSON response should be a "token" with a token
 
+  Scenario: User resets their current token that is expired
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current token has the following attributes:
+      """
+      { "expiry": "$time.1.week.ago.iso" }
+      """
+    When I send a PUT request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+
   Scenario: User resets their current token with a bad reset token
     Given the current account is "test1"
     And the current account has 1 "user"
