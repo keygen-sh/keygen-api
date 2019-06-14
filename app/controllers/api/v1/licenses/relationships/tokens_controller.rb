@@ -42,6 +42,8 @@ module Api::V1::Licenses::Relationships
     def show
       authorize @license, :show_token?
 
+      @token = @license.tokens.find params[:id]
+
       render jsonapi: @token
     end
 
