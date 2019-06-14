@@ -40,7 +40,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/tokens/1
     def show
-      authorize @license, :view_token?
+      authorize @license, :show_token?
 
       @token = @license.tokens.find params[:id]
       authorize @token
