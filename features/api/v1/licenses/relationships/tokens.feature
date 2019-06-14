@@ -200,6 +200,17 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
+  Scenario: Product requests a license's token
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "licenses"
+    And I am a product of account "test1"
+    And the current product has 3 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/tokens/$3"
+    Then the response status should be "200"
+    And the JSON response should be a "token"
+
   Scenario: Product attempts to request tokens for a license it doesn't own
     Given the current account is "test1"
     And the current account has 1 "product"
