@@ -4,6 +4,7 @@ class SerializableRequestLog < SerializableBase
   attribute :request_id
   attribute :url
   attribute :method
+  attribute :query_params
   attribute :status
   attribute :user_agent
   attribute :ip

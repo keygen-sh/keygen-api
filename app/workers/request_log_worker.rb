@@ -15,6 +15,7 @@ class RequestLogWorker
       requestor_id: req['requestor_id'],
       request_id: req['request_id'],
       url: req['url'],
+      query_params: req['query_params'],
       method: req['method'],
       ip: req['ip'],
       user_agent: req['user_agent'],

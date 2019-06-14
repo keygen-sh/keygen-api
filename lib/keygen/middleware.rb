@@ -64,6 +64,7 @@ module Keygen
             requestor_id: requestor&.id,
             request_id: req.request_id,
             url: req.path,
+            query_params: req.query_parameters,
             method: req.method,
             ip: req.ip,
             user_agent: req.user_agent
