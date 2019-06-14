@@ -19,18 +19,30 @@ Feature: Request limits
 
   Scenario: Endpoint should be inaccessible when account is trialing and has exceeded its daily request limit
     Given the account "test1" has exceeded its daily request limit
+    And the current account is "test1"
+    And the account "test1" does not have a card on file
     And the account "test1" is trialing
     And I am an admin of account "test1"
-    And the current account is "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses"
     Then the response status should be "402"
 
-  Scenario: Endpoint should be accessible when account is trialing and has exceeded its daily request limit but the request came from the dashboard
+  Scenario: Endpoint should be accessible when account is trialing and has exceeded its daily request limit but has a card on file
     Given the account "test1" has exceeded its daily request limit
+    And the current account is "test1"
+    And the account "test1" does have a card on file
     And the account "test1" is trialing
     And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses"
+    Then the response status should not be "402"
+
+  Scenario: Endpoint should be accessible when account is trialing and has exceeded its daily request limit but the request came from the dashboard
+    Given the account "test1" has exceeded its daily request limit
     And the current account is "test1"
+    And the account "test1" does not have a card on file
+    And the account "test1" is trialing
+    And I am an admin of account "test1"
     And I use an authentication token
     And I send the following headers:
       """

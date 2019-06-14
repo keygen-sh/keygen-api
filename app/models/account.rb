@@ -75,7 +75,7 @@ class Account < ApplicationRecord
   end
 
   def daily_request_limit
-    return 2_500 if billing&.trialing?
+    return 2_500 if billing&.trialing? && billing&.card.nil?
 
     plan&.max_reqs
   end
@@ -89,7 +89,8 @@ class Account < ApplicationRecord
   def trialing_or_free_tier?
     return true if billing.nil?
 
-    billing.trialing? || plan.free?
+    return (billing.trialing? && billing.card.nil?) ||
+            plan.free?
   end
 
   def protected?
