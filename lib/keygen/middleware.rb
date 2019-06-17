@@ -63,7 +63,7 @@ module Keygen
             requestor_type: requestor&.class&.name,
             requestor_id: requestor&.id,
             request_id: req.request_id,
-            url: req.path,
+            url: req.fullpath,
             method: req.method,
             ip: req.headers['cf-connecting-ip'] || req.remote_ip,
             user_agent: req.user_agent
