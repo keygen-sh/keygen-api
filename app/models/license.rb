@@ -67,9 +67,9 @@ class License < ApplicationRecord
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :expired, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'expiry < ?', Time.current
+      where 'expiry IS NOT NULL AND expiry < ?', Time.current
     else
-      where 'expiry >= ?', Time.current
+      where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
   scope :policy, -> (id) { where policy: id }

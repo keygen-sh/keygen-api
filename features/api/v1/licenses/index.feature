@@ -149,6 +149,10 @@ Feature: List license
       """
       { "expiry": "$time.1.hour.ago" }
       """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expired=true"
     Then the response status should be "200"
@@ -161,6 +165,10 @@ Feature: List license
     And the first "license" has the following attributes:
       """
       { "expiry": "$time.1.hour.ago" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?expired=false"
