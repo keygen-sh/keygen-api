@@ -90,7 +90,9 @@ module Api::V1
 
         data = JSONAPI::Serializable::Renderer.new.render(res, options)
         data.tap do |d|
-          d[:links] = pagination_links(res)
+          links = pagination_links(res)
+
+          d[:links] = links unless links.empty?
         end
       end
 
