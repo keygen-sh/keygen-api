@@ -18,6 +18,36 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
 
+  Scenario: Admin quick validates a license from the Dashboard
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["*"]
+      }
+      """
+    And the current account has 1 "license"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      {
+        "Origin": "https://app.keygen.sh"
+      }
+      """
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Anonymous quick validates a check-in license that is valid
     Given the current account is "test1"
     And the current account has 1 "policies"
@@ -668,6 +698,29 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
+
+  Scenario: Admin validates a license from the Dashboard
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      {
+        "Origin": "https://app.keygen.sh"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous validates a check-in license that is valid
     Given the current account is "test1"
@@ -1893,6 +1946,34 @@ Feature: License validation actions
     And the current account is "test1"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key"
     Then the response status should be "403"
+
+  Scenario: Anonymous validates a license key from the Dashboard
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I send the following headers:
+      """
+      {
+        "Origin": "https://app.keygen.sh"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
 
   Scenario: Anonymous validates a valid license by key
     Given the current account is "test1"
