@@ -88,7 +88,10 @@ module Api::V1
 
         res = policy_scope apply_scopes(res)
 
-        JSONAPI::Serializable::Renderer.new.render(res, options)
+        data = JSONAPI::Serializable::Renderer.new.render(res, options)
+        data.tap do |d|
+          d[:links] = pagination_links(res)
+        end
       end
 
       render json: json
