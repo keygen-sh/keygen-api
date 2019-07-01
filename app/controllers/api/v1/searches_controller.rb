@@ -11,13 +11,40 @@ module Api::V1
       query, type = search_params[:meta].fetch_values 'query', 'type'
       model = type.classify.constantize rescue nil
 
-      if model.respond_to?(:search) && current_account.respond_to?(type.pluralize)
-        authorize model
+      if !model.respond_to?(:search) || !current_account.respond_to?(type.pluralize)
+        return render_bad_request(
+          detail: "unsupported search type '#{type.camelize(:lower)}'",
+          source: { pointer: "/meta/type" }
+        )
+      end
 
+      authorize model
+
+      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
         search_rels = model::SEARCH_RELATIONSHIPS
+        options = {
+          expose: { url_helpers: Rails.application.routes.url_helpers },
+          class: {
+            Account: SerializableAccount,
+            Token: SerializableToken,
+            Product: SerializableProduct,
+            Policy: SerializablePolicy,
+            User: SerializableUser,
+            License: SerializableLicense,
+            Machine: SerializableMachine,
+            Key: SerializableKey,
+            Billing: SerializableBilling,
+            Plan: SerializablePlan,
+            WebhookEndpoint: SerializableWebhookEndpoint,
+            WebhookEvent: SerializableWebhookEvent,
+            Metric: SerializableMetric,
+            Error: SerializableError
+          }
+        }
 
         res = current_account.send type.pluralize
+
         query.each do |attribute, value|
           if !res.respond_to?("search_#{attribute}") || (!search_attrs.include?(attribute.to_sym) &&
             !search_rels.key?(attribute.to_sym))

@@ -1,5 +1,7 @@
 module Api::V1::Licenses::Actions
   class ValidationsController < Api::V1::BaseController
+    IGNORED_ORIGINS = Keygen::Middleware::RequestLogger::IGNORED_ORIGINS
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[validate_by_key]
@@ -22,7 +24,8 @@ module Api::V1::Licenses::Actions
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
-          meta: meta
+          meta: meta,
+          record_metric: !req_from_dashboard?
         ).execute
       end
 
@@ -46,7 +49,8 @@ module Api::V1::Licenses::Actions
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
-          meta: meta
+          meta: meta,
+          record_metric: !req_from_dashboard?
         ).execute
       end
 
@@ -79,7 +83,8 @@ module Api::V1::Licenses::Actions
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
-          meta: meta
+          meta: meta,
+          record_metric: !req_from_dashboard?
         ).execute
       end
 
@@ -90,6 +95,10 @@ module Api::V1::Licenses::Actions
 
     def set_license
       @license = current_account.licenses.find params[:id]
+    end
+
+    def req_from_dashboard?
+      IGNORED_ORIGINS.include?(request.headers['origin'])
     end
 
     typed_parameters do

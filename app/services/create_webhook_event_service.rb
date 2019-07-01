@@ -1,10 +1,11 @@
 class CreateWebhookEventService < BaseService
 
-  def initialize(event:, account:, resource:, meta: nil)
-    @event    = event
-    @account  = account
-    @resource = resource
-    @meta     = meta
+  def initialize(event:, account:, resource:, meta: nil, record_metric: true)
+    @event         = event
+    @account       = account
+    @resource      = resource
+    @meta          = meta
+    @record_metric = record_metric
   end
 
   def execute
@@ -29,14 +30,12 @@ class CreateWebhookEventService < BaseService
     }
 
     # TODO: Move this out of the webhook event service
-    begin
+    if record_metric
       RecordMetricService.new(
         metric: event,
         account: account,
         resource: resource
       ).execute
-    rescue
-      # noop
     end
 
     # Append meta to options for resource payload and serialize
@@ -53,5 +52,5 @@ class CreateWebhookEventService < BaseService
 
   private
 
-  attr_reader :event, :account, :resource, :meta
+  attr_reader :event, :account, :resource, :meta, :record_metric
 end
