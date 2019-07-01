@@ -1,7 +1,13 @@
 class Metric < ApplicationRecord
   include DateRangeable
+  include Searchable
   include Limitable
   include Pageable
+
+  SEARCH_ATTRIBUTES = %i[id metric data].freeze
+  SEARCH_RELATIONSHIPS = {}.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
 
