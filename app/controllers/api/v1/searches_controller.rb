@@ -86,18 +86,21 @@ module Api::V1
           end
         end
 
-        @search = policy_scope apply_scopes(res)
+        res = policy_scope apply_scopes(res)
 
-        render jsonapi: @search
-      else
-        render_bad_request(
-          detail: "unsupported search type '#{type.camelize(:lower)}'",
-          source: { pointer: "/meta/type" }
-        )
+        JSONAPI::Serializable::Renderer.new.render(res, options)
       end
+
+      render json: json
     end
 
     private
+
+    def cache_key
+      query, type = search_params[:meta].fetch_values 'query', 'type'
+
+      [:searches, current_account.id, type, Base64.strict_encode64(query.to_json), request.query_string.parameterize].select(&:present?).join ":"
+    end
 
     typed_parameters do
       options strict: true
