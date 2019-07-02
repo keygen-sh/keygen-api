@@ -175,5 +175,6 @@ Rails.application.routes.draw do
     match code, to: "errors#show", code: code.to_i, via: :all
   end
 
+  get '*unmatched_route', to: "errors#show", code: 404
   root to: "errors#show", code: 404
 end
