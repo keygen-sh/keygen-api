@@ -53,6 +53,9 @@ gem 'premailer-rails'
 gem 'haml-rails'
 gem 'sass-rails'
 
+# Logging
+gem 'lograge'
+
 # Exception reporting
 gem 'raygun4ruby', "~> 1.1.11"
 
