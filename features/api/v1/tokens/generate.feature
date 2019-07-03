@@ -18,6 +18,7 @@ Feature: Generate authentication token
 
   Scenario: Admin generates a new token via basic authentication
     Given the current account is "test1"
+    And the current account has 4 "webhook-endpoints"
     And I am an admin of account "test1"
     And I send the following headers:
       """
@@ -33,6 +34,9 @@ Feature: Generate authentication token
         "expiry": null
       }
       """
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User generates a new token via basic authentication
     Given the current account is "test1"
@@ -50,6 +54,9 @@ Feature: Generate authentication token
       """
       { "kind": "user-token" }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to generate a new token but fails to authenticate
     Given the current account is "test1"

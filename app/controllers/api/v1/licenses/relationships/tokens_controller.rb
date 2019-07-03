@@ -21,6 +21,12 @@ module Api::V1::Licenses::Relationships
         **kwargs
       ).execute
 
+      CreateWebhookEventService.new(
+        event: "token.generated",
+        account: current_account,
+        resource: token
+      ).execute
+
       render jsonapi: token
     end
 

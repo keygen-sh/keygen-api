@@ -15,7 +15,7 @@ class RecordMetricWorker
     data =
       if resource.present?
         { resource: resource.id }.tap { |data|
-          %w[product policy license user].map(&:to_sym).each do |r|
+          %w[product policy license user bearer].map(&:to_sym).each do |r|
             data[r] = resource.send(r)&.id if resource.respond_to? r
           end
         }.compact

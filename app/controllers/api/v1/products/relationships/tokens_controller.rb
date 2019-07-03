@@ -15,6 +15,12 @@ module Api::V1::Products::Relationships
         expiry: nil
       ).execute
 
+      CreateWebhookEventService.new(
+        event: "token.generated",
+        account: current_account,
+        resource: token
+      ).execute
+
       render jsonapi: token
     end
 
