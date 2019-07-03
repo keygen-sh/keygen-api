@@ -45,6 +45,12 @@ module Api::V1
             **kwargs
           ).execute
 
+          CreateWebhookEventService.new(
+            event: "token.generated",
+            account: current_account,
+            resource: token
+          ).execute
+
           render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
         end
       end
@@ -73,6 +79,12 @@ module Api::V1
 
         tok.regenerate!
 
+        CreateWebhookEventService.new(
+          event: "token.regenerated",
+          account: current_account,
+          resource: tok
+        ).execute
+
         render jsonapi: tok and return
       end
 
@@ -85,12 +97,24 @@ module Api::V1
 
       @token.regenerate!
 
+      CreateWebhookEventService.new(
+        event: "token.regenerated",
+        account: current_account,
+        resource: @token
+      ).execute
+
       render jsonapi: @token
     end
 
     # DELETE /tokens/1
     def revoke
       authorize @token
+
+      CreateWebhookEventService.new(
+        event: "token.revoked",
+        account: current_account,
+        resource: @token
+      ).execute
 
       @token.destroy_async
     end

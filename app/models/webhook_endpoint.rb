@@ -49,6 +49,9 @@ class WebhookEndpoint < ApplicationRecord
     key.created
     key.updated
     key.deleted
+    token.generated
+    token.regenerated
+    token.revoked
     *
   ].freeze
 

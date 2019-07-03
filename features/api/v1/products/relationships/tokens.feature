@@ -20,6 +20,7 @@ Feature: Generate authentication token for product
   Scenario: Admin generates a product token
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$0/tokens"
@@ -31,6 +32,9 @@ Feature: Generate authentication token for product
         "expiry": null
       }
       """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product attempts to generate a token
     Given the current account is "test1"
