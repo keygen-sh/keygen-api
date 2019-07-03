@@ -20,6 +20,7 @@ Feature: Generate authentication token for license
   Scenario: Admin generates a license token
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
     And the current account has 1 "license"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
@@ -35,6 +36,9 @@ Feature: Generate authentication token for license
         "deactivations": 0
       }
       """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a license token with a max activation count
     Given I am an admin of account "test1"

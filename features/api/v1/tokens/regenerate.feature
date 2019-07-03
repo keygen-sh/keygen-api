@@ -19,6 +19,7 @@ Feature: Regenerate authentication token
   Scenario: Admin resets their current token
     Given the current account is "test1"
     And I am an admin of account "test1"
+    And the current account has 2 "webhook-endpoints"
     And I use an authentication token
     And the current token has the following attributes:
       """
@@ -34,6 +35,9 @@ Feature: Regenerate authentication token
         "expiry": null
       }
       """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User resets their current token
     Given the current account is "test1"

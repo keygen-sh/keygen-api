@@ -19,9 +19,13 @@ Feature: Revoke authentication token
   Scenario: Admin revokes one of their tokens
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: User revokes one of their tokens
     Given the current account is "test1"
@@ -30,6 +34,9 @@ Feature: Revoke authentication token
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$0"
     Then the response status should be "204"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product revokes one of their tokens
     Given the current account is "test1"
