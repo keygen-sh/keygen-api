@@ -20,7 +20,9 @@ ip_limiter = lambda do |req|
 end
 
 Rack::Attack.throttle("req/ip/burst/10s", { limit: 50, period: 30.seconds }, &ip_limiter)
-Rack::Attack.throttle("req/ip/burst/5m", { limit: 250, period: 5.minutes }, &ip_limiter)
+Rack::Attack.throttle("req/ip/burst/2m", { limit: 100, period: 2.minutes }, &ip_limiter)
+Rack::Attack.throttle("req/ip/burst/5m", { limit: 200, period: 5.minutes }, &ip_limiter)
+Rack::Attack.throttle("req/ip/burst/10m", { limit: 500, period: 10.minutes }, &ip_limiter)
 
 Rack::Attack.blocklist("req/block/ip") do |req|
   !Rack::Attack.cache.read("req/block/ip:#{req.ip}").nil?
