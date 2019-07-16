@@ -104,7 +104,7 @@ module Api::V1
     def cache_key
       query, type = search_params[:meta].fetch_values 'query', 'type'
 
-      [:searches, current_account.id, type, Base64.strict_encode64(query.to_json), request.query_string.parameterize].select(&:present?).join ":"
+      [:searches, current_account.id, type, Digest::SHA2.hexdigest(query.to_json), request.query_string.parameterize].select(&:present?).join ":"
     end
 
     typed_parameters do
