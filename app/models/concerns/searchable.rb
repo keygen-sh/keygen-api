@@ -17,12 +17,16 @@ module Searchable
           throw InvalidSearchAttribute.new("invalid search attribute type '#{attribute.class.name.underscore}' for '#{self.name.underscore}'")
         end
 
+        # Skip prefix search on metric data
+        prefix =
+          !(self.class === Metric && against == :data)
+
         pg_search_scope "search_#{scope}",
           against: against,
           using: {
             tsearch: {
               dictionary: 'simple',
-              prefix: true
+              prefix: prefix
             }
           }
       end
