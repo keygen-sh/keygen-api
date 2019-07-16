@@ -82,7 +82,13 @@ module Api::V1
               )
             end
 
-            res = res.send "search_#{attribute}", value.to_s
+            if value.is_a?(Hash) || value.is_a?(Array)
+              value = value.to_json
+            else
+              value = value.to_s
+            end
+
+            res = res.send "search_#{attribute}", value
           end
         end
 
