@@ -12,10 +12,42 @@ module Api::V1
 
     # GET /users
     def index
-      @users = policy_scope apply_scopes(current_account.users.eager_load(:role))
-      authorize @users
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
+        users = policy_scope apply_scopes(current_account.users.eager_load(:role))
+        authorize users
 
-      render jsonapi: @users
+        cache_status = :miss
+        data = JSONAPI::Serializable::Renderer.new.render(users, {
+          expose: { url_helpers: Rails.application.routes.url_helpers },
+          class: {
+            Account: SerializableAccount,
+            Token: SerializableToken,
+            Product: SerializableProduct,
+            Policy: SerializablePolicy,
+            User: SerializableUser,
+            License: SerializableLicense,
+            Machine: SerializableMachine,
+            Key: SerializableKey,
+            Billing: SerializableBilling,
+            Plan: SerializablePlan,
+            WebhookEndpoint: SerializableWebhookEndpoint,
+            WebhookEvent: SerializableWebhookEvent,
+            Metric: SerializableMetric,
+            Error: SerializableError
+          }
+        })
+
+        data.tap do |d|
+          links = pagination_links(users)
+
+          d[:links] = links unless links.empty?
+        end
+      end
+
+      # Skip auth when he have a cache hit
+      skip_authorization if cached?
+
+      render json: json
     end
 
     # GET /users/1
@@ -88,6 +120,24 @@ module Api::V1
         end
 
       raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
+    end
+
+    # TODO(ezekg) Extract this out into a caching module since it's duplicated
+    #             across quite a few different controllers.
+    def cache_key
+      [:users, current_account.id, current_bearer.id, request.query_string.parameterize].select(&:present?).join ":"
+    end
+
+    def cache_status=(status)
+      @cache_status = status
+    end
+
+    def cache_status
+      @cache_status ||= :hit
+    end
+
+    def cached?
+      cache_status == :hit
     end
 
     typed_parameters transform: true do

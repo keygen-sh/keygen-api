@@ -14,10 +14,42 @@ module Api::V1
 
     # GET /licenses
     def index
-      @licenses = policy_scope apply_scopes(current_account.licenses.preload(:policy))
-      authorize @licenses
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
+        licenses = policy_scope apply_scopes(current_account.licenses.preload(:policy))
+        authorize licenses
 
-      render jsonapi: @licenses
+        cache_status = :miss
+        data = JSONAPI::Serializable::Renderer.new.render(licenses, {
+          expose: { url_helpers: Rails.application.routes.url_helpers },
+          class: {
+            Account: SerializableAccount,
+            Token: SerializableToken,
+            Product: SerializableProduct,
+            Policy: SerializablePolicy,
+            User: SerializableUser,
+            License: SerializableLicense,
+            Machine: SerializableMachine,
+            Key: SerializableKey,
+            Billing: SerializableBilling,
+            Plan: SerializablePlan,
+            WebhookEndpoint: SerializableWebhookEndpoint,
+            WebhookEvent: SerializableWebhookEvent,
+            Metric: SerializableMetric,
+            Error: SerializableError
+          }
+        })
+
+        data.tap do |d|
+          links = pagination_links(licenses)
+
+          d[:links] = links unless links.empty?
+        end
+      end
+
+      # Skip auth when he have a cache hit
+      skip_authorization if cached?
+
+      render json: json
     end
 
     # GET /licenses/1
@@ -79,6 +111,22 @@ module Api::V1
 
     def set_license
       @license = current_account.licenses.find params[:id]
+    end
+
+    def cache_key
+      [:licenses, current_account.id, current_bearer.id, request.query_string.parameterize].select(&:present?).join ":"
+    end
+
+    def cache_status=(status)
+      @cache_status = status
+    end
+
+    def cache_status
+      @cache_status ||= :hit
+    end
+
+    def cached?
+      cache_status == :hit
     end
 
     typed_parameters transform: true do
