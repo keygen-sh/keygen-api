@@ -20,7 +20,7 @@ module Api::V1
 
       authorize model
 
-      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
         search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
         search_rels = model::SEARCH_RELATIONSHIPS
         options = {
