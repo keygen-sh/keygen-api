@@ -128,7 +128,7 @@ ActiveRecord::Schema.define(version: 2019_07_01_152254) do
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index "to_tsvector('simple'::regconfig, COALESCE((data)::text, ''::text))", name: "metrics_tsv_data_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((data)::text, ''::text))", name: "metrics_tsv_data_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_metrics_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_metrics_on_id_and_created_at", unique: true
     t.index ["metric", "account_id", "created_at"], name: "index_metrics_on_metric_and_account_id_and_created_at"
