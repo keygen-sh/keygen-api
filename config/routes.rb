@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
-  scope module: "api", constraints: { subdomain: "api", format: "jsonapi" } do
+  constraints =
+    if !Rails.env.development?
+      { constraints: { subdomain: "api", format: "jsonapi" } }
+    else
+      { constraints: { format: "jsonapi" } }
+    end
+
+  scope module: "api", **constraints do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
 
