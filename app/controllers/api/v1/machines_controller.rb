@@ -104,7 +104,7 @@ module Api::V1
         resource: @machine
       ).execute
 
-      @machine.destroy_async
+      @machine.destroy
     end
 
     private
