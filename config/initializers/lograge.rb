@@ -10,6 +10,13 @@ Rails.application.configure do
     bearer_id = controller.current_bearer&.id
     token_id = controller.current_token&.id
     req = controller.request
+    res = controller.response
+    err =
+      if res.status > 399
+        Base64.strict_encode64 res.body
+      else
+        nil
+      end
 
     {
       account_id: account_id || 'N/A',
@@ -20,6 +27,7 @@ Rails.application.configure do
       ip: req.headers['cf-connecting-ip'] || req.remote_ip,
       user_agent: req.user_agent || 'N/A',
       time: Time.current,
+      err: err || 'N/A',
       **rate_limit_info,
     }
   end
