@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::API
+  PUBLIC_RATE_LIMIT_KEYS = %w[req/ip/burst/30s req/ip/burst/2m req/ip/burst/5m req/ip/burst/10m]
+
   include Pundit
 
   before_action :force_jsonapi_response_format
@@ -68,6 +70,32 @@ class ApplicationController < ActionController::API
 
   def pundit_user
     current_bearer
+  end
+
+  def rate_limiting_info
+    throttle_data = (request.env["rack.attack.throttle_data"] || {}).slice(*PUBLIC_RATE_LIMIT_KEYS)
+    return unless throttle_data.present?
+
+    key, data = throttle_data.max_by { |k, v| v[:count].to_f / v[:limit].to_f * 100 }
+    return unless data.present?
+
+    window = key.split('/').last
+    period = data[:period].to_i
+    count = data[:count].to_i
+    limit = data[:limit].to_i
+    now = Time.current
+
+    {
+      window: window,
+      count: count,
+      limit: limit.to_s,
+      remaining: [0, limit - count].max.to_s,
+      reset: (now + (period - now.to_i % period)).to_i.to_s,
+    }
+  rescue => e
+    Raygun.track_exception e
+
+    nil
   end
 
   private
@@ -293,20 +321,15 @@ class ApplicationController < ActionController::API
   end
 
   def send_rate_limiting_headers
-    data = (request.env["rack.attack.throttle_data"] || {})["req/ip/burst"]
-    return unless data.present?
+    info = rate_limiting_info
+    return if info.nil?
 
-    period = data[:period].to_i
-    count = data[:count].to_i
-    limit = data[:limit].to_i
-    now = Time.current
-
-    response.headers["X-RateLimit-Limit"] = limit.to_s
-    response.headers["X-RateLimit-Remaining"] = [0, limit - count].max.to_s
-    response.headers["X-RateLimit-Reset"] = (now + (period - now.to_i % period)).to_i.to_s
+    response.headers["X-RateLimit-Window"]    = info[:window]
+    response.headers["X-RateLimit-Count"]     = info[:count]
+    response.headers["X-RateLimit-Limit"]     = info[:limit]
+    response.headers["X-RateLimit-Remaining"] = info[:remaining]
+    response.headers["X-RateLimit-Reset"]     = info[:reset]
   rescue => e
     Raygun.track_exception e
-
-    raise e
   end
 end
