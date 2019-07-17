@@ -6,7 +6,7 @@
   - [metrics, 2]
   - [mailers, 3]
   - [webhooks, 4]
-  - [deletes, 5]
   - [cron, 5]
   - [billing, 6]
   - [system, 7]
+  - [deletes, 8]
