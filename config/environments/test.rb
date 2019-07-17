@@ -2,7 +2,6 @@ require 'bullet'
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  config.cache_store = :memory_store, { namespace: "test_#{ENV['TEST_ENV_NUMBER']}" }
 
   # The test environment is used exclusively to run your application's
   # test suite. You never need to work with it otherwise. Remember that
@@ -20,6 +19,24 @@ Rails.application.configure do
   config.public_file_server.headers = {
     'Cache-Control' => 'public, max-age=3600'
   }
+
+  # Enable/disable caching with redis.
+  if ENV['REDIS_URL'].present?
+    config.action_controller.perform_caching = true
+    config.cache_store = :redis_cache_store, {
+      namespace: "test_#{ENV['TEST_ENV_NUMBER']}",
+      url: ENV['REDIS_URL'],
+      pool_size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
+      pool_timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
+      connect_timeout: 5,
+      read_timeout: 1,
+      write_timeout: 1,
+      reconnect_attempts: 1,
+    }
+  else
+    config.action_controller.perform_caching = false
+    config.cache_store = :memory_store
+  end
 
   # Show full error reports and disable caching.
   config.action_controller.perform_caching = false
