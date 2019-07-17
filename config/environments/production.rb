@@ -24,6 +24,7 @@ Rails.application.configure do
     read_timeout: 1,
     write_timeout: 1,
     reconnect_attempts: 1,
+    driver: :hiredis,
     error_handler: -> (method:, returning:, exception:) {
       Raygun.track_exception exception, method: method, returning: returning
     },
