@@ -49,7 +49,7 @@ After do |scenario|
   begin
     Rails.cache.clear
   rescue => e
-    puts e
+    puts '[REDIS]', e
   end
 
   @account = nil
