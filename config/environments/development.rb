@@ -31,6 +31,7 @@ Rails.application.configure do
       read_timeout: 1,
       write_timeout: 1,
       reconnect_attempts: 1,
+      driver: :hiredis,
     }
   else
     config.action_controller.perform_caching = false
