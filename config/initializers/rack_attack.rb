@@ -30,6 +30,10 @@ end
 
 Rack::Attack.throttled_response = -> (env) {
   match_data = env["rack.attack.match_data"] || {}
+  match_key = env['rack.attack.matched'] || ''
+
+  window = match_key.split('/').last
+  count = match_data[:count].to_i
   period = match_data[:period].to_i
   limit = match_data[:limit].to_i
   now = Time.current
@@ -38,6 +42,8 @@ Rack::Attack.throttled_response = -> (env) {
     429,
     {
       "Content-Type" => "application/vnd.api+json",
+      "X-RateLimit-Window" => window.to_s,
+      "X-RateLimit-Count" => count.to_s,
       "X-RateLimit-Limit" => limit.to_s,
       "X-RateLimit-Remaining" => "0",
       "X-RateLimit-Reset" => (now + (period - now.to_i % period)).to_i.to_s
@@ -56,6 +62,8 @@ Rack::Attack.blocklisted_response = -> (env) {
     403,
     {
       "Content-Type" => "application/vnd.api+json",
+      "X-RateLimit-Window" => "blacklist",
+      "X-RateLimit-Count" => "0",
       "X-RateLimit-Limit" => "0",
       "X-RateLimit-Remaining" => "0",
       "X-RateLimit-Reset" => "0"
