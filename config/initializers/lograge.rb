@@ -3,6 +3,7 @@ Rails.application.configure do
   config.lograge.enabled = true
 
   config.lograge.custom_payload do |controller|
+    rate_limit_info = controller.rate_limiting_info || {}
     account_id = controller.current_account&.id
     account_slug = controller.current_account&.slug
     bearer_type = controller.current_bearer&.class&.name&.underscore
@@ -18,7 +19,8 @@ Rails.application.configure do
       token_id: token_id || 'N/A',
       ip: req.headers['cf-connecting-ip'] || req.remote_ip,
       user_agent: req.user_agent || 'N/A',
-      time: Time.current
+      time: Time.current,
+      **rate_limit_info,
     }
   end
 end
