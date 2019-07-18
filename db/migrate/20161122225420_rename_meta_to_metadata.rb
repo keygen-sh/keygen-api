@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenameMetaToMetadata < ActiveRecord::Migration[5.0]
   def change
     rename_column :licenses, :meta, :metadata

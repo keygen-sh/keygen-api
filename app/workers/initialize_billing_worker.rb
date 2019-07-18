@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InitializeBillingWorker
   include Sidekiq::Worker
 

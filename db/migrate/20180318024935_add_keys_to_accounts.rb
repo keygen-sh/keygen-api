@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddKeysToAccounts < ActiveRecord::Migration[5.0]
   def up
     add_column :accounts, :public_key, :text

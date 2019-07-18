@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1::Accounts::Relationships
   class BillingsController < Api::V1::BaseController
     before_action :scope_to_current_account!

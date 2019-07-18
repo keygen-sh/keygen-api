@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RequireActiveSubscription
   IGNORED_ORIGINS = Keygen::Middleware::RequestLogger::IGNORED_ORIGINS
 

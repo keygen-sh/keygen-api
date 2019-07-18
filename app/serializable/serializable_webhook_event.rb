@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SerializableWebhookEvent < SerializableBase
   type "webhook-events"
 

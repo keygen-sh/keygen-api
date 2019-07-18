@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TokenGeneratorService < BaseService
 
   def initialize(account:, bearer:, expiry: nil, max_activations: nil, max_deactivations: nil)

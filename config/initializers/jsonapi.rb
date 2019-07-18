@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Register JSON API mime-type
 Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
   application/vnd.keygen+json

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddRequiredScopesToPolicies < ActiveRecord::Migration[5.0]
   def change
     add_column :policies, :require_product_scope, :boolean, default: false

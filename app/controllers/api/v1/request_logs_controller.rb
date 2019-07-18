@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'oj'
 
 Oj::Rails.tap do |oj|

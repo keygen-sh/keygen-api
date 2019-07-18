@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Tokenable
   ALGO_VERSION = "v2"
 

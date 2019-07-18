@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Pageable
   SIZE_UPPER = 100
   SIZE_LOWER = 1

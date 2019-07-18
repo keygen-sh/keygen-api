@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecordMetricService < BaseService
 
   def initialize(metric:, account:, resource:)

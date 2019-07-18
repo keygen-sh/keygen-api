@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SerializableLicense < SerializableBase
   type :licenses
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Keygen
   module Error
     class UnauthorizedError < StandardError; end

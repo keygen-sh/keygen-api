@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Whacamole.configure ENV['WHACAMOLE_APP_NAME'] do |config|
   config.api_token = ENV['WHACAMOLE_API_TOKEN']
   config.dynos = %w[web]

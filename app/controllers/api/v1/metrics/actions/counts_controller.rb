@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1::Metrics::Actions
   class CountsController < Api::V1::BaseController
     has_scope :metrics, type: :array

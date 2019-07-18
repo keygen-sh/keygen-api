@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sidekiq'
 require 'sidekiq-unique-jobs'
 require 'sidekiq-status'

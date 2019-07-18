@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   MINIMUM_ADMIN_COUNT = 1
 

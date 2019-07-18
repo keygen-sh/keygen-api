@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cucumber/rspec/doubles'
 require 'cucumber/rails'
 require 'bullet'

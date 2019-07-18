@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddProtectedToLicenses < ActiveRecord::Migration[5.0]
   def change
     add_column :licenses, :protected, :boolean

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1
   class SearchesController < Api::V1::BaseController
     MINIMUM_SEARCH_QUERY_SIZE = 3

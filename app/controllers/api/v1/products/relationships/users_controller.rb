@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1::Products::Relationships
   class UsersController < Api::V1::BaseController
     has_scope :roles, type: :array, default: [:user]

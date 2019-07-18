@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WebhookEvent < ApplicationRecord
   include Idempotentable
   include Limitable

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateRequestLogs < ActiveRecord::Migration[5.2]
   def change
     create_table :request_logs, id: :uuid, default: -> { "uuid_generate_v4()" } do |t|

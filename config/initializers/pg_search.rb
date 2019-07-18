@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # FIXME(ezekg) This is incredibly hacky, but since our keys can get quite
 #              large due to cryptographic signatures, this limits key search
 #              space to the first 128 chars.

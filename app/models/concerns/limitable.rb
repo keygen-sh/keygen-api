@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Limitable
   LIMIT_UPPER = 100
   LIMIT_LOWER = 1

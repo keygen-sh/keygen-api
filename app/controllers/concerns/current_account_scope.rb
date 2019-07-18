@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CurrentAccountScope
   extend ActiveSupport::Concern
 

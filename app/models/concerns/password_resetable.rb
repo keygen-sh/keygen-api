@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PasswordResetable
   extend ActiveSupport::Concern
   include Tokenable

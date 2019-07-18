@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AccountMailer < ApplicationMailer
   default from: "Keygen Support <support@keygen.sh>"
   layout "account_mailer"

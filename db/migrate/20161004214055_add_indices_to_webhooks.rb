@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndicesToWebhooks < ActiveRecord::Migration[5.0]
   def change
     add_index :webhook_endpoints, :account_id

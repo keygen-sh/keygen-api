@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateWebhookEventService < BaseService
 
   def initialize(event:, account:, resource:, meta: nil)

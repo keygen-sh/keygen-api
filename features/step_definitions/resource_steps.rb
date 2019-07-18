@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Given /^the following "([^\"]*)" exist:$/ do |resource, table|

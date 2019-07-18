@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Metric < ApplicationRecord
   include DateRangeable
   include Limitable

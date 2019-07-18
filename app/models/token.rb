@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Token < ApplicationRecord
   TOKEN_DURATION = 2.weeks
 

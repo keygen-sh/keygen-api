@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Policy < ApplicationRecord
   include Limitable
   include Pageable

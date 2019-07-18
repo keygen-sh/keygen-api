@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddAssociationIndices < ActiveRecord::Migration[5.0]
   def up
     add_index :accounts, :plan_id, where: "deleted_at IS NULL"
