@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Role < ApplicationRecord
   belongs_to :resource, polymorphic: true
 

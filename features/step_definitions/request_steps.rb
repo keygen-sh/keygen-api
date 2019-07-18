@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Given /^I send and accept HTML$/ do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDefaultValuesToPolicies < ActiveRecord::Migration[5.0]
 
   def up

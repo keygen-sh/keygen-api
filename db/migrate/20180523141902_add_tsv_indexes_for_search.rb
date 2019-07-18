@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddTsvIndexesForSearch < ActiveRecord::Migration[5.0]
   INDEXES = {
     products: %i[id name metadata],

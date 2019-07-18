@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Idempotentable
   extend ActiveSupport::Concern
   include Tokenable

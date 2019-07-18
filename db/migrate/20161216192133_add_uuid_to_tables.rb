@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddUuidToTables < ActiveRecord::Migration[5.0]
   def up
     tables = [

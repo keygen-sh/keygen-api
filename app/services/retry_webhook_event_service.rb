@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RetryWebhookEventService < BaseService
 
   def initialize(event:)

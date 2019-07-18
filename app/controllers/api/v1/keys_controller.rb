@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1
   class KeysController < Api::V1::BaseController
     has_scope :product

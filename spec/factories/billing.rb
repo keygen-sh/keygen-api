@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :billing do
     customer_id { Faker::Internet.password }

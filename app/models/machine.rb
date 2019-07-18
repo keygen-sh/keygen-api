@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Machine < ApplicationRecord
   include Sluggable
   include Limitable

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndicesToTables < ActiveRecord::Migration[5.0]
   def change
     add_index :billings, [:customer_id, :customer_type]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SerializableRequestLog < SerializableBase
   type "request-logs"
 

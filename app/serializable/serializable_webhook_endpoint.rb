@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SerializableWebhookEndpoint < SerializableBase
   type "webhook-endpoints"
 

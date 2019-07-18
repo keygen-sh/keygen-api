@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Before "@api/v1" do

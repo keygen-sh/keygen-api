@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DateRangeable
   extend ActiveSupport::Concern
 

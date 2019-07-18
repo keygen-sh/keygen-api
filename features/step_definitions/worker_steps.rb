@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|

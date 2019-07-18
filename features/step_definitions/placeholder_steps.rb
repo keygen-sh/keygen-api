@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # FIXME(ezekg) This is incredibly dirty, hacky and down right bad, but
 #              *it works* for quicking writing integration tests.
 World Rack::Test::Methods

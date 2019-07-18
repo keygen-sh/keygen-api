@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   Stripe::Customer.send :alias_method, :save!, :save
 

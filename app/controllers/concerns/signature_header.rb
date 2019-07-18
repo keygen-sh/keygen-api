@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SignatureHeader
   extend ActiveSupport::Concern
   include Signable

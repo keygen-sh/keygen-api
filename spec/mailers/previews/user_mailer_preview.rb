@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserMailerPreview < ActionMailer::Preview
 
   def password_reset

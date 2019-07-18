@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LicenseKeyLookupService < BaseService
   ENCRYPTED_KEY_REGEX = /\A(.{#{UUID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
 

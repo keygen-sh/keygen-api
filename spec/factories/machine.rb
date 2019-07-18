@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :machine do
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }

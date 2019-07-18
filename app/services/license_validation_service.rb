@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LicenseValidationService < BaseService
 
   def initialize(license:, scope: nil)

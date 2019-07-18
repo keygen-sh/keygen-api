@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UrlValidator < ActiveModel::EachValidator
   BLACKLISTED_HOSTS = %w[
     dist.keygen.sh

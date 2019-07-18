@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ReportMailer < ApplicationMailer
   default from: 'Keygen Reports <support@keygen.sh>', to: 'zeke+reports@keygen.sh'
   layout 'report_mailer'

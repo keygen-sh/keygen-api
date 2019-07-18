@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Given /^I am an? (user|admin|product|license) of account "([^\"]*)"$/ do |role, slug|

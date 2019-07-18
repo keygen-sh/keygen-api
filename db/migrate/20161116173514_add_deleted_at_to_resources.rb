@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDeletedAtToResources < ActiveRecord::Migration[5.0]
   def change
     add_column :accounts, :deleted_at, :datetime

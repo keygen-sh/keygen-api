@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TokenAuthenticationService < BaseService
   TOKEN_ID_REGEX = /\A([^\.]+)\.([^\.]+)/ # Form: {account}.{id}.xxx
 

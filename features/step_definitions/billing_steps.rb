@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 World Rack::Test::Methods
 
 Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreatePolicies < ActiveRecord::Migration[5.0]
   def change
     create_table :policies do |t|

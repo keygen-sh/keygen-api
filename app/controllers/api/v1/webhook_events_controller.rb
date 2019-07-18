@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1
   class WebhookEventsController < Api::V1::BaseController
     has_scope :events, type: :array

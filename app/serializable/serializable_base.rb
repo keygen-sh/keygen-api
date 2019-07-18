@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "jsonapi/serializable/resource/conditional_fields"
 require "jsonapi/serializable/resource/key_format"
 

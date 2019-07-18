@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api::V1
   class TokensController < Api::V1::BaseController
     include ActionController::HttpAuthentication::Basic::ControllerMethods

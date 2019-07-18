@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndicesToResourceIds < ActiveRecord::Migration[5.0]
   def change
     tables = [

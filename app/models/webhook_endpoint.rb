@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WebhookEndpoint < ApplicationRecord
   include Limitable
   include Pageable

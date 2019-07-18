@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateKeyTsvIndexForLicenses < ActiveRecord::Migration[5.0]
   def up
     remove_index :licenses, name: :licenses_tsv_key_idx

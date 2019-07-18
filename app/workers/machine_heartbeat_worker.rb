@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MachineHeartbeatWorker
   include Sidekiq::Worker
   include Sidekiq::Throttled::Worker

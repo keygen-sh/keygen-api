@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 TEST_ENV = "test".freeze
 
 class ApplicationRecord < ActiveRecord::Base

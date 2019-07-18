@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TypedParameters
   class InvalidParameterError < StandardError
     attr_reader :source

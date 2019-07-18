@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 WHITELISTED_DOMAINS = %w[dist.keygen.sh]
 
 Rack::Attack.safelist("req/allow/localhost") do |req|
