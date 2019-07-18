@@ -46,7 +46,7 @@ class License < ApplicationRecord
   validates :user, presence: { message: "must exist" }, unless: -> { user_id.nil? }
 
   validate on: :create, unless: -> { policy.nil? } do
-    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if account.licenses.exists? key
+    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if key.present? && key =~ UUID_REGEX && account.licenses.exists?(key)
 
     # This is for our original "encrypted" keys only (legacy scheme)
     errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && legacy_encrypted?
