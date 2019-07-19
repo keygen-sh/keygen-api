@@ -422,7 +422,7 @@ DEPENDENCIES
   raygun4ruby (~> 1.1.11)
   redis
   rspec-expectations
-  rspec-rails (~> 3.5)
+  rspec-rails (~> 3.8)
   sass-rails
   scout_apm
   sidekiq

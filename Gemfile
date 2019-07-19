@@ -86,7 +86,7 @@ end
 group :test do
   gem 'stripe-ruby-mock', '~> 2.3.1', require: 'stripe_mock'
   gem 'cucumber-rails', require: false
-  gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-rails', '~> 3.8'
   gem 'rspec-expectations'
   gem 'factory_bot_rails', '~> 4.11'
   gem 'database_cleaner'
