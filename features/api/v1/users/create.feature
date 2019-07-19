@@ -384,8 +384,8 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "firstName": "String in CP1252 encoding: \xE4\xF6\xFC\xDF",
-            "lastName": "Partly valid\xE4 UTF-8 encoding: äöüß",
+            "firstName": "String in CP1252 encoding: \\xE4\\xF6\\xFC\\xDF",
+            "lastName": "Partly valid\\xE4 UTF-8 encoding: äöüß",
             "email": "thor@keygen.sh",
             "password": "mjolnir",
             "role": "admin"
@@ -405,4 +405,4 @@ Feature: Create user
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "request-log" job
+    And sidekiq should have 1 "request-log" jobs

@@ -130,7 +130,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains an unexpected null byte (check encoding)",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
         "code": "ENCODING_INVALID"
       }
       """

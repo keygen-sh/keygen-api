@@ -90,10 +90,19 @@ module Keygen
 
       def call(env)
         @app.call env
-      rescue ArgumentError => e
-        case e.message
+      rescue ActionDispatch::Http::Parameters::ParseError,
+             Rack::QueryParser::InvalidParameterError,
+             Rack::QueryParser::ParameterTypeError,
+             # I have no idea why this is a bad request error - it should
+             # be one of the above Rack errors, but for some reason, by the
+             # time it propagates here, it's a different error.
+             ActionController::BadRequest => e
+        e = e.original_exception if e.respond_to? :original_exception
+
+        case e.message.scrub
         when /invalid byte sequence in UTF-8/,
-             /incomplete multibyte character/
+             /incomplete multibyte character/,
+             /string contains null byte/
           [
             400,
             {
@@ -107,31 +116,7 @@ module Keygen
               }]
             }.to_json]
           ]
-        when /string contains null byte/
-          [
-            400,
-            {
-              "Content-Type" => "application/vnd.api+json",
-            },
-            [{
-              errors: [{
-                title: "Bad request",
-                detail: "The request could not be completed because it contains an unexpected null byte (check encoding)",
-                code: "ENCODING_INVALID"
-              }]
-            }.to_json]
-          ]
-        else
-          raise e
-        end
-      rescue ActionDispatch::Http::Parameters::ParseError,
-             Rack::QueryParser::InvalidParameterError,
-             Rack::QueryParser::ParameterTypeError,
-             # I have no idea why this is a bad request error - it should
-             # be one of the above Rack errors, but for some reason, by the
-             # time it propagates here, it's a different error.
-             ActionController::BadRequest => e
-        if e.message =~ /query parameters/
+        when /query parameters/
           [
             400,
             {

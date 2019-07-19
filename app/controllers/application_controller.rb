@@ -52,10 +52,9 @@ class ApplicationController < ActionController::API
   rescue_from ArgumentError, with: -> (err) {
     case err.message
     when /invalid byte sequence in UTF-8/,
-         /incomplete multibyte character/
+         /incomplete multibyte character/,
+         /string contains null byte/
       render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when /string contains null byte/
-      render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
 
