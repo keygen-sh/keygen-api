@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   Stripe::Customer.send :alias_method, :save!, :save
 
   factory :customer, class: Stripe::Customer do

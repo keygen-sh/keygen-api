@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :role do
-    resource nil
+    resource { nil }
 
     trait :user do
-      name :user
+      name { :user }
     end
 
     trait :admin do
-      name :admin
+      name { :admin }
     end
 
     trait :product do
-      name :product
+      name { :product }
     end
   end
 end

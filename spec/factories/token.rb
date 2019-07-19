@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :token do
-    account nil
-    bearer nil
+    account { nil }
+    bearer { nil }
 
     before :create do |token|
       if token.digest.nil?

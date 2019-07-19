@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :key do
     key { SecureRandom.hex(12).upcase.scan(/.{4}/).join "-" }
 

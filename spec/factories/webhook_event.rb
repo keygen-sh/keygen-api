@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :webhook_event do
     event { "test.event" }
     endpoint { Faker::Internet.url }

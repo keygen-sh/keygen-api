@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     first_name { Faker::Name.name }
     last_name { Faker::Name.name }
     email { [SecureRandom.hex, Faker::Internet.safe_email].join }
-    password "password"
+    password { "password" }
 
     association :account
 

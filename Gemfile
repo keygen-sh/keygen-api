@@ -88,7 +88,7 @@ group :test do
   gem 'cucumber-rails', require: false
   gem 'rspec-rails', '~> 3.5'
   gem 'rspec-expectations'
-  gem 'factory_girl_rails', '4.8.0'
+  gem 'factory_bot_rails', '~> 4.11'
   gem 'database_cleaner'
   gem 'faker', '~> 1.6.3'
 end
