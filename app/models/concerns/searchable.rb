@@ -4,7 +4,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   included do
-    include PgSearch
+    include PgSearch::Model
 
     def self.search(attributes:, relationships: {})
       attributes.each do |attribute|
