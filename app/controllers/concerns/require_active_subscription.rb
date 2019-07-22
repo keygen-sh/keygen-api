@@ -18,7 +18,7 @@ module RequireActiveSubscription
          current_account.daily_request_limit_exceeded?
       render_payment_required(
         title: "Daily API request limit reached",
-        detail: "Daily API request limit of #{current_account.daily_request_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid subscription at https://app.keygen.sh/subscription to continue. This limit will reset at #{Date.tomorrow.beginning_of_day}."
+        detail: "Daily API request limit of #{current_account.daily_request_limit.to_s :delimited} has been reached for your account. Please add a payment method at https://app.keygen.sh/billing to continue. This limit will reset at #{Date.tomorrow.beginning_of_day}."
       )
       return false
     end
