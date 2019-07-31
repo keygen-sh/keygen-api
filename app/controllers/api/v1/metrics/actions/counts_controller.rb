@@ -14,7 +14,6 @@ module Api::V1::Metrics::Actions
 
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         metrics = policy_scope(apply_scopes(current_account.metrics))
-                    .current_period
                     .unscope(:order)
                     .group_by_day(:created_at, last: 14)
                     .count
