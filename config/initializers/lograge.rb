@@ -24,12 +24,12 @@ Rails.application.configure do
       {}.tap do |log|
         next if rate_limit_info.nil?
 
-        log[:rate_limited] = rate_limit_info[:count] > rate_limit_info[:limit]
-        log[:rate_reset] = Time.at rate_limit_info[:reset]
-        log[:rate_window] = rate_limit_info[:window]
-        log[:rate_count] = rate_limit_info[:count]
-        log[:rate_limit] = rate_limit_info[:limit]
-        log[:rate_remaining] = rate_limit_info[:remaining]
+        log[:rate_limited] = rate_limit_info[:count].to_i > rate_limit_info[:limit].to_i
+        log[:rate_reset] = Time.at(rate_limit_info[:reset]) rescue nil
+        log[:rate_window] = rate_limit_info[:window].to_i
+        log[:rate_count] = rate_limit_info[:count].to_i
+        log[:rate_limit] = rate_limit_info[:limit].to_i
+        log[:rate_remaining] = rate_limit_info[:remaining].to_i
       end
 
     {
