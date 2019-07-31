@@ -6,11 +6,23 @@ module Api::V1
 
     # GET /plans
     def index
-      @plans = apply_scopes(Plan.visible).reorder(price: :asc)
+      authorize Plan
 
-      authorize @plans
+      json = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
+        plans = apply_scopes(Plan.visible).reorder(price: :asc)
+        data = JSONAPI::Serializable::Renderer.new.render(plans, {
+          expose: { url_helpers: Rails.application.routes.url_helpers },
+          class: {
+            Account: SerializableAccount,
+            Plan: SerializablePlan,
+            Error: SerializableError
+          }
+        })
 
-      render jsonapi: @plans
+        data
+      end
+
+      render json: json
     end
 
     # GET /plans/1
@@ -24,6 +36,10 @@ module Api::V1
 
     def set_plan
       @plan = Plan.find params[:id]
+    end
+
+    def cache_key
+      [:plans, request.query_string.parameterize].select(&:present?).join ":"
     end
   end
 end
