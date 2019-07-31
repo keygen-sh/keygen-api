@@ -91,9 +91,9 @@ class ApplicationController < ActionController::API
     {
       window: window,
       count: count,
-      limit: limit.to_s,
-      remaining: [0, limit - count].max.to_s,
-      reset: (now + (period - now.to_i % period)).to_i.to_s,
+      limit: limit,
+      remaining: [0, limit - count].max,
+      reset: (now + (period - now.to_i % period)).to_i,
     }
   rescue => e
     Raygun.track_exception e
