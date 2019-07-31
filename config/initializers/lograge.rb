@@ -20,6 +20,18 @@ Rails.application.configure do
         nil
       end
 
+    rate_limit_logs =
+      {}.tap do |log|
+        next if rate_limit_info.nil?
+
+        log[:rate_limited] = rate_limit_info[:count] > rate_limit_info[:limit]
+        log[:rate_reset] = Time.at rate_limit_info[:reset]
+        log[:rate_window] = rate_limit_info[:window]
+        log[:rate_count] = rate_limit_info[:count]
+        log[:rate_limit] = rate_limit_info[:limit]
+        log[:rate_remaining] = rate_limit_info[:remaining]
+      end
+
     {
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
@@ -29,8 +41,8 @@ Rails.application.configure do
       ip: req.headers['cf-connecting-ip'] || req.remote_ip,
       user_agent: req.user_agent || 'N/A',
       time: Time.current,
-      err: err || 'N/A',
-      **rate_limit_info,
+      encoded_response: err || 'N/A',
+      **rate_limit_logs,
     }
   end
 end
