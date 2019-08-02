@@ -67,7 +67,6 @@ module Api::V1
                 value.to_s
               end
 
-
             res = res.send "search_#{attribute}", term
           end
         end

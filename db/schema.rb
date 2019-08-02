@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_161025) do
+ActiveRecord::Schema.define(version: 2019_08_02_174124) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -62,8 +60,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.datetime "updated_at", null: false
     t.uuid "policy_id"
     t.uuid "account_id"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((key)::text, ''::text))", name: "keys_tsv_key_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "keys_tsv_key_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_keys_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_keys_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true
@@ -89,10 +87,10 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.boolean "protected"
     t.string "name"
     t.integer "machines_count", default: 0
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "licenses_tsv_key_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((key)::text, ''::text), 128))", name: "licenses_tsv_key_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
@@ -113,10 +111,10 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.uuid "account_id"
     t.uuid "license_id"
     t.datetime "last_heartbeat_at"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((fingerprint)::text, ''::text))", name: "machines_tsv_fingerprint_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, \"left\"(COALESCE((fingerprint)::text, ''::text), 128))", name: "machines_tsv_fingerprint_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_machines_on_created_at", order: :desc
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
@@ -180,9 +178,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.boolean "concurrent", default: true
     t.integer "max_uses"
     t.string "scheme"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_policies_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_policies_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true
@@ -197,9 +195,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.jsonb "metadata"
     t.uuid "account_id"
     t.string "url"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "products_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "products_tsv_metadata_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_products_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true
@@ -275,11 +273,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_161025) do
     t.uuid "account_id"
     t.string "first_name"
     t.string "last_name"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((email)::text, ''::text))", name: "users_tsv_email_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((email)::text, ''::text))", name: "users_tsv_email_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
+    t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id", "created_at"], name: "index_users_on_email_and_account_id_and_created_at"
