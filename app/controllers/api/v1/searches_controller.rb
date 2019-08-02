@@ -57,7 +57,18 @@ module Api::V1
               )
             end
 
-            res = res.send "search_#{attribute}", value.to_s
+            # Replace out non-ascii characters with spaces and truncate the
+            # search term to speed up our GiST search queries
+            term =
+              case
+              when search_attrs.include?(attribute.to_sym)
+                value.to_s.gsub(/[^A-Za-z0-9]/, ' ')[0...16]
+              when search_rels.key?(attribute.to_sym)
+                value.to_s
+              end
+
+
+            res = res.send "search_#{attribute}", term
           end
         end
 
