@@ -20,6 +20,13 @@ Rails.application.configure do
         nil
       end
 
+    query_params =
+      if req.query_string.present?
+        "{#{req.query_string}}"
+      else
+        'N/A'
+      end
+
     rate_limit_logs =
       {}.tap do |log|
         next if rate_limit_info.nil?
@@ -33,6 +40,7 @@ Rails.application.configure do
       end
 
     {
+      query_params: query_params,
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
       bearer_type: bearer_type || 'N/A',
