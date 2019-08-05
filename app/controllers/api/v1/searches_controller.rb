@@ -67,7 +67,9 @@ module Api::V1
                 value.to_s
               end
 
-            res = res.send "search_#{attribute}", term
+            res = res.send "search_#{attribute}", term do |s|
+              s.where(account_id: current_account.id)
+            end
           end
         end
 
