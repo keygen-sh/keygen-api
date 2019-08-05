@@ -10,6 +10,17 @@
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins '*'
-    resource '*', headers: :any, methods: :any
+    resource '*',
+      headers: :any,
+      methods: :any,
+      expose: %w[
+        x-ratelimit-window
+        x-ratelimit-count
+        x-ratelimit-limit
+        x-ratelimit-remaining
+        x-ratelimit-reset
+        x-request-id
+        x-signature
+      ]
   end
 end
