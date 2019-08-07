@@ -2,8 +2,9 @@
 
 WHITELISTED_DOMAINS = %w[dist.keygen.sh]
 
-Rack::Attack.safelist("req/allow/localhost") do |req|
-  ip = req.fetch_header('cf-connecting-ip') { req.ip }
+Rack::Attack.safelist("req/allow/localhost") do |rack_req|
+  req = ActionDispatch::Request.new rack_req.env
+  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   "127.0.0.1" == ip || "::1" == ip unless Rails.env.development?
 end
@@ -12,10 +13,19 @@ Rack::Attack.safelist("req/allow/internal") do |req|
   WHITELISTED_DOMAINS.include?(req.host)
 end
 
-ip_limiter = lambda do |req|
+Rack::Attack.blocklist("req/block/ip") do |rack_req|
+  req = ActionDispatch::Request.new rack_req.env
+  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  !Rack::Attack.cache.read("req/block/ip:#{ip}").nil?
+end
+
+ip_limiter = lambda do |rack_req|
+  req = ActionDispatch::Request.new rack_req.env
+  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
+
   matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
   account = matches[1] unless matches.nil?
-  ip = req.fetch_header('cf-connecting-ip') { req.ip }
 
   if account.present?
     "#{account}/#{ip}"
@@ -28,12 +38,6 @@ Rack::Attack.throttle("req/ip/burst/30s", { limit: 50, period: 30.seconds }, &ip
 Rack::Attack.throttle("req/ip/burst/2m", { limit: 100, period: 2.minutes }, &ip_limiter)
 Rack::Attack.throttle("req/ip/burst/5m", { limit: 200, period: 5.minutes }, &ip_limiter)
 Rack::Attack.throttle("req/ip/burst/10m", { limit: 500, period: 10.minutes }, &ip_limiter)
-
-Rack::Attack.blocklist("req/block/ip") do |req|
-  ip = req.fetch_header('cf-connecting-ip') { req.ip }
-
-  !Rack::Attack.cache.read("req/block/ip:#{ip}").nil?
-end
 
 Rack::Attack.throttled_response = -> (env) {
   match_data = env["rack.attack.match_data"] || {}
