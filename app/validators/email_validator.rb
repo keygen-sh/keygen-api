@@ -3,13 +3,14 @@
 class EmailValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
-    record.errors.add attribute, :invalid, message: "must be a valid email" unless valid_email?(value)
+    record.errors.add attribute, :invalid, message: "must be a valid email" unless EmailValidator.valid_email?(value)
   end
 
-  private
-
-  def valid_email?(value)
+  def self.valid?(value)
     return false if value.nil?
-    value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+
+    m = value =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+
+    !m.nil?
   end
 end

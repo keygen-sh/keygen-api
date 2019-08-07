@@ -62,14 +62,16 @@ module Api::V1
             term =
               case
               when search_attrs.include?(attribute.to_sym)
-                value.to_s.gsub(/[^A-Za-z0-9]/, ' ')[0...16]
+                if EmailValidator.valid?(value)
+                  value.to_s
+                else
+                  value.to_s[0...32]
+                end
               when search_rels.key?(attribute.to_sym)
                 value.to_s
               end
 
-            res = res.send "search_#{attribute}", term do |s|
-              s.where(account_id: current_account.id)
-            end
+            res = res.send "search_#{attribute}", term
           end
         end
 
