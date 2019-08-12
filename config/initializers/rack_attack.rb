@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-WHITELISTED_DOMAINS = %w[dist.keygen.sh]
+WHITELISTED_DOMAINS = %w[
+  dist.keygen.sh
+  app.keygen.sh
+]
 
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
