@@ -12,8 +12,13 @@ Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   "127.0.0.1" == ip || "::1" == ip unless Rails.env.development?
 end
 
-Rack::Attack.safelist("req/allow/internal") do |req|
-  WHITELISTED_DOMAINS.include?(req.host)
+Rack::Attack.safelist("req/allow/internal") do |rack_req|
+  req = ActionDispatch::Request.new rack_req.env
+  origin = URI.parse(req.headers['origin']) rescue nil
+
+  WHITELISTED_DOMAINS.include?(req.host) || (
+    !origin.nil? && WHITELISTED_DOMAINS.include?(origin.host)
+  )
 end
 
 Rack::Attack.blocklist("req/block/ip") do |rack_req|
