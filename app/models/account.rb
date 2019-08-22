@@ -60,10 +60,14 @@ class Account < ApplicationRecord
     Account.clear_cache! id
   end
 
-  def daily_request_count_cache_key
+  def self.daily_request_count_cache_key(id)
     now = Time.current
 
     [:req, :limits, :daily, id, now.beginning_of_day.to_i].join ':'
+  end
+
+  def daily_request_count_cache_key
+    Account.daily_request_count_cache_key id
   end
 
   def daily_request_count=(count)

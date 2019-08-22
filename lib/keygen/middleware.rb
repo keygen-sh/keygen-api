@@ -20,6 +20,33 @@ module Keygen
       end
     end
 
+    class RequestCountLogger
+      IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
+
+      def initialize(app)
+        @app = app
+      end
+
+      def call(env)
+        req = ActionDispatch::Request.new env
+        status, headers, res = @app.call env
+
+        if IGNORED_ORIGINS.include?(req.headers['origin'])
+          return [status, headers, res]
+        end
+
+        begin
+          account_id = req.params[:account_id] || req.params[:id]
+
+          Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
+        rescue => e
+          Raygun.track_exception e
+        end
+
+        [status, headers, res]
+      end
+    end
+
     class RequestLogger
       IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
       IGNORED_RESOURCES = %w[

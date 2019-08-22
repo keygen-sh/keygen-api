@@ -38,7 +38,8 @@ module Keygen
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::Runtime
 
-    # Log Rack request/response to datebase
+    # Log Rack request/response to datastores
+    config.middleware.insert_before 0, Keygen::Middleware::RequestCountLogger
     config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
     config.middleware.insert_before 0, Keygen::Middleware::RequestStore
 
