@@ -22,8 +22,6 @@ class RequestLogWorker
       user_agent: req['user_agent'],
       status: res['status']
     )
-
-    increment_daily_request_count!
   rescue Keygen::Error::NotFoundError
     # Skip logging requests for accounts that do not exist
   end
@@ -31,16 +29,4 @@ class RequestLogWorker
   private
 
   attr_reader :account
-
-  def increment_daily_request_count!
-    cache.increment account.daily_request_count_cache_key, 1, expires_in: 1.day
-  rescue => e
-    Raygun.track_exception e
-
-    raise e
-  end
-
-  def cache
-    Rails.cache
-  end
 end
