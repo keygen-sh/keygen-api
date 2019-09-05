@@ -20,6 +20,8 @@ module Api::V1::Licenses::Actions
       }
 
       if @license.present?
+        Rails.logger.info "[license.quick-validate] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
@@ -44,6 +46,8 @@ module Api::V1::Licenses::Actions
       }
 
       if @license.present?
+        Rails.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
@@ -77,6 +81,8 @@ module Api::V1::Licenses::Actions
       }
 
       if @license.present?
+        Rails.logger.info "[license.validate-key] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+
         CreateWebhookEventService.new(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
