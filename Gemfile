@@ -48,7 +48,7 @@ gem 'sidekiq-throttled'
 gem 'httparty'
 
 # State machine
-gem 'aasm'
+gem 'aasm', '~> 5.0.3'
 
 # Email templating
 gem 'premailer-rails'
