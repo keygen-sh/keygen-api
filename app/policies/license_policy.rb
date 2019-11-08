@@ -55,7 +55,7 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def increment?
-    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer
+    bearer.role? :admin or (!resource.policy.protected? and resource.user == bearer) or resource.product == bearer or resource == bearer
   end
 
   def decrement?
