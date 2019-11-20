@@ -3214,3 +3214,72 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/actions/validate"
     Then the response status should be "403"
+
+  Scenario: Anonymous validates a license and sends a nonce
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "some-license-key-2"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "nonce": 1574265636
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "constant": "VALID",
+        "nonce": 1574265636
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key and sends a nonce
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "some-license-key-3"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-license-key-3",
+          "nonce": 1574265297
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "constant": "VALID",
+        "nonce": 1574265297
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
