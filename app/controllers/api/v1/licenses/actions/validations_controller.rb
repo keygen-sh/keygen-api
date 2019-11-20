@@ -45,6 +45,10 @@ module Api::V1::Licenses::Actions
         constant: constant,
       }
 
+      if nonce = validation_params.dig(:meta, :nonce)
+        meta[:nonce] = nonce
+      end
+
       if @license.present?
         Rails.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
@@ -80,6 +84,10 @@ module Api::V1::Licenses::Actions
         constant: constant,
       }
 
+      if nonce = validation_params[:meta][:nonce]
+        meta[:nonce] = nonce
+      end
+
       if @license.present?
         Rails.logger.info "[license.validate-key] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
@@ -105,6 +113,7 @@ module Api::V1::Licenses::Actions
 
       on :validate_by_id do
         param :meta, type: :hash, optional: true do
+          param :nonce, type: :integer, optional: true
           param :scope, type: :hash, optional: true do
             param :product, type: :string, optional: true
             param :policy, type: :string, optional: true
@@ -119,6 +128,7 @@ module Api::V1::Licenses::Actions
           param :key, type: :string, allow_blank: false
           param :legacy_encrypted, type: :boolean, optional: true
           param :encrypted, type: :boolean, optional: true
+          param :nonce, type: :integer, optional: true
           param :scope, type: :hash, optional: true do
             param :product, type: :string, optional: true
             param :policy, type: :string, optional: true
