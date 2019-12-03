@@ -8,6 +8,7 @@ class ApplicationController < ActionController::API
   before_action :disable_keep_alive_connections
   before_action :force_jsonapi_response_format
   before_action :send_rate_limiting_headers
+  after_action :send_keygen_whoami_headers
   after_action :verify_authorized
 
   rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
@@ -336,6 +337,14 @@ class ApplicationController < ActionController::API
     response.headers["X-RateLimit-Limit"]     = info[:limit]
     response.headers["X-RateLimit-Remaining"] = info[:remaining]
     response.headers["X-RateLimit-Reset"]     = info[:reset]
+  rescue => e
+    Raygun.track_exception e
+  end
+
+  def send_keygen_whoami_headers
+    response.headers["X-Keygen-Account-Id"] = current_account&.id
+    response.headers["X-Keygen-Bearer-Id"] = current_bearer&.id
+    response.headers["X-Keygen-Token-Id"] = current_token&.id
   rescue => e
     Raygun.track_exception e
   end
