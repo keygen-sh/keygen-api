@@ -1299,7 +1299,14 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      {
+        "valid": true,
+        "detail": "is valid",
+        "constant": "VALID",
+        "scope": {
+          "fingerprint": "$machines[0].fingerprint"
+        }
+      }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1347,7 +1354,14 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      {
+        "valid": false,
+        "detail": "fingerprint scope does not match",
+        "constant": "FINGERPRINT_SCOPE_MISMATCH",
+        "scope": {
+          "fingerprint": "$machines[1].fingerprint"
+        }
+      }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job

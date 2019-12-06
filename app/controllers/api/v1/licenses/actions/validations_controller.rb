@@ -49,6 +49,10 @@ module Api::V1::Licenses::Actions
         meta[:nonce] = nonce
       end
 
+      if scope = validation_params.dig(:meta, :scope)
+        meta[:scope] = scope
+      end
+
       if @license.present?
         Rails.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
@@ -86,6 +90,10 @@ module Api::V1::Licenses::Actions
 
       if nonce = validation_params[:meta][:nonce]
         meta[:nonce] = nonce
+      end
+
+      if scope = validation_params[:meta][:scope]
+        meta[:scope] = scope
       end
 
       if @license.present?
