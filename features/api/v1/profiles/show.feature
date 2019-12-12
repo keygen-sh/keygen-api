@@ -18,11 +18,19 @@ Feature: Show profile of current bearer
 
   Scenario: Admin requests their profile
     Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/profile"
     Then the response status should be "200"
     And the JSON response should be a "user"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "tokenId": "$tokens[0].id" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Product requests their profile
     Given the current account is "test1"
