@@ -67,6 +67,13 @@ class License < ApplicationRecord
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
+  scope :unassigned, -> (status = true) {
+    if ActiveRecord::Type::Boolean.new.cast(status)
+      where 'user_id IS NOT NULL'
+    else
+      where 'user_id IS NULL'
+    end
+  }
   scope :expired, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
       where 'expiry IS NOT NULL AND expiry < ?', Time.current
