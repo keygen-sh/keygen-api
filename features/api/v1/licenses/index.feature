@@ -194,7 +194,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?unassigned=true"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "licenses"
+    And the JSON response should be an array with 1 "license"
 
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
@@ -215,7 +215,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?unassigned=false"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    And the JSON response should be an array with 2 "licenses"
 
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
