@@ -69,9 +69,9 @@ class License < ApplicationRecord
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :unassigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
-      where 'user_id IS NOT NULL'
-    else
       where 'user_id IS NULL'
+    else
+      where 'user_id IS NOT NULL'
     end
   }
   scope :expired, -> (status = true) {
