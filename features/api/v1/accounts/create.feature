@@ -46,7 +46,7 @@ Feature: Create account
       {
         "publicKeys": {
           "rsa": "$~accounts[0].rsa_public_key",
-          "dsa": "$~accounts[0].dsa_public_key"
+          "dsa": "$~accounts[0].dsa_public_key",
           "ecdsa": "$accounts[0].ecdsa_public_key"
         }
       }
