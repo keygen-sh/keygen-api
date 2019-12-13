@@ -33,7 +33,7 @@ module Tokenable
         raw = SecureRandom.hex(length).gsub /.{#{version.length}}\z/, version
         raw = yield raw if block_given?
 
-        res = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, raw
+        res = OpenSSL::HMAC.hexdigest "SHA512", account.rsa_private_key, raw
       when "v3"
         raw = SecureRandom.hex(length) + version
         raw = yield raw if block_given?
@@ -59,7 +59,7 @@ module Tokenable
       bcrypt = BCrypt::Password.new a
       b = BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
     when "v2"
-      b = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
+      b = OpenSSL::HMAC.hexdigest "SHA512", account.rsa_private_key, token
     when "v3"
       b = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, token
     end

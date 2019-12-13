@@ -25,9 +25,11 @@ ActiveRecord::Schema.define(version: 2020_09_10_202414) do
     t.datetime "updated_at", null: false
     t.uuid "plan_id"
     t.boolean "protected", default: false
-    t.text "public_key"
-    t.text "private_key"
     t.text "secret_key"
+    t.text "rsa_public_key"
+    t.text "rsa_private_key"
+    t.text "dsa_public_key"
+    t.text "dsa_private_key"
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"

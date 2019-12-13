@@ -12,7 +12,7 @@ module SignatureHeader
     return if current_account.nil?
 
     response.headers["X-Signature"] = sign(
-      key: current_account.private_key,
+      key: current_account.rsa_private_key,
       data: response.body
     )
   end

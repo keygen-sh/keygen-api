@@ -202,6 +202,8 @@ class License < ApplicationRecord
       generate_pkcs1_pss_signed_key!
     when "RSA_2048_JWT_RS256"
       generate_jwt_rs256_key!
+    when "DSA_2048_SIGN"
+      generate_dsa_signed_key!
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?
@@ -235,7 +237,7 @@ class License < ApplicationRecord
 
   def generate_pkcs1_encrypted_key!
     if key.bytesize <= RSA_MAX_BYTE_SIZE
-      priv = OpenSSL::PKey::RSA.new account.private_key
+      priv = OpenSSL::PKey::RSA.new account.rsa_private_key
       enc = priv.private_encrypt key
 
       self.key = Base64.urlsafe_encode64 enc
@@ -245,7 +247,7 @@ class License < ApplicationRecord
   end
 
   def generate_pkcs1_signed_key!
-    priv = OpenSSL::PKey::RSA.new account.private_key
+    priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
     encoded_key = Base64.urlsafe_encode64 key
@@ -255,7 +257,7 @@ class License < ApplicationRecord
   end
 
   def generate_pkcs1_pss_signed_key!
-    priv = OpenSSL::PKey::RSA.new account.private_key
+    priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
 
     encoded_key = Base64.urlsafe_encode64 key
@@ -265,7 +267,7 @@ class License < ApplicationRecord
   end
 
   def generate_jwt_rs256_key!
-    priv = OpenSSL::PKey::RSA.new account.private_key
+    priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     payload = JSON.parse key
     jwt = JWT.encode payload, priv, "RS256"
 
@@ -275,5 +277,16 @@ class License < ApplicationRecord
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (must be a valid JSON encoded string)"
   rescue JWT::InvalidPayload => e
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message})"
+  end
+
+  def generate_dsa_signed_key!
+    priv = OpenSSL::PKey::DSA.new account.dsa_private_key
+    digest = OpenSSL::Digest::SHA256.digest key
+    sig = priv.syssign digest
+
+    encoded_key = Base64.urlsafe_encode64 key
+    encoded_sig = Base64.urlsafe_encode64 sig
+
+    self.key = "#{encoded_key}.#{encoded_sig}"
   end
 end

@@ -29,7 +29,7 @@ class TokenAuthenticationService < BaseService
         nil
       end
     when "v2"
-      digest = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
+      digest = OpenSSL::HMAC.hexdigest "SHA512", account.rsa_private_key, token
       tok = Rails.cache.fetch(cache_key(digest), expires_in: 15.minutes) do
         account.tokens.find_by digest: digest
       end

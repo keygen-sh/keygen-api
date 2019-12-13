@@ -1362,6 +1362,108 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license using scheme DSA_2048_SIGN for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "DSA_2048_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be specified for a license using DSA_2048_SIGN",
+        "code": "KEY_BLANK",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme DSA_2048_SIGN with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "DSA_2048_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "some-dsa-signed-payload-here"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the signed key of "some-dsa-signed-payload-here" using "DSA_2048_SIGN"
+    And the JSON response should be a "license" with the scheme "DSA_2048_SIGN"
+    And the JSON response should be a "license" that is not encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"

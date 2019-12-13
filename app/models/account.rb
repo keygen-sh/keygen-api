@@ -28,7 +28,8 @@ class Account < ApplicationRecord
 
   before_create -> { self.slug = slug.downcase }
   before_create :generate_secret_key!
-  before_create :generate_keys!
+  before_create :generate_rsa_keys!
+  before_create :generate_dsa_keys!
 
   before_create :set_founding_users_roles!
 
@@ -172,16 +173,29 @@ class Account < ApplicationRecord
   end
   alias_method :regenerate_secret_key!, :generate_secret_key!
 
-  def generate_keys!
-    priv = if private_key.nil?
+  def generate_rsa_keys!
+    priv = if rsa_private_key.nil?
              OpenSSL::PKey::RSA.generate RSA_KEY_SIZE
            else
-             OpenSSL::PKey::RSA.new private_key
+             OpenSSL::PKey::RSA.new rsa_private_key
            end
     pub = priv.public_key
 
-    self.private_key = priv.to_pem
-    self.public_key = pub.to_pem
+    self.rsa_private_key = priv.to_pem
+    self.rsa_public_key = pub.to_pem
   end
-  alias_method :regenerate_keys!, :generate_keys!
+  alias_method :regenerate_rsa_keys!, :generate_rsa_keys!
+
+  def generate_dsa_keys!
+    priv = if dsa_private_key.nil?
+             OpenSSL::PKey::DSA.generate DSA_KEY_SIZE
+           else
+             OpenSSL::PKey::DSA.new dsa_private_key
+           end
+    pub = priv.public_key
+
+    self.dsa_private_key = priv.to_pem
+    self.dsa_public_key = pub.to_pem
+  end
+  alias_method :regenerate_dsa_keys!, :generate_dsa_keys!
 end

@@ -157,7 +157,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
 
   case scheme
   when "RSA_2048_PKCS1_ENCRYPT"
-    pub = OpenSSL::PKey::RSA.new @account.public_key
+    pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
 
     key = Base64.urlsafe_decode64 json["data"]["attributes"]["key"].to_s
     dec = pub.public_decrypt key rescue nil
@@ -165,7 +165,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(dec).to eq value.to_s
   when "RSA_2048_PKCS1_SIGN"
-    pub = OpenSSL::PKey::RSA.new @account.public_key
+    pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     digest = OpenSSL::Digest::SHA256.new
 
     encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
@@ -179,7 +179,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(key).to eq val
     expect(res).to be true
   when "RSA_2048_PKCS1_PSS_SIGN"
-    pub = OpenSSL::PKey::RSA.new @account.public_key
+    pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     digest = OpenSSL::Digest::SHA256.new
 
     encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
@@ -193,7 +193,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(key).to eq val
     expect(res).to be true
   when "RSA_2048_JWT_RS256"
-    pub = OpenSSL::PKey::RSA.new @account.public_key
+    pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     jwt = json["data"]["attributes"]["key"].to_s
     dec = JWT.decode jwt, pub, true, algorithm: "RS256"
     payload = JSON.parse value
@@ -202,6 +202,20 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(alg).to eq "alg" => "RS256"
     expect(val).to eq payload
+  when "DSA_2048_SIGN"
+    pub = OpenSSL::PKey::DSA.new @account.dsa_public_key
+
+    encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
+    dig = OpenSSL::Digest::SHA256.digest key
+    val = value.to_s
+
+    res = pub.sysverify dig, sig rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(key).to eq val
+    expect(res).to be true
   else
     raise "unknown encryption scheme"
   end
@@ -431,7 +445,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
 end
 
 Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
-  pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
+  pub = OpenSSL::PKey::RSA.new Account.find(slug).rsa_public_key
   digest = OpenSSL::Digest::SHA256.new
 
   sig = Base64.strict_decode64 last_response.headers['X-Signature']

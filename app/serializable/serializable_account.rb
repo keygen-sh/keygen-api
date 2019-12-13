@@ -80,6 +80,11 @@ class SerializableAccount < SerializableBase
   end
 
   meta do
-    { publicKey: Base64.strict_encode64(@object.public_key) }
+    {
+      publicKeys: {
+        rsa: Base64.strict_encode64(@object.rsa_public_key),
+        dsa: Base64.strict_encode64(@object.dsa_public_key),
+      }
+    }
   end
 end

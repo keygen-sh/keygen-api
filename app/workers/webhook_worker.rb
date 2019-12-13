@@ -27,7 +27,7 @@ class WebhookWorker
       headers: {
         "Content-Type" => "application/json",
         "X-Signature" => sign(
-          key: account.private_key,
+          key: account.rsa_private_key,
           data: payload
         )
       },

@@ -54,6 +54,10 @@ FactoryGirl.define do
       association :policy, :rsa_2048_jwt_rs256
     end
 
+    trait :dsa_2048_sign do
+      association :policy, :dsa_2048_sign
+    end
+
     trait :day_check_in do
       association :policy, :day_check_in
     end

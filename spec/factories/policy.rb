@@ -57,6 +57,11 @@ FactoryGirl.define do
       encrypted false
     end
 
+    trait :dsa_2048_sign do
+      scheme 'DSA_2048_SIGN'
+      encrypted false
+    end
+
     trait :day_check_in do
       require_check_in true
       check_in_interval 'day'
