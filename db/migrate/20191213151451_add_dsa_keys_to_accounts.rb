@@ -18,5 +18,8 @@ class AddDsaKeysToAccounts < ActiveRecord::Migration[5.2]
   def down
     rename_column :accounts, :rsa_public_key, :public_key
     rename_column :accounts, :rsa_private_key, :private_key
+
+    remove_column :accounts, :dsa_public_key
+    remove_column :accounts, :dsa_private_key
   end
 end

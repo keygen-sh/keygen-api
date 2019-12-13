@@ -204,6 +204,8 @@ class License < ApplicationRecord
       generate_jwt_rs256_key!
     when "DSA_2048_SIGN"
       generate_dsa_signed_key!
+    when "ECDSA_SECP256K1_SIGN"
+      generate_ecdsa_secp256k1_signed_key!
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?
@@ -283,6 +285,20 @@ class License < ApplicationRecord
     priv = OpenSSL::PKey::DSA.new account.dsa_private_key
     digest = OpenSSL::Digest::SHA256.digest key
     sig = priv.syssign digest
+
+    encoded_key = Base64.urlsafe_encode64 key
+    encoded_sig = Base64.urlsafe_encode64 sig
+
+    self.key = "#{encoded_key}.#{encoded_sig}"
+  end
+
+  def generate_ecdsa_secp256k1_signed_key!
+    group = OpenSSL::PKey::EC::Group.new ECDSA_GROUP
+    ec = OpenSSL::PKey::EC.new group
+    bn = OpenSSL::BN.new account.ecdsa_private_key, 16
+    ec.private_key = bn
+
+    sig = ec.dsa_sign_asn1 key
 
     encoded_key = Base64.urlsafe_encode64 key
     encoded_sig = Base64.urlsafe_encode64 sig

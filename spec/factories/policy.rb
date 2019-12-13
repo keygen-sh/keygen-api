@@ -62,6 +62,11 @@ FactoryGirl.define do
       encrypted false
     end
 
+    trait :ecdsa_secp256k1_sign do
+      scheme 'ECDSA_SECP256K1_SIGN'
+      encrypted false
+    end
+
     trait :day_check_in do
       require_check_in true
       check_in_interval 'day'

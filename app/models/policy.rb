@@ -12,6 +12,7 @@ class Policy < ApplicationRecord
     RSA_2048_PKCS1_PSS_SIGN
     RSA_2048_JWT_RS256
     DSA_2048_SIGN
+    ECDSA_SECP256K1_SIGN
   ].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze

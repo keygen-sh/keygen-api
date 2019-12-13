@@ -58,6 +58,10 @@ FactoryGirl.define do
       association :policy, :dsa_2048_sign
     end
 
+    trait :ecdsa_secp256k1_sign do
+      association :policy, :ecdsa_secp256k1_sign
+    end
+
     trait :day_check_in do
       association :policy, :day_check_in
     end

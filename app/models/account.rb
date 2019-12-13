@@ -30,6 +30,7 @@ class Account < ApplicationRecord
   before_create :generate_secret_key!
   before_create :generate_rsa_keys!
   before_create :generate_dsa_keys!
+  before_create :generate_ecdsa_keys!
 
   before_create :set_founding_users_roles!
 
@@ -198,4 +199,17 @@ class Account < ApplicationRecord
     self.dsa_public_key = pub.to_pem
   end
   alias_method :regenerate_dsa_keys!, :generate_dsa_keys!
+
+  def generate_ecdsa_keys!
+    priv = if ecdsa_private_key.nil?
+             OpenSSL::PKey::EC.generate ECDSA_GROUP
+           else
+             OpenSSL::PKey::EC.new ecdsa_private_key
+           end
+    pub = priv.public_key
+
+    self.ecdsa_private_key = priv.private_key.to_s(16).downcase
+    self.ecdsa_public_key = pub.to_bn.to_s(16).downcase
+  end
+  alias_method :regenerate_ecdsa_keys!, :generate_ecdsa_keys!
 end

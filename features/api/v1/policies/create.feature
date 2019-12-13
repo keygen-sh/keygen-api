@@ -694,6 +694,50 @@ Feature: Create policy
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to create a policy using scheme ECDSA_SECP256K1_SIGN that uses a pool
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Invalid",
+            "scheme": "ECDSA_SECP256K1_SIGN",
+            "usePool": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "cannot use a scheme and use a pool",
+        "code": "SCHEME_NOT_SUPPORTED",
+        "source": {
+          "pointer": "/data/attributes/scheme"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attempts to create a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
@@ -1239,6 +1283,40 @@ Feature: Create policy
     And the JSON response should be a "policy" with the scheme "DSA_2048_SIGN"
     And the JSON response should be a "policy" that is not encrypted
     And the JSON response should be a "policy" with the name "DSA Signed"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy using scheme ECDSA_SECP256K1_SIGN for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "ECDSA Signed",
+            "scheme": "ECDSA_SECP256K1_SIGN"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the scheme "ECDSA_SECP256K1_SIGN"
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" with the name "ECDSA Signed"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

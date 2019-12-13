@@ -216,6 +216,23 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
     expect(res).to be true
+  when "ECDSA_SECP256K1_SIGN"
+    group = OpenSSL::PKey::EC::Group.new 'secp256k1'
+    ec = OpenSSL::PKey::EC.new group
+    bn = OpenSSL::BN.new @account.ecdsa_public_key, 16
+    pub = OpenSSL::PKey::EC::Point.new group, bn
+    ec.public_key = pub
+
+    encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
+    val = value.to_s
+
+    res = ec.dsa_verify_asn1 key, sig rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(key).to eq val
+    expect(res).to be true
   else
     raise "unknown encryption scheme"
   end
