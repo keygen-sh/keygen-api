@@ -218,6 +218,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(res).to be true
   when "ECDSA_SECP256K1_SIGN"
     group = OpenSSL::PKey::EC::Group.new 'secp256k1'
+    digest = OpenSSL::Digest::SHA256.new
     ec = OpenSSL::PKey::EC.new group
     bn = OpenSSL::BN.new @account.ecdsa_public_key, 16
     pub = OpenSSL::PKey::EC::Point.new group, bn
@@ -228,7 +229,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     sig = Base64.urlsafe_decode64 encoded_sig
     val = value.to_s
 
-    res = ec.dsa_verify_asn1 key, sig rescue false
+    res = ec.verify digest, sig, key rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val

@@ -298,7 +298,7 @@ class License < ApplicationRecord
     bn = OpenSSL::BN.new account.ecdsa_private_key, 16
     ec.private_key = bn
 
-    sig = ec.dsa_sign_asn1 key
+    sig = ec.sign OpenSSL::Digest::SHA256.new, key
 
     encoded_key = Base64.urlsafe_encode64 key
     encoded_sig = Base64.urlsafe_encode64 sig
