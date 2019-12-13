@@ -283,8 +283,8 @@ class License < ApplicationRecord
 
   def generate_dsa_signed_key!
     priv = OpenSSL::PKey::DSA.new account.dsa_private_key
-    digest = OpenSSL::Digest::SHA256.digest key
-    sig = priv.syssign digest
+
+    sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
     encoded_key = Base64.urlsafe_encode64 key
     encoded_sig = Base64.urlsafe_encode64 sig

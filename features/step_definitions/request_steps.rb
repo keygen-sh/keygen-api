@@ -204,14 +204,14 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(val).to eq payload
   when "DSA_2048_SIGN"
     pub = OpenSSL::PKey::DSA.new @account.dsa_public_key
+    digest = OpenSSL::Digest::SHA256.new
 
     encoded_key, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
     key = Base64.urlsafe_decode64 encoded_key
     sig = Base64.urlsafe_decode64 encoded_sig
-    dig = OpenSSL::Digest::SHA256.digest key
     val = value.to_s
 
-    res = pub.sysverify dig, sig rescue false
+    res = pub.verify digest, sig, key rescue false
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
