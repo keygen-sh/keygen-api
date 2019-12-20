@@ -21,7 +21,7 @@ module Keygen
     end
 
     class RequestCountLogger
-      IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
+      IGNORED_ORIGINS = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
 
       def initialize(app)
         @app = app
@@ -48,7 +48,7 @@ module Keygen
     end
 
     class RequestLogger
-      IGNORED_ORIGINS = %w[https://app.keygen.sh].freeze
+      IGNORED_ORIGINS = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
       IGNORED_RESOURCES = %w[
         webhook_endpoints
         webhook_events
