@@ -15,6 +15,8 @@ class Token < ApplicationRecord
   validates :account, presence: true
   validates :bearer, presence: true
 
+  validates :max_activations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
+  validates :max_deactivations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
   validates :activations, numericality: { greater_than_or_equal_to: 0 }, if: :activation_token?
   validates :deactivations, numericality: { greater_than_or_equal_to: 0 }, if: :activation_token?
 
