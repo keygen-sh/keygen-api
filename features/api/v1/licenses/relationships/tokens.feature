@@ -69,6 +69,66 @@ Feature: Generate authentication token for license
       }
       """
 
+  Scenario: Admin generates a license token with a negative max activation count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "maxActivations": -1
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than or equal to 0",
+        "source": {
+          "pointer": "/data/attributes/maxActivations"
+        },
+        "code": "MAX_ACTIVATIONS_INVALID"
+      }
+      """
+
+  Scenario: Admin generates a license token with a negative max deactivation count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "maxDeactivations": -1
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than or equal to 0",
+        "source": {
+          "pointer": "/data/attributes/maxDeactivations"
+        },
+        "code": "MAX_DEACTIVATIONS_INVALID"
+      }
+      """
+
   Scenario: Admin generates a license token with a set expiry
     Given I am an admin of account "test1"
     And the current account is "test1"
