@@ -42,6 +42,7 @@ class ApplicationController < ActionController::API
       render_internal_server_error
     end
   }
+  rescue_from ActiveRecord::RecordInvalid, with: -> (err) { render_unprocessable_resource err.record }
   rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
   rescue_from ActiveRecord::RecordNotFound, with: -> (err) {
     if err.model.present? && err.id.present?

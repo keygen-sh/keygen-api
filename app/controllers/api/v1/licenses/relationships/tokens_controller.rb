@@ -22,14 +22,17 @@ module Api::V1::Licenses::Relationships
         bearer: @license,
         **kwargs
       ).execute
+      if token.valid?
+        CreateWebhookEventService.new(
+          event: "token.generated",
+          account: current_account,
+          resource: token
+        ).execute
 
-      CreateWebhookEventService.new(
-        event: "token.generated",
-        account: current_account,
-        resource: token
-      ).execute
-
-      render jsonapi: token
+        render jsonapi: token
+      else
+        render_unprocessable_resource token
+      end
     end
 
     # GET /licenses/1/tokens
