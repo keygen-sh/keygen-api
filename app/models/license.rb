@@ -180,7 +180,7 @@ class License < ApplicationRecord
     when pool?
       generate_pooled_key!
     else
-      generate_unencrypted_key!
+      generate_raw_key!
     end
 
     # We're raising a RecordInvalid exception so that the transaction will be
@@ -230,7 +230,7 @@ class License < ApplicationRecord
     self.key = enc
   end
 
-  def generate_unencrypted_key!
+  def generate_raw_key!
     self.key = generate_token :key, length: 16 do |token|
       # Split every n characters, e.g. XXXX-XXXX-XXXX
       token.scan(/.{1,6}/).join("-").upcase
