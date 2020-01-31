@@ -195,15 +195,15 @@ class License < ApplicationRecord
 
     case scheme
     when Crypto.schemes.rsa_2048_pkcs1_encrypt
-      generate_pkcs1_encrypted_key!
+      generate_rsa_2048_pkcs1_encrypted_key!
     when Crypto.schemes.rsa_2048_pkcs1_sign
-      generate_pkcs1_signed_key!
+      generate_rsa_2048_pkcs1_signed_key!
     when Crypto.schemes.rsa_2048_pkcs1_pss_sign
-      generate_pkcs1_pss_signed_key!
+      generate_rsa_2048_pkcs1_pss_signed_key!
     when Crypto.schemes.rsa_2048_jwt_rs256
-      generate_jwt_rs256_key!
+      generate_rsa_2048_jwt_rs256_key!
     when Crypto.schemes.dsa_2048_sign
-      generate_dsa_signed_key!
+      generate_dsa_2048_signed_key!
     when Crypto.schemes.ecdsa_secp256k1_sign
       generate_ecdsa_secp256k1_signed_key!
     end
@@ -237,7 +237,7 @@ class License < ApplicationRecord
     end
   end
 
-  def generate_pkcs1_encrypted_key!
+  def generate_rsa_2048_pkcs1_encrypted_key!
     if key.bytesize <= RSA_MAX_BYTE_SIZE
       priv = OpenSSL::PKey::RSA.new account.rsa_private_key
       enc = priv.private_encrypt key
@@ -248,7 +248,7 @@ class License < ApplicationRecord
     end
   end
 
-  def generate_pkcs1_signed_key!
+  def generate_rsa_2048_pkcs1_signed_key!
     priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
@@ -258,7 +258,7 @@ class License < ApplicationRecord
     self.key = "#{encoded_key}.#{encoded_sig}"
   end
 
-  def generate_pkcs1_pss_signed_key!
+  def generate_rsa_2048_pkcs1_pss_signed_key!
     priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
 
@@ -268,7 +268,7 @@ class License < ApplicationRecord
     self.key = "#{encoded_key}.#{encoded_sig}"
   end
 
-  def generate_jwt_rs256_key!
+  def generate_rsa_2048_jwt_rs256_key!
     priv = OpenSSL::PKey::RSA.new account.rsa_private_key
     payload = JSON.parse key
     jwt = JWT.encode payload, priv, "RS256"
@@ -281,7 +281,7 @@ class License < ApplicationRecord
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message})"
   end
 
-  def generate_dsa_signed_key!
+  def generate_dsa_2048_signed_key!
     priv = OpenSSL::PKey::DSA.new account.dsa_private_key
 
     sig = priv.sign OpenSSL::Digest::SHA256.new, key
