@@ -88,17 +88,17 @@ end
 Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, resource, scheme|
   count.to_i.times do
     case scheme
-    when 'RSA_2048_PKCS1_ENCRYPT'
+    when Crypto.schemes.rsa_2048_pkcs1_encrypt
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_encrypt, account: @account, key: SecureRandom.hex)
-    when 'RSA_2048_PKCS1_SIGN'
+    when Crypto.schemes.rsa_2048_pkcs1_sign
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_sign, account: @account, key: SecureRandom.hex)
-    when 'RSA_2048_PKCS1_PSS_SIGN'
+    when Crypto.schemes.rsa_2048_pkcs1_pss_sign
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_sign, account: @account, key: SecureRandom.hex)
-    when 'RSA_2048_JWT_RS256'
+    when Crypto.schemes.rsa_2048_jwt_rs256
       @crypt << create(resource.singularize.underscore, :rsa_2048_jwt_rs256, account: @account, key: JSON.generate(key: SecureRandom.hex))
-    when 'DSA_2048_SIGN'
+    when Crypto.schemes.dsa_2048_sign
       @crypt << create(resource.singularize.underscore, :dsa_2048_sign, account: @account, key: SecureRandom.hex)
-    when 'ECDSA_SECP256K1_SIGN'
+    when Crypto.schemes.ecdsa_secp256k1_sign
       @crypt << create(resource.singularize.underscore, :ecdsa_secp256k1_sign, account: @account, key: SecureRandom.hex)
     end
   end

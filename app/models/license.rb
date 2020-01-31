@@ -194,17 +194,17 @@ class License < ApplicationRecord
     return unless key.present?
 
     case scheme
-    when "RSA_2048_PKCS1_ENCRYPT"
+    when Crypto.schemes.rsa_2048_pkcs1_encrypt
       generate_pkcs1_encrypted_key!
-    when "RSA_2048_PKCS1_SIGN"
+    when Crypto.schemes.rsa_2048_pkcs1_sign
       generate_pkcs1_signed_key!
-    when "RSA_2048_PKCS1_PSS_SIGN"
+    when Crypto.schemes.rsa_2048_pkcs1_pss_sign
       generate_pkcs1_pss_signed_key!
-    when "RSA_2048_JWT_RS256"
+    when Crypto.schemes.rsa_2048_jwt_rs256
       generate_jwt_rs256_key!
-    when "DSA_2048_SIGN"
+    when Crypto.schemes.dsa_2048_sign
       generate_dsa_signed_key!
-    when "ECDSA_SECP256K1_SIGN"
+    when Crypto.schemes.ecdsa_secp256k1_sign
       generate_ecdsa_secp256k1_signed_key!
     end
 

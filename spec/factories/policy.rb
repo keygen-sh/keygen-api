@@ -33,37 +33,37 @@ FactoryGirl.define do
     end
 
     trait :legacy_encrypt do
-      scheme 'LEGACY_ENCRYPT'
+      scheme Crypto.schemes.legacy_encrypt
       encrypted true
     end
 
     trait :rsa_2048_pkcs1_encrypt do
-      scheme 'RSA_2048_PKCS1_ENCRYPT'
+      scheme Crypto.schemes.rsa_2048_pkcs1_encrypt
       encrypted false
     end
 
     trait :rsa_2048_pkcs1_sign do
-      scheme 'RSA_2048_PKCS1_SIGN'
+      scheme Crypto.schemes.rsa_2048_pkcs1_sign
       encrypted false
     end
 
     trait :rsa_2048_pkcs1_pss_sign do
-      scheme 'RSA_2048_PKCS1_PSS_SIGN'
+      scheme Crypto.schemes.rsa_2048_pkcs1_pss_sign
       encrypted false
     end
 
     trait :rsa_2048_jwt_rs256 do
-      scheme 'RSA_2048_JWT_RS256'
+      scheme Crypto.schemes.rsa_2048_jwt_rs256
       encrypted false
     end
 
     trait :dsa_2048_sign do
-      scheme 'DSA_2048_SIGN'
+      scheme Crypto.schemes.dsa_2048_sign
       encrypted false
     end
 
     trait :ecdsa_secp256k1_sign do
-      scheme 'ECDSA_SECP256K1_SIGN'
+      scheme Crypto.schemes.ecdsa_secp256k1_sign
       encrypted false
     end
 

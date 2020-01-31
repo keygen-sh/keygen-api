@@ -156,7 +156,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
   value = v1 || v2
 
   case scheme
-  when "RSA_2048_PKCS1_ENCRYPT"
+  when Crypto.schemes.rsa_2048_pkcs1_encrypt
     pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
 
     key = Base64.urlsafe_decode64 json["data"]["attributes"]["key"].to_s
@@ -164,7 +164,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
 
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(dec).to eq value.to_s
-  when "RSA_2048_PKCS1_SIGN"
+  when Crypto.schemes.rsa_2048_pkcs1_sign
     pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     digest = OpenSSL::Digest::SHA256.new
 
@@ -178,7 +178,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
     expect(res).to be true
-  when "RSA_2048_PKCS1_PSS_SIGN"
+  when Crypto.schemes.rsa_2048_pkcs1_pss_sign
     pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     digest = OpenSSL::Digest::SHA256.new
 
@@ -192,7 +192,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
     expect(res).to be true
-  when "RSA_2048_JWT_RS256"
+  when Crypto.schemes.rsa_2048_jwt_rs256
     pub = OpenSSL::PKey::RSA.new @account.rsa_public_key
     jwt = json["data"]["attributes"]["key"].to_s
     dec = JWT.decode jwt, pub, true, algorithm: "RS256"
@@ -202,7 +202,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(alg).to eq "alg" => "RS256"
     expect(val).to eq payload
-  when "DSA_2048_SIGN"
+  when Crypto.schemes.dsa_2048_sign
     pub = OpenSSL::PKey::DSA.new @account.dsa_public_key
     digest = OpenSSL::Digest::SHA256.new
 
@@ -216,7 +216,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(key).to eq val
     expect(res).to be true
-  when "ECDSA_SECP256K1_SIGN"
+  when Crypto.schemes.ecdsa_secp256k1_sign
     group = OpenSSL::PKey::EC::Group.new 'secp256k1'
     digest = OpenSSL::Digest::SHA256.new
     ec = OpenSSL::PKey::EC.new group

@@ -5,16 +5,6 @@ class Policy < ApplicationRecord
   include Pageable
   include Searchable
 
-  CRYPTO_SCHEMES = %w[
-    LEGACY_ENCRYPT
-    RSA_2048_PKCS1_ENCRYPT
-    RSA_2048_PKCS1_SIGN
-    RSA_2048_PKCS1_PSS_SIGN
-    RSA_2048_JWT_RS256
-    DSA_2048_SIGN
-    ECDSA_SECP256K1_SIGN
-  ].freeze
-
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name]
@@ -46,7 +36,7 @@ class Policy < ApplicationRecord
   validates :check_in_interval_count, inclusion: { in: 1..365, message: "must be a number between 1 and 365 inclusive" }, if: :requires_check_in?
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
-  validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
+  validates :scheme, inclusion: { in: Crypto.schemes.values, message: "unsupported encryption scheme" }, if: :scheme?
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
