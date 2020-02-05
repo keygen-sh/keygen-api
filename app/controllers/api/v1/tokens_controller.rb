@@ -33,27 +33,28 @@ module Api::V1
         user = current_account.users.find_by email: "#{email}".downcase
 
         if user&.authenticate(password)
-          kwargs = {
-            expiry: if user.role?(:user)
-                      Time.current + Token::TOKEN_DURATION
-                    else
-                      nil # Admin tokens don't expire
-                    end
-          }
+          kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
+          if !kwargs.key?(:expiry)
+            # NOTE(ezekg) Admin tokens do not expire by default
+            kwargs[:expiry] = user.role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
+          end
 
           token = TokenGeneratorService.new(
             account: current_account,
             bearer: user,
             **kwargs
           ).execute
+          if token.valid?
+            CreateWebhookEventService.new(
+              event: "token.generated",
+              account: current_account,
+              resource: token
+            ).execute
 
-          CreateWebhookEventService.new(
-            event: "token.generated",
-            account: current_account,
-            resource: token
-          ).execute
-
-          render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
+            render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
+          else
+            render_unprocessable_resource token
+          end
         end
       end
 
@@ -125,6 +126,19 @@ module Api::V1
 
     def set_token
       @token = current_account.tokens.find params[:id]
+    end
+
+    typed_parameters transform: true do
+      options strict: true
+
+      on :generate do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[token tokens]
+          param :attributes, type: :hash do
+            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+          end
+        end
+      end
     end
   end
 end

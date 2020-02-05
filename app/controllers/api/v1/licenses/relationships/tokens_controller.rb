@@ -71,7 +71,7 @@ module Api::V1::Licenses::Relationships
         param :data, type: :hash, optional: true do
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
-            param :expiry, type: :datetime, optional: true, coerce: true
+            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
             param :max_activations, type: :integer, optional: true
             param :max_deactivations, type: :integer, optional: true
           end
