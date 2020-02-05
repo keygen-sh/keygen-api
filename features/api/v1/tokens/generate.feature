@@ -38,6 +38,36 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a new token with a custom expiry via basic authentication
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And I am an admin of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "expiry": "2531-01-01T00:00:00.000Z"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with an expiry "2531-01-01T00:00:00.000Z"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "kind": "admin-token" }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User generates a new token via basic authentication
     Given the current account is "test1"
     And the current account has 1 "user"
@@ -53,6 +83,68 @@ Feature: Generate authentication token
     And the JSON response should be a "token" with the following attributes:
       """
       { "kind": "user-token" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User generates a new token with a custom expiry via basic authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "expiry": "2049-01-01T00:00:00.000Z"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with an expiry "2049-01-01T00:00:00.000Z"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "kind": "user-token" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User generates a new token without an expiry via basic authentication
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "expiry": null
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "user-token",
+        "expiry": null
+      }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
