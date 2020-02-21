@@ -30,10 +30,12 @@ Rails.application.configure do
       url: ENV['REDIS_URL'],
       pool_size: ENV.fetch('REDIS_POOL_SIZE') { 5 }.to_i,
       pool_timeout: ENV.fetch('REDIS_POOL_TIMEOUT') { 5 }.to_i,
-      connect_timeout: 5,
-      read_timeout: 1,
-      write_timeout: 1,
-      reconnect_attempts: 1,
+      connect_timeout: ENV.fetch('REDIS_CONNECT_TIMEOUT') { 5 }.to_i,
+      read_timeout: ENV.fetch('REDIS_READ_TIMEOUT') { 5 }.to_i,
+      write_timeout: ENV.fetch('REDIS_WRITE_TIMEOUT') { 5 }.to_i,
+      reconnect_attempts: ENV.fetch('REDIS_RECONNECT_ATTEMPTS') { 5 }.to_i,
+      reconnect_delay: ENV.fetch('REDIS_RECONNECT_DELAY') { 1 }.to_f,
+      reconnect_delay_max: ENV.fetch('REDIS_RECONNECT_DELAY_MAX') { 1 }.to_f,
     }
   else
     config.action_controller.perform_caching = false
