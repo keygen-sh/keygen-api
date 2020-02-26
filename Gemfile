@@ -31,7 +31,7 @@ gem 'jwt'
 
 # Scopes and pagination
 gem 'has_scope'
-gem 'groupdate'
+gem 'groupdate', '~> 5.0'
 gem 'kaminari'
 
 # Search
