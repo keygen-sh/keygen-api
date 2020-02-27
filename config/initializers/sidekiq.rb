@@ -9,6 +9,16 @@ require "sidekiq/throttled"
 SIDEKIQ_MAX_QUEUE_LATENCY =
   (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
 
+class Sidekiq::Status::ClientMiddleware
+  # NOTE(ezekg) sidekiq-status needlessly stores the job args for display purposes in their UI,
+  #             which we don't even use, and our args can be very large JSON payloads which
+  #             causes unneeded bloat. At the time of this monkey patch, we had a 800MB keyspace
+  #             for `sidekiq:status:*` for absolutely no benefit, since we don't use the UI.
+  def display_args(msg, queue)
+    nil
+  end
+end
+
 Sidekiq.configure_client do |config|
   config.redis = { size: 5, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
 
