@@ -9,11 +9,14 @@ task stat_cleanup: :environment do
 
   redis.with do |conn|
     conn.scan_each(match: 'stat:*') do |key|
-      t2 = Time.parse(key.split(':').last).to_i
-      if t2 >= t1
-        puts "Skipping: #{key}"
+      parts = key.split(':')
+      if parts.size == 3
+        t2 = Time.parse(parts.last).to_i
+        if t2 >= t1
+          puts "Skipping: #{key}"
 
-        next
+          next
+        end
       end
 
       puts "Clearing: #{key}"
