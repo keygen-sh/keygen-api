@@ -10,7 +10,7 @@ class WebhookWorker
   include Sidekiq::Status::Worker
   include Signable
 
-  sidekiq_options queue: :webhooks, retry: 15
+  sidekiq_options queue: :webhooks, retry: 15, dead: false
   sidekiq_retry_in do |count|
     (count ** 4) + (10.minutes.to_i * rand(1..10))
   end
