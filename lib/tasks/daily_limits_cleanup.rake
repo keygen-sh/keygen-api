@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 # FIXME(ezekg) Remove once we upgrade to Rails 6 which supports `expire` on Redis `incr`
