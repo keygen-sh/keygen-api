@@ -5,7 +5,6 @@ ruby '2.6.5'
 
 gem 'rails', '~> 5.2'
 gem 'pg'
-gem 'puma', '~> 4.3.3'
 gem 'falcon'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-timeout', require: 'rack/timeout/base'
