@@ -5,7 +5,6 @@ class ApplicationController < ActionController::API
 
   include Pundit
 
-  before_action :disable_keep_alive_connections
   before_action :force_jsonapi_response_format
   before_action :send_rate_limiting_headers
   after_action :send_keygen_whoami_headers
@@ -301,10 +300,6 @@ class ApplicationController < ActionController::API
       meta: { id: request.request_id },
       errors: errors
     }, status: :unprocessable_entity
-  end
-
-  def disable_keep_alive_connections
-    response.headers["Connection"] = "close"
   end
 
   def force_jsonapi_response_format
