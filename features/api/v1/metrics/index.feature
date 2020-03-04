@@ -79,8 +79,8 @@ Feature: List metrics
       """
       {
         "self": "/v1/accounts/test1/metrics?page[number]=2&page[size]=100",
-        "prev": null,
-        "next": null
+        "prev": "/v1/accounts/test1/metrics?page[number]=1&page[size]=100",
+        "next": "/v1/accounts/test1/metrics?page[number]=3&page[size]=100"
       }
       """
     And sidekiq should have 0 "request-log" jobs
