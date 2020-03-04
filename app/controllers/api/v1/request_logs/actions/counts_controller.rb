@@ -11,13 +11,33 @@ module Api::V1::RequestLogs::Actions
       authorize RequestLog
 
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
-        logs = policy_scope(apply_scopes(current_account.request_logs))
-                    .unscope(:order)
-                    .group_by_day(:created_at, last: 14)
-                    .count
+        conn = ActiveRecord::Base.connection
 
+        dates = (13.days.ago.to_date..Date.today).map{ |date| date }
+        sql = <<~SQL
+          SELECT
+            "request_logs"."created_at"::date AS date,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            (
+              "request_logs"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
+              "request_logs"."created_at" <= #{conn.quote dates.last.end_of_day}
+            )
+          GROUP BY
+            "request_logs"."created_at"::date
+        SQL
+
+        rows = conn.execute sql.squish
+
+        # Create zeroed out hash of dates then merge real counts (so we include dates with no data)
         {
-          meta: logs
+          meta: dates.map { |d| [d.strftime('%Y-%m-%d'), 0] }.to_h
+            .merge(
+              rows.map { |r| r.fetch_values('date', 'count') }.to_h
+            )
         }
       end
 
