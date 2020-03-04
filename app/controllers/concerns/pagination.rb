@@ -26,20 +26,28 @@ module Pagination
   def pagination_links(resource)
     return {} unless resource.respond_to?(:total_pages)
 
-    {}.tap do |page|
+    {}.tap do |links|
+      # This will raise if the paginated model is not countable (see pageable model concern)
       count = resource.total_count rescue nil
 
-      page[:self]  = pagination_link resource.current_page, resource.limit_value
-      page[:prev]  = pagination_link resource.prev_page, resource.limit_value
-      page[:next]  = pagination_link resource.next_page, resource.limit_value
-
       if !count.nil?
-        page[:first] = pagination_link 1, resource.limit_value
-        page[:last]  = pagination_link resource.total_pages, resource.limit_value
-        page[:meta]  = {
+        links[:self]  = pagination_link resource.current_page, resource.limit_value
+        links[:prev]  = pagination_link resource.prev_page, resource.limit_value
+        links[:next]  = pagination_link resource.next_page, resource.limit_value
+        links[:first] = pagination_link 1, resource.limit_value
+        links[:last]  = pagination_link resource.total_pages, resource.limit_value
+        links[:meta]  = {
           pages: resource.total_pages,
           count: resource.total_count
         }
+      else
+        current_page = resource.current_page
+        prev_page = current_page == 1 ? nil : current_page - 1
+        next_page = current_page + 1
+
+        links[:self] = pagination_link current_page, resource.limit_value
+        links[:prev] = pagination_link prev_page, resource.limit_value
+        links[:next] = pagination_link next_page, resource.limit_value
       end
     end
   end
