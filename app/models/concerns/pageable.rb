@@ -7,6 +7,7 @@ module Pageable
 
   # NOTE(ezekg) We're not counting these tables for performance reasons
   WITHOUT_COUNT_MODELS = %w[
+    WebhookEvent
     RequestLog
     Metric
   ]
