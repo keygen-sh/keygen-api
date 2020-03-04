@@ -22,7 +22,7 @@ module Api::V1::Metrics::Actions
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         conn = ActiveRecord::Base.connection
 
-        dates = (13.days.ago.to_date..Date.today).map{ |date| date }
+        dates = 13.days.ago.to_date..Date.today
         sql =
           if metrics.present?
             <<~SQL
