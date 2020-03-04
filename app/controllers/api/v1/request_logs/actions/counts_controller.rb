@@ -13,7 +13,7 @@ module Api::V1::RequestLogs::Actions
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         conn = ActiveRecord::Base.connection
 
-        dates = (13.days.ago.to_date..Date.today).map{ |date| date }
+        dates = 13.days.ago.to_date..Date.today
         sql = <<~SQL
           SELECT
             "request_logs"."created_at"::date AS date,
