@@ -43,7 +43,7 @@ module Pagination
       else
         current_page = resource.current_page
         prev_page = current_page == 1 ? nil : current_page - 1
-        next_page = resource.size == 0 ? nil : current_page + 1
+        next_page = resource.length < resource.limit_value ? nil : current_page + 1
 
         links[:self] = pagination_link current_page, resource.limit_value
         links[:prev] = pagination_link prev_page, resource.limit_value
