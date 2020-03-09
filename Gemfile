@@ -31,7 +31,7 @@ gem 'jwt'
 
 # Scopes and pagination
 gem 'has_scope'
-gem 'kaminari'
+gem 'kaminari', '~> 1.2.0'
 
 # Search
 gem 'pg_search'
