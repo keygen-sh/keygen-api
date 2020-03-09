@@ -45,6 +45,42 @@ Feature: List webhook events
       """
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin retrieves the first page a paginated list of webhook events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 17 "webhook-events"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?page[number]=1&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "webhook-events"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/webhook-events?page[number]=1&page[size]=5",
+        "prev": null,
+        "next": "/v1/accounts/test1/webhook-events?page[number]=2&page[size]=5"
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves the last page of a paginated list of webhook events
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 22 "webhook-events"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events?page[number]=5&page[size]=5"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "webhook-events"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/webhook-events?page[number]=5&page[size]=5",
+        "prev": "/v1/accounts/test1/webhook-events?page[number]=4&page[size]=5",
+        "next": null
+      }
+      """
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin retrieves a paginated list of webhook events with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
