@@ -24,6 +24,15 @@
           max:
             width: 100%
           overflow: hidden
+      ul
+        &.no-margin
+          margin: 0
+      hr
+        margin: 20px 0
+        outline: none
+        border: none
+        border:
+          top: 1px solid #f3f3f3
   %body
     %p
       #{@account.name},
@@ -32,3 +41,12 @@
       – Zeke, Founder
     %p
       %small This is an automated message, but feel free to reply and you'll hit my personal inbox!
+    %hr
+    %small Additional information:
+    %ul.no-margin
+      %li
+        %small Account ID: #{@account.id}
+      %li
+        %small Account name: #{@account.slug}
+      %li
+        %small Time: #{Time.current}
