@@ -19,6 +19,7 @@ class ApplicationController < ActionController::API
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
+  rescue_from ActiveModel::RangeError, with: -> { render_bad_request detail: "integer is too large" }
   rescue_from ActiveRecord::StatementInvalid, with: -> (err) {
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
     case err.cause

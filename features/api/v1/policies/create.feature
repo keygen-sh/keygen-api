@@ -1359,3 +1359,45 @@ Feature: Create policy
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy for their account that has a duration that is too large
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 4 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Bad Duration",
+            "duration": 7464960000
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "must be less than or equal to 2147483647",
+          "source": {
+            "pointer": "/data/attributes/duration"
+          },
+          "code": "DURATION_INVALID"
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
