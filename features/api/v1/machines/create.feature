@@ -258,6 +258,21 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+    # Sanity check on license's machine counter
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "machines": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
+          "meta": { "count": 1 }
+        }
+      }
+      """
+
   Scenario: User creates a machine for their license with a protected policy
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
