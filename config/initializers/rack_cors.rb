@@ -14,6 +14,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       headers: :any,
       methods: :any,
       expose: %w[
+        x-keygen-account-id
+        x-keygen-bearer-id
+        x-keygen-token-id
         x-ratelimit-window
         x-ratelimit-count
         x-ratelimit-limit
