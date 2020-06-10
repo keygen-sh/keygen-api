@@ -81,6 +81,8 @@ class SerializableAccount < SerializableBase
 
   meta do
     {
+      # NOTE(ezekg) For backwards compatability
+      publicKey: Base64.strict_encode64(@object.rsa_public_key),
       publicKeys: {
         rsa: Base64.strict_encode64(@object.rsa_public_key),
         dsa: Base64.strict_encode64(@object.dsa_public_key),
