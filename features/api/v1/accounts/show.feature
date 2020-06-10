@@ -22,6 +22,7 @@ Feature: Show account
     And the JSON response should be an "account" with the following meta:
       """
       {
+        "publicKey": "$~accounts[0].rsa_public_key",
         "publicKeys": {
           "rsa": "$~accounts[0].rsa_public_key",
           "dsa": "$~accounts[0].dsa_public_key",
