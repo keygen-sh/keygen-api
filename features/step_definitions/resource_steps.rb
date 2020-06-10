@@ -2,7 +2,31 @@
 
 World Rack::Test::Methods
 
+def stub_cryptography_keygens!
+  def stubbed!; @stubbed = true end
+  def stubbed?; !!@stubbed end
+
+  return if stubbed?
+
+  allow_any_instance_of(Account).to receive(:ecdsa_private_key) { "7a768f62a10b6d7a231662d25fee01e090731b6277a9aa68007b4e5b0a3f188a" }
+  allow_any_instance_of(Account).to receive(:ecdsa_public_key) { "047c256ba49442bc24e881256e7bb5f4b4088b7af85196f46df9c98e5305ed8a9f57f0af6dc016df6fe694abb40e23f506cce95928e61eef71463cec9028077879" }
+  allow_any_instance_of(Account).to receive(:dsa_private_key) { "-----BEGIN DSA PRIVATE KEY-----\nMIIDVwIBAAKCAQEAiN4Z4uyGQ4SqPFUvagdKQn4fdmkS4kIlRU/mXeoF9VCouMt4\nncLOaHvLFHdg1AnGF+TF4icQgQPI36yQVw4WykzlDvVpdYg7LRq17YwRqKLFyUR/\n0Ty3t5ADQotd0kDqpZdllKPyfboXoIf1pTfErVj5jOocqTJV5Sxz6qu9wVuU/gv9\n7/Dlcxq6xiMTGwRrP0WZZJG4G0vQlki7MSnSrxOT8eARewbcww7FerGRqlKYPR7R\n38pZDlC5YPyF2YvXNk8gD8/IYrMnjOTewnEo7Es8Egvwuy/FvpJBDg7ZEUxofkWb\nbsPu4H0L72lBclvmFXZUgKkAjquNQrPG3fodMQIhANHlWtd1jNOdsLE4/QTNZ6Vz\nBQ4291OY51xgq62mXItpAoIBAQCAtqCe/QRNXa22d6/FNoL1XPixwT2/gG2cAq97\nbmogveGvd/vuqHZiZfZ/vrKk29zvia67YcK04JwgilkAhUUQf5FXDEbCW3gpfUxD\nBeLgRHkv3sWjeZfL67gZbNv867B4mX4jDS3F9pKou20RSUXzQ1js3XYNFV0rDvPR\ncUlNGM1+phG06M3T3CcAGv7XC+WvV1uXAK4snpfm2b3AAS1bPiOrjDyjwjYNIkkP\n7EJjjcXLxVfzACRGHZQjYc/bgZPUv2suxjzQ8Eiw3ONYZCatbkzK1eNLadivTjvU\nT9tN9M6hgRBYmHcweTwTT0Pt8g1zepxBRMU9WYj87FVoUg+FAoIBABqrc4yDZeDJ\n2FyPjkAJNRfD8uFqVMtbotxgBAY0+3mH1yFX/vyHxk+NEGOIMt9wiVKtW2b2GZvO\n8nctR8sXuHrZtP2M2rjex1VgpdyzR7s/YSBUcQARw+qFLc6nsZozJh4gLUhwpdLZ\nkWiVuGS2H7g5+Y1e5F8Y38ew3zP7gA9I4uCg94y+oD5gE9tkSMwwIcRb6wCd0ei2\nLg0N2pBDn4CgYLYwaDqT83CagBnT7JcE/tHMxTpRnIDLwQunJkilmb2meevDlBWA\nhU3KAtLuxMNIom8ENcETkJGz5NcYtjhyfzpInB+qOBJOt17p2UKzVBodslXQssU0\nq8AUPNGP4UwCIQCyB5NiBHhMZiMwNhpOOwTDeR83iAIZ+hsgh+wvZ0uzzA==\n-----END DSA PRIVATE KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:dsa_public_key) { "-----BEGIN PUBLIC KEY-----\nMIIDRzCCAjoGByqGSM44BAEwggItAoIBAQCI3hni7IZDhKo8VS9qB0pCfh92aRLi\nQiVFT+Zd6gX1UKi4y3idws5oe8sUd2DUCcYX5MXiJxCBA8jfrJBXDhbKTOUO9Wl1\niDstGrXtjBGoosXJRH/RPLe3kANCi13SQOqll2WUo/J9uhegh/WlN8StWPmM6hyp\nMlXlLHPqq73BW5T+C/3v8OVzGrrGIxMbBGs/RZlkkbgbS9CWSLsxKdKvE5Px4BF7\nBtzDDsV6sZGqUpg9HtHfylkOULlg/IXZi9c2TyAPz8hisyeM5N7CcSjsSzwSC/C7\nL8W+kkEODtkRTGh+RZtuw+7gfQvvaUFyW+YVdlSAqQCOq41Cs8bd+h0xAiEA0eVa\n13WM052wsTj9BM1npXMFDjb3U5jnXGCrraZci2kCggEBAIC2oJ79BE1drbZ3r8U2\ngvVc+LHBPb+AbZwCr3tuaiC94a93++6odmJl9n++sqTb3O+JrrthwrTgnCCKWQCF\nRRB/kVcMRsJbeCl9TEMF4uBEeS/exaN5l8vruBls2/zrsHiZfiMNLcX2kqi7bRFJ\nRfNDWOzddg0VXSsO89FxSU0YzX6mEbTozdPcJwAa/tcL5a9XW5cAriyel+bZvcAB\nLVs+I6uMPKPCNg0iSQ/sQmONxcvFV/MAJEYdlCNhz9uBk9S/ay7GPNDwSLDc41hk\nJq1uTMrV40tp2K9OO9RP2030zqGBEFiYdzB5PBNPQ+3yDXN6nEFExT1ZiPzsVWhS\nD4UDggEFAAKCAQAaq3OMg2Xgydhcj45ACTUXw/LhalTLW6LcYAQGNPt5h9chV/78\nh8ZPjRBjiDLfcIlSrVtm9hmbzvJ3LUfLF7h62bT9jNq43sdVYKXcs0e7P2EgVHEA\nEcPqhS3Op7GaMyYeIC1IcKXS2ZFolbhkth+4OfmNXuRfGN/HsN8z+4APSOLgoPeM\nvqA+YBPbZEjMMCHEW+sAndHoti4NDdqQQ5+AoGC2MGg6k/NwmoAZ0+yXBP7RzMU6\nUZyAy8ELpyZIpZm9pnnrw5QVgIVNygLS7sTDSKJvBDXBE5CRs+TXGLY4cn86SJwf\nqjgSTrde6dlCs1QaHbJV0LLFNKvAFDzRj+FM\n-----END PUBLIC KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:rsa_private_key) { "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAzPAseDYupK78ZUaSbGw7YyUCCeKo/1XqTACOcmTTHHGgeHac\nLK2j9UrbTlhW5h8Vyo0iUEHrY1Kgf4wwiGgFh0Yc+oDWDhq1bIertI03AE420Lbp\nUf6OTioX+nY0EInxXF3J7aAdx/R/nYgRJrLZ9ATWaQVSgf3vtxCtCwUeKxKZI41G\nA/9KHTcCmd3BryAQ1piYPr+qrEGf2NDJgr3WvVrMtnjeoordAaCTyYKtfm56WGXe\nXr43dfdejBuIkI5kqSzwVyoxhnjE/Rj6xks8ffH+dkAPNwm0IpxXJerybjmPWyv7\niyXEUN8CKG+6430D7NoYHp/c991ZHQBUs59gvwIDAQABAoIBAHb03ks04CQ1cknz\nCeEnfd1RyPol+ASmQSa2l/isr6HuDsB90K9aZzZlqiCyxFY1Kvf0rjs52EFB3+nJ\nXQ6AmtznhMCfciCjvjVuFuvpoEhsHgNOeOZgRQf4BQ0b+aKz/0anJiPpcf/z2vN8\n3L/CxyKOgEpbjYXo+XEgm+EuqlFDI3UZqhqFBTTf550QazjOihpItAMzf5yHP20Q\n8lA8PzYyYdkKqxdnaOt1IwhF+yFw2exZYPdHoWzmE/fI6RhQ5UyD9pidzBuW4xdH\nZQbWnsXPK7ZzNqN3Y1TkHl1TLPOKA0Ge5X/lcyCKB4v8zCVPUHOrVGDrsrHEc08P\nxCi52PkCgYEA5914ulPHrBN/h/G2nA45R1SE6QgFKPGQk8HaplV788aN+X73JNv5\nL8vSlhUJsUuGwuRkJkslxy/cA8do/39hSKESx2Tuu8EUeinCID26l1p4eczFoqps\nT7h4ggRsrJbN78bndG7ZkNQJPK2fEmZ/hp8XT9cJhgy2YwfUwydtLA0CgYEA4kUt\ne+7jlj7tQH5H/7ZpLhwckMNYr9Ojm8qCy+t40TAxVMBuGDfWhldMIjyzDU8wj9dr\nuKaejQ83jWqFlt/qbb1NFrLL7QKJajDlujI9hh55mG+jUa/bgfShuJnlMXPpCz+K\njhO5edT/jE4br3PgEAdnkbwVIJ8E+6vpjMQt8PsCgYAAoh85Sw9JjggUI/netT88\nzaNLS6VP9lDxxl7Fg4hCIzGyE8GzDRLCKalalZYgMNeeYqdPX3cr8xqDvCCySfPH\nEgGOH91zD9TxfHm2QtTmou2fT4repd6D3TofCMoPMp4/YGizbbYUai/YRZUgpL0G\nbhrPMgQppJE+9f+DxPDMZQKBgQCOG3RdicNV8V+ASc9eQmn8k5s9L/LbOsheZ+mN\nuO3AM8xHtjNu8mLBLMKcHhM2IK4XKOx2o+6gGRaCsowEHc1V7rYjs1dwG0/CacNe\nFX+eZDVqD3M7Mn9iNwn6rmzLikiqz9VtNeYfJi75J3Ur1FK8vmnFlaKPQlAW3/lm\ndy+DUQKBgEkNkmfafNVzCUZhgB5NDF1HNOqlPM0R9UrDraarG4pH7tVsl6lkEIc9\nujJSB6CauUNGVSx5zhiGXKLTYoQRTEWmdbBR0NK9EaK4icCTR+0cFS/jBpS4rJW8\n6hlMaiHG6DNtYdVbgtVqVC3EAXWrjfAPqBwoHP4CWq/vYfLK/53I\n-----END RSA PRIVATE KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:rsa_public_key) { "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzPAseDYupK78ZUaSbGw7\nYyUCCeKo/1XqTACOcmTTHHGgeHacLK2j9UrbTlhW5h8Vyo0iUEHrY1Kgf4wwiGgF\nh0Yc+oDWDhq1bIertI03AE420LbpUf6OTioX+nY0EInxXF3J7aAdx/R/nYgRJrLZ\n9ATWaQVSgf3vtxCtCwUeKxKZI41GA/9KHTcCmd3BryAQ1piYPr+qrEGf2NDJgr3W\nvVrMtnjeoordAaCTyYKtfm56WGXeXr43dfdejBuIkI5kqSzwVyoxhnjE/Rj6xks8\nffH+dkAPNwm0IpxXJerybjmPWyv7iyXEUN8CKG+6430D7NoYHp/c991ZHQBUs59g\nvwIDAQAB\n-----END PUBLIC KEY-----\n" }
+  allow_any_instance_of(Account).to receive(:generate_ecdsa_keys!) { true }
+  allow_any_instance_of(Account).to receive(:generate_dsa_keys!) { true }
+  allow_any_instance_of(Account).to receive(:generate_rsa_keys!) { true }
+
+  # FIXME(ezekg) Caching breaks due to stubbing
+  allow(Rails.cache).to receive(:fetch) { |&block| block.call }
+
+  stubbed!
+end
+
 Given /^the following "([^\"]*)" exist:$/ do |resource, table|
+  stub_cryptography_keygens!
+
   data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
   data.each { |attributes| create(resource.singularize.underscore, attributes) }
 end
