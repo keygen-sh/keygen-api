@@ -46,6 +46,29 @@ class Account < ApplicationRecord
 
   after_commit :clear_cache!, on: [:update, :destroy]
 
+  # TODO(ezekg) Temp attributes for backwards compat during DSA/ECDSA deploy
+  def private_key
+    attrs = attributes
+
+    case
+    when attrs.key?("rsa_private_key")
+      attrs["rsa_private_key"]
+    when attrs.key?("private_key")
+      attrs["private_key"]
+    end
+  end
+
+  def public_key
+    attrs = attributes
+
+    case
+    when attrs.key?("rsa_public_key")
+      attrs["rsa_public_key"]
+    when attrs.key?("public_key")
+      attrs["public_key"]
+    end
+  end
+
   def self.cache_key(id)
     [:accounts, id].join ":"
   end
