@@ -216,7 +216,8 @@ module Keygen
             }.to_json]
           ]
         end
-      rescue Rack::Timeout::Error => e
+      rescue Rack::Timeout::Error,
+             Timeout::Error => e
         Raygun.track_exception e, env.to_h.slice(
           "REQUEST_METHOD",
           "PATH_INFO",
