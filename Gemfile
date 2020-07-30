@@ -16,6 +16,7 @@ gem 'redis'
 gem 'hiredis'
 
 # JSON API serializers
+gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.3.1'
 gem 'oj'
 
