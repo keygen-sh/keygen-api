@@ -69,25 +69,25 @@ module Api::V1
           card_brand: card.brand,
           card_last4: card.last4
         )
-      when "customer.subscription.trial_will_end"
-        subscription = event.data.object
-        billing = Billing.find_by customer_id: subscription.customer
-        return unless billing && !billing.canceling? && !billing.canceled?
+      # when "customer.subscription.trial_will_end"
+      #   subscription = event.data.object
+      #   billing = Billing.find_by customer_id: subscription.customer
+      #   return unless billing && !billing.canceling? && !billing.canceled?
 
-        # Make sure our customer knows that they need to add a card to their
-        # account within the next few days
-        if billing.card.nil?
-          AccountMailer.payment_method_missing(account: billing.account).deliver_later
-        end
+      #   # Make sure our customer knows that they need to add a card to their
+      #   # account within the next few days
+      #   if billing.card.nil?
+      #     AccountMailer.payment_method_missing(account: billing.account).deliver_later
+      #   end
       when "invoice.payment_succeeded"
         invoice = event.data.object
         billing = Billing.find_by customer_id: invoice.customer
         return unless billing && invoice.total > 0
 
-        # Ask for feedback after first successful payment
-        if billing.receipts.paid.empty?
-          AccountMailer.first_payment_succeeded(account: billing.account).deliver_later
-        end
+        # # Ask for feedback after first successful payment
+        # if billing.receipts.paid.empty?
+        #   AccountMailer.first_payment_succeeded(account: billing.account).deliver_later
+        # end
 
         billing.receipts.create(
           invoice_id: invoice.id,
@@ -99,11 +99,11 @@ module Api::V1
         billing = Billing.find_by customer_id: invoice.customer
         return unless billing && !billing.canceling? && !billing.canceled?
 
-        if billing.card.nil?
-          AccountMailer.payment_method_missing(account: billing.account).deliver_later
-        else
-          AccountMailer.payment_failed(account: billing.account).deliver_later
-        end
+        # if billing.card.nil?
+        #   AccountMailer.payment_method_missing(account: billing.account).deliver_later
+        # else
+        #   AccountMailer.payment_failed(account: billing.account).deliver_later
+        # end
 
         billing.receipts.create(
           invoice_id: invoice.id,
