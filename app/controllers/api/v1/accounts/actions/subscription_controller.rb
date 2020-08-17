@@ -6,6 +6,18 @@ module Api::V1::Accounts::Actions
     before_action :authenticate_with_token!
     before_action :set_account
 
+    def manage
+      authorize @account
+
+      session = Billings::CreateBillingPortalSessionService.new(customer: @account.billing.customer_id).execute
+
+      if session
+        redirect_to session.url, status: 303
+      else
+        render_unprocessable_entity detail: "failed to generate a subscription management session"
+      end
+    end
+
     # POST /accounts/1/actions/pause-subscription
     def pause
       authorize @account
