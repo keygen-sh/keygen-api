@@ -58,6 +58,17 @@ class Account < ApplicationRecord
     end
   end
 
+  def private_key=(value)
+    attrs = attributes
+
+    case
+    when attrs.key?("rsa_private_key")
+      write_attribute :rsa_private_key, value
+    when attrs.key?("private_key")
+      write_attribute :private_key, value
+    end
+  end
+
   def public_key
     attrs = attributes
 
@@ -66,6 +77,17 @@ class Account < ApplicationRecord
       attrs["rsa_public_key"]
     when attrs.key?("public_key")
       attrs["public_key"]
+    end
+  end
+
+  def public_key=(value)
+    attrs = attributes
+
+    case
+    when attrs.key?("rsa_public_key")
+      write_attribute :rsa_public_key, value
+    when attrs.key?("public_key")
+      write_attribute :public_key, value
     end
   end
 
