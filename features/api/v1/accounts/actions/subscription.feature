@@ -19,10 +19,16 @@ Feature: Account subscription actions
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/manage-subscription"
-    Then the response status should be "303"
+    Then the response status should be "200"
     And the response should contain the following headers:
       """
       { "Location": "https://billing.stripe.com/session/test_session_secret" }
+      """
+    And the JSON response should be meta with the following:
+      """
+      {
+        "url": "https://billing.stripe.com/session/test_session_secret"
+      }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
