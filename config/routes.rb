@@ -26,6 +26,7 @@ Rails.application.routes.draw do
         end
         member do
           scope "actions", module: "accounts/actions" do
+            post "manage-subscription", to: "subscription#manage"
             post "pause-subscription", to: "subscription#pause"
             post "resume-subscription", to: "subscription#resume"
             post "cancel-subscription", to: "subscription#cancel"

@@ -13,6 +13,21 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
     Then the response status should not be "403"
 
+  Scenario: Admin manages their subscription account
+    Given the account "test1" is subscribed
+    And I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "303"
+    And the response should contain the following headers:
+      """
+      { "Location": "https://billing.stripe.com/session/test_session_secret" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

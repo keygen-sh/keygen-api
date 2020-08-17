@@ -18,6 +18,10 @@ class AccountPolicy < ApplicationPolicy
     false
   end
 
+  def manage?
+    bearer.role? :admin
+  end
+
   def pause?
     bearer.role? :admin
   end
