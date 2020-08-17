@@ -49,7 +49,9 @@ module Api::V1
         billing.subscription_status = subscription.status
 
         billing.save
-      when "customer.source.created", "customer.source.updated"
+      when "customer.source.created",
+           "customer.source.updated",
+           "payment_method.attached"
         source = event.data.object
         return unless (source.respond_to?(:object) && source.object == 'card') ||
                       (source.respond_to?(:type) && source.type == 'card')
