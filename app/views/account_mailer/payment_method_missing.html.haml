@@ -4,6 +4,9 @@
   account's trial is ending, but you're missing a payment method. If you're ready to move
   forward with Keygen, you can add a payment method on your #{link_to "billing dashboard", "https://app.keygen.sh/billing"}.
   If you're undecided, no worries! Let me know if there's any way that I can help.
+- if @invoice.present?
+  %p
+    Alternatively, you can view and pay your invoice directly by #{link_to "following this link", @invoice.hosted_invoice_url}.
 %p
   Again, please #{link_to "reach out to me directly", "mailto:zeke@keygen.sh"} if
   you have any questions or concerns!
