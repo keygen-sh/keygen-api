@@ -31,11 +31,15 @@ class AccountMailerPreview < ActionMailer::Preview
   end
 
   def payment_method_missing
-    AccountMailer.payment_method_missing account: account
+    invoice = { hosted_invoice_url: 'https://pay.stripe.com/invoice/acct_17LRySBuIJAzxZqV/invst_HlevM2pFfEVxU1LkG2i8sdXyv2w7ftK' }
+
+    AccountMailer.payment_method_missing account: account, invoice: invoice
   end
 
   def payment_failed
-    AccountMailer.payment_failed account: account
+    invoice = { hosted_invoice_url: 'https://pay.stripe.com/invoice/acct_17LRySBuIJAzxZqV/invst_HlevM2pFfEVxU1LkG2i8sdXyv2w7ftK' }
+
+    AccountMailer.payment_failed account: account, invoice: invoice
   end
 
   def subscription_canceled

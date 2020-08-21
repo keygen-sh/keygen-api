@@ -102,9 +102,9 @@ module Api::V1
         return unless billing && !billing.canceling? && !billing.canceled?
 
         if billing.card.nil?
-          AccountMailer.payment_method_missing(account: billing.account, invoice: invoice).deliver_later
+          AccountMailer.payment_method_missing(account: billing.account, invoice: invoice.to_hash).deliver_later
         else
-          AccountMailer.payment_failed(account: billing.account, invoice: invoice).deliver_later
+          AccountMailer.payment_failed(account: billing.account, invoice: invoice.to_hash).deliver_later
         end
 
         billing.receipts.create(

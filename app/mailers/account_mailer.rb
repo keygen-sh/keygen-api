@@ -51,7 +51,7 @@ class AccountMailer < ApplicationMailer
 
   def payment_method_missing(account:, invoice: nil)
     @account = account
-    @invoice = invoice
+    @invoice = Stripe::Util.convert_to_stripe_object(invoice, symbolize_keys: true) if invoice.present?
 
     account.admins.each do |admin|
       @user = admin
@@ -62,7 +62,7 @@ class AccountMailer < ApplicationMailer
 
   def payment_failed(account:, invoice: nil)
     @account = account
-    @invoice = invoice
+    @invoice = Stripe::Util.convert_to_stripe_object(invoice, symbolize_keys: true) if invoice.present?
 
     account.admins.each do |admin|
       @user = admin
