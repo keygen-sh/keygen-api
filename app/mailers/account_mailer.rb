@@ -49,8 +49,9 @@ class AccountMailer < ApplicationMailer
     end
   end
 
-  def payment_method_missing(account:)
+  def payment_method_missing(account:, invoice: nil)
     @account = account
+    @invoice = invoice
 
     account.admins.each do |admin|
       @user = admin
@@ -59,8 +60,9 @@ class AccountMailer < ApplicationMailer
     end
   end
 
-  def payment_failed(account:)
+  def payment_failed(account:, invoice: nil)
     @account = account
+    @invoice = invoice
 
     account.admins.each do |admin|
       @user = admin
