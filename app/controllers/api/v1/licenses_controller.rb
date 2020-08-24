@@ -2,6 +2,7 @@
 
 module Api::V1
   class LicensesController < Api::V1::BaseController
+    has_scope :metadata, type: :hash, only: :index
     has_scope :suspended
     has_scope :expired
     has_scope :unassigned

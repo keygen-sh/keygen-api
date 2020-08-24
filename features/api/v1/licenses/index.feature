@@ -217,6 +217,69 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 2 "licenses"
 
+  Scenario: Admin retrieves 1 license filtered by metadata ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "id": "e029e80d-7649-4770-8744-74bd794ddc08" } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "id": "6f79fb2e-f072-44f6-b014-7e304bcf5fcd" } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-01be-4dc3-a8d4-c44ff2068a04" } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[id]=e029e80d"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves 1 license filtered by metadata ID and user email
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-7649-4770-8744-74bd794ddc08", "user": "foo-1@example.com" } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-f072-44f6-b014-7e304bcf5fcd", "user": "foo-2@example.com" } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-01be-4dc3-a8d4-c44ff2068a04", "user": "foo-3@example.com" } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f&metadata[user]=foo-1@example.com"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves 3 licenses filtered by metadata ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-7649-4770-8744-74bd794ddc08", "user": "foo-1@example.com" } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-f072-44f6-b014-7e304bcf5fcd", "user": "foo-2@example.com" } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "id": "9cd5a11f-01be-4dc3-a8d4-c44ff2068a04", "user": "foo-3@example.com" } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"

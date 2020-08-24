@@ -81,6 +81,7 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
+  scope :metadata, -> (meta) { search_metadata meta }
   scope :policy, -> (id) { where policy: id }
   scope :user, -> (id) { where user: id }
   scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
