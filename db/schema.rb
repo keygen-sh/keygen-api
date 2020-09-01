@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_19_164545) do
+ActiveRecord::Schema.define(version: 2020_09_01_161659) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -308,6 +308,7 @@ ActiveRecord::Schema.define(version: 2020_08_19_164545) do
     t.text "last_response_body"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
+    t.index ["event"], name: "index_webhook_events_on_event"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"
