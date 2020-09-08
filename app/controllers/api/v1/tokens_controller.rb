@@ -36,7 +36,7 @@ module Api::V1
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default
-            kwargs[:expiry] = user.role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
+            kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
           end
 
           token = TokenGeneratorService.new(

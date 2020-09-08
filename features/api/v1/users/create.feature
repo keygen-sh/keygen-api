@@ -180,6 +180,81 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer creates a user for their protected account
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: Sales creates a user for their protected account
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
+  Scenario: Support creates a user for their account
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin creates an admin for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -210,6 +285,28 @@ Feature: Create user
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Developer attempts to create an admin for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr.",
+            "lastName": "Robot",
+            "email": "ecorp@keygen.sh",
+            "password": "password",
+            "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
 
   Scenario: Admin attempts to create a user with an invalid role
     Given I am an admin of account "test1"

@@ -26,11 +26,13 @@ class User < ApplicationRecord
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
 
-  accepts_nested_attributes_for :role
+  accepts_nested_attributes_for :role, update_only: true
 
   before_destroy :enforce_admin_minimum_on_account!
+  before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }
+  before_create :set_user_role!, if: -> { role.nil? }
+
   before_save -> { self.email = email.downcase }
-  after_create :set_role, if: -> { role.nil? }
 
   validates :first_name, presence: true
   validates :last_name, presence: true
@@ -55,7 +57,7 @@ class User < ApplicationRecord
   end
 
   def intercom_id
-    return unless role? :admin
+    return unless has_role?(:admin)
 
     OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue nil
   end
@@ -63,7 +65,7 @@ class User < ApplicationRecord
   # Our async destroy logic needs to be a bit different to prevent accounts
   # from going under the minimum admin threshold
   def destroy_async
-    if role?(:admin) && account.admins.count <= MINIMUM_ADMIN_COUNT
+    if has_role?(:admin) && account.admins.count <= MINIMUM_ADMIN_COUNT
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
       return false
@@ -74,15 +76,24 @@ class User < ApplicationRecord
 
   private
 
-  def set_role
-    grant :user
+  def set_user_role!
+    grant! :user
   end
 
   def enforce_admin_minimum_on_account!
-    return if !role?(:admin) || account.admins.count >= MINIMUM_ADMIN_COUNT
+    return if !has_role?(:admin) && !was_role?(:admin)
 
-    errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
+    admin_count = account.admins.count
 
-    throw :abort
+    # Count is not accounting for the current role changes
+    if !has_role?(:admin) && was_role?(:admin)
+      admin_count -= 1
+    end
+
+    if admin_count < MINIMUM_ADMIN_COUNT
+      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
+
+      throw :abort
+    end
   end
 end

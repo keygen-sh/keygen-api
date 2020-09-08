@@ -154,7 +154,7 @@ class License < ApplicationRecord
   private
 
   def set_role
-    grant :license
+    grant! :license
   end
 
   def set_first_check_in

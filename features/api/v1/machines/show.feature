@@ -32,6 +32,33 @@ Feature: Show machine
     And the JSON response should be a "machine"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Developer retrieves a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+
+  Scenario: Sales retrieves a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+
+  Scenario: Support retrieves a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0"
+    Then the response status should be "200"
+
   Scenario: Admin retrieves a machine for their account by fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"

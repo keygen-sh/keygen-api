@@ -34,6 +34,33 @@ Feature: Account subscription actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Developer attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
+  Scenario: Sales attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
+  Scenario: Support attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

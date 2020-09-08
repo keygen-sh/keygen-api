@@ -36,6 +36,33 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer deletes one of their users
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 3 "users"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3"
+    Then the response status should be "204"
+
+  Scenario: Sales attempts to delete one of their users
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 3 "users"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3"
+    Then the response status should be "403"
+
+  Scenario: Support attempts to delete one of their users
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 3 "users"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3"
+    Then the response status should be "403"
+
   Scenario: Admin attempts to delete a user for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
@@ -95,3 +122,14 @@ Feature: Delete user
     When I send a DELETE request to "/accounts/test1/users/$current"
     Then the response status should be "422"
     And the current account should have 1 "admin"
+    And the first error should have the following properties:
+      """
+        {
+          "title": "Unprocessable resource",
+          "detail": "account must have at least 1 admin user",
+          "source": {
+            "pointer": "/data/relationships/account"
+          },
+          "code": "ACCOUNT_ADMINS_REQUIRED"
+        }
+      """

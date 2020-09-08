@@ -30,6 +30,6 @@ class Product < ApplicationRecord
   private
 
   def set_role
-    grant :product
+    grant! :product
   end
 end

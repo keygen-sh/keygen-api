@@ -22,6 +22,30 @@ Feature: Account plan relationship
     And the JSON response should be a "plan"
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Developer attempts to retrieve the plan for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "200"
+
+  Scenario: Sales attempts to retrieve the plan for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "200"
+
+  Scenario: Support attempts to retrieve the plan for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "200"
+
   Scenario: Product attempts to retrieve the plan for their account
     Given the account "test1" is subscribed
     And the account "test1" has 1 "product"

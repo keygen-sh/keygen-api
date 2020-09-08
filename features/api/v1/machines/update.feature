@@ -42,6 +42,69 @@ Feature: Update machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer updates a machine
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "name": "Home iMac"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  Scenario: Sales updates a machine
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "name": "Home iMac"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  Scenario: Support updates a machine
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "name": "Home iMac"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
   Scenario: Admin removes a machine's IP address
     Given I am an admin of account "test1"
     And the current account is "test1"
