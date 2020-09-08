@@ -26,6 +26,36 @@ Feature: List products
     Then the response status should be "200"
     And the JSON response should be an array with 3 "products"
 
+  Scenario: Developer retrieves all products for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 2 "products"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "products"
+
+  Scenario: Sales retrieves all products for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 2 "products"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "products"
+
+  Scenario: Support retrieves all products for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 5 "products"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "products"
+
   Scenario: Admin retrieves a paginated list of products
     Given I am an admin of account "test1"
     And the current account is "test1"

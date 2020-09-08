@@ -104,6 +104,78 @@ Feature: Create product
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer creates a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    And the current account has 2 "webhook-endpoints"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "url": "http://example.com",
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Sales attempts to create a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And I use an authentication token
+    And the current account has 2 "webhook-endpoints"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "url": "http://example.com",
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Support attempts to create a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And I use an authentication token
+    And the current account has 2 "webhook-endpoints"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "url": "http://example.com",
+            "platforms": ["iOS", "Android"]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create a product for their account
     Given the current account is "test1"
     And the current account has 1 "product"
