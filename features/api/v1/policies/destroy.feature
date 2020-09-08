@@ -52,11 +52,7 @@ Feature: Delete policy
     And the current account has 3 "policies"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$2"
-    Then the response status should be "204"
-    And the current account should have 2 "policies"
-    And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
+    Then the response status should be "403"
 
   Scenario: Support deletes one of their policies
     Given the current account is "test1"
