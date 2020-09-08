@@ -31,6 +31,39 @@ Feature: Delete machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer deletes one of their machines
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "machines"
+
+  Scenario: Sales deletes one of their machines
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "machines"
+
+  Scenario: Support deletes one of their machines
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "403"
+    And the current account should have 3 "machines"
+
   Scenario: Admin deletes one of their machines by fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"

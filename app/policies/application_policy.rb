@@ -37,7 +37,7 @@ class ApplicationPolicy
   end
 
   def search?
-    bearer.role?(:admin, :developer, :sales_agent, :support_agent)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
 
   def scope
@@ -58,15 +58,15 @@ class ApplicationPolicy
 
     def resolve
       case
-      when bearer.role?(:admin, :developer, :sales_agent, :support_agent)
+      when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
         scope.all
-      when scope.respond_to?(:bearer) && bearer.role?(:product, :user, :license)
+      when scope.respond_to?(:bearer) && bearer.has_role?(:product, :user, :license)
         scope.bearer bearer.id
-      when scope.respond_to?(:product) && bearer.role?(:product)
+      when scope.respond_to?(:product) && bearer.has_role?(:product)
         scope.product bearer.id
-      when scope.respond_to?(:user) && bearer.role?(:user)
+      when scope.respond_to?(:user) && bearer.has_role?(:user)
         scope.user bearer.id
-      when scope.respond_to?(:license) && bearer.role?(:license)
+      when scope.respond_to?(:license) && bearer.has_role?(:license)
         scope.license bearer.id
       else
         scope.none

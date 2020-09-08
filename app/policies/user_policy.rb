@@ -3,30 +3,36 @@
 class UserPolicy < ApplicationPolicy
 
   def index?
-    bearer.role?(:admin, :developer, :sales_agent, :support_agent, :product)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
   def show?
-    bearer.role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       resource == bearer
   end
 
   def create?
-    (bearer.present? and (bearer.role?(:admin, :developer, :sales_agent, :product))) ||
+    return false if resource.has_role?(:admin) &&
+                    !bearer.has_role?(:admin)
+
+    (bearer.present? && bearer.has_role?(:admin, :developer, :product)) ||
       !account.protected?
   end
 
   def update?
-    bearer.role?(:admin, :developer, :sales_agent, :product) ||
+    return false if resource.has_role?(:admin) &&
+                    !bearer.has_role?(:admin)
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :product) ||
       resource == bearer
   end
 
   def destroy?
-    bearer.role?(:admin, :developer)
+    bearer.has_role?(:admin, :developer)
   end
 
   def read_tokens?
-    bearer.role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource == bearer
   end
 

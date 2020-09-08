@@ -27,6 +27,39 @@ Feature: Show license
     And the JSON response should be a "license"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Developer retrieves a license for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Sales retrieves a license for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Support retrieves a license for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license"
+    And the response should contain a valid signature header for "test1"
+
   Scenario: Admin retrieves a license for their account with a valid accept header
     Given I am an admin of account "test1"
     And the current account is "test1"

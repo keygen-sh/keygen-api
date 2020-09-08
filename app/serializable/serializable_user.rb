@@ -54,7 +54,7 @@ class SerializableUser < SerializableBase
   end
 
   meta do
-    next unless @object.role? :admin
+    next unless @object.has_role? :admin
 
     {
       intercomId: @object.intercom_id

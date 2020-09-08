@@ -29,7 +29,7 @@ class Account < ApplicationRecord
   before_create -> { self.slug = slug.downcase }
   before_create :generate_keys!
 
-  after_create :set_founding_users_roles
+  before_create :set_founding_users_roles!
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -158,8 +158,8 @@ class Account < ApplicationRecord
 
   private
 
-  def set_founding_users_roles
-    users.each { |u| u.grant :admin }
+  def set_founding_users_roles!
+    users.each { |u| u.grant! :admin }
   end
 
   def generate_keys!

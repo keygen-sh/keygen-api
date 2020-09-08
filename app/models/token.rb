@@ -87,19 +87,19 @@ class Token < ApplicationRecord
   end
 
   def product_token?
-    bearer.role? :product
+    bearer.has_role? :product
   end
 
   def admin_token?
-    bearer.role? :admin
+    bearer.has_role? :admin
   end
 
   def user_token?
-    bearer.role? :user
+    bearer.has_role? :user
   end
 
   def activation_token?
-    bearer.role? :license
+    bearer.has_role? :license
   end
 
   def kind

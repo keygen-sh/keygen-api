@@ -61,6 +61,63 @@ Feature: Update user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer updates a user for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  Scenario: Sales updates a user for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  Scenario: Support updates a user for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin updates a user for their account including the wrong id
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -169,7 +226,7 @@ Feature: Update user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User updates attempts to promote themself to admin
+  Scenario: User attempts to promote themself to admin
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -192,6 +249,52 @@ Feature: Update user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
     And the account "test1" should have 1 "admin"
+
+  Scenario: Admin attempts to demote themself to user when they're not the only admin
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "admin"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+
+  Scenario: Admin attempts to demote themself to user when they're the only admin
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+        {
+          "title": "Unprocessable resource",
+          "detail": "account must have at least 1 admin user",
+          "source": {
+            "pointer": "/data/relationships/account"
+          },
+          "code": "ACCOUNT_ADMINS_REQUIRED"
+        }
+      """
 
   Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"

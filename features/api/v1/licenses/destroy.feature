@@ -31,6 +31,39 @@ Feature: Delete license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer deletes one of their licenses
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "licenses"
+
+  Scenario: Sales deletes one of their licenses
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "licenses"
+
+  Scenario: Support deletes one of their licenses
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$2"
+    Then the response status should be "403"
+    And the current account should have 3 "licenses"
+
   Scenario: User attempts to delete one of their licenses
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

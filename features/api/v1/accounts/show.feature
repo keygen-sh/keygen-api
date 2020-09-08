@@ -25,6 +25,30 @@ Feature: Show account
       """
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Developer retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+
+  Scenario: Sales retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+
+  Scenario: Support retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
     And I use an authentication token
