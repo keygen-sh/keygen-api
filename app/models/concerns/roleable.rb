@@ -14,10 +14,14 @@ module Roleable
   end
 
   def revoke(name)
-    role.destroy_async if role.name == name.to_s
+    return false if role.nil?
+
+    role.destroy if role.name == name.to_s
   end
 
-  def role?(name)
-    role&.name == name.to_s
+  def role?(*names)
+    return false if role.nil?
+
+    names.any? { |r| r.to_s == role.name }
   end
 end

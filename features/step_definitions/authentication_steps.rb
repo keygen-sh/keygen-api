@@ -2,17 +2,21 @@
 
 World Rack::Test::Methods
 
-Given /^I am an? (user|admin|product|license) of account "([^\"]*)"$/ do |role, slug|
+Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |role, slug|
   account = Account.find slug
   @bearer =
     case role
-    when "admin", "user"
-      account.users.roles(role).first
+    when "admin", "user", "developer", "sales agent", "support agent"
+      account.users.roles(role.parameterize.underscore).first
     when "product"
       account.products.first
     when "license"
       account.licenses.first
+    else
+      raise 'invalid role'
     end
+
+  raise 'failed to find bearer' if @bearer.nil?
 end
 
 Given /^I send the following headers:$/ do |body|

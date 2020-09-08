@@ -37,7 +37,7 @@ class ApplicationPolicy
   end
 
   def search?
-    bearer.role? :admin
+    bearer.role?(:admin, :developer, :sales_agent, :support_agent)
   end
 
   def scope
@@ -58,9 +58,9 @@ class ApplicationPolicy
 
     def resolve
       case
-      when bearer.role?(:admin)
+      when bearer.role?(:admin, :developer, :sales_agent, :support_agent)
         scope.all
-      when scope.respond_to?(:bearer) && (bearer.role?(:product) || bearer.role?(:user) || bearer.role?(:license))
+      when scope.respond_to?(:bearer) && bearer.role?(:product, :user, :license)
         scope.bearer bearer.id
       when scope.respond_to?(:product) && bearer.role?(:product)
         scope.product bearer.id

@@ -12,6 +12,18 @@ FactoryGirl.define do
       name :admin
     end
 
+    trait :developer do
+      name :developer
+    end
+
+    trait :sales_agent do
+      name :sales_agent
+    end
+
+    trait :support_agent do
+      name :support_agent
+    end
+
     trait :product do
       name :product
     end
