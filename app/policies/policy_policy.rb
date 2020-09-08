@@ -3,26 +3,31 @@
 class PolicyPolicy < ApplicationPolicy
 
   def index?
-    bearer.role? :admin or bearer.role? :product
+    bearer.role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
   def show?
-    bearer.role? :admin or resource.product == bearer
+    bearer.role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.product == bearer
   end
 
   def create?
-    bearer.role? :admin or resource.product == bearer
+    bearer.role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
   end
 
   def update?
-    bearer.role? :admin or resource.product == bearer
+    bearer.role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
   end
 
   def destroy?
-    bearer.role? :admin or resource.product == bearer
+    bearer.role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
   end
 
   def pop?
-    bearer.role? :admin or resource.product == bearer
+    bearer.role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
   end
 end
