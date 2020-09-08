@@ -363,7 +363,6 @@ Feature: License heartbeat actions
   # Reset
   Scenario: Anonymous resets a machine's heartbeat
     Given the current account is "test1"
-    And I am a license of account "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
