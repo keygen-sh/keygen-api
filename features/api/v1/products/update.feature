@@ -200,6 +200,79 @@ Feature: Update product
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer updates a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "id": "$products[0].id",
+          "attributes": {
+            "name": "Updated App"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "product" with the name "Updated App"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Sales updates a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "id": "$products[0].id",
+          "attributes": {
+            "name": "Updated App"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Support updates a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "id": "$products[0].id",
+          "attributes": {
+            "name": "Updated App"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates the platforms for itself
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
