@@ -51,7 +51,7 @@ module Api::V1::Licenses::Relationships
             pointer: "/data/relationships/policy"
           }
         )
-      when current_bearer.role?(:user) && new_policy&.protected?
+      when current_bearer.has_role?(:user) && new_policy&.protected?
         return render_forbidden
       end
 

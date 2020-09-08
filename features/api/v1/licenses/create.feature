@@ -52,6 +52,104 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer creates a license for a user of their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[2]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+
+  Scenario: Sales creates a license for a user of their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[2]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+
+  Scenario: Support attempts to create a license for a user of their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[2]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin creates a named license for a user of their account
     Given I am an admin of account "test1"
     And the current account is "test1"

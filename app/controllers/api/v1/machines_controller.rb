@@ -149,7 +149,7 @@ module Api::V1
             param :ip, type: :string, optional: true, allow_nil: true
             param :hostname, type: :string, optional: true, allow_nil: true
             param :platform, type: :string, optional: true, allow_nil: true
-            if current_bearer&.role?(:admin, :developer, :sales_agent, :product)
+            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
               param :metadata, type: :hash, optional: true
             end
           end

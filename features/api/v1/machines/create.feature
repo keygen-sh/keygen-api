@@ -52,6 +52,87 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer creates a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: Sales creates a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: Support attempts to create a machine for their account
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin creates a machine for their account with a UUID fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"

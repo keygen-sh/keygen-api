@@ -3,14 +3,14 @@
 class MetricPolicy < ApplicationPolicy
 
   def index?
-    bearer.role?(:admin, :developer, :sales_agent)
+    bearer.has_role?(:admin, :developer)
   end
 
   def show?
-    bearer.role?(:admin, :developer, :sales_agent)
+    bearer.has_role?(:admin, :developer)
   end
 
   def count?
-    bearer.role?(:admin, :developer, :sales_agent)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
 end

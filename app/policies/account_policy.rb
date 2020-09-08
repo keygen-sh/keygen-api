@@ -3,7 +3,7 @@
 class AccountPolicy < ApplicationPolicy
 
   def show?
-    bearer.role?(:admin, :developer, :sales_agent, :support_agent)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
 
   def create?
@@ -11,7 +11,7 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def update?
-    bearer.role?(:admin, :developer)
+    bearer.has_role?(:admin, :developer)
   end
 
   def destroy?
@@ -19,22 +19,22 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def manage?
-    bearer.role?(:admin)
+    bearer.has_role?(:admin)
   end
 
   def pause?
-    bearer.role?(:admin)
+    bearer.has_role?(:admin)
   end
 
   def resume?
-    bearer.role?(:admin)
+    bearer.has_role?(:admin)
   end
 
   def cancel?
-    bearer.role?(:admin)
+    bearer.has_role?(:admin)
   end
 
   def renew?
-    bearer.role?(:admin)
+    bearer.has_role?(:admin)
   end
 end

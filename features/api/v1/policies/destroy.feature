@@ -30,6 +30,44 @@ Feature: Delete policy
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer deletes one of their policies
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And I am a developer of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "policies"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Sales deletes one of their policies
+    Given the current account is "test1"
+    And the current account has 1 "sales-agent"
+    And I am a sales agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "policies"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Support deletes one of their policies
+    Given the current account is "test1"
+    And the current account has 1 "support-agent"
+    And I am a support agent of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "403"
+
   Scenario: Admin attempts to delete a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

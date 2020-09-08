@@ -94,7 +94,7 @@ module Api::V1
           param :attributes, type: :hash, optional: true do
             param :name, type: :string, optional: true
             param :key, type: :string, optional: true
-            if current_bearer&.role?(:admin, :developer, :sales_agent, :product)
+            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
               param :protected, type: :boolean, optional: true
               param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
               param :suspended, type: :boolean, optional: true
@@ -124,7 +124,7 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
-            if current_bearer&.role?(:admin, :developer, :sales_agent, :product)
+            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
               param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
               param :protected, type: :boolean, optional: true
               param :suspended, type: :boolean, optional: true
