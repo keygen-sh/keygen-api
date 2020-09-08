@@ -28,5 +28,26 @@ FactoryGirl.define do
         create :token, bearer: admin
       end
     end
+
+    factory :developer do
+      after :create do |dev|
+        dev.role = create :role, :developer, resource: dev
+        create :token, bearer: dev
+      end
+    end
+
+    factory :support_agent do
+      after :create do |agent|
+        agent.role = create :role, :support_agent, resource: agent
+        create :token, bearer: agent
+      end
+    end
+
+    factory :sales_agent do
+      after :create do |agent|
+        agent.role = create :role, :sales_agent, resource: agent
+        create :token, bearer: agent
+      end
+    end
   end
 end
