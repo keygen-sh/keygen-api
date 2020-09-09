@@ -42,6 +42,7 @@ Feature: Create user
       """
     Then the response status should be "201"
     And the JSON response should be a "user" with the firstName "Clark"
+    And the JSON response should be a "user" with the role "user"
     And the response should contain a valid signature header for "test1"
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
@@ -176,6 +177,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "user" with the role "user"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -282,6 +284,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "user" with the role "admin"
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -313,6 +316,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "user" with the role "developer"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -344,6 +348,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "user" with the role "sales-agent"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -375,6 +380,7 @@ Feature: Create user
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "user" with the role "support-agent"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
