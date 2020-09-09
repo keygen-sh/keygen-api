@@ -286,6 +286,99 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a developer for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      {
+        "subscriptions": ["user.created"]
+      }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr.",
+            "lastName": "Robot",
+            "email": "mr.robot@keygen.sh",
+            "password": "password",
+            "role": "developer"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a sales agent for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      {
+        "subscriptions": ["user.created"]
+      }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Jim",
+            "lastName": "Halpert",
+            "email": "jim@keygen.sh",
+            "password": "pam",
+            "role": "sales-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a support agent for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      {
+        "subscriptions": ["user.created"]
+      }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Pam",
+            "lastName": "Beesly",
+            "email": "beesly@keygen.sh",
+            "password": "jim",
+            "role": "support-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Developer attempts to create an admin for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
