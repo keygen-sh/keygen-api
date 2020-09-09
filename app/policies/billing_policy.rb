@@ -7,7 +7,7 @@ class BillingPolicy < ApplicationPolicy
   end
 
   def show?
-    bearer.has_role?(:admin)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
 
   def create?

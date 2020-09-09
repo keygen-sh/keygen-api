@@ -28,7 +28,7 @@ Feature: Account billing relationship
     And I am a developer of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
-    Then the response status should be "403"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Sales attempts to retrieve the billing info for their account
@@ -37,7 +37,7 @@ Feature: Account billing relationship
     And I am a sales agent of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
-    Then the response status should be "403"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Support attempts to retrieve the billing info for their account
@@ -46,7 +46,7 @@ Feature: Account billing relationship
     And I am a support agent of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/billing"
-    Then the response status should be "403"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Product attempts to retrieve the billing info for their account
