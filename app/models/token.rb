@@ -94,6 +94,18 @@ class Token < ApplicationRecord
     bearer.has_role? :admin
   end
 
+  def developer_token?
+    bearer.has_role? :developer
+  end
+
+  def sales_token?
+    bearer.has_role? :sales_agent
+  end
+
+  def support_token?
+    bearer.has_role? :support_agent
+  end
+
   def user_token?
     bearer.has_role? :user
   end
@@ -112,6 +124,12 @@ class Token < ApplicationRecord
       "user-token"
     when activation_token?
       "activation-token"
+    when developer_token?
+      "developer-token"
+    when sales_token?
+      "sales-token"
+    when support_token?
+      "support-token"
     else
       "token"
     end
