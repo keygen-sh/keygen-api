@@ -57,7 +57,7 @@ class User < ApplicationRecord
   end
 
   def intercom_id
-    return unless has_role?(:admin)
+    return unless has_role?(:admin, :developer)
 
     OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue nil
   end
