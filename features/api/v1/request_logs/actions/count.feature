@@ -8,14 +8,14 @@ Feature: Request log counts
       | Test 2  | test2 |
     And I send and accept JSON
 
-  Scenario: Endpoint should be inaccessible when account is disabled
+  Scenario: Endpoint should be accessible when account is disabled
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "request-logs"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/actions/count"
-    Then the response status should be "403"
+    Then the response status should be "200"
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves log counts for their account
