@@ -182,6 +182,69 @@ Feature: Update user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin promotes a user to developer for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "developer"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin promotes a user to sales for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "sales-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin promotes a user to support for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "support-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin promotes a user with an invalid role name for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
