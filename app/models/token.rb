@@ -60,11 +60,11 @@ class Token < ApplicationRecord
 
   def generate!(version: Tokenable::ALGO_VERSION)
     length =
-      case bearer_type.constantize
-      when User, Product
-        32
-      when License
+      case
+      when activation_token?
         16
+      else
+        32
       end
 
     @raw, enc = generate_hashed_token :digest, length: length, version: version do |token|

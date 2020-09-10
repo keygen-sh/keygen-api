@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Tokenable
+  # NOTE(ezekg) Remember to update tests to sample from new versions when changed
   ALGO_VERSION = "v3"
 
   extend ActiveSupport::Concern
