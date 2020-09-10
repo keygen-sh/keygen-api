@@ -68,14 +68,14 @@ Given /^I use an authentication token$/ do
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to
   # make sure we're backwards compatible.
-  @token.regenerate! version: %w[v1 v2].sample
+  @token.regenerate! version: %w[v1 v2 v3].sample
 
   header "Authorization", "Bearer #{@token.raw}"
 end
 
 Given /^I use an expired authentication token$/ do
   @token = @bearer.tokens.first_or_create account: @bearer.account
-  @token.regenerate! version: %w[v1 v2].sample
+  @token.regenerate! version: %w[v1 v2 v3].sample
   @token.update expiry: Time.current
 
   header "Authorization", "Bearer #{@token.raw}"
