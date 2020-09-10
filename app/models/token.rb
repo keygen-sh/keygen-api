@@ -59,12 +59,22 @@ class Token < ApplicationRecord
   end
 
   def generate!(version: Tokenable::ALGO_VERSION)
-    @raw, enc = generate_hashed_token :digest, version: version do |token|
+    length =
+      case bearer_type.constantize
+      when User, Product
+        32
+      when License
+        16
+      end
+
+    @raw, enc = generate_hashed_token :digest, length: length, version: version do |token|
       case version
       when "v1"
         "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
       when "v2"
         "#{kind[0..3]}-#{token}"
+      when "v3"
+        "#{prefix}_#{token}"
       end
     end
 
@@ -132,6 +142,27 @@ class Token < ApplicationRecord
       "support-token"
     else
       "token"
+    end
+  end
+
+  def prefix
+    case
+    when product_token?
+      :prod
+    when admin_token?
+      :admin
+    when user_token?
+      :user
+    when activation_token?
+      :activ
+    when developer_token?
+      :dev
+    when sales_token?
+      :sales
+    when support_token?
+      :spprt
+    else
+      :token
     end
   end
 end
