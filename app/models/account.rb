@@ -170,6 +170,7 @@ class Account < ApplicationRecord
   def generate_secret_key!
     self.secret_key = SecureRandom.hex 64
   end
+  alias_method :regenerate_secret_key!, :generate_secret_key!
 
   def generate_keys!
     priv = if private_key.nil?
