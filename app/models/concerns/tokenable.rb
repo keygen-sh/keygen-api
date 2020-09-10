@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Tokenable
-  ALGO_VERSION = "v2"
+  ALGO_VERSION = "v3"
 
   extend ActiveSupport::Concern
 
@@ -33,6 +33,13 @@ module Tokenable
         raw = yield raw if block_given?
 
         res = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, raw
+      when "v3"
+        raw = SecureRandom.hex(length) + version
+        raw = yield raw if block_given?
+
+        res = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, raw
+      else
+        raise NotImplementedError.new "token #{version} not implemented"
       end
 
       break [raw, res] unless self.class.exists? attribute => res
