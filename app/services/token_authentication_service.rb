@@ -35,6 +35,13 @@ class TokenAuthenticationService < BaseService
       end
 
       tok
+    when "v3"
+      digest = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, token
+      tok = Rails.cache.fetch(cache_key(digest), expires_in: 15.minutes) do
+        account.tokens.find_by digest: digest
+      end
+
+      tok
     end
   end
 
