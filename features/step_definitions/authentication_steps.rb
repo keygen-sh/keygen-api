@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq.sample
+TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq
 
 World Rack::Test::Methods
 
