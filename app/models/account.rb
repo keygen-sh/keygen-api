@@ -46,6 +46,10 @@ class Account < ApplicationRecord
 
   after_commit :clear_cache!, on: [:update, :destroy]
 
+  def email
+    admins.first.email
+  end
+
   # TODO(ezekg) Temp attributes for backwards compat during DSA/ECDSA deploy
   def private_key
     attrs = attributes
