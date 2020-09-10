@@ -27,6 +27,7 @@ class Account < ApplicationRecord
   accepts_nested_attributes_for :users
 
   before_create -> { self.slug = slug.downcase }
+  before_create :generate_secret_key!
   before_create :generate_keys!
 
   before_create :set_founding_users_roles!
@@ -164,6 +165,10 @@ class Account < ApplicationRecord
 
   def set_founding_users_roles!
     users.each { |u| u.grant! :admin }
+  end
+
+  def generate_secret_key!
+    self.secret_key = SecureRandom.hex 64
   end
 
   def generate_keys!

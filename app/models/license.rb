@@ -220,16 +220,16 @@ class License < ApplicationRecord
       # Replace first n characters with our id so that we can do a lookup
       # on the encrypted key
       token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
-            .scan(/.{#{UUID_LENGTH}}/).join "-"
+           .scan(/.{#{UUID_LENGTH}}/).join("-")
     end
 
     self.key = enc
   end
 
   def generate_unencrypted_key!
-    self.key = generate_token :key do |token|
-      token.gsub(/\A.{#{UUID_LENGTH}}/, id.delete("-"))
-           .scan(/.{#{UUID_LENGTH}}/).join "-"
+    self.key = generate_token :key, length: 16 do |token|
+      # Split every n characters, e.g. XXXX-XXXX-XXXX
+      token.scan(/.{1,6}/).join("-").upcase
     end
   end
 
