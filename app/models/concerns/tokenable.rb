@@ -60,6 +60,8 @@ module Tokenable
       b = BCrypt::Engine.hash_secret Digest::SHA256.digest(token), bcrypt.salt
     when "v2"
       b = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
+    when "v3"
+      b = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, token
     end
 
     secure_compare a, b
