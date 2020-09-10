@@ -9,6 +9,6 @@ class UserMailer < ApplicationMailer
     @account = @user.account
     @expiration_date = @user.password_reset_sent_at + 24.hours
 
-    mail to: user.email, subject: "Password reset requested for your #{@account.name} account"
+    mail to: user.email, reply_to: @account.email, subject: "Password reset requested for your #{@account.name} account"
   end
 end
