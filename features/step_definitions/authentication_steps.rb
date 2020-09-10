@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq.sample
+
 World Rack::Test::Methods
 
 Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |role, slug|
@@ -68,14 +70,14 @@ Given /^I use an authentication token$/ do
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to
   # make sure we're backwards compatible.
-  @token.regenerate! version: %w[v1 v2 v3].sample
+  @token.regenerate! version: TOKEN_VERSIONS.sample
 
   header "Authorization", "Bearer #{@token.raw}"
 end
 
 Given /^I use an expired authentication token$/ do
   @token = @bearer.tokens.first_or_create account: @bearer.account
-  @token.regenerate! version: %w[v1 v2 v3].sample
+  @token.regenerate! version: TOKEN_VERSIONS.sample
   @token.update expiry: Time.current
 
   header "Authorization", "Bearer #{@token.raw}"

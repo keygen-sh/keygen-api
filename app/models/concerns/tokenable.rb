@@ -62,6 +62,8 @@ module Tokenable
       b = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
     when "v3"
       b = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, token
+    else
+      raise NotImplementedError.new "token #{version} not implemented"
     end
 
     secure_compare a, b
