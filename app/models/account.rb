@@ -100,6 +100,10 @@ class Account < ApplicationRecord
     [:accounts, id].join ":"
   end
 
+  def cache_key
+    Account.cache_key id
+  end
+
   def self.clear_cache!(id)
     key = Account.cache_key id
 
