@@ -26,7 +26,7 @@ Feature: Typed parameters
       """
     Then the response status should be "201"
 
-  Scenario: User sends a request containing a type mismatch
+  Scenario: User sends a request containing a type mismatch (string => integer)
     Given I am an admin of account "spacex"
     And the current account is "spacex"
     And I use an authentication token
@@ -42,6 +42,68 @@ Feature: Typed parameters
       }
       """
     Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received integer expected string)",
+        "source": {
+          "pointer": "/data/attributes/name"
+        }
+      }
+      """
+
+  Scenario: User sends a request containing a type mismatch (object => string)
+    Given I am an admin of account "spacex"
+    And the current account is "spacex"
+    And I use an authentication token
+    When I send a POST request to "/v1/accounts/spacex/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "license",
+          "attributes": "{}"
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected object)",
+        "source": {
+          "pointer": "/data/attributes"
+        }
+      }
+      """
+
+  Scenario: User sends a request containing a type mismatch (integer => object)
+    Given I am an admin of account "spacex"
+    And the current account is "spacex"
+    And I use an authentication token
+    When I send a POST request to "/v1/accounts/spacex/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policy",
+          "attributes": {
+            "maxMachines": { "foo": "bar" }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received object expected integer)",
+        "source": {
+          "pointer": "/data/attributes/maxMachines"
+        }
+      }
+      """
 
   Scenario: User sends a request containing an unpermitted parameter
     Given I am an admin of account "tesla"

@@ -95,7 +95,12 @@ class TypedParameters
     end
 
     def self.class_type(c)
-      c.name.demodulize.underscore rescue nil
+      t = c.name.demodulize.underscore.to_sym rescue nil
+
+      # Rename hash => object for easier debugging (since most languages call a hash type an "object" or "dictionary")
+      t = :object if t == :hash || t == :hash_with_indifferent_access
+
+      t.to_s
     end
   end
 
@@ -186,20 +191,20 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced to #{type}"
+            raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced"
           end
         else
-          raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced (received #{type} expected one of #{COERCABLE_TYPES.keys.join ", "})"
+          raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced (expected one of #{COERCABLE_TYPES.keys.join ", "})"
         end
       end
 
       case
       when real_type.nil?
-        raise InvalidParameterError.new(pointer: keys.join("/")), "type is invalid (received #{type} expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "type is invalid (expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional && !allow_nil
         raise InvalidParameterError.new(pointer: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{type})"
+        raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
       when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
         raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
       when value.blank? && !allow_blank
@@ -240,7 +245,7 @@ class TypedParameters
                     if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
                       next
                     end
-                    raise InvalidParameterError.new(pointer: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested hash of scalar types)"
+                    raise InvalidParameterError.new(pointer: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
                   end
                 when Array
                   v.each_with_index do |v, i|
@@ -252,7 +257,7 @@ class TypedParameters
                 end
               end
             else
-              raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected hash of scalar types)"
+              raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected object of scalar types)"
             end
           end
 
