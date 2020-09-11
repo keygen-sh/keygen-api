@@ -74,7 +74,7 @@ class Token < ApplicationRecord
       when "v2"
         "#{kind[0..3]}-#{token}"
       when "v3"
-        "#{prefix}_#{token}"
+        "#{prefix}-#{token}"
       end
     end
 
