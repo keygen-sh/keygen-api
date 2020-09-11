@@ -40,14 +40,20 @@ class Token < ApplicationRecord
   #              store the raw token value.
   after_commit :clear_cache!, on: [:update, :destroy]
 
-  def self.cache_key(token)
-    hash = Digest::SHA256.hexdigest token
+  def self.cache_key(digest)
+    hash = Digest::SHA256.hexdigest digest
 
     [:tokens, hash].join ":"
   end
 
-  def self.clear_cache!(token)
-    key = Token.cache_key token
+  def cache_key
+    return if digest.nil?
+
+    Token.cache_key digest
+  end
+
+  def self.clear_cache!(digest)
+    key = Token.cache_key digest
 
     Rails.cache.delete key
   end
