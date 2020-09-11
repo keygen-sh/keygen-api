@@ -10,7 +10,9 @@ class TokenAuthenticationService < BaseService
 
   def execute
     return nil unless account.present? && token.present?
-    version = token[-2..-1] # TODO(ezekg) This can't handle token versions beyond v9 (2 chars)
+
+    # TODO(ezekg) This can't handle token versions beyond v9 (2 chars)
+    version = token[-2..-1]&.downcase
 
     case version
     when "v1"
