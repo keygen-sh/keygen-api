@@ -239,6 +239,20 @@ module Keygen
             }]
           }.to_json]
         ]
+      rescue ActionController::UnknownHttpMethod => e
+        [
+          400,
+          {
+            "Content-Type" => "application/vnd.api+json",
+          },
+          [{
+            errors: [{
+              title: "Bad request",
+              detail: "The HTTP method for the request is not valid",
+              code: "HTTP_METHOD_INVALID"
+            }]
+          }.to_json]
+        ]
       end
     end
 

@@ -704,3 +704,23 @@ Feature: Create account
         }
       }
       """
+
+  # Scenario: Anonymous sends an invalid HTTP method
+  #   When I send a INVALID request to "/accounts" with the following:
+  #     """
+  #     {
+  #       "data": {}
+  #     }
+  #     """
+  #   Then the response status should be "400"
+  #   And the JSON response should be an array of 1 errors
+  #   And the first error should have the following properties:
+  #     """
+  #     {
+  #       "title": "Unprocessable resource",
+  #       "detail": "must be a valid email",
+  #       "source": {
+  #         "pointer": "/data/relationships/admins/data/0/attributes/email"
+  #       }
+  #     }
+  #     """
