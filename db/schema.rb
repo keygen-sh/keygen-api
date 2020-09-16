@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_10_202414) do
+ActiveRecord::Schema.define(version: 2020_09_16_174908) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -178,6 +178,7 @@ ActiveRecord::Schema.define(version: 2020_09_10_202414) do
     t.boolean "concurrent", default: true
     t.integer "max_uses"
     t.string "scheme"
+    t.integer "heartbeat_duration"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

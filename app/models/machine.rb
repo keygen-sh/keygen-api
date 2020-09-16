@@ -58,6 +58,10 @@ class Machine < ApplicationRecord
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
+  def heartbeat_duration
+    policy.heartbeat_duration || HEARTBEAT_TTL
+  end
+
   def heartbeat_not_started?
     heartbeat_status == :NOT_STARTED
   end
@@ -77,7 +81,7 @@ class Machine < ApplicationRecord
   def next_heartbeat_at
     return nil if last_heartbeat_at.nil?
 
-    last_heartbeat_at + HEARTBEAT_TTL
+    last_heartbeat_at + heartbeat_duration
   end
 
   def requires_heartbeat?

@@ -21,6 +21,7 @@ class SerializablePolicy < SerializableBase
   attribute :require_check_in
   attribute :check_in_interval
   attribute :check_in_interval_count
+  attribute :heartbeat_duration
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

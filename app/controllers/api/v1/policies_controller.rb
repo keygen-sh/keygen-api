@@ -103,6 +103,7 @@ module Api::V1
             param :require_check_in, type: :boolean, optional: true
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
+            param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
@@ -136,6 +137,7 @@ module Api::V1
             param :require_check_in, type: :boolean, optional: true
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
+            param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
         end

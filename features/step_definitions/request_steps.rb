@@ -228,12 +228,10 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+)
 
   expect(json["data"]["type"]).to eq resource.pluralize
 
-  # FIXME(ezekg) This is really hacky, but can't figure out another way to
-  #              do this type of time validation in a reproducible way.
-  a = json["data"]["attributes"][attribute].to_time.change sec: 0, nsec: 0
-  b = value.to_time.change sec: 0, nsec: 0
+  t1 = json["data"]["attributes"][attribute].to_time
+  t2 = value.to_time
 
-  expect(a).to eq b
+  expect(t1).to be_within(3.seconds).of t2
 
   if @account.present?
     account_id = json["data"]["relationships"]["account"]["data"]["id"]
