@@ -59,7 +59,7 @@ class Machine < ApplicationRecord
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
   def heartbeat_duration
-    policy&.heartbeat_duration || HEARTBEAT_TTL
+    policy&.heartbeat_duration || HEARTBEAT_TTL.to_i
   end
 
   def heartbeat_not_started?
