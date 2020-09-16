@@ -12,6 +12,7 @@ class SerializableMachine < SerializableBase
     @object.requires_heartbeat?
   end
   attribute :heartbeat_status
+  attribute :heartbeat_duration
   attribute :last_heartbeat do
     @object.last_heartbeat_at
   end
