@@ -13,7 +13,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/machines
     def index
-      @machines = policy_scope apply_scopes(@product.machines.preload(:product))
+      @machines = policy_scope apply_scopes(@product.machines.preload(:product, :policy))
       authorize @machines
 
       render jsonapi: @machines
