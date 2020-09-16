@@ -18,7 +18,7 @@ module Api::V1
 
     # GET /machines
     def index
-      @machines = policy_scope apply_scopes(current_account.machines.preload(:product))
+      @machines = policy_scope apply_scopes(current_account.machines.preload(:product, :policy))
       authorize @machines
 
       render jsonapi: @machines
