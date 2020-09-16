@@ -2,7 +2,7 @@
 
 World Rack::Test::Methods
 
-Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
+Then /^sidekiq should have (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |count, resource, queued_at|
   case resource
   when "webhook"
     CreateWebhookEventsWorker.drain # Make sure our webhooks are created
@@ -17,6 +17,22 @@ Then /^sidekiq should have (\d+) "([^\"]*)" jobs?$/ do |count, resource|
   worker = "#{resource.singularize.underscore}_worker"
 
   expect(worker.classify.constantize.jobs.size).to eq count.to_i
+
+  if queued_at.present?
+    job = worker.classify.constantize.jobs.last
+    n, m = queued_at.split ' '
+
+    dt = n.to_f.send(m)
+    t1 = job['at']
+    t2 = dt.from_now.to_f
+
+    case m
+    when 'seconds', 'minutes'
+      expect(t1).to be_within(3.seconds).of t2
+    else
+      expect(t1).to be_within(1.minute).of t2
+    end
+  end
 end
 
 Then /^the (?:account|user) should receive an? "([^\"]*)" email$/ do |mailer|

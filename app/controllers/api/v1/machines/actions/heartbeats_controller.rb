@@ -44,7 +44,7 @@ module Api::V1::Machines::Actions
 
       # Queue up heartbeat worker which will handle deactivating dead machines
       MachineHeartbeatWorker.perform_in(
-        Machine::HEARTBEAT_TTL + Machine::HEARTBEAT_DRIFT,
+        @machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
         @machine.id
       )
 
