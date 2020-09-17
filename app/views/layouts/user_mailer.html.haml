@@ -168,7 +168,7 @@
                     %tr
                       %td.content-block
                         %p
-                          Hi #{@user.first_name},
+                          Hi #{@user.first_name || 'there'},
                         = yield
           .footer
             %table(border="0" cellpadding="0" cellspacing="0")
