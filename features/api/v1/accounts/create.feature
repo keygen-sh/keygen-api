@@ -115,7 +115,7 @@ Feature: Create account
       """
     Then the response status should be "201"
     And the JSON response should be an "account" with a slug that is not "keygen-sh"
-    And the JSON response should be an "account" with the name "keygen.sh"
+    And the JSON response should be an "account" with a name that is not "keygen.sh"
     And the account should receive a "welcome" email
 
   Scenario: Anonymous creates an account with a UUID slug with dashes
