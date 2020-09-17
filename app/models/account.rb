@@ -191,7 +191,7 @@ class Account < ApplicationRecord
 
     # Generate a random name if the current domain is a public email service
     # or if an account with the domain already exists
-    if PUBLIC_EMAIL_SERVICES.include?(domain) || Account.exists?(slug: autogen_slug)
+    if autogen_slug.nil? || PUBLIC_EMAIL_SERVICES.include?(domain) || Account.exists?(slug: autogen_slug)
       words = generate_words_for_name!
 
       autogen_name = words.join(' ')
@@ -208,7 +208,7 @@ class Account < ApplicationRecord
 
     # Generate a random slug if the current domain is a public email service
     # or if an account with the domain already exists
-    if PUBLIC_EMAIL_SERVICES.include?(domain) || Account.exists?(slug: autogen_slug)
+    if autogen_slug.nil? || PUBLIC_EMAIL_SERVICES.include?(domain) || Account.exists?(slug: autogen_slug)
       autogen_slug = "#{name}-#{SecureRandom.hex(4)}".downcase.parameterize
     end
 
