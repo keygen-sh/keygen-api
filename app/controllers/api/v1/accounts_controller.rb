@@ -20,34 +20,6 @@ module Api::V1
       @account = Account.new account_params
       authorize @account
 
-      # Use the admin's email domain as a fallback account name (maybe use Clearbit here?)
-      admin, _ = account_params.fetch(:users_attributes, [])
-      email = admin&.fetch(:email)
-
-      # Extract the domain so that we can for the account's name and slug
-      domain = email&.[](/[^@]+@(.+)/, 1)
-
-      if @account.slug.nil?
-        # Parameterize the domain, i.e. keygen.sh => keygen-sh
-        slug = domain&.parameterize
-
-        # Generate a random slug if the current one is nil, a public email
-        # service, or if an account with that slug already exists.
-        if slug.nil? || PUBLIC_EMAIL_SERVICES.include?(domain) || Account.exists?(slug: slug)
-          trek_word = Faker::TvShows::StarTrek.location
-          sw_word =  Faker::Movies::StarWars.planet
-          color = Faker::Color.color_name
-
-          slug = "acct-#{color}-#{sw_word}-#{trek_word}-#{SecureRandom.hex(4)}".downcase.parameterize
-        end
-
-        @account.slug = slug
-      end
-
-      if @account.name.nil?
-        @account.name = domain
-      end
-
       if @account.save
         render jsonapi: @account, status: :created, location: v1_account_url(@account)
       else
