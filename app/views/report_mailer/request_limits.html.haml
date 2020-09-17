@@ -18,6 +18,6 @@
           #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
         %br
         %strong Plan:
-        %span #{report.account.plan.name} / #{report.account.billing.state}
+        %span #{report.account.plan.name} @ #{report.account.plan.price} / #{report.account.billing.state}
 - else
   %p Nothing to report
