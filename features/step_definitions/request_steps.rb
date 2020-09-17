@@ -149,6 +149,24 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?
   end
 end
 
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+) that is not "([^\"]*)"$/ do |resource, attribute, value|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  case attribute
+  when "id"
+    expect(json["data"]["id"]).to_not eq value.to_s
+  else
+    expect(json["data"]["attributes"][attribute].to_s).to_not eq value.to_s
+  end
+
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
+
+    expect(account_id).to eq @account.id
+  end
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (?:encrypted|signed|jwt) key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
   json = JSON.parse last_response.body
 

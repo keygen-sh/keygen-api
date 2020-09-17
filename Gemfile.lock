@@ -68,7 +68,7 @@ GEM
       xpath (~> 3.2)
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)
-    concurrent-ruby (1.1.5)
+    concurrent-ruby (1.1.7)
     connection_pool (2.2.2)
     crass (1.0.4)
     css_parser (1.6.0)
@@ -113,8 +113,8 @@ GEM
     factory_girl_rails (4.8.0)
       factory_girl (~> 4.8.0)
       railties (>= 3.0.0)
-    faker (1.6.6)
-      i18n (~> 0.5)
+    faker (2.14.0)
+      i18n (>= 1.6, < 2)
     ffi (1.9.25)
     fugit (1.1.6)
       et-orbi (~> 1.1, >= 1.1.6)
@@ -145,7 +145,7 @@ GEM
       domain_name (~> 0.5)
     httparty (0.16.2)
       multi_xml (>= 0.5.2)
-    i18n (0.9.5)
+    i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     json (2.3.1)
     jsonapi-deserializable (0.2.0)
@@ -381,7 +381,7 @@ DEPENDENCIES
   database_cleaner
   dotenv-rails
   factory_girl_rails (= 4.8.0)
-  faker (~> 1.6.3)
+  faker (~> 2.14.0)
   haml-rails
   has_scope
   hiredis
