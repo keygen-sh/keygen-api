@@ -175,9 +175,9 @@ class Account < ApplicationRecord
   end
 
   def generate_words_for_name!
-    color = Faker::Color.color_name.capitalize
-    trek_word = Faker::TvShows::StarTrek.location
-    sw_word = Faker::Movies::StarWars.planet
+    color = AUTOGEN_SLUG_COLORS.sample
+    trek_word = AUTOGEN_SLUG_STAR_TREK.sample
+    sw_word = AUTOGEN_SLUG_STAR_WARS.sample
 
     [color, trek_word, sw_word]
   end
