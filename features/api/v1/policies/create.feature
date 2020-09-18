@@ -311,7 +311,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Long Heartbeat Policy",
-            "maxUses": 604800
+            "heartbeatDuration": 604800
           },
           "relationships": {
             "product": {
@@ -326,7 +326,43 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the name "Long Heartbeat Policy"
-    And the JSON response should be a "policy" with the maxUses "604800"
+    And the JSON response should be a "policy" with the heartbeatDuration "604800"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that does not have a custom heartbeat duration
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Normal Heartbeat Policy"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Normal Heartbeat Policy"
+    And the JSON response should be a "policy" with a nil heartbeatDuration
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
