@@ -76,6 +76,7 @@ Rails.application.routes.draw do
         # NOTE(ezekg) Users are queryable by email attr.
         resources "users", constraints: { id: /[^\/]*/ } do
           scope module: "users/relationships" do
+            resources "second_factors", path: "second-factors", only: [:index, :show, :create, :update, :destroy]
             resources "products", only: [:index, :show]
             resources "licenses", only: [:index, :show]
             resources "machines", only: [:index, :show]

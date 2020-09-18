@@ -48,6 +48,11 @@ class SerializableUser < SerializableBase
       @url_helpers.v1_account_user_tokens_path @object.account_id, @object
     end
   end
+  relationship :second_factors do
+    link :related do
+      @url_helpers.v1_account_user_second_factors_path @object.account_id, @object
+    end
+  end
 
   link :self do
     @url_helpers.v1_account_user_path @object.account_id, @object
