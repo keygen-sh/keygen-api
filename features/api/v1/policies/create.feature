@@ -367,6 +367,53 @@ Feature: Create policy
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy with a custom heartbeat duration that is too short
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Short Heartbeat Policy",
+            "heartbeatDuration": 60
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than or equal to 120 (2 minutes)",
+        "code": "HEARTBEAT_DURATION_INVALID",
+        "source": {
+          "pointer": "/data/attributes/heartbeatDuration"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a policy that has a heartbeat duration that exceeds the max value of a 4 byte integer
     Given I am an admin of account "test1"
     And the current account is "test1"
