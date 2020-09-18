@@ -69,9 +69,6 @@ gem 'barnes'
 # Dyno management
 gem 'whacamole'
 
-# Data generators
-gem 'faker', '~> 2.14.0'
-
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
@@ -93,4 +90,5 @@ group :test do
   gem 'rspec-expectations'
   gem 'factory_girl_rails', '4.8.0'
   gem 'database_cleaner'
+  gem 'faker', '~> 2.14.0'
 end
