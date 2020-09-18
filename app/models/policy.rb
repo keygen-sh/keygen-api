@@ -37,7 +37,7 @@ class Policy < ApplicationRecord
   validates :duration, numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true
   validates :duration, numericality: { greater_than_or_equal_to: 1.day.to_i, message: "must be greater than or equal to 86400 (1 day)" }, allow_nil: true
   validates :heartbeat_duration, numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true
-  validates :heartbeat_duration, numericality: { greater_than_or_equal_to: 1.minute.to_i, message: "must be greater than or equal to 86400 (1 day)" }, allow_nil: true
+  validates :heartbeat_duration, numericality: { greater_than_or_equal_to: 2.minutes.to_i, message: "must be greater than or equal to 120 (2 minutes)" }, allow_nil: true
   validates :max_machines, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true
   validates :max_machines, numericality: { greater_than_or_equal_to: 1, message: "must be greater than or equal to 1 for floating policy" }, allow_nil: true, if: :floating?
   validates :max_machines, numericality: { equal_to: 1, message: "must be equal to 1 for non-floating policy" }, allow_nil: true, if: :node_locked?
