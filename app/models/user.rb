@@ -20,6 +20,7 @@ class User < ApplicationRecord
   has_secure_password
 
   belongs_to :account
+  has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :products, -> { reorder(nil).select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').order(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
   has_many :machines, through: :licenses
@@ -66,6 +67,16 @@ class User < ApplicationRecord
     return unless has_role?(:admin, :developer)
 
     OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue ''
+  end
+
+  def second_factor_enabled?
+    return false if second_factors.empty?
+
+    # We only allow a single 2FA key right now, but we may allow more later,
+    # e.g. multiple 2FA keys, or U2F.
+    second_factor = second_factors.last
+
+    second_factor.enabled?
   end
 
   # Our async destroy logic needs to be a bit different to prevent accounts

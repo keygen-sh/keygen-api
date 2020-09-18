@@ -26,6 +26,7 @@ class CreateWebhookEventService < BaseService
         WebhookEndpoint: SerializableWebhookEndpoint,
         WebhookEvent: SerializableWebhookEvent,
         Metric: SerializableMetric,
+        SecondFactor: SerializableSecondFactor,
         Error: SerializableError
       }
     }
