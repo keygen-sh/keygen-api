@@ -30,6 +30,9 @@ gem 'pundit'
 gem 'openssl'
 gem 'jwt'
 
+# 2FA/TOTP
+gem 'rotp'
+
 # Scopes and pagination
 gem 'has_scope'
 gem 'kaminari', '~> 1.2.0'

@@ -38,6 +38,7 @@ class RetryWebhookEventService < BaseService
         WebhookEndpoint: SerializableWebhookEndpoint,
         WebhookEvent: SerializableWebhookEvent,
         Metric: SerializableMetric,
+        SecondFactor: SerializableSecondFactor,
         Error: SerializableError
       }
     }).to_json

@@ -51,6 +51,7 @@ describe CreateWebhookEventService do
         WebhookEndpoint: SerializableWebhookEndpoint,
         WebhookEvent: SerializableWebhookEvent,
         Metric: SerializableMetric,
+        SecondFactor: SerializableSecondFactor,
         Error: SerializableError
       }
     }

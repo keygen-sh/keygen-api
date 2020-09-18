@@ -296,6 +296,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rotp (6.1.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
     rspec-expectations (3.8.2)
@@ -423,6 +424,7 @@ DEPENDENCIES
   rails_autoscale_agent
   raygun4ruby (~> 3.2.1)
   redis
+  rotp
   rspec-expectations
   rspec-rails (~> 3.5)
   sass-rails

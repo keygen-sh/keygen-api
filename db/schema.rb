@@ -252,6 +252,21 @@ ActiveRecord::Schema.define(version: 2020_10_01_141046) do
     t.index ["resource_id", "resource_type", "created_at"], name: "index_roles_on_resource_id_and_resource_type_and_created_at"
   end
 
+  create_table "second_factors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "user_id", null: false
+    t.text "secret", null: false
+    t.boolean "enabled", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_second_factors_on_account_id_and_created_at"
+    t.index ["enabled"], name: "index_second_factors_on_enabled"
+    t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
+    t.index ["secret"], name: "index_second_factors_on_secret", unique: true
+    t.index ["user_id", "created_at"], name: "index_second_factors_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_second_factors_on_user_id", unique: true
+  end
+
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "digest"
     t.string "bearer_type"
