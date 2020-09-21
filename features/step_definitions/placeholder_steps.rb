@@ -27,6 +27,7 @@ PLACEHOLDERS = %w[
   time
   null_byte
   event_types
+  otp
 ]
 
 # Matches:
@@ -91,6 +92,8 @@ def parse_placeholders!(str)
         event = index
         event_type = EventType.find_or_create_by! event: event
         event_type.id
+      when "otp"
+        ROTP::TOTP.new(@second_factor.secret).now
       else
         model =
           if @account && resource.singularize != 'account'
