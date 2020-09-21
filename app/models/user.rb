@@ -70,19 +70,19 @@ class User < ApplicationRecord
   end
 
   def second_factor_enabled?
-    return false if second_factors.empty?
+    return false if second_factors.enabled.empty?
 
     # We only allow a single 2FA key right now, but we may allow more later,
     # e.g. multiple 2FA keys, or U2F.
-    second_factor = second_factors.last
+    second_factor = second_factors.enabled.last
 
     second_factor.enabled?
   end
 
   def verify_second_factor(otp)
-    return false if second_factors.empty?
+    return false if second_factors.enabled.empty?
 
-    second_factor = second_factors.last
+    second_factor = second_factors.enabled.last
 
     second_factor.verify(otp)
   end
