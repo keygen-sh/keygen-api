@@ -80,9 +80,9 @@ class User < ApplicationRecord
   end
 
   def verify_second_factor(otp)
-    return false if second_factors.empty?
+    return false unless second_factor_enabled?
 
-    second_factor = second_factors.last
+    second_factor = second_factors.enabled.last
 
     second_factor.verify(otp)
   end
