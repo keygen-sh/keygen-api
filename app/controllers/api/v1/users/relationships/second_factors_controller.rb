@@ -56,7 +56,8 @@ module Api::V1::Users::Relationships
       @second_factor = @user.second_factors.find params[:id]
       authorize @second_factor
 
-      if !@user.verify_second_factor(second_factor_meta[:otp])
+      # Verify this particular second factor (which may not be enabled yet)
+      if !@second_factor.verify(second_factor_meta[:otp])
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
