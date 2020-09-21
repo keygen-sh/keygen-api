@@ -32,6 +32,10 @@ module Api::V1
       authenticate_with_http_basic do |email, password|
         user = current_account.users.find_by email: "#{email}".downcase
 
+        if user&.second_factor_enabled? && !user.verify_second_factor(token_meta[:otp])
+          render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+        end
+
         if user&.authenticate(password)
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
@@ -137,6 +141,9 @@ module Api::V1
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
           end
+        end
+        param :meta, type: :hash, optional: true do
+          param :otp, type: :string
         end
       end
     end

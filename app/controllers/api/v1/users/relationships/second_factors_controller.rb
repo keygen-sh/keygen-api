@@ -29,7 +29,7 @@ module Api::V1::Users::Relationships
       authorize @second_factor
 
       if !@user.authenticate(second_factor_meta[:password])
-        render_unauthorized detail: 'credentials must be valid', code: 'PASSWORD_INVALID'
+        render_unauthorized detail: 'credentials must be valid', code: 'PASSWORD_INVALID', source: { pointer: '/meta/password' } and return
       end
 
       if @second_factor.save
@@ -51,7 +51,7 @@ module Api::V1::Users::Relationships
       authorize @second_factor
 
       if !@user.verify_second_factor(second_factor_meta[:otp])
-        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID'
+        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
       if @second_factor.update(second_factor_params)
@@ -73,7 +73,7 @@ module Api::V1::Users::Relationships
       authorize @second_factor
 
       if !@user.verify_second_factor(second_factor_meta[:otp])
-        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID'
+        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
       CreateWebhookEventService.new(

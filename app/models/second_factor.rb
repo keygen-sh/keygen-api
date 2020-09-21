@@ -22,7 +22,7 @@ class SecondFactor < ApplicationRecord
 
   def verify(otp)
     totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
-    ts = totp.verify(otp, after: last_verified_at.to_i)
+    ts = totp.verify(otp.to_s, after: last_verified_at.to_i)
 
     if ts.present?
       update(last_verified_at: Time.at(ts))
