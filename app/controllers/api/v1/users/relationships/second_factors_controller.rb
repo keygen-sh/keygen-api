@@ -28,6 +28,10 @@ module Api::V1::Users::Relationships
       @second_factor = @user.second_factors.new account: current_account
       authorize @second_factor
 
+      if @user.second_factor_enabled? && !@user.verify_second_factor(second_factor_meta[:otp])
+        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+      end
+
       if !@user.authenticate(second_factor_meta[:password])
         render_unauthorized detail: 'credentials must be valid', code: 'PASSWORD_INVALID', source: { pointer: '/meta/password' } and return
       end
@@ -96,7 +100,8 @@ module Api::V1::Users::Relationships
 
       on :create do
         param :meta, type: :hash do
-          param :password, type: :string
+          param :password, type: :string, optional: true
+          param :otp, type: :string, optional: true
         end
       end
 
