@@ -11,7 +11,7 @@ class CreateWebhookEventService < BaseService
 
   def execute
     options = {
-      expose: { url_helpers: Rails.application.routes.url_helpers },
+      expose: { url_helpers: Rails.application.routes.url_helpers, context: :webhook },
       class: {
         Account: SerializableAccount,
         Token: SerializableToken,
