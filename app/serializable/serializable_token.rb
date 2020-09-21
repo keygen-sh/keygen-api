@@ -4,7 +4,7 @@ class SerializableToken < SerializableBase
   type :tokens
 
   attribute :kind
-  attribute :token, if: -> { @object.raw.present? } do
+  attribute :token, if: -> { @object.raw.present? && @context != :webhook } do
     @object.raw
   end
   attribute :expiry

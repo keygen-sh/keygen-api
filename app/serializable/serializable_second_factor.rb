@@ -3,7 +3,7 @@
 class SerializableSecondFactor < SerializableBase
   type "second-factor"
 
-  attribute :uri, if: -> { @object.uri.present? } do
+  attribute :uri, if: -> { @object.uri.present? && @context != :webhook } do
     @object.uri
   end
   attribute :enabled
