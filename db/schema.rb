@@ -257,13 +257,12 @@ ActiveRecord::Schema.define(version: 2020_10_01_141046) do
     t.uuid "user_id", null: false
     t.text "secret", null: false
     t.boolean "enabled", default: false, null: false
+    t.datetime "last_verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_second_factors_on_account_id_and_created_at"
-    t.index ["enabled"], name: "index_second_factors_on_enabled"
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
     t.index ["secret"], name: "index_second_factors_on_secret", unique: true
-    t.index ["user_id", "created_at"], name: "index_second_factors_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_second_factors_on_user_id", unique: true
   end
 

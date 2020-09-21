@@ -5,15 +5,14 @@ class CreateSecondFactors < ActiveRecord::Migration[5.2]
       t.uuid :user_id, null: false
       t.text :secret, null: false
       t.boolean :enabled, null: false, default: false
+      t.datetime :last_verified_at
 
       t.timestamps
     end
 
     add_index :second_factors, [:id, :created_at], unique: true
     add_index :second_factors, [:account_id, :created_at]
-    add_index :second_factors, [:user_id, :created_at]
     add_index :second_factors, :user_id, unique: true
     add_index :second_factors, :secret, unique: true
-    add_index :second_factors, :enabled
   end
 end
