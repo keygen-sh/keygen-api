@@ -324,6 +324,12 @@ class TypedParameters
 
           define_method "#{resource}_parameters", &method
           define_method "#{resource}_params", &method
+
+          define_method "#{resource}_meta" do
+            @_typed_parameters ||= TypedParameters.build self, &block
+
+            @_typed_parameters.fetch(:meta, {})
+          end
         end
         alias_method :typed_params, :typed_parameters
       end
