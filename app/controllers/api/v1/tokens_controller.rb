@@ -32,8 +32,15 @@ module Api::V1
       authenticate_with_http_basic do |email, password|
         user = current_account.users.find_by email: "#{email}".downcase
 
-        if user&.second_factor_enabled? && !user.verify_second_factor(token_meta[:otp])
-          render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+        if user&.second_factor_enabled?
+          otp = token_meta[:otp]
+          if otp.nil?
+            render_unauthorized detail: 'second factor is required', code: 'OTP_REQUIRED', source: { pointer: '/meta/otp' } and return
+          end
+
+          if !user.verify_second_factor(otp)
+            render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+          end
         end
 
         if user&.authenticate(password)
