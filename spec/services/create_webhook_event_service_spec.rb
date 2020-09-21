@@ -247,4 +247,51 @@ describe CreateWebhookEventService do
 
     expect { create_webhook_event! }.to raise_error Exception
   end
+
+  context 'when serializing resources with sensitive secrets' do
+    it 'the account payload should not contain private keys' do
+      @resource = create(:account)
+
+      event = create_webhook_event!
+      payload = JSON.parse(event.payload)
+      attrs = payload.dig('data', 'attributes')
+      meta = payload.fetch('meta', {})
+
+      expect(attrs.key?('privateKeys')).to eq false
+      expect(attrs.key?('privateKey')).to eq false
+
+      expect(meta.key?('privateKeys')).to eq false
+      expect(meta.key?('privateKey')).to eq false
+    end
+
+    it 'the token payload should not contain one-time secret token' do
+      @resource = create(:token)
+
+      event = create_webhook_event!
+      payload = JSON.parse(event.payload)
+      attrs = payload.dig('data', 'attributes')
+
+      expect(attrs.key?('token')).to eq false
+    end
+
+    it 'the second factor payload should not contain one-time secret uri' do
+      @resource = create(:second_factor)
+
+      event = create_webhook_event!
+      payload = JSON.parse(event.payload)
+      attrs = payload.dig('data', 'attributes')
+
+      expect(attrs.key?('uri')).to eq false
+    end
+
+    it 'the user payload should not contain password' do
+      @resource = create(:user)
+
+      event = create_webhook_event!
+      payload = JSON.parse(event.payload)
+      attrs = payload.dig('data', 'attributes')
+
+      expect(attrs.key?('password')).to eq false
+    end
+  end
 end
