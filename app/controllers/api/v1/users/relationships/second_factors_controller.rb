@@ -28,18 +28,20 @@ module Api::V1::Users::Relationships
       @second_factor = @user.second_factors.new account: current_account
       authorize @second_factor
 
-      # TODO(ezekg) Prompt for password
+      if !@user.authenticate(second_factor_meta[:password])
+        render_unauthorized detail: 'credentials must be valid', code: 'PASSWORD_INVALID'
+      end
 
       if @second_factor.save
         CreateWebhookEventService.new(
-          event: "second-factor.created",
+          event: 'second-factor.created',
           account: current_account,
           resource: @second_factor
         ).execute
 
         render jsonapi: @second_factor, status: :created, location: v1_account_user_second_factor_url(@second_factor.account, @second_factor.user, @second_factor)
       else
-        render_unprocessable_resource @machine
+        render_unprocessable_resource @second_factor
       end
     end
 
@@ -48,11 +50,13 @@ module Api::V1::Users::Relationships
       @second_factor = @user.second_factors.find params[:id]
       authorize @second_factor
 
-      # TODO(ezekg) Prompt for TOTP
+      if !@user.verify_second_factor(second_factor_meta[:otp])
+        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID'
+      end
 
       if @second_factor.update(second_factor_params)
         CreateWebhookEventService.new(
-          event: @second_factor.enabled? ? "second-factor.enabled" : "second-factor.disabled",
+          event: @second_factor.enabled? ? 'second-factor.enabled' : 'second-factor.disabled',
           account: current_account,
           resource: @second_factor
         ).execute
@@ -65,12 +69,15 @@ module Api::V1::Users::Relationships
 
     # DELETE /users/1/second-factors/1
     def destroy
+      @second_factor = @user.second_factors.find params[:id]
       authorize @second_factor
 
-      # TODO(ezekg) Prompt for TOTP
+      if !@user.verify_second_factor(second_factor_meta[:otp])
+        render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID'
+      end
 
       CreateWebhookEventService.new(
-        event: "second-factor.deleted",
+        event: 'second-factor.deleted',
         account: current_account,
         resource: @second_factor
       ).execute
@@ -87,6 +94,12 @@ module Api::V1::Users::Relationships
     typed_parameters transform: true do
       options strict: true
 
+      on :create do
+        param :meta, type: :hash do
+          param :password, type: :string
+        end
+      end
+
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors]
@@ -94,6 +107,15 @@ module Api::V1::Users::Relationships
           param :attributes, type: :hash do
             param :enabled, type: :boolean
           end
+        end
+        param :meta, type: :hash do
+          param :otp, type: :string
+        end
+      end
+
+      on :destroy do
+        param :meta, type: :hash do
+          param :otp, type: :string
         end
       end
     end
