@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SecondFactor < ApplicationRecord
+  SECOND_FACTOR_ISSUER = 'Keygen'
+
   include Limitable
   include Pageable
 
@@ -18,6 +20,12 @@ class SecondFactor < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
 
+  def verify(otp)
+    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
+
+    totp.verify(otp)
+  end
+
   private
 
   def generate_secret!
@@ -25,7 +33,7 @@ class SecondFactor < ApplicationRecord
   end
 
   def generate_uri!
-    totp = ROTP::TOTP.new(secret, issuer: 'Keygen')
+    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
 
     @uri = totp.provisioning_uri(user.email)
   end

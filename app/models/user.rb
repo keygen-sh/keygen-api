@@ -79,6 +79,14 @@ class User < ApplicationRecord
     second_factor.enabled?
   end
 
+  def verify_second_factor(otp)
+    return false if second_factors.empty?
+
+    second_factor = second_factors.last
+
+    second_factor.verify(otp)
+  end
+
   # Our async destroy logic needs to be a bit different to prevent accounts
   # from going under the minimum admin threshold
   def destroy_async
