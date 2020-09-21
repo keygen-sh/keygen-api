@@ -21,6 +21,12 @@ Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|li
   raise 'failed to find bearer' if @bearer.nil?
 end
 
+Given /^I have 2FA (enabled|disabled)$/ do |second_factor_status|
+  @second_factor = SecondFactor.new user: @bearer, account: @bearer.account
+  @second_factor.enabled = second_factor_status == 'enabled'
+  @second_factor.save
+end
+
 Given /^I send the following headers:$/ do |body|
   parse_placeholders! body
   headers = JSON.parse body

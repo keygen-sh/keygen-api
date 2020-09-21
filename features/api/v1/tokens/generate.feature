@@ -38,6 +38,87 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin with 2FA enabled generates a new token via basic authentication without an OTP code
+    Given I am an admin of account "test1"
+    And I have 2FA enabled
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "meta": {
+
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "pointer": "/meta/otp"
+        }
+      }
+      """
+
+  Scenario: Admin with 2FA enabled generates a new token via basic authentication with an invalid OTP code
+    Given I am an admin of account "test1"
+    And I have 2FA enabled
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "meta": {
+          "otp": "000000"
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "second factor must be valid",
+        "code": "OTP_INVALID",
+        "source": {
+          "pointer": "/meta/otp"
+        }
+      }
+      """
+
+  Scenario: Admin with 2FA enabled generates a new token via basic authentication with a valid OTP code
+    Given I am an admin of account "test1"
+    And I have 2FA enabled
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "admin-token"
+      }
+      """
+
   Scenario: Developer generates a new token via basic authentication
     Given the current account is "test1"
     And the current account has 1 "developer"
