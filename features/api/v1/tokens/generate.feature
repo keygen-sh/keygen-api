@@ -45,21 +45,15 @@ Feature: Generate authentication token
       """
       { "Authorization": "Basic \"$users[0].email:password\"" }
       """
-    When I send a POST request to "/accounts/test1/tokens" with the following:
-      """
-      {
-        "meta": {
-
-        }
-      }
-      """
-    Then the response status should be "400"
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
       {
-        "title": "Bad request",
-        "detail": "is missing",
+       "title": "Unauthorized",
+        "detail": "second factor is required",
+        "code": "OTP_REQUIRED",
         "source": {
           "pointer": "/meta/otp"
         }
