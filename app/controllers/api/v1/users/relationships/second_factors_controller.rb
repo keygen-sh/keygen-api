@@ -34,7 +34,7 @@ module Api::V1::Users::Relationships
         end
       else
         if !@user.authenticate(second_factor_meta[:password])
-          render_unauthorized detail: 'credentials must be valid', code: 'PASSWORD_INVALID', source: { pointer: '/meta/password' } and return
+          render_unauthorized detail: 'password must be valid', code: 'PASSWORD_INVALID', source: { pointer: '/meta/password' } and return
         end
       end
 
