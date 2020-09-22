@@ -61,14 +61,16 @@ gem 'lograge'
 # Exception reporting
 gem 'raygun4ruby', '~> 1.1.11'
 
-# Monitoring/APM
-gem 'raygun-apm-rails'
-gem 'raygun-apm-sidekiq'
-gem 'rails_autoscale_agent'
-gem 'barnes'
+group :production do
+  # Monitoring/APM
+  gem 'raygun-apm-rails'
+  gem 'raygun-apm-sidekiq'
+  gem 'rails_autoscale_agent'
+  gem 'barnes'
 
-# Dyno management
-gem 'whacamole'
+  # Dyno management
+  gem 'whacamole'
+end
 
 group :development, :test do
   gem 'byebug', platform: :mri
