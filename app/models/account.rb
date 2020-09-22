@@ -11,18 +11,19 @@ class Account < ApplicationRecord
   sluggable attributes: %i[id slug], scope: -> (s) { s.includes :billing }
 
   belongs_to :plan
-  has_many :webhook_endpoints, dependent: :destroy
-  has_many :webhook_events, dependent: :destroy
-  has_many :request_logs, dependent: :destroy
-  has_many :metrics, dependent: :destroy
-  has_many :tokens, dependent: :destroy
-  has_many :users, index_errors: true, dependent: :destroy
-  has_many :products, dependent: :destroy
-  has_many :policies, dependent: :destroy
-  has_many :keys, dependent: :destroy
-  has_many :licenses, dependent: :destroy
-  has_many :machines, dependent: :destroy
-  has_one :billing, dependent: :destroy
+  has_many :webhook_endpoints
+  has_many :webhook_events
+  has_many :request_logs
+  has_many :metrics
+  has_many :tokens
+  has_many :users, index_errors: true
+  has_many :second_factors
+  has_many :products
+  has_many :policies
+  has_many :keys
+  has_many :licenses
+  has_many :machines
+  has_one :billing
 
   accepts_nested_attributes_for :users
 
