@@ -3,22 +3,26 @@
 class SecondFactorPolicy < ApplicationPolicy
 
   def index?
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :user)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
 
   def show?
-    resource.user == bearer
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) &&
+      resource.user == bearer
   end
 
   def create?
-    resource.user == bearer
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) &&
+      resource.user == bearer
   end
 
   def update?
-    resource.user == bearer
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) &&
+      resource.user == bearer
   end
 
   def destroy?
-    resource.user == bearer
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) &&
+      resource.user == bearer
   end
 end
