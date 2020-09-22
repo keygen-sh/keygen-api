@@ -27,6 +27,10 @@ Given /^I have 2FA (enabled|disabled)$/ do |second_factor_status|
   @second_factor.save
 end
 
+Given /^I do not have 2FA$/ do
+  @bearer.second_factors.delete_all
+end
+
 Given /^I send the following headers:$/ do |body|
   parse_placeholders! body
   headers = JSON.parse body
