@@ -59,11 +59,12 @@ gem 'sass-rails'
 gem 'lograge'
 
 # Exception reporting
-gem 'raygun4ruby', "~> 1.1.11"
+gem 'raygun4ruby', '~> 1.1.11'
 
 # Monitoring/APM
+gem 'raygun-apm-rails'
+gem 'raygun-apm-sidekiq'
 gem 'rails_autoscale_agent'
-gem 'scout_apm', '~> 2.6.0'
 gem 'barnes'
 
 # Dyno management
