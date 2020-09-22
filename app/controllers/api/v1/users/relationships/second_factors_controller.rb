@@ -103,6 +103,9 @@ module Api::V1::Users::Relationships
       options strict: true
 
       on :create do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[second-factor second-factors secondFactor secondFactors second_factor second_factors]
+        end
         param :meta, type: :hash do
           param :password, type: :string, optional: true
           param :otp, type: :string, optional: true
