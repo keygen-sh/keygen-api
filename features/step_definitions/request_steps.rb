@@ -64,6 +64,13 @@ When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
+When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, body|
+  parse_path_placeholders! path
+  parse_placeholders! body
+
+  delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+end
+
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
 
