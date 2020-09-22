@@ -79,7 +79,8 @@ module Api::V1::Users::Relationships
       @second_factor = @user.second_factors.find params[:id]
       authorize @second_factor
 
-      if !@user.verify_second_factor(second_factor_meta[:otp])
+      # Verify user's second factor if currently enabled
+      if @user.second_factor_enabled? && !@user.verify_second_factor(second_factor_meta[:otp])
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
@@ -122,7 +123,7 @@ module Api::V1::Users::Relationships
       end
 
       on :destroy do
-        param :meta, type: :hash do
+        param :meta, type: :hash, optional: true do
           param :otp, type: :string
         end
       end
