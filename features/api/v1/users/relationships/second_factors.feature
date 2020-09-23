@@ -69,6 +69,7 @@ Feature: Manage second factors for user
       """
       { "enabled": false }
       """
+    And the JSON response should be a "second-factor" with a uri
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -85,6 +86,7 @@ Feature: Manage second factors for user
       """
       { "enabled": true }
       """
+    And the JSON response should be a "second-factor" without a uri
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

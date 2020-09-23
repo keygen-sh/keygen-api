@@ -9,16 +9,21 @@ class SecondFactor < ApplicationRecord
   belongs_to :account
   belongs_to :user
 
-  attr_reader :uri
-
   before_create :generate_secret!
-  before_create :generate_uri!
 
   validates :account, presence: { message: 'must exist' }
   validates :user, presence: { message: 'must exist' }
 
   scope :enabled, -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
+
+  def uri
+    return nil if enabled?
+
+    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
+
+    totp.provisioning_uri(user.email)
+  end
 
   def verify(otp)
     totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
@@ -35,11 +40,5 @@ class SecondFactor < ApplicationRecord
 
   def generate_secret!
     self.secret = ROTP::Base32.random
-  end
-
-  def generate_uri!
-    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
-
-    @uri = totp.provisioning_uri(user.email)
   end
 end

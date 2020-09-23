@@ -22,7 +22,7 @@ Feature: Show authentication token
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
-    And the JSON response should be a "token"
+    And the JSON response should be a "token" without a token
 
   Scenario: Admin retrieves an invalid token while authenticated
     Given I am an admin of account "test1"
