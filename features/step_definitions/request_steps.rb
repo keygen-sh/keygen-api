@@ -351,6 +351,19 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a nil (\w+)$/
   end
 end
 
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without a (\w+)$/ do |resource, attribute|
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  expect(json["data"]["attributes"].key?(attribute)).to eq false
+
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
+
+    expect(account_id).to eq @account.id
+  end
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+)(?: that is not nil)?$/ do |resource, attribute|
   json = JSON.parse last_response.body
 
