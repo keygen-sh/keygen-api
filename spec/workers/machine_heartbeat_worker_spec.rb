@@ -5,7 +5,7 @@ require 'spec_helper'
 require 'database_cleaner'
 require 'sidekiq/testing'
 
-DatabaseCleaner.strategy = :truncation
+DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
 describe MachineHeartbeatWorker do
   let(:worker) { MachineHeartbeatWorker }
