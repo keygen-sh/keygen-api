@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-class Metric < ApplicationRecord
-  include DateRangeable
-  include Limitable
-  include Pageable
-
-  METRIC_TYPES = %w[
+class EventType < ApplicationRecord
+  EVENT_TYPES = %w[
     account.updated
     account.subscription.paused
     account.subscription.resumed
@@ -55,21 +51,24 @@ class Metric < ApplicationRecord
     token.generated
     token.regenerated
     token.revoked
+    *
   ].freeze
 
-  belongs_to :account
-  belongs_to :event_type
+  def self.cache_key(id)
+    [:event_types, id].join ":"
+  end
 
-  validates :account, presence: { message: "must exist" }
-  validates :metric, presence: true
-  validates :data, presence: true
+  def cache_key
+    EventType.cache_key id
+  end
 
-  # TODO(ezekg) Rename metrics => events
-  scope :metrics, -> (*metrics) { joins(:event_type).where(event_types: { event: metrics }) }
-  scope :current_period, -> {
-    date_start = 2.weeks.ago.beginning_of_day
-    date_end = Time.current.end_of_day
+  def self.clear_cache!(id)
+    key = EventType.cache_key id
 
-    where created_at: (date_start..date_end)
-  }
+    Rails.cache.delete key
+  end
+
+  def clear_cache!
+    EventType.clear_cache! id
+  end
 end

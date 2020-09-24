@@ -1,11 +1,5 @@
-# frozen_string_literal: true
-
-class Metric < ApplicationRecord
-  include DateRangeable
-  include Limitable
-  include Pageable
-
-  METRIC_TYPES = %w[
+class CreateEventTypes < ActiveRecord::Migration[5.2]
+  EVENT_TYPES = %w[
     account.updated
     account.subscription.paused
     account.subscription.resumed
@@ -55,21 +49,24 @@ class Metric < ApplicationRecord
     token.generated
     token.regenerated
     token.revoked
+    *
   ].freeze
 
-  belongs_to :account
-  belongs_to :event_type
+  def up
+    create_table :event_types, id: :uuid, default: -> { "uuid_generate_v4()" } do |t|
+      t.string :event
 
-  validates :account, presence: { message: "must exist" }
-  validates :metric, presence: true
-  validates :data, presence: true
+      t.timestamps
+    end
 
-  # TODO(ezekg) Rename metrics => events
-  scope :metrics, -> (*metrics) { joins(:event_type).where(event_types: { event: metrics }) }
-  scope :current_period, -> {
-    date_start = 2.weeks.ago.beginning_of_day
-    date_end = Time.current.end_of_day
+    add_index :event_types, :event, unique: true
 
-    where created_at: (date_start..date_end)
-  }
+    EventType.create!(
+      EVENT_TYPES.map { |e| { event: e } }
+    )
+  end
+
+  def down
+    drop_table :event_types
+  end
 end

@@ -59,7 +59,7 @@ Feature: Metric counts
     And the first 19 "metrics" have the following attributes:
       """
       {
-        "metric": "license.validation.succeeded"
+        "eventTypeId": "$event_types[license.validation.succeeded]"
       }
       """
     And I use an authentication token

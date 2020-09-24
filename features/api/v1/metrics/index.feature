@@ -129,7 +129,9 @@ Feature: List metrics
     And the current account has 20 "metrics"
     And the first "metric" has the following attributes:
       """
-      { "metric": "real.metric" }
+      {
+        "eventTypeId": "$event_types[real.metric]"
+      }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?metrics[]=real.metric"

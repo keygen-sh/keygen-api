@@ -3,7 +3,9 @@
 class SerializableMetric < SerializableBase
   type :metrics
 
-  attribute :metric
+  attribute :metric do
+    @object.event_type.event
+  end
   attribute :data
   attribute :created do
     @object.created_at
