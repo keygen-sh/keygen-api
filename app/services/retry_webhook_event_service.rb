@@ -17,6 +17,8 @@ class RetryWebhookEventService < BaseService
       idempotency_token: event.idempotency_token,
       endpoint: event.endpoint,
       payload: event.payload,
+      event_type: event.event_type,
+      # FIXME(ezekg) Drop event column after full migration to event type table
       event: event.event
     )
 

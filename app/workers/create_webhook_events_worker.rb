@@ -33,9 +33,15 @@ class CreateWebhookEventsWorker
     account.webhook_endpoints.find_each do |endpoint|
       next unless endpoint.subscribed? event
 
+      event_type = Rails.cache.fetch(EventType.cache_key(event), expires_in: 1.day) do
+        EventType.find_or_create_by event: event
+      end
+
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create(
         endpoint: endpoint.url,
+        event_type: event_type,
+        # FIXME(ezekg) Drop event column after full migration to event type table
         event: event
       )
 
