@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_194746) do
     t.index ["account_id", "created_at", "metric"], name: "index_metrics_on_account_id_and_created_at_and_metric"
     t.index ["account_id"], name: "index_metrics_on_account_id"
     t.index ["created_at"], name: "index_metrics_on_created_at", order: :desc
+    t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
     t.index ["metric"], name: "index_metrics_on_metric"
   end
 
@@ -321,11 +322,10 @@ ActiveRecord::Schema.define(version: 2020_09_24_194746) do
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
     t.index ["event"], name: "index_webhook_events_on_event"
+    t.index ["event_type_id"], name: "index_webhook_events_on_event_type_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"
   end
 
-  add_foreign_key "metrics", "event_types"
-  add_foreign_key "webhook_events", "event_types"
 end
