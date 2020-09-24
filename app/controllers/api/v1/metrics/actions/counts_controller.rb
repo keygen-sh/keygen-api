@@ -12,10 +12,12 @@ module Api::V1::Metrics::Actions
     def count
       authorize Metric
 
-      # TODO(ezekg) This should query the event_types table
-      metrics = params[:metrics]
-      if metrics.present? && (metrics - Metric::METRIC_TYPES).any?
-        diff = metrics - Metric::METRIC_TYPES
+      # TODO(ezekg) Cache this in-memory on event type model?
+      event_types = EventType.pluck(:event)
+      events = params[:metrics]
+
+      if events.present? && (events - event_types).any?
+        diff = events - event_types
 
         raise Keygen::Error::InvalidScopeError.new(parameter: "metrics"), "one or more metric is invalid: #{diff.join(', ')}"
       end
@@ -25,7 +27,7 @@ module Api::V1::Metrics::Actions
 
         dates = 13.days.ago.to_date..Date.today
         sql =
-          if metrics.present?
+          if events.present?
             <<~SQL
               SELECT
                 "metrics"."created_at"::date AS date,
@@ -35,7 +37,7 @@ module Api::V1::Metrics::Actions
               JOIN
                 "event_types" ON "event_types"."id" = "metrics"."event_type_id"
               WHERE
-                "event_types"."event" IN (#{metrics.map { |m| conn.quote(m) }.join(", ")}) AND
+                "event_types"."event" IN (#{events.map { |m| conn.quote(m) }.join(", ")}) AND
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
                   "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
