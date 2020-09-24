@@ -84,6 +84,7 @@ describe CreateWebhookEventService do
   after do
     Sidekiq::Worker.clear_all
     DatabaseCleaner.clean
+    Rails.cache.clear
   end
 
   it 'should create a new webhook event' do
