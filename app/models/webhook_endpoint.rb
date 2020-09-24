@@ -13,7 +13,9 @@ class WebhookEndpoint < ApplicationRecord
   validates :url, url: { protocols: %w[https] }, presence: true
 
   validate do
-    if (subscriptions - EventType::EVENT_TYPES).any?
+    event_types = EventType.pluck(:event)
+
+    if (subscriptions - event_types).any?
       errors.add :subscriptions, :not_allowed, message: "unsupported webhook event type for subscription"
     end
   end
