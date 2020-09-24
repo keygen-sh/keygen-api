@@ -1,4 +1,6 @@
 class AddEventTypeToWebhookEvents < ActiveRecord::Migration[5.2]
+  disable_ddl_transaction!
+
   def up
     add_column :webhook_events, :event_type_id, :uuid, null: true
 
@@ -13,7 +15,7 @@ class AddEventTypeToWebhookEvents < ActiveRecord::Migration[5.2]
 
     change_column :webhook_events, :event_type_id, :uuid, null: false
 
-    add_foreign_key :webhook_events, :event_types
+    add_index :webhook_events, :event_type_id, algorithm: :concurrently
   end
 
   def down
