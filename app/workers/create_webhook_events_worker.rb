@@ -34,7 +34,7 @@ class CreateWebhookEventsWorker
       next unless endpoint.subscribed? event
 
       event_type = Rails.cache.fetch(EventType.cache_key(event), expires_in: 1.day) do
-        EventType.find_or_create_by event: event
+        EventType.find_or_create_by! event: event
       end
 
       # Create a partial event (we'll complete it after the job is fired)
