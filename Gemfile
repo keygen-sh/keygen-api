@@ -59,12 +59,12 @@ gem 'sass-rails'
 gem 'lograge'
 
 # Exception reporting
-gem 'raygun4ruby', '~> 1.1.11'
+gem 'raygun4ruby', '~> 3.2.1'
 
 group :production do
   # Monitoring/APM
-  # gem 'raygun-apm-rails'
-  # gem 'raygun-apm-sidekiq'
+  gem 'raygun-apm-rails'
+  gem 'raygun-apm-sidekiq'
   gem 'rails_autoscale_agent'
   gem 'barnes'
 
