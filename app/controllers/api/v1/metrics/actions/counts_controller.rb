@@ -16,6 +16,8 @@ module Api::V1::Metrics::Actions
       event_types = EventType.pluck(:event)
       events = params[:metrics]
 
+      # This not only blocks counts for invalid event types, but it is also our
+      # first defense from SQL injection below
       if events.present? && (events - event_types).any?
         diff = events - event_types
 
