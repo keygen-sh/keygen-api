@@ -7,9 +7,12 @@ class RecordMetricWorker
   sidekiq_throttle concurrency: { limit: 10 }
   sidekiq_options queue: :metrics
 
-  def perform(metric, account_id, resource_type, resource_id)
+  def perform(event, account_id, resource_type, resource_id)
+    event_type = Rails.cache.fetch(EventType.cache_key(event), expires_in: 1.day) do
+      EventType.find_or_create_by! event: event
+    end
     account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
-      Account.find account_id
+      Account.find! account_id
     end
 
     # TODO(ezekg) Should probably scope this to the account
@@ -26,7 +29,8 @@ class RecordMetricWorker
       end
 
     account.metrics.create(
-      metric: metric,
+      event_type: event_type,
+      metric: event,
       data: data
     )
   end

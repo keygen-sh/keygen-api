@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_24_161033) do
+ActiveRecord::Schema.define(version: 2020_09_24_171000) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -53,6 +53,13 @@ ActiveRecord::Schema.define(version: 2020_09_24_161033) do
     t.index ["customer_id", "created_at"], name: "index_billings_on_customer_id_and_created_at"
     t.index ["id", "created_at"], name: "index_billings_on_id_and_created_at", unique: true
     t.index ["subscription_id", "created_at"], name: "index_billings_on_subscription_id_and_created_at"
+  end
+
+  create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "event"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -129,6 +136,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_161033) do
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "event_type_id", null: false
     t.index ["account_id", "created_at", "metric"], name: "index_metrics_on_account_id_and_created_at_and_metric"
     t.index ["account_id"], name: "index_metrics_on_account_id"
     t.index ["created_at"], name: "index_metrics_on_created_at", order: :desc
@@ -317,4 +325,5 @@ ActiveRecord::Schema.define(version: 2020_09_24_161033) do
     t.index ["jid", "created_at", "account_id"], name: "index_webhook_events_on_jid_and_created_at_and_account_id"
   end
 
+  add_foreign_key "metrics", "event_types"
 end

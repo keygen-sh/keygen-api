@@ -12,6 +12,7 @@ module Api::V1::Metrics::Actions
     def count
       authorize Metric
 
+      # TODO(ezekg) This should query the event_types table
       metrics = params[:metrics]
       if metrics.present? && (metrics - Metric::METRIC_TYPES).any?
         diff = metrics - Metric::METRIC_TYPES
@@ -31,9 +32,11 @@ module Api::V1::Metrics::Actions
                 COUNT(*) AS count
               FROM
                 "metrics"
+              JOIN
+                "event_types" ON "event_types"."id" = "metrics"."event_type_id"
               WHERE
+                "event_types"."event" IN (#{metrics.map { |m| conn.quote(m) }.join(", ")}) AND
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
-                "metrics"."metric" IN (#{metrics.map { |m| conn.quote(m) }.join(", ")}) AND
                 (
                   "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
                   "metrics"."created_at" <= #{conn.quote dates.last.end_of_day}

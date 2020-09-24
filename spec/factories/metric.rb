@@ -2,7 +2,11 @@
 
 FactoryGirl.define do
   factory :metric do
+    association :event_type
+
     metric { "test.metric" }
-    data { { data: "data" } }
+    data {
+      { data: { foo: 'bar' } }
+    }
   end
 end

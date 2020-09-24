@@ -26,6 +26,7 @@ PLACEHOLDERS = %w[
   date
   time
   null_byte
+  event_types
 ]
 
 # Matches:
@@ -33,13 +34,14 @@ PLACEHOLDERS = %w[
 # $resource.attribute (random resource)
 # $current.attribute (current user)
 def parse_placeholders!(str)
-  str.dup.scan /((?<!\\)\$(!)?(~)?([-\w]+)(?:\[(\w+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
+  str.dup.scan /((?<!\\)\$(!)?(~)?([-\w]+)(?:\[([^\]]+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
     escape, encode, resource, index, attribute = matches
 
     # Return the raw string if this isn't a placeholder (e.g. $foo), as we
     # can assume that this isn't supposed to be a placeholder and is
     # probably just a string containing a $ symbol.
-    next unless PLACEHOLDERS.include? resource.singularize.underscore
+    next unless PLACEHOLDERS.include?(resource.singularize.underscore) ||
+                PLACEHOLDERS.include?(resource.pluralize.underscore)
 
     attribute =
       case attribute&.underscore
@@ -85,6 +87,10 @@ def parse_placeholders!(str)
         end
       when "null_byte"
         "foo-\\u0000-bar"
+      when "event_types"
+        event = index
+        event_type = EventType.find_or_create_by! event: event
+        event_type.id
       else
         if @account
           @account.send(resource.underscore)
