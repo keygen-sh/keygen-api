@@ -154,7 +154,7 @@ Feature: List webhook events
     And the current account has 20 "webhook-events"
     And the first "webhook-event" has the following attributes:
       """
-      { "event": "real.event" }
+      { "eventTypeId": "$event_types[real.event]" }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events?events[]=real.event"
