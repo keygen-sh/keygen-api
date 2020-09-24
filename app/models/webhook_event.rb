@@ -6,11 +6,12 @@ class WebhookEvent < ApplicationRecord
   include Pageable
 
   belongs_to :account
+  belongs_to :event_type
 
   validates :account, presence: { message: "must exist" }
   validates :endpoint, url: true, presence: true
 
-  scope :events, -> (*events) { where event: events }
+  scope :events, -> (*events) { joins(:event_type).where(event_types: { event: events }) }
 
   def status
     return :unavailable if updated_at < 3.days.ago

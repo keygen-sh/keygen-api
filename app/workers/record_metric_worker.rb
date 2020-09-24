@@ -30,6 +30,7 @@ class RecordMetricWorker
 
     account.metrics.create(
       event_type: event_type,
+      # FIXME(ezekg) Drop metric column after full migration to event type table
       metric: event,
       data: data
     )

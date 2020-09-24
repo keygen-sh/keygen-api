@@ -5,7 +5,9 @@ class SerializableWebhookEvent < SerializableBase
 
   attribute :endpoint
   attribute :payload
-  attribute :event
+  attribute :event do
+    @object.event_type.event
+  end
   attribute :status
   attribute :last_response_code
   attribute :last_response_body
