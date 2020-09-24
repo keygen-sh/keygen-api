@@ -1,4 +1,6 @@
 class AddEventTypeToMetrics < ActiveRecord::Migration[5.2]
+  disable_ddl_transaction!
+
   def up
     add_column :metrics, :event_type_id, :uuid, null: true
 
@@ -13,7 +15,7 @@ class AddEventTypeToMetrics < ActiveRecord::Migration[5.2]
 
     change_column :metrics, :event_type_id, :uuid, null: false
 
-    add_foreign_key :metrics, :event_types
+    add_index :metrics, :event_type_id, algorithm: :concurrently
   end
 
   def down
