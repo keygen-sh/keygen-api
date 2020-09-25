@@ -21,8 +21,6 @@ loop do
           metrics m2
         WHERE
           m2.event_type_id IS NULL
-        ORDER BY
-          m2.created_at DESC
         LIMIT
           #{BATCH_SIZE}
       )

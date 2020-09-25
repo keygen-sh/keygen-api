@@ -21,8 +21,6 @@ loop do
           webhook_events w2
         WHERE
           w2.event_type_id IS NULL
-        ORDER BY
-          w2.created_at DESC
         LIMIT
           #{BATCH_SIZE}
       )
