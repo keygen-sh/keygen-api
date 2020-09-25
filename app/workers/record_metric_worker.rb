@@ -12,7 +12,7 @@ class RecordMetricWorker
       EventType.find_or_create_by! event: event
     end
     account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
-      Account.find! account_id
+      Account.find account_id
     end
 
     # TODO(ezekg) Should probably scope this to the account
