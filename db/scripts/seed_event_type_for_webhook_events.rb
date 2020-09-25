@@ -3,7 +3,7 @@
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 batch = 0
 
-puts "[SeedEventTypeForWebhookEvents] Starting"
+puts "[scripts.seed_event_type_for_webhook_events] Starting"
 
 loop do
   batch += 1
@@ -28,9 +28,9 @@ loop do
       )
   ")
 
-  puts "[SeedEventTypeForWebhookEvents] Updated #{count} webhook event rows (batch ##{batch})"
+  puts "[scripts.seed_event_type_for_webhook_events] Updated #{count} webhook event rows (batch ##{batch})"
 
   break if count == 0
 end
 
-puts "[SeedEventTypeForWebhookEvents] Done"
+puts "[scripts.seed_event_type_for_webhook_events] Done"

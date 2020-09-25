@@ -3,7 +3,7 @@
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 batch = 0
 
-puts "[SeedEventTypeForMetrics] Starting"
+puts "[scripts.seed_event_type_for_metrics] Starting"
 
 loop do
   batch += 1
@@ -28,9 +28,9 @@ loop do
       )
   ")
 
-  puts "[SeedEventTypeForMetrics] Updated #{count} metric rows (batch ##{batch})"
+  puts "[scripts.seed_event_type_for_metrics] Updated #{count} metric rows (batch ##{batch})"
 
   break if count == 0
 end
 
-puts "[SeedEventTypeForMetrics] Done"
+puts "[scripts.seed_event_type_for_metrics] Done"
