@@ -5,32 +5,38 @@ batch = 0
 
 puts "[scripts.seed_event_type_for_webhook_events] Starting"
 
-loop do
-  batch += 1
-  count = WebhookEvent.connection.update("
-    UPDATE
-      webhook_events AS w
-    SET
-      event_type_id = e.id
-    FROM
-      event_types AS e
-    WHERE
-      w.event = e.event AND
-      w.id IN (
-        SELECT
-          id
-        FROM
-          webhook_events w2
-        WHERE
-          w2.event_type_id IS NULL
-        LIMIT
-          #{BATCH_SIZE}
-      )
-  ")
+events = EventType.pluck(:event)
+conn = WebhookEvent.connection
 
-  puts "[scripts.seed_event_type_for_webhook_events] Updated #{count} webhook event rows (batch ##{batch})"
+events.each do |event|
+  loop do
+    batch += 1
+    count = conn.update("
+      UPDATE
+        webhook_events AS w
+      SET
+        event_type_id = e.id
+      FROM
+        event_types AS e
+      WHERE
+        e.event = '#{event}' AND
+        w.id IN (
+          SELECT
+            id
+          FROM
+            webhook_events w2
+          WHERE
+            w2.event_type_id IS NULL AND
+            w2.event = '#{event}'
+          LIMIT
+            #{BATCH_SIZE}
+        )
+    ")
 
-  break if count == 0
+    puts "[scripts.seed_event_type_for_webhook_events] Updated #{count} webhook event rows for #{event} (batch ##{batch})"
+
+    break if count == 0
+  end
 end
 
 puts "[scripts.seed_event_type_for_webhook_events] Done"
