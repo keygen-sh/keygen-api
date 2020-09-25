@@ -14,6 +14,7 @@ class WebhookEvent < ApplicationRecord
   scope :events, -> (*events) { joins(:event_type).where(event_types: { event: events }) }
 
   def status
+    return :queued if updated_at.nil?
     return :unavailable if updated_at < 3.days.ago
 
     Sidekiq::Status.status(jid) rescue :queued
