@@ -9,3 +9,15 @@ check_for_license_overdue_check_ins:
 report_account_request_limits:
   cron: "0 0 * * *" # Every day at midnight
   class: "RequestLimitsReportWorker"
+
+vacuum_analyze_metrics:
+  cron: "0 3 * * *" # Every day at 3am
+  class: "VacuumAnalyzeMetricsWorker"
+
+vacuum_analyze_webhook_events:
+  cron: "0 4 * * *" # Every day at 4am
+  class: "VacuumAnalyzeWebhookEventsWorker"
+
+vacuum_analyze_request_logs:
+  cron: "0 5 * * *" # Every day at 5am
+  class: "VacuumAnalyzeRequestLogsWorker"
