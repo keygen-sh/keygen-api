@@ -1,4 +1,4 @@
-BATCH_SIZE = 100_000
+BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 batch = 0
 
 puts "[SeedEventTypeForWebhookEvents] Starting"
@@ -21,6 +21,8 @@ loop do
           webhook_events w2
         WHERE
           w2.event_type_id IS NULL
+        ORDER BY
+          w2.created_at DESC
         LIMIT
           #{BATCH_SIZE}
       )
