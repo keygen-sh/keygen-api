@@ -38,7 +38,7 @@ class CreateWebhookEventsWorker
       end
 
       # Create a partial event (we'll complete it after the job is fired)
-      webhook_event = account.webhook_events.create(
+      webhook_event = account.webhook_events.create!(
         endpoint: endpoint.url,
         event_type: event_type,
         # FIXME(ezekg) Drop event column after full migration to event type table
@@ -60,7 +60,7 @@ class CreateWebhookEventsWorker
       )
 
       # Update the event to contain the payload and job identifier
-      webhook_event.update(
+      webhook_event.update!(
         payload: payload.dig(:data, :attributes, :payload),
         jid: jid
       )
