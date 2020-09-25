@@ -5,38 +5,32 @@ batch = 0
 
 puts "[scripts.seed_event_type_for_metrics] Starting"
 
-conn = Metric.connection
-events = EventType.pluck(:event)
+loop do
+  batch += 1
+  count = Metric.connection.update("
+    UPDATE
+      metrics AS m
+    SET
+      event_type_id = e.id
+    FROM
+      event_types AS e
+    WHERE
+      m.metric = e.event AND
+      m.id IN (
+        SELECT
+          id
+        FROM
+          metrics m2
+        WHERE
+          m2.event_type_id IS NULL
+        LIMIT
+          #{BATCH_SIZE}
+      )
+  ")
 
-events.each do |event|
-  loop do
-    batch += 1
-    count = conn.update("
-      UPDATE
-        metrics AS m
-      SET
-        event_type_id = e.id
-      FROM
-        event_types AS e
-      WHERE
-        e.event = '#{event}' AND
-        m.id IN (
-          SELECT
-            id
-          FROM
-            metrics m2
-          WHERE
-            m2.event_type_id IS NULL AND
-            m2.metric = '#{event}'
-          LIMIT
-            #{BATCH_SIZE}
-        )
-    ")
+  puts "[scripts.seed_event_type_for_metrics] Updated #{count} metric rows (batch ##{batch})"
 
-    puts "[scripts.seed_event_type_for_metrics] Updated #{count} metric rows for #{event} (batch ##{batch})"
-
-    break if count == 0
-  end
+  break if count == 0
 end
 
 puts "[scripts.seed_event_type_for_metrics] Done"
