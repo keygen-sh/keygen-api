@@ -1,3 +1,5 @@
+# heroku run -e BATCH_SIZE=1000000 rails runner db/scripts/seed_event_type_for_webhook_events.rb
+
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 batch = 0
 

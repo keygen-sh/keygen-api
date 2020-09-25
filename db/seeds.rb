@@ -27,6 +27,7 @@ EVENT_TYPES = %w[
   license.checked-in
   license.check-in-required-soon
   license.check-in-overdue
+  license.validated
   license.validation.succeeded
   license.validation.failed
   license.usage.incremented
@@ -44,6 +45,7 @@ EVENT_TYPES = %w[
   machine.heartbeat.ping
   machine.heartbeat.pong
   machine.heartbeat.dead
+  machine.heartbeat.reset
   key.created
   key.updated
   key.deleted
