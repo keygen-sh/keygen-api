@@ -26,6 +26,7 @@ class CreateEventTypes < ActiveRecord::Migration[5.2]
     license.checked-in
     license.check-in-required-soon
     license.check-in-overdue
+    license.validated
     license.validation.succeeded
     license.validation.failed
     license.usage.incremented
@@ -43,6 +44,7 @@ class CreateEventTypes < ActiveRecord::Migration[5.2]
     machine.heartbeat.ping
     machine.heartbeat.pong
     machine.heartbeat.dead
+    machine.heartbeat.reset
     key.created
     key.updated
     key.deleted
