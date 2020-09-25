@@ -6,7 +6,12 @@ class SerializableWebhookEvent < SerializableBase
   attribute :endpoint
   attribute :payload
   attribute :event do
-    @object.event_type.event
+    # FIXME(ezekg) Backwards compat during deploy
+    if @object.event_type.present?
+      @object.event_type.event
+    else
+      @object.event
+    end
   end
   attribute :status
   attribute :last_response_code
