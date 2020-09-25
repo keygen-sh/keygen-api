@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_194746) do
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "event_type_id", null: false
+    t.uuid "event_type_id"
     t.index ["account_id", "created_at", "metric"], name: "index_metrics_on_account_id_and_created_at_and_metric"
     t.index ["account_id"], name: "index_metrics_on_account_id"
     t.index ["created_at"], name: "index_metrics_on_created_at", order: :desc
@@ -318,7 +318,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_194746) do
     t.string "event"
     t.integer "last_response_code"
     t.text "last_response_body"
-    t.uuid "event_type_id", null: false
+    t.uuid "event_type_id"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
     t.index ["event"], name: "index_webhook_events_on_event"
