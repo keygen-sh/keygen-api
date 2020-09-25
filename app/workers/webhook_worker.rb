@@ -17,7 +17,7 @@ class WebhookWorker
 
   def perform(account_id, event_id, endpoint_id, payload)
     account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
-      Account.find account_id
+      Account.find! account_id
     end
 
     endpoint = account.webhook_endpoints.find endpoint_id
@@ -43,7 +43,7 @@ class WebhookWorker
           res.body
         end
 
-      event.update(
+      event.update!(
         last_response_code: res.code,
         last_response_body: body
       )
@@ -57,22 +57,22 @@ class WebhookWorker
       raise FailedRequestError
     end
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
-    event.update(
+    event.update!(
       last_response_code: nil,
       last_response_body: 'SSL_ERROR'
     )
   rescue Net::ReadTimeout, Net::OpenTimeout # Our request to the endpoint timed out
-    event.update(
+    event.update!(
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT'
     )
   rescue Errno::ECONNREFUSED # Stop sending requests when the connection is refused
-    event.update(
+    event.update!(
       last_response_code: nil,
       last_response_body: 'CONN_REFUSED'
     )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
-    event.update(
+    event.update!(
       last_response_code: nil,
       last_response_body: 'DNS_ERROR'
     )

@@ -18,7 +18,7 @@ class MachineHeartbeatWorker
         resource: machine
       ).execute
 
-      machine.destroy if machine.policy.deactivate_dead_machines?
+      machine.destroy! if machine.policy.deactivate_dead_machines?
     else
       CreateWebhookEventService.new(
         event: "machine.heartbeat.pong",
