@@ -17,8 +17,6 @@ module Api::V1
     def index
       authorize Metric
 
-      render_service_unavailable detail: 'Dashboard metrics are undergoing maintenance. They will be back shortly.', code: 'DASHBOARD_MAINTENANCE' and return
-
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         metrics = policy_scope apply_scopes(current_account.metrics.preload(:event_type))
         data = JSONAPI::Serializable::Renderer.new.render(metrics, {
@@ -41,8 +39,6 @@ module Api::V1
     # GET /metrics/1
     def show
       authorize @metric
-
-      render_service_unavailable detail: 'Dashboard metrics are undergoing maintenance. They will be back shortly.', code: 'DASHBOARD_MAINTENANCE' and return
 
       render jsonapi: @metric
     end
