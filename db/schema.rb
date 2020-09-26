@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 2020_09_25_225600) do
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "event_type_id"
+    t.uuid "event_type_id", null: false
     t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
     t.index ["metric"], name: "index_metrics_on_metric"
   end
