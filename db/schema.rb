@@ -316,7 +316,7 @@ ActiveRecord::Schema.define(version: 2020_09_26_141921) do
     t.string "event"
     t.integer "last_response_code"
     t.text "last_response_body"
-    t.uuid "event_type_id"
+    t.uuid "event_type_id", null: false
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
     t.index ["event"], name: "index_webhook_events_on_event"
