@@ -12,8 +12,6 @@ module Api::V1::Metrics::Actions
     def count
       authorize Metric
 
-      render_service_unavailable detail: 'Dashboard metrics are undergoing maintenance. They will be back shortly.', code: 'DASHBOARD_MAINTENANCE' and return
-
       # TODO(ezekg) Cache this in-memory on event type model?
       event_types = EventType.pluck(:event)
       events = params[:metrics]
