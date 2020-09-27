@@ -65,7 +65,7 @@ class User < ApplicationRecord
   def intercom_id
     return unless has_role?(:admin, :developer)
 
-    OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue nil
+    OpenSSL::HMAC.hexdigest('SHA256', ENV['INTERCOM_ID_SECRET'], id) rescue ''
   end
 
   # Our async destroy logic needs to be a bit different to prevent accounts
