@@ -16,6 +16,13 @@ class ApplicationController < ActionController::API
   rescue_from TypedParameters::InvalidRequestError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Keygen::Error::InvalidScopeError, with: -> (err) { render_bad_request detail: err.message, source: err.source }
   rescue_from Keygen::Error::UnauthorizedError, with: -> { render_unauthorized }
+  rescue_from Keygen::Error::NotFoundError, with: -> (err) {
+    if err.model.present? && err.id.present?
+      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{err.id}' was not found"
+    else
+      render_not_found
+    end
+  }
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
