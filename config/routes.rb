@@ -17,6 +17,9 @@ Rails.application.routes.draw do
       get "health/webhooks", to: "health#webhook_health"
       get "ping", to: "health#general_ping"
 
+      # Recover
+      post "recover", to: "recoveries#recover"
+
       resources "plans", only: [:index, :show]
 
       resources "accounts", except: [:index] do
