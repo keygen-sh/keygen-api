@@ -3,9 +3,9 @@
 source 'https://rubygems.org'
 ruby '2.6.5'
 
-gem 'rails', '~> 5.2'
+gem 'rails', '~> 5.2.4.4'
 gem 'pg'
-gem 'puma', '~> 4.3.5'
+gem 'puma', '~> 5.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-timeout', require: 'rack/timeout/base'
 gem 'rack-attack', '~> 5.2'
