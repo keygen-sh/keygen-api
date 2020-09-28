@@ -46,6 +46,7 @@ class ApplicationController < ActionController::API
       render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
+      Rails.logger.error err
 
       render_internal_server_error
     end
@@ -69,6 +70,7 @@ class ApplicationController < ActionController::API
       render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
+      Rails.logger.error err
 
       render_internal_server_error
     end
