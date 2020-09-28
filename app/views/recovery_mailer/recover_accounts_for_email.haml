@@ -5,14 +5,10 @@
   - @users.each do |user|
     %li
       %strong Account name:
-      %span
-        = user.account.name
-        %a(href="https://app.keygen.sh/settings") edit
+      %span= user.account.name
       %br
       %strong Unique ID:
-      %span
-        = user.account.slug
-        %a(href="https://app.keygen.sh/settings") edit
+      %span= user.account.slug
       %br
       %span
         %strong Login:
