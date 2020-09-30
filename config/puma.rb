@@ -24,6 +24,12 @@ workers ENV.fetch("WEB_CONCURRENCY") { 2 }
 # Specifies connection keep-alive/idle timeout
 persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }
 
+# https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#lower-latency-better-throughput
+wait_for_less_busy_worker 0.001
+
+# https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#better-memory-usage
+nakayoshi_fork
+
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
 # before forking the application. This takes advantage of Copy On Write
