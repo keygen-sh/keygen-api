@@ -342,7 +342,7 @@ Then /^the JSON response should be meta that contains a valid activation proof o
   pub = OpenSSL::PKey::RSA.new(@account.public_key)
   digest = OpenSSL::Digest::SHA256.new
   sig = Base64.urlsafe_decode64(encoded_sig)
-  ok = pub.verify(digest, sig, data) rescue false
+  ok = pub.verify(digest, sig, "proof/#{encoded_dataset}") rescue false
 
   expect(ok).to be true
 end
