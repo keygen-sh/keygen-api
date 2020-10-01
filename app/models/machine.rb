@@ -58,6 +58,17 @@ class Machine < ApplicationRecord
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
+  def generate_proof(dataset:)
+    data = JSON.generate(dataset)
+    priv = OpenSSL::PKey::RSA.new(account.private_key)
+    sig = priv.sign(OpenSSL::Digest::SHA256.new, data)
+
+    encoded_data = Base64.urlsafe_encode64(data)
+    encoded_sig = Base64.urlsafe_encode64(sig)
+
+    "#{encoded_data}.#{encoded_sig}"
+  end
+
   def heartbeat_duration
     policy&.heartbeat_duration || HEARTBEAT_TTL.to_i
   end
