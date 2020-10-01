@@ -119,7 +119,7 @@ class Machine < ApplicationRecord
       mid: id,
       key: license.key,
       exp: license.expiry,
-      act: created_at,
+      crt: created_at,
       frp: fingerprint,
     }
   end
