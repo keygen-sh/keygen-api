@@ -48,7 +48,7 @@ Feature: Machine proof actions
       """
       {
         "meta": {
-          "dataset": {
+          "proof": {
             "fingerprint": "$machines[0].fingerprint",
             "id": "$machines[0].id",
             "nonce": 1
