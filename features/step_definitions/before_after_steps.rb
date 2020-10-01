@@ -17,6 +17,7 @@ Before do
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
   StripeHelper.start
+  Rails.cache.clear
 
   @crypt = []
 end
