@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_26_141921) do
+ActiveRecord::Schema.define(version: 2020_10_01_141046) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -137,9 +137,8 @@ ActiveRecord::Schema.define(version: 2020_09_26_141921) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "event_type_id", null: false
-    t.index ["account_id", "created_at", "event_type_id"], name: "index_metrics_on_account_id_and_created_at_and_event_type_id"
+    t.index ["account_id", "created_at"], name: "index_metrics_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
-    t.index ["metric"], name: "index_metrics_on_metric"
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -317,9 +316,7 @@ ActiveRecord::Schema.define(version: 2020_09_26_141921) do
     t.integer "last_response_code"
     t.text "last_response_body"
     t.uuid "event_type_id", null: false
-    t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at"
-    t.index ["created_at"], name: "index_webhook_events_on_created_at", order: :desc
-    t.index ["event"], name: "index_webhook_events_on_event"
+    t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["event_type_id"], name: "index_webhook_events_on_event_type_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
     t.index ["idempotency_token"], name: "index_webhook_events_on_idempotency_token"
