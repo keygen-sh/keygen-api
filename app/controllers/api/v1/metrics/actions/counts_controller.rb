@@ -13,13 +13,15 @@ module Api::V1::Metrics::Actions
       authorize Metric
 
       # TODO(ezekg) Cache this in-memory on event type model?
-      valid_events = EventType.pluck(:event)
+      event_types = EventType.select(:id, :event)
       event_params = params[:metrics]
-      events = nil
+      event_type_ids = []
 
       # This not only blocks counts for invalid event types but it is also our
       # first defense from SQL injection below
       if event_params.present?
+        valid_events = event_types.map(&:event)
+
         if (event_params - valid_events).any?
           diff = event_params - valid_events
 
@@ -27,7 +29,10 @@ module Api::V1::Metrics::Actions
         end
 
         # Select the event types from the event params
-        events = valid_events & event_params
+        selected_events = valid_events & event_params
+        event_type_ids = event_types
+          .select { |e| selected_events.include?(e.event) }
+          .map(&:id)
       end
 
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
@@ -35,7 +40,7 @@ module Api::V1::Metrics::Actions
 
         dates = 13.days.ago.to_date..Time.current.to_date
         sql =
-          if events.present?
+          if event_type_ids.any?
             <<~SQL
               SELECT
                 "metrics"."created_at"::date AS date,
@@ -48,14 +53,7 @@ module Api::V1::Metrics::Actions
                   "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
                   "metrics"."created_at" <= #{conn.quote dates.last.end_of_day}
                 ) AND
-                "metrics"."event_type_id" IN (
-                  SELECT
-                    "event_types"."id"
-                  FROM
-                    "event_types"
-                  WHERE
-                    "event_types"."event" IN (#{events.map { |m| conn.quote(m) }.join(", ")})
-                )
+                "metrics"."event_type_id" IN (#{event_type_ids.map { |m| conn.quote(m) }.join(", ")})
               GROUP BY
                 "metrics"."created_at"::date
             SQL
