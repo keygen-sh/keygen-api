@@ -5,11 +5,12 @@
 # Any libraries that use thread pools should be configured to match
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum, this matches the default thread size of Active Record.
-threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i
-threads threads_count, threads_count
+max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i
+min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }.to_i
+threads min_threads_count, max_threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests, default is 3000.
-port ENV.fetch("PORT") { 3000 }
+port ENV.fetch("PORT") { 3000 }.to_i
 
 # Specifies the `environment` that Puma will run in.
 environment ENV.fetch("RAILS_ENV") { "development" }
@@ -19,13 +20,13 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 # the concurrency of the application would be max `threads` * `workers`.
 # Workers do not work on JRuby or Windows (both of which do not support
 # processes).
-workers ENV.fetch("WEB_CONCURRENCY") { 2 }
+workers ENV.fetch("WEB_CONCURRENCY") { 2 }.to_i
 
 # Specifies connection keep-alive/idle timeout
-persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }
+persistent_timeout ENV.fetch("RAILS_KEEP_ALIVE_TIMEOUT") { 20 }.to_i
 
 # https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#lower-latency-better-throughput
-wait_for_less_busy_worker 0.001
+wait_for_less_busy_worker ENV.fetch("RAILS_WAIT_FOR_LESS_BUSY_WORKERS") { 0.005 }.to_f
 
 # https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#better-memory-usage
 nakayoshi_fork
