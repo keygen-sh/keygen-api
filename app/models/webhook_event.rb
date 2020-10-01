@@ -11,7 +11,7 @@ class WebhookEvent < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :endpoint, url: true, presence: true
 
-  scope :events, -> (*events) { joins(:event_type).where(event_types: { event: events }) }
+  scope :events, -> (*events) { where(event_type_id: EventType.where(event: events)) }
 
   def status
     return :queued if updated_at.nil?
