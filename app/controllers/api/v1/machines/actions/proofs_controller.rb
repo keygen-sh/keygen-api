@@ -27,7 +27,7 @@ module Api::V1::Machines::Actions
       options strict: true
 
       on :generate_offline_proof do
-        param :meta, type: :hash do
+        param :meta, type: :hash, optional: true do
           param :dataset, type: :hash
         end
       end
