@@ -60,13 +60,14 @@ class Machine < ApplicationRecord
 
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)
-    encoded_data = "proof/#{Base64.urlsafe_encode64(data)}"
+    encoded_data = Base64.urlsafe_encode64(data)
+    signing_data = "proof/#{encoded_data}"
 
     priv = OpenSSL::PKey::RSA.new(account.private_key)
-    sig = priv.sign(OpenSSL::Digest::SHA256.new, encoded_data)
+    sig = priv.sign(OpenSSL::Digest::SHA256.new, signing_data)
     encoded_sig = Base64.urlsafe_encode64(sig)
 
-    "#{encoded_data}.#{encoded_sig}"
+    "#{signing_data}.#{encoded_sig}"
   end
 
   def heartbeat_duration
