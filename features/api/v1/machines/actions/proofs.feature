@@ -33,7 +33,7 @@ Feature: Machine proof actions
         "mid": "$machines[0].id",
         "key": "$machines[0].license.key",
         "exp": "$machines[0].license.expiry",
-        "act": "$machines[0].created_at",
+        "crt": "$machines[0].created_at",
         "frp": "$machines[0].fingerprint"
       }
       """
