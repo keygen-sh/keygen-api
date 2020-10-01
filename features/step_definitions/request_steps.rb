@@ -355,23 +355,28 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+) 
   end
 end
 
-Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |dataset|
-  parse_placeholders! dataset
+Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |body|
+  parse_placeholders! body
   json = JSON.parse last_response.body
 
   # Clean up the dataset whitespace (parse then regenerate JSON)
-  data = JSON.generate(JSON.parse(dataset))
+  expected_dataset = JSON.generate(JSON.parse(body))
 
-  # Sign with 2048-bit RSA SHA256 using PKCS1 v1.5 padding
-  priv = OpenSSL::PKey::RSA.new(@account.private_key)
-  sig = priv.sign(OpenSSL::Digest::SHA256.new, data)
+  proof = json.dig("meta", "proof")
+  data, encoded_sig = proof.split(".")
+  prefix, encoded_dataset = data.split("/")
+  dataset = Base64.urlsafe_decode64(encoded_dataset)
 
-  encoded_data = Base64.urlsafe_encode64(data)
-  encoded_sig = Base64.urlsafe_encode64(sig)
+  expect(dataset).to eq expected_dataset
+  expect(prefix).to eq "proof"
 
-  proof = "#{encoded_data}.#{encoded_sig}"
+  # Verify with 2048-bit RSA SHA256 using PKCS1 v1.5 padding
+  pub = OpenSSL::PKey::RSA.new(@account.public_key)
+  digest = OpenSSL::Digest::SHA256.new
+  sig = Base64.urlsafe_decode64(encoded_sig)
+  ok = pub.verify(digest, sig, data) rescue false
 
-  expect(json["meta"]["proof"]).to eq proof
+  expect(ok).to be true
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|

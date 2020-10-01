@@ -60,10 +60,10 @@ class Machine < ApplicationRecord
 
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)
-    priv = OpenSSL::PKey::RSA.new(account.private_key)
-    sig = priv.sign(OpenSSL::Digest::SHA256.new, data)
+    encoded_data = "proof/#{Base64.urlsafe_encode64(data)}"
 
-    encoded_data = Base64.urlsafe_encode64(data)
+    priv = OpenSSL::PKey::RSA.new(account.private_key)
+    sig = priv.sign(OpenSSL::Digest::SHA256.new, encoded_data)
     encoded_sig = Base64.urlsafe_encode64(sig)
 
     "#{encoded_data}.#{encoded_sig}"
