@@ -41,7 +41,12 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def reset_heartbeat?
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
+  end
+
+  def generate_offline_proof?
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
   end
 end

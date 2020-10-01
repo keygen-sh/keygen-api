@@ -355,6 +355,25 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+) 
   end
 end
 
+Then /^the JSON response should be meta that contains a valid activation proof with the following dataset:/ do |dataset|
+  parse_placeholders! dataset
+  json = JSON.parse last_response.body
+
+  # Clean up the dataset whitespace (parse then regenerate JSON)
+  data = JSON.generate(JSON.parse(dataset))
+
+  # Sign with 2048-bit RSA SHA256 using PKCS1 v1.5 padding
+  priv = OpenSSL::PKey::RSA.new(@account.private_key)
+  sig = priv.sign(OpenSSL::Digest::SHA256.new, data)
+
+  encoded_data = Base64.urlsafe_encode64(data)
+  encoded_sig = Base64.urlsafe_encode64(sig)
+
+  proof = "#{encoded_data}.#{encoded_sig}"
+
+  expect(json["meta"]["proof"]).to eq proof
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|
   json = JSON.parse last_response.body
 
