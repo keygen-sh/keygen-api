@@ -355,7 +355,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+) 
   end
 end
 
-Then /^the JSON response should be meta that contains a valid activation proof with the following dataset:/ do |dataset|
+Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |dataset|
   parse_placeholders! dataset
   json = JSON.parse last_response.body
 

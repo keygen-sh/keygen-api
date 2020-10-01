@@ -58,8 +58,8 @@ class Machine < ApplicationRecord
   scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
-  def generate_proof(dataset:)
-    data = JSON.generate(dataset)
+  def generate_proof(dataset: nil)
+    data = JSON.generate(dataset || default_proof_dataset)
     priv = OpenSSL::PKey::RSA.new(account.private_key)
     sig = priv.sign(OpenSSL::Digest::SHA256.new, data)
 
@@ -107,5 +107,20 @@ class Machine < ApplicationRecord
     else
       :DEAD
     end
+  end
+
+  private
+
+  def default_proof_dataset
+    {
+      aid: account.id,
+      pid: policy.id,
+      lid: license.id,
+      mid: id,
+      key: license.key,
+      exp: license.expiry,
+      act: created_at,
+      frp: fingerprint,
+    }
   end
 end

@@ -46,7 +46,7 @@ def parse_placeholders!(str)
     attribute =
       case attribute&.underscore
       when nil
-        :id
+        'id'
       else
         attribute.underscore
       end
@@ -92,20 +92,29 @@ def parse_placeholders!(str)
         event_type = EventType.find_or_create_by! event: event
         event_type.id
       else
-        if @account
-          @account.send(resource.underscore)
-            .all
-            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-            .send attribute
-        else
-          resource.singularize
-            .underscore
-            .classify
-            .constantize
-            .all
-            .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
-            .send attribute
-        end
+        model =
+          if @account
+            @account.send(resource.underscore)
+              .all
+              .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+          else
+            resource.singularize
+              .underscore
+              .classify
+              .constantize
+              .all
+              .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+          end
+
+        # Handle multiple method calls
+        attrs = attribute.to_s.split '.'
+        attrs.each { |attr|
+          model = model.send attr
+          # FIXME(ezekg) Format timestamps to ISO 8601
+          model = model.iso8601 3 if model.is_a?(ActiveSupport::TimeWithZone)
+        }
+
+        model
       end
 
     if escape
