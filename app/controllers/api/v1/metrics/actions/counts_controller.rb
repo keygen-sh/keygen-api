@@ -13,15 +13,21 @@ module Api::V1::Metrics::Actions
       authorize Metric
 
       # TODO(ezekg) Cache this in-memory on event type model?
-      event_types = EventType.pluck(:event)
-      events = params[:metrics]
+      valid_events = EventType.pluck(:event)
+      event_params = params[:metrics]
+      events = nil
 
-      # This not only blocks counts for invalid event types, but it is also our
+      # This not only blocks counts for invalid event types but it is also our
       # first defense from SQL injection below
-      if events.present? && (events - event_types).any?
-        diff = events - event_types
+      if event_params.present?
+        if (event_params - valid_events).any?
+          diff = event_params - valid_events
 
-        raise Keygen::Error::InvalidScopeError.new(parameter: "metrics"), "one or more metric is invalid: #{diff.join(', ')}"
+          raise Keygen::Error::InvalidScopeError.new(parameter: "metrics"), "one or more metric is invalid: #{diff.join(', ')}"
+        end
+
+        # Select the event types from the event params
+        events = valid_events & event_params
       end
 
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
@@ -36,14 +42,19 @@ module Api::V1::Metrics::Actions
                 COUNT(*) AS count
               FROM
                 "metrics"
-              JOIN
-                "event_types" ON "event_types"."id" = "metrics"."event_type_id"
               WHERE
-                "event_types"."event" IN (#{events.map { |m| conn.quote(m) }.join(", ")}) AND
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
                   "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
                   "metrics"."created_at" <= #{conn.quote dates.last.end_of_day}
+                ) AND
+                "metrics"."event_type_id" IN (
+                  SELECT
+                    "event_types"."id"
+                  FROM
+                    "event_types"
+                  WHERE
+                    "event_types"."event" IN (#{events.map { |m| conn.quote(m) }.join(", ")})
                 )
               GROUP BY
                 "metrics"."created_at"::date
