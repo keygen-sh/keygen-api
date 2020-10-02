@@ -326,6 +326,22 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
 
+  Scenario: Admin attempts to retrieve a license for their account by key using scheme RSA_2048_PKCS1_SIGN_V2
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license" using "RSA_2048_PKCS1_SIGN_V2"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
+  Scenario: Admin attempts to retrieve a license for their account by key using scheme RSA_2048_PKCS1_PSS_SIGN_V2
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "license" using "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
     And the current account has 1 "product"

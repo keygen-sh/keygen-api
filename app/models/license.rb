@@ -197,11 +197,15 @@ class License < ApplicationRecord
     when "RSA_2048_PKCS1_ENCRYPT"
       generate_pkcs1_encrypted_key!
     when "RSA_2048_PKCS1_SIGN"
-      generate_pkcs1_signed_key!
+      generate_pkcs1_signed_key! version: 1
     when "RSA_2048_PKCS1_PSS_SIGN"
-      generate_pkcs1_pss_signed_key!
+      generate_pkcs1_pss_signed_key! version: 1
     when "RSA_2048_JWT_RS256"
       generate_jwt_rs256_key!
+    when "RSA_2048_PKCS1_SIGN_V2"
+      generate_pkcs1_signed_key! version: 2
+    when "RSA_2048_PKCS1_PSS_SIGN_V2"
+      generate_pkcs1_pss_signed_key! version: 2
     end
 
     raise ActiveRecord::RecordInvalid if key.nil?
@@ -236,32 +240,61 @@ class License < ApplicationRecord
   def generate_pkcs1_encrypted_key!
     if key.bytesize <= RSA_MAX_BYTE_SIZE
       priv = OpenSSL::PKey::RSA.new account.private_key
-      enc = priv.private_encrypt key
+      encrypted_key = priv.private_encrypt key
+      encoded_key = Base64.urlsafe_encode64 encrypted_key
 
-      self.key = Base64.urlsafe_encode64 enc
+      self.key = encoded_key
     else
       errors.add :key, :byte_size_exceeded, message: "key exceeds maximum byte length (max size of #{RSA_MAX_BYTE_SIZE} bytes)"
     end
   end
 
-  def generate_pkcs1_signed_key!
+  def generate_pkcs1_signed_key!(version:)
     priv = OpenSSL::PKey::RSA.new account.private_key
-    sig = priv.sign OpenSSL::Digest::SHA256.new, key
+    res = nil
 
-    encoded_key = Base64.urlsafe_encode64 key
-    encoded_sig = Base64.urlsafe_encode64 sig
+    case version
+    when 1
+      sig = priv.sign OpenSSL::Digest::SHA256.new, key
 
-    self.key = "#{encoded_key}.#{encoded_sig}"
+      encoded_key = Base64.urlsafe_encode64 key
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      res = "#{encoded_key}.#{encoded_sig}"
+    when 2
+      encoded_key = Base64.urlsafe_encode64 key
+      signing_data = "key/#{encoded_key}"
+      sig = priv.sign OpenSSL::Digest::SHA256.new, signing_data
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      res = "#{signing_data}.#{encoded_sig}"
+    end
+
+    self.key = res
   end
 
-  def generate_pkcs1_pss_signed_key!
+  def generate_pkcs1_pss_signed_key!(version:)
     priv = OpenSSL::PKey::RSA.new account.private_key
-    sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
+    res = nil
 
-    encoded_key = Base64.urlsafe_encode64 key
-    encoded_sig = Base64.urlsafe_encode64 sig
+    case version
+    when 1
+      sig = priv.sign_pss OpenSSL::Digest::SHA256.new, key, salt_length: :max, mgf1_hash: "SHA256"
 
-    self.key = "#{encoded_key}.#{encoded_sig}"
+      encoded_key = Base64.urlsafe_encode64 key
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      res = "#{encoded_key}.#{encoded_sig}"
+    when 2
+      encoded_key = Base64.urlsafe_encode64 key
+      signing_data = "key/#{encoded_key}"
+      sig = priv.sign_pss OpenSSL::Digest::SHA256.new, signing_data, salt_length: :max, mgf1_hash: "SHA256"
+      encoded_sig = Base64.urlsafe_encode64 sig
+
+      res = "#{signing_data}.#{encoded_sig}"
+    end
+
+    self.key = res
   end
 
   def generate_jwt_rs256_key!

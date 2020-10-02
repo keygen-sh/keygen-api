@@ -57,6 +57,16 @@ FactoryGirl.define do
       encrypted false
     end
 
+    trait :rsa_2048_pkcs1_sign_v2 do
+      scheme 'RSA_2048_PKCS1_SIGN_V2'
+      encrypted false
+    end
+
+    trait :rsa_2048_pkcs1_pss_sign_v2 do
+      scheme 'RSA_2048_PKCS1_PSS_SIGN_V2'
+      encrypted false
+    end
+
     trait :day_check_in do
       require_check_in true
       check_in_interval 'day'

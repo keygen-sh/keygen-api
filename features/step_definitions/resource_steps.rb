@@ -96,6 +96,10 @@ Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, r
       @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_sign, account: @account, key: SecureRandom.hex)
     when 'RSA_2048_JWT_RS256'
       @crypt << create(resource.singularize.underscore, :rsa_2048_jwt_rs256, account: @account, key: JSON.generate(key: SecureRandom.hex))
+    when 'RSA_2048_PKCS1_SIGN_V2'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_sign_v2, account: @account, key: SecureRandom.hex)
+    when 'RSA_2048_PKCS1_PSS_SIGN_V2'
+      @crypt << create(resource.singularize.underscore, :rsa_2048_pkcs1_pss_sign_v2, account: @account, key: SecureRandom.hex)
     end
   end
 end
