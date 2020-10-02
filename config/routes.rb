@@ -62,13 +62,12 @@ Rails.application.routes.draw do
             resource "product", only: [:show]
             resource "license", only: [:show]
             resource "user", only: [:show]
-
           end
           member do
             scope "actions", module: "machines/actions" do
+              post "generate-offline-proof", to: "proofs#generate_offline_proof"
               post "reset-heartbeat", to: "heartbeats#reset_heartbeat"
               post "ping-heartbeat", to: "heartbeats#ping_heartbeat"
-              post "generate-offline-proof", to: "proofs#generate_offline_proof"
             end
           end
         end
