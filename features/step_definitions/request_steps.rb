@@ -220,6 +220,38 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(json["data"]["type"]).to eq resource.pluralize
     expect(alg).to eq "alg" => "RS256"
     expect(val).to eq payload
+  when "RSA_2048_PKCS1_SIGN_V2"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    data, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    prefix, encoded_key = data.split("/")
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
+    val = value.to_s
+
+    res = pub.verify digest, sig, "key/#{encoded_key}" rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(prefix).to eq "key"
+    expect(key).to eq val
+    expect(res).to be true
+  when "RSA_2048_PKCS1_PSS_SIGN_V2"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    data, encoded_sig = json["data"]["attributes"]["key"].to_s.split "."
+    prefix, encoded_key = data.split("/")
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
+    val = value.to_s
+
+    res = pub.verify_pss digest, sig, "key/#{encoded_key}", salt_length: :auto, mgf1_hash: "SHA256" rescue false
+
+    expect(json["data"]["type"]).to eq resource.pluralize
+    expect(prefix).to eq "key"
+    expect(key).to eq val
+    expect(res).to be true
   else
     raise "unknown encryption scheme"
   end

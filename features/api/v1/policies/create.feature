@@ -1297,6 +1297,74 @@ Feature: Create policy
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_SIGN_V2 for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "RSA Signed",
+            "scheme": "RSA_2048_PKCS1_SIGN_V2"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_SIGN_V2"
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" with the name "RSA Signed"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy using scheme RSA_2048_PKCS1_PSS_SIGN_V2 for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "RSA Probabilistic Signature Scheme",
+            "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" with the name "RSA Probabilistic Signature Scheme"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a legacy encrypted policy using scheme LEGACY_ENCRYPT for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
