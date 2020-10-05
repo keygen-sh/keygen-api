@@ -14,7 +14,7 @@ module Api::V1::Machines::Actions
       dataset = proof_params.dig(:meta, :proof)
       proof = @machine.generate_proof(dataset: dataset)
 
-      render_meta proof: proof
+      render jsonapi: @machine, meta: { proof: proof }
     end
 
     private
