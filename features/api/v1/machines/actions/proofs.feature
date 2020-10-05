@@ -24,17 +24,29 @@ Feature: Machine proof actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
     Then the response status should be "200"
+    And the JSON response should be a "machine"
     And the JSON response should be meta that contains a valid activation proof of the following dataset:
       """
       {
-        "aid": "$machines[0].account.id",
-        "pid": "$machines[0].policy.id",
-        "lid": "$machines[0].license.id",
-        "mid": "$machines[0].id",
-        "key": "$machines[0].license.key",
-        "exp": "$machines[0].license.expiry",
-        "crt": "$machines[0].created_at",
-        "frp": "$machines[0].fingerprint"
+        "account": {
+          "id": "$machines[0].account.id"
+        },
+        "product": {
+          "id": "$machines[0].product.id"
+        },
+        "policy": {
+          "id": "$machines[0].policy.id"
+        },
+        "license": {
+          "id": "$machines[0].license.id",
+          "key": "$machines[0].license.key",
+          "expiry": "$machines[0].license.expiry"
+        },
+        "machine": {
+          "id": "$machines[0].id",
+          "fingerprint": "$machines[0].fingerprint",
+          "created": "$machines[0].created_at"
+        }
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -57,6 +69,7 @@ Feature: Machine proof actions
       }
       """
     Then the response status should be "200"
+    And the JSON response should be a "machine"
     And the JSON response should be meta that contains a valid activation proof of the following dataset:
       """
       {

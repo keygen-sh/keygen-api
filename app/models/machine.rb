@@ -114,14 +114,20 @@ class Machine < ApplicationRecord
 
   def default_proof_dataset
     {
-      aid: account.id,
-      pid: policy.id,
-      lid: license.id,
-      mid: id,
-      key: license.key,
-      exp: license.expiry,
-      crt: created_at,
-      frp: fingerprint,
+      account: { id: account.id },
+      product: { id: product.id },
+      policy: { id: policy.id },
+      license: {
+        id: license.id,
+        key: license.key,
+        expiry: license.expiry,
+      },
+      machine: {
+        id: id,
+        fingerprint: fingerprint,
+        created: created_at,
+      },
+      ts: Time.current,
     }
   end
 end

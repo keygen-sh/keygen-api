@@ -359,15 +359,13 @@ Then /^the JSON response should be meta that contains a valid activation proof o
   parse_placeholders! body
   json = JSON.parse last_response.body
 
-  # Clean up the dataset whitespace (parse then regenerate JSON)
-  expected_dataset = JSON.generate(JSON.parse(body))
-
+  expected_dataset = JSON.parse(body)
   proof = json.dig("meta", "proof")
   data, encoded_sig = proof.split(".")
   prefix, encoded_dataset = data.split("/")
-  dataset = Base64.urlsafe_decode64(encoded_dataset)
+  dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
 
-  expect(dataset).to eq expected_dataset
+  expect(dataset).to include expected_dataset
   expect(prefix).to eq "proof"
 
   # Verify with 2048-bit RSA SHA256 using PKCS1 v1.5 padding
