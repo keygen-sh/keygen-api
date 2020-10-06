@@ -478,7 +478,7 @@ Then /^the JSON response should contain the following links:$/ do |body|
 
   json = JSON.parse last_response.body
 
-  expect(json["links"]&.transform_values { |l| l.is_a?(String) ? URI.decode(l) : l }).to include JSON.parse(body)
+  expect(json["links"]&.transform_values { |l| l.is_a?(String) ? URI.decode_www_form_component(l) : l }).to include JSON.parse(body)
 end
 
 Then /^the response should contain the following headers:$/ do |body|
