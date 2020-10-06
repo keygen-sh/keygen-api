@@ -117,9 +117,16 @@ module Keygen
 
       def call(env)
         @app.call env
-      rescue ArgumentError => e
-        case e.message
+      rescue ActionDispatch::Http::Parameters::ParseError,
+             Rack::QueryParser::InvalidParameterError,
+             Rack::QueryParser::ParameterTypeError,
+             ActionController::BadRequest,
+             ArgumentError => e
+        message = e.message.scrub
+
+        case message
         when /incomplete multibyte character/,
+             /invalid escaped character/,
              /invalid byte sequence/
           [
             400,
@@ -148,17 +155,7 @@ module Keygen
               }]
             }.to_json]
           ]
-        else
-          raise e
-        end
-      rescue ActionDispatch::Http::Parameters::ParseError,
-             Rack::QueryParser::InvalidParameterError,
-             Rack::QueryParser::ParameterTypeError,
-             # I have no idea why this is a bad request error - it should
-             # be one of the above Rack errors, but for some reason, by the
-             # time it propagates here, it's a different error.
-             ActionController::BadRequest => e
-        if e.message =~ /query parameters/
+        when /query parameters/
           [
             400,
             {
@@ -173,22 +170,51 @@ module Keygen
             }.to_json]
           ]
         else
-          [
-            400,
-            {
-              "Content-Type" => "application/vnd.api+json",
-            },
-            [{
-              errors: [{
-                title: "Bad request",
-                detail: "The request could not be completed because it contains invalid JSON (check encoding)",
-                code: "JSON_INVALID"
-              }]
-            }.to_json]
-          ]
+          if e.is_a?(ArgumentError)
+            # Special case (report error and consider this a bug)
+            Raygun.track_exception e, env.to_h.slice(
+              "REQUEST_METHOD",
+              "PATH_INFO",
+              "QUERY_STRING",
+              "CONTENT_LENGTH",
+              "CONTENT_TYPE",
+              "HTTP_ACCEPT"
+            )
+
+            [
+              400,
+              {
+                "Content-Type" => "application/vnd.api+json",
+              },
+              [{
+                errors: [{
+                  title: "Bad request",
+                  detail: "The request could not be completed because it was invalid",
+                  code: "REQUEST_INVALID"
+                }]
+              }.to_json]
+            ]
+          else
+            [
+              400,
+              {
+                "Content-Type" => "application/vnd.api+json",
+              },
+              [{
+                errors: [{
+                  title: "Bad request",
+                  detail: "The request could not be completed because it contains invalid JSON (check encoding)",
+                  code: "JSON_INVALID"
+                }]
+              }.to_json]
+            ]
+          end
         end
       rescue ActionController::RoutingError => e
-        if e.message =~ /bad URI\(is not URI\?\)/
+        message = e.message.scrub
+
+        case message
+        when /bad URI\(is not URI\?\)/
           [
             400,
             {
