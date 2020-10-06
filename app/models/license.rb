@@ -307,6 +307,6 @@ class License < ApplicationRecord
          JSON::ParserError
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (must be a valid JSON encoded string)"
   rescue JWT::InvalidPayload => e
-    errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message})"
+    errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message.downcase})"
   end
 end

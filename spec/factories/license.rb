@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :license do
     association :account
     association :policy
@@ -81,7 +81,7 @@ FactoryGirl.define do
     trait :userless do |license|
       # FIXME(ezekg) This kind of acts as a sentinel value to not create a user
       #              in the factory's create hook (above)
-      user false
+      user { false }
     end
 
     after :create do |license|

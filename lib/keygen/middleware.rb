@@ -119,8 +119,8 @@ module Keygen
         @app.call env
       rescue ArgumentError => e
         case e.message
-        when /invalid byte sequence in UTF-8/,
-             /incomplete multibyte character/
+        when /incomplete multibyte character/,
+             /invalid byte sequence/
           [
             400,
             {

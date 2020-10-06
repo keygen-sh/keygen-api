@@ -32,7 +32,7 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    puts JSON.pretty_generate(
+    log JSON.pretty_generate(
       request: {
         url: last_request.url,
         # headers: {

@@ -1296,7 +1296,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "key is not a valid JWT claims payload (exp claim must be an integer)",
+        "detail": "key is not a valid JWT claims payload (exp claim must be an integer but it is a string)",
         "code": "KEY_JWT_CLAIMS_INVALID",
         "source": {
           "pointer": "/data/attributes/key"
@@ -2609,7 +2609,7 @@ Feature: Create license
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "request-log" jobs
 
   # Scenario: Admin sends a badly encoded URL query parameter when attempting to create a license
   #   Given I am an admin of account "test1"

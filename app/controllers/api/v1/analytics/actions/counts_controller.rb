@@ -30,7 +30,7 @@ module Api::V1::Analytics::Actions
     private
 
     def cache_key
-      [:analytics, current_account.id].select(&:present?).join ":"
+      [:analytics, current_account.id].join ":"
     end
   end
 end

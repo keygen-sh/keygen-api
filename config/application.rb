@@ -20,6 +20,8 @@ Bundler.require *Rails.groups
 
 module Keygen
   class Application < Rails::Application
+    config.load_defaults 6.0
+
     config.generators do |generator|
       # Use UUIDs for table primary keys
       generator.orm :active_record, primary_key_type: :uuid

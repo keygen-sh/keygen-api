@@ -39,7 +39,7 @@ module Api::V1
     end
 
     def cache_key
-      [:plans, request.query_string.parameterize].select(&:present?).join ":"
+      [:plans, Digest::SHA2.hexdigest(request.query_string)].join ":"
     end
   end
 end
