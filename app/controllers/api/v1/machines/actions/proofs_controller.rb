@@ -11,7 +11,7 @@ module Api::V1::Machines::Actions
     def generate_offline_proof
       authorize @machine
 
-      dataset = proof_params.dig(:meta, :proof)
+      dataset = proof_params.dig(:meta, :dataset)
       proof = @machine.generate_proof(dataset: dataset)
 
       render jsonapi: @machine, meta: { proof: proof }
@@ -28,7 +28,7 @@ module Api::V1::Machines::Actions
 
       on :generate_offline_proof do
         param :meta, type: :hash, optional: true do
-          param :proof, type: :hash
+          param :dataset, type: :hash
         end
       end
     end
