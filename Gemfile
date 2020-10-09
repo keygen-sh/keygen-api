@@ -63,10 +63,12 @@ gem 'raygun4ruby', '~> 3.2.1'
 
 group :production do
   # Monitoring/APM
-  # gem 'raygun-apm-rails'
-  # gem 'raygun-apm-sidekiq'
   gem 'rails_autoscale_agent'
   gem 'barnes'
+
+  # FIXME(ezekg) Disabling APM for now (remember to re-add buildpack!)
+  # gem 'raygun-apm-rails'
+  # gem 'raygun-apm-sidekiq'
 
   # Dyno management
   gem 'whacamole'
