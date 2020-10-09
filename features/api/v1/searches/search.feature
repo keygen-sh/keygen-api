@@ -425,6 +425,126 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by user type on the email attribute using domain name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.sh"
+      }
+      """
+    And the second "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.net"
+      }
+      """
+    And the third "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.dev"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "email": "@keygen.sh"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by user type on the email attribute using domain name without TLD
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.sh"
+      }
+      """
+    And the second "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.net"
+      }
+      """
+    And the third "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.dev"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "email": "@keygen."
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by user type on the email attribute using local part
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.sh"
+      }
+      """
+    And the second "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.net"
+      }
+      """
+    And the third "user" has the following attributes:
+      """
+      {
+        "email": "zeke@keygen.dev"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {
+            "email": "zeke@"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by user type on the metadata attribute using an exact query
     Given I am an admin of account "test1"
     And the current account is "test1"
