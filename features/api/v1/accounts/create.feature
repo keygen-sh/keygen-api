@@ -675,7 +675,7 @@ Feature: Create account
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains invalid JSON (check formatting)",
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
         "code": "JSON_INVALID"
       }
       """

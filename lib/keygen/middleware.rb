@@ -119,6 +119,7 @@ module Keygen
              Rack::QueryParser::InvalidParameterError,
              Rack::QueryParser::ParameterTypeError,
              ActionController::BadRequest,
+             JSON::ParserError,
              ArgumentError => e
         message = e.message.scrub
 
@@ -201,7 +202,7 @@ module Keygen
               [{
                 errors: [{
                   title: "Bad request",
-                  detail: "The request could not be completed because it contains invalid JSON (check encoding)",
+                  detail: "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
                   code: "JSON_INVALID"
                 }]
               }.to_json]
