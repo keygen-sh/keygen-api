@@ -218,8 +218,8 @@ GEM
     numerizer (0.1.1)
     oj (3.7.12)
     openssl (2.1.2)
-    parallel (1.12.1)
-    parallel_tests (2.26.2)
+    parallel (1.19.2)
+    parallel_tests (3.3.0)
       parallel
     pg (1.1.4)
     pg_search (2.3.0)
@@ -410,7 +410,7 @@ DEPENDENCIES
   lograge
   oj
   openssl
-  parallel_tests
+  parallel_tests (~> 3.3)
   pg
   pg_search
   premailer-rails
