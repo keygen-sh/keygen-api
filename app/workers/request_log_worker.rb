@@ -9,7 +9,7 @@ class RequestLogWorker
 
   def perform(account_id, req, res)
     @account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
-      Account.find account_id
+      Account.sluggable_find! account_id
     end
 
     account.request_logs.create!(

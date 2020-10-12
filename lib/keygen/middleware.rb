@@ -36,9 +36,10 @@ module Keygen
         end
 
         begin
-          account_id = req.params[:account_id] || req.params[:id]
+          account = Keygen::Store::Request.store[:current_account]
+          return [status, headers, res] if account.nil?
 
-          Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
+          Rails.cache.increment Account.daily_request_count_cache_key(account.id), 1, expires_in: 1.day
         rescue => e
           Raygun.track_exception e
         end
@@ -74,20 +75,17 @@ module Keygen
           return [status, headers, res]
         end
 
-        # TODO(ezekg) Use current account from request store? Has the side effect of not
-        #             counting invalid requests e.g. 400 and 404 errors.
-        account_id = req.params[:account_id] || req.params[:id]
+        requestor = Keygen::Store::Request.store[:current_bearer]
+        account = Keygen::Store::Request.store[:current_account]
         route = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
 
-        if account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
+        if account.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
           return [status, headers, res]
         end
 
-        requestor = Keygen::Store::Request.store[:current_bearer]
-
         RequestLogWorker.perform_async(
-          account_id,
+          account.id,
           {
             requestor_type: requestor&.class&.name,
             requestor_id: requestor&.id,
