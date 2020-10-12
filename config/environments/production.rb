@@ -2,6 +2,7 @@
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  config.hosts << "api.keygen.sh"
 
   # Disables security vulnerability
   config.assets.compile = false
