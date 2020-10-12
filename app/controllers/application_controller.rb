@@ -59,7 +59,9 @@ class ApplicationController < ActionController::API
       render_not_found
     end
   }
-  rescue_from JSON::ParserError, with: -> { render_bad_request }
+  rescue_from JSON::ParserError, with: -> {
+    render_bad_request detail: 'The request could not be completed because it contains invalid JSON (check formatting)', code: 'JSON_INVALID'
+  }
   rescue_from ArgumentError, with: -> (err) {
     case err.message
     when /invalid byte sequence in UTF-8/,
