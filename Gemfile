@@ -77,7 +77,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'timecop'
   gem 'bullet'
-  gem 'parallel_tests'
+  gem 'parallel_tests', '~> 3.3'
 end
 
 group :development do
