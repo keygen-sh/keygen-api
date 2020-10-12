@@ -102,5 +102,9 @@ module Sluggable
     def sluggable_find!(slug)
       self.class.sluggable_find!(slug, scope: self)
     end
+
+    def sluggable_find(slug)
+      sluggable_find!(slug) rescue nil
+    end
   end
 end
