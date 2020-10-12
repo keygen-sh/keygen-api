@@ -48,7 +48,7 @@ module Api::V1::Users::Actions
     private
 
     def set_user
-      @user = current_account.users.find params[:id]
+      @user = current_account.users.sluggable_find! params[:id]
     end
 
     typed_parameters do

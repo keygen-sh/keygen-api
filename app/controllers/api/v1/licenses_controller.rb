@@ -82,7 +82,7 @@ module Api::V1
     private
 
     def set_license
-      @license = current_account.licenses.find params[:id]
+      @license = current_account.licenses.sluggable_find! params[:id]
     end
 
     typed_parameters transform: true do

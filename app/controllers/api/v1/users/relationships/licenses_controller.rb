@@ -21,7 +21,7 @@ module Api::V1::Users::Relationships
 
     # GET /users/1/licenses/1
     def show
-      @license = @user.licenses.find params[:id]
+      @license = @user.licenses.sluggable_find! params[:id]
       authorize @license
 
       render jsonapi: @license
@@ -30,7 +30,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = current_account.users.find params[:user_id]
+      @user = current_account.users.sluggable_find! params[:user_id]
       authorize @user, :show?
     end
   end

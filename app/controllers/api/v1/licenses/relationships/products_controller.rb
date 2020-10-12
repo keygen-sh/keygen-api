@@ -18,7 +18,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = current_account.licenses.find params[:license_id]
+      @license = current_account.licenses.sluggable_find! params[:license_id]
       authorize @license, :show?
     end
   end

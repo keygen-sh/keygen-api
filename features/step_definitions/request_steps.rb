@@ -501,7 +501,8 @@ Then /^the response should contain the following raw headers:$/ do |body|
 end
 
 Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
-  pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
+  key = Account.sluggable_find!(slug).public_key
+  pub = OpenSSL::PKey::RSA.new key
   digest = OpenSSL::Digest::SHA256.new
 
   sig = Base64.strict_decode64 last_response.headers['X-Signature']

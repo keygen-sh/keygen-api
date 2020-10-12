@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# TODO(ezekg) Rename to Aliasable or something that better infers an aliased lookup
 module Sluggable
   extend ActiveSupport::Concern
 
@@ -38,7 +39,7 @@ module Sluggable
       end
 
       # Redefine finder to search by sluggable attributes
-      def find(slug, scope: self)
+      def sluggable_find!(slug, scope: self)
         raise Keygen::Error::NotFoundError.new(model: sluggable_model.name, id: slug) if slug.nil?
 
         # Strip out ID attribute if the finder doesn't resemble a UUID (pg will throw)
@@ -67,7 +68,7 @@ module Sluggable
         #     "accounts"."slug" = :slug
         record = scope
           .where(
-            attrs.map { |column| "#{Arel.sql("\"#{sluggable_model.table_name}\".\"#{column}\"")} = :slug" }.join(" OR "),
+            attrs.map(&method(:sluggable_map_query_part)).join(" OR "),
             slug: slug
           )
           .limit(1)
@@ -79,12 +80,27 @@ module Sluggable
 
         record
       end
+
+      def sluggable_find(slug, scope: self)
+        sluggable_find!(slug, scope: scope) rescue nil
+      end
+
+      private
+
+      def sluggable_map_query_part(column)
+        case column.to_sym
+        when :email
+          "#{Arel.sql("lower(\"#{sluggable_model.table_name}\".\"#{column}\")")} = lower(:slug)"
+        else
+          "#{Arel.sql("\"#{sluggable_model.table_name}\".\"#{column}\"")} = :slug"
+        end
+      end
     end
 
     # Relations and collection proxies need to delegate to the
     # class's finder method
-    def find(slug)
-      self.class.find(slug, scope: self)
+    def sluggable_find!(slug)
+      self.class.sluggable_find!(slug, scope: self)
     end
   end
 end

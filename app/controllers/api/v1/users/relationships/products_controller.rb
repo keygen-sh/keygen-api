@@ -26,7 +26,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = current_account.users.find params[:user_id]
+      @user = current_account.users.sluggable_find! params[:user_id]
       authorize @user, :show?
     end
   end

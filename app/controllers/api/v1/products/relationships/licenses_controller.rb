@@ -21,7 +21,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/licenses/1
     def show
-      @license = @product.licenses.find params[:id]
+      @license = @product.licenses.sluggable_find! params[:id]
       authorize @license
 
       render jsonapi: @license

@@ -3,7 +3,7 @@
 World Rack::Test::Methods
 
 Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   # Set up a fake subscription
   customer = create :customer, :with_card
@@ -42,13 +42,13 @@ Given /^the account does not have a card on file$/ do
 end
 
 Given /^the account "([^\"]*)" does have a card on file$/ do |slug|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   account.billing.update card_brand: 'Visa', card_last4: '4242', card_expiry: 2.years.from_now
 end
 
 Given /^the account "([^\"]*)" does not have a card on file$/ do |slug|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   account.billing.update card_brand: nil, card_last4: nil, card_expiry: nil
 end

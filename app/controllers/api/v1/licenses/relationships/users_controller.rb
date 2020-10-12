@@ -19,7 +19,7 @@ module Api::V1::Licenses::Relationships
     def update
       authorize @license, :transfer?
 
-      user = current_account.users.find_by id: user_params[:id]
+      user = current_account.users.sluggable_find user_params[:id]
       if user.nil?
         return render_unprocessable_entity(
           detail: "user must exist",
@@ -45,7 +45,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = current_account.licenses.find params[:license_id]
+      @license = current_account.licenses.sluggable_find! params[:license_id]
       authorize @license, :show?
     end
 

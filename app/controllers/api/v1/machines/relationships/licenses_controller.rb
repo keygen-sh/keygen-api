@@ -18,7 +18,7 @@ module Api::V1::Machines::Relationships
     private
 
     def set_machine
-      @machine = current_account.machines.find params[:machine_id]
+      @machine = current_account.machines.sluggable_find! params[:machine_id]
       authorize @machine, :show?
     end
   end

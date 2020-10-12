@@ -83,7 +83,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = current_account.licenses.find params[:id]
+      @license = current_account.licenses.sluggable_find! params[:id]
     end
 
     def increment_param

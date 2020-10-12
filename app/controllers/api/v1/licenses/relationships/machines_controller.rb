@@ -21,7 +21,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/machines/1
     def show
-      @machine = @license.machines.find params[:id]
+      @machine = @license.machines.sluggable_find! params[:id]
       authorize @machine
 
       render jsonapi: @machine
@@ -30,7 +30,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = current_account.licenses.find params[:license_id]
+      @license = current_account.licenses.sluggable_find! params[:license_id]
       authorize @license, :show?
     end
   end

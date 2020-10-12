@@ -82,12 +82,7 @@ module Api::V1
     private
 
     def set_user
-      @user =
-        if params[:id] =~ UUID_REGEX
-          current_account.users.find_by id: params[:id]
-        else
-          current_account.users.find_by email: params[:id].downcase
-        end
+      @user = current_account.users.sluggable_find! params[:id]
 
       raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
     end

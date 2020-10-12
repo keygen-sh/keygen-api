@@ -20,7 +20,7 @@ module Api::V1::Machines::Actions
     private
 
     def set_machine
-      @machine = current_account.machines.find params[:id]
+      @machine = current_account.machines.sluggable_find! params[:id]
     end
 
     typed_parameters do

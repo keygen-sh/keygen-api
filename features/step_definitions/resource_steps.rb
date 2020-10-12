@@ -22,7 +22,7 @@ Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.find(slug).update attributes
+  Account.sluggable_find!(slug).update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -40,7 +40,7 @@ Then /^the current token has the following attributes:$/ do |body|
 end
 
 Given /^the current account is "([^\"]*)"$/ do |slug|
-  @account = Account.find slug
+  @account = Account.sluggable_find! slug
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
@@ -48,19 +48,19 @@ Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |slug|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   account.daily_request_count = 1_000_000_000
 end
 
 Given /^the account "([^\"]*)" is on a free tier$/ do |slug|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   account.plan.update! price: 0
 end
 
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -331,7 +331,7 @@ end
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
   parse_placeholders! body
 
-  account = Account.find slug
+  account = Account.sluggable_find! slug
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -356,7 +356,7 @@ end
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, slug, body|
   parse_placeholders! body
 
-  account = Account.find slug
+  account = Account.sluggable_find! slug
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -396,7 +396,7 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.find slug
+  account = Account.sluggable_find! slug
 
   user  = account.admins.first
   token = TokenGeneratorService.new(
@@ -418,7 +418,7 @@ Then /^the account "([^\"]*)" should have the following attributes:$/ do |slug, 
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  account = Account.find(slug)
+  account = Account.sluggable_find!(slug)
 
   expect(account.attributes).to include attributes
 end

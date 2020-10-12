@@ -21,7 +21,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/machines/1
     def show
-      @machine = @product.machines.find params[:id]
+      @machine = @product.machines.sluggable_find! params[:id]
       authorize @machine
 
       render jsonapi: @machine
