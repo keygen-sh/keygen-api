@@ -39,16 +39,21 @@
     = yield
     %p
       Kind regards,
+    %p
+      Zeke Gabrielse
       %br
-      %br
-      Zeke Gabrielse, Founder of Keygen
+      Founder
     %hr
-    %small Techinical information:
+    %small Techinical information for your account, in case you need it:
     %ul.no-margin
+      %li
+        %small Account login: #{link_to "https://app.keygen.sh/login", "https://app.keygen.sh/login?account=" + @account.id} (bookmark this for easier access)
+      %li
+        %small Account name: #{@account.name}
       %li
         %small Account ID: #{@account.id}
       %li
-        %small Account name: #{@account.slug}
+        %small Account slug: #{@account.slug}
       %li
         %small Admin email: #{@user.email}
       %li
