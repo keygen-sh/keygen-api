@@ -463,7 +463,7 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a license expiry that has exceeded it's usage limit
+  Scenario: Admin updates a license that has exceeded it's usage limit
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
