@@ -56,6 +56,7 @@ class License < ApplicationRecord
   end
 
   validate on: :update do |license|
+    next unless license.uses_changed?
     next if license&.uses.nil? || license.policy&.max_uses.nil?
     next if license.uses <= license.policy.max_uses
 
