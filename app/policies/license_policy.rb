@@ -118,4 +118,8 @@ class LicensePolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
+
+  def me?
+    resource == bearer
+  end
 end
