@@ -46,6 +46,7 @@ Rails.application.routes.draw do
 
         post "passwords", to: "passwords#reset_password"
         get  "profile", to: "profiles#show"
+        get  "me", to: "profiles#me"
 
         resources "keys" do
           scope module: "keys/relationships" do

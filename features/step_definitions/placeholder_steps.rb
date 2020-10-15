@@ -93,7 +93,7 @@ def parse_placeholders!(str)
         event_type.id
       else
         model =
-          if @account
+          if @account && resource.singularize != 'account'
             @account.send(resource.underscore)
               .all
               .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
@@ -146,7 +146,7 @@ def parse_path_placeholders!(str)
           instance_variable_get("@#{resource.singularize}").id
         end
       else
-        if @account
+        if @account && resource.singularize != 'account'
           case resource.underscore
           when "request-logs"
             @account.request_logs.send(:[], index.to_i).id

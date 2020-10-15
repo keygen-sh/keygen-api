@@ -27,4 +27,8 @@ class ProductPolicy < ApplicationPolicy
   def generate?
     bearer.has_role?(:admin, :developer)
   end
+
+  def me?
+    resource == bearer
+  end
 end

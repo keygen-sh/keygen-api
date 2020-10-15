@@ -39,4 +39,8 @@ class UserPolicy < ApplicationPolicy
   def update_password?
     resource == bearer
   end
+
+  def me?
+    resource == bearer
+  end
 end

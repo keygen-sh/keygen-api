@@ -128,7 +128,48 @@ end
 Then /^the JSON response should not (?:contain|be) an? "([^\"]*)"$/ do |name|
   json = JSON.parse last_response.body
 
-  expect(json["data"]).to be nil
+  resource = json["data"]
+  if resource.present?
+    expect(resource["type"]).to_not eq name.pluralize
+  else
+    expect(resource).to eq nil
+  end
+end
+
+Then /^the JSON response should contain an included "([^\"]*)"$/ do |name|
+  json = JSON.parse last_response.body
+  inlc = json["included"]
+  expect(incl).to be_an Array
+
+  res = incl&.any? { |i| i["type"] == name.pluralize }
+  expect(res).to be true
+
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
+
+    expect(account_id).to eq @account.id
+  end
+end
+
+Then /^the JSON response should contain an included "([^\"]*)" with the following relationships:$/ do |name, body|
+  parse_placeholders! body
+
+  json = JSON.parse last_response.body
+  incl = json["included"]
+  expect(incl).to be_an Array
+
+  res = incl&.any? { |i| i["type"] == name.pluralize }
+  expect(res).to be true
+
+  record = incl.first
+  rels = record["relationships"]
+  expect(rels).to include JSON.parse(body)
+
+  if @account.present?
+    account_id = json["data"]["relationships"]["account"]["data"]["id"]
+
+    expect(account_id).to eq @account.id
+  end
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:(?:the|an?) )?(\w+) "([^\"]*)"$/ do |resource, attribute, value|
