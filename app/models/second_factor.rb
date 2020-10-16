@@ -2,6 +2,7 @@
 
 class SecondFactor < ApplicationRecord
   SECOND_FACTOR_ISSUER = 'Keygen'
+  SECOND_FACTOR_IMAGE = 'https://keygen.sh/authy-icon.png'
 
   include Limitable
   include Pageable
@@ -20,7 +21,7 @@ class SecondFactor < ApplicationRecord
   def uri
     return nil if enabled?
 
-    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER)
+    totp = ROTP::TOTP.new(secret, issuer: SECOND_FACTOR_ISSUER, image: SECOND_FACTOR_IMAGE)
 
     totp.provisioning_uri(user.email)
   end
