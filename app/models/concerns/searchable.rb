@@ -29,9 +29,11 @@ module Searchable
           if against == :metadata
             prefix = false
 
-            # Transform keys to snakecase (may be camelcased user input)
+            # Transform keys to snakecase (may be camelcased user input) and then
+            # map into string query parts
             if query.respond_to?(:transform_keys!)
-              query.transform_keys! { |k| k.to_s.underscore.parameterize(separator: '_') }
+              query = query.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                           .map { |k, v| "#{k}:#{v}" }
             end
           end
 
