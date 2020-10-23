@@ -49,6 +49,7 @@ class WebhookWorker
       )
     rescue => e
       Raygun.track_exception e
+      Rails.logger.error e
 
       raise e
     end

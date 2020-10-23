@@ -2,6 +2,7 @@
 
 module Api::V1
   class MachinesController < Api::V1::BaseController
+    has_scope :metadata, type: :hash, only: :index
     has_scope :fingerprint
     has_scope :ip
     has_scope :hostname

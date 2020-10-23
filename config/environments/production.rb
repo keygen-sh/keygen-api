@@ -31,6 +31,7 @@ Rails.application.configure do
     driver: :hiredis,
     error_handler: -> (method:, returning:, exception:) {
       Raygun.track_exception exception, method: method, returning: returning
+      Rails.logger.error exception
     },
   }
 

@@ -16,6 +16,7 @@ module Pagination
         "CONTENT_TYPE",
         "HTTP_ACCEPT"
       )
+      Rails.logger.error e
 
       super args unless performed? # Avoid double render
     end

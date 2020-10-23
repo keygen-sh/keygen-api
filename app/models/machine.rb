@@ -49,6 +49,7 @@ class Machine < ApplicationRecord
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
+  scope :metadata, -> (meta) { search_metadata meta }
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :hostname, -> (hostname) { where hostname: hostname }
   scope :ip, -> (ip_address) { where ip: ip_address }

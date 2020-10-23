@@ -24,8 +24,16 @@ module Searchable
           query = query.gsub('@', ' ') if against == :email
 
           # Skip prefix search on metadata
-          prefix =
-            against != :metadata
+          prefix = true
+
+          if against == :metadata
+            prefix = false
+
+            # Transform keys to snakecase (may be camelcased user input)
+            if query.respond_to?(:transform_keys!)
+              query.transform_keys! { |k| k.to_s.underscore.parameterize(separator: '_') }
+            end
+          end
 
           {
             against: against,
