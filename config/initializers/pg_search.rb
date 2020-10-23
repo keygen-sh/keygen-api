@@ -13,19 +13,20 @@ module PgSearch
     end
 
     def subquery
-      relation = model
+      model
         # FIXME(ezekg) PgSearch and ActiveRecord don't play well together when
         #              a table gets aliased e.g. `roles` => `roles_users` so
         #              this removes the top-level scopes altogether since it's
         #              a subquery and the scopes will be applied outside of the
-        #              search scope.
+        #              search scope. This is taken from latest PgSearch.
         .unscoped
         .select("#{primary_key} AS pg_search_id")
         .select("#{rank} AS rank")
         .joins(subquery_join)
         .where(conditions)
         .reorder('rank DESC')
-        .limit(100)
+        .limit(nil)
+        .offset(nil)
     end
   end
 
