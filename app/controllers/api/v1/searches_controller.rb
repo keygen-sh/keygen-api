@@ -20,7 +20,9 @@ module Api::V1
         search_rels = model::SEARCH_RELATIONSHIPS
 
         res = current_account.send type.pluralize
-        query.each do |attribute, value|
+        query.each do |key, value|
+          attribute = key.to_s.underscore.parameterize(separator: '_')
+
           if !res.respond_to?("search_#{attribute}") || (!search_attrs.include?(attribute.to_sym) &&
             !search_rels.key?(attribute.to_sym))
             return render_bad_request(
@@ -38,7 +40,6 @@ module Api::V1
               )
             end
 
-            # Transform our metadata query into a query with snakecased keys
             value.each do |k, v|
               if v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE
                 return render_bad_request(
@@ -47,7 +48,7 @@ module Api::V1
                 )
               end
 
-              res = res.search_metadata "#{k.underscore}:#{v}"
+              res = res.search_metadata k => v
             end
           else
             if value.is_a?(String) && value.size < MINIMUM_SEARCH_QUERY_SIZE

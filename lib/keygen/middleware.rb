@@ -41,6 +41,7 @@ module Keygen
           Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
         rescue => e
           Raygun.track_exception e
+          Rails.logger.error e
         end
 
         [status, headers, res]
@@ -105,6 +106,7 @@ module Keygen
         [status, headers, res]
       rescue => e
         Raygun.track_exception e
+        Rails.logger.error e
 
         raise e
       end
@@ -227,6 +229,7 @@ module Keygen
           "CONTENT_TYPE",
           "HTTP_ACCEPT"
         )
+        Rails.logger.error e
 
         [
           503,

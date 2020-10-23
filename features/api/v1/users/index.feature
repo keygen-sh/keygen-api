@@ -218,6 +218,90 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 7 "users"
 
+  Scenario: Admin retrieves all users filtered by metadata customer email
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 9 "users"
+    # NOTE(ezekg) First user is the current admin
+    And the second "user" has the following attributes:
+      """
+      {
+        "metadata": {
+          "customer": "john.doe@example.com"
+        }
+      }
+      """
+    And the third "user" has the following attributes:
+      """
+      {
+        "metadata": {
+          "customer": "jane.doe@example.com"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?metadata[customer]=john.doe@example.com"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "user"
+
+  Scenario: Admin retrieves all users filtered by metadata customer email (excluding admins)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 9 "users"
+    And the first "user" has the following attributes:
+      """
+      {
+        "metadata": {
+          "customer": "john.doe@example.com"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?metadata[customer]=john.doe@example.com"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "users"
+
+  Scenario: Admin retrieves all users filtered by metadata customer ID and product ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 9 "users"
+    # NOTE(ezekg) First user is the current admin
+    And the second "user" has the following attributes:
+      """
+      {
+        "metadata": {
+          "customerId": "a81b9d89dec6"
+        }
+      }
+      """
+    And the current account has 2 "products"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[2]", "policyId": "$policies[0]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[3]", "policyId": "$policies[0]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?metadata[customerId]=a81b9d89dec6&product=$products[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "user"
+
   Scenario: Product retrieves all users for their product
     Given the current account is "test1"
     And the current account has 2 "products"
@@ -263,6 +347,23 @@ Feature: List users
     But the current account is "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+
+  Scenario: Admin attempts to retrieve all users for another account via search
+    Given I am an admin of account "test2"
+    But the current account is "test1"
+    And the current account has 9 "users"
+    And the fourth "user" has the following attributes:
+      """
+      {
+        "metadata": {
+          "foo": "bar"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?metadata[foo]=bar"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 

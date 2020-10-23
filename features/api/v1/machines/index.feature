@@ -188,6 +188,31 @@ Feature: List machines
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
 
+  Scenario: Admin retrieves all machines filtered by metadata node ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 11 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "metadata": {
+          "nodeId": "68666bf8b"
+        }
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "metadata": {
+          "nodeId": "68666bf80"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?metadata[nodeId]=68666bf8b"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
   Scenario: Product retrieves all machines for their product
     Given the current account is "test1"
     And the current account has 1 "product"

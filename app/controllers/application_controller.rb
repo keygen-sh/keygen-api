@@ -36,6 +36,7 @@ class ApplicationController < ActionController::API
       render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
       Raygun.track_exception err
+      Rails.logger.error err
 
       render_bad_request
     end
@@ -109,6 +110,7 @@ class ApplicationController < ActionController::API
     }
   rescue => e
     Raygun.track_exception e
+    Rails.logger.error e
 
     nil
   end
@@ -299,6 +301,7 @@ class ApplicationController < ActionController::API
           end
         rescue => e
           Raygun.track_exception e
+          Rails.logger.error e
 
           raise e
         end
@@ -350,6 +353,7 @@ class ApplicationController < ActionController::API
     response.headers["X-RateLimit-Reset"]     = info[:reset]
   rescue => e
     Raygun.track_exception e
+    Rails.logger.error e
   end
 
   def send_keygen_whoami_headers
@@ -358,5 +362,6 @@ class ApplicationController < ActionController::API
     response.headers["X-Keygen-Token-Id"] = current_token&.id
   rescue => e
     Raygun.track_exception e
+    Rails.logger.error e
   end
 end
