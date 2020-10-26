@@ -27,6 +27,16 @@ Rails.application.configure do
         'N/A'
       end
 
+    daily_req_limits =
+      {}.tap do |req|
+        acct = controller.current_account
+        next if acct.nil?
+
+        req[:req_exceeded] = acct.daily_request_limit_exceeded? || false
+        req[:req_count] = acct.daily_request_count || 'N/A'
+        req[:req_limit] = acct.daily_request_limit || 'N/A'
+      end
+
     rate_limit_logs =
       {}.tap do |log|
         next if rate_limit_info.nil?
@@ -50,6 +60,7 @@ Rails.application.configure do
       user_agent: req.user_agent || 'N/A',
       time: Time.current,
       encoded_response: err || 'N/A',
+      **daily_req_limits,
       **rate_limit_logs,
     }
   end
