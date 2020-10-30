@@ -1,4 +1,4 @@
-PUBLIC_EMAIL_SERVICES = %w[
+PUBLIC_EMAIL_DOMAINS = %w[
   1033edge.com
   11mail.com
   123.com

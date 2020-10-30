@@ -60,8 +60,13 @@ class User < ApplicationRecord
     [first_name, last_name].join " "
   end
 
-  def email_domain
-    email&.[](/[^@]+@(.+)/, 1)
+  def parsed_email
+    user, host = email.match(/([^@]+)@(.+)/).captures
+
+    {
+      user: user,
+      host: host,
+    }
   end
 
   def intercom_id
