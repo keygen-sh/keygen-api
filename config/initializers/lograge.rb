@@ -32,9 +32,13 @@ Rails.application.configure do
         acct = controller.current_account
         next if acct.nil?
 
-        req[:req_exceeded] = acct.daily_request_limit_exceeded? || false
-        req[:req_count] = acct.daily_request_count || 'N/A'
-        req[:req_limit] = acct.daily_request_limit || 'N/A'
+        begin
+          req[:req_exceeded] = acct.daily_request_limit_exceeded? || false
+          req[:req_count] = acct.daily_request_count || 'N/A'
+          req[:req_limit] = acct.daily_request_limit || 'N/A'
+        rescue => e
+          Rails.logger.error e
+        end
       end
 
     rate_limit_logs =
