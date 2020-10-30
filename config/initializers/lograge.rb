@@ -32,6 +32,8 @@ Rails.application.configure do
         acct = controller.current_account
         next if acct.nil?
 
+        # FIXME(ezekg) Sometimes we get DB connection issues here if the conn
+        #              has already been closed, or closed due to an error.
         begin
           req[:req_exceeded] = acct.daily_request_limit_exceeded? || false
           req[:req_count] = acct.daily_request_count || 'N/A'
