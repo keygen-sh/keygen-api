@@ -17,7 +17,15 @@
         %span(style="color: #{report.request_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
           #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
         %br
+        %strong Products:
+        %span(style="color: #{report.product_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+          #{number_with_delimiter report.product_count} / #{number_with_delimiter report.product_limit || 'unlimited'}
+        %br
+        %strong Admins:
+        %span(style="color: #{report.admin_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+          #{number_with_delimiter report.admin_count} / #{number_with_delimiter report.admin_limit || 'unlimited'}
+        %br
         %strong Plan:
-        %span #{report.account.plan.name} @ #{report.account.plan.price} / #{report.account.billing.state}
+        %span #{report.account.plan.name} @ $#{number_with_delimiter report.account.plan.price&.div(100) || 0} / #{report.account.billing.state}
 - else
   %p Nothing to report
