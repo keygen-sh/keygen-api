@@ -70,6 +70,7 @@ module Sluggable
             attrs.map { |column| "#{Arel.sql("\"#{sluggable_model.table_name}\".\"#{column}\"")} = :slug" }.join(" OR "),
             slug: slug
           )
+          .reorder(created_at: :asc)
           .limit(1)
           .first
 
