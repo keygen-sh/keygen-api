@@ -19,11 +19,23 @@ class RequestLimitsReportWorker
 
       admin = account.admins.first
       plan = account.plan
+
       request_limit = plan.max_reqs
       request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
+
+      admin_count = account.users.roles(:admin, :developer, :sales_agent, :support_agent).count
+      admin_limit = plan.max_admins
+
+      product_count = account.products.count
+      product_limit = plan.max_products
+
       report = OpenStruct.new(
         request_count: request_count,
         request_limit: request_limit,
+        product_count: product_count,
+        product_limit: product_limit,
+        admin_count: admin_count,
+        admin_limit: admin_limit,
         account: account,
         admin: admin,
         plan: plan
