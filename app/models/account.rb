@@ -190,7 +190,7 @@ class Account < ApplicationRecord
     autogen_name = slug || host
 
     # Parameterize the domain, i.e. keygen.sh => keygen-sh
-    autogen_slug = slug || host&.parameterize
+    autogen_slug = slug || host&.parameterize&.dasherize
 
     # Generate an account slug using the email if the current domain is a public
     # email service or if an account with the domain already exists
@@ -213,11 +213,11 @@ class Account < ApplicationRecord
     host = parsed_email&.fetch(:host)
 
     # Parameterize the domain, i.e. keygen.sh => keygen-sh
-    autogen_slug = host&.parameterize
+    autogen_slug = slug || host&.parameterize&.dasherize
 
     # Generate a random slug if the current domain is a public email service
     if autogen_slug.nil? || PUBLIC_EMAIL_DOMAINS.include?(host)
-      autogen_slug = name.downcase.parameterize
+      autogen_slug = name.downcase.parameterize.dasherize
     end
 
     # Append a random string if slug is already taken
