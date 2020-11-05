@@ -18,8 +18,6 @@ class ReportMailer < ApplicationMailer
         [
           # NOTE(ezekg) Ruby can't sort on boolean fields
           report.request_limit_exceeded ? 1 : 0,
-          report.product_limit_exceeded ? 1 : 0,
-          report.admin_limit_exceeded ? 1 : 0,
           report.request_count,
         ]
       end
