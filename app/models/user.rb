@@ -61,7 +61,9 @@ class User < ApplicationRecord
   end
 
   def parsed_email
-    user, host = email.match(/([^@]+)@(.+)/).captures
+    return nil if email.nil?
+
+    user, host = email.downcase.match(/([^@]+)@(.+)/).captures
 
     {
       user: user,
