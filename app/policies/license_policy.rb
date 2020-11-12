@@ -33,7 +33,8 @@ class LicensePolicy < ApplicationPolicy
   def check_in?
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
-      resource.product == bearer
+      resource.product == bearer ||
+      resource == bearer
   end
 
   def revoke?
