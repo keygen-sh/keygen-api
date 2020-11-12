@@ -81,6 +81,36 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License checks in itself
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "day",
+        "checkInIntervalCount": 1
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "lastCheckInAt": null
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-in"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with a lastCheckIn that is not nil
+    And the JSON response should be a "license" with a nextCheckIn that is not nil
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User checks in one of their licenses
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
