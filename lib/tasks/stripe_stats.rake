@@ -70,9 +70,10 @@ module Stripe
     end
 
     def conversion_rate
-      converted_customers = new_customers.filter { |c| c.default_source.present? || c.invoice_settings.default_payment_method.present? }
+      recent_conversions = paid_customers.filter { |c| Time.at(c.created) >= 90.days.ago }
+      recent_sign_ups = customers.filter { |c| Time.at(c.created) >= 90.days.ago }
 
-      converted_customers.size.to_f / new_customers.size.to_f * 100
+      recent_conversions.size.to_f / recent_sign_ups.size.to_f * 100
     end
 
     def churn_rate
@@ -178,15 +179,16 @@ namespace :stripe do
     report = stats.report
 
     s = ''
+    s << "\e[34m======================\e[0m\n"
     s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[0m\n"
     s << "\e[34m======================\e[0m\n"
     s << "\e[34mAnnually Recurring Revenue: \e[32m#{report.annually_recurring_revenue.to_s(:currency)}\e[0m\n"
     s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[0m\n"
     s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
     s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
-    s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} mo\e[0m\n"
-    s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} d\e[0m\n"
-    s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+    s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
+    s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+    s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
     s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
     s << "\e[34mNew Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
     s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
@@ -194,6 +196,7 @@ namespace :stripe do
     s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
     s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
     s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34m======================\e[0m\n"
 
     puts s
   end
