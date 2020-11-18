@@ -6,8 +6,6 @@ module Stripe
     BEGINNING_OF_PERIOD = 4.weeks.ago.beginning_of_day.to_time.to_i
     END_OF_PERIOD = Date.today.end_of_day.to_time.to_i
 
-    attr_reader :cache
-
     def initialize(cache:)
       Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY')
       Stripe.api_version = '2016-07-06' # NOTE(ezekg) For `list(status: 'all')`` support
@@ -16,16 +14,15 @@ module Stripe
     end
 
     def report
-      start_date_formatted = Time.at(BEGINNING_OF_PERIOD).strftime('%b %d')
-      end_date_formatted = Time.at(END_OF_PERIOD).strftime('%b %d, %Y')
-
       OpenStruct.new(
-        billing_cycle: "#{start_date_formatted} — #{end_date_formatted}",
+        start_date: Time.at(BEGINNING_OF_PERIOD),
+        end_date: Time.at(END_OF_PERIOD),
         annually_recurring_revenue: monthly_recurring_revenue * 12,
         monthly_recurring_revenue: monthly_recurring_revenue,
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
         average_life_time_value: average_life_time_value,
+        average_time_to_convert: average_time_to_convert,
         conversion_rate: conversion_rate,
         churn_rate: churn_rate,
         total_customers: paid_customers.size + free_customers.size,
@@ -39,6 +36,8 @@ module Stripe
 
     private
 
+    attr_reader :cache
+
     def monthly_recurring_revenue
       revenue_per_user.sum(0.0)
     end
@@ -48,15 +47,29 @@ module Stripe
     end
 
     def average_subscription_length_per_user
-      converted_subsciptions = subscriptions.filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
-      subscription_lengths_in_months = converted_subsciptions
-        .map { |s| ((s.created - (s.ended_at || Time.now.to_i)).abs.to_f / 2628000) }
+      subscription_lengths_in_months = converted_subscriptions
+        .map { |s| ((s.ended_at.present? ? Time.at(s.ended_at) : Time.now) - Time.at(s.created)) / 1.month }
 
-      subscription_lengths_in_months.sum(0.0) / converted_subsciptions.size.to_f
+      subscription_lengths_in_months.sum(0.0) / subscription_lengths_in_months.size.to_f
     end
 
     def average_life_time_value
       average_revenue_per_user * average_subscription_length_per_user
+    end
+
+    def average_time_to_convert
+      days_to_convert = converted_subscriptions.map do |s|
+        invoices = cache.fetch("stripe:stats:subscriptions:#{s.id}:invoices", expires_in: 1.hour) do
+          s.customer.invoices.auto_paging_each.to_a.sort_by { |i| i.created }
+        end
+
+        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
+        next if first_paid_invoice.nil?
+
+        (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+      end.compact
+
+      days_to_convert.sum(0.0) / days_to_convert.size.to_f
     end
 
     def conversion_rate
@@ -112,6 +125,10 @@ module Stripe
       @canceled_subscriptions ||= subscriptions.filter { |s| s.status == 'canceled' }
     end
 
+    def converted_subscriptions
+      @converted_subscriptions ||= subscriptions.filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+    end
+
     def customers
       @customers ||= subscriptions.map(&:customer)
     end
@@ -148,22 +165,22 @@ namespace :stripe do
     report = stats.report
 
     s = ''
-    s << "\e[34mReport for #{report.billing_cycle}\e[0m\n"
+    s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[0m\n"
     s << "\e[34m======================\e[0m\n"
     s << "\e[34mAnnually Recurring Revenue: \e[32m#{report.annually_recurring_revenue.to_s(:currency)}\e[0m\n"
     s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[0m\n"
     s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
     s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
     s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} mo\e[0m\n"
+    s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} d\e[0m\n"
     s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[0m\n"
     s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-    s << "\e[34mCustomers: \e[0m\n"
-    s << "\e[34m  New Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m  Total: \e[32m#{report.total_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m  Paid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m  Trialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m  Free: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m  Churned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34mNew Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
+    s << "\e[34mPaid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
+    s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
 
     puts s
   end
