@@ -47,7 +47,7 @@ module Stripe
     end
 
     def average_subscription_length_per_user
-      subscription_lengths_in_months = converted_subscriptions
+      subscription_lengths_in_months = paid_subscriptions
         .map { |s| ((s.ended_at.present? ? Time.at(s.ended_at) : Time.now) - Time.at(s.created)) / 1.month }
 
       subscription_lengths_in_months.sum(0.0) / subscription_lengths_in_months.size.to_f
@@ -58,11 +58,8 @@ module Stripe
     end
 
     def average_time_to_convert
-      days_to_convert = converted_subscriptions.map do |s|
-        invoices = cache.fetch("stripe:stats:subscriptions:#{s.id}:invoices", expires_in: 1.hour) do
-          s.customer.invoices.auto_paging_each.to_a.sort_by { |i| i.created }
-        end
-
+      days_to_convert = paid_subscriptions.map do |s|
+        invoices = invoices_for(s.customer)
         first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
         next if first_paid_invoice.nil?
 
@@ -96,6 +93,20 @@ module Stripe
       end
     end
 
+    def invoices_for(resource)
+      cache.fetch("stripe:stats:invoices:#{resource.id}", expires_in: 1.hour) do
+        invoices =
+          case resource
+          when Stripe::Subscription
+            Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
+          when Stripe::Customer
+            Stripe::Invoice.list(customer: resource.id, limit: 100).auto_paging_each.to_a
+          end
+
+        invoices&.sort_by { |i| i.created }
+      end
+    end
+
     def subscriptions
       @subscriptions ||= cache.fetch('stripe:stats:subscriptions', expires_in: 1.hour) do
         Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer'])
@@ -109,8 +120,14 @@ module Stripe
 
     def paid_subscriptions
       @paid_subscriptions ||= subscriptions
-        .filter { |s| s.status == 'active' || s.status == 'trialing' }
-        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+        .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
+        .filter do |s|
+          invoices = invoices_for(s)
+
+          invoices.any? { |i| i.paid? && i.amount_paid > 0 } ||
+            s.customer.default_source.present? ||
+            s.customer.invoice_settings.default_payment_method.present?
+        end
     end
 
     def trialing_subscriptions
@@ -123,10 +140,6 @@ module Stripe
 
     def canceled_subscriptions
       @canceled_subscriptions ||= subscriptions.filter { |s| s.status == 'canceled' }
-    end
-
-    def converted_subscriptions
-      @converted_subscriptions ||= subscriptions.filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
     end
 
     def customers
