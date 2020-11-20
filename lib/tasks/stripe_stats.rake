@@ -17,17 +17,20 @@ module Stripe
       OpenStruct.new(
         start_date: Time.at(BEGINNING_OF_PERIOD),
         end_date: Time.at(END_OF_PERIOD),
-        annually_recurring_revenue: monthly_recurring_revenue * 12,
         monthly_recurring_revenue: monthly_recurring_revenue,
+        annual_run_rate: monthly_recurring_revenue * 12,
+        new_revenue: new_revenue,
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
         average_life_time_value: average_life_time_value,
         average_time_to_convert: average_time_to_convert,
         conversion_rate: conversion_rate,
+        growth_rate: growth_rate,
         churn_rate: churn_rate,
         total_customers: paid_customers.size + free_customers.size,
         new_customers: new_customers.size,
         paid_customers: paid_customers.size,
+        new_paid_customers: new_paid_customers.size,
         trialing_customers: trialing_customers.size,
         free_customers: free_customers.size,
         churned_customers: churned_customers.size,
@@ -40,6 +43,10 @@ module Stripe
 
     def monthly_recurring_revenue
       revenue_per_user.sum(0.0)
+    end
+
+    def new_revenue
+      revenue_per_new_user.sum(0.0)
     end
 
     def average_revenue_per_user
@@ -76,12 +83,27 @@ module Stripe
       recent_conversions.size.to_f / recent_sign_ups.size.to_f * 100
     end
 
+    def growth_rate
+      next_mrr = monthly_recurring_revenue
+      prev_mrr = next_mrr - new_revenue
+
+      (next_mrr - prev_mrr) / prev_mrr * 100
+    end
+
     def churn_rate
       churned_customers.size.to_f / paid_customers.size.to_f * 100
     end
 
     def revenue_per_user
-      paid_subscriptions.map do |subscription|
+      revenue_for(paid_subscriptions)
+    end
+
+    def revenue_per_new_user
+      revenue_for(new_paid_subscriptions)
+    end
+
+    def revenue_for(subscriptions)
+      subscriptions.map do |subscription|
         plan = subscription.plan
         amount =
           if plan.interval == 'year'
@@ -131,6 +153,16 @@ module Stripe
         end
     end
 
+    def new_paid_subscriptions
+      @new_paid_subscriptions ||= paid_subscriptions.filter do |s|
+        invoices = invoices_for(s)
+        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
+        next if first_paid_invoice.nil?
+
+        first_paid_invoice.status_transitions.paid_at >= BEGINNING_OF_PERIOD
+      end.compact
+    end
+
     def trialing_subscriptions
       @trailing_subscriptions ||= subscriptions.filter { |s| s.status == 'trialing' }
     end
@@ -155,6 +187,10 @@ module Stripe
       @paid_customers ||= paid_subscriptions.map(&:customer)
     end
 
+    def new_paid_customers
+      @new_paid_customers ||= new_paid_subscriptions.map(&:customer)
+    end
+
     def churned_customers
       @churned_customers ||= canceled_subscriptions
         .filter { |s| s.canceled_at >= BEGINNING_OF_PERIOD || s.ended_at >= BEGINNING_OF_PERIOD }
@@ -169,35 +205,72 @@ module Stripe
     def free_customers
       @free_customers ||= free_subscriptions.map(&:customer)
     end
+
+    class Spinner
+      @@thread = nil
+
+      def self.start(&block)
+        print "\u001B[?25l"
+
+        @@thread = Thread.new do
+          frames = %w[⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏]
+          frames.cycle do |frame|
+            print "\e[H\e[2J\e[36m#{frame}\e[34m generating report…\e[0m\n"
+            sleep 0.1
+          end
+        end
+
+        if block_given?
+          block.call
+          stop
+        end
+      end
+
+      def self.stop
+        print "\u001B[?25h"
+        print "\e[H\e[2J"
+
+        @@thread.kill
+      end
+    end
   end
 end
 
 namespace :stripe do
   desc 'calculate stripe stats'
   task stats: :environment do
-    stats = Stripe::Stats.new(cache: Rails.cache)
-    report = stats.report
+    Rails.logger.silence do
+      stats = Stripe::Stats.new(cache: Rails.cache)
+      report = nil
 
-    s = ''
-    s << "\e[34m======================\e[0m\n"
-    s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[0m\n"
-    s << "\e[34m======================\e[0m\n"
-    s << "\e[34mAnnually Recurring Revenue: \e[32m#{report.annually_recurring_revenue.to_s(:currency)}\e[0m\n"
-    s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[0m\n"
-    s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
-    s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
-    s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
-    s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
-    s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
-    s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-    s << "\e[34mNew Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
-    s << "\e[34mPaid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
-    s << "\e[34m======================\e[0m\n"
+      Stripe::Stats::Spinner.start do
+        report = stats.report
+      end
 
-    puts s
+      s = ''
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[0m\n"
+      s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
+      s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
+      s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
+      s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
+      s << "\e[34mGrowth Rate: \e[32m#{report.growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34mNew Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mNew Paid Customers: \e[32m#{report.new_paid_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
+      s << "\e[34mPaid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
+
+      puts s
+    end
   end
 end
