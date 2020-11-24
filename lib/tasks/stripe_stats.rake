@@ -164,7 +164,7 @@ module Stripe
     end
 
     def trialing_subscriptions
-      @trailing_subscriptions ||= subscriptions.filter { |s| s.status == 'trialing' }
+      @trialing_subscriptions ||= subscriptions.filter { |s| s.status == 'trialing' }
     end
 
     def free_subscriptions
