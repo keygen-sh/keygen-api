@@ -25,10 +25,11 @@ module Stripe
         average_life_time_value: average_life_time_value,
         average_time_to_convert: average_time_to_convert,
         conversion_rate: conversion_rate,
-        growth_rate: growth_rate,
+        revenue_growth_rate: revenue_growth_rate,
+        user_growth_rate: user_growth_rate,
         churn_rate: churn_rate,
-        total_customers: paid_customers.size + free_customers.size,
-        new_customers: new_customers.size,
+        total_customers: paid_customers.size + trialing_customers.size + free_customers.size,
+        new_sign_ups: new_sign_ups.size,
         paid_customers: paid_customers.size,
         new_paid_customers: new_paid_customers.size,
         trialing_customers: trialing_customers.size,
@@ -83,11 +84,18 @@ module Stripe
       recent_conversions.size.to_f / recent_sign_ups.size.to_f * 100
     end
 
-    def growth_rate
+    def revenue_growth_rate
       next_mrr = monthly_recurring_revenue
       prev_mrr = next_mrr - new_revenue
 
       (next_mrr - prev_mrr) / prev_mrr * 100
+    end
+
+    def user_growth_rate
+      next_user_count = paid_customers.size.to_f + trialing_customers.size.to_f + free_customers.size.to_f
+      prev_user_count = next_user_count - new_sign_ups.size.to_f
+
+      (next_user_count - prev_user_count) / prev_user_count * 100
     end
 
     def churn_rate
@@ -179,8 +187,8 @@ module Stripe
       @customers ||= subscriptions.map(&:customer)
     end
 
-    def new_customers
-      @new_customers ||= customers.filter { |c| c.created >= BEGINNING_OF_PERIOD }
+    def new_sign_ups
+      @new_sign_ups ||= customers.filter { |c| c.created >= BEGINNING_OF_PERIOD }
     end
 
     def paid_customers
@@ -258,10 +266,11 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34mUser Growth Rate: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
-      s << "\e[34mGrowth Rate: \e[32m#{report.growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-      s << "\e[34mNew Sign Ups: \e[32m#{report.new_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mNew Sign Ups: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[0m\n"
       s << "\e[34mNew Paid Customers: \e[32m#{report.new_paid_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34mPaid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
