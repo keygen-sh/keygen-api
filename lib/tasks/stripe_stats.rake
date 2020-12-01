@@ -112,6 +112,7 @@ module Stripe
 
     def revenue_for(subscriptions)
       subscriptions.map do |subscription|
+        coupon = subscription.discount&.coupon
         plan = subscription.plan
         amount =
           if plan.interval == 'year'
@@ -119,8 +120,14 @@ module Stripe
           else
             plan.amount.to_f
           end
+        discount =
+          if coupon.present? && coupon.duration == 'forever'
+            amount * (coupon.percent_off.to_f / 100)
+          else
+            0.0
+          end
 
-        amount * subscription.quantity / 100
+        (amount - discount) * subscription.quantity / 100
       end
     end
 
