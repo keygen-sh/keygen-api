@@ -87,10 +87,6 @@ Feature: Show user
     And the response should contain a valid signature header for "test1"
     And the JSON response should be a "user"
     And the JSON response should be a "user" with the role "admin"
-    And the JSON response should be an "user" with the following meta:
-      """
-      { "intercomId": "$users[0].intercom_id" }
-      """
 
   Scenario: Admin retrieves an invalid user for their account
     Given I am an admin of account "test1"
