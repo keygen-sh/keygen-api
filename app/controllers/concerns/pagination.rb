@@ -8,14 +8,6 @@ module Pagination
     def render(args)
       super args.merge links: pagination_links(args[:jsonapi]) unless performed?
     rescue => e # TODO: Let's not catch everything here
-      Raygun.track_exception e, request.env.to_h.slice(
-        "REQUEST_METHOD",
-        "PATH_INFO",
-        "QUERY_STRING",
-        "CONTENT_LENGTH",
-        "CONTENT_TYPE",
-        "HTTP_ACCEPT"
-      )
       Rails.logger.error e
 
       super args unless performed? # Avoid double render

@@ -30,7 +30,6 @@ Rails.application.configure do
     reconnect_delay_max: ENV.fetch('REDIS_RECONNECT_DELAY_MAX') { 1 }.to_f,
     driver: :hiredis,
     error_handler: -> (method:, returning:, exception:) {
-      Raygun.track_exception exception, method: method, returning: returning
       Rails.logger.error exception
     },
   }

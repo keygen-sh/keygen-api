@@ -11,7 +11,6 @@ module Signable
     # 60 chars, which creates invalid signature headers.
     Base64.strict_encode64 sig
   rescue => e
-    Raygun.track_exception e
     Rails.logger.error e
 
     raise e
