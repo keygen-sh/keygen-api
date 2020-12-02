@@ -40,7 +40,6 @@ module Keygen
 
           Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
         rescue => e
-          Raygun.track_exception e
           Rails.logger.error e
         end
 
@@ -105,7 +104,6 @@ module Keygen
 
         [status, headers, res]
       rescue => e
-        Raygun.track_exception e
         Rails.logger.error e
 
         raise e
@@ -221,14 +219,6 @@ module Keygen
       rescue Rack::Timeout::RequestTimeoutException,
              Rack::Timeout::Error,
              Timeout::Error => e
-        Raygun.track_exception e, env.to_h.slice(
-          "REQUEST_METHOD",
-          "PATH_INFO",
-          "QUERY_STRING",
-          "CONTENT_LENGTH",
-          "CONTENT_TYPE",
-          "HTTP_ACCEPT"
-        )
         Rails.logger.error e
 
         [

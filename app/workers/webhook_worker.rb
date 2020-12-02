@@ -48,7 +48,6 @@ class WebhookWorker
         last_response_body: body
       )
     rescue => e
-      Raygun.track_exception e
       Rails.logger.error e
 
       raise e
