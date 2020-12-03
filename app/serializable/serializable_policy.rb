@@ -11,7 +11,7 @@ class SerializablePolicy < SerializableBase
   attribute :max_machines
   attribute :max_uses
   attribute :concurrent
-  attribute :fingerprint_policy
+  attribute :fingerprint_strategy
   attribute :scheme
   attribute :encrypted
   attribute :protected
