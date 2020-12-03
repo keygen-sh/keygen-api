@@ -38,7 +38,7 @@ class Policy < ApplicationRecord
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
 
-  before_create -> { self.fingerprint_policy = 'UNIQUE_PER_ACCOUNT' }, if: -> { fingerprint_policy.nil? }
+  before_create -> { self.fingerprint_policy = 'UNIQUE_PER_LICENSE' }, if: -> { fingerprint_policy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
