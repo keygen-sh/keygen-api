@@ -51,13 +51,18 @@ module Api::V1::Licenses::Relationships
             pointer: "/data/relationships/policy"
           }
         )
+      when new_policy.present? && old_policy.fingerprint_policy != new_policy.fingerprint_policy
+        return render_unprocessable_entity(
+          detail: "cannot change to a policy with a different fingerprint uniqueness policy",
+          source: {
+            pointer: "/data/relationships/policy"
+          }
+        )
       when current_bearer.has_role?(:user) && new_policy&.protected?
         return render_forbidden
       end
 
-      @license.policy = new_policy
-
-      if @license.save(context: :policy_transfer)
+      if @license.update(policy: new_policy)
         CreateWebhookEventService.new(
           event: "license.policy.updated",
           account: current_account,

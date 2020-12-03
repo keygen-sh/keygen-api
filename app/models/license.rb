@@ -63,30 +63,6 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
-  # Validate machines on policy transfers (enforce fingerprint uniqueness policies)
-  validate on: :policy_transfer do
-    next unless policy.present? &&
-                (
-                  policy.fingerprint_uniq_per_product? ||
-                  policy.fingerprint_uniq_per_policy?
-                )
-
-    # FIXME(ezekg) If machines count is over a certain threshold, maybe we
-    #              should queue a "policy transfer request" background job
-    #              and respond with a 202 HTTP status?
-
-    machines.find_each(batch_size: 100) do |machine|
-      next if machine.valid?(:policy_transfer)
-
-      machine.errors.to_hash.each { |attr, errs|
-        errors.add :machines, :invalid, message: "#{attr} #{errs.first}"
-      }
-
-      # No use continuing once we've hit an invalid machine
-      break
-    end
-  end
-
   validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
