@@ -63,22 +63,6 @@ class Machine < ApplicationRecord
     end
   end
 
-  # Valdiate fingerprint uniqueness on policy transfers
-  validate on: :policy_transfer do |machine|
-    # We're using `license.policy` here because we want the updated value, not
-    # the current value (i.e. the policy being transferred to.)
-    case
-    when uniq_per_account?
-      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.where.not(id: id).exists?(fingerprint: fingerprint)
-    when uniq_per_product?
-      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).where.not(id: id).exists?(fingerprint: fingerprint, products: { id: license.policy.product_id })
-    when uniq_per_policy?
-      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).where.not(id: id).exists?(fingerprint: fingerprint, policies: { id: license.policy_id })
-    when uniq_per_license?
-      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.where.not(id: id).exists?(fingerprint: fingerprint)
-    end
-  end
-
   validates :fingerprint, presence: true, blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
