@@ -553,11 +553,10 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "fingerprint has already been taken for this product",
-        "code": "MACHINES_INVALID",
+        "title": "Unprocessable entity",
+        "detail": "cannot change to a policy with a different fingerprint uniqueness policy",
         "source": {
-          "pointer": "/data/relationships/machines"
+          "pointer": "/data/relationships/policy"
         }
       }
       """
