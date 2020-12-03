@@ -41,6 +41,9 @@ class License < ApplicationRecord
 
   # Validate machines on policy transfers (enforce fingerprint uniqueness policies)
   validate on: :policy_transfer do
+    next unless policy.fingerprint_uniq_per_product? ||
+                policy.fingerprint_uniq_per_policy?
+
     machines.find_each do |machine|
       next if machine.valid?(:policy_transfer)
 
