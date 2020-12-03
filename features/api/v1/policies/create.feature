@@ -84,6 +84,7 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "policy" with the fingerprintPolicy "UNIQUE_PER_LICENSE"
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
@@ -107,6 +108,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Premium Add-On",
+            "fingerprintPolicy": "UNIQUE_PER_PRODUCT",
             "maxMachines": 3,
             "floating": true,
             "strict": false,
@@ -125,6 +127,7 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" with the maxMachines "3"
+    And the JSON response should be a "policy" with the fingerprintPolicy "UNIQUE_PER_PRODUCT"
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
     And the JSON response should be a "policy" with a nil scheme
