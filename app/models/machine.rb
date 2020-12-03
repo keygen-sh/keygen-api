@@ -30,10 +30,13 @@ class Machine < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
+  # Disallow machine fingerprints to match UUID of another machine
   validate on: :create do |machine|
     errors.add :fingerprint, :conflict, message: "must not conflict with another machine's identifier (UUID)" if account.machines.exists? fingerprint
+  end
 
-    # Disallow machine overages when the policy is not set to concurrent
+  # Disallow machine overages when the policy is not set to concurrent
+  validate on: :create do |machine|
     machines_count = machine.license&.machines&.count || 0
 
     next if machine.policy.nil? ||
@@ -44,6 +47,20 @@ class Machine < ApplicationRecord
     next unless (machines_count >= machine.policy.max_machines rescue false)
 
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
+  end
+
+  # Fingerprint uniqueness
+  validate on: [:create, :update] do |machine|
+    case
+    when uniq_per_account?
+      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists? fingerprint: fingerprint
+    when uniq_per_product?
+      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists? fingerprint: fingerprint, products: { id: product.id }
+    when uniq_per_policy?
+      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists? fingerprint: fingerprint, policies: { id: policy.id }
+    when uniq_per_license?
+      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists? fingerprint: fingerprint
+    end
   end
 
   validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
@@ -130,5 +147,29 @@ class Machine < ApplicationRecord
       },
       ts: Time.current,
     }
+  end
+
+  def uniq_per_account?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_account?
+  end
+
+  def uniq_per_product?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_product?
+  end
+
+  def uniq_per_policy?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_policy?
+  end
+
+  def uniq_per_license?
+    return false if policy.nil?
+
+    policy.fingerprint_uniq_per_license?
   end
 end

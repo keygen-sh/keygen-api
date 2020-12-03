@@ -15,6 +15,13 @@ class Policy < ApplicationRecord
     RSA_2048_PKCS1_PSS_SIGN_V2
   ].freeze
 
+  FINGERPRINT_POLICIES = %w[
+    UNIQUE_PER_ACCOUNT
+    UNIQUE_PER_PRODUCT
+    UNIQUE_PER_POLICY
+    UNIQUE_PER_LICENSE
+  ].freeze
+
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name]
@@ -25,10 +32,15 @@ class Policy < ApplicationRecord
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
+  has_many :machines, through: :licenses
   has_many :pool, class_name: "Key", dependent: :destroy
+
+  # Add default fingerprint policy
+  before_validation -> { self.fingerprint_policy = 'UNIQUE_PER_LICENSE' }, on: :create, if: -> { fingerprint_policy.nil? }
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
+
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -49,6 +61,7 @@ class Policy < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
   validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
+  validates :fingerprint_policy, inclusion: { in: FINGERPRINT_POLICIES, message: "unsupported fingerprint policy" }, allow_nil: true
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -100,6 +113,24 @@ class Policy < ApplicationRecord
 
   def deactivate_dead_machines?
     true
+  end
+
+  def fingerprint_uniq_per_account?
+    fingerprint_policy == 'UNIQUE_PER_ACCOUNT'
+  end
+
+  def fingerprint_uniq_per_product?
+    fingerprint_policy == 'UNIQUE_PER_PRODUCT'
+  end
+
+  def fingerprint_uniq_per_policy?
+    fingerprint_policy == 'UNIQUE_PER_POLICY'
+  end
+
+  def fingerprint_uniq_per_license?
+    return true if fingerprint_policy.nil? # NOTE(ezekg) Backwards compat
+
+    fingerprint_policy == 'UNIQUE_PER_LICENSE'
   end
 
   def pop!
