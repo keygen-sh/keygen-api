@@ -55,7 +55,9 @@ module Api::V1::Licenses::Relationships
         return render_forbidden
       end
 
-      if @license.update(policy: new_policy)
+      @license.policy = new_policy
+
+      if @license.save(context: :policy_transfer)
         CreateWebhookEventService.new(
           event: "license.policy.updated",
           account: current_account,

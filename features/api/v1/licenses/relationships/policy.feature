@@ -499,6 +499,72 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin changes a license's policy relationship to a policy with a product-scoped fingerprint uniqueness policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "fingerprintPolicy": "UNIQUE_PER_LICENSE",
+        "productId": "$products[0]"
+      }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "fingerprintPolicy": "UNIQUE_PER_PRODUCT",
+        "productId": "$products[0]"
+      }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 2 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "fingerprint": "mN:8M:uK:WL:Dx:8z:Vb:9A:ut:zD:FA:xL:fv:zt:ZE",
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "fingerprint has already been taken for this product",
+        "code": "MACHINES_INVALID",
+        "source": {
+          "pointer": "/data/relationships/machines"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product changes a license's policy relationship to a new policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
