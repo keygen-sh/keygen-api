@@ -49,17 +49,29 @@ class Machine < ApplicationRecord
     machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
-  # Fingerprint uniqueness
-  validate on: [:create, :update] do |machine|
+  # Fingerprint uniqueness on create
+  validate on: :create do |machine|
     case
     when uniq_per_account?
-      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists? fingerprint: fingerprint
+      errors.add :fingerprint, :taken, message: "has already been taken for this account" if account.machines.exists?(fingerprint: fingerprint)
     when uniq_per_product?
-      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists? fingerprint: fingerprint, products: { id: product.id }
+      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).exists?(fingerprint: fingerprint, products: { id: product.id })
     when uniq_per_policy?
-      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists? fingerprint: fingerprint, policies: { id: policy.id }
+      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).exists?(fingerprint: fingerprint, policies: { id: policy.id })
     when uniq_per_license?
-      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists? fingerprint: fingerprint
+      errors.add :fingerprint, :taken, message: "has already been taken" if license.machines.exists?(fingerprint: fingerprint)
+    end
+  end
+
+  # Valdiate fingerprint uniqueness on policy transfers
+  validate on: :policy_transfer do |machine|
+    # We're using `license.policy` here because we want the updated value, not
+    # the current value (i.e. the policy being transferred to.)
+    case
+    when uniq_per_product?
+      errors.add :fingerprint, :taken, message: "has already been taken for this product" if account.machines.joins(:product).where.not(id: id).exists?(fingerprint: fingerprint, products: { id: license.policy.product_id })
+    when uniq_per_policy?
+      errors.add :fingerprint, :taken, message: "has already been taken for this policy" if account.machines.joins(:policy).where.not(id: id).exists?(fingerprint: fingerprint, policies: { id: license.policy_id })
     end
   end
 
@@ -152,24 +164,24 @@ class Machine < ApplicationRecord
   def uniq_per_account?
     return false if policy.nil?
 
-    policy.fingerprint_uniq_per_account?
+    license.policy.fingerprint_uniq_per_account?
   end
 
   def uniq_per_product?
     return false if policy.nil?
 
-    policy.fingerprint_uniq_per_product?
+    license.policy.fingerprint_uniq_per_product?
   end
 
   def uniq_per_policy?
     return false if policy.nil?
 
-    policy.fingerprint_uniq_per_policy?
+    license.policy.fingerprint_uniq_per_policy?
   end
 
   def uniq_per_license?
     return false if policy.nil?
 
-    policy.fingerprint_uniq_per_license?
+    license.policy.fingerprint_uniq_per_license?
   end
 end
