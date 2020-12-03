@@ -51,9 +51,9 @@ module Api::V1::Licenses::Relationships
             pointer: "/data/relationships/policy"
           }
         )
-      when new_policy.present? && old_policy.fingerprint_policy != new_policy.fingerprint_policy
+      when new_policy.present? && old_policy.fingerprint_strategy != new_policy.fingerprint_strategy
         return render_unprocessable_entity(
-          detail: "cannot change to a policy with a different fingerprint uniqueness policy",
+          detail: "cannot change to a policy with a different fingerprint strategy",
           source: {
             pointer: "/data/relationships/policy"
           }
