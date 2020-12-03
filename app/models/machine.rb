@@ -75,7 +75,7 @@ class Machine < ApplicationRecord
     end
   end
 
-  validates :fingerprint, presence: true, blank: false, uniqueness: { scope: :license_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
+  validates :fingerprint, presence: true, blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :metadata, -> (meta) { search_metadata meta }
