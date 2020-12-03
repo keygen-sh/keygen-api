@@ -71,11 +71,11 @@ class License < ApplicationRecord
                   policy.fingerprint_uniq_per_policy?
                 )
 
-    # We're going to skip this "nice-to-have" validation if a license has
-    # so many machines that it would reduce performance
-    next if machines_count > 100
+    # FIXME(ezekg) If machines count is over a certain threshold, maybe we
+    #              should queue a "policy transfer request" background job
+    #              and respond with a 202 HTTP status?
 
-    machines.find_each(batch_size: 10) do |machine|
+    machines.find_each(batch_size: 100) do |machine|
       next if machine.valid?(:policy_transfer)
 
       machine.errors.to_hash.each { |attr, errs|
