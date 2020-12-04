@@ -499,7 +499,7 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a policy with a product-scoped fingerprint strategy
+  Scenario: Admin changes a license's policy relationship to a policy with a product-scoped fingerprint uniqueness strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
@@ -507,14 +507,14 @@ Feature: License policy relationship
     And the first "policy" has the following attributes:
       """
       {
-        "fingerprintStrategy": "UNIQUE_PER_LICENSE",
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE",
         "productId": "$products[0]"
       }
       """
     And the second "policy" has the following attributes:
       """
       {
-        "fingerprintStrategy": "UNIQUE_PER_PRODUCT",
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
         "productId": "$products[0]"
       }
       """
@@ -554,7 +554,7 @@ Feature: License policy relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot change to a policy with a different fingerprint strategy",
+        "detail": "cannot change to a policy with a different fingerprint uniqueness strategy",
         "source": {
           "pointer": "/data/relationships/policy"
         }
