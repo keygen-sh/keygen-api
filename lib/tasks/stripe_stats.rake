@@ -33,6 +33,7 @@ module Stripe
         paid_customers: paid_customers.size,
         new_paid_customers: new_paid_customers.size,
         trialing_customers: trialing_customers.size,
+        trialing_customers_with_payment_method: trialing_customers_with_payment_method.size,
         free_customers: free_customers.size,
         churned_customers: churned_customers.size,
       )
@@ -217,6 +218,11 @@ module Stripe
       @trialing_customers ||= trialing_subscriptions.map(&:customer)
     end
 
+    def trialing_customers_with_payment_method
+      @trialing_customers_with_payment_method ||= trialing_customers
+        .filter { |c| c.default_source.present? || c.invoice_settings.default_payment_method.present? }
+    end
+
     def free_customers
       @free_customers ||= free_subscriptions.map(&:customer)
     end
@@ -281,7 +287,7 @@ namespace :stripe do
       s << "\e[34mNew Paid Customers: \e[32m#{report.new_paid_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mTotal Customers: \e[32m#{report.total_customers.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34mPaid: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
-      s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[34m (#{report.trialing_customers_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
