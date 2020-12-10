@@ -64,6 +64,7 @@ Rails.application.configure do
       token_id: token_id || 'N/A',
       ip: req.headers['cf-connecting-ip'] || req.remote_ip,
       user_agent: req.user_agent || 'N/A',
+      origin: req.headers['origin'] || 'N/A',
       time: Time.current,
       encoded_response: err || 'N/A',
       **daily_req_limits,
