@@ -133,7 +133,7 @@ module Stripe
     end
 
     def invoices_for(resource)
-      cache.fetch("stripe:stats:invoices:#{resource.id}", expires_in: 1.hour) do
+      cache.fetch("stripe:stats:invoices:#{resource.id}", expires_in: 2.days) do
         invoices =
           case resource
           when Stripe::Subscription
@@ -147,7 +147,7 @@ module Stripe
     end
 
     def subscriptions
-      @subscriptions ||= cache.fetch('stripe:stats:subscriptions', expires_in: 1.hour) do
+      @subscriptions ||= cache.fetch('stripe:stats:subscriptions', expires_in: 2.days) do
         Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer'])
           .auto_paging_each
           .to_a
