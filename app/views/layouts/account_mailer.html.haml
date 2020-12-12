@@ -38,16 +38,18 @@
       #{@account.name},
     = yield
     %p
-      Kind regards,
-    %p
+      Kind regards
+      %br
+      &#45;&#45;
+      %br
       Zeke Gabrielse
       %br
-      Founder
+      Founder &lt;zeke@keygen.sh&gt;
     %hr
     %small Techinical information for your account, in case you need it:
     %ul.no-margin
       %li
-        %small Account login: #{link_to "https://app.keygen.sh/login", "https://app.keygen.sh/login?account=" + @account.id} (bookmark this for easier access)
+        %small Account login: #{link_to "https://app.keygen.sh/login?account=" + @account.slug, "https://app.keygen.sh/login?account=" + @account.id} (bookmark for quicker access)
       %li
         %small Account name: #{@account.name}
       %li
