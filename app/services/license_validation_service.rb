@@ -44,14 +44,28 @@ class LicenseValidationService < BaseService
       end
       # Check against fingerprint scope requirements
       if scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
-        fp = scope[:fingerprint] || scope[:fingerprints]
+        fingerprints = []
+
+        if scope.key?(:fingerprints)
+          fingerprints += scope[:fingerprints]
+        else
+          fingerprints << scope[:fingerprint]
+        end
+
         case
         when !license.policy.floating? && license.machines.count == 0
           return [false, "has no associated machine", :NO_MACHINE]
         when license.policy.floating? && license.machines.count == 0
           return [false, "has no associated machines", :NO_MACHINES]
         else
-          return [false, "fingerprint scope does not match", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fp).empty?
+          case
+          when license.policy.fingerprint_match_most?
+            return [false, "fingerprint scope does not match enough associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
+          when license.policy.fingerprint_match_all?
+            return [false, "fingerprint scope does not match all associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).count < fingerprints.size
+          else
+            return [false, "fingerprint scope does not match any associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).empty?
+          end
         end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?

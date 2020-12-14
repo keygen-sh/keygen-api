@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_03_153606) do
+ActiveRecord::Schema.define(version: 2020_12_14_151403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -188,6 +188,7 @@ ActiveRecord::Schema.define(version: 2020_12_03_153606) do
     t.string "scheme"
     t.integer "heartbeat_duration"
     t.string "fingerprint_uniqueness_strategy"
+    t.string "fingerprint_matching_strategy"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
