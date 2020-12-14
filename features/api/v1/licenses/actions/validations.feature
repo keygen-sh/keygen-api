@@ -3352,7 +3352,7 @@ Feature: License validation actions
         "key": "some-key"
       }
       """
-    And the current account has 3 "machines"
+    And the current account has 5 "machines"
     And all "machines" have the following attributes:
       """
       {
