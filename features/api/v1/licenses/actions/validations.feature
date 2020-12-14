@@ -3384,6 +3384,57 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous validates a valid license key scoped to an array of nil fingerprints
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.year.from_now",
+        "key": "some-key"
+      }
+      """
+    And the current account has 4 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-key",
+          "scope": {
+            "fingerprints": [
+              null,
+              null
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "fingerprint scope is empty", "constant": "FINGERPRINT_SCOPE_EMPTY" }
+      """
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a valid license key scoped to an array of fingerprints belonging to another license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
