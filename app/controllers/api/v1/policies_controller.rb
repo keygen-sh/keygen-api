@@ -97,6 +97,7 @@ module Api::V1
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :max_uses, type: :integer, optional: true, allow_nil: true
             param :fingerprint_uniqueness_strategy, type: :string, optional: true
+            param :fingerprint_matching_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true
@@ -131,6 +132,8 @@ module Api::V1
             param :concurrent, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :max_uses, type: :integer, optional: true, allow_nil: true
+            param :fingerprint_uniqueness_strategy, type: :string, optional: true
+            param :fingerprint_matching_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true
