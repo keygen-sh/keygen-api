@@ -15,11 +15,17 @@ class Policy < ApplicationRecord
     RSA_2048_PKCS1_PSS_SIGN_V2
   ].freeze
 
-  FINGERPRINT_POLICIES = %w[
+  FINGERPRINT_UNIQUENESS_STRATEGIES = %w[
     UNIQUE_PER_ACCOUNT
     UNIQUE_PER_PRODUCT
     UNIQUE_PER_POLICY
     UNIQUE_PER_LICENSE
+  ].freeze
+
+  FINGERPRINT_MATCHING_STRATEGIES = %w[
+    MATCH_ANY
+    MATCH_MOST
+    MATCH_ALL
   ].freeze
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
@@ -39,6 +45,7 @@ class Policy < ApplicationRecord
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }
 
   before_create -> { self.fingerprint_uniqueness_strategy = 'UNIQUE_PER_LICENSE' }, if: -> { fingerprint_uniqueness_strategy.nil? }
+  before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -59,7 +66,8 @@ class Policy < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :scheme, inclusion: { in: %w[LEGACY_ENCRYPT], message: "unsupported encryption scheme (scheme must be LEGACY_ENCRYPT for legacy encrypted policies)" }, if: :encrypted?
   validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
-  validates :fingerprint_uniqueness_strategy, inclusion: { in: FINGERPRINT_POLICIES, message: "unsupported fingerprint uniqueness strategy" }, allow_nil: true
+  validates :fingerprint_uniqueness_strategy, inclusion: { in: FINGERPRINT_UNIQUENESS_STRATEGIES, message: "unsupported fingerprint uniqueness strategy" }, allow_nil: true
+  validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -129,6 +137,20 @@ class Policy < ApplicationRecord
     return true if fingerprint_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
 
     fingerprint_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
+  end
+
+  def fingerprint_match_any?
+    return true if fingerprint_matching_strategy.nil? # NOTE(ezekg) Backwards compat
+
+    fingerprint_matching_strategy == 'MATCH_ANY'
+  end
+
+  def fingerprint_match_most?
+    fingerprint_matching_strategy == 'MATCH_MOST'
+  end
+
+  def fingerprint_match_all?
+    fingerprint_matching_strategy == 'MATCH_ALL'
   end
 
   def pop!

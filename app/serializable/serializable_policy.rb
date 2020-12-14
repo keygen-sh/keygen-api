@@ -12,6 +12,7 @@ class SerializablePolicy < SerializableBase
   attribute :max_uses
   attribute :concurrent
   attribute :fingerprint_uniqueness_strategy
+  attribute :fingerprint_matching_strategy
   attribute :scheme
   attribute :encrypted
   attribute :protected

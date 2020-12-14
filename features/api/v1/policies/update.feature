@@ -65,6 +65,8 @@ Feature: Update policy
           "type": "policies",
           "id": "$policies[0].id",
           "attributes": {
+            "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
+            "fingerprintMatchingStrategy": "MATCH_MOST",
             "name": "Test"
           }
         }
