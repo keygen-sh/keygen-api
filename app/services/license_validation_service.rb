@@ -44,13 +44,15 @@ class LicenseValidationService < BaseService
       end
       # Check against fingerprint scope requirements
       if scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
-        fingerprints = []
+        fingerprints = [].tap do |fp|
+          if scope.key?(:fingerprints)
+            fp.concat scope[:fingerprints]
+          else
+            fp << scope[:fingerprint]
+          end
+        end.compact
 
-        if scope.key?(:fingerprints)
-          fingerprints += scope[:fingerprints]
-        else
-          fingerprints << scope[:fingerprint]
-        end
+        return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if fingerprints.empty?
 
         case
         when !license.policy.floating? && license.machines.count == 0
