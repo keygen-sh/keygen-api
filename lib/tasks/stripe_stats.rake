@@ -15,8 +15,8 @@ module Stripe
 
     def report
       OpenStruct.new(
-        start_date: Time.at(BEGINNING_OF_PERIOD),
-        end_date: Time.at(END_OF_PERIOD),
+        start_date: reporting_start_date,
+        end_date: reporting_end_date,
         monthly_recurring_revenue: monthly_recurring_revenue,
         annual_run_rate: monthly_recurring_revenue * 12,
         new_revenue: new_revenue,
@@ -39,9 +39,13 @@ module Stripe
       )
     end
 
-    private
+    def reporting_start_date
+      Time.at(BEGINNING_OF_PERIOD)
+    end
 
-    attr_reader :cache
+    def reporting_end_date
+      Time.at(END_OF_PERIOD)
+    end
 
     def monthly_recurring_revenue
       revenue_per_user.sum(0.0)
@@ -57,7 +61,7 @@ module Stripe
 
     def average_subscription_length_per_user
       subscription_lengths_in_months = paid_subscriptions
-        .map { |s| ((s.ended_at.present? ? Time.at(s.ended_at) : Time.now) - Time.at(s.created)) / 1.month }
+        .map { |s| subscription_length_for(s) }
 
       subscription_lengths_in_months.sum(0.0) / subscription_lengths_in_months.size.to_f
     end
@@ -104,32 +108,41 @@ module Stripe
     end
 
     def revenue_per_user
-      revenue_for(paid_subscriptions)
+      revenues_for(paid_subscriptions)
     end
 
     def revenue_per_new_user
-      revenue_for(new_paid_subscriptions)
+      revenues_for(new_paid_subscriptions)
     end
 
-    def revenue_for(subscriptions)
-      subscriptions.map do |subscription|
-        coupon = subscription.discount&.coupon
-        plan = subscription.plan
-        amount =
-          if plan.interval == 'year'
-            plan.amount.to_f / 12
-          else
-            plan.amount.to_f
-          end
-        discount =
-          if coupon.present? && coupon.duration == 'forever'
-            amount * (coupon.percent_off.to_f / 100)
-          else
-            0.0
-          end
+    def revenue_for(subscription)
+      coupon = subscription.discount&.coupon
+      plan = subscription.plan
+      amount =
+        if plan.interval == 'year'
+          plan.amount.to_f / 12
+        else
+          plan.amount.to_f
+        end
+      discount =
+        if coupon.present? && coupon.duration == 'forever'
+          amount * (coupon.percent_off.to_f / 100)
+        else
+          0.0
+        end
 
-        (amount - discount) * subscription.quantity / 100
-      end
+      (amount - discount) * subscription.quantity / 100
+    end
+
+    def revenues_for(subscriptions)
+      subscriptions.map { |s| revenue_for(s) }
+    end
+
+    def subscription_length_for(subscription)
+      end_date = subscription.ended_at.present? ? Time.at(subscription.ended_at) : Time.now
+      start_date = Time.at(subscription.created)
+
+      (end_date - start_date) / 1.month
     end
 
     def invoices_for(resource)
@@ -191,6 +204,12 @@ module Stripe
       @canceled_subscriptions ||= subscriptions.filter { |s| s.status == 'canceled' }
     end
 
+    def churned_subscriptions
+      @churned_subscriptions ||= canceled_subscriptions
+        .filter { |s| s.canceled_at >= BEGINNING_OF_PERIOD || s.ended_at >= BEGINNING_OF_PERIOD }
+        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+    end
+
     def customers
       @customers ||= subscriptions.map(&:customer)
     end
@@ -208,10 +227,7 @@ module Stripe
     end
 
     def churned_customers
-      @churned_customers ||= canceled_subscriptions
-        .filter { |s| s.canceled_at >= BEGINNING_OF_PERIOD || s.ended_at >= BEGINNING_OF_PERIOD }
-        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
-        .map(&:customer)
+      @churned_customers ||= churned_subscriptions.map(&:customer)
     end
 
     def trialing_customers
@@ -226,6 +242,10 @@ module Stripe
     def free_customers
       @free_customers ||= free_subscriptions.map(&:customer)
     end
+
+    private
+
+    attr_reader :cache
 
     class Spinner
       @@thread = nil
@@ -290,6 +310,39 @@ namespace :stripe do
       s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[34m (#{report.trialing_customers_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34mFree: \e[1;33m#{report.free_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
+
+      puts s
+    end
+  end
+
+  desc 'retrieve churned customers'
+  task churn: :environment do
+    Rails.logger.silence do
+      stats = Stripe::Stats.new(cache: Rails.cache)
+      churned_subscriptions = nil
+      churn_rate = nil
+
+      Stripe::Stats::Spinner.start do
+        churned_subscriptions = stats.churned_subscriptions
+        churn_rate = stats.churn_rate
+      end
+
+      s = ''
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mChurn for \e[33m#{stats.reporting_start_date.strftime('%b %d')}\e[34m – \e[33m#{stats.reporting_end_date.strftime('%b %d, %Y')}\e[34m (last 4 weeks)\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mChurn Rate: \e[31m#{churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+
+      churned_subscriptions.each do |subscription|
+        life_time = stats.subscription_length_for(subscription)
+        life_time_value = stats.revenue_for(subscription) * life_time
+        customer = subscription.customer
+
+        s << "\e[34m  - \e[31m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+      end
+
       s << "\e[34m======================\e[0m\n"
 
       puts s
