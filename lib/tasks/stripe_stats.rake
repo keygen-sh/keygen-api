@@ -18,6 +18,7 @@ module Stripe
         start_date: reporting_start_date,
         end_date: reporting_end_date,
         monthly_recurring_revenue: monthly_recurring_revenue,
+        pending_revenue: pending_revenue,
         annual_run_rate: monthly_recurring_revenue * 12,
         new_revenue: new_revenue,
         average_revenue_per_user: average_revenue_per_user,
@@ -50,6 +51,10 @@ module Stripe
 
     def monthly_recurring_revenue
       revenue_per_user.sum(0.0)
+    end
+
+    def pending_revenue
+      pending_revenue_per_user.sum(0.0)
     end
 
     def new_revenue
@@ -117,6 +122,10 @@ module Stripe
 
     def revenue_per_user
       revenues_for(paid_subscriptions)
+    end
+
+    def pending_revenue_per_user
+      revenues_for(paid_subscriptions.filter { |s| s.status == 'trialing' })
     end
 
     def revenue_per_new_user
@@ -300,7 +309,7 @@ namespace :stripe do
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[34m (last 4 weeks)\e[0m\n"
       s << "\e[34m======================\e[0m\n"
-      s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[0m\n"
+      s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[34m (#{report.pending_revenue.to_s(:currency)} pending conversion)\e[0m\n"
       s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
       s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
