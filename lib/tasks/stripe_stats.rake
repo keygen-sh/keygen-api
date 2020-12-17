@@ -17,9 +17,10 @@ module Stripe
       OpenStruct.new(
         start_date: reporting_start_date,
         end_date: reporting_end_date,
+        annual_run_rate: monthly_recurring_revenue * 12,
         monthly_recurring_revenue: monthly_recurring_revenue,
         pending_revenue: pending_revenue,
-        annual_run_rate: monthly_recurring_revenue * 12,
+        forecasted_revenue: forecasted_revenue,
         new_revenue: new_revenue,
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
@@ -59,6 +60,12 @@ module Stripe
 
     def new_revenue
       revenue_per_new_user.sum(0.0)
+    end
+
+    def forecasted_revenue
+      current_revenue = monthly_recurring_revenue
+
+      current_revenue + current_revenue * (revenue_growth_rate / 100)
     end
 
     def average_revenue_per_user
@@ -310,8 +317,9 @@ namespace :stripe do
       s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[34m (last 4 weeks)\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[34m (#{report.pending_revenue.to_s(:currency)} pending conversion)\e[0m\n"
-      s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
+      s << "\e[34mForecasted Revenue: \e[32m#{report.forecasted_revenue.to_s(:currency)}/mo\e[34m (next 4 weeks)\e[0m\n"
       s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
