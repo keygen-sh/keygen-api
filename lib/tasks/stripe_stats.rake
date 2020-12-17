@@ -26,6 +26,7 @@ module Stripe
         average_subscription_length_per_user: average_subscription_length_per_user,
         average_life_time_value: average_life_time_value,
         average_time_to_convert: average_time_to_convert,
+        average_time_on_free: average_time_on_free,
         conversion_rate: conversion_rate,
         revenue_growth_rate: revenue_growth_rate,
         customer_growth_rate: customer_growth_rate,
@@ -93,6 +94,20 @@ module Stripe
       end.compact
 
       days_to_convert.sum(0.0) / days_to_convert.size.to_f
+    end
+
+    def average_time_on_free
+      days_on_free = paid_subscriptions.map do |s|
+        invoices = invoices_for(s.customer)
+        next unless invoices.any? { |i| i.subscription&.plan&.amount == 0 }
+
+        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
+        next if first_paid_invoice.nil?
+
+        (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+      end.compact
+
+      days_on_free.sum(0.0) / days_on_free.size.to_f
     end
 
     def conversion_rate
@@ -174,9 +189,9 @@ module Stripe
         invoices =
           case resource
           when Stripe::Subscription
-            Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
+            Stripe::Invoice.list(subscription: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
           when Stripe::Customer
-            Stripe::Invoice.list(customer: resource.id, limit: 100).auto_paging_each.to_a
+            Stripe::Invoice.list(customer: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
           end
 
         invoices&.sort_by { |i| i.created }
@@ -324,6 +339,7 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mAverage Time-on-Free: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mCustomer Growth Rate: \e[32m#{report.customer_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mUser Growth Rate: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
