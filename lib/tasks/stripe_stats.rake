@@ -18,7 +18,7 @@ module Stripe
       OpenStruct.new(
         start_date: reporting_start_date,
         end_date: reporting_end_date,
-        annual_run_rate: monthly_recurring_revenue * 12,
+        annual_run_rate: annual_run_rate,
         monthly_recurring_revenue: monthly_recurring_revenue,
         pending_revenue: pending_revenue,
         forecasted_revenue: forecasted_revenue,
@@ -37,14 +37,16 @@ module Stripe
         customer_growth_rate: customer_growth_rate,
         user_growth_rate: user_growth_rate,
         churn_rate: churn_rate,
-        total_users: paid_customers.size + trialing_customers.size + free_users.size,
-        new_sign_ups: new_sign_ups.size,
-        paid_customers: paid_customers.size,
-        new_paid_customers: new_paid_customers.size,
-        trialing_customers: trialing_customers.size,
-        trialing_customers_with_payment_method: trialing_customers_with_payment_method.size,
-        free_users: free_users.size,
-        churned_customers: churned_customers.size,
+        total_users: total_users_count,
+        paid_customers_percentage: paid_customers_percentage,
+        free_users_percentage: free_users_percentage,
+        new_sign_ups: new_sign_ups_count,
+        paid_customers: paid_customers_count,
+        new_paid_customers: new_paid_customers_count,
+        trialing_customers: trialing_customers_count,
+        trialing_customers_with_payment_method: trialing_customers_with_payment_method_count,
+        free_users: free_users_count,
+        churned_customers: churned_customers_count,
       )
     end
 
@@ -56,8 +58,52 @@ module Stripe
       Time.at(END_OF_PERIOD)
     end
 
+    def new_sign_ups_count
+      new_sign_ups.size
+    end
+
+    def paid_customers_count
+      paid_customers.size
+    end
+
+    def new_paid_customers_count
+      new_paid_customers.size
+    end
+
+    def trialing_customers_count
+      trialing_customers.size
+    end
+
+    def trialing_customers_with_payment_method_count
+      trialing_customers_with_payment_method.size
+    end
+
+    def free_users_count
+      free_users.size
+    end
+
+    def churned_customers_count
+      churned_customers.size
+    end
+
+    def total_users_count
+      paid_customers.size + trialing_customers.size + free_users.size
+    end
+
+    def paid_customers_percentage
+      paid_customers_count.to_f / total_users_count.to_f * 100
+    end
+
+    def free_users_percentage
+      free_users_count.to_f / total_users_count.to_f * 100
+    end
+
     def monthly_recurring_revenue
       revenue_per_user.sum(0.0)
+    end
+
+    def annual_run_rate
+      monthly_recurring_revenue * 12
     end
 
     def pending_revenue
@@ -421,8 +467,8 @@ namespace :stripe do
       s << "\e[34mNew Sign Ups: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[0m\n"
       s << "\e[34mNew Customers: \e[32m#{report.new_paid_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mTotal Users: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (paid + free)\e[0m\n"
-      s << "\e[34mPaid Customers: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
-      s << "\e[34mFree Users: \e[1;36m#{report.free_users.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mPaid Customers: \e[32m#{report.paid_customers.to_s(:delimited)}\e[34m (#{report.paid_customers_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
+      s << "\e[34mFree Users: \e[1;36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)})\e[0m\n"
       s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[34m (#{report.trialing_customers_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
