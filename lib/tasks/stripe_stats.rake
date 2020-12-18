@@ -3,8 +3,8 @@ require 'stripe'
 
 module Stripe
   class Stats
-    BEGINNING_OF_PERIOD = 4.weeks.ago.beginning_of_day.to_time.to_i
-    END_OF_PERIOD = Date.today.end_of_day.to_time.to_i
+    START_DATE = ENV.fetch('START_DATE') { 4.weeks.ago.beginning_of_day.to_time }.to_i
+    END_DATE = ENV.fetch('END_DATE') { Date.today.end_of_day.to_time }.to_i
     FREE_TIER_PRODUCT_ID = 'prod_DvO2JQ0AtwO7Tp'
 
     def initialize(cache:)
@@ -51,11 +51,11 @@ module Stripe
     end
 
     def reporting_start_date
-      Time.at(BEGINNING_OF_PERIOD)
+      Time.at(START_DATE)
     end
 
     def reporting_end_date
-      Time.at(END_OF_PERIOD)
+      Time.at(END_DATE)
     end
 
     def new_sign_ups_count
@@ -331,8 +331,8 @@ module Stripe
         first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
         next if first_paid_invoice.nil?
 
-        first_paid_invoice.status_transitions.paid_at >= BEGINNING_OF_PERIOD
-      end.compact
+        first_paid_invoice.status_transitions.paid_at >= START_DATE
+      end
     end
 
     def trialing_subscriptions
@@ -349,7 +349,7 @@ module Stripe
 
     def churned_subscriptions
       @churned_subscriptions ||= canceled_subscriptions
-        .filter { |s| s.canceled_at >= BEGINNING_OF_PERIOD || s.ended_at >= BEGINNING_OF_PERIOD }
+        .filter { |s| s.canceled_at >= START_DATE || s.ended_at >= START_DATE }
         .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
     end
 
@@ -358,7 +358,7 @@ module Stripe
     end
 
     def new_sign_ups
-      @new_sign_ups ||= customers.filter { |c| c.created >= BEGINNING_OF_PERIOD }
+      @new_sign_ups ||= customers.filter { |c| c.created >= START_DATE }
     end
 
     def paid_customers
