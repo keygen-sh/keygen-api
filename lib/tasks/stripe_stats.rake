@@ -5,6 +5,7 @@ module Stripe
   class Stats
     BEGINNING_OF_PERIOD = 4.weeks.ago.beginning_of_day.to_time.to_i
     END_OF_PERIOD = Date.today.end_of_day.to_time.to_i
+    FREE_TIER_PRODUCT_ID = 'prod_DvO2JQ0AtwO7Tp'
 
     def initialize(cache:)
       Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY')
@@ -27,6 +28,10 @@ module Stripe
         average_life_time_value: average_life_time_value,
         average_time_to_convert: average_time_to_convert,
         average_time_on_free: average_time_on_free,
+        median_time_to_convert: median_time_to_convert,
+        median_time_on_free: median_time_on_free,
+        latest_time_to_convert: latest_time_to_convert,
+        latest_time_on_free: latest_time_on_free,
         conversion_rate: conversion_rate,
         revenue_growth_rate: revenue_growth_rate,
         customer_growth_rate: customer_growth_rate,
@@ -85,29 +90,41 @@ module Stripe
     end
 
     def average_time_to_convert
-      days_to_convert = paid_subscriptions.map do |s|
-        invoices = invoices_for(s.customer)
-        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
-        next if first_paid_invoice.nil?
-
-        (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
-      end.compact
-
       days_to_convert.sum(0.0) / days_to_convert.size.to_f
     end
 
     def average_time_on_free
-      days_on_free = paid_subscriptions.map do |s|
-        invoices = invoices_for(s.customer)
-        next unless invoices.any? { |i| i.subscription&.plan&.amount == 0 }
-
-        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
-        next if first_paid_invoice.nil?
-
-        (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
-      end.compact
-
       days_on_free.sum(0.0) / days_on_free.size.to_f
+    end
+
+    def median_time_to_convert
+      sorted_times = days_to_convert.sort
+      mid_idx = days_to_convert.size / 2
+
+      if days_to_convert.size.even?
+        (sorted_times[mid_idx] + sorted_times[mid_idx - 1]) / 2
+      else
+        sorted_times[mid_idx]
+      end
+    end
+
+    def median_time_on_free
+      sorted_times = days_on_free.sort
+      mid_idx = days_on_free.size / 2
+
+      if days_on_free.size.even?
+        (sorted_times[mid_idx] + sorted_times[mid_idx - 1]) / 2
+      else
+        sorted_times[mid_idx]
+      end
+    end
+
+    def latest_time_to_convert
+      days_to_convert.last
+    end
+
+    def latest_time_on_free
+      days_on_free.last
     end
 
     def conversion_rate
@@ -140,6 +157,32 @@ module Stripe
 
     def churn_rate
       churned_customers.size.to_f / paid_customers.size.to_f * 100
+    end
+
+    def days_to_convert
+      @days_to_convert ||= paid_subscriptions
+        .map do |s|
+          invoices = invoices_for(s.customer)
+          first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
+          next if first_paid_invoice.nil?
+
+          (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+        end.compact
+    end
+
+    def days_on_free
+      @days_on_free ||= paid_subscriptions
+        .map do |s|
+          invoices = invoices_for(s.customer)
+          next unless invoices.any? { |i|
+            i.lines.data.any? { |l| l.price&.product == FREE_TIER_PRODUCT_ID }
+          }
+
+          first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
+          next if first_paid_invoice.nil?
+
+          (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+        end.compact
     end
 
     def revenue_per_user
@@ -185,28 +228,43 @@ module Stripe
     end
 
     def invoices_for(resource)
-      cache.fetch("stripe:stats:invoices:#{resource.id}", expires_in: 2.days) do
-        invoices =
-          case resource
-          when Stripe::Subscription
-            Stripe::Invoice.list(subscription: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
-          when Stripe::Customer
-            Stripe::Invoice.list(customer: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
-          end
+      @invoices_for ||= {}
 
-        invoices&.sort_by { |i| i.created }
-      end
+      @invoices_for[resource.id] ||= to_struct(
+        JSON.parse(
+          cache.fetch("stripe:stats:invoices:#{resource.id}", raw: true, expires_in: 2.days) do
+            invoices =
+              case resource.object
+              when 'subscription'
+                Stripe::Invoice.list(subscription: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
+              when 'customer'
+                Stripe::Invoice.list(customer: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
+              else
+                []
+              end
+
+            invoices
+              &.sort_by { |i| i.created }
+              .to_json
+          end
+        )
+      )
     end
 
     def subscriptions
-      @subscriptions ||= cache.fetch('stripe:stats:subscriptions', expires_in: 2.days) do
-        Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer'])
-          .auto_paging_each
-          .to_a
-          .filter { |s| !s.customer.deleted? }
-          .sort_by { |s| [s.customer.id, -s.created] }
-          .uniq { |s| s.customer.id }
-      end
+      @subscriptions ||= to_struct(
+        JSON.parse(
+          cache.fetch('stripe:stats:subscriptions', raw: true, expires_in: 2.days) do
+            Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer'])
+              .auto_paging_each
+              .to_a
+              .filter { |s| !s.customer.deleted? }
+              .sort_by { |s| [s.customer.id, -s.created] }
+              .uniq { |s| s.customer.id }
+              .to_json
+          end
+        )
+      )
     end
 
     def paid_subscriptions
@@ -215,7 +273,7 @@ module Stripe
         .filter do |s|
           invoices = invoices_for(s)
 
-          invoices.any? { |i| i.paid? && i.amount_paid > 0 } ||
+          invoices.any? { |i| i.amount_paid > 0 } ||
             s.customer.default_source.present? ||
             s.customer.invoice_settings.default_payment_method.present?
         end
@@ -224,7 +282,7 @@ module Stripe
     def new_paid_subscriptions
       @new_paid_subscriptions ||= paid_subscriptions.filter do |s|
         invoices = invoices_for(s)
-        first_paid_invoice = invoices.find { |i| i.paid? && i.amount_paid > 0 }
+        first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
         next if first_paid_invoice.nil?
 
         first_paid_invoice.status_transitions.paid_at >= BEGINNING_OF_PERIOD
@@ -236,7 +294,7 @@ module Stripe
     end
 
     def free_subscriptions
-      @free_subscriptions ||= subscriptions.filter { |s| s.status == 'active' && s.plan.amount == 0 }
+      @free_subscriptions ||= subscriptions.filter { |s| s.status == 'active' && s.plan.product == FREE_TIER_PRODUCT_ID }
     end
 
     def canceled_subscriptions
@@ -285,6 +343,17 @@ module Stripe
     private
 
     attr_reader :cache
+
+    def to_struct(object)
+      case object
+      when Hash
+        OpenStruct.new(object.each_with_object({}) { |(k, v), h| h[k] = to_struct(v) })
+      when Array
+        object.map { |v| to_struct(v) }
+      else
+        object
+      end
+    end
 
     class Spinner
       @@thread = nil
@@ -340,6 +409,10 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mAverage Time-on-Free: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mMedian Time-to-Convert: \e[36m#{report.median_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mMedian Time-on-Free: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mLatest Time-to-Convert: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mLatest Time-on-Free: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mCustomer Growth Rate: \e[32m#{report.customer_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mUser Growth Rate: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
@@ -349,7 +422,7 @@ namespace :stripe do
       s << "\e[34mNew Customers: \e[32m#{report.new_paid_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34mTotal Users: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (paid + free)\e[0m\n"
       s << "\e[34mPaid Customers: \e[32m#{report.paid_customers.to_s(:delimited)}\e[0m\n"
-      s << "\e[34mFree Users: \e[1;33m#{report.free_users.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mFree Users: \e[1;36m#{report.free_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34mTrialing: \e[1;33m#{report.trialing_customers.to_s(:delimited)}\e[34m (#{report.trialing_customers_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34mChurned: \e[31m#{report.churned_customers.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
