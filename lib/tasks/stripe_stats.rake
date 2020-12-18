@@ -317,6 +317,8 @@ module Stripe
       @paid_subscriptions ||= subscriptions
         .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
         .filter do |s|
+          next if s.plan.product == FREE_TIER_PRODUCT_ID
+
           invoices = invoices_for(s)
 
           invoices.any? { |i| i.amount_paid > 0 } ||
@@ -327,6 +329,8 @@ module Stripe
 
     def new_paid_subscriptions
       @new_paid_subscriptions ||= paid_subscriptions.filter do |s|
+        next if s.plan.product == FREE_TIER_PRODUCT_ID
+
         invoices = invoices_for(s)
         first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
         next if first_paid_invoice.nil?
@@ -454,10 +458,10 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mAverage Time-to-Convert: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
-      s << "\e[34mAverage Time-on-Free: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mMedian Time-to-Convert: \e[36m#{report.median_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
-      s << "\e[34mMedian Time-on-Free: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mLatest Time-to-Convert: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34mAverage Time-on-Free: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[34m (of those which convert)\e[0m\n"
+      s << "\e[34mMedian Time-on-Free: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mLatest Time-on-Free: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mCustomer Growth Rate: \e[32m#{report.customer_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
