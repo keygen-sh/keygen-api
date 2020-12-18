@@ -26,12 +26,18 @@ module Stripe
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
         average_life_time_value: average_life_time_value,
-        average_time_to_convert: average_time_to_convert,
-        average_time_on_free: average_time_on_free,
-        median_time_to_convert: median_time_to_convert,
-        median_time_on_free: median_time_on_free,
         latest_time_to_convert: latest_time_to_convert,
+        average_time_to_convert: average_time_to_convert,
+        median_time_to_convert: median_time_to_convert,
+        p90_time_to_convert: p90_time_to_convert,
+        p95_time_to_convert: p95_time_to_convert,
+        p99_time_to_convert: p99_time_to_convert,
         latest_time_on_free: latest_time_on_free,
+        average_time_on_free: average_time_on_free,
+        median_time_on_free: median_time_on_free,
+        p90_time_on_free: p90_time_on_free,
+        p95_time_on_free: p95_time_on_free,
+        p99_time_on_free: p99_time_on_free,
         conversion_rate: conversion_rate,
         revenue_growth_rate: revenue_growth_rate,
         paid_user_growth_rate: paid_user_growth_rate,
@@ -135,12 +141,12 @@ module Stripe
       average_revenue_per_user * average_subscription_length_per_user
     end
 
-    def average_time_to_convert
-      days_to_convert.sum(0.0) / days_to_convert.size.to_f
+    def latest_time_to_convert
+      days_to_convert.last
     end
 
-    def average_time_on_free
-      days_on_free.sum(0.0) / days_on_free.size.to_f
+    def average_time_to_convert
+      days_to_convert.sum(0.0) / days_to_convert.size.to_f
     end
 
     def median_time_to_convert
@@ -154,6 +160,26 @@ module Stripe
       end
     end
 
+    def p90_time_to_convert
+      quantile(days_to_convert, 0.90)
+    end
+
+    def p95_time_to_convert
+      quantile(days_to_convert, 0.95)
+    end
+
+    def p99_time_to_convert
+      quantile(days_to_convert, 0.99)
+    end
+
+    def latest_time_on_free
+      days_on_free.last
+    end
+
+    def average_time_on_free
+      days_on_free.sum(0.0) / days_on_free.size.to_f
+    end
+
     def median_time_on_free
       sorted_times = days_on_free.sort
       mid_idx = days_on_free.size / 2
@@ -165,12 +191,16 @@ module Stripe
       end
     end
 
-    def latest_time_to_convert
-      days_to_convert.last
+    def p90_time_on_free
+      quantile(days_on_free, 0.90)
     end
 
-    def latest_time_on_free
-      days_on_free.last
+    def p95_time_on_free
+      quantile(days_on_free, 0.95)
+    end
+
+    def p99_time_on_free
+      quantile(days_on_free, 0.99)
     end
 
     def conversion_rate
@@ -405,6 +435,16 @@ module Stripe
       end
     end
 
+    def quantile(values, percentile)
+      return values.first if values.size == 1
+
+      sorted = values.sort
+      k = (percentile * (sorted.size - 1) + 1).floor - 1
+      f = (percentile * (sorted.size - 1) + 1).modulo(1)
+
+      return sorted[k] + (f * (sorted[k + 1] - sorted[k]))
+    end
+
     class Spinner
       @@thread = nil
 
@@ -463,19 +503,25 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mTime-to-Convert:\e[0m\n"
+      s << "\e[34m  - Latest: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
-      s << "\e[34m  - Latest: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P90: \e[36m#{report.p90_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P95: \e[36m#{report.p95_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P99: \e[36m#{report.p99_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mTime-on-Free:\e[34m (of those which convert)\e[0m\n"
+      s << "\e[34m  - Latest: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
-      s << "\e[34m  - Latest: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P90: \e[36m#{report.p90_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P95: \e[36m#{report.p95_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - P99: \e[36m#{report.p99_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mUsers:\e[0m\n"
+      s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
-      s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
 
