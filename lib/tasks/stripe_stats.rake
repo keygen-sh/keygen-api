@@ -551,10 +551,12 @@ namespace :stripe do
     Rails.logger.silence do
       stats = Stripe::Stats.new(cache: Rails.cache)
       churned_subscriptions = nil
+      at_risk_subscriptions = nil
       churn_rate = nil
 
       Stripe::Stats::Spinner.start do
         churned_subscriptions = stats.churned_subscriptions
+        at_risk_subscriptions = stats.at_risk_subscriptions
         churn_rate = stats.churn_rate
       end
 
@@ -571,6 +573,16 @@ namespace :stripe do
         customer = subscription.customer
 
         s << "\e[34m  - \e[31m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+      end
+
+      s << "\e[34mAt-Risk:\e[34m (\e[33m#{at_risk_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+
+      at_risk_subscriptions.each do |subscription|
+        life_time = stats.subscription_length_for(subscription)
+        life_time_value = stats.revenue_for(subscription) * life_time
+        customer = subscription.customer
+
+        s << "\e[34m  - \e[33m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
       s << "\e[34m======================\e[0m\n"
