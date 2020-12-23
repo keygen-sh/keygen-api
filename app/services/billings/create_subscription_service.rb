@@ -3,7 +3,7 @@
 module Billings
   class CreateSubscriptionService < BaseService
 
-    def initialize(customer:, plan:, trial: nil)
+    def initialize(customer:, plan:, trial_end: nil)
       @customer = customer
       @plan     = plan
       @trial    = trial
@@ -12,7 +12,7 @@ module Billings
     def execute
       params = {
         customer: customer,
-        trial_end: trial == false ? 'now' : trial,
+        trial_end: trial_end,
         plan: plan
       }
 
@@ -23,6 +23,6 @@ module Billings
 
     private
 
-    attr_reader :customer, :plan, :trial
+    attr_reader :customer, :plan, :trial_end
   end
 end

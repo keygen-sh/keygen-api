@@ -24,7 +24,7 @@ module Api::V1::Accounts::Relationships
                  Billings::CreateSubscriptionService.new(
                    customer: @account.billing.customer_id,
                    plan: @plan.plan_id,
-                   trial: false
+                   trial_end: 'now'
                  ).execute
                else
                  Billings::UpdateSubscriptionService.new(
