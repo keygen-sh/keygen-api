@@ -4,9 +4,9 @@ module Billings
   class CreateSubscriptionService < BaseService
 
     def initialize(customer:, plan:, trial_end: nil)
-      @customer = customer
-      @plan     = plan
-      @trial    = trial
+      @customer  = customer
+      @plan      = plan
+      @trial_end = trial_end
     end
 
     def execute
