@@ -23,7 +23,8 @@ module Api::V1::Accounts::Relationships
       status = if @account.billing.canceled?
                  Billings::CreateSubscriptionService.new(
                    customer: @account.billing.customer_id,
-                   plan: @plan.plan_id
+                   plan: @plan.plan_id,
+                   trial: false
                  ).execute
                else
                  Billings::UpdateSubscriptionService.new(

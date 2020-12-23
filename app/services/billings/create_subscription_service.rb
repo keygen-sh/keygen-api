@@ -12,7 +12,7 @@ module Billings
     def execute
       params = {
         customer: customer,
-        trial_end: trial,
+        trial_end: trial == false ? 'now' : trial,
         plan: plan
       }
 
