@@ -468,8 +468,11 @@ module Stripe
 
         @@thread = Thread.new do
           frames = %w[⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏]
-          frames.cycle do |frame|
-            print "\e[H\e[2J\e[36m#{frame}\e[34m generating report…\e[0m\n"
+          frames.cycle do |frame, i|
+            clear!
+
+            print "\e[36m#{frame}\e[34m generating report…\e[0m"
+
             sleep 0.1
           end
         end
@@ -482,9 +485,16 @@ module Stripe
 
       def self.stop
         print "\u001B[?25h"
-        print "\e[H\e[2J"
+
+        clear!
 
         @@thread.kill
+      end
+
+      private
+
+      def self.clear!
+        print "\b" * 80
       end
     end
   end
