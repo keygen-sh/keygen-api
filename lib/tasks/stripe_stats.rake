@@ -52,6 +52,7 @@ module Stripe
         trialing_users: trialing_users_count,
         trialing_users_with_payment_method: trialing_users_with_payment_method_count,
         free_users: free_users_count,
+        at_risk_users: at_risk_users_count,
         churned_users: churned_users_count,
       )
     end
@@ -86,6 +87,10 @@ module Stripe
 
     def free_users_count
       free_users.size
+    end
+
+    def at_risk_users_count
+      at_risk_users.size
     end
 
     def churned_users_count
@@ -387,6 +392,12 @@ module Stripe
         .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
     end
 
+    def at_risk_subscriptions
+      @at_risk_subscriptions ||= subscriptions
+        .filter { |s| s.status == 'past_due' }
+        .filter { |s| !s.customer.default_source.present? && !s.customer.invoice_settings.default_payment_method.present? }
+    end
+
     def customers
       @customers ||= subscriptions.map(&:customer)
     end
@@ -418,6 +429,10 @@ module Stripe
 
     def free_users
       @free_users ||= free_subscriptions.map(&:customer)
+    end
+
+    def at_risk_users
+      @at_risk_users ||= at_risk_subscriptions.map(&:customer)
     end
 
     private
@@ -520,6 +535,7 @@ namespace :stripe do
       s << "\e[34mUsers:\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
+      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue w/ no payment method)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
