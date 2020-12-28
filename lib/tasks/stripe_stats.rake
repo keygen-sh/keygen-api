@@ -21,7 +21,10 @@ module Stripe
         annual_run_rate: annual_run_rate,
         monthly_recurring_revenue: monthly_recurring_revenue,
         pending_revenue: pending_revenue,
-        forecasted_revenue: forecasted_revenue,
+        forecasted_revenue_4w: forecasted_revenue_4w,
+        forecasted_revenue_3m: forecasted_revenue_3m,
+        forecasted_revenue_6m: forecasted_revenue_6m,
+        forecasted_revenue_1y: forecasted_revenue_1y,
         new_revenue: new_revenue,
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
@@ -125,10 +128,28 @@ module Stripe
       revenue_per_new_user.sum(0.0)
     end
 
-    def forecasted_revenue
+    def forecasted_revenue_4w
       current_revenue = monthly_recurring_revenue
 
       current_revenue + current_revenue * (revenue_growth_rate / 100)
+    end
+
+    def forecasted_revenue_3m
+      current_revenue = monthly_recurring_revenue
+
+      current_revenue + current_revenue * (revenue_growth_rate * 3 / 100)
+    end
+
+    def forecasted_revenue_6m
+      current_revenue = monthly_recurring_revenue
+
+      current_revenue + current_revenue * (revenue_growth_rate * 6 / 100)
+    end
+
+    def forecasted_revenue_1y
+      current_revenue = monthly_recurring_revenue
+
+      current_revenue + current_revenue * (revenue_growth_rate * 12 / 100)
     end
 
     def average_revenue_per_user
@@ -516,15 +537,19 @@ namespace :stripe do
       s << "\e[34mReport for \e[32m#{report.start_date.strftime('%b %d')}\e[34m – \e[32m#{report.end_date.strftime('%b %d, %Y')}\e[34m (last 4 weeks)\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[34m (#{report.pending_revenue.to_s(:currency)} pending conversion)\e[0m\n"
-      s << "\e[34mForecasted Revenue: \e[32m#{report.forecasted_revenue.to_s(:currency)}/mo\e[34m (next 4 weeks)\e[0m\n"
-      s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
+      s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mUser Growth Rate:\e[0m\n"
       s << "\e[34m  - Overall: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34mForecasted Revenue:\e[0m\n"
+      s << "\e[34m  - Next 4 Weeks: \e[32m#{report.forecasted_revenue_4w.to_s(:currency)}/mo\e[34m (with #{report.revenue_growth_rate.to_s(:percentage, precision: 2)} growth rate)\e[0m\n"
+      s << "\e[34m  - 3 Months: \e[32m#{report.forecasted_revenue_3m.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34m  - 6 Months: \e[32m#{report.forecasted_revenue_6m.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34m  - 1 Year: \e[32m#{report.forecasted_revenue_1y.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
