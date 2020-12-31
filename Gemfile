@@ -53,6 +53,10 @@ gem 'httparty'
 # State machine
 gem 'aasm', '~> 5.0.3'
 
+# Emails
+gem 'sendgrid-ruby'
+gem 'sendgrid-actionmailer'
+
 # Email templating
 gem 'premailer-rails'
 gem 'haml-rails'
