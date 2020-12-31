@@ -26,6 +26,8 @@ module Stripe
         forecasted_revenue_6m: forecasted_revenue_6m,
         forecasted_revenue_1y: forecasted_revenue_1y,
         new_revenue: new_revenue,
+        lost_revenue: lost_revenue,
+        net_new_revenue: net_new_revenue,
         average_revenue_per_user: average_revenue_per_user,
         average_subscription_length_per_user: average_subscription_length_per_user,
         average_life_time_value: average_life_time_value,
@@ -126,6 +128,14 @@ module Stripe
 
     def new_revenue
       revenue_per_new_user.sum(0.0)
+    end
+
+    def lost_revenue
+      revenue_per_churned_user.sum(0.0)
+    end
+
+    def net_new_revenue
+      new_revenue - lost_revenue
     end
 
     def forecasted_revenue_4w
@@ -297,6 +307,10 @@ module Stripe
 
     def revenue_per_new_user
       revenues_for(new_paid_subscriptions)
+    end
+
+    def revenue_per_churned_user
+      revenues_for(churned_subscriptions)
     end
 
     def revenue_for(subscription)
@@ -538,7 +552,8 @@ namespace :stripe do
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mMonthly Recurring Revenue: \e[32m#{report.monthly_recurring_revenue.to_s(:currency)}\e[34m (#{report.pending_revenue.to_s(:currency)} pending conversion)\e[0m\n"
       s << "\e[34mAnnual Run Rate: \e[32m#{report.annual_run_rate.to_s(:currency)}\e[0m\n"
-      s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[34m (#{report.net_new_revenue.to_s(:currency)} net)\e[0m\n"
+      s << "\e[34mLost Revenue: \e[31m#{report.lost_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
