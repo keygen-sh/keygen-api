@@ -1,7 +1,7 @@
 -# frozen_string_literal: true
 %p
-  Hope things are going well for you. Just a quick heads up — it looks like your
-  account's trial is ending, but you're missing a payment method. If you're ready to move
+  Hope things are going well for you. Just a quick heads up — it looks like the trial
+  for your account, #{@account.name}, is ending, but you're missing a payment method. If you're ready to move
   forward with Keygen, you can add a payment method on your #{link_to "billing dashboard", "https://app.keygen.sh/billing"}.
   If you're undecided, no worries! Let me know if there's any way that I can help.
 - if @invoice.present?
