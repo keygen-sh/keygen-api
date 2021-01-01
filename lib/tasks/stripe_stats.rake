@@ -602,11 +602,13 @@ namespace :stripe do
       stats = Stripe::Stats.new(cache: Rails.cache)
       churned_subscriptions = nil
       at_risk_subscriptions = nil
+      lost_revenue = nil
       churn_rate = nil
 
       Stripe::Stats::Spinner.start do
         churned_subscriptions = stats.churned_subscriptions
         at_risk_subscriptions = stats.at_risk_subscriptions
+        lost_revenue = stats.lost_revenue
         churn_rate = stats.churn_rate
       end
 
@@ -614,6 +616,7 @@ namespace :stripe do
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mChurn for \e[33m#{stats.reporting_start_date.strftime('%b %d')}\e[34m – \e[33m#{stats.reporting_end_date.strftime('%b %d, %Y')}\e[34m (last 4 weeks)\e[0m\n"
       s << "\e[34m======================\e[0m\n"
+      s << "\e[34mLost Revenue: \e[31m#{lost_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
 
