@@ -268,7 +268,9 @@ module Stripe
     end
 
     def churn_rate
-      churned_users.size.to_f / paid_users.size.to_f * 100
+      paid_users_at_period_start = (paid_users.size - new_paid_users.size) + churned_users.size
+
+      churned_users.size.to_f / paid_users_at_period_start.to_f * 100
     end
 
     def days_to_convert
