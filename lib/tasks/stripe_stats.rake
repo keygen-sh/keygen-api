@@ -585,7 +585,7 @@ namespace :stripe do
       s << "\e[34mUsers:\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
-      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue w/ no payment method)\e[0m\n"
+      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
