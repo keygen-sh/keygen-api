@@ -262,14 +262,14 @@ module Stripe
 
     def revenue_growth_rate
       next_mrr = monthly_recurring_revenue
-      prev_mrr = next_mrr - new_revenue
+      prev_mrr = (next_mrr - new_revenue) + lost_revenue
 
       (next_mrr - prev_mrr) / prev_mrr * 100
     end
 
     def paid_user_growth_rate
       next_paid_user_count = paid_users.size.to_f
-      prev_paid_user_count = next_paid_user_count - new_paid_users.size.to_f
+      prev_paid_user_count = (next_paid_user_count - new_paid_users.size.to_f) + churned_users.size.to_f
 
       (next_paid_user_count - prev_paid_user_count) / prev_paid_user_count * 100
     end
