@@ -43,7 +43,9 @@ module Stripe
         p90_time_on_free: p90_time_on_free,
         p95_time_on_free: p95_time_on_free,
         p99_time_on_free: p99_time_on_free,
-        conversion_rate: conversion_rate,
+        conversion_rate_90d: conversion_rate_90d,
+        conversion_rate_1y: conversion_rate_1y,
+        conversion_rate_ytd: conversion_rate_ytd,
         revenue_growth_rate: revenue_growth_rate,
         paid_user_growth_rate: paid_user_growth_rate,
         user_growth_rate: user_growth_rate,
@@ -239,9 +241,21 @@ module Stripe
       quantile(days_on_free, 0.99)
     end
 
-    def conversion_rate
-      recent_conversions = paid_users.filter { |c| Time.at(c.created) >= 90.days.ago }
-      recent_sign_ups = customers.filter { |c| Time.at(c.created) >= 90.days.ago }
+    def conversion_rate_90d
+      conversion_rate_for(90.days.ago)
+    end
+
+    def conversion_rate_1y
+      conversion_rate_for(1.year.ago)
+    end
+
+    def conversion_rate_ytd
+      conversion_rate_for(Time.now.beginning_of_year)
+    end
+
+    def conversion_rate_for(period)
+      recent_conversions = paid_users.filter { |c| Time.at(c.created) >= period }
+      recent_sign_ups = customers.filter { |c| Time.at(c.created) >= period }
 
       recent_conversions.size.to_f / recent_sign_ups.size.to_f * 100
     end
@@ -557,7 +571,10 @@ namespace :stripe do
       s << "\e[34mNew Revenue: \e[32m#{report.new_revenue.to_s(:currency)}/mo\e[34m (#{report.net_new_revenue.to_s(:currency)} net)\e[0m\n"
       s << "\e[34mLost Revenue: \e[31m#{report.lost_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mRevenue Growth Rate: \e[32m#{report.revenue_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-      s << "\e[34mConversion Rate: \e[36m#{report.conversion_rate.to_s(:percentage, precision: 2)}\e[34m (rolling 90 days)\e[0m\n"
+      s << "\e[34mConversion Rate:\e[0m\n"
+      s << "\e[34m  - Past 90 Days: \e[36m#{report.conversion_rate_90d.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34m  - 1 Year: \e[36m#{report.conversion_rate_1y.to_s(:percentage, precision: 2)}\e[0m\n"
+      s << "\e[34m  - YTD: \e[36m#{report.conversion_rate_ytd.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{report.churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34mUser Growth Rate:\e[0m\n"
       s << "\e[34m  - Overall: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
