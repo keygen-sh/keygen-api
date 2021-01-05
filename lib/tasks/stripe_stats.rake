@@ -169,7 +169,7 @@ module Stripe
     end
 
     def average_subscription_length_per_user
-      subscription_lengths_in_months = paid_subscriptions
+      subscription_lengths_in_months = converted_subscriptions
         .map { |s| subscription_length_for(s) }
 
       subscription_lengths_in_months.sum(0.0) / subscription_lengths_in_months.size.to_f
@@ -449,6 +449,19 @@ module Stripe
         .filter { |s| !s.customer.default_source.present? && !s.customer.invoice_settings.default_payment_method.present? }
     end
 
+    def converted_subscriptions
+      @converted_subscriptions ||= subscriptions
+        .filter { |s| s.status == 'active' || s.status == 'canceled' }
+        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+        .filter do |s|
+          next if s.plan.product == FREE_TIER_PRODUCT_ID
+
+          invoices = invoices_for(s)
+
+          invoices.any? { |i| i.amount_paid > 0 }
+        end
+    end
+
     def customers
       @customers ||= subscriptions.map(&:customer)
     end
@@ -484,6 +497,10 @@ module Stripe
 
     def at_risk_users
       @at_risk_users ||= at_risk_subscriptions.map(&:customer)
+    end
+
+    def converted_users
+      @converted_users ||= converted_subscriptions.map(&:customer)
     end
 
     private
