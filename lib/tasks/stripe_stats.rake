@@ -1,5 +1,8 @@
+require 'action_view/helpers'
 require 'ostruct'
 require 'stripe'
+
+include ActionView::Helpers::DateHelper
 
 module Stripe
   class Stats
@@ -574,9 +577,12 @@ namespace :stripe do
     Rails.logger.silence do
       stats = Stripe::Stats.new(cache: Rails.cache)
       report = nil
+      t1 = Time.now
+      t2 = nil
 
       Stripe::Stats::Spinner.start do
         report = stats.report
+        t2 = Time.now
       end
 
       s = ''
@@ -627,6 +633,8 @@ namespace :stripe do
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
       s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
+      s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
 
       puts s
     end
@@ -640,12 +648,15 @@ namespace :stripe do
       at_risk_subscriptions = nil
       lost_revenue = nil
       churn_rate = nil
+      t1 = Time.now
+      t2 = nil
 
       Stripe::Stats::Spinner.start do
         churned_subscriptions = stats.churned_subscriptions
         at_risk_subscriptions = stats.at_risk_subscriptions
         lost_revenue = stats.lost_revenue
         churn_rate = stats.churn_rate
+        t2 = Time.now
       end
 
       s = ''
@@ -674,6 +685,8 @@ namespace :stripe do
         s << "\e[34m  - \e[33m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
 
       puts s
