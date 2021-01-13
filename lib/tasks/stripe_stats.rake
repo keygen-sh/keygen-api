@@ -40,6 +40,7 @@ module Stripe
         p90_time_to_convert: p90_time_to_convert,
         p95_time_to_convert: p95_time_to_convert,
         p99_time_to_convert: p99_time_to_convert,
+        latest_converted_user: latest_converted_user,
         latest_time_on_free: latest_time_on_free,
         average_time_on_free: average_time_on_free,
         median_time_on_free: median_time_on_free,
@@ -314,6 +315,21 @@ module Stripe
 
           (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
         end.compact
+    end
+
+    def latest_converted_user
+      @latest_converted_user ||= paid_subscriptions
+        .map do |s|
+          invoices = invoices_for(s.customer)
+          next unless invoices.any? { |i|
+            i.lines.data.any? { |l| l.price&.product == FREE_TIER_PRODUCT_ID }
+          }
+
+          first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
+          next if first_paid_invoice.nil?
+
+          s.customer
+        end.compact.last
     end
 
     def revenue_per_user
@@ -611,7 +627,7 @@ namespace :stripe do
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
       s << "\e[34mTime-to-Convert:\e[0m\n"
-      s << "\e[34m  - Latest: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - Latest: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[34m (#{report.latest_converted_user.email} signed up #{time_ago_in_words(report.latest_converted_user.created)} ago)\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P90: \e[36m#{report.p90_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
