@@ -688,7 +688,7 @@ namespace :stripe do
         life_time_value = stats.revenue_for(subscription) * life_time
         customer = subscription.customer
 
-        s << "\e[34m  - \e[31m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+        s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
       s << "\e[34mAt-Risk:\e[34m (\e[33m#{at_risk_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
