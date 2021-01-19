@@ -685,7 +685,7 @@ namespace :stripe do
 
       churned_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time
+        life_time_value = stats.revenue_for(subscription) * life_time.ceil
         customer = subscription.customer
 
         s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
@@ -695,7 +695,7 @@ namespace :stripe do
 
       at_risk_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time
+        life_time_value = stats.revenue_for(subscription) * life_time.ceil
         customer = subscription.customer
 
         s << "\e[34m  - \e[33m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
