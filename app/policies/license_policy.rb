@@ -16,7 +16,7 @@ class LicensePolicy < ApplicationPolicy
   def create?
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((resource.policy.nil? || !resource.policy.protected?) && resource.user == bearer) ||
-      resource.product == bearer
+      (resource.product.nil? || resource.product == bearer)
   end
 
   def update?
