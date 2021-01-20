@@ -2615,6 +2615,36 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product attempts to create a license using a policy they don't own
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "policies"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin sends invalid JSON while attempting to create a license
     Given I am an admin of account "test1"
     And the current account is "test1"
