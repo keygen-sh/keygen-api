@@ -1,7 +1,10 @@
 -# frozen_string_literal: true
 %h3 Usage report for #{@date.strftime "%m/%d/%Y"}
 
-%p There were #{number_with_delimiter @request_count} total requests across #{number_with_delimiter @reports.size} accounts.
+%p
+  There were #{number_with_delimiter @request_count} total requests across #{number_with_delimiter @reports.size} active
+  accounts (#{number_with_delimiter @reports.filter { |r| r.account.plan&.free? }.size} free,
+  #{number_with_delimiter @reports.filter { |r| r.account.plan&.paid? }.size} paid accounts).
 
 - if @reports.any?
   %ul
