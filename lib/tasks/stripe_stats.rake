@@ -64,6 +64,7 @@ module Stripe
         trialing_users_with_payment_method: trialing_users_with_payment_method_count,
         free_users: free_users_count,
         at_risk_users: at_risk_users_count,
+        canceling_users: canceling_users_count,
         churned_users: churned_users_count,
       )
     end
@@ -102,6 +103,10 @@ module Stripe
 
     def at_risk_users_count
       at_risk_users.size
+    end
+
+    def canceling_users_count
+      canceling_users.size
     end
 
     def churned_users_count
@@ -452,6 +457,10 @@ module Stripe
       @free_subscriptions ||= subscriptions.filter { |s| s.status == 'active' && s.plan.product == FREE_TIER_PRODUCT_ID }
     end
 
+    def canceling_subscriptions
+      @canceling_subscriptions ||= paid_subscriptions.filter { |s| s.cancel_at_period_end }
+    end
+
     def canceled_subscriptions
       @canceled_subscriptions ||= subscriptions.filter { |s| s.status == 'canceled' }
     end
@@ -495,6 +504,10 @@ module Stripe
 
     def new_paid_users
       @new_paid_users ||= new_paid_subscriptions.map(&:customer)
+    end
+
+    def canceling_users
+      @canceling_users ||= canceling_subscriptions.map(&:customer)
     end
 
     def churned_users
@@ -643,10 +656,11 @@ namespace :stripe do
       s << "\e[34mUsers:\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
-      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
+      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
+      s << "\e[34m  - Canceling: \e[31m#{report.canceling_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
@@ -660,16 +674,18 @@ namespace :stripe do
   task churn: :environment do
     Rails.logger.silence do
       stats = Stripe::Stats.new(cache: Rails.cache)
-      churned_subscriptions = nil
+      canceling_subscriptions = nil
       at_risk_subscriptions = nil
+      churned_subscriptions = nil
       lost_revenue = nil
       churn_rate = nil
       t1 = Time.now
       t2 = nil
 
       Stripe::Stats::Spinner.start do
-        churned_subscriptions = stats.churned_subscriptions
+        canceling_subscriptions = stats.canceling_subscriptions
         at_risk_subscriptions = stats.at_risk_subscriptions
+        churned_subscriptions = stats.churned_subscriptions
         lost_revenue = stats.lost_revenue
         churn_rate = stats.churn_rate
         t2 = Time.now
@@ -681,15 +697,6 @@ namespace :stripe do
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mLost Revenue: \e[31m#{lost_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-      s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
-
-      churned_subscriptions.each do |subscription|
-        life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time.ceil
-        customer = subscription.customer
-
-        s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
-      end
 
       s << "\e[34mAt-Risk:\e[34m (\e[33m#{at_risk_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
 
@@ -698,7 +705,27 @@ namespace :stripe do
         life_time_value = stats.revenue_for(subscription) * life_time.ceil
         customer = subscription.customer
 
-        s << "\e[34m  - \e[33m#{customer.email}\e[34m (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+        s << "\e[34m  - \e[33m#{customer.email}\e[34m is at-risk (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+      end
+
+      s << "\e[34mCanceling:\e[34m (\e[31m#{canceling_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+
+      canceling_subscriptions.each do |subscription|
+        life_time = stats.subscription_length_for(subscription)
+        life_time_value = stats.revenue_for(subscription) * life_time.ceil
+        customer = subscription.customer
+
+        s << "\e[34m  - \e[31m#{customer.email}\e[34m is canceling (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
+      end
+
+      s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+
+      churned_subscriptions.each do |subscription|
+        life_time = stats.subscription_length_for(subscription)
+        life_time_value = stats.revenue_for(subscription) * life_time.ceil
+        customer = subscription.customer
+
+        s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
       s << "\e[34m======================\e[0m\n"
