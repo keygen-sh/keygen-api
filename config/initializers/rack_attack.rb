@@ -28,7 +28,25 @@ Rack::Attack.blocklist("req/block/ip") do |rack_req|
   !Rack::Attack.cache.read("req/block/ip:#{ip}").nil?
 end
 
-ip_limiter = lambda do |rack_req|
+req_limit_proc = lambda do |base_req_limit|
+  lambda do |rack_req|
+    req = ActionDispatch::Request.new rack_req.env
+    auth = req.headers.fetch('authorization') { '' }
+    return base_req_limit if auth.blank?
+
+    token = auth.remove('Bearer ')
+    return base_req_limit if token.blank?
+
+    # Admins/products get to make additional RPS (indicates server-side)
+    if token.starts_with?('admi') || token.starts_with?('dev') || token.starts_with?('prod')
+      base_req_limit * 5
+    else
+      base_req_limit
+    end
+  end
+end
+
+ip_limit_proc = lambda do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
   ip = req.headers.fetch('cf-connecting-ip') { req.ip }
 
@@ -42,10 +60,10 @@ ip_limiter = lambda do |rack_req|
   end
 end
 
-Rack::Attack.throttle("req/ip/burst/30s", { limit: 150, period: 30.seconds }, &ip_limiter)
-Rack::Attack.throttle("req/ip/burst/2m", { limit: 600, period: 2.minutes }, &ip_limiter)
-Rack::Attack.throttle("req/ip/burst/5m", { limit: 1_500, period: 5.minutes }, &ip_limiter)
-Rack::Attack.throttle("req/ip/burst/10m", { limit: 3_000, period: 10.minutes }, &ip_limiter)
+Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(150), period: 30.seconds }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/2m", { limit: req_limit_proc.call(600), period: 2.minutes }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/5m", { limit: req_limit_proc.call(1_500), period: 5.minutes }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/10m", { limit: req_limit_proc.call(3_000), period: 10.minutes }, &ip_limit_proc)
 
 Rack::Attack.throttled_response = -> (env) {
   match_data = env["rack.attack.match_data"] || {}
