@@ -149,6 +149,7 @@ class TypedParameters
         value = params.delete key
         k, v = transform.call key, value
         next if k.nil?
+
         params[k] = v
       }
     end
@@ -232,9 +233,7 @@ class TypedParameters
           if !value.values.all? { |v| SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
             if allow_non_scalars
               value.each do |k, v|
-                if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
-                  next
-                end
+                next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
                 keys << k.to_s.camelize(:lower)
 
@@ -242,16 +241,14 @@ class TypedParameters
                 case v
                 when Hash
                   v.each do |k, v|
-                    if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
-                      next
-                    end
+                    next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
+
                     raise InvalidParameterError.new(pointer: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
                   end
                 when Array
                   v.each_with_index do |v, i|
-                    if SCALAR_TYPES[Helper.class_type(v.class).to_sym]
-                      next
-                    end
+                    next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
+
                     raise InvalidParameterError.new(pointer: (keys << i).join("/")), "unpermitted type (expected nested array of scalar types)"
                   end
                 end
