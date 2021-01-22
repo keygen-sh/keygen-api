@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_14_151403) do
+ActiveRecord::Schema.define(version: 2021_01_22_170219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -132,7 +132,6 @@ ActiveRecord::Schema.define(version: 2020_12_14_151403) do
 
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
-    t.string "metric"
     t.jsonb "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -328,7 +327,6 @@ ActiveRecord::Schema.define(version: 2020_12_14_151403) do
     t.string "endpoint"
     t.uuid "account_id"
     t.string "idempotency_token"
-    t.string "event"
     t.integer "last_response_code"
     t.text "last_response_body"
     t.uuid "event_type_id", null: false
