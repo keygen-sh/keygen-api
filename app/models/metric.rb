@@ -61,7 +61,7 @@ class Metric < ApplicationRecord
   belongs_to :event_type
 
   validates :account, presence: { message: "must exist" }
-  validates :metric, presence: true
+  validates :event_type, presence: { message: "must exist" }
   validates :data, presence: true
 
   # TODO(ezekg) Rename metrics => events

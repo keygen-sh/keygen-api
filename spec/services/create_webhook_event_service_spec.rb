@@ -96,8 +96,9 @@ describe CreateWebhookEventService do
 
   it 'the event should contain the correct event type' do
     event = create_webhook_event!
+    type = event.event_type
 
-    expect(event.event).to eq 'license.created'
+    expect(type.event).to eq 'license.created'
   end
 
   it 'the event should contain the correct endpoint' do

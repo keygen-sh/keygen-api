@@ -42,8 +42,6 @@ class CreateWebhookEventsWorker
       webhook_event = account.webhook_events.create!(
         endpoint: endpoint.url,
         event_type: event_type,
-        # FIXME(ezekg) Drop event column after full migration to event type table
-        event: event
       )
 
       # Serialize the event and decode so we can use in webhook job

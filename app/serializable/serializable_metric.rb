@@ -4,12 +4,7 @@ class SerializableMetric < SerializableBase
   type :metrics
 
   attribute :metric do
-    # FIXME(ezekg) Backwards compat during deploy
-    if @object.event_type.present?
-      @object.event_type.event
-    else
-      @object.metric
-    end
+    @object.event_type.event
   end
   attribute :data
   attribute :created do
