@@ -3,8 +3,8 @@
 
 %p
   There were #{number_with_delimiter @request_count} total requests across #{number_with_delimiter @reports.size} active
-  accounts (#{number_with_delimiter @reports.filter { |r| r.account.plan&.free? }.size} free,
-  #{number_with_delimiter @reports.filter { |r| r.account.plan&.paid? }.size} paid accounts).
+  accounts (#{number_with_delimiter @free_user_count} free,
+  #{number_with_delimiter @paid_user_count} paid accounts).
 
 - if @reports.any?
   %ul
@@ -19,6 +19,10 @@
         %strong Requests:
         %span(style="color: #{report.request_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
           #{number_with_delimiter report.request_count} / #{number_with_delimiter report.request_limit || 'unlimited'}
+        %br
+        %strong Licenses:
+        %span(style="color: #{report.license_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
+          #{number_with_delimiter report.license_count} / #{number_with_delimiter report.license_limit || 'unlimited'}
         %br
         %strong Products:
         %span(style="color: #{report.product_limit_exceeded ? '#cb2431' : '#2cbe4e'}")

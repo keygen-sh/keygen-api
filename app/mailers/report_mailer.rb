@@ -10,6 +10,7 @@ class ReportMailer < ApplicationMailer
     @reports = reports
       .map do |report|
         report.request_limit_exceeded = (report.request_count > report.request_limit) rescue false
+        report.license_limit_exceeded = (report.license_count > report.license_limit) rescue false
         report.product_limit_exceeded = (report.product_count > report.product_limit) rescue false
         report.admin_limit_exceeded = (report.admin_count > report.admin_limit) rescue false
         report
@@ -22,6 +23,9 @@ class ReportMailer < ApplicationMailer
         ]
       end
       .reverse
+
+    @free_user_count = @reports.filter { |r| r.account.plan&.free? }.size
+    @paid_user_count = @reports.filter { |r| r.account.plan&.paid? }.size
 
     mail subject: "Request limits report for #{date.strftime '%m/%d/%Y'}"
   end
