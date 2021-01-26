@@ -30,7 +30,8 @@ class RequestLimitsReportWorker
       product_limit = plan.max_products
 
       license_count = account.licenses.count
-      license_limit = plan.max_licenses
+      license_limit = plan.max_licenses ||
+                      plan.max_users
 
       report = OpenStruct.new(
         request_count: request_count,
