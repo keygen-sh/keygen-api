@@ -63,6 +63,8 @@ module Stripe
         trialing_users: trialing_users_count,
         trialing_users_with_payment_method: trialing_users_with_payment_method_count,
         free_users: free_users_count,
+        upgraded_users_from_free: upgraded_users_from_free_count,
+        downgraded_users_to_free: downgraded_users_to_free_count,
         at_risk_users: at_risk_users_count,
         canceling_users: canceling_users_count,
         churned_users: churned_users_count,
@@ -115,6 +117,14 @@ module Stripe
 
     def total_users_count
       paid_users.size + trialing_users.size + free_users.size
+    end
+
+    def upgraded_users_from_free_count
+      upgraded_users_from_free.size
+    end
+
+    def downgraded_users_to_free_count
+      downgraded_users_to_free.size
     end
 
     def paid_users_percentage
@@ -490,6 +500,34 @@ module Stripe
         end
     end
 
+    def upgraded_subscriptions_from_free
+      @upgraded_subscriptions_from_free ||= subscriptions
+        .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
+        .filter do |s|
+          next if s.plan.product == FREE_TIER_PRODUCT_ID
+
+          invoices = invoices_for(s)
+          next unless invoices.any? { |i|
+            i.lines.data.any? { |l| l.price&.product == FREE_TIER_PRODUCT_ID }
+          }
+
+          invoices.any? { |i|
+            i.amount_paid > 0 && i.status_transitions.paid_at >= START_DATE
+          }
+        end
+    end
+
+    def downgraded_subscriptions_to_free
+      @downgraded_subscriptions_to_free ||= subscriptions
+        .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
+        .filter do |s|
+          next unless s.plan.product == FREE_TIER_PRODUCT_ID
+
+          invoices = invoices_for(s)
+          invoices.any? { |i| i.amount_paid > 0 }
+        end
+    end
+
     def customers
       @customers ||= subscriptions.map(&:customer)
     end
@@ -533,6 +571,14 @@ module Stripe
 
     def converted_users
       @converted_users ||= converted_subscriptions.map(&:customer)
+    end
+
+    def upgraded_users_from_free
+      @upgraded_users_from_free ||= upgraded_subscriptions_from_free.map(&:customer)
+    end
+
+    def downgraded_users_to_free
+      @downgraded_users_to_free ||= downgraded_subscriptions_to_free.map(&:customer)
     end
 
     private
@@ -659,6 +705,8 @@ namespace :stripe do
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
       s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
+      s << "\e[34m  - Upgrades: \e[32m#{report.upgraded_users_from_free.to_s(:delimited)}\e[34m (free to paid)\e[0m\n"
+      s << "\e[34m  - Downgrades: \e[33m#{report.downgraded_users_to_free.to_s(:delimited)}\e[34m (paid to free)\e[0m\n"
       s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
       s << "\e[34m  - Canceling: \e[31m#{report.canceling_users.to_s(:delimited)}\e[0m\n"
       s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_s(:delimited)}\e[0m\n"
