@@ -8,6 +8,8 @@ class Plan < ApplicationRecord
 
   scope :visible, -> { where private: false }
   scope :hidden, -> { where private: true }
+  scope :paid, -> { where 'price > 0' }
+  scope :free, -> { where 'price IS NULL OR price = 0' }
 
   def private?
     private
