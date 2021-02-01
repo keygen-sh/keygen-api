@@ -618,23 +618,33 @@ module Stripe
     end
 
     def active_paid_accounts
-      @active_paid_accounts ||=
-        ::Account.paid
-          .joins(:request_logs)
-          .where('request_logs.created_at > ?', 90.days.ago)
-          .group('accounts.id')
-          .having('count(request_logs.id) > 0')
-          .to_a
+      @active_paid_accounts ||= to_struct(
+        JSON.parse(
+          cache.fetch('stripe:stats:accounts:paid', raw: true, expires_in: 2.days) do
+            ::Account.paid
+              .joins(:request_logs)
+              .where('request_logs.created_at > ?', 90.days.ago)
+              .group('accounts.id')
+              .having('count(request_logs.id) > 0')
+              .to_a
+          end
+        )
+      )
     end
 
     def active_free_accounts
-      @active_free_accounts ||=
-        ::Account.free
-          .joins(:request_logs)
-          .where('request_logs.created_at > ?', 90.days.ago)
-          .group('accounts.id')
-          .having('count(request_logs.id) > 0')
-          .to_a
+      @active_free_accounts ||= to_struct(
+        JSON.parse(
+          cache.fetch('stripe:stats:accounts:free', raw: true, expires_in: 2.days) do
+            ::Account.free
+              .joins(:request_logs)
+              .where('request_logs.created_at > ?', 90.days.ago)
+              .group('accounts.id')
+              .having('count(request_logs.id) > 0')
+              .to_a
+          end
+        )
+      )
     end
 
     private
