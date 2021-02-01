@@ -58,6 +58,7 @@ module Stripe
         total_users: total_users_count,
         paid_users_percentage: paid_users_percentage,
         free_users_percentage: free_users_percentage,
+        active_paid_accounts_percentage: active_paid_accounts_percentage,
         active_free_accounts_percentage: active_free_accounts_percentage,
         new_sign_ups: new_sign_ups_count,
         paid_users: paid_users_count,
@@ -152,10 +153,16 @@ module Stripe
       free_users_count.to_f / total_users_count.to_f * 100
     end
 
-    def active_free_accounts_percentage
-      return 0.0 if total_active_accounts.zero?
+    def active_paid_accounts_percentage
+      return 0.0 if active_paid_accounts_count.zero?
 
-      active_free_accounts_count.to_f / total_active_accounts.to_f * 100
+      active_paid_accounts_count.to_f / paid_users_count.to_f * 100
+    end
+
+    def active_free_accounts_percentage
+      return 0.0 if active_free_accounts_count.zero?
+
+      active_free_accounts_count.to_f / free_users_count.to_f * 100
     end
 
     def monthly_recurring_revenue
@@ -621,12 +628,13 @@ module Stripe
       @active_paid_accounts ||= to_struct(
         JSON.parse(
           cache.fetch('stripe:stats:accounts:paid', raw: true, expires_in: 2.days) do
-            ::Account.paid
+            ::Account.paid.select(:id)
               .joins(:request_logs)
               .where('request_logs.created_at > ?', 90.days.ago)
               .group('accounts.id')
               .having('count(request_logs.id) > 0')
               .to_a
+              .to_json
           end
         )
       )
@@ -636,12 +644,13 @@ module Stripe
       @active_free_accounts ||= to_struct(
         JSON.parse(
           cache.fetch('stripe:stats:accounts:free', raw: true, expires_in: 2.days) do
-            ::Account.free
+            ::Account.free.select(:id)
               .joins(:request_logs)
               .where('request_logs.created_at > ?', 90.days.ago)
               .group('accounts.id')
               .having('count(request_logs.id) > 0')
               .to_a
+              .to_json
           end
         )
       )
@@ -768,7 +777,7 @@ namespace :stripe do
       s << "\e[34m  - P95: \e[36m#{report.p95_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mUsers:\e[0m\n"
-      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[0m\n"
+      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[34m (over last 90 days, #{report.active_paid_accounts_percentage.to_s(:percentage, precision: 2)} of paid, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} of free)\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
@@ -845,6 +854,37 @@ namespace :stripe do
         s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
+      s << "\e[34m======================\e[0m\n"
+
+      puts s
+    end
+  end
+
+  # NOTE(ezekg) DATABASE_URL=$(heroku config:get DATABASE_URL) RAILS_ENV=production rake stripe:accounts
+  desc 'retrieve account data (and prime prod data cache)'
+  task accounts: :environment do
+    Rails.logger.silence do
+      stats = Stripe::Stats.new(cache: Rails.cache)
+      total_active_accounts = nil
+      active_paid_accounts = nil
+      active_free_accounts = nil
+      t1 = Time.now
+      t2 = nil
+
+      Stripe::Stats::Spinner.start do
+        total_active_accounts = stats.total_active_accounts
+        active_paid_accounts = stats.active_paid_accounts_count
+        active_free_accounts = stats.active_free_accounts_count
+        t2 = Time.now
+      end
+
+      s = ''
+      s << "\e[34m======================\e[0m\n"
+      s << "\e[34mActive: \e[32m#{total_active_accounts.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mPaid: \e[32m#{active_paid_accounts.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mFree: \e[32m#{active_free_accounts.to_s(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
