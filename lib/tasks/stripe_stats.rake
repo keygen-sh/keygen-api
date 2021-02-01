@@ -58,6 +58,7 @@ module Stripe
         total_users: total_users_count,
         paid_users_percentage: paid_users_percentage,
         free_users_percentage: free_users_percentage,
+        active_free_accounts_percentage: active_free_accounts_percentage,
         new_sign_ups: new_sign_ups_count,
         paid_users: paid_users_count,
         new_paid_users: new_paid_users_count,
@@ -69,6 +70,9 @@ module Stripe
         at_risk_users: at_risk_users_count,
         canceling_users: canceling_users_count,
         churned_users: churned_users_count,
+        active_paid_accounts: active_paid_accounts_count,
+        active_free_accounts: active_free_accounts_count,
+        total_active_accounts: total_active_accounts,
       )
     end
 
@@ -128,12 +132,30 @@ module Stripe
       downgraded_users_to_free.size
     end
 
+    def active_paid_accounts_count
+      active_paid_accounts.size
+    end
+
+    def active_free_accounts_count
+      active_free_accounts.size
+    end
+
+    def total_active_accounts
+      active_paid_accounts.size + active_free_accounts.size
+    end
+
     def paid_users_percentage
       paid_users_count.to_f / total_users_count.to_f * 100
     end
 
     def free_users_percentage
       free_users_count.to_f / total_users_count.to_f * 100
+    end
+
+    def active_free_accounts_percentage
+      return 0.0 if total_active_accounts.zero?
+
+      active_free_accounts_count.to_f / total_active_accounts.to_f * 100
     end
 
     def monthly_recurring_revenue
@@ -595,6 +617,26 @@ module Stripe
       @downgraded_users_to_free ||= downgraded_subscriptions_to_free.map(&:customer)
     end
 
+    def active_paid_accounts
+      @active_paid_accounts ||=
+        ::Account.paid
+          .joins(:request_logs)
+          .where('request_logs.created_at > ?', 90.days.ago)
+          .group('accounts.id')
+          .having('count(request_logs.id) > 0')
+          .to_a
+    end
+
+    def active_free_accounts
+      @active_free_accounts ||=
+        ::Account.free
+          .joins(:request_logs)
+          .where('request_logs.created_at > ?', 90.days.ago)
+          .group('accounts.id')
+          .having('count(request_logs.id) > 0')
+          .to_a
+    end
+
     private
 
     attr_reader :cache
@@ -714,10 +756,11 @@ namespace :stripe do
       s << "\e[34m  - P95: \e[36m#{report.p95_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mUsers:\e[0m\n"
+      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
-      s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of users)\e[0m\n"
+      s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of all users, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} active last 90 days)\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
       s << "\e[34m  - Upgrades: \e[32m#{report.upgraded_users_from_free.to_s(:delimited)}\e[34m (free to paid)\e[0m\n"
       s << "\e[34m  - Downgrades: \e[33m#{report.downgraded_users_to_free.to_s(:delimited)}\e[34m (paid to free)\e[0m\n"

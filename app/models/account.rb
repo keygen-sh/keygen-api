@@ -46,6 +46,8 @@ class Account < ApplicationRecord
     errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
   end
 
+  scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
+  scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
   scope :plan, -> (id) { where plan: id }
 
   after_commit :clear_cache!, on: [:update, :destroy]
