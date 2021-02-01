@@ -22,7 +22,7 @@
         %br
         %strong Licenses:
         %span(style="color: #{report.license_limit_exceeded ? '#cb2431' : '#2cbe4e'}")
-          #{number_with_delimiter report.license_count} / #{number_with_delimiter report.license_limit || 'unlimited'}
+          #{number_with_delimiter report.active_licensed_user_count} / #{number_with_delimiter report.license_limit || 'unlimited'} (total #{number_with_delimiter report.license_count} licenses)
         %br
         %strong Products:
         %span(style="color: #{report.product_limit_exceeded ? '#cb2431' : '#2cbe4e'}")

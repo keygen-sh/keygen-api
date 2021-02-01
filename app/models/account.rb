@@ -153,6 +153,21 @@ class Account < ApplicationRecord
     daily_request_count > daily_request_limit
   end
 
+  def active_licensed_user_count
+    # Get count of userless licenses then add in grouped licensed user count
+    total_licensed_users, *licensed_users =
+      self.licenses.active
+        .reorder(Arel.sql('"licenses"."user_id" NULLS FIRST'))
+        .group(Arel.sql('"licenses"."user_id"'))
+        .count
+        .values
+
+    # We're counting a user with any amount of licenses as 1 licensed user
+    total_licensed_users += licensed_users.count unless total_licensed_users.nil?
+
+    total_licensed_users.to_i
+  end
+
   def trialing_or_free_tier?
     return true if billing.nil?
 

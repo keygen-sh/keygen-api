@@ -6,6 +6,7 @@ class ReportMailerPreview < ActionMailer::Preview
       OpenStruct.new(
         request_count: 3_401,
         request_limit: 5_000,
+        active_licensed_user_count: 51,
         license_count: 3_102,
         license_limit: 50,
         product_count: 1,
@@ -18,6 +19,7 @@ class ReportMailerPreview < ActionMailer::Preview
       OpenStruct.new(
         request_count: 6_199,
         request_limit: 5_000,
+        active_licensed_user_count: 430,
         license_count: 932,
         license_limit: 100_000,
         product_count: 1,
@@ -30,6 +32,7 @@ class ReportMailerPreview < ActionMailer::Preview
       OpenStruct.new(
         request_count: 42,
         request_limit: 5_000,
+        active_licensed_user_count: 499,
         license_count: 33_941,
         license_limit: 500,
         product_count: 1,
@@ -42,6 +45,7 @@ class ReportMailerPreview < ActionMailer::Preview
       OpenStruct.new(
         request_count: 103,
         request_limit: 500,
+        active_licensed_user_count: 33,
         license_count: 33,
         license_limit: 500,
         product_count: 1,
@@ -54,6 +58,7 @@ class ReportMailerPreview < ActionMailer::Preview
       OpenStruct.new(
         request_count: 230_456,
         request_limit: 100_000,
+        active_licensed_user_count: 12_000,
         license_count: 92_753,
         license_limit: 10_000,
         product_count: 23,
