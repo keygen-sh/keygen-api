@@ -67,7 +67,7 @@ class License < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
-  scope :active, -> (start_date = 90.days.ago) { where 'last_validated_at >= ?', start_date }
+  scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :unassigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
