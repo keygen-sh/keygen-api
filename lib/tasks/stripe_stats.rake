@@ -777,7 +777,7 @@ namespace :stripe do
       s << "\e[34m  - P95: \e[36m#{report.p95_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mUsers:\e[0m\n"
-      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[34m (over last 90 days, #{report.active_paid_accounts_percentage.to_s(:percentage, precision: 2)} of paid, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} of free)\e[0m\n"
+      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[34m (API usage over last 90 days, #{report.active_paid_accounts_percentage.to_s(:percentage, precision: 2)} of paid, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} of free)\e[0m\n"
       s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
       s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
       s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
