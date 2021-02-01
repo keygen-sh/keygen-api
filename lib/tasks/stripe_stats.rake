@@ -676,6 +676,8 @@ module Stripe
       @@thread = nil
 
       def self.start(&block)
+        return block.call unless $stdout.tty?
+
         print "\u001B[?25l"
 
         @@thread = Thread.new do
