@@ -40,6 +40,7 @@ module Stripe
         p90_time_to_convert: p90_time_to_convert,
         p95_time_to_convert: p95_time_to_convert,
         p99_time_to_convert: p99_time_to_convert,
+        latest_converted_free_user: latest_converted_free_user,
         latest_converted_user: latest_converted_user,
         latest_time_on_free: latest_time_on_free,
         average_time_on_free: average_time_on_free,
@@ -332,8 +333,8 @@ module Stripe
         end.compact
     end
 
-    def latest_converted_user
-      @latest_converted_user ||= paid_subscriptions
+    def latest_converted_free_user
+      @latest_converted_free_user ||= paid_subscriptions
         .map do |s|
           invoices = invoices_for(s.customer)
           next unless invoices.any? { |i|
@@ -344,6 +345,19 @@ module Stripe
           next if first_paid_invoice.nil?
 
           s.customer
+        end.compact.last
+    end
+
+    def latest_converted_user
+      @latest_converted_user ||= paid_subscriptions
+        .map do |s|
+          customer = s.customer
+          invoices = invoices_for(customer)
+          has_added_payment_method = customer.default_source.present? || customer.invoice_settings.default_payment_method.present?
+          first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
+          next if first_paid_invoice.nil? && !has_added_payment_method
+
+          customer
         end.compact.last
     end
 
@@ -489,7 +503,7 @@ module Stripe
 
     def converted_subscriptions
       @converted_subscriptions ||= subscriptions
-        .filter { |s| s.status == 'active' || s.status == 'canceled' }
+        .filter { |s| s.status == 'active' || s.status == 'trialing' || s.status == 'canceled' }
         .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
         .filter do |s|
           next if s.plan.product == FREE_TIER_PRODUCT_ID
@@ -693,7 +707,7 @@ namespace :stripe do
       s << "\e[34m  - P95: \e[36m#{report.p95_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mTime-on-Free:\e[34m (of those which convert)\e[0m\n"
-      s << "\e[34m  - Latest: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
+      s << "\e[34m  - Latest: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[34m (#{report.latest_converted_free_user.email} signed up #{time_ago_in_words(report.latest_converted_free_user.created)} ago)\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P90: \e[36m#{report.p90_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
