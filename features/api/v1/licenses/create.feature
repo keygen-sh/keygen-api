@@ -2681,6 +2681,157 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to create a license while on a paid tier with card but has exceeded their max licensed user limit
+    Given I am an admin of account "test1"
+    And the account "test1" has a max license limit of 50
+    And the account "test1" is subscribed
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 50 "licenses"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 51 "licenses"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attempts to create a license while trialing a paid tier with card but has exceeded their max licensed user limit
+    Given I am an admin of account "test1"
+    And the account "test1" has a max license limit of 50
+    And the account "test1" does have a card on file
+    And the account "test1" is trialing
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 50 "licenses"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 51 "licenses"
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attempts to create a license while trialing a paid tier without card but has exceeded their max licensed user limit
+    Given I am an admin of account "test1"
+    And the account "test1" has a max license limit of 50
+    And the account "test1" does not have a card on file
+    And the account "test1" is trialing
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 50 "licenses"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
+        "code": "ACCOUNT_LICENSE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/account"
+        }
+      }
+      """
+    And the current account should have 50 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attempts to create a license while on the free tier but has exceeded their max licensed user limit
+    Given I am an admin of account "test1"
+    And the account "test1" has a max license limit of 50
+    And the account "test1" is on a free tier
+    And the account "test1" is subscribed
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 50 "licenses"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "Your tier's active licensed user limit of 50 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
+        "code": "ACCOUNT_LICENSE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/account"
+        }
+      }
+      """
+    And the current account should have 50 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   # Scenario: Admin sends a badly encoded URL query parameter when attempting to create a license
   #   Given I am an admin of account "test1"
   #   And the current account is "test1"

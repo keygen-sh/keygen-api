@@ -33,6 +33,7 @@ class License < ApplicationRecord
   attr_reader :raw
 
   before_validation :encrypt_key, on: :create, unless: -> { key.nil? || policy.nil? || !scheme? || legacy_encrypted? }
+  before_create :enforce_license_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { requires_check_in? }
   before_create :set_expiry, unless: -> { expiry.present? || policy.nil? }
@@ -310,5 +311,19 @@ class License < ApplicationRecord
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (must be a valid JSON encoded string)"
   rescue JWT::InvalidPayload => e
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message})"
+  end
+
+  def enforce_license_limit_on_account!
+    return unless account.trialing_or_free_tier?
+
+    active_licensed_user_count = account.active_licensed_user_count
+    active_licensed_user_limit = account.plan.max_licenses ||
+                                 account.plan.max_users
+
+    if active_licensed_user_count >= active_licensed_user_limit
+      errors.add :account, :license_limit_exceeded, message: "Your tier's active licensed user limit of #{active_licensed_user_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
+
+      throw :abort
+    end
   end
 end

@@ -59,6 +59,12 @@ Given /^the account "([^\"]*)" is on a free tier$/ do |slug|
   account.plan.update! price: 0
 end
 
+Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |slug, resource, limit|
+  account = Account.find slug
+
+  account.plan.update! "max_#{resource.pluralize.underscore}" => limit.to_i
+end
+
 Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
   account = Account.find slug
 
