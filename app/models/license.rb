@@ -320,6 +320,9 @@ class License < ApplicationRecord
     active_licensed_user_limit = account.plan.max_licenses ||
                                  account.plan.max_users
 
+    return if active_licensed_user_count.nil? ||
+              active_licensed_user_limit.nil?
+
     if active_licensed_user_count >= active_licensed_user_limit
       errors.add :account, :license_limit_exceeded, message: "Your tier's active licensed user limit of #{active_licensed_user_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
 

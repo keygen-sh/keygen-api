@@ -19,6 +19,21 @@ class AccountMailer < ApplicationMailer
     end
   end
 
+  def license_limit_exceeded(account:, plan:, license_count:, license_limit:)
+    @account = account
+    @plan = plan
+    @report = OpenStruct.new(
+      license_count: license_count,
+      license_limit: license_limit
+    )
+
+    account.admins.each do |admin|
+      @user = admin
+
+      mail to: admin.email, subject: "You've exceeded the active licensed user limit of your Keygen account"
+    end
+  end
+
   def pricing_change(account:)
     @account = account
 
