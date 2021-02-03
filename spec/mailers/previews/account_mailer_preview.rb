@@ -18,6 +18,22 @@ class AccountMailerPreview < ActionMailer::Preview
     )
   end
 
+  def license_limit_exceeded
+    report = OpenStruct.new(
+      license_count: 16_384,
+      license_limit: 10_000,
+      account: account,
+      plan: account.plan
+    )
+
+    AccountMailer.license_limit_exceeded(
+      account: report.account,
+      plan: report.plan,
+      license_count: report.license_count,
+      license_limit: report.license_limit
+    )
+  end
+
   def pricing_change
     AccountMailer.pricing_change account: account
   end
