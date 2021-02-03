@@ -13,19 +13,41 @@ Rails.application.configure do
     token_id = controller.current_token&.id
     req = controller.request
     res = controller.response
-    err =
-      if res.status > 399
-        Base64.strict_encode64 res.body
-      else
-        nil
-      end
-
     query_params =
       if req.query_string.present?
         "{#{req.query_string}}"
       else
-        'N/A'
+        nil
       end
+
+    begin
+      code =
+        if res.status > 399
+          body = JSON.parse(res.body) rescue {}
+          errs = body.fetch('errors') { [] }
+
+          if errs.any? { |e| e.key?('code') }
+            errs.map { |e| e['code'] }.join ','
+          else
+            nil
+          end
+        else
+          nil
+        end
+    rescue => e
+      Rails.logger.error e
+    end
+
+    begin
+      enc_res =
+        if res.status > 399
+          Base64.strict_encode64 res.body
+        else
+          nil
+        end
+    rescue => e
+      Rails.logger.error e
+    end
 
     daily_req_limits =
       {}.tap do |req|
@@ -56,7 +78,7 @@ Rails.application.configure do
       end
 
     {
-      query_params: query_params,
+      query_params: query_params || 'N/A',
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
       bearer_type: bearer_type || 'N/A',
@@ -66,7 +88,8 @@ Rails.application.configure do
       user_agent: req.user_agent || 'N/A',
       origin: req.headers['origin'] || 'N/A',
       time: Time.current,
-      encoded_response: err || 'N/A',
+      code: code || 'N/A',
+      encoded_response: enc_res || 'N/A',
       **daily_req_limits,
       **rate_limit_logs,
     }
