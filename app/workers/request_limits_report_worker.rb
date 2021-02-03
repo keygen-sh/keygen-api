@@ -48,7 +48,7 @@ class RequestLimitsReportWorker
         plan: plan
       )
 
-      license_limit_exceeded = (active_licensed_user_count > license_limit * 1.3) rescue false
+      license_limit_exceeded = (active_licensed_user_count > license_limit * 1.1) rescue false
       request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
 
       # TODO(ezekg) Uncomment when we add related account stat widgets to the admin dashboard
