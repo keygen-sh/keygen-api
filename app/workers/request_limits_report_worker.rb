@@ -51,11 +51,12 @@ class RequestLimitsReportWorker
       license_limit_exceeded = (active_licensed_user_count > license_limit * 1.3) rescue false
       request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
 
-      # Only send on Mondays to limit inbox noise for accounts that are currently
-      # over their license limit but don't upgrade right away
-      if Date.today.monday? && license_limit_exceeded && !account.trialing_or_free_tier?
-        AccountMailer.license_limit_exceeded(account: account, plan: plan, license_count: request_count, license_limit: request_limit).deliver_later
-      end
+      # TODO(ezekg) Uncomment when we add related account stat widgets to the admin dashboard
+      # # Only send on Mondays to limit inbox noise for accounts that are currently
+      # # over their license limit but don't upgrade right away
+      # if Date.today.monday? && license_limit_exceeded && !account.trialing_or_free_tier?
+      #   AccountMailer.license_limit_exceeded(account: account, plan: plan, license_count: request_count, license_limit: request_limit).deliver_later
+      # end
 
       if request_limit_exceeded && !account.trialing_or_free_tier?
         AccountMailer.request_limit_exceeded(account: account, plan: plan, request_count: request_count, request_limit: request_limit).deliver_later
