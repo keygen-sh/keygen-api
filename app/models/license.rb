@@ -116,6 +116,10 @@ class License < ApplicationRecord
     expiry < Time.current
   end
 
+  def active?(t = 90.days.ago)
+    (created_at >= t || last_validated_at >= t) rescue false
+  end
+
   def check_in_overdue?
     return false unless requires_check_in?
 
