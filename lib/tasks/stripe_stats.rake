@@ -395,7 +395,7 @@ module Stripe
     end
 
     def pending_revenue_per_user
-      revenues_for(paid_subscriptions.filter { |s| s.status == 'trialing' })
+      revenues_for(paid_subscriptions.filter { |s| s.status == 'trialing' || s.status == 'unpaid' })
     end
 
     def revenue_per_new_user
@@ -478,7 +478,7 @@ module Stripe
 
     def paid_subscriptions
       @paid_subscriptions ||= subscriptions
-        .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
+        .filter { |s| s.status == 'active' || s.status == 'incomplete' || s.status == 'past_due' || s.status == 'unpaid' || s.status == 'trialing' }
         .filter do |s|
           next if s.plan.product == FREE_TIER_PRODUCT_ID
 
