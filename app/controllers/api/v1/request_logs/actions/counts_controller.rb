@@ -105,7 +105,7 @@ module Api::V1::RequestLogs::Actions
           GROUP BY
             "request_logs"."ip"
           ORDER BY
-          count DESC
+            count DESC
           LIMIT
             10
         SQL
