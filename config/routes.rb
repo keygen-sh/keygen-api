@@ -194,5 +194,5 @@ Rails.application.routes.draw do
   end
 
   match '*unmatched_route', to: "errors#show", code: 404, via: :all
-  root to: "errors#show", code: 404
+  root to: "errors#show", code: 404, via: :all
 end
