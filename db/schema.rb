@@ -237,10 +237,10 @@ ActiveRecord::Schema.define(version: 2021_02_18_213930) do
     t.datetime "updated_at", null: false
     t.string "requestor_type"
     t.uuid "requestor_id"
+    t.index "to_tsvector('simple'::regconfig, (ip)::text)", name: "request_logs_tsv_ip_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, (request_id)::text)", name: "request_logs_tsv_request_id_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
-    t.index ["ip"], name: "request_logs_tsv_ip_idx", using: :gin
     t.index ["request_id", "created_at"], name: "index_request_logs_on_request_id_and_created_at", unique: true
-    t.index ["request_id"], name: "request_logs_tsv_request_id_idx", using: :gin
     t.index ["url"], name: "request_logs_tsv_url_idx", using: :gin
   end
 
