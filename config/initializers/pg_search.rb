@@ -42,6 +42,8 @@ module PgSearch
         "\"left\"(coalesce(#{expression}::text, ''), 128)"
       elsif "#{table_name}.#{column_name}" == '"users"."email"'
         "\"replace\"(coalesce(#{expression}::text, ''), '@', ' ')"
+      elsif "#{table_name}.#{column_name}" == '"request_logs"."url"'
+        "\"replace\"(coalesce(#{expression}::text, ''), '/', ' ')"
       else
         "coalesce(#{expression}::text, '')"
       end

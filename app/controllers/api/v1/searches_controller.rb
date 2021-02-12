@@ -11,15 +11,15 @@ module Api::V1
     # POST /search
     def search
       query, type = search_params[:meta].fetch_values 'query', 'type'
-      model = type.classify.constantize rescue nil
+      model = type.underscore.classify.constantize rescue nil
 
-      if model.respond_to?(:search) && current_account.respond_to?(type.pluralize)
+      if model.respond_to?(:search) && current_account.respond_to?(type.underscore.pluralize)
         authorize model
 
         search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
         search_rels = model::SEARCH_RELATIONSHIPS
 
-        res = current_account.send type.pluralize
+        res = current_account.send type.underscore.pluralize
         query.each do |key, value|
           attribute = key.to_s.underscore.parameterize(separator: '_')
 
