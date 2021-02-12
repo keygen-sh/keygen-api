@@ -4,6 +4,12 @@ class RequestLog < ApplicationRecord
   include DateRangeable
   include Limitable
   include Pageable
+  include Searchable
+
+  SEARCH_ATTRIBUTES = [{ fuzzy: [:request_id, :status, :method, :url, :ip] }].freeze
+  SEARCH_RELATIONSHIPS = {}.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
 
