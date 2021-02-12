@@ -22,6 +22,8 @@ module Api::V1::Licenses::Actions
       Rails.logger.info "[license.quick-validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
       if @license.present?
+        Keygen::Store::Request.store[:current_resource] = @license
+
         @license.touch :last_validated_at unless request.headers['origin'] == 'https://app.keygen.sh'
 
         CreateWebhookEventService.new(
@@ -58,6 +60,8 @@ module Api::V1::Licenses::Actions
       Rails.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
+        Keygen::Store::Request.store[:current_resource] = @license
+
         @license.touch :last_validated_at
 
         CreateWebhookEventService.new(
@@ -103,6 +107,8 @@ module Api::V1::Licenses::Actions
       Rails.logger.info "[license.validate-key] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
+        Keygen::Store::Request.store[:current_resource] = @license
+
         @license.touch :last_validated_at
 
         CreateWebhookEventService.new(

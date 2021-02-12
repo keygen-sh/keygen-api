@@ -32,6 +32,8 @@ module Api::V1::Licenses::Relationships
     def set_license
       @license = current_account.licenses.find params[:license_id]
       authorize @license, :show?
+
+      Keygen::Store::Request.store[:current_resource] = @license
     end
   end
 end

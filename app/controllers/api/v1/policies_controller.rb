@@ -76,6 +76,8 @@ module Api::V1
 
     def set_policy
       @policy = current_account.policies.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @policy
     end
 
     typed_parameters transform: true do

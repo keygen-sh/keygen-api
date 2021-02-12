@@ -97,6 +97,8 @@ module Api::V1::Users::Relationships
 
     def set_user
       @user = current_account.users.find params[:user_id] || params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @user
     end
 
     typed_parameters transform: true do

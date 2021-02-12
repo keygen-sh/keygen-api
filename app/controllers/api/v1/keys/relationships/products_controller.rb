@@ -20,6 +20,8 @@ module Api::V1::Keys::Relationships
     def set_key
       @key = current_account.keys.find params[:key_id]
       authorize @key, :show?
+
+      Keygen::Store::Request.store[:current_resource] = @key
     end
   end
 end

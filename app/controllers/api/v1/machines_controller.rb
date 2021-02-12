@@ -114,6 +114,8 @@ module Api::V1
 
     def set_machine
       @machine = current_account.machines.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @machine
     end
 
     typed_parameters transform: true do
