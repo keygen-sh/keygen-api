@@ -48,6 +48,8 @@ module Api::V1::Users::Actions
 
     def set_user
       @user = current_account.users.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @user
     end
 
     typed_parameters do

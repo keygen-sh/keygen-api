@@ -64,6 +64,18 @@ module Keygen
         plans
       ].freeze
 
+      REDACTED_RESOURCES ||= %w[
+        tokens/generate
+        tokens/regenerate
+        tokens/regenerate_current
+
+        users/create
+        users/update
+
+        password/update_password
+        password/reset_password
+      ]
+
       def initialize(app)
         @app = app
       end
@@ -71,21 +83,20 @@ module Keygen
       def call(env)
         req = ActionDispatch::Request.new env
         status, headers, res = @app.call env
-
-        if IGNORED_ORIGINS.include?(req.headers['origin'])
-          return [status, headers, res]
-        end
+        return [status, headers, res] if IGNORED_ORIGINS.include?(req.headers['origin'])
 
         account = Keygen::Store::Request.store[:current_account]
         account_id = account&.id || req.params[:account_id] || req.params[:id]
 
         route = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
+        action = route[:action]
 
-        if account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
-          return [status, headers, res]
-        end
+        is_ignored = account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
+        is_redacted = REDACTED_RESOURCES.any? { |r| "#{controller}/#{action}".include?(r) }
+        return [status, headers, res] if is_ignored
 
+        resource = Keygen::Store::Request.store[:current_resource]
         requestor = Keygen::Store::Request.store[:current_bearer]
 
         RequestLogWorker.perform_async(
@@ -93,14 +104,19 @@ module Keygen
           {
             requestor_type: requestor&.class&.name,
             requestor_id: requestor&.id,
+            resource_type: resource&.class&.name,
+            resource_id: resource&.id,
             request_id: req.request_id,
+            body: is_redacted ? nil : req.raw_post,
             url: req.fullpath,
             method: req.method,
             ip: req.headers['cf-connecting-ip'] || req.remote_ip,
-            user_agent: req.user_agent
+            user_agent: req.user_agent,
           },
           {
-            status: status
+            body: is_redacted ? nil : (res.respond_to?(:body) ? res.body : res.first),
+            signature: headers['X-Signature'],
+            status: status,
           }
         )
 

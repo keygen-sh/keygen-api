@@ -55,6 +55,8 @@ module Api::V1::Machines::Actions
 
     def set_machine
       @machine = current_account.machines.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @machine
     end
   end
 end

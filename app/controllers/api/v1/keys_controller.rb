@@ -77,6 +77,8 @@ module Api::V1
 
     def set_key
       @key = current_account.keys.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @key
     end
 
     typed_parameters transform: true do

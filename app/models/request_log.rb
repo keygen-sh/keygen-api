@@ -10,6 +10,8 @@ class RequestLog < ApplicationRecord
   SEARCH_RELATIONSHIPS = {}.freeze
 
   belongs_to :account
+  belongs_to :requestor, polymorphic: true
+  belongs_to :resource, polymorphic: true
 
   validates :account, presence: { message: "must exist" }
 

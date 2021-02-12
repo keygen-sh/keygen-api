@@ -83,6 +83,8 @@ module Api::V1
 
     def set_license
       @license = current_account.licenses.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @license
     end
 
     typed_parameters transform: true do
