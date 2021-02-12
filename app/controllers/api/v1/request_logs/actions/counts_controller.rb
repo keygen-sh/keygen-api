@@ -5,7 +5,6 @@ module Api::V1::RequestLogs::Actions
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
 
-    # GET /request-logs/actions/count
     def count
       authorize RequestLog
 
@@ -37,6 +36,84 @@ module Api::V1::RequestLogs::Actions
             .merge(
               rows.map { |r| r.fetch_values('date', 'count') }.to_h
             )
+        }
+      end
+
+      render json: json
+    end
+
+    def top_urls_by_volume
+      authorize RequestLog
+
+      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+        conn = ActiveRecord::Base.connection
+
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current.end_of_day
+        sql = <<~SQL
+          SELECT
+            "request_logs"."url" AS url,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."url" IS NOT NULL AND
+            (
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
+            )
+          GROUP BY
+            "request_logs"."url"
+          ORDER BY
+            count DESC
+          LIMIT
+            10
+        SQL
+
+        rows = conn.execute sql.squish
+
+        json = {
+          meta: rows.map { |r| r.fetch_values('url', 'count') }.to_h,
+        }
+      end
+
+      render json: json
+    end
+
+    def top_ips_by_volume
+      authorize RequestLog
+
+      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+        conn = ActiveRecord::Base.connection
+
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current.end_of_day
+        sql = <<~SQL
+          SELECT
+            "request_logs"."ip" AS ip,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."ip" IS NOT NULL AND
+            (
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
+            )
+          GROUP BY
+            "request_logs"."ip"
+          ORDER BY
+          count DESC
+          LIMIT
+            10
+        SQL
+
+        rows = conn.execute sql.squish
+
+        json = {
+          meta: rows.map { |r| r.fetch_values('ip', 'count') }.to_h,
         }
       end
 
