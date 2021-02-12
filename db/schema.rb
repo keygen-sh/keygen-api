@@ -237,13 +237,11 @@ ActiveRecord::Schema.define(version: 2021_02_18_213930) do
     t.datetime "updated_at", null: false
     t.string "requestor_type"
     t.uuid "requestor_id"
-    t.index "to_tsvector('simple'::regconfig, COALESCE((ip)::text, ''::text))", name: "request_logs_tsv_ip_idx", using: :gist
-    t.index "to_tsvector('simple'::regconfig, COALESCE((method)::text, ''::text))", name: "request_logs_tsv_method_idx", using: :gist
-    t.index "to_tsvector('simple'::regconfig, COALESCE((request_id)::text, ''::text))", name: "request_logs_tsv_request_id_idx", using: :gist
-    t.index "to_tsvector('simple'::regconfig, COALESCE((status)::text, ''::text))", name: "request_logs_tsv_status_idx", using: :gist
-    t.index "to_tsvector('simple'::regconfig, regexp_replace(COALESCE((url)::text, ''::text), '[^\\w]+'::text, ' '::text, 'gi'::text))", name: "request_logs_tsv_url_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
+    t.index ["ip"], name: "request_logs_tsv_ip_idx", using: :gin
     t.index ["request_id", "created_at"], name: "index_request_logs_on_request_id_and_created_at", unique: true
+    t.index ["request_id"], name: "request_logs_tsv_request_id_idx", using: :gin
+    t.index ["url"], name: "request_logs_tsv_url_idx", using: :gin
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
