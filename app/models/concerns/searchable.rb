@@ -26,9 +26,6 @@ module Searchable
           when :email
             # Remove `@` so that searching on partial email is doable e.g. `User.search_email('@keygen.sh')`
             query = query.gsub('@', ' ')
-          when :url
-            # Remove `/` so that searching on partial URL is doable e.g. `RequestLog.search_url('/validate-key')`
-            query = query.gsub('/', ' ')
           when :metadata
             # Skip prefix search on metadata
             prefix = false

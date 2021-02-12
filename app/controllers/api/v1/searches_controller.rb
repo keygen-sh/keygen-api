@@ -20,6 +20,17 @@ module Api::V1
         search_rels = model::SEARCH_RELATIONSHIPS
 
         res = current_account.send type.underscore.pluralize
+
+        # Special cases for certain models
+        case
+        when model == RequestLog
+          start_date = 30.days.ago.beginning_of_day
+          end_date = Time.current.end_of_day
+
+          # Limit request log searches to last 30 days to improve perf
+          res = res.where('created_at >= :start_date AND created_at <= :end_date', start_date: start_date, end_date: end_date)
+        end
+
         query.each do |key, value|
           attribute = key.to_s.underscore.parameterize(separator: '_')
 
