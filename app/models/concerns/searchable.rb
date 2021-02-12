@@ -20,8 +20,14 @@ module Searchable
         end
 
         pg_search_scope "search_#{scope}", lambda { |query|
-          # Remove `@` so that searching on partial email is doable e.g. `User.search_email('@keygen.sh')`
-          query = query.gsub('@', ' ') if against == :email
+          case
+          when against == :email
+            # Remove `@` so that searching on partial email is doable e.g. `User.search_email('@keygen.sh')`
+            query = query.gsub('@', ' ')
+          when scope == :fuzzy
+            # Remove `/` so that searching on partial URL is doable e.g. `RequestLog.search_fuzzy('/validate-key')`
+            query = query.gsub('/', ' ')
+          end
 
           # Skip prefix search on metadata
           prefix = true
