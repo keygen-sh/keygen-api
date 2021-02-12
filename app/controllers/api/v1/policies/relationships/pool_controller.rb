@@ -49,6 +49,8 @@ module Api::V1::Policies::Relationships
         render_unprocessable_entity detail: "policy does not use a pool",
           source: { pointer: "/data/attributes/usePool" } and return
       end
+
+      Keygen::Store::Request.store[:current_resource] = @policy
     end
   end
 end

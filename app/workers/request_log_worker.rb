@@ -15,7 +15,16 @@ class RequestLogWorker
     account.request_logs.create!(
       requestor_type: req['requestor_type'],
       requestor_id: req['requestor_id'],
+
+      resource_type: req['resource_type'],
+      resource_id: req['resource_id'],
+
       request_id: req['request_id'],
+      request_body: req['body'],
+
+      response_signature: res['signature'],
+      response_body: res['body'],
+
       url: req['url'],
       method: req['method'],
       ip: req['ip'],

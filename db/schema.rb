@@ -237,6 +237,11 @@ ActiveRecord::Schema.define(version: 2021_02_18_213930) do
     t.datetime "updated_at", null: false
     t.string "requestor_type"
     t.uuid "requestor_id"
+    t.text "request_body"
+    t.text "response_body"
+    t.text "response_signature"
+    t.string "resource_type"
+    t.uuid "resource_id"
     t.index "to_tsvector('simple'::regconfig, (ip)::text)", name: "request_logs_tsv_ip_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, (request_id)::text)", name: "request_logs_tsv_request_id_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"

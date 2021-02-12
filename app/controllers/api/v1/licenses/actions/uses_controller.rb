@@ -84,6 +84,8 @@ module Api::V1::Licenses::Actions
 
     def set_license
       @license = current_account.licenses.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = @license
     end
 
     def increment_param

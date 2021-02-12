@@ -91,6 +91,8 @@ module Api::V1
         end
 
       raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
+
+      Keygen::Store::Request.store[:current_resource] = @user
     end
 
     typed_parameters transform: true do
