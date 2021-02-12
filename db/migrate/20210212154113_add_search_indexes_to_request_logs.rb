@@ -1,22 +1,27 @@
 class AddSearchIndexesToRequestLogs < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
+  COLUMNS = [
+    :request_id,
+    :status,
+    :method,
+    :url,
+    :ip,
+  ]
+
   def change
-    add_index(
-      :request_logs,
-      %[
-        to_tsvector(
-          'pg_catalog.simple',
-          coalesce(request_id::TEXT, '') || ' ' ||
-          coalesce(status::TEXT, '') ||  ' ' ||
-          coalesce(method::TEXT, '') || ' ' ||
-          coalesce(url::TEXT, '') || ' ' ||
-          coalesce(ip::TEXT, '')
-        )
-      ].squish,
-      name: :request_logs_tsv_fuzzy_idx,
-      algorithm: :concurrently,
-      using: :gist
-    )
+    COLUMNS.each do |column|
+      idx_statement =
+        if column == :url
+          %[to_tsvector('pg_catalog.simple', regexp_replace(coalesce(#{column}::TEXT, ''), '[^\\w]+', ' ', 'gi'))]
+        else
+          %[to_tsvector('pg_catalog.simple', coalesce(#{column}::TEXT, ''))]
+        end
+
+      add_index :request_logs, idx_statement,
+                name: "request_logs_tsv_#{column}_idx",
+                algorithm: :concurrently,
+                using: :gist
+    end
   end
 end
