@@ -40,8 +40,6 @@ module PgSearch
          "#{table_name}.#{column_name}" == '"licenses"."key"' ||
          "#{table_name}.#{column_name}" == '"keys"."key"'
         "\"left\"(coalesce(#{expression}::text, ''), 128)"
-      elsif "#{table_name}.#{column_name}" == '"request_logs"."url"'
-        "\"regexp_replace\"(coalesce(#{expression}::text, ''), '[^\\w+]+', ' ', 'gi')"
       elsif "#{table_name}.#{column_name}" == '"users"."email"'
         "\"replace\"(coalesce(#{expression}::text, ''), '@', ' ')"
       else

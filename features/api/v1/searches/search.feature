@@ -1247,6 +1247,120 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by request log type on the url attribute (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And 9 "request-logs" have the following attributes:
+      """
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "url": "/v1/accounts/test1/licenses/actions/validate-key"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 9 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on the url attribute (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 25 "request-logs"
+    And 3 "request-logs" have the following attributes:
+      """
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "url": "/validate-key"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on multiple attributes
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 5 "request-logs"
+    And all "request-logs" have the following attributes:
+      """
+      {
+        "url": "/v1/accounts/test1/licenses/actions/validate-key",
+        "method": "POST",
+        "status": 200
+      }
+      """
+    And the first "request-log" has the following attributes:
+      """
+      { "ip": "192.168.1.1" }
+      """
+    And the second "request-log" has the following attributes:
+      """
+      { "ip": "192.168.1.1", "status": 400 }
+      """
+    And the third "request-log" has the following attributes:
+      """
+      { "ip": "192.168.0.1" }
+      """
+    And the fourth "request-log" has the following attributes:
+      """
+      { "ip": "192.168.0.1" }
+      """
+    And the fifth "request-log" has the following attributes:
+      """
+      { "ip": "192.168.1.1" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "requestLog",
+          "query": {
+            "url": "/validate-key",
+            "method": "POST",
+            "status": 200,
+            "ip": "192.168.1.1"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Product performs a search
     Given the current account is "test1"
     And the current account has 1 "product"
