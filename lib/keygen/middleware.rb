@@ -107,7 +107,7 @@ module Keygen
             resource_type: resource&.class&.name,
             resource_id: resource&.id,
             request_id: req.request_id,
-            body: is_redacted ? nil : req.raw_post,
+            body: is_redacted || !req.raw_post.present? ? nil : req.raw_post,
             url: req.fullpath,
             method: req.method,
             ip: req.headers['cf-connecting-ip'] || req.remote_ip,
