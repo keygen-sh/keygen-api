@@ -73,7 +73,7 @@ module Api::V1::RequestLogs::Actions
 
         rows = conn.execute sql.squish
 
-        json = {
+        {
           meta: rows.map { |r| r.fetch_values('url', 'count') }.to_h,
         }
       end
@@ -112,7 +112,7 @@ module Api::V1::RequestLogs::Actions
 
         rows = conn.execute sql.squish
 
-        json = {
+        {
           meta: rows.map { |r| r.fetch_values('ip', 'count') }.to_h,
         }
       end
