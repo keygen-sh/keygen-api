@@ -6,7 +6,7 @@ batch = 0
 puts "[scripts.prune_metrics] Starting"
 
 loop do
-  count = Metric.where('created_at < ?', 1.year.ago).limit(BATCH_SIZE).delete_all
+  count = Metric.where('created_at < ?', 90.days.ago).limit(BATCH_SIZE).delete_all
   batch += 1
 
   puts "[scripts.prune_metrics] Pruned #{count} metric rows (batch ##{batch})"

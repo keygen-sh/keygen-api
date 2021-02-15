@@ -6,7 +6,7 @@ batch = 0
 puts "[scripts.prune_webhook_events] Starting"
 
 loop do
-  count = WebhookEvent.where('created_at < ?', 1.year.ago).limit(BATCH_SIZE).delete_all
+  count = WebhookEvent.where('created_at < ?', 90.days.ago).limit(BATCH_SIZE).delete_all
   batch += 1
 
   puts "[scripts.prune_webhook_events] Pruned #{count} webhook event rows (batch ##{batch})"
