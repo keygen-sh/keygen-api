@@ -9,7 +9,7 @@ loop do
   count = RequestLog.where('created_at < ?', 90.days.ago).limit(BATCH_SIZE).delete_all
   batch += 1
 
-  puts "[scripts.prune_request_logs] Pruned #{count} metric rows (batch ##{batch})"
+  puts "[scripts.prune_request_logs] Pruned #{count} request log rows (batch ##{batch})"
 
   break if count == 0
 end
