@@ -12,7 +12,7 @@ class PruneWebhookEventsWorker
     accounts.find_each do |account|
       loop do
         events = account.webhook_events
-                        .where('created_at < ?', 90.days.ago)
+                        .where('created_at < ?', 90.days.ago.beginning_of_day)
 
         count = events.limit(1_000)
                       .delete_all

@@ -12,7 +12,7 @@ class PruneRequestLogsWorker
     accounts.find_each do |account|
       loop do
         logs = account.request_logs
-                      .where('created_at < ?', 90.days.ago)
+                      .where('created_at < ?', 90.days.ago.beginning_of_day)
 
         count = logs.limit(1_000)
                     .delete_all
