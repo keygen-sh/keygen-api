@@ -5,13 +5,17 @@ batch = 0
 
 puts "[scripts.prune_metrics] Starting"
 
-loop do
-  count = Metric.where('created_at < ?', 90.days.ago).limit(BATCH_SIZE).delete_all
-  batch += 1
+Account.find_each do |account|
+  puts "[scripts.prune_metrics] Pruning metrics for account #{account.id}"
 
-  puts "[scripts.prune_metrics] Pruned #{count} metric rows (batch ##{batch})"
+  loop do
+    count = account.metrics.where('created_at < ?', 90.days.ago).limit(BATCH_SIZE).delete_all
+    batch += 1
 
-  break if count == 0
+    puts "[scripts.prune_metrics] Pruned #{count} metric rows (batch ##{batch})"
+
+    break if count == 0
+  end
 end
 
 puts "[scripts.prune_metrics] Done"
