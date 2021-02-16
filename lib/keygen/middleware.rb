@@ -64,18 +64,6 @@ module Keygen
         plans
       ].freeze
 
-      REDACTED_RESOURCES ||= %w[
-        tokens/generate
-        tokens/regenerate
-        tokens/regenerate_current
-
-        users/create
-        users/update
-
-        password/update_password
-        password/reset_password
-      ]
-
       def initialize(app)
         @app = app
       end
@@ -83,7 +71,9 @@ module Keygen
       def call(env)
         req = ActionDispatch::Request.new env
         status, headers, res = @app.call env
-        return [status, headers, res] if IGNORED_ORIGINS.include?(req.headers['origin'])
+
+        is_ignored_origin = IGNORED_ORIGINS.include?(req.headers['origin'])
+        return [status, headers, res] if is_ignored_origin
 
         account = Keygen::Store::Request.store[:current_account]
         account_id = account&.id || req.params[:account_id] || req.params[:id]
@@ -92,12 +82,19 @@ module Keygen
         controller = route[:controller]
         action = route[:action]
 
-        is_ignored = account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
-        is_redacted = REDACTED_RESOURCES.any? { |r| "#{controller}/#{action}".include?(r) }
-        return [status, headers, res] if is_ignored
+        is_ignored_resource = account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
+        return [status, headers, res] if is_ignored_resource
 
         resource = Keygen::Store::Request.store[:current_resource]
         requestor = Keygen::Store::Request.store[:current_bearer]
+
+        filtered_req_params = req.filtered_parameters.slice(:meta, :data)
+        filtered_req_body =
+          if filtered_req_params.present?
+            filtered_req_params.to_json
+          else
+            nil
+          end
 
         RequestLogWorker.perform_async(
           account_id,
@@ -107,14 +104,15 @@ module Keygen
             resource_type: resource&.class&.name,
             resource_id: resource&.id,
             request_id: req.request_id,
-            body: is_redacted || !req.raw_post.present? ? nil : req.raw_post,
+            body: filtered_req_body,
             url: req.fullpath,
             method: req.method,
             ip: req.headers['cf-connecting-ip'] || req.remote_ip,
             user_agent: req.user_agent,
           },
           {
-            body: is_redacted ? nil : (res.respond_to?(:body) ? res.body : res.first),
+            # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
+            body: res.respond_to?(:body) ? res.body : res.first,
             signature: headers['X-Signature'],
             status: status,
           }
