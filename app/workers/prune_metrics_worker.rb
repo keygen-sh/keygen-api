@@ -12,7 +12,7 @@ class PruneMetricsWorker
     accounts.find_each do |account|
       loop do
         metrics = account.metrics
-                         .where('created_at < ?', 90.days.ago)
+                         .where('created_at < ?', 90.days.ago.beginning_of_day)
 
         count = metrics.limit(1_000)
                        .delete_all
