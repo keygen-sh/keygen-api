@@ -6,7 +6,7 @@ class RequestLog < ApplicationRecord
   include Pageable
   include Searchable
 
-  SEARCH_ATTRIBUTES = [:request_id, :resource_id, :status, :method, :url, :ip].freeze
+  SEARCH_ATTRIBUTES = [:request_id, :requestor_id, :resource_id, :status, :method, :url, :ip].freeze
   SEARCH_RELATIONSHIPS = {}.freeze
 
   belongs_to :account
@@ -26,6 +26,16 @@ class RequestLog < ApplicationRecord
   scope :search_request_id, -> (term) {
     query = <<~SQL
       to_tsvector('simple', request_id::text)
+      @@
+      to_tsquery('simple', ? || ':*')
+    SQL
+
+    where(query.squish, term.to_s)
+  }
+
+  scope :search_requestor_id, -> (term) {
+    query = <<~SQL
+      to_tsvector('simple', requestor_id::text)
       @@
       to_tsquery('simple', ? || ':*')
     SQL
