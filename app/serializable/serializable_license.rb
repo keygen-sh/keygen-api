@@ -39,6 +39,9 @@ class SerializableLicense < SerializableBase
   attribute :require_check_in do
     @object.requires_check_in?
   end
+  attribute :last_validated do
+    @object.last_validated_at
+  end
   attribute :last_check_in do
     @object.last_check_in_at
   end
