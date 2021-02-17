@@ -8,9 +8,9 @@ module Api::V1::Analytics::Actions
 
     # GET /analytics/actions/count
     def count
-      authorize Metric
+      authorize :analytics, :read?
 
-      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+      json = Rails.cache.fetch(cache_key_for(:count), expires_in: 15.minutes) do
         active_licensed_users = current_account.active_licensed_user_count
         active_licenses = current_account.licenses.active.count
         total_licenses = current_account.licenses.count
@@ -31,10 +31,128 @@ module Api::V1::Analytics::Actions
       render json: json
     end
 
+    def top_licenses_by_volume
+      authorize :analytics, :read?
+
+      json = Rails.cache.fetch(cache_key_for(:top_licenses_by_volume), expires_in: 15.minutes) do
+        conn = ActiveRecord::Base.connection
+
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current.end_of_day
+        sql = <<~SQL
+          SELECT
+            "request_logs"."resource_id" AS license_id,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."resource_type" = 'License' AND
+            "request_logs"."resource_id" IS NOT NULL AND
+            (
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
+            )
+          GROUP BY
+            "request_logs"."resource_id"
+          ORDER BY
+            count DESC
+          LIMIT
+            10
+        SQL
+
+        rows = conn.execute sql.squish
+
+        {
+          meta: rows.map { |r| r.fetch_values('license_id', 'count') }.to_h,
+        }
+      end
+
+      render json: json
+    end
+
+    def top_urls_by_volume
+      authorize :analytics, :read?
+
+      json = Rails.cache.fetch(cache_key_for(:top_urls_by_volume), expires_in: 15.minutes) do
+        conn = ActiveRecord::Base.connection
+
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current.end_of_day
+        sql = <<~SQL
+          SELECT
+            "request_logs"."url" AS url,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."url" IS NOT NULL AND
+            (
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
+            )
+          GROUP BY
+            "request_logs"."url"
+          ORDER BY
+            count DESC
+          LIMIT
+            10
+        SQL
+
+        rows = conn.execute sql.squish
+
+        {
+          meta: rows.map { |r| r.fetch_values('url', 'count') }.to_h,
+        }
+      end
+
+      render json: json
+    end
+
+    def top_ips_by_volume
+      authorize :analytics, :read?
+
+      json = Rails.cache.fetch(cache_key_for(:top_ips_by_volume), expires_in: 15.minutes) do
+        conn = ActiveRecord::Base.connection
+
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current.end_of_day
+        sql = <<~SQL
+          SELECT
+            "request_logs"."ip" AS ip,
+            COUNT(*) AS count
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."ip" IS NOT NULL AND
+            (
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
+            )
+          GROUP BY
+            "request_logs"."ip"
+          ORDER BY
+            count DESC
+          LIMIT
+            10
+        SQL
+
+        rows = conn.execute sql.squish
+
+        {
+          meta: rows.map { |r| r.fetch_values('ip', 'count') }.to_h,
+        }
+      end
+
+      render json: json
+    end
+
     private
 
-    def cache_key
-      [:analytics, current_account.id].select(&:present?).join ":"
+    def cache_key_for(action)
+      [:analytics, current_account.id, action].join ":"
     end
   end
 end

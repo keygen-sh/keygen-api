@@ -161,8 +161,6 @@ Rails.application.routes.draw do
         resources "request_logs", path: "request-logs", only: [:index, :show]  do
           collection do
             scope "actions", module: "request_logs/actions" do
-              get "top-urls-by-volume", to: "counts#top_urls_by_volume"
-              get "top-ips-by-volume", to: "counts#top_ips_by_volume"
               get "count", to: "counts#count"
             end
           end
@@ -179,6 +177,9 @@ Rails.application.routes.draw do
         resources "analytics", only: [] do
           collection do
             scope "actions", module: "analytics/actions" do
+              get "top-licenses-by-volume", to: "counts#top_licenses_by_volume"
+              get "top-urls-by-volume", to: "counts#top_urls_by_volume"
+              get "top-ips-by-volume", to: "counts#top_ips_by_volume"
               get "count", to: "counts#count"
             end
           end
