@@ -244,9 +244,13 @@ ActiveRecord::Schema.define(version: 2021_02_18_213930) do
     t.uuid "resource_id"
     t.index "to_tsvector('simple'::regconfig, (ip)::text)", name: "request_logs_tsv_ip_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, (request_id)::text)", name: "request_logs_tsv_request_id_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, (requestor_id)::text)", name: "request_logs_tsv_requestor_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, (resource_id)::text)", name: "request_logs_tsv_resource_id_idx", using: :gin
+    t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
+    t.index ["request_id", "created_at"], name: "index_request_logs_on_request_id_and_created_at", unique: true
+    t.index ["requestor_id", "requestor_type", "created_at"], name: "request_logs_requestor_idx"
     t.index ["resource_id", "resource_type", "created_at"], name: "request_logs_resource_idx"
-    t.index ["url"], name: "index_request_logs_on_url", using: :gin
+    t.index ["url"], name: "request_logs_tsv_url_idx", using: :gin
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
