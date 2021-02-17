@@ -468,6 +468,7 @@ module Stripe
               .auto_paging_each
               .to_a
               .filter { |s| !s.customer.deleted? }
+              .reject { |s| internal_email?(s.customer.email) }
               .sort_by { |s| [s.customer.id, -s.created] }
               .uniq { |s| s.customer.id }
               .to_json
@@ -679,6 +680,14 @@ module Stripe
       f = (percentile * (sorted.size - 1) + 1).modulo(1)
 
       return sorted[k] + (f * (sorted[k + 1] - sorted[k]))
+    end
+
+    def internal_email?(email)
+      return true if email == 'ezekg@yahoo.com' || email == 'zekegabrielse@gmail.com'
+
+      user, host = email.downcase.match(/([^@]+)@(.+)/).captures
+
+      return host == 'keygen.sh'
     end
 
     class Spinner
