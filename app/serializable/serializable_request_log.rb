@@ -9,6 +9,9 @@ class SerializableRequestLog < SerializableBase
   attribute :status
   attribute :user_agent
   attribute :ip
+  attribute :request_body
+  attribute :response_body
+  attribute :response_signature
   attribute :created do
     @object.created_at
   end
