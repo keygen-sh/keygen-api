@@ -88,13 +88,31 @@ module Keygen
         resource = Keygen::Store::Request.store[:current_resource]
         requestor = Keygen::Store::Request.store[:current_bearer]
 
-        filtered_req_params = req.filtered_parameters.slice(:meta, :data)
-        filtered_req_body =
-          if filtered_req_params.present?
-            filtered_req_params.to_json
-          else
-            nil
-          end
+        begin
+          filtered_req_params = req.filtered_parameters.slice(:meta, :data)
+          filtered_req_body =
+            if filtered_req_params.present?
+              params = filtered_req_params.deep_transform_keys! { |k| k.to_s.camelize :lower }
+
+              params.to_json
+            else
+              nil
+            end
+        rescue => e
+          Rails.logger.error e
+        end
+
+        # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
+        begin
+          res_body =
+            if res.respond_to?(:body)
+              res.body
+            else
+              res.first
+            end
+        rescue => e
+          Rails.logger.error e
+        end
 
         RequestLogWorker.perform_async(
           account_id,
@@ -111,8 +129,7 @@ module Keygen
             user_agent: req.user_agent,
           },
           {
-            # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
-            body: res.respond_to?(:body) ? res.body : res.first,
+            body: res_body,
             signature: headers['X-Signature'],
             status: status,
           }
