@@ -123,7 +123,7 @@ module Keygen
             resource_id: resource&.id,
             request_id: req.request_id,
             body: filtered_req_body,
-            url: req.fullpath,
+            url: req.original_fullpath,
             method: req.method,
             ip: req.headers['cf-connecting-ip'] || req.remote_ip,
             user_agent: req.user_agent,
