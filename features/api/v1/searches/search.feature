@@ -1307,6 +1307,66 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by request log type on resource ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 25 "request-logs"
+    And 8 "request-logs" have the following attributes:
+      """
+      {
+        "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660",
+        "resourceType": "License"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "resourceId": "671b5c1e-df06-4479-b8b0-94303149a660"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 8 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on requestor ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 29 "request-logs"
+    And the first "request-log" has the following attributes:
+      """
+      {
+        "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660",
+        "requestorType": "User"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-log",
+          "query": {
+            "requestorId": "a499bb93-9902-4b52-8a04-76944ad7f660"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "request-log"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by request log type on multiple attributes
     Given I am an admin of account "test1"
     And the current account is "test1"
