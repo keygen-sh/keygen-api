@@ -13,12 +13,4 @@ class RequestLogPolicy < ApplicationPolicy
   def count?
     bearer.has_role?(:admin, :developer)
   end
-
-  def top_urls_by_volume?
-    bearer.has_role?(:admin, :developer)
-  end
-
-  def top_ips_by_volume?
-    bearer.has_role?(:admin, :developer)
-  end
 end
