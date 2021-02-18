@@ -75,6 +75,7 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
@@ -115,6 +116,7 @@ Feature: License validation actions
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
       { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
@@ -720,6 +722,7 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
@@ -753,6 +756,7 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
       { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
@@ -1965,6 +1969,7 @@ Feature: License validation actions
       """
     Then the response status should be "200"
     And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
@@ -3964,6 +3969,42 @@ Feature: License validation actions
         "detail": "is valid",
         "constant": "VALID",
         "nonce": 1574265636
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates an expired license key and sends a nonce
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "some-license-key-3",
+        "expiry": "$time.1.month.ago"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "some-license-key-3",
+          "nonce": 9048238457
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": false,
+        "detail": "is expired",
+        "constant": "EXPIRED",
+        "nonce": 9048238457
       }
       """
     And sidekiq should have 1 "webhook" job
