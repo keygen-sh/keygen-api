@@ -64,7 +64,7 @@ module Api::V1::Analytics::Actions
         rows = conn.execute sql.squish
 
         {
-          meta: rows.map { |r| r.fetch_values('license_id', 'count') }.to_h,
+          meta: rows.map { |r| r.slice('license_id', 'count').transform_keys { |k| k.camelize(:lower) } },
         }
       end
 
@@ -81,18 +81,21 @@ module Api::V1::Analytics::Actions
         end_date = Time.current.end_of_day
         sql = <<~SQL
           SELECT
+            "request_logs"."method" AS method,
             "request_logs"."url" AS url,
             COUNT(*) AS count
           FROM
             "request_logs"
           WHERE
             "request_logs"."account_id" = #{conn.quote current_account.id} AND
+            "request_logs"."method" IS NOT NULL AND
             "request_logs"."url" IS NOT NULL AND
             (
               "request_logs"."created_at" >= #{conn.quote start_date} AND
               "request_logs"."created_at" <= #{conn.quote end_date}
             )
           GROUP BY
+            "request_logs"."method",
             "request_logs"."url"
           ORDER BY
             count DESC
@@ -103,7 +106,7 @@ module Api::V1::Analytics::Actions
         rows = conn.execute sql.squish
 
         {
-          meta: rows.map { |r| r.fetch_values('url', 'count') }.to_h,
+          meta: rows.map { |r| r.slice('method', 'url', 'count') },
         }
       end
 
@@ -142,7 +145,7 @@ module Api::V1::Analytics::Actions
         rows = conn.execute sql.squish
 
         {
-          meta: rows.map { |r| r.fetch_values('ip', 'count') }.to_h,
+          meta: rows.map { |r| r.slice('ip', 'count') },
         }
       end
 
