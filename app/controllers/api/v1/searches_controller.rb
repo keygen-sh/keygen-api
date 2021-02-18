@@ -69,16 +69,11 @@ module Api::V1
               )
             end
 
-            # Replace out non-ascii characters with spaces and truncate the
-            # search term to speed up our GiST search queries
+            # Truncate search terms to speed up search queries
             term =
               case
               when search_attrs.include?(attribute.to_sym)
-                if EmailValidator.valid?(value)
-                  value.to_s
-                else
-                  value.to_s[0...32]
-                end
+                value.to_s[0...128]
               when search_rels.key?(attribute.to_sym)
                 value.to_s
               end
