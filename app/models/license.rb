@@ -75,7 +75,16 @@ class License < ApplicationRecord
   }
 
   scope :search_user, -> (term) {
-    joins(:user).where('users.id::text ILIKE :term OR users.email ILIKE :term', term: "%#{term}%")
+    tsv_query = <<~SQL
+      to_tsvector('simple', users.id::text)
+      @@
+      to_tsquery('simple', ? || ':*')
+    SQL
+
+    joins(:user).where('users.email ILIKE ?', "%#{term}%")
+                .or(
+                  joins(:user).where(tsv_query.squish, term.to_s)
+                )
   }
 
   scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
