@@ -22,7 +22,7 @@ class RequestLog < ApplicationRecord
     where created_at: (date_start..date_end)
   }
 
-  # FIXME(ezekg) Rip out pg_search and replace with scopes
+  # FIXME(ezekg) Rip out pg_search for other models and replace with scopes
   scope :search_request_id, -> (term) {
     query = <<~SQL
       to_tsvector('simple', request_id::text)
