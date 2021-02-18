@@ -276,6 +276,16 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   )
 end
 
+Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
+  parse_placeholders! body
+
+  resources = @account.send(resource.pluralize.underscore).all
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  slice = resources[(start_index.to_i - 1)..(end_index.to_i - 1)]
+
+  slice.each { |r| r.update(attrs) }
+end
+
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
   parse_placeholders! body
   numbers = {
