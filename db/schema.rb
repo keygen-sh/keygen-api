@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_18_210252) do
+ActiveRecord::Schema.define(version: 2021_02_18_213930) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -102,7 +102,6 @@ ActiveRecord::Schema.define(version: 2021_02_18_210252) do
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
-    t.index ["key"], name: "index_licenses_on_key", using: :gin
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at"
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at"
