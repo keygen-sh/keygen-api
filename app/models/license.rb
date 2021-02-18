@@ -74,6 +74,10 @@ class License < ApplicationRecord
     where('key ILIKE ?', "%#{term}%")
   }
 
+  scope :search_user, -> (term) {
+    joins(:user).where('users.id::text ILIKE :term OR users.email ILIKE :term', term: "%#{term}%")
+  }
+
   scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :unassigned, -> (status = true) {
