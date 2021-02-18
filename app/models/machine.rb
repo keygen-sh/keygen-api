@@ -66,6 +66,12 @@ class Machine < ApplicationRecord
   validates :fingerprint, presence: true, blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
+  # FIXME(ezekg) Hack to override pg_search with more performant query
+  # TODO(ezekg) Rip out pg_search
+  scope :search_fingerprint, -> (term) {
+    where('fingerprint ILIKE ?', "%#{term}%")
+  }
+
   scope :metadata, -> (meta) { search_metadata meta }
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :hostname, -> (hostname) { where hostname: hostname }
