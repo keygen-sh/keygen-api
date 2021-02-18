@@ -40,6 +40,12 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
+  # FIXME(ezekg) Hack to override pg_search with more performant query
+  # TODO(ezekg) Rip out pg_search
+  scope :search_email, -> (term) {
+    where('email ILIKE ?', "%#{term}%")
+  }
+
   scope :metadata, -> (meta) { search_metadata meta }
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
