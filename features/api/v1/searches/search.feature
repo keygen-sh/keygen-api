@@ -1307,6 +1307,147 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by request log type on the IP attribute (full, IPv4)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And "request-logs" 1-4 have the following attributes:
+      """
+      {
+        "ip": "192.168.1.1"
+      }
+      """
+    And "request-logs" 5-10 have the following attributes:
+      """
+      {
+        "ip": "192.168.0.1"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "ip": "192.168.1.1"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  # FIXME(ezekg) This isn't supported. Maybe use ILIKE for IPv4 IPs?
+  # Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv4)
+  #   Given I am an admin of account "test1"
+  #   And the current account is "test1"
+  #   And the current account has 1 "user"
+  #   And the current account has 100 "request-logs"
+  #   And "request-logs" 1-3 have the following attributes:
+  #     """
+  #     {
+  #       "ip": "192.168.1.1"
+  #     }
+  #     """
+  #   And "request-logs" 4-10 have the following attributes:
+  #     """
+  #     {
+  #       "ip": "192.168.0.1"
+  #     }
+  #     """
+  #   And I use an authentication token
+  #   When I send a POST request to "/accounts/test1/search" with the following:
+  #     """
+  #     {
+  #       "meta": {
+  #         "type": "request-logs",
+  #         "query": {
+  #           "ip": "192.168"
+  #         }
+  #       }
+  #     }
+  #     """
+  #   Then the response status should be "200"
+  #   And the JSON response should be an array with 10 "request-logs"
+  #   And sidekiq should have 0 "webhook" jobs
+  #   And sidekiq should have 0 "metric" jobs
+  #   And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on the IP attribute (full, IPv6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And "request-logs" 1-2 have the following attributes:
+      """
+      {
+        "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
+      }
+      """
+    And "request-logs" 3-10 have the following attributes:
+      """
+      {
+        "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by request log type on the IP attribute (partial, IPv6)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 100 "request-logs"
+    And "request-logs" 1-7 have the following attributes:
+      """
+      {
+        "ip": "2600:1700:3e90:a450:89df:f64:4791:6a55"
+      }
+      """
+    And "request-logs" 8-10 have the following attributes:
+      """
+      {
+        "ip": "2600:1700:3e90:a450:89df:f91:7211:5c81"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "request-logs",
+          "query": {
+            "ip": "2600:1700:3e90:a450:89df"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "request-logs"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by request log type on resource ID (full)
     Given I am an admin of account "test1"
     And the current account is "test1"
