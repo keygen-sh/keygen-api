@@ -27,7 +27,7 @@ class RequestLog < ApplicationRecord
     query = <<~SQL
       to_tsvector('simple', request_id::text)
       @@
-      to_tsquery('simple', ? || ':*')
+      plainto_tsquery('simple', ? || ':*')
     SQL
 
     where(query.squish, term.to_s)
@@ -37,7 +37,7 @@ class RequestLog < ApplicationRecord
     query = <<~SQL
       to_tsvector('simple', requestor_id::text)
       @@
-      to_tsquery('simple', ? || ':*')
+      plainto_tsquery('simple', ? || ':*')
     SQL
 
     where(query.squish, term.to_s)
@@ -47,7 +47,7 @@ class RequestLog < ApplicationRecord
     query = <<~SQL
       to_tsvector('simple', resource_id::text)
       @@
-      to_tsquery('simple', ? || ':*')
+      plainto_tsquery('simple', ? || ':*')
     SQL
 
     where(query.squish, term.to_s)
@@ -69,7 +69,7 @@ class RequestLog < ApplicationRecord
     query = <<~SQL
       to_tsvector('simple', ip::text)
       @@
-      to_tsquery('simple', ? || ':*')
+      plainto_tsquery('simple', ? || ':*')
     SQL
 
     where(query.squish, term.to_s)
