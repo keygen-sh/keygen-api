@@ -80,6 +80,11 @@ describe CreateWebhookEventService do
 
     # FIXME(ezekg) Workaround for sidekiq-status for not having good test support
     allow_any_instance_of(WebhookEvent).to receive(:status).and_return 'working'
+
+    # FIXME(ezekg) Mock HTTPParty so we don't actually make any real requests
+    allow(WebhookWorker::Request).to receive(:post) {
+      OpenStruct.new(code: 204, body: nil)
+    }
   end
 
   after do

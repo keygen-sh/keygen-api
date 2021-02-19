@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :webhook_endpoint do
-    url { "https://#{SecureRandom.hex}.com" }
+    url { "https://#{SecureRandom.hex}.example" }
   end
 end
