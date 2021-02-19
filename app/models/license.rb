@@ -78,7 +78,7 @@ class License < ApplicationRecord
     tsv_query = <<~SQL
       to_tsvector('simple', users.id::text)
       @@
-      to_tsquery('simple', ? || ':*')
+      plainto_tsquery('simple', ? || ':*')
     SQL
 
     joins(:user).where('users.email ILIKE ?', "%#{term}%")
