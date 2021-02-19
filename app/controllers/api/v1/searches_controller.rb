@@ -2,7 +2,8 @@
 
 module Api::V1
   class SearchesController < Api::V1::BaseController
-    MINIMUM_SEARCH_QUERY_SIZE = 3
+    DISALLOWED_SEARCH_QUERY_CHARS = /['?\\‘’]/.freeze
+    MINIMUM_SEARCH_QUERY_SIZE = 3.freeze
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -69,14 +70,11 @@ module Api::V1
               )
             end
 
-            # Truncate search terms to speed up search queries
-            term =
-              case
-              when search_attrs.include?(attribute.to_sym)
-                value.to_s[0...128]
-              when search_rels.key?(attribute.to_sym)
-                value.to_s
-              end
+            # Remove disallowed chars
+            term = value.to_s.gsub(DISALLOWED_SEARCH_QUERY_CHARS, ' ')
+
+            # Truncate attr search terms to speed up search queries
+            term = term[0...128] if search_attrs.include?(attribute.to_sym)
 
             res = res.send "search_#{attribute}", term
           end
