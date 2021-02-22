@@ -1657,7 +1657,7 @@ Feature: Search
         "meta": {
           "type": "request-logs",
           "query": {
-            "ip": "'; select pg_terminate_backend(pg_backend_pid());"
+            "ip": "'; select pg_terminate_backend(pg_backend_pid()); --"
           }
         }
       }
