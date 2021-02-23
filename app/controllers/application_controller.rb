@@ -305,10 +305,15 @@ class ApplicationController < ActionController::API
       end
     }.flatten
 
-    render json: {
-      meta: { id: request.request_id },
-      errors: errors
-    }, status: :unprocessable_entity
+    # Special cases where a certain limit has been met on the free tier
+    status_code =
+      if errors&.any? { |e| e[:code] == 'ACCOUNT_LICENSE_LIMIT_EXCEEDED' }
+        :payment_required
+      else
+        :unprocessable_entity
+      end
+
+    render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
   end
 
   def disable_keep_alive_connections

@@ -2770,7 +2770,7 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "402"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
@@ -2814,7 +2814,7 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
+    Then the response status should be "402"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:
       """
