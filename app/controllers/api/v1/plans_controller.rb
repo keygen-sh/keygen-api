@@ -9,7 +9,7 @@ module Api::V1
       authorize Plan
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
-        plans = apply_scopes(Plan.visible).reorder(price: :asc)
+        plans = apply_scopes(Plan.visible).reorder('price ASC NULLS FIRST')
         data = JSONAPI::Serializable::Renderer.new.render(plans, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
           class: {
