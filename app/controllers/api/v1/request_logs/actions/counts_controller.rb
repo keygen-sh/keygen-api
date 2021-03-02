@@ -11,7 +11,8 @@ module Api::V1::RequestLogs::Actions
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         conn = ActiveRecord::Base.connection
 
-        dates = 13.days.ago.to_date..Time.current.to_date
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current
         sql = <<~SQL
           SELECT
             "request_logs"."created_at"::date AS date,
@@ -21,8 +22,8 @@ module Api::V1::RequestLogs::Actions
           WHERE
             "request_logs"."account_id" = #{conn.quote current_account.id} AND
             (
-              "request_logs"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
-              "request_logs"."created_at" <= #{conn.quote dates.last.end_of_day}
+              "request_logs"."created_at" >= #{conn.quote start_date} AND
+              "request_logs"."created_at" <= #{conn.quote end_date}
             )
           GROUP BY
             "request_logs"."created_at"::date
@@ -31,6 +32,8 @@ module Api::V1::RequestLogs::Actions
         rows = conn.execute sql.squish
 
         # Create zeroed out hash of dates then merge real counts (so we include dates with no data)
+        dates = start_date.to_date..end_date.to_date
+
         {
           meta: dates.map { |d| [d.strftime('%Y-%m-%d'), 0] }.to_h
             .merge(

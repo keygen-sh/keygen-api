@@ -38,7 +38,7 @@ module Api::V1::Analytics::Actions
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current.end_of_day
+        end_date = Time.current
         sql = <<~SQL
           SELECT
             "request_logs"."resource_id" AS license_id,
@@ -78,7 +78,7 @@ module Api::V1::Analytics::Actions
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current.end_of_day
+        end_date = Time.current
         sql = <<~SQL
           SELECT
             "request_logs"."method" AS method,
@@ -120,7 +120,7 @@ module Api::V1::Analytics::Actions
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current.end_of_day
+        end_date = Time.current
         sql = <<~SQL
           SELECT
             "request_logs"."ip" AS ip,
