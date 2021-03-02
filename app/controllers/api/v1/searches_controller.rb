@@ -26,7 +26,7 @@ module Api::V1
         case
         when model == RequestLog
           start_date = 30.days.ago.beginning_of_day
-          end_date = Time.current.end_of_day
+          end_date = Time.current
 
           # Limit request log searches to last 30 days to improve perf
           res = res.where('created_at >= :start_date AND created_at <= :end_date', start_date: start_date, end_date: end_date)

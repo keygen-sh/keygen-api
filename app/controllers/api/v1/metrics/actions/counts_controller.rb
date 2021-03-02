@@ -38,7 +38,8 @@ module Api::V1::Metrics::Actions
       json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
         conn = ActiveRecord::Base.connection
 
-        dates = 13.days.ago.to_date..Time.current.to_date
+        start_date = 13.days.ago.beginning_of_day
+        end_date = Time.current
         sql =
           if event_type_ids.any?
             <<~SQL
@@ -50,8 +51,8 @@ module Api::V1::Metrics::Actions
               WHERE
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
-                  "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
-                  "metrics"."created_at" <= #{conn.quote dates.last.end_of_day}
+                  "metrics"."created_at" >= #{conn.quote start_date} AND
+                  "metrics"."created_at" <= #{conn.quote end_date}
                 ) AND
                 "metrics"."event_type_id" IN (#{event_type_ids.map { |m| conn.quote(m) }.join(", ")})
               GROUP BY
@@ -67,8 +68,8 @@ module Api::V1::Metrics::Actions
               WHERE
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
-                  "metrics"."created_at" >= #{conn.quote dates.first.beginning_of_day} AND
-                  "metrics"."created_at" <= #{conn.quote dates.last.end_of_day}
+                  "metrics"."created_at" >= #{conn.quote start_date} AND
+                  "metrics"."created_at" <= #{conn.quote end_date}
                 )
               GROUP BY
                 "metrics"."created_at"::date
@@ -78,6 +79,8 @@ module Api::V1::Metrics::Actions
         rows = conn.execute sql.squish
 
         # Create zeroed out hash of dates then merge real counts (so we include dates with no data)
+        dates = start_date.to_date..end_date.to_date
+
         {
           meta: dates.map { |d| [d.strftime("%Y-%m-%d"), 0] }.to_h
             .merge(
