@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_18_213930) do
+ActiveRecord::Schema.define(version: 2021_03_02_163826) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -136,6 +136,7 @@ ActiveRecord::Schema.define(version: 2021_02_18_213930) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "event_type_id", null: false
+    t.index ["account_id", "created_at", "event_type_id"], name: "metrics_account_created_event_type_idx", order: { created_at: :desc }
     t.index ["account_id", "created_at"], name: "index_metrics_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
   end
