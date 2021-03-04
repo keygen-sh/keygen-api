@@ -4,6 +4,13 @@ module Api::V1
   class RequestLogsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index
     has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
+    has_scope(:request) { |_, s, v| s.search_request_id(v) }
+    has_scope(:requestor) { |_, s, v| s.search_requestor_id(v) }
+    has_scope(:resource) { |_, s, v| s.search_resource_id(v) }
+    has_scope(:ip) { |_, s, v| s.search_ip(v) }
+    has_scope(:method) { |_, s, v| s.search_method(v) }
+    has_scope(:url) { |_, s, v| s.search_url(v) }
+    has_scope(:status) { |_, s, v| s.search_status(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
