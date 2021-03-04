@@ -14,7 +14,7 @@ module Api::V1
     def index
       authorize RequestLog
 
-      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
         request_logs = policy_scope apply_scopes(current_account.request_logs)
         data = JSONAPI::Serializable::Renderer.new.render(request_logs, {
           expose: { url_helpers: Rails.application.routes.url_helpers },

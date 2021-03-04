@@ -8,7 +8,7 @@ module Api::V1::RequestLogs::Actions
     def count
       authorize RequestLog
 
-      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
