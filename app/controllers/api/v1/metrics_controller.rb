@@ -17,7 +17,7 @@ module Api::V1
     def index
       authorize Metric
 
-      json = Rails.cache.fetch(cache_key, expires_in: 15.minutes) do
+      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
         metrics = policy_scope apply_scopes(current_account.metrics.preload(:event_type))
         data = JSONAPI::Serializable::Renderer.new.render(metrics, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
