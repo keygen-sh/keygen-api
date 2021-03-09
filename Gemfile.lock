@@ -68,6 +68,8 @@ GEM
       numerizer (~> 0.1.1)
     concurrent-ruby (1.1.7)
     connection_pool (2.2.2)
+    crack (0.4.5)
+      rexml
     crass (1.0.6)
     css_parser (1.6.0)
       addressable
@@ -146,6 +148,7 @@ GEM
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
+    hashdiff (1.0.1)
     hiredis (0.6.3)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
@@ -291,6 +294,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rexml (3.2.4)
     rotp (6.1.0)
     rspec-core (3.8.0)
       rspec-support (~> 3.8.0)
@@ -379,6 +383,10 @@ GEM
       unf_ext
     unf_ext (0.0.7.5)
     uniform_notifier (1.12.1)
+    webmock (3.12.1)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -440,6 +448,7 @@ DEPENDENCIES
   stripe
   stripe-ruby-mock (~> 2.3.1)
   timecop
+  webmock
   whacamole
 
 RUBY VERSION
