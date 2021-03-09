@@ -96,4 +96,5 @@ group :test do
   gem 'factory_girl_rails', '4.8.0'
   gem 'database_cleaner'
   gem 'faker', '~> 2.14.0'
+  gem 'webmock'
 end
