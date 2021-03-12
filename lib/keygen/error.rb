@@ -2,7 +2,13 @@
 
 module Keygen
   module Error
-    class UnauthorizedError < StandardError; end
+    class UnauthorizedError < StandardError
+      attr_reader :code
+
+      def initialize(code:)
+        @code = code
+      end
+    end
 
     class InvalidScopeError < StandardError
       attr_reader :source

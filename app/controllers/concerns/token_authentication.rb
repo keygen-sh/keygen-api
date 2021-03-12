@@ -15,6 +15,8 @@ module TokenAuthentication
 
   private
 
+  attr_accessor :current_token_value
+
   def authenticator(token, options)
     return if current_account.nil?
 
@@ -24,6 +26,7 @@ module TokenAuthentication
       render_unauthorized code: 'TOKEN_FORMAT_INVALID', detail: "Token format is invalid (make sure the token begins with a proper prefix e.g. 'prod-XXX' or 'acti-XXX', and that it's not a token UUID)" and return
     end
 
+    @current_token_value = token
     @current_token = TokenAuthenticationService.new(
       account: current_account,
       token: token
@@ -44,6 +47,11 @@ module TokenAuthentication
   def request_http_token_authentication(realm = "Keygen", message = nil)
     headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
 
-    raise Keygen::Error::UnauthorizedError
+    case
+    when current_token_value.nil?
+      raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_BLANK')
+    else
+      raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
+    end
   end
 end
