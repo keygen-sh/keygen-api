@@ -438,6 +438,99 @@ Then /^the JSON response should be meta that contains a valid activation proof o
   expect(ok).to be true
 end
 
+Then /^the JSON response should a "license" that contains a valid "([^\"]*)" key with the following dataset:$/ do |scheme, body|
+  parse_placeholders! body
+
+  json = JSON.parse last_response.body
+  resource_type = json.dig("data", "type")
+  encoded_key = json.dig("data", "attributes", "key")
+  expected_dataset = JSON.parse(body)
+
+  expect(resource_type).to eq "licenses"
+
+  case scheme
+  when "RSA_2048_PKCS1_ENCRYPT"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+
+    encrypted_data = Base64.urlsafe_decode64 encoded_key
+    decrypted_data = pub.public_decrypt encrypted_data rescue nil
+    dataset = JSON.parse(decrypted_data)
+
+    expect(dataset).to include expected_dataset
+  when "RSA_2048_PKCS1_SIGN"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    encoded_dataset, encoded_sig = encoded_key.split(".")
+    dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
+
+    expect(dataset).to include expected_dataset
+
+    signing_data = Base64.urlsafe_decode64 encoded_dataset
+    sig = Base64.urlsafe_decode64 encoded_sig
+    ok = pub.verify digest, sig, signing_data rescue false
+
+    expect(ok).to be true
+  when "RSA_2048_PKCS1_PSS_SIGN"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    encoded_dataset, encoded_sig = encoded_key.split(".")
+    dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
+
+    expect(dataset).to include expected_dataset
+
+    signing_data = Base64.urlsafe_decode64 encoded_dataset
+    sig = Base64.urlsafe_decode64 encoded_sig
+    ok = pub.verify_pss digest, sig, signing_data, salt_length: :auto, mgf1_hash: "SHA256" rescue false
+
+    expect(ok).to be true
+  when "RSA_2048_JWT_RS256"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+
+    jwt = JWT.decode encoded_key, pub, true, algorithm: "RS256"
+
+    expect(jwt).to_not be_nil
+
+    dataset, alg = jwt
+
+    expect(alg).to eq "alg" => "RS256"
+    expect(dataset).to include expected_dataset
+  when "RSA_2048_PKCS1_SIGN_V2"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    signing_data, encoded_sig = encoded_key.split(".")
+    prefix, encoded_dataset = signing_data.split("/")
+    dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
+
+    expect(dataset).to include expected_dataset
+    expect(prefix).to eq "key"
+
+    sig = Base64.urlsafe_decode64 encoded_sig
+    ok = pub.verify digest, sig, "key/#{encoded_dataset}" rescue false
+
+    expect(ok).to be true
+  when "RSA_2048_PKCS1_PSS_SIGN_V2"
+    pub = OpenSSL::PKey::RSA.new @account.public_key
+    digest = OpenSSL::Digest::SHA256.new
+
+    signing_data, encoded_sig = encoded_key.split(".")
+    prefix, encoded_dataset = signing_data.split("/")
+    dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
+
+    expect(dataset).to include expected_dataset
+    expect(prefix).to eq "key"
+
+    sig = Base64.urlsafe_decode64 encoded_sig
+    ok = pub.verify_pss digest, sig, "key/#{encoded_dataset}", salt_length: :auto, mgf1_hash: "SHA256" rescue false
+
+    expect(ok).to be true
+  else
+    raise "unknown encryption scheme"
+  end
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following "([^\"]*)":$/ do |resource, attribute, body|
   json = JSON.parse last_response.body
 
