@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_02_163826) do
+ActiveRecord::Schema.define(version: 2021_03_15_172007) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(version: 2021_03_02_163826) do
   end
 
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "key"
+    t.string "key", null: false
     t.datetime "expiry"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
