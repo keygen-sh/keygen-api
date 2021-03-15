@@ -111,13 +111,15 @@ def parse_placeholders!(str)
 
         # Handle multiple method calls
         attrs = attribute.to_s.split '.'
+        res = model
         attrs.each { |attr|
-          model = model.send attr
-          # FIXME(ezekg) Format timestamps to ISO 8601
-          model = model.iso8601 3 if model.is_a?(ActiveSupport::TimeWithZone)
+          res = res.send attr
         }
 
-        model
+        # FIXME(ezekg) Format timestamps to ISO 8601
+        res = res.iso8601 3 if res.is_a?(ActiveSupport::TimeWithZone)
+
+        res
       end
 
     if escape

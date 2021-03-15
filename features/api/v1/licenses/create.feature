@@ -47,6 +47,41 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with a key that is not nil
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin attempts to create a license with a null key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": null
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with a key that is not nil
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -780,11 +815,11 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT for a user of their account
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT without seed data
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -815,22 +850,18 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_ENCRYPT" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_PKCS1_ENCRYPT",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
-        }
+        "id": "$licenses[0].id",
+        "created": "$licenses[0].created_at",
+        "expiry": "$licenses[0].expiry"
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_ENCRYPT with a pre-determined key
@@ -942,10 +973,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
+        "productId": "$products[0].id",
         "scheme": "RSA_2048_PKCS1_SIGN"
       }
       """
@@ -973,22 +1006,24 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_PKCS1_SIGN",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": { "id": "$policies[0].id" },
+        "user": { "id": "$users[1].id" },
+        "license": {
+          "id": "$licenses[0].id",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN with a pre-determined key
@@ -1044,10 +1079,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
+        "productId": "$products[0].id",
         "scheme": "RSA_2048_PKCS1_PSS_SIGN"
       }
       """
@@ -1064,33 +1101,29 @@ Feature: Create license
                 "type": "policies",
                 "id": "$policies[0]"
               }
-            },
-            "user": {
-              "data": {
-                "type": "users",
-                "id": "$users[1]"
-              }
             }
           }
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_PKCS1_PSS_SIGN",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": { "id": "$policies[0].id" },
+        "user": null,
+        "license": {
+          "id": "$licenses[0].id",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN with a pre-determined key
@@ -1146,10 +1179,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
+        "productId": "$products[0].id",
         "scheme": "RSA_2048_JWT_RS256"
       }
       """
@@ -1177,22 +1212,21 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_JWT_RS256" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_JWT_RS256",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
-        }
+        "iss": "https://keygen.sh",
+        "aud": "$licenses[0].account_id",
+        "sub": "$licenses[0].id",
+        "exp": $licenses[0].expiry.to_i,
+        "iat": $licenses[0].created_at.to_i,
+        "nbf": $licenses[0].created_at.to_i
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_JWT_RS256 with an invalid payload
@@ -1366,10 +1400,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
+        "productId": "$products[0].id",
         "scheme": "RSA_2048_PKCS1_SIGN_V2"
       }
       """
@@ -1397,22 +1433,24 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_PKCS1_SIGN_V2",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": { "id": "$policies[0].id" },
+        "user": { "id": "$users[1].id" },
+        "license": {
+          "id": "$licenses[0].id",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN_V2 with a pre-determined key
@@ -1468,10 +1506,12 @@ Feature: Create license
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
+        "productId": "$products[0].id",
         "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
       }
       """
@@ -1488,33 +1528,29 @@ Feature: Create license
                 "type": "policies",
                 "id": "$policies[0]"
               }
-            },
-            "user": {
-              "data": {
-                "type": "users",
-                "id": "$users[1]"
-              }
             }
           }
         }
       }
       """
-    Then the response status should be "422"
-    And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "must be specified for a license using RSA_2048_PKCS1_PSS_SIGN_V2",
-        "code": "KEY_BLANK",
-        "source": {
-          "pointer": "/data/attributes/key"
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": { "id": "$policies[0].id" },
+        "user": null,
+        "license": {
+          "id": "$licenses[0].id",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined key
