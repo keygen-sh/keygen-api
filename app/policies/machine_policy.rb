@@ -47,6 +47,8 @@ class MachinePolicy < ApplicationPolicy
 
   def generate_offline_proof?
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      (!resource.license.protected? && resource.user == bearer) ||
+      resource.product == bearer ||
+      resource.license == bearer
   end
 end
