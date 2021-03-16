@@ -29,8 +29,10 @@ module Api::V1::Machines::Actions
       options strict: true
 
       on :generate_offline_proof do
-        param :meta, type: :hash, optional: true do
-          param :dataset, type: :hash
+        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+          param :meta, type: :hash, optional: true do
+            param :dataset, type: :hash
+          end
         end
       end
     end
