@@ -1014,7 +1014,10 @@ Feature: Create license
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
         "policy": { "id": "$policies[0].id" },
-        "user": { "id": "$users[1].id" },
+        "user": {
+          "id": "$users[1].id",
+          "email": "$users[1].email"
+        },
         "license": {
           "id": "$licenses[0].id",
           "created": "$licenses[0].created_at",
@@ -1441,7 +1444,10 @@ Feature: Create license
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
         "policy": { "id": "$policies[0].id" },
-        "user": { "id": "$users[1].id" },
+        "user": {
+          "id": "$users[1].id",
+          "email": "$users[1].email"
+        },
         "license": {
           "id": "$licenses[0].id",
           "created": "$licenses[0].created_at",

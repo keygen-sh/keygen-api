@@ -199,7 +199,7 @@ class License < ApplicationRecord
         product: { id: product.id },
         policy: { id: policy.id },
         user: if user.present?
-                { id: user.id }
+                { id: user.id, email: user.email }
               else
                 nil
               end,
