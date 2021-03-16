@@ -13,7 +13,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hey team,
 
-        I noticed that you created an account but there hasn't been much activity on it lately. Is there anything I can do to help get things kickstarted?
+        I noticed that you created an account but there hasn't been much API activity on it lately. Is there anything I can do to help get things kickstarted?
 
         Just want to make sure you aren't stuck on anything. As a technical founder, it's easy for me to overlook roadblocks for new users. :)
 
