@@ -17,7 +17,8 @@ class RequestLimitsReportWorker
       request_count = account.request_logs.where(created_at: (start_date..end_date)).count
       if request_count == 0
         next unless account.trialing_or_free_tier? &&
-                    account.created_at > 2.months.ago
+                    account.created_at > 2.months.ago &&
+                    account.created_at < 1.week.ago
 
         request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
         next if request_count_for_week > 0
