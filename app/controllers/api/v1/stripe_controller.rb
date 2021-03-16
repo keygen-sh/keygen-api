@@ -76,20 +76,26 @@ module Api::V1
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing && !billing.canceling? && !billing.canceled?
 
-        # Make sure our customer knows that they need to add a card to their
-        # account within the next few days
-        if billing.card.nil?
-          AccountMailer.payment_method_missing(account: billing.account).deliver_later
+        account = billing.account
+        return if account.last_trial_will_end_sent_at.present?
+
+        request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
+
+        # Let the active account know that their trial is going to be ending
+        if billing.card.nil? && request_count_for_week > 0
+          account.touch(:last_trial_will_end_sent_at)
+
+          PlaintextMailer.trial_ending_soon(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
         end
       when "invoice.payment_succeeded"
         invoice = event.data.object
         billing = Billing.find_by customer_id: invoice.customer
         return unless billing && invoice.total > 0
 
-        # # Ask for feedback after first successful payment
-        # if billing.receipts.paid.empty?
-        #   AccountMailer.first_payment_succeeded(account: billing.account).deliver_later
-        # end
+        # Ask for feedback after first successful payment
+        if billing.receipts.paid.empty?
+          PlaintextMailer.first_payment_succeeded(account: billing.account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+        end
 
         billing.receipts.create(
           invoice_id: invoice.id,
@@ -101,9 +107,7 @@ module Api::V1
         billing = Billing.find_by customer_id: invoice.customer
         return unless billing && !billing.canceling? && !billing.canceled?
 
-        if billing.card.nil?
-          AccountMailer.payment_method_missing(account: billing.account, invoice: invoice.to_hash).deliver_later
-        else
+        if billing.card.present?
           AccountMailer.payment_failed(account: billing.account, invoice: invoice.to_hash).deliver_later
         end
 
