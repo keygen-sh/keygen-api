@@ -15,7 +15,20 @@ class RequestLimitsReportWorker
 
     Account.includes(:billing, :plan).where(billings: { state: active_states }).find_each do |account|
       request_count = account.request_logs.where(created_at: (start_date..end_date)).count
-      next unless request_count > 0
+      if request_count == 0
+        next unless account.trialing_or_free_tier?
+
+        request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
+        next if request_count_for_week > 0
+
+        if account.last_low_activity_lifeline_sent_at.nil?
+          account.touch(:last_low_activity_lifeline_sent_at)
+
+          PlaintextMailer.low_activity_lifeline(account: self).deliver_later(wait: 42.minutes)
+        end
+
+        next
+      end
 
       admin = account.admins.first
       plan = account.plan

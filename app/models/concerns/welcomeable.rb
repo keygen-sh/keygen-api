@@ -8,6 +8,6 @@ module Welcomeable
   end
 
   def send_welcome_email
-    AccountMailer.welcome(account: self).deliver_later
+    AccountMailer.welcome(account: self).deliver_later(wait: 15.minutes)
   end
 end
