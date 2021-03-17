@@ -26,7 +26,7 @@ class RequestLimitsReportWorker
         if account.last_low_activity_lifeline_sent_at.nil?
           account.touch(:last_low_activity_lifeline_sent_at)
 
-          PlaintextMailer.low_activity_lifeline(account: self).deliver_later(wait: 42.minutes)
+          PlaintextMailer.low_activity_lifeline(account: account).deliver_later(wait: 42.minutes)
         end
 
         next
