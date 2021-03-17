@@ -49,6 +49,38 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous creates a user with no name
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["user.created", "user.updated"]
+      }
+      """
+    And the current account has 1 "user"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "cap@keygen.sh",
+            "password": "america"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with a nil firstName
+    And the JSON response should be a "user" with a nil lastName
+    And the JSON response should be a "user" with the role "user"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 2 "users"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous attempts to create a user for a protected account
     Given the current account is "test1"
     And the account "test1" has the following attributes:
@@ -274,8 +306,6 @@ Feature: Create user
         "data": {
           "type": "users",
           "attributes": {
-            "firstName": "Ironman",
-            "lastName": "Stark",
             "email": "ironman@keygen.sh",
             "password": "jarvis",
             "role": "admin"
