@@ -18,7 +18,7 @@ class PlaintextMailer < ApplicationMailer
         Just want to make sure you aren't stuck on anything. As a technical founder, it's easy for me to overlook roadblocks for new users. :)
 
         --
-        Zeke, Founder (https://keygen.sh)
+        Zeke, Founder <https://keygen.sh>
       TXT
     )
   end
@@ -38,7 +38,7 @@ class PlaintextMailer < ApplicationMailer
         Hopefully you're getting some value out of Keygen and aren't stuck on anything?
 
         --
-        Zeke, Founder (https://keygen.sh)
+        Zeke, Founder <https://keygen.sh>
       TXT
     )
   end
@@ -58,7 +58,7 @@ class PlaintextMailer < ApplicationMailer
         Keygen is a bootstrapped company and we love to connect with our customers. Is there anything we can do better?
 
         --
-        Zeke, Founder (https://keygen.sh)
+        Zeke, Founder <https://keygen.sh>
       TXT
     )
   end
