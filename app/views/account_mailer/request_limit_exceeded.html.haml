@@ -1,6 +1,6 @@
 -# frozen_string_literal: true
 %p
-  I’m reaching out because your Keygen account "#{@account.slug}" has exceeded your tier's daily
+  I’m reaching out because your Keygen account #{@account.name} has exceeded your tier's daily
   request limit of #{number_with_delimiter @report.request_limit} API requests per-day. Over the
   past 24 hours, #{number_with_delimiter @report.request_count} API requests were made to your
   Keygen account. If you foresee this trend continuing, I recommend that you upgrade from "#{@plan.name}"
