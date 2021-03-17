@@ -7,7 +7,7 @@ class PlaintextMailer < ApplicationMailer
     admin = account.admins.first
 
     mail(
-      content_type: "text/html",
+      content_type: "text/plain",
       to: admin.email,
       subject: "Have a quick question for you",
       body: <<~TXT
@@ -27,7 +27,7 @@ class PlaintextMailer < ApplicationMailer
     admin = account.admins.first
 
     mail(
-      content_type: "text/html",
+      content_type: "text/plain",
       to: admin.email,
       subject: "Quick heads up",
       body: <<~TXT
@@ -47,7 +47,7 @@ class PlaintextMailer < ApplicationMailer
     admin = account.admins.first
 
     mail(
-      content_type: "text/html",
+      content_type: "text/plain",
       to: admin.email,
       subject: "Keygen <> #{account.name}",
       body: <<~TXT
