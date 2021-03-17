@@ -33,7 +33,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hey team,
 
-        I noticed that your trial is ending soon but there is no payment method added yet. Is there anything I can do to help get one added? I'd also be happy to extend your trial -- just let me know. :)
+        I noticed that your trial is ending soon but there's no payment method added yet. Is there anything I can do to help get one added? I'd also be happy to extend your trial -- just let me know. :)
 
         Hopefully you're getting some value out of Keygen and aren't stuck on anything?
 
