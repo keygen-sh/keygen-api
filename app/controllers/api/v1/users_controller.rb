@@ -102,8 +102,8 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[user users]
           param :attributes, type: :hash do
-            param :first_name, type: :string
-            param :last_name, type: :string
+            param :first_name, type: :string, optional: true
+            param :last_name, type: :string, optional: true
             param :email, type: :string
             param :password, type: :string
             param :metadata, type: :hash, optional: true

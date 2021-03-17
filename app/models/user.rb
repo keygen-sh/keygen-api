@@ -35,8 +35,6 @@ class User < ApplicationRecord
 
   before_save -> { self.email = email.downcase }
 
-  validates :first_name, presence: true, if: -> { has_role?(:user) }
-  validates :last_name, presence: true, if: -> { has_role?(:user) }
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
