@@ -5,8 +5,12 @@
   has #{number_with_delimiter @report.license_count} active licensed users. An "active licensed user"
   is any license that has had activity within the last 90 days.
 %p
-  %strong We have not limited your account in any way — license creation is still active.
-  If you foresee this growth continuing, I recommend that you upgrade from "#{@plan.name}"
-  to the next appropriate tier. You can upgrade here: #{link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription'}.
+  - if @plan.paid?
+    %strong We have not limited your account in any way — license creation is still active.
+    If you foresee this growth continuing, I recommend that you upgrade from #{@plan.name}
+    to the next appropriate tier. You can upgrade here: #{link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription'}.
+  - else
+    %strong Because you're on a free tier, license creation has been paused.
+    I recommend that you upgrade from #{@plan.name} to a paid tier. You can upgrade here: #{link_to 'https://app.keygen.sh/subscription', 'https://app.keygen.sh/subscription'}.
 %p
   Let me know if you have any questions about this! (You can respond to this email directly.)
