@@ -203,24 +203,9 @@ class Account < ApplicationRecord
 
     # Generate an account slug using the email if the current domain is a public
     # email service or if an account with the domain already exists
-    if PUBLIC_EMAIL_DOMAINS.include?(host) || Account.exists?(slug: autogen_slug)
+    if PUBLIC_EMAIL_DOMAINS.include?(host)
       autogen_slug = user.parameterize.dasherize.downcase
       autogen_name = user
-    end
-
-    # Generate a completely random slug if the autogen'd slug is taken
-    if Account.exists?(slug: autogen_slug)
-      color = AUTOGEN_SLUG_COLORS.sample
-      trek_word = AUTOGEN_SLUG_STAR_TREK.sample
-      sw_word = AUTOGEN_SLUG_STAR_WARS.sample
-      words = [color, trek_word, sw_word]
-
-      autogen_slug = words.join(' ').parameterize.dasherize.downcase
-    end
-
-    # Append a random string if slug is still taken
-    if Account.exists?(slug: autogen_slug)
-      autogen_slug += "-#{SecureRandom.hex(4)}"
     end
 
     # FIXME(ezekg) Duplicate slug validation (name may be a UUID)
@@ -228,6 +213,18 @@ class Account < ApplicationRecord
       errors.add :slug, :not_allowed, message: "cannot resemble a UUID"
 
       throw :abort
+    end
+
+    # Append a random string if slug is taken for public email service.
+    # Otherwise, don't allow duplicate accounts for taken domains.
+    if Account.exists?(slug: autogen_slug)
+      if PUBLIC_EMAIL_DOMAINS.include?(host)
+        autogen_slug += "-#{SecureRandom.hex(4)}"
+      else
+        errors.add :slug, :not_allowed, message: "already exists for this domain (please use account recovery)"
+
+        throw :abort
+      end
     end
 
     self.slug = autogen_slug unless slug.present?
