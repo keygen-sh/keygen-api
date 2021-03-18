@@ -441,16 +441,19 @@ Feature: License validation actions
     And the current account has 1 "policies"
     And the current account has 3 "licenses"
     And the current account has 1 "webhook-endpoint"
+    And the first "license" has the following attributes:
+      """
+      { "key": "foo-bar" }
+      """
     And all "licenses" have the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.ago",
-        "key": "foobar"
+        "expiry": "$time.1.day.ago"
       }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/foobar/actions/validate"
+    When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
@@ -1038,12 +1041,15 @@ Feature: License validation actions
       }
       """
     And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "key": "a-b-c-d-e" }
+      """
     And all "licenses" have the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now",
-        "key": "a-b-c-d-e"
+        "expiry": "$time.1.day.from_now"
       }
       """
     And I use an authentication token
