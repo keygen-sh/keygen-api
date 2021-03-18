@@ -227,8 +227,8 @@ class Account < ApplicationRecord
       end
     end
 
-    self.slug = autogen_slug unless slug.present?
     self.name = autogen_name unless name.present?
+    self.slug = autogen_slug
   end
 
   def generate_secret_key!
