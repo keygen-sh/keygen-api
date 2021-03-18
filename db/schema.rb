@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_18_021634) do
+ActiveRecord::Schema.define(version: 2021_03_18_023315) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_021634) do
     t.string "name"
     t.integer "machines_count", default: 0
     t.datetime "last_validated_at"
+    t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
