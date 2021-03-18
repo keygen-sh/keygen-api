@@ -198,7 +198,7 @@ class Account < ApplicationRecord
     user = parsed_email.fetch(:user)
     host = parsed_email.fetch(:host)
 
-    autogen_slug = host.parameterize.dasherize.downcase
+    autogen_slug = slug || host.parameterize.dasherize.downcase
     autogen_name = host
 
     # Generate an account slug using the email if the current domain is a public
