@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_16_212414) do
+ActiveRecord::Schema.define(version: 2021_03_18_021634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 2021_03_16_212414) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
+    t.index ["account_id", "key"], name: "index_licenses_on_account_id_and_key", unique: true
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
