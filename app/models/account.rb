@@ -221,7 +221,7 @@ class Account < ApplicationRecord
       if PUBLIC_EMAIL_DOMAINS.include?(host)
         autogen_slug += "-#{SecureRandom.hex(4)}"
       else
-        errors.add :slug, :not_allowed, message: "already exists for this domain (please use account recovery)"
+        errors.add :slug, :not_allowed, message: "already exists for this domain (please choose a different value or use account recovery)"
 
         throw :abort
       end

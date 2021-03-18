@@ -119,7 +119,7 @@ Feature: Create account
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists for this domain (please use account recovery)",
+        "detail": "already exists for this domain (please choose a different value or use account recovery)",
         "source": {
           "pointer": "/data/attributes/slug"
         }
