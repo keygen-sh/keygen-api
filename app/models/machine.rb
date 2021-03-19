@@ -53,6 +53,7 @@ class Machine < ApplicationRecord
   # Disallow machine core overages
   validate on: [:create, :update] do |machine|
     next if machine.policy.nil? || machine.license.nil?
+    next if machine.policy.max_cores.nil?
 
     prev_core_count = machine.license.machines.where.not(id: machine.id).sum(:cores) || 0
     next_core_count = prev_core_count + machine.cores.to_i
