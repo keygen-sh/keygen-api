@@ -33,12 +33,14 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hey team,
 
-        I noticed that your trial is ending soon but there's no payment method added yet. Is there anything I can do to help get one added? I'd also be happy to extend your trial -- just let me know. :)
+        I noticed that your trial is ending soon but there's no payment method added yet. Is there anything I can do to help get one added? I'd also be happy to extend your trial -- just let me know.
 
         Hopefully you're getting some value out of Keygen and aren't stuck on anything?
 
         --
         Zeke, Founder <https://keygen.sh>
+
+        p.s. I know COVID has affected many businesses, so please let me know if there's anything I can do to help. :)
       TXT
     )
   end
@@ -53,7 +55,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hey team,
 
-        I noticed your first payment went through earlier and I just wanted to reach out real quick to thank you for your business.
+        I saw your first payment went through earlier and I just wanted to reach out real quick to thank you for your business.
 
         Keygen is a bootstrapped company and we love to connect with our customers. Is there anything we can do better?
 
