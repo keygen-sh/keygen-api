@@ -4,6 +4,7 @@ class SerializableMachine < SerializableBase
   type :machines
 
   attribute :fingerprint
+  attribute :cores
   attribute :ip
   attribute :hostname
   attribute :platform
