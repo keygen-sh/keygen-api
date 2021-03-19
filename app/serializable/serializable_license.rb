@@ -102,7 +102,10 @@ class SerializableLicense < SerializableBase
       @url_helpers.v1_account_license_machines_path @object.account_id, @object
     end
     meta do
-      { count: @object.machines_count }
+      {
+        cores: @object.machines_core_count || 0,
+        count: @object.machines_count || 0,
+      }
     end
   end
   relationship :tokens do

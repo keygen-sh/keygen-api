@@ -25,7 +25,7 @@ class License < ApplicationRecord
   belongs_to :user
   belongs_to :policy
   has_many :tokens, as: :bearer, dependent: :destroy
-  has_many :machines, dependent: :destroy
+  has_many :machines, dependent: :delete_all
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
 

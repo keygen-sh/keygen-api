@@ -349,7 +349,7 @@ Feature: Create machine
       {
         "machines": {
           "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
-          "meta": { "count": 1 }
+          "meta": { "cores": 0, "count": 1 }
         }
       }
       """
@@ -1758,6 +1758,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And the JSON response should be a "machine" with the cores "12"
+    And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1875,6 +1876,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And the JSON response should be a "machine" with the cores "8"
+    And the first "license" should have a correct machine core count
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2009,6 +2011,7 @@ Feature: Create machine
     Then the response status should be "201"
     And the response should contain a valid signature header for "test1"
     And the JSON response should be a "machine" with the cores "2147483647"
+    And the first "license" should have a correct machine core count
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
