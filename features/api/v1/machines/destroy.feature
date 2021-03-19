@@ -21,11 +21,20 @@ Feature: Delete machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "licenses"
     And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/machines/$2"
     Then the response status should be "204"
     And the response should contain a valid signature header for "test1"
+    And the first "license" should have a correct machine core count
     And the current account should have 2 "machines"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -194,7 +203,7 @@ Feature: Delete machine
       {
         "machines": {
           "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
-          "meta": { "count": 2 }
+          "meta": { "cores": 0, "count": 2 }
         }
       }
       """

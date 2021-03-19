@@ -387,6 +387,57 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$1"
     Then the response status should be "403"
 
+  Scenario: Admin retrieves a license with a correct machine core count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "machinesCount": 3 }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    # FIXME(ezekg) Need to force the counter callbacks since factory doesn't trigger it
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 8
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    And I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "machines": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/machines" },
+          "meta": { "cores": 32, "count": 4 }
+        }
+      }
+      """
+
   # Scenario: Admin requests an license with an invalid URI
   #   Given I am an admin of account "test1"
   #   And the current account is "test1"

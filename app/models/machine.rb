@@ -27,6 +27,11 @@ class Machine < ApplicationRecord
   has_one :policy, through: :license
   has_one :user, through: :license
 
+  # Update license's total core count on machine create, update and destroy
+  after_create :update_machines_core_count_on_create
+  after_update :update_machines_core_count_on_update
+  after_destroy :update_machines_core_count_on_destroy
+
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
@@ -192,5 +197,46 @@ class Machine < ApplicationRecord
     return false if policy.nil?
 
     license.policy.fingerprint_uniq_per_license?
+  end
+
+  # FIXME(ezekg) Maybe there's a better way to do this?
+  def update_machines_core_count_on_create
+    return if policy.nil? || license.nil?
+
+    prev_core_count = license.machines.where.not(id: id).sum(:cores) || 0
+    next_core_count = prev_core_count + cores.to_i
+    return if license.machines_core_count == next_core_count
+
+    license.update!(machines_core_count: next_core_count)
+  rescue => e
+    Rails.logger.error e
+  end
+
+  def update_machines_core_count_on_update
+    return if policy.nil? || license.nil?
+
+    # Skip unless cores have chagned
+    return unless saved_change_to_cores?
+
+    core_count = license.machines.sum(:cores) || 0
+    return if license.machines_core_count == core_count
+
+    license.update!(machines_core_count: core_count)
+  rescue => e
+    Rails.logger.error e
+  end
+
+  def update_machines_core_count_on_destroy
+    return if policy.nil? || license.nil?
+
+    # Skip if license is being destroyed
+    return if license.destroyed?
+
+    core_count = license.machines.where.not(id: id).sum(:cores) || 0
+    return if license.machines_core_count == core_count
+
+    license.update!(machines_core_count: core_count)
+  rescue => e
+    Rails.logger.error e
   end
 end
