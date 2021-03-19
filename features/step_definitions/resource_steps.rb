@@ -446,3 +446,21 @@ Then /^the current token should have the following attributes:$/ do |body|
 
   expect(@token.reload.attributes).to include attributes
 end
+
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have a correct machine core count$/ do |word_index|
+  numbers = {
+    "first"   => 0,
+    "second"  => 1,
+    "third"   => 2,
+    "fourth"  => 3,
+    "fifth"   => 4,
+    "sixth"   => 5,
+    "seventh" => 6,
+    "eigth"   => 7,
+    "ninth"   => 8
+  }
+  index = numbers[word_index]
+  model = @account.licenses.all[index]
+
+  expect(model.machines_core_count).to eq model.machines.sum(:cores)
+end
