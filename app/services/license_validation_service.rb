@@ -83,6 +83,8 @@ class LicenseValidationService < BaseService
     return [false, "must have at least 1 associated machine", :NO_MACHINES] if license.policy.floating? && license.machines.count == 0
     # When floating, license's machine count should not surpass what policy allows
     return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.policy.floating? && !license.policy.max_machines.nil? && license.machines.count > license.policy.max_machines
+    # Check if license has exceeded its CPU core limit
+    return [false, "has too many associated machine cores", :TOO_MANY_CORES] if !license.policy.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.policy.max_cores
     # All good
     return [true, "is valid", :VALID]
   end
