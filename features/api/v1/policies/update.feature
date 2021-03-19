@@ -24,7 +24,11 @@ Feature: Update policy
     And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
-      { "duration": 31557600 }
+      {
+        "duration": 31557600,
+        "maxCores": 12,
+        "maxUses": 5
+      }
       """
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
@@ -37,6 +41,7 @@ Feature: Update policy
             "requireFingerprintScope": true,
             "concurrent": false,
             "name": "Trial",
+            "maxCores": 32,
             "maxUses": 3
           }
         }
@@ -47,6 +52,7 @@ Feature: Update policy
     And the JSON response should be a "policy" with a requireFingerprintScope
     And the JSON response should be a "policy" that is not concurrent
     And the JSON response should be a "policy" with the name "Trial"
+    And the JSON response should be a "policy" with the maxCores "32"
     And the JSON response should be a "policy" with the maxUses "3"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job

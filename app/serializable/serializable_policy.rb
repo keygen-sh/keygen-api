@@ -9,6 +9,7 @@ class SerializablePolicy < SerializableBase
   attribute :floating
   attribute :use_pool
   attribute :max_machines
+  attribute :max_cores
   attribute :max_uses
   attribute :concurrent
   attribute :fingerprint_uniqueness_strategy

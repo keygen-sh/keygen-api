@@ -33,6 +33,9 @@ class SerializableLicense < SerializableBase
   attribute :max_machines do
     @object.policy.max_machines
   end
+  attribute :max_cores do
+    @object.policy.max_cores
+  end
   attribute :max_uses do
     @object.policy.max_uses
   end

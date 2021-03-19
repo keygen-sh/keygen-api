@@ -30,6 +30,8 @@ class Machine < ApplicationRecord
   validates :account, presence: { message: "must exist" }
   validates :license, presence: { message: "must exist" }
 
+  validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
+
   # Disallow machine fingerprints to match UUID of another machine
   validate on: :create do |machine|
     errors.add :fingerprint, :conflict, message: "must not conflict with another machine's identifier (UUID)" if account.machines.exists? fingerprint
@@ -37,16 +39,28 @@ class Machine < ApplicationRecord
 
   # Disallow machine overages when the policy is not set to concurrent
   validate on: :create do |machine|
-    machines_count = machine.license&.machines&.count || 0
+    next if machine.policy.nil? || machine.license.nil?
+    next if machine.policy.concurrent?
 
-    next if machine.policy.nil? ||
-            machine.policy.concurrent ||
-            machine.license.nil? ||
-            machines_count == 0
+    machines_count = machine.license.machines.count || 0
+    next if machines_count == 0
 
     next unless (machines_count >= machine.policy.max_machines rescue false)
 
-    machine.errors.add :base, :limit_exceeded, message: "machine count has reached maximum allowed by current policy (#{machine.policy.max_machines || 1})"
+    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.policy.max_machines || 1})"
+  end
+
+  # Disallow machine core overages
+  validate on: [:create, :update] do |machine|
+    next if machine.policy.nil? || machine.license.nil?
+
+    prev_core_count = machine.license.machines.where.not(id: machine.id).sum(:cores) || 0
+    next_core_count = prev_core_count + machine.cores.to_i
+    next if next_core_count == 0
+
+    next unless (next_core_count > machine.policy.max_cores rescue false)
+
+    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.policy.max_cores || 1})"
   end
 
   # Fingerprint uniqueness on create

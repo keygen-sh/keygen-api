@@ -1075,7 +1075,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has reached maximum allowed by current policy (5)",
+        "detail": "machine count has exceeded maximum allowed by current policy (5)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -1193,7 +1193,7 @@ Feature: Create machine
       """
       {
         "title": "Unprocessable resource",
-        "detail": "machine count has reached maximum allowed by current policy (1)",
+        "detail": "machine count has exceeded maximum allowed by current policy (1)",
         "code": "MACHINE_LIMIT_EXCEEDED",
         "source": {
           "pointer": "/data"
@@ -1702,4 +1702,313 @@ Feature: Create machine
     And the current account should have 1 "machine"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has not reached its core limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 10,
+        "maxCores": 32,
+        "concurrent": false,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 12
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "machine" with the cores "12"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its core limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 10,
+        "maxCores": 32,
+        "concurrent": false,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 12
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine core count has exceeded maximum allowed by current policy (32)",
+        "code": "MACHINE_CORE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has not reached its core limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 1,
+        "maxCores": 8,
+        "concurrent": false,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 8
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "machine" with the cores "8"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a node-locked license that has exceeded its core limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 1,
+        "maxCores": 8,
+        "concurrent": false,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 12
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine core count has exceeded maximum allowed by current policy (8)",
+        "code": "MACHINE_CORE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with an invalid core count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 0
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than or equal to 1",
+        "code": "CORES_INVALID",
+        "source": {
+          "pointer": "/data/attributes/cores"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine with a large core count but policy has no maximum
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw",
+            "cores": 2147483647
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "machine" with the cores "2147483647"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
