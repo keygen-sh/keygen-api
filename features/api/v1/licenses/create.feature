@@ -636,7 +636,11 @@ Feature: Create license
     And the current account has 1 "policy"
     And the first "policy" of account "test1" has the following attributes:
       """
-      { "maxMachines": 3 }
+      {
+        "maxMachines": 3,
+        "maxCores": 32,
+        "maxUses": 100
+      }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses" with the following:
@@ -661,6 +665,8 @@ Feature: Create license
     Then the response status should be "201"
     And the JSON response should be a "license" with key "977f1752-d6a9-4669-a6af-b039154ec40f"
     And the JSON response should be a "license" with maxMachines "3"
+    And the JSON response should be a "license" with maxCores "32"
+    And the JSON response should be a "license" with maxUses "100"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
