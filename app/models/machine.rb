@@ -55,7 +55,7 @@ class Machine < ApplicationRecord
     machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.policy.max_machines || 1})"
   end
 
-  # Disallow machine core overages for concurrent licenses
+  # Disallow machine core overages for non-concurrent licenses
   validate on: [:create, :update] do |machine|
     next if machine.policy.nil? || machine.license.nil?
     next if machine.policy.max_cores.nil? ||
