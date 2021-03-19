@@ -185,7 +185,7 @@ Feature: Update machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a machine's core count to an amount that exceeds their maximum core limit
+  Scenario: Admin updates a non-concurrent machine's core count to an amount that exceeds their maximum core limit
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -193,10 +193,10 @@ Feature: Update machine
     And the first "policy" has the following attributes:
       """
       {
-        "maxMachines": 1,
+        "maxMachines": 2,
         "maxCores": 12,
         "concurrent": false,
-        "floating": false,
+        "floating": true,
         "strict": true
       }
       """
@@ -242,6 +242,56 @@ Feature: Update machine
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a concurrent-capable machine's core count to an amount that exceeds their maximum core limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 5,
+        "maxCores": 12,
+        "concurrent": true,
+        "floating": true,
+        "strict": false
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]"
+      }
+      """
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "cores": 32
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the cores "32"
+    And the first "license" should have a correct machine core count
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to update a machine's fingerprint
