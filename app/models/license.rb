@@ -116,6 +116,7 @@ class License < ApplicationRecord
   delegate :requires_check_in?, to: :policy
   delegate :check_in_interval, to: :policy
   delegate :check_in_interval_count, to: :policy
+  delegate :duration, to: :policy
   delegate :encrypted?, to: :policy
   delegate :legacy_encrypted?, to: :policy
   delegate :scheme?, to: :policy
@@ -187,7 +188,7 @@ class License < ApplicationRecord
   def default_seed_key
     case scheme
     when "RSA_2048_PKCS1_ENCRYPT"
-      JSON.generate(id: id, created: created_at, expiry: expiry)
+      JSON.generate(id: id, created: created_at, duration: duration, expiry: expiry)
     when "RSA_2048_JWT_RS256"
       claims = { jti: SecureRandom.uuid, iss: 'https://keygen.sh', aud: account.id, sub: id, iat: created_at.to_i, nbf: created_at.to_i }
       claims[:exp] = expiry.to_i if expiry.present?
@@ -197,7 +198,7 @@ class License < ApplicationRecord
       JSON.generate(
         account: { id: account.id },
         product: { id: product.id },
-        policy: { id: policy.id },
+        policy: { id: policy.id, duration: policy.duration },
         user: if user.present?
                 { id: user.id, email: user.email }
               else
