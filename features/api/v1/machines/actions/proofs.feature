@@ -35,7 +35,8 @@ Feature: Machine proof actions
           "id": "$machines[0].product.id"
         },
         "policy": {
-          "id": "$machines[0].policy.id"
+          "id": "$machines[0].policy.id",
+          "duration": $machines[0].policy.duration
         },
         "license": {
           "id": "$machines[0].license.id",
@@ -135,7 +136,8 @@ Feature: Machine proof actions
           "id": "$machines[0].product.id"
         },
         "policy": {
-          "id": "$machines[0].policy.id"
+          "id": "$machines[0].policy.id",
+          "duration": $machines[0].policy.duration
         },
         "license": {
           "id": "$machines[0].license.id",

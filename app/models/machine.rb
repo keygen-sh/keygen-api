@@ -161,7 +161,7 @@ class Machine < ApplicationRecord
     {
       account: { id: account.id },
       product: { id: product.id },
-      policy: { id: policy.id },
+      policy: { id: policy.id, duration: policy.duration },
       license: {
         id: license.id,
         key: license.key,
