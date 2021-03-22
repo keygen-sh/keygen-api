@@ -829,7 +829,8 @@ Feature: Create license
     And the first "policy" has the following attributes:
       """
       {
-        "scheme": "RSA_2048_PKCS1_ENCRYPT"
+        "scheme": "RSA_2048_PKCS1_ENCRYPT",
+        "duration": 2895149
       }
       """
     And the current account has 1 "user"
@@ -863,6 +864,7 @@ Feature: Create license
       {
         "id": "$licenses[0].id",
         "created": "$licenses[0].created_at",
+        "duration": 2895149,
         "expiry": "$licenses[0].expiry"
       }
       """
@@ -985,7 +987,8 @@ Feature: Create license
       """
       {
         "productId": "$products[0].id",
-        "scheme": "RSA_2048_PKCS1_SIGN"
+        "scheme": "RSA_2048_PKCS1_SIGN",
+        "duration": null
       }
       """
     And the current account has 1 "user"
@@ -1019,7 +1022,10 @@ Feature: Create license
       {
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
-        "policy": { "id": "$policies[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": null
+        },
         "user": {
           "id": "$users[1].id",
           "email": "$users[1].email"
@@ -1027,7 +1033,7 @@ Feature: Create license
         "license": {
           "id": "$licenses[0].id",
           "created": "$licenses[0].created_at",
-          "expiry": "$licenses[0].expiry"
+          "expiry": null
         }
       }
       """
@@ -1122,7 +1128,10 @@ Feature: Create license
       {
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
-        "policy": { "id": "$policies[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": $policies[0].duration
+        },
         "user": null,
         "license": {
           "id": "$licenses[0].id",
@@ -1449,7 +1458,10 @@ Feature: Create license
       {
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
-        "policy": { "id": "$policies[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": $policies[0].duration
+        },
         "user": {
           "id": "$users[1].id",
           "email": "$users[1].email"
@@ -1552,7 +1564,10 @@ Feature: Create license
       {
         "account": { "id": "$accounts[0].id" },
         "product": { "id": "$products[0].id" },
-        "policy": { "id": "$policies[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": $policies[0].duration
+        },
         "user": null,
         "license": {
           "id": "$licenses[0].id",
