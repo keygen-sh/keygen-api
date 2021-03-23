@@ -19,6 +19,8 @@ class RequestLogWorker
       resource_type: req['resource_type'],
       resource_id: req['resource_id'],
 
+      created_at: req['request_time'],
+      updated_at: req['request_time'],
       request_id: req['request_id'],
       request_body: req['body'],
 
