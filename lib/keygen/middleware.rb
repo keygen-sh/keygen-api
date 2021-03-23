@@ -121,6 +121,7 @@ module Keygen
             requestor_id: requestor&.id,
             resource_type: resource&.class&.name,
             resource_id: resource&.id,
+            request_time: Time.current,
             request_id: req.request_id,
             body: filtered_req_body,
             url: req.original_fullpath,
