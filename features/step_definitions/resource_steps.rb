@@ -257,23 +257,29 @@ end
 
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize.underscore).update_all(
-    JSON.parse(body).deep_transform_keys! &:underscore
-  )
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resources = @account.send(resource.pluralize.underscore)
+
+  resources.each { |r| r.update(attrs) }
 end
 
 Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize.underscore).limit(count).update_all(
-    JSON.parse(body).deep_transform_keys! &:underscore
-  )
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resources = @account.send(resource.pluralize.underscore).limit(count)
+
+  resources.each { |r| r.update(attrs) }
 end
 
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
   parse_placeholders! body
-  @account.send(resource.pluralize.underscore).limit(count).update_all(
-    JSON.parse(body).deep_transform_keys! &:underscore
-  )
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resources = @account.send(resource.pluralize.underscore).limit(count)
+
+  resources.each { |r| r.update(attrs) }
 end
 
 Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
