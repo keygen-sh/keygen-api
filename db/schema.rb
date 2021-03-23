@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_19_151903) do
+ActiveRecord::Schema.define(version: 2021_03_23_152738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(version: 2021_03_19_151903) do
     t.text "secret_key"
     t.datetime "last_low_activity_lifeline_sent_at"
     t.datetime "last_trial_will_end_sent_at"
+    t.datetime "last_license_limit_exceeded_sent_at"
+    t.datetime "last_request_limit_exceeded_sent_at"
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"

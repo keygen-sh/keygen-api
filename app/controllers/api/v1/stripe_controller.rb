@@ -14,7 +14,8 @@ module Api::V1
       return unless event
 
       case event.type
-      when "customer.subscription.created", "customer.subscription.updated"
+      when "customer.subscription.created",
+           "customer.subscription.updated"
         subscription = event.data.object
         billing = Billing.find_by customer_id: subscription.customer
         return unless billing

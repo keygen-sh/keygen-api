@@ -66,19 +66,36 @@ class RequestLimitsReportWorker
         plan: plan
       )
 
-      license_limit_exceeded = (active_licensed_user_count > license_limit * 1.1) rescue false
-      request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
+      begin
+        # Only send once a week to limit inbox noise for accounts that are currently
+        # over their license limit but don't upgrade right away
+        license_limit_reached = (active_licensed_user_count >= license_limit) rescue false
+        license_limit_exceeded = (active_licensed_user_count > license_limit * 1.1) rescue false
+        should_send_license_limit_notification =
+          (account.last_license_limit_exceeded_sent_at.nil? || account.last_license_limit_exceeded_sent_at < 1.week.ago) &&
+          ((account.trialing_or_free_tier? && license_limit_reached) || (account.paid_tier? && license_limit_exceeded))
 
-      # TODO(ezekg) Uncomment when we add related account stat widgets to the admin dashboard
-      # TODO(ezekg) Ensure active subscription i.e. not canceled
-      # # Only send on Mondays to limit inbox noise for accounts that are currently
-      # # over their license limit but don't upgrade right away
-      # if Date.today.monday? && license_limit_exceeded
-      #   AccountMailer.license_limit_exceeded(account: account, plan: plan, license_count: request_count, license_limit: request_limit).deliver_later
-      # end
+        if should_send_license_limit_notification
+          account.touch(:last_license_limit_exceeded_sent_at)
 
-      if request_limit_exceeded
-        AccountMailer.request_limit_exceeded(account: account, plan: plan, request_count: request_count, request_limit: request_limit).deliver_later
+          AccountMailer.license_limit_exceeded(account: account, plan: plan, license_count: active_licensed_user_count, license_limit: license_limit).deliver_later
+        end
+
+        # Send once per day if there was a daily request limit overage
+        request_limit_exceeded = (request_count > request_limit * 1.3) rescue false
+        should_send_request_limit_notification =
+          (account.last_request_limit_exceeded_sent_at.nil? || account.last_request_limit_exceeded_sent_at < 23.hours.ago) &&
+          request_limit_exceeded
+
+        if should_send_request_limit_notification
+          account.touch(:last_request_limit_exceeded_sent_at)
+
+          AccountMailer.request_limit_exceeded(account: account, plan: plan, request_count: request_count, request_limit: request_limit).deliver_later
+        end
+      rescue => e
+        account.touch(:last_license_limit_exceeded_sent_at, :last_request_limit_exceeded_sent_at) rescue nil
+
+        Rails.logger.error(e)
       end
 
       reports << report
