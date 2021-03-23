@@ -177,6 +177,13 @@ class Account < ApplicationRecord
             plan.free?
   end
 
+  def paid_tier?
+    return false if billing.nil?
+
+    return billing.active? && billing.card.present? &&
+           plan.paid?
+  end
+
   def protected?
     protected
   end
