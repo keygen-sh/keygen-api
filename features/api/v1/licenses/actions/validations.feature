@@ -359,8 +359,7 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now",
-        "machinesCoreCount": 32
+        "expiry": "$time.1.day.from_now"
       }
       """
     And the current account has 2 "machines"
@@ -402,8 +401,7 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now",
-        "machinesCoreCount": 32
+        "expiry": "$time.1.day.from_now"
       }
       """
     And the current account has 2 "machines"
@@ -1031,8 +1029,7 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now",
-        "machinesCoreCount": 32
+        "expiry": "$time.1.day.from_now"
       }
       """
     And the current account has 2 "machines"
@@ -1073,15 +1070,22 @@ Feature: License validation actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now",
-        "machinesCoreCount": 32
+        "expiry": "$time.1.day.from_now"
       }
       """
     And the current account has 2 "machines"
-    And all "machines" have the following attributes:
+    And the first "machine" has the following attributes:
       """
       {
-        "licenseId": "$licenses[0]"
+        "licenseId": "$licenses[0]",
+        "cores": 12
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
       }
       """
     And I use an authentication token

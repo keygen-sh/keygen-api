@@ -501,7 +501,7 @@ Feature: Create user
     And all "webhook-endpoints" have the following attributes:
       """
       {
-        "subscriptions": []
+        "subscriptions": ["license.created"]
       }
       """
     When I send a POST request to "/accounts/test1/users" with the following:
