@@ -2,6 +2,7 @@
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  config.hosts << 'api.keygen.sh'
 
   # Disables security vulnerability
   config.assets.compile = false
@@ -60,7 +61,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :info
+  config.log_level = ENV.fetch('RAILS_LOG_LEVEL') { :info }.to_sym
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
