@@ -20,6 +20,8 @@ Bundler.require *Rails.groups
 
 module Keygen
   class Application < Rails::Application
+    config.load_defaults 6.1
+
     config.generators do |generator|
       # Use UUIDs for table primary keys
       generator.orm :active_record, primary_key_type: :uuid
@@ -55,6 +57,9 @@ module Keygen
 
     # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
+
+    # Use mailers queue
+    config.action_mailer.deliver_later_queue_name = :mailers
 
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq

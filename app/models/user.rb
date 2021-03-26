@@ -22,7 +22,7 @@ class User < ApplicationRecord
   belongs_to :account
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
-  has_many :products, -> { reorder(nil).select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').order(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
+  has_many :products, -> { select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').reorder(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
