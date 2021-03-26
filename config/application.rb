@@ -64,6 +64,9 @@ module Keygen
     # Use Sidekiq for background jobs
     config.active_job.queue_adapter = :sidekiq
 
+    # Force UTF-8 encoding
+    config.encoding = 'utf-8'
+
     # Add services/validators to autoload path
     config.autoload_paths += %W[
       #{config.root}/app/validators
