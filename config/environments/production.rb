@@ -31,7 +31,7 @@ Rails.application.configure do
     reconnect_delay_max: ENV.fetch('REDIS_RECONNECT_DELAY_MAX') { 1 }.to_f,
     driver: :hiredis,
     error_handler: -> (method:, returning:, exception:) {
-      Rails.logger.error exception
+      Keygen.logger.exception exception
     },
   }
 
