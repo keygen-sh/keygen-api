@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "./logger"
 require_relative './store'
 
 module Keygen
