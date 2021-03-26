@@ -106,7 +106,6 @@ ActiveRecord::Schema.define(version: 2021_03_23_152738) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
-    t.index ["account_id", "key"], name: "index_licenses_on_account_id_and_key", unique: true
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
