@@ -35,7 +35,7 @@ Rails.application.configure do
           nil
         end
     rescue => e
-      Rails.logger.error e
+      Keygen.logger.exception e
     end
 
     begin
@@ -46,7 +46,7 @@ Rails.application.configure do
           nil
         end
     rescue => e
-      Rails.logger.error e
+      Keygen.logger.exception e
     end
 
     daily_req_limits =
@@ -61,7 +61,7 @@ Rails.application.configure do
           req[:req_count] = acct.daily_request_count || 'N/A'
           req[:req_limit] = acct.daily_request_limit || 'N/A'
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception e
         end
       end
 

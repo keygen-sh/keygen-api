@@ -210,7 +210,7 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: next_core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 
   def update_machines_core_count_on_update
@@ -224,7 +224,7 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 
   def update_machines_core_count_on_destroy
@@ -238,6 +238,6 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 end
