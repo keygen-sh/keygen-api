@@ -8,30 +8,37 @@ require 'sidekiq/testing'
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
 describe CreateWebhookEventService do
+  let(:account) { create(:account) }
+  let(:endpoint) { create(:webhook_endpoint, account: account) }
+  let(:resource) { create(:license, account: account) }
 
-  def create_webhook_event!
+  def create_webhook_event!(account, resource)
+    throw if endpoint.nil?
+
     CreateWebhookEventService.new(
       event: 'license.created',
-      account: @account,
-      resource: @resource
+      account: account,
+      resource: resource
     ).execute
 
-    @event = @account.webhook_events.last
+    event = account.webhook_events.last
 
-    @event
+    event
   end
 
-  def create_validation_webhook_event!(meta)
+  def create_validation_webhook_event!(account, resource, meta)
+    throw if endpoint.nil?
+
     CreateWebhookEventService.new(
       event: 'license.validation.succeeded',
-      account: @account,
-      resource: @resource,
+      account: account,
+      resource: resource,
       meta: meta
     ).execute
 
-    @event = @account.webhook_events.last
+    event = account.webhook_events.last
 
-    @event
+    event
   end
 
   def jsonapi_render(model, options = nil)
@@ -64,13 +71,10 @@ describe CreateWebhookEventService do
   before do
     Sidekiq::Testing.inline!
 
-    @account = create :account
-    @endpoint = create :webhook_endpoint, account: @account
-    @resource = create :license, account: @account
-
-    # FIXME(ezekg) Instantiate a webhook event so Active Record lazy loads the model's
+    # FIXME(ezekg) Instantiate models so Active Record lazy loads the model's
     #              attributes otherwise the mocks below will fail
     WebhookEvent.new
+    License.new
 
     # Make sure our license resources always have the same timestamps so comparison is easier
     allow_any_instance_of(WebhookEvent).to receive(:updated_at).and_return Time.current
@@ -94,27 +98,27 @@ describe CreateWebhookEventService do
   end
 
   it 'should create a new webhook event' do
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
 
     expect(event).to be_a WebhookEvent
   end
 
   it 'the event should contain the correct event type' do
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
     type = event.event_type
 
     expect(type.event).to eq 'license.created'
   end
 
   it 'the event should contain the correct endpoint' do
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
 
-    expect(event.endpoint).to eq @endpoint.url
+    expect(event.endpoint).to eq endpoint.url
   end
 
   it 'the event payload should contain a snapshot of the resource' do
-    payload = jsonapi_render @resource
-    event = create_webhook_event!
+    payload = jsonapi_render(resource)
+    event = create_webhook_event!(account, resource)
 
     expect(event.payload).to eq payload
   end
@@ -127,8 +131,8 @@ describe CreateWebhookEventService do
       constant: 'EXPIRED',
     }
 
-    payload = jsonapi_render @resource, meta: meta
-    event = create_validation_webhook_event! meta
+    payload = jsonapi_render(resource, meta: meta)
+    event = create_validation_webhook_event!(account, resource, meta)
 
     expect(event.payload).to eq payload
   end
@@ -138,7 +142,7 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 204, body: nil)
     }
 
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
 
     expect(event.last_response_code).to eq 204
   end
@@ -148,7 +152,7 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 200, body: 'OK')
     }
 
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
 
     expect(event.last_response_body).to eq 'OK'
   end
@@ -158,7 +162,7 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 200, body: SecureRandom.hex(8092))
     }
 
-    event = create_webhook_event!
+    event = create_webhook_event!(account, resource)
 
     expect(event.last_response_body).to eq 'RES_BODY_TOO_LARGE'
   end
@@ -170,9 +174,9 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 200, body: 'OK')
     }
 
-    event = create_webhook_event!
-    body = jsonapi_render event
-    url = @endpoint.url
+    event = create_webhook_event!(account, resource)
+    body = jsonapi_render(event)
+    url = endpoint.url
 
     expect(WebhookWorker::Request).to have_received(:post).with(
       url,
@@ -185,7 +189,7 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 204, body: nil)
     }
 
-    expect { create_webhook_event! }.to_not raise_error
+    expect { create_webhook_event!(account, resource) }.to_not raise_error
   end
 
   it 'should raise when event delivery fails' do
@@ -193,7 +197,7 @@ describe CreateWebhookEventService do
       OpenStruct.new(code: 500, body: nil)
     }
 
-    expect { create_webhook_event! }.to raise_error WebhookWorker::FailedRequestError
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
   end
 
   it 'should skip when event delivery fails due to SSL error' do
@@ -201,9 +205,10 @@ describe CreateWebhookEventService do
       raise OpenSSL::SSL::SSLError.new
     }
 
-    expect { create_webhook_event! }.to_not raise_error
-
-    expect(@event.last_response_body).to eq 'SSL_ERROR'
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'SSL_ERROR'
   end
 
   it 'should skip when event delivery fails due to read timeout error' do
@@ -211,9 +216,10 @@ describe CreateWebhookEventService do
       raise Net::ReadTimeout.new
     }
 
-    expect { create_webhook_event! }.to_not raise_error
-
-    expect(@event.last_response_body).to eq 'REQ_TIMEOUT'
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'REQ_TIMEOUT'
   end
 
   it 'should skip when event delivery fails due to open timeout error' do
@@ -221,9 +227,10 @@ describe CreateWebhookEventService do
       raise Net::OpenTimeout.new
     }
 
-    expect { create_webhook_event! }.to_not raise_error
-
-    expect(@event.last_response_body).to eq 'REQ_TIMEOUT'
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'REQ_TIMEOUT'
   end
 
   it 'should skip when event delivery fails due to DNS error' do
@@ -231,9 +238,10 @@ describe CreateWebhookEventService do
       raise SocketError.new
     }
 
-    expect { create_webhook_event! }.to_not raise_error
-
-    expect(@event.last_response_body).to eq 'DNS_ERROR'
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'DNS_ERROR'
   end
 
   it 'should skip when event delivery fails due to connection refused error' do
@@ -241,9 +249,10 @@ describe CreateWebhookEventService do
       raise Errno::ECONNREFUSED.new
     }
 
-    expect { create_webhook_event! }.to_not raise_error
-
-    expect(@event.last_response_body).to eq 'CONN_REFUSED'
+    event = nil
+    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect(event).to_not be_nil
+    expect(event.last_response_body).to eq 'CONN_REFUSED'
   end
 
   it 'should not skip when event delivery fails due to an exception' do
@@ -251,14 +260,14 @@ describe CreateWebhookEventService do
       raise Exception.new
     }
 
-    expect { create_webhook_event! }.to raise_error Exception
+    expect { create_webhook_event!(account, resource) }.to raise_error Exception
   end
 
   context 'when serializing resources with sensitive secrets' do
     it 'the account payload should not contain private keys' do
-      @resource = create(:account)
+      resource = create(:account)
 
-      event = create_webhook_event!
+      event = create_webhook_event!(account, resource)
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
       meta = payload.fetch('meta', {})
@@ -271,9 +280,9 @@ describe CreateWebhookEventService do
     end
 
     it 'the token payload should not contain one-time secret token' do
-      @resource = create(:token)
+      resource = create(:token, account: account)
 
-      event = create_webhook_event!
+      event = create_webhook_event!(account, resource)
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
@@ -281,9 +290,9 @@ describe CreateWebhookEventService do
     end
 
     it 'the second factor payload should not contain one-time secret uri' do
-      @resource = create(:second_factor)
+      resource = create(:second_factor, account: account)
 
-      event = create_webhook_event!
+      event = create_webhook_event!(account, resource)
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
@@ -291,9 +300,9 @@ describe CreateWebhookEventService do
     end
 
     it 'the user payload should not contain password' do
-      @resource = create(:user)
+      resource = create(:user, account: account)
 
-      event = create_webhook_event!
+      event = create_webhook_event!(account, resource)
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
