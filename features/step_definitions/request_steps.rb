@@ -654,8 +654,9 @@ Then /^the response should contain the following raw headers:$/ do |body|
 
 end
 
-Then /^the response should contain a valid signature header for "(\w+)"$/ do |slug|
-  pub = OpenSSL::PKey::RSA.new Account.find(slug).public_key
+Then /^the response should contain a valid signature header for "(\w+)"$/ do |id|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
+  pub = OpenSSL::PKey::RSA.new account.public_key
   digest = OpenSSL::Digest::SHA256.new
 
   sig = Base64.strict_decode64 last_response.headers['X-Signature']
