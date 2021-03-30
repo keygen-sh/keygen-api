@@ -18,11 +18,13 @@ Given /^there exists an(?:other)? account "([^\"]*)"$/ do |slug|
   create :account, slug: slug
 end
 
-Given /^the account "([^\"]*)" has the following attributes:$/ do |slug, body|
+Given /^the account "([^\"]*)" has the following attributes:$/ do |id, body|
   parse_placeholders! body
 
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  Account.find(slug).update attributes
+
+  account.update attributes
 end
 
 Given /^I have the following attributes:$/ do |body|
@@ -39,34 +41,34 @@ Then /^the current token has the following attributes:$/ do |body|
   @token.update attributes
 end
 
-Given /^the current account is "([^\"]*)"$/ do |slug|
-  @account = Account.find slug
+Given /^the current account is "([^\"]*)"$/ do |id|
+  @account = FindByAliasService.new(Account, id, aliases: :slug).call
 end
 
 Given /^there exists (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times { create(resource.singularize.underscore) }
 end
 
-Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |slug|
-  account = Account.find slug
+Given /^the account "([^\"]*)" has exceeded its daily request limit$/ do |id|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   account.daily_request_count = 1_000_000_000
 end
 
-Given /^the account "([^\"]*)" is on a free tier$/ do |slug|
-  account = Account.find slug
+Given /^the account "([^\"]*)" is on a free tier$/ do |id|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   account.plan.update! price: 0
 end
 
-Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |slug, resource, limit|
-  account = Account.find slug
+Given /^the account "([^\"]*)" has a max (\w+) limit of (\d+)$/ do |id, resource, limit|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   account.plan.update! "max_#{resource.pluralize.underscore}" => limit.to_i
 end
 
-Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.find slug
+Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   count.to_i.times do
     create resource.singularize.underscore, account: account
@@ -350,10 +352,10 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
   m.save validate: false
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, slug, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   parse_placeholders! body
 
-  account = Account.find slug
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -375,10 +377,10 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
   m.save validate: false
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, slug, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
   parse_placeholders! body
 
-  account = Account.find slug
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -417,8 +419,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, resource|
-  account = Account.find slug
+Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, resource|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   user  = account.admins.first
   token = TokenGeneratorService.new(
@@ -436,11 +438,11 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |slug, count, re
   end
 end
 
-Then /^the account "([^\"]*)" should have the following attributes:$/ do |slug, body|
+Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, body|
   parse_placeholders! body
 
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  account = Account.find(slug)
 
   expect(account.attributes).to include attributes
 end

@@ -4,7 +4,6 @@ class User < ApplicationRecord
   MINIMUM_ADMIN_COUNT = 1
 
   include PasswordResetable
-  include Sluggable
   include Limitable
   include Pageable
   include Roleable
@@ -14,8 +13,6 @@ class User < ApplicationRecord
   SEARCH_RELATIONSHIPS = { role: %i[name] }.freeze
 
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
-
-  sluggable attributes: %i[id email]
 
   has_secure_password
 
