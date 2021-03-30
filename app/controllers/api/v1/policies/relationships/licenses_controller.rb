@@ -21,7 +21,7 @@ module Api::V1::Policies::Relationships
 
     # GET /policies/1/licenses/1
     def show
-      @license = @policy.licenses.find params[:id]
+      @license = FindByAliasService.new(@policy.licenses, params[:id], aliases: :key).call
       authorize @license
 
       render jsonapi: @license

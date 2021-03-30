@@ -21,7 +21,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/machines/1
     def show
-      @machine = @product.machines.find params[:id]
+      @machine = FindByAliasService.new(@product.machines, params[:id], aliases: :fingerprint).call
       authorize @machine
 
       render jsonapi: @machine

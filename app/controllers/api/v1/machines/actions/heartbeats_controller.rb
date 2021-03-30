@@ -54,7 +54,7 @@ module Api::V1::Machines::Actions
     private
 
     def set_machine
-      @machine = current_account.machines.find params[:id]
+      @machine = FindByAliasService.new(current_account.machines, params[:id], aliases: :fingerprint).call
 
       Keygen::Store::Request.store[:current_resource] = @machine
     end
