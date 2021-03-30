@@ -10,7 +10,13 @@ FactoryGirl.define do
 
     after :build do |machine, evaluator|
       account = evaluator.account or create :account
-      license = create :license, account: account
+      license =
+        case
+        when evaluator.license.present?
+          evaluator.license
+        else
+          create :license, account: account
+        end
 
       machine.assign_attributes(
         account: account,
