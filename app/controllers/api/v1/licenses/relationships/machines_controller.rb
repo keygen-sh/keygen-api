@@ -21,7 +21,7 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/machines/1
     def show
-      @machine = FindByAliasService.new(@license.machines, params[:id], aliases: :fingerprint).call
+      @machine = @license.machines.find params[:id]
       authorize @machine
 
       render jsonapi: @machine
@@ -30,7 +30,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:license_id], aliases: :key).call
+      @license = current_account.licenses.find params[:license_id]
       authorize @license, :show?
 
       Keygen::Store::Request.store[:current_resource] = @license

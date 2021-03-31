@@ -125,7 +125,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = current_account.licenses.find params[:id]
     end
 
     typed_parameters do
