@@ -19,6 +19,9 @@ Before do
   StripeHelper.start
   Rails.cache.clear
 
+  stub_account_keygens
+  stub_cache
+
   @crypt = []
 end
 
