@@ -34,7 +34,7 @@ class ApplicationController < ActionController::API
     when PG::CharacterNotInRepertoire
       render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
-      Keygen.logger.exception err
+      Rails.logger.error err
 
       render_bad_request
     end
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::API
     when /incomplete multibyte character/
       render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
     else
-      Keygen.logger.exception err
+      Rails.logger.error err
 
       render_internal_server_error
     end
@@ -66,7 +66,7 @@ class ApplicationController < ActionController::API
     when /string contains null byte/
       render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
     else
-      Keygen.logger.exception err
+      Rails.logger.error err
 
       render_internal_server_error
     end
@@ -104,7 +104,7 @@ class ApplicationController < ActionController::API
       reset: (now + (period - now.to_i % period)).to_i,
     }
   rescue => e
-    Keygen.logger.exception e
+    Rails.logger.error e
 
     nil
   end
@@ -294,7 +294,7 @@ class ApplicationController < ActionController::API
             res.merge! code: "#{subject}_#{code}".parameterize.underscore.upcase
           end
         rescue => e
-          Keygen.logger.exception e
+          Rails.logger.error e
 
           raise e
         end
@@ -350,7 +350,7 @@ class ApplicationController < ActionController::API
     response.headers["X-RateLimit-Remaining"] = info[:remaining]
     response.headers["X-RateLimit-Reset"]     = info[:reset]
   rescue => e
-    Keygen.logger.exception e
+    Rails.logger.error e
   end
 
   def send_keygen_whoami_headers
@@ -358,6 +358,6 @@ class ApplicationController < ActionController::API
     response.headers["X-Keygen-Bearer-Id"] = current_bearer&.id
     response.headers["X-Keygen-Token-Id"] = current_token&.id
   rescue => e
-    Keygen.logger.exception e
+    Rails.logger.error e
   end
 end
