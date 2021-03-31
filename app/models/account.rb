@@ -99,7 +99,7 @@ class Account < ApplicationRecord
   end
 
   def self.cache_key(id)
-    [:accounts, id].join ":"
+    [:accounts, id, CACHE_KEY_VERSION].join ":"
   end
 
   def cache_key

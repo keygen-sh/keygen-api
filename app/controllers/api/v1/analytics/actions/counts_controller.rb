@@ -155,7 +155,7 @@ module Api::V1::Analytics::Actions
     private
 
     def cache_key_for(action)
-      [:analytics, current_account.id, action].join ":"
+      [:analytics, current_account.id, action, CACHE_KEY_VERSION].join ":"
     end
   end
 end

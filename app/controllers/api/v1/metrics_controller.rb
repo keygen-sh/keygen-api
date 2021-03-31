@@ -50,7 +50,7 @@ module Api::V1
     end
 
     def cache_key
-      [:metrics, current_account.id, Digest::SHA2.hexdigest(request.query_string)].join ":"
+      [:metrics, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
     end
   end
 end
