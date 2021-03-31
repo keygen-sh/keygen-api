@@ -21,7 +21,7 @@ module Api::V1::Users::Relationships
 
     # GET /users/1/licenses/1
     def show
-      @license = @user.licenses.find params[:id]
+      @license = FindByAliasService.new(@user.licenses, params[:id], aliases: :key).call
       authorize @license
 
       render jsonapi: @license
@@ -30,7 +30,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = current_account.users.find params[:user_id]
+      @user = FindByAliasService.new(current_account.users, params[:user_id], aliases: :email).call
       authorize @user, :show?
 
       Keygen::Store::Request.store[:current_resource] = @user

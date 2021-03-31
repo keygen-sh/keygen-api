@@ -19,6 +19,9 @@ Before do
   StripeHelper.start
   Rails.cache.clear
 
+  stub_account_keygens
+  stub_cache
+
   @crypt = []
 end
 
@@ -32,7 +35,7 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    puts JSON.pretty_generate(
+    log JSON.pretty_generate(
       request: {
         url: last_request.url,
         # headers: {
@@ -52,7 +55,7 @@ After do |scenario|
   begin
     Rails.cache.clear
   rescue => e
-    puts '[REDIS]', e
+    log '[REDIS]', e
   end
 
   @account = nil

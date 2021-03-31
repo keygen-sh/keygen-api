@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Machine < ApplicationRecord
-  include Sluggable
   include Limitable
   include Pageable
   include Searchable
@@ -18,8 +17,6 @@ class Machine < ApplicationRecord
   }.freeze
 
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
-
-  sluggable attributes: %i[id fingerprint]
 
   belongs_to :account
   belongs_to :license, counter_cache: true
@@ -84,7 +81,7 @@ class Machine < ApplicationRecord
     end
   end
 
-  validates :fingerprint, presence: true, blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
+  validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   # FIXME(ezekg) Hack to override pg_search with more performant query
@@ -210,7 +207,7 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: next_core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 
   def update_machines_core_count_on_update
@@ -224,7 +221,7 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 
   def update_machines_core_count_on_destroy
@@ -238,6 +235,6 @@ class Machine < ApplicationRecord
 
     license.update!(machines_core_count: core_count)
   rescue => e
-    Rails.logger.error e
+    Keygen.logger.exception e
   end
 end

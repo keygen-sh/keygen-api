@@ -19,7 +19,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/users/1
     def show
-      @user = @product.users.find params[:id]
+      @user = FindByAliasService.new(@product.users, params[:id], aliases: :email).call
       authorize @user
 
       render jsonapi: @user

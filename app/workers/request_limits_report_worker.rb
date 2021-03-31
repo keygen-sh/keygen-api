@@ -3,7 +3,7 @@
 class RequestLimitsReportWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :cron, unique: :until_executed
+  sidekiq_options queue: :cron, lock: :until_executed
 
   def perform
     date = Date.yesterday
@@ -95,7 +95,7 @@ class RequestLimitsReportWorker
       rescue => e
         account.touch(:last_license_limit_exceeded_sent_at, :last_request_limit_exceeded_sent_at) rescue nil
 
-        Rails.logger.error(e)
+        Keygen.logger.exception(e)
       end
 
       reports << report
