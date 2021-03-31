@@ -54,7 +54,7 @@ module Api::V1
     end
 
     def cache_key
-      [:logs, current_account.id, Digest::SHA2.hexdigest(request.query_string)].join ":"
+      [:logs, current_account.id, request.query_string.parameterize].select(&:present?).join ":"
     end
   end
 end

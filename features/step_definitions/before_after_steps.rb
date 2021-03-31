@@ -32,7 +32,7 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
-    log JSON.pretty_generate(
+    puts JSON.pretty_generate(
       request: {
         url: last_request.url,
         # headers: {
@@ -52,7 +52,7 @@ After do |scenario|
   begin
     Rails.cache.clear
   rescue => e
-    log '[REDIS]', e
+    puts '[REDIS]', e
   end
 
   @account = nil

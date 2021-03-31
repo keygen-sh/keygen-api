@@ -15,8 +15,8 @@ class Product < ApplicationRecord
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
-  has_many :machines, -> { select('"machines".*, "machines"."id", "machines"."created_at"').distinct('"machines"."id"').reorder(Arel.sql('"machines"."created_at" ASC')) }, through: :licenses
-  has_many :users, -> { select('"users".*, "users"."id", "users"."created_at"').distinct('"users"."id"').reorder(Arel.sql('"users"."created_at" ASC')) }, through: :licenses
+  has_many :machines, -> { reorder(nil).select('"machines".*, "machines"."id", "machines"."created_at"').distinct('"machines"."id"').order(Arel.sql('"machines"."created_at" ASC')) }, through: :licenses
+  has_many :users, -> { reorder(nil).select('"users".*, "users"."id", "users"."created_at"').distinct('"users"."id"').order(Arel.sql('"users"."created_at" ASC')) }, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
 

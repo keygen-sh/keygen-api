@@ -71,24 +71,6 @@ Feature: Show user
     And the JSON response should be a "user" with the role "user"
     And the JSON response should be a "user" with no meta
 
-  Scenario: Admin retrieves a user for their account by email with a different casing
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "users"
-    And the second "user" has the following attributes:
-      """
-      {
-        "email": "someuser123@example.com"
-      }
-      """
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/users/SomeUser123@example.com"
-    Then the response status should be "200"
-    And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "user"
-    And the JSON response should be a "user" with the role "user"
-    And the JSON response should be a "user" with no meta
-
   Scenario: Admin retrieves another admin for their account by email
     Given I am an admin of account "test1"
     And the current account is "test1"

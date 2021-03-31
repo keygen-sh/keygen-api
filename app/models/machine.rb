@@ -84,7 +84,7 @@ class Machine < ApplicationRecord
     end
   end
 
-  validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
+  validates :fingerprint, presence: true, blank: false, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   # FIXME(ezekg) Hack to override pg_search with more performant query
