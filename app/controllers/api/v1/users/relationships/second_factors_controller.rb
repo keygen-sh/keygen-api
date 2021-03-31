@@ -96,7 +96,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = current_account.users.find params[:user_id] || params[:id]
+      @user = FindByAliasService.new(current_account.users, params[:user_id], aliases: :email).call
 
       Keygen::Store::Request.store[:current_resource] = @user
     end

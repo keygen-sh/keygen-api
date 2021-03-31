@@ -9,6 +9,7 @@ DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
 describe MachineHeartbeatWorker do
   let(:worker) { MachineHeartbeatWorker }
+  let(:account) { create(:account) }
 
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
@@ -23,7 +24,7 @@ describe MachineHeartbeatWorker do
   end
 
   it 'should enqueue and run the worker' do
-    machine = create :machine, last_heartbeat_at: nil
+    machine = create :machine, last_heartbeat_at: nil, account: account
 
     worker.perform_async machine.id
     expect(worker.jobs.size).to eq 1
@@ -33,7 +34,7 @@ describe MachineHeartbeatWorker do
   end
 
   context 'when there is a machine that does not require heartbeats' do
-    let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
+    let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, account: account) }
     let(:event) { 'machine.heartbeat.pong' }
     let(:heartbeat_at) { nil }
 
@@ -55,7 +56,7 @@ describe MachineHeartbeatWorker do
 
   context 'when there is a machine that does require heartbeats' do
     context 'when heartbeat is alive' do
-      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
+      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, account: account) }
       let(:event) { 'machine.heartbeat.pong' }
       let(:heartbeat_at) { Time.current }
 
@@ -80,7 +81,7 @@ describe MachineHeartbeatWorker do
     end
 
     context 'when heartbeat is dead' do
-      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at) }
+      let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, account: account) }
       let(:event) { 'machine.heartbeat.dead' }
       let(:heartbeat_at) { 1.hour.ago }
 
@@ -107,7 +108,7 @@ describe MachineHeartbeatWorker do
 
   context 'when the machine uses the default heartbeat duration' do
     let(:heartbeat_duration) { Machine::HEARTBEAT_TTL + Machine::HEARTBEAT_DRIFT }
-    let(:machine) { create(:machine) }
+    let(:machine) { create(:machine, account: account) }
     let(:event) { 'machine.heartbeat.pong' }
     let(:heartbeat_at) { Time.current }
 
@@ -122,9 +123,9 @@ describe MachineHeartbeatWorker do
 
   context 'when the machine uses a custom heartbeat duration' do
     let(:heartbeat_duration) { 7.days }
-    let(:policy) { create(:policy, heartbeat_duration: heartbeat_duration ) }
-    let(:license) { create(:license, policy: policy ) }
-    let(:machine) { create(:machine, license: license ) }
+    let(:policy) { create(:policy, heartbeat_duration: heartbeat_duration, account: account) }
+    let(:license) { create(:license, policy: policy, account: account) }
+    let(:machine) { create(:machine, license: license, account: account) }
     let(:event) { 'machine.heartbeat.pong' }
     let(:heartbeat_at) { Time.current }
 

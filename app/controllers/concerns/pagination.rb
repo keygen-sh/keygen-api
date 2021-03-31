@@ -8,7 +8,7 @@ module Pagination
     def render(args)
       super args.merge links: pagination_links(args[:jsonapi]) unless performed?
     rescue => e # TODO: Let's not catch everything here
-      Rails.logger.error e
+      Keygen.logger.exception e
 
       super args unless performed? # Avoid double render
     end

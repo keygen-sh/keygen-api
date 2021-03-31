@@ -1,3 +1,4 @@
+require 'active_support/core_ext/integer/time'
 require 'action_view/helpers'
 require 'ostruct'
 require 'stripe'

@@ -2,8 +2,8 @@
 
 World Rack::Test::Methods
 
-Given /^the account "([^\"]*)" is (\w+)$/ do |slug, state|
-  account = Account.find slug
+Given /^the account "([^\"]*)" is (\w+)$/ do |id, state|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   # Set up a fake subscription
   customer = create :customer, :with_card
@@ -41,14 +41,14 @@ Given /^the account does not have a card on file$/ do
   @billing.update card_brand: nil, card_last4: nil, card_expiry: nil
 end
 
-Given /^the account "([^\"]*)" does have a card on file$/ do |slug|
-  account = Account.find slug
+Given /^the account "([^\"]*)" does have a card on file$/ do |id|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   account.billing.update card_brand: 'Visa', card_last4: '4242', card_expiry: 2.years.from_now
 end
 
-Given /^the account "([^\"]*)" does not have a card on file$/ do |slug|
-  account = Account.find slug
+Given /^the account "([^\"]*)" does not have a card on file$/ do |id|
+  account = FindByAliasService.new(Account, id, aliases: :slug).call
 
   account.billing.update card_brand: nil, card_last4: nil, card_expiry: nil
 end
