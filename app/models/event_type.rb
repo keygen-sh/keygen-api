@@ -2,7 +2,7 @@
 
 class EventType < ApplicationRecord
   def self.cache_key(event)
-    [:event_types, event].join ":"
+    [:event_types, event, CACHE_KEY_VERSION].join ":"
   end
 
   def cache_key

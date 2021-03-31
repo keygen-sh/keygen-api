@@ -43,7 +43,7 @@ class Token < ApplicationRecord
   def self.cache_key(digest)
     hash = Digest::SHA256.hexdigest digest
 
-    [:tokens, hash].join ":"
+    [:tokens, hash, CACHE_KEY_VERSION].join ":"
   end
 
   def cache_key
