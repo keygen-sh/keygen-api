@@ -48,7 +48,7 @@ class WebhookWorker
         last_response_body: body
       )
     rescue => e
-      Keygen.logger.exception e
+      Rails.logger.error e
 
       raise e
     end

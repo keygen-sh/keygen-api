@@ -19,7 +19,7 @@ module Api::V1::Licenses::Actions
         constant: constant,
       }
 
-      Keygen.logger.info "[license.quick-validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+      Rails.logger.info "[license.quick-validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
@@ -57,7 +57,7 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Rails.logger.info "[license.validate] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
@@ -104,7 +104,7 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate-key] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Rails.logger.info "[license.validate-key] request_id=#{request.uuid} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
