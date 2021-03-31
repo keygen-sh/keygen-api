@@ -270,7 +270,6 @@ Feature: Generate authentication token for license
     And the current account has 3 "licenses"
     And I am a product of account "test1"
     And the current product has 3 "licenses"
-    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens/$3"
     Then the response status should be "200"

@@ -5,11 +5,11 @@ FactoryGirl.define do
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name { Faker::Company.buzzword }
 
-    account nil
-    license nil
+    association :account
+    association :license
 
     after :build do |machine, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account or create :account
       license =
         case
         when evaluator.license.present?

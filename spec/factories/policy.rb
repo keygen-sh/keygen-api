@@ -20,22 +20,15 @@ FactoryGirl.define do
     max_uses nil
     scheme nil
 
-    account nil
-    product nil
+    association :account
+    association :product
 
     after :build do |policy, evaluator|
-      account = evaluator.account.presence || create(:account)
-      product =
-        case
-        when evaluator.product.present?
-          evaluator.product
-        else
-          create :product, account: account
-        end
+      account = evaluator.account or create :account
 
       policy.assign_attributes(
-        account: account,
-        product: product
+        product: create(:product, account: account),
+        account: account
       )
     end
 

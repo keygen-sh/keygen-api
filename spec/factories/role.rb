@@ -27,9 +27,5 @@ FactoryGirl.define do
     trait :product do
       name :product
     end
-
-    trait :license do
-      name :license
-    end
   end
 end
