@@ -21,13 +21,10 @@ FactoryGirl.define do
           create :policy, account: account
         end
       user =
-        case
-        when evaluator.user == false
-          nil
-        when evaluator.user.present?
-          evaluator.user
-        else
+        if evaluator.user != false
           create :user, account: account
+        else
+          nil
         end
 
       license.assign_attributes(
