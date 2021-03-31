@@ -5,19 +5,11 @@ FactoryGirl.define do
     account nil
     user nil
 
-    after :build do |second_factor, evaluator|
-      account = evaluator.account.presence || create(:account)
-      user =
-        if evaluator.user.present?
-          evaluator.user
-        else
-          create :user, account: account
-        end
-
-      second_factor.assign_attributes(
-        account: user.account,
-        user: user
-      )
+    before :create do |token|
+      if token.user.nil?
+        token.user = create :user
+      end
+      token.account = token.user.account
     end
   end
 end

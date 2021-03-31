@@ -5,20 +5,14 @@ FactoryGirl.define do
     account nil
     bearer nil
 
-    after :build do |token, evaluator|
-      account = evaluator.account.presence || create(:account)
-      bearer =
-        if evaluator.bearer.present?
-          evaluator.bearer
-        else
-          create :user, account: account
-        end
-
-      token.assign_attributes(
-        digest: "test_#{SecureRandom.hex}",
-        account: bearer.account,
-        bearer: bearer
-      )
+    before :create do |token|
+      if token.digest.nil?
+        token.digest = "rand_#{SecureRandom.hex}"
+      end
+      if token.bearer.nil?
+        token.bearer = create :user
+      end
+      token.account = token.bearer.account
     end
   end
 end
