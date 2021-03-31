@@ -11,10 +11,10 @@ FactoryGirl.define do
       ]
     }
 
-    association :account
+    account nil
 
     after :build do |product, evaluator|
-      account = evaluator.account or create :account
+      account = evaluator.account.presence || create(:account)
 
       product.assign_attributes(
         account: account
@@ -22,7 +22,7 @@ FactoryGirl.define do
     end
 
     after :create do |product|
-      create :role, :product, resource: product
+      product.role = create :role, :product, resource: product
       create :token, bearer: product
     end
   end

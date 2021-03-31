@@ -3,12 +3,9 @@
 class Account < ApplicationRecord
   include ActiveModel::Validations
   include Welcomeable
-  include Sluggable
   include Limitable
   include Pageable
   include Billable
-
-  sluggable attributes: %i[id slug], scope: -> (s) { s.includes :billing }
 
   belongs_to :plan
   has_many :webhook_endpoints
@@ -39,7 +36,7 @@ class Account < ApplicationRecord
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
-  validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { slug.nil? }
+  validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }
 
   validate on: [:create, :update] do
     clean_slug = "#{slug}".tr "-", ""

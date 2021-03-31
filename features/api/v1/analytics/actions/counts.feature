@@ -21,8 +21,8 @@ Feature: Analytic counts
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 50 "users"
-    And the current account has 50 "licenses"
-    And the current account has 30 "machines"
+    And the current account has 50 userless "licenses"
+    And the current account has 30 "machines" for existing "licenses"
     # Adjust created timestamps so that some licenses are old
     And 25 "licenses" have the following attributes:
       """
@@ -47,17 +47,14 @@ Feature: Analytic counts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/count"
     Then the response status should be "200"
-    # FIXME(ezekg) The totals are a bit of a mess here because our factories
-    #              create associated models instead of reusing the existing
-    #              resource pool
     And the JSON response should contain meta with the following:
       """
       {
-        "activeLicensedUsers": 66,
-        "activeLicenses": 75,
-        "totalLicenses": 80,
+        "activeLicensedUsers": 36,
+        "activeLicenses": 45,
+        "totalLicenses": 50,
         "totalMachines": 30,
-        "totalUsers": 131
+        "totalUsers": 51
       }
       """
     And sidekiq should have 0 "request-log" jobs

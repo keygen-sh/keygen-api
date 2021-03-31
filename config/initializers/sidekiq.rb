@@ -23,6 +23,7 @@ Sidekiq.configure_client do |config|
   config.redis = { size: 5, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
 
   config.client_middleware do |chain|
+    chain.add SidekiqUniqueJobs::Middleware::Client
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 3.days
   end
 end
@@ -37,12 +38,16 @@ Sidekiq.configure_server do |config|
   end
 
   config.server_middleware do |chain|
+    chain.add SidekiqUniqueJobs::Middleware::Client
     chain.add Sidekiq::Status::ServerMiddleware, expiration: 3.days
   end
 
   config.client_middleware do |chain|
+    chain.add SidekiqUniqueJobs::Middleware::Client
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 3.days
   end
+
+  SidekiqUniqueJobs::Server.configure(config)
 end
 
 SidekiqUniqueJobs.configure do |config|
