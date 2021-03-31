@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class License < ApplicationRecord
+  include Sluggable
   include Limitable
   include Tokenable
   include Pageable
@@ -17,6 +18,8 @@ class License < ApplicationRecord
   }
 
   search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
+
+  sluggable attributes: %i[id key]
 
   belongs_to :account
   belongs_to :user
@@ -58,7 +61,7 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
-  validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { key.nil? }
+  validates :key, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: Sluggable::EXCLUDED_SLUGS, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 

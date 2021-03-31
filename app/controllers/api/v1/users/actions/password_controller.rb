@@ -47,7 +47,7 @@ module Api::V1::Users::Actions
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:id], aliases: :email).call
+      @user = current_account.users.find params[:id]
 
       Keygen::Store::Request.store[:current_resource] = @user
     end

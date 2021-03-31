@@ -82,7 +82,7 @@ module Api::V1
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = current_account.licenses.find params[:id]
 
       Keygen::Store::Request.store[:current_resource] = @license
     end

@@ -21,7 +21,7 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/licenses/1
     def show
-      @license = FindByAliasService.new(@product.licenses, params[:id], aliases: :key).call
+      @license = @product.licenses.find params[:id]
       authorize @license
 
       render jsonapi: @license

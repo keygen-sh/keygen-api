@@ -18,7 +18,7 @@ module Api::V1::Machines::Relationships
     private
 
     def set_machine
-      @machine = FindByAliasService.new(current_account.machines, params[:machine_id], aliases: :fingerprint).call
+      @machine = current_account.machines.find params[:machine_id]
       authorize @machine, :show?
 
       Keygen::Store::Request.store[:current_resource] = @machine
