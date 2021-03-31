@@ -95,7 +95,7 @@ class RequestLimitsReportWorker
       rescue => e
         account.touch(:last_license_limit_exceeded_sent_at, :last_request_limit_exceeded_sent_at) rescue nil
 
-        Keygen.logger.exception(e)
+        Rails.logger.error(e)
       end
 
       reports << report
