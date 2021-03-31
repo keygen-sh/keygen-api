@@ -1,7 +1,7 @@
 class PruneWebhookEventsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :cron, lock: :until_executed
+  sidekiq_options queue: :cron, unique: :until_executed
 
   def perform
     accounts = Account.joins(:webhook_events)

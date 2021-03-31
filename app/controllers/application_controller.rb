@@ -25,6 +25,7 @@ class ApplicationController < ActionController::API
   }
   rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
   rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
+  rescue_from ActiveModel::ForbiddenAttributesError, with: -> { render_bad_request }
   rescue_from ActiveModel::RangeError, with: -> { render_bad_request detail: "integer is too large" }
   rescue_from ActiveRecord::StatementInvalid, with: -> (err) {
     # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
@@ -58,6 +59,7 @@ class ApplicationController < ActionController::API
       render_not_found
     end
   }
+  rescue_from JSON::ParserError, with: -> { render_bad_request }
   rescue_from ArgumentError, with: -> (err) {
     case err.message
     when /invalid byte sequence in UTF-8/,
