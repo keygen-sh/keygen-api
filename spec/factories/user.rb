@@ -7,10 +7,10 @@ FactoryGirl.define do
     email { [SecureRandom.hex(4), Faker::Internet.safe_email].join('') }
     password "password"
 
-    account nil
+    association :account
 
     after :build do |user, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account or create :account
 
       user.assign_attributes(
         account: account
