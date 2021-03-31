@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ErrorsController < ApplicationController
-  STATUS_CODES = Rack::Utils::HTTP_STATUS_CODES.transform_values { |v| v.encode('utf-8') }
+  STATUS_CODES = Rack::Utils::HTTP_STATUS_CODES
 
   before_action :set_status
 
