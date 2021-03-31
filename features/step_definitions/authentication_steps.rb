@@ -4,8 +4,8 @@ TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq
 
 World Rack::Test::Methods
 
-Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |role, id|
-  account = FindByAliasService.new(Account, id, aliases: :slug).call
+Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |role, slug|
+  account = Account.find slug
   @bearer =
     case role
     when "admin", "user", "developer", "sales agent", "support agent"

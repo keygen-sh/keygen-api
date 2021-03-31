@@ -83,7 +83,14 @@ module Api::V1
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:id].downcase, aliases: :email).call
+      @user =
+        if params[:id] =~ UUID_REGEX
+          current_account.users.find_by id: params[:id]
+        else
+          current_account.users.find_by email: params[:id].downcase
+        end
+
+      raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) if @user.nil?
 
       Keygen::Store::Request.store[:current_resource] = @user
     end

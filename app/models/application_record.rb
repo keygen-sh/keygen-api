@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
+TEST_ENV = "test".freeze
+
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
-
-  EXCLUDED_ALIASES = %w[actions action].freeze
-  TEST_ENV = "test".freeze
 
   default_scope -> {
     # FIXME(ezekg) It's easier to test things when sort order to ASC
