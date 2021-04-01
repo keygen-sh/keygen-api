@@ -5,14 +5,14 @@ class PruneMetricsWorker
 
   def perform
     accounts = Account.joins(:metrics)
-                      .where('metrics.created_at < ?', 90.days.ago)
+                      .where('metrics.created_at < ?', 60.days.ago)
                       .group('accounts.id')
                       .having('count(metrics.id) > 0')
 
     accounts.find_each do |account|
       loop do
         metrics = account.metrics
-                         .where('created_at < ?', 90.days.ago.beginning_of_day)
+                         .where('created_at < ?', 60.days.ago.beginning_of_day)
 
         count = metrics.limit(1_000)
                        .delete_all
