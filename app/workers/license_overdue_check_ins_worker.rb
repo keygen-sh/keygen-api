@@ -20,7 +20,7 @@ class LicenseOverdueCheckInsWorker
     ]
 
     License.preload(:account, :policy).joins(:policy).where(query, require_check_in: true, start_date: 3.days.ago, end_date: 3.days.from_now).find_each do |license|
-      next if license.expired?
+      next if license.expired? || license.account.nil? || license.policy.nil?
 
       case
       when license.check_in_overdue?
