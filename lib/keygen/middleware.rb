@@ -302,6 +302,20 @@ module Keygen
             }]
           }.to_json]
         ]
+      rescue ActionDispatch::Http::MimeNegotiation::InvalidType
+        [
+          400,
+          {
+            "Content-Type" => "application/vnd.api+json",
+          },
+          [{
+            errors: [{
+              title: "Bad request",
+              detail: "The content type of the request is not acceptable (check content-type header)",
+              code: "CONTENT_TYPE_INVALID"
+            }]
+          }.to_json]
+        ]
       end
     end
 
