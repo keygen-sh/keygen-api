@@ -4224,3 +4224,38 @@ Feature: License validation actions
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license key using an invalid content type
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "xml-license-key"
+      }
+      """
+    And I send the following headers:
+      """
+      { "content-type": "vnd.api+xml" }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      <validation>
+        <meta>
+          <key>xml-license-key</key>
+        </meta>
+      </validation>
+      """
+   Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The content type of the request is not acceptable (check content-type header)",
+        "code": "CONTENT_TYPE_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
