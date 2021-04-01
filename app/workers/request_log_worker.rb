@@ -8,7 +8,7 @@ class RequestLogWorker
   sidekiq_options queue: :logs
 
   def perform(account_id, req, res)
-    @account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
+    account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
       Account.find account_id
     end
 
@@ -36,8 +36,4 @@ class RequestLogWorker
   rescue Keygen::Error::NotFoundError
     # Skip logging requests for accounts that do not exist
   end
-
-  private
-
-  attr_reader :account
 end

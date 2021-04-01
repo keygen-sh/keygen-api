@@ -8,10 +8,10 @@ class RecordMetricWorker
   sidekiq_options queue: :metrics
 
   def perform(event, account_id, resource_type, resource_id)
-    event_type = Rails.cache.fetch(EventType.cache_key(event), expires_in: 1.day) do
+    event_type = Rails.cache.fetch(EventType.cache_key(event), skip_nil: true, expires_in: 1.day) do
       EventType.find_or_create_by! event: event
     end
-    account = Rails.cache.fetch(Account.cache_key(account_id), expires_in: 15.minutes) do
+    account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
       Account.find account_id
     end
 
