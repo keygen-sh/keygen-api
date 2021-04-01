@@ -32,14 +32,14 @@ class TokenAuthenticationService < BaseService
       end
     when "v2"
       digest = OpenSSL::HMAC.hexdigest "SHA512", account.private_key, token
-      tok = Rails.cache.fetch(cache_key(digest), expires_in: 15.minutes) do
+      tok = Rails.cache.fetch(cache_key(digest), skip_nil: true, expires_in: 15.minutes) do
         account.tokens.find_by digest: digest
       end
 
       tok
     when "v3"
       digest = OpenSSL::HMAC.hexdigest "SHA256", account.secret_key, token
-      tok = Rails.cache.fetch(cache_key(digest), expires_in: 15.minutes) do
+      tok = Rails.cache.fetch(cache_key(digest), skip_nil: true, expires_in: 15.minutes) do
         account.tokens.find_by digest: digest
       end
 
