@@ -59,6 +59,8 @@ describe CreateWebhookEventService do
         WebhookEvent: SerializableWebhookEvent,
         Metric: SerializableMetric,
         SecondFactor: SerializableSecondFactor,
+        Entitlement: SerializableEntitlement,
+        LicenseEntitlement: SerializableLicenseEntitlement,
         Error: SerializableError
       }
     }

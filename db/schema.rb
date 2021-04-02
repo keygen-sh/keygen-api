@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your
-# database schema. If you need to create the application database on another
-# system, you should be using db:schema:load, not running all the migrations
-# from scratch. The latter is a flawed and unsustainable approach (the more migrations
-# you'll amass, the slower it'll run and the greater likelihood for issues).
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_23_152738) do
+ActiveRecord::Schema.define(version: 2021_04_02_200646) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -59,6 +59,16 @@ ActiveRecord::Schema.define(version: 2021_03_23_152738) do
     t.index ["subscription_id", "created_at"], name: "index_billings_on_subscription_id_and_created_at"
   end
 
+  create_table "entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name", null: false
+    t.string "code", null: false
+    t.jsonb "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "code"], name: "index_entitlements_on_account_id_and_code", unique: true
+  end
+
   create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "event"
     t.datetime "created_at", null: false
@@ -78,6 +88,17 @@ ActiveRecord::Schema.define(version: 2021_03_23_152738) do
     t.index ["created_at"], name: "index_keys_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_keys_on_id_and_created_at_and_account_id", unique: true
     t.index ["policy_id", "created_at"], name: "index_keys_on_policy_id_and_created_at"
+  end
+
+  create_table "license_entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "license_id", null: false
+    t.uuid "entitlement_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "license_id", "entitlement_id"], name: "license_entitlements_acct_lic_ent_ids_idx", unique: true
+    t.index ["entitlement_id"], name: "index_license_entitlements_on_entitlement_id"
+    t.index ["license_id"], name: "index_license_entitlements_on_license_id"
   end
 
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -256,11 +277,9 @@ ActiveRecord::Schema.define(version: 2021_03_23_152738) do
     t.index "to_tsvector('simple'::regconfig, (request_id)::text)", name: "request_logs_tsv_request_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, (requestor_id)::text)", name: "request_logs_tsv_requestor_id_idx", using: :gin
     t.index "to_tsvector('simple'::regconfig, (resource_id)::text)", name: "request_logs_tsv_resource_id_idx", using: :gin
-    t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
-    t.index ["request_id", "created_at"], name: "index_request_logs_on_request_id_and_created_at", unique: true
     t.index ["requestor_id", "requestor_type", "created_at"], name: "request_logs_requestor_idx"
     t.index ["resource_id", "resource_type", "created_at"], name: "request_logs_resource_idx"
-    t.index ["url"], name: "request_logs_tsv_url_idx", using: :gin
+    t.index ["url"], name: "index_request_logs_on_url", using: :gin
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

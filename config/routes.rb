@@ -94,6 +94,7 @@ Rails.application.routes.draw do
         #             arbitrary string.
         resources "licenses", constraints: { id: /[^\/]*/ } do
           scope module: "licenses/relationships" do
+            resources "entitlements", only: [:index, :show, :create, :destroy]
             resources "machines", only: [:index, :show]
             resources "tokens", only: [:index, :show]
             resource "product", only: [:show]
@@ -148,6 +149,8 @@ Rails.application.routes.draw do
             end
           end
         end
+
+        resources "entitlements"
 
         resources "webhook_endpoints", path: "webhook-endpoints"
         resources "webhook_events", path: "webhook-events", only: [:index, :show, :destroy] do

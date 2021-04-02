@@ -20,6 +20,7 @@ class Account < ApplicationRecord
   has_many :keys
   has_many :licenses
   has_many :machines
+  has_many :entitlements
   has_one :billing
 
   accepts_nested_attributes_for :users
