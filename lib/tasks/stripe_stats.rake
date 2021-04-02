@@ -340,41 +340,57 @@ module Stripe
     def days_to_convert
       @days_to_convert ||= paid_subscriptions
         .map do |s|
-          invoices = invoices_for(s.customer)
+          customer = s.customer
+          invoices = invoices_for(customer)
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
-          next if first_paid_invoice.nil?
+          payment_method = payment_method_for(customer)
+          next if first_paid_invoice.nil? && payment_method.nil?
 
-          (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+          conversion_at =
+            first_paid_invoice&.status_transitions&.paid_at ||
+            payment_method.created
+          next if conversion_at.nil?
+
+          (Time.at(conversion_at) - Time.at(customer.created)) / 1.day
         end.compact
     end
 
     def days_on_free
       @days_on_free ||= paid_subscriptions
         .map do |s|
-          invoices = invoices_for(s.customer)
+          customer = s.customer
+          invoices = invoices_for(customer)
           next unless invoices.any? { |i|
             i.lines.data.any? { |l| l.price&.product == FREE_TIER_PRODUCT_ID }
           }
 
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
-          next if first_paid_invoice.nil?
+          payment_method = payment_method_for(customer)
+          next if first_paid_invoice.nil? && payment_method.nil?
 
-          (Time.at(first_paid_invoice.status_transitions.paid_at) - Time.at(s.customer.created)) / 1.day
+          conversion_at =
+            first_paid_invoice&.status_transitions&.paid_at ||
+            payment_method.created
+          next if conversion_at.nil?
+
+          (Time.at(conversion_at) - Time.at(customer.created)) / 1.day
         end.compact
     end
 
     def latest_converted_free_user
       @latest_converted_free_user ||= paid_subscriptions
         .map do |s|
-          invoices = invoices_for(s.customer)
+          customer = s.customer
+          invoices = invoices_for(customer)
           next unless invoices.any? { |i|
             i.lines.data.any? { |l| l.price&.product == FREE_TIER_PRODUCT_ID }
           }
 
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
-          next if first_paid_invoice.nil?
+          payment_method = payment_method_for(customer)
+          next if first_paid_invoice.nil? && payment_method.nil?
 
-          s.customer
+          customer
         end.compact.last
     end
 
@@ -383,9 +399,9 @@ module Stripe
         .map do |s|
           customer = s.customer
           invoices = invoices_for(customer)
-          has_added_payment_method = customer.default_source.present? || customer.invoice_settings.default_payment_method.present?
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
-          next if first_paid_invoice.nil? && !has_added_payment_method
+          payment_method = payment_method_for(customer)
+          next if first_paid_invoice.nil? && payment_method.nil?
 
           customer
         end.compact.last
@@ -437,6 +453,10 @@ module Stripe
       (end_date - start_date) / 1.month
     end
 
+    def payment_method_for(customer)
+      customer.invoice_settings.default_payment_method.presence || customer.default_source
+    end
+
     def invoices_for(resource)
       @invoices_for ||= {}
 
@@ -446,9 +466,9 @@ module Stripe
             invoices =
               case resource.object
               when 'subscription'
-                Stripe::Invoice.list(subscription: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
+                Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
               when 'customer'
-                Stripe::Invoice.list(customer: resource.id, expand: ['data.subscription'], limit: 100).auto_paging_each.to_a
+                Stripe::Invoice.list(customer: resource.id, limit: 100).auto_paging_each.to_a
               else
                 []
               end
@@ -465,7 +485,7 @@ module Stripe
       @subscriptions ||= to_struct(
         JSON.parse(
           cache.fetch('stripe:stats:subscriptions', raw: true, expires_in: 2.days) do
-            Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer'])
+            Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer', 'data.customer.default_source', 'data.customer.invoice_settings.default_payment_method'])
               .auto_paging_each
               .to_a
               .filter { |s| !s.customer.deleted? }
@@ -484,11 +504,10 @@ module Stripe
         .filter do |s|
           next if s.plan.product == FREE_TIER_PRODUCT_ID
 
-          invoices = invoices_for(s)
+          customer = s.customer
+          invoices = invoices_for(customer)
 
-          invoices.any? { |i| i.amount_paid > 0 } ||
-            s.customer.default_source.present? ||
-            s.customer.invoice_settings.default_payment_method.present?
+          invoices.any? { |i| i.amount_paid > 0 } || payment_method_for(customer).present?
         end
     end
 
@@ -496,11 +515,18 @@ module Stripe
       @new_paid_subscriptions ||= paid_subscriptions.filter do |s|
         next if s.plan.product == FREE_TIER_PRODUCT_ID
 
-        invoices = invoices_for(s)
+        customer = s.customer
+        invoices = invoices_for(customer)
         first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
-        next if first_paid_invoice.nil?
+        payment_method = payment_method_for(customer)
+        next if first_paid_invoice.nil? && payment_method.nil?
 
-        first_paid_invoice.status_transitions.paid_at >= START_DATE
+        conversion_at =
+          first_paid_invoice&.status_transitions&.paid_at ||
+          payment_method.created
+        next if conversion_at.nil?
+
+        conversion_at >= START_DATE
       end
     end
 
@@ -523,19 +549,19 @@ module Stripe
     def churned_subscriptions
       @churned_subscriptions ||= canceled_subscriptions
         .filter { |s| s.canceled_at >= START_DATE || s.ended_at >= START_DATE }
-        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+        .filter { |s| payment_method_for(s.customer).present? }
     end
 
     def at_risk_subscriptions
       @at_risk_subscriptions ||= subscriptions
         .filter { |s| s.status == 'past_due' }
-        .filter { |s| !s.customer.default_source.present? && !s.customer.invoice_settings.default_payment_method.present? }
+        .filter { |s| !payment_method_for(s.customer).present? }
     end
 
     def converted_subscriptions
       @converted_subscriptions ||= subscriptions
         .filter { |s| s.status == 'active' || s.status == 'trialing' || s.status == 'canceled' }
-        .filter { |s| s.customer.default_source.present? || s.customer.invoice_settings.default_payment_method.present? }
+        .filter { |s| payment_method_for(s.customer).present? }
         .filter do |s|
           next if s.plan.product == FREE_TIER_PRODUCT_ID
 
@@ -603,7 +629,7 @@ module Stripe
 
     def trialing_users_with_payment_method
       @trialing_users_with_payment_method ||= trialing_users
-        .filter { |c| c.default_source.present? || c.invoice_settings.default_payment_method.present? }
+        .filter { |c| payment_method_for(c).present? }
     end
 
     def free_users
