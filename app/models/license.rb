@@ -21,6 +21,8 @@ class License < ApplicationRecord
   belongs_to :account
   belongs_to :user
   belongs_to :policy
+  has_many :license_entitlements, dependent: :delete_all
+  has_many :entitlements, -> { readonly }, through: :license_entitlements
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
   has_one :product, through: :policy

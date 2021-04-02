@@ -114,6 +114,12 @@ class SerializableLicense < SerializableBase
     end
   end
 
+  relationship :entitlements do
+    link :related do
+      @url_helpers.v1_account_license_entitlements_path @object.account_id, @object
+    end
+  end
+
   link :self do
     @url_helpers.v1_account_license_path @object.account_id, @object
   end
