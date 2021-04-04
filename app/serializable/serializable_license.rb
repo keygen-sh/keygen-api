@@ -115,6 +115,7 @@ class SerializableLicense < SerializableBase
   end
 
   relationship :entitlements do
+    linkage always: true
     link :related do
       @url_helpers.v1_account_license_entitlements_path @object.account_id, @object
     end
