@@ -127,6 +127,7 @@ Rails.application.routes.draw do
 
         resources "policies" do
           scope module: "policies/relationships" do
+            resources "entitlements", only: [:index, :show, :create, :destroy]
             resources "pool", only: [:index, :show], as: "keys" do
               collection do
                 delete "/", to: "pool#pop", as: "pop"

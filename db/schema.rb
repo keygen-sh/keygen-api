@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_02_200646) do
+ActiveRecord::Schema.define(version: 2021_04_02_221345) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -226,6 +226,17 @@ ActiveRecord::Schema.define(version: 2021_04_02_200646) do
     t.index ["created_at"], name: "index_policies_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_policies_on_id_and_created_at_and_account_id", unique: true
     t.index ["product_id", "created_at"], name: "index_policies_on_product_id_and_created_at"
+  end
+
+  create_table "policy_entitlements", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "policy_id", null: false
+    t.uuid "entitlement_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "policy_id", "entitlement_id"], name: "policy_entitlements_acct_lic_ent_ids_idx", unique: true
+    t.index ["entitlement_id"], name: "index_policy_entitlements_on_entitlement_id"
+    t.index ["policy_id"], name: "index_policy_entitlements_on_policy_id"
   end
 
   create_table "products", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

@@ -40,6 +40,8 @@ class Policy < ApplicationRecord
   has_many :licenses, dependent: :destroy
   has_many :machines, through: :licenses
   has_many :pool, class_name: "Key", dependent: :destroy
+  has_many :policy_entitlements, dependent: :delete_all
+  has_many :entitlements, -> { readonly }, through: :policy_entitlements
 
   # Default to legacy encryption scheme so that we don't break backwards compat
   before_validation -> { self.scheme = 'LEGACY_ENCRYPT' }, on: :create, if: -> { encrypted? && scheme.nil? }

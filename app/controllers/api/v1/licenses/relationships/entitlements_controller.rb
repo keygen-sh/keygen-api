@@ -8,47 +8,47 @@ module Api::V1::Licenses::Relationships
     before_action :set_license
 
     def index
-      @license_entitlements = policy_scope apply_scopes(@license.license_entitlements)
-      authorize @license_entitlements
+      @entitlements = policy_scope apply_scopes(@license.license_entitlements)
+      authorize @entitlements
 
-      render jsonapi: @license_entitlements
+      render jsonapi: @entitlements
     end
 
     def show
-      @license_entitlement = @license.license_entitlements.find params[:id]
-      authorize @license_entitlement
+      @entitlement = @license.license_entitlements.find params[:id]
+      authorize @entitlement
 
-      render jsonapi: @license_entitlement
+      render jsonapi: @entitlement
     end
 
     def create
-      @license_entitlement = @license.license_entitlements.new entitlement_params.merge(account: current_account)
-      authorize @license_entitlement
+      @entitlement = @license.license_entitlements.new entitlement_params.merge(account: current_account)
+      authorize @entitlement
 
-      if @license_entitlement.save
+      if @entitlement.save
         CreateWebhookEventService.new(
           event: 'license.entitlement.created',
           account: current_account,
-          resource: @license_entitlement
+          resource: @entitlement
         ).execute
 
-        render jsonapi: @license_entitlement, status: :created, location: v1_account_license_entitlement_url(@license_entitlement.account, @license_entitlement.license, @license_entitlement)
+        render jsonapi: @entitlement, status: :created, location: v1_account_license_entitlement_url(@entitlement.account, @entitlement.license, @entitlement)
       else
-        render_unprocessable_resource @license_entitlement
+        render_unprocessable_resource @entitlement
       end
     end
 
     def destroy
-      @license_entitlement = @license.license_entitlements.find params[:id]
-      authorize @license_entitlement
+      @entitlement = @license.license_entitlements.find params[:id]
+      authorize @entitlement
 
       CreateWebhookEventService.new(
         event: 'license.entitlement.deleted',
         account: current_account,
-        resource: @license_entitlement
+        resource: @entitlement
       ).execute
 
-      @license_entitlement.destroy
+      @entitlement.destroy
     end
 
     private
