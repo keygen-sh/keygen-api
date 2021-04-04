@@ -22,7 +22,7 @@ class License < ApplicationRecord
   belongs_to :user
   belongs_to :policy
   has_many :license_entitlements, dependent: :delete_all
-  has_many :entitlements, -> { readonly }, through: :license_entitlements
+  has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
   has_one :product, through: :policy
@@ -121,6 +121,18 @@ class License < ApplicationRecord
   delegate :scheme?, to: :policy
   delegate :scheme, to: :policy
   delegate :pool?, to: :policy
+
+  def entitlements
+    entl = policy_entitlements.includes(:entitlement) + license_entitlements.includes(:entitlement)
+
+    entl.map(&:entitlement)
+  end
+
+  def entitlement_ids
+    entl = policy_entitlements + license_entitlements
+
+    entl.map(&:entitlement_id)
+  end
 
   def protected?
     return policy.protected? if protected.nil?

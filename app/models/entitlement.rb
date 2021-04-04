@@ -6,7 +6,7 @@ class Entitlement < ApplicationRecord
 
   belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
-  has_many :licenses, -> { readonly }, through: :license_entitlements
+  has_many :policy_entitlements, dependent: :delete_all
 
   validates :account, presence: { message: 'must exist' }
 
