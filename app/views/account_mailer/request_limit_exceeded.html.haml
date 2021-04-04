@@ -8,15 +8,27 @@
   If this request count seems off or unexpected, please ensure that your software is working
   as intended and is not making superfluous API requests.
 %p
-  Here are a few tips that may help:
+  To reduce your API request volume, there are a few things you could do:
 %ul
-  %li Reduce the number of API requests by #{link_to 'caching validation requests', 'https://github.com/keygen-sh/example-validation-caching'} locally, when possible.
-  %li If you're currently running #{link_to 'automated CI/CD tests', 'https://keygen.sh/docs/api/#testing'} against our API, mock our API instead.
-  %li Lower the frequency at which you revalidate licenses, when possible.
-  %li Talk to us about a separate sandbox account, for development purposes.
+  %li
+    Reduce the number of API requests by #{link_to 'caching validation requests', 'https://github.com/keygen-sh/example-validation-caching'}
+    locally, when possible.
+  %li
+    If you're currently running #{link_to 'automated CI/CD tests', 'https://keygen.sh/docs/api/#testing'}
+    against our API, mock our API instead.
+  %li
+    Instead of sending a GET request for webhook events, you can verify the signature of the webhook event
+    request body. Here’s #{link_to 'an example', 'https://github.com/keygen-sh/example-webhook-handler/blob/master/index.js#L24-L41'}
+    of that, and #{link_to 'here are the docs', 'https://keygen.sh/docs/api/#request-signatures'}.
+  %li
+    Update your webhook endpoint to only subscribe to events that you care about.
+  %li
+    Lower the frequency at which you revalidate licenses, when possible.
+  %li
+    Talk to us about a separate sandbox account, for development purposes.
 %p
   If we see this usage trend continue over the next 2 weeks, we will automatically upgrade your
   account to the next appropriate tier to support your current request volume. If this was just
   an occasional spike in volume, no worries, and no need to upgrade yet!
 %p
-  Let me know if you have any questions about this! (You can respond to this email directly.)
+  If you have any questions about this, just hit reply! Happy to help.
