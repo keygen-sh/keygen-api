@@ -410,7 +410,7 @@ Feature: License entitlements relationship
       """
       {
         "title": "Access denied",
-        "detail": "cannot detach entitlement '$entitlements[1]' granted by policy",
+        "detail": "cannot detach entitlement '$entitlements[1]' (entitlement is attached through policy)",
         "source": {
           "pointer": "/data/1/id"
         }
