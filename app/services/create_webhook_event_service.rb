@@ -27,6 +27,8 @@ class CreateWebhookEventService < BaseService
         WebhookEvent: SerializableWebhookEvent,
         Metric: SerializableMetric,
         SecondFactor: SerializableSecondFactor,
+        LicenseEntitlement: SerializableLicenseEntitlement,
+        PolicyEntitlement: SerializablePolicyEntitlement,
         Entitlement: SerializableEntitlement,
         Error: SerializableError
       }

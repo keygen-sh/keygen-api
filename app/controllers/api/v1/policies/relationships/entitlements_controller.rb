@@ -34,13 +34,13 @@ module Api::V1::Policies::Relationships
       @policy_entitlements.transaction do
         attached = @policy_entitlements.create!(entitlements)
 
-        attached.each do |policy_entitlement|
-          CreateWebhookEventService.new(
-            event: 'policy.entitlement.attached',
-            account: current_account,
-            resource: policy_entitlement.entitlement
-          ).execute
-        end
+        CreateWebhookEventService.new(
+          event: 'policy.entitlements.attached',
+          account: current_account,
+          resource: attached
+        ).execute
+
+        render jsonapi: attached
       end
     end
 
@@ -64,13 +64,11 @@ module Api::V1::Policies::Relationships
       @policy_entitlements.transaction do
         detached = @policy_entitlements.delete(entitlements)
 
-        detached.each do |policy_entitlement|
-          CreateWebhookEventService.new(
-            event: 'policy.entitlement.detached',
-            account: current_account,
-            resource: policy_entitlement.entitlement
-          ).execute
-        end
+        CreateWebhookEventService.new(
+          event: 'policy.entitlements.detached',
+          account: current_account,
+          resource: detached
+        ).execute
       end
     end
 
