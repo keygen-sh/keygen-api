@@ -123,9 +123,13 @@ class License < ApplicationRecord
   delegate :pool?, to: :policy
 
   def entitlements
-    entl = policy_entitlements.includes(:entitlement) + license_entitlements.includes(:entitlement)
+    entl = Entitlement.where(account_id: account_id)
 
-    entl.map(&:entitlement)
+    entl.left_outer_joins(:policy_entitlements, :license_entitlements)
+        .where(policy_entitlements: { policy_id: policy_id })
+        .or(
+          entl.where(license_entitlements: { license_id: id })
+        )
   end
 
   def entitlement_ids

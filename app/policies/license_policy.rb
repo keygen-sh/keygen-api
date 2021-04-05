@@ -120,6 +120,30 @@ class LicensePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def attach_entitlement?
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
+  end
+
+  def detach_entitlement?
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
+  end
+
+  def list_entitlements?
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.user == bearer ||
+      resource.product == bearer ||
+      resource == bearer
+  end
+
+  def show_entitlement?
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.user == bearer ||
+      resource.product == bearer ||
+      resource == bearer
+  end
+
   def me?
     resource == bearer
   end
