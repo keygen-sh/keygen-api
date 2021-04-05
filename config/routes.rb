@@ -94,12 +94,17 @@ Rails.application.routes.draw do
         #             arbitrary string.
         resources "licenses", constraints: { id: /[^\/]*/ } do
           scope module: "licenses/relationships" do
-            resources "entitlements", only: [:index, :show, :create, :destroy]
             resources "machines", only: [:index, :show]
             resources "tokens", only: [:index, :show]
             resource "product", only: [:show]
             resource "policy", only: [:show, :update]
             resource "user", only: [:show, :update]
+            resources "entitlements", only: [:index, :show] do
+              collection do
+                post "/", to: "entitlements#attach", as: "attach"
+                delete "/", to: "entitlements#detach", as: "detach"
+              end
+            end
             member do
               post "tokens", to: "tokens#generate"
             end
@@ -127,7 +132,6 @@ Rails.application.routes.draw do
 
         resources "policies" do
           scope module: "policies/relationships" do
-            resources "entitlements", only: [:index, :show, :create, :destroy]
             resources "pool", only: [:index, :show], as: "keys" do
               collection do
                 delete "/", to: "pool#pop", as: "pop"
@@ -135,6 +139,12 @@ Rails.application.routes.draw do
             end
             resources "licenses", only: [:index, :show]
             resource "product", only: [:index, :show]
+            resources "entitlements", only: [:index, :show] do
+              collection do
+                post "/", to: "entitlements#attach", as: "attach"
+                delete "/", to: "entitlements#detach", as: "detach"
+              end
+            end
           end
         end
 

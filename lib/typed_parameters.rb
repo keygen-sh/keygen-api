@@ -334,11 +334,10 @@ class TypedParameters
       private
 
       def _transform_parameters!(parameters)
-        # TODO: Handle meta here as well?
-        parameters.inject(HashWithIndifferentAccess.new) do |hash, (_, data)|
-          hash.merge! data.slice(:id)
-          hash.merge! data.fetch(:attributes, {})
-          hash.merge! data.fetch(:relationships, nil)&.map { |key, rel|
+        transformer = -> (params, data) {
+          params.merge! data.slice(:id)
+          params.merge! data.fetch(:attributes, {})
+          params.merge! data.fetch(:relationships, nil)&.map { |key, rel|
             dat = rel.fetch :data, nil
             next if dat.nil?
 
@@ -349,6 +348,16 @@ class TypedParameters
               _transform_data_hash! dat
             end
           }&.compact&.reduce(:merge) || {}
+        }
+
+        # TODO: Handle meta here as well?
+        parameters.inject(HashWithIndifferentAccess.new) do |params, (_, data)|
+          case data
+          when Array
+            data.map { |d| transformer.call(params, d) }
+          when Hash
+            transformer.call(params, data)
+          end
         end
       end
 
