@@ -24,6 +24,8 @@ class Metric < ApplicationRecord
     policy.updated
     policy.deleted
     policy.pool.popped
+    policy.entitlements.attached
+    policy.entitlements.detached
     license.created
     license.updated
     license.deleted
@@ -43,6 +45,8 @@ class Metric < ApplicationRecord
     license.reinstated
     license.policy.updated
     license.user.updated
+    license.entitlements.attached
+    license.entitlements.detached
     machine.created
     machine.updated
     machine.deleted
@@ -55,6 +59,9 @@ class Metric < ApplicationRecord
     token.generated
     token.regenerated
     token.revoked
+    entitlement.created
+    entitlement.updated
+    entitlement.deleted
   ].freeze
 
   belongs_to :account
