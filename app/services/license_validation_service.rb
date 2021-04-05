@@ -72,6 +72,12 @@ class LicenseValidationService < BaseService
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
       end
+      # Check against entitlement scope requirements
+      if scope.present? && scope.key?(:entitlements)
+        entitlements = scope[:entitlements]
+
+        return [false, "does not have all entitlements", :ENTITLEMENTS_NOT_MET] if license.entitlements.where(code: entitlements).count != entitlements.size
+      end
     end
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
     return [true, "is valid", :VALID] if !license.policy.strict?
