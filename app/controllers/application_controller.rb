@@ -18,7 +18,9 @@ class ApplicationController < ActionController::API
   rescue_from Keygen::Error::UnauthorizedError, with: -> (err) { render_unauthorized code: err.code }
   rescue_from Keygen::Error::NotFoundError, with: -> (err) {
     if err.model.present? && err.id.present?
-      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{err.id}' was not found"
+      id = Array.wrap(err.id).first
+
+      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{id}' was not found"
     else
       render_not_found
     end
@@ -53,7 +55,9 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
   rescue_from ActiveRecord::RecordNotFound, with: -> (err) {
     if err.model.present? && err.id.present?
-      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{err.id}' was not found"
+      id = Array.wrap(err.id).first
+
+      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{id}' was not found"
     else
       render_not_found
     end

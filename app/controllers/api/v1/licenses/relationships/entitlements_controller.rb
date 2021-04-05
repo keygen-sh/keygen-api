@@ -8,47 +8,70 @@ module Api::V1::Licenses::Relationships
     before_action :set_license
 
     def index
-      @entitlements = policy_scope apply_scopes(@license.license_entitlements)
+      authorize @license, :list_entitlements?
+
+      @entitlements = policy_scope apply_scopes(@license.entitlements)
       authorize @entitlements
 
       render jsonapi: @entitlements
     end
 
     def show
-      @entitlement = @license.license_entitlements.find params[:id]
-      authorize @entitlement
+      authorize @license, :show_entitlement?
+      @entitlement = @license.entitlements.find params[:id]
 
       render jsonapi: @entitlement
     end
 
-    def create
-      @entitlement = @license.license_entitlements.new entitlement_params.merge(account: current_account)
-      authorize @entitlement
+    def attach
+      authorize @license, :attach_entitlement?
+      @license_entitlements = @license.license_entitlements
 
-      if @entitlement.save
-        CreateWebhookEventService.new(
-          event: 'license.entitlement.created',
-          account: current_account,
-          resource: @entitlement
-        ).execute
+      entitlements = entitlement_params.fetch(:data).map do |entitlement|
+        entitlement.merge(account_id: current_account.id)
+      end
 
-        render jsonapi: @entitlement, status: :created, location: v1_account_license_entitlement_url(@entitlement.account, @entitlement.license, @entitlement)
-      else
-        render_unprocessable_resource @entitlement
+      @license_entitlements.transaction do
+        attached = @license_entitlements.create!(entitlements)
+
+        attached.each do |license_entitlement|
+          CreateWebhookEventService.new(
+            event: 'license.entitlement.attached',
+            account: current_account,
+            resource: license_entitlement.entitlement
+          ).execute
+        end
       end
     end
 
-    def destroy
-      @entitlement = @license.license_entitlements.find params[:id]
-      authorize @entitlement
+    def detach
+      authorize @license, :detach_entitlement?
+      @license_entitlements = @license.license_entitlements
 
-      CreateWebhookEventService.new(
-        event: 'license.entitlement.deleted',
-        account: current_account,
-        resource: @entitlement
-      ).execute
+      entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
+      entitlements = @license_entitlements.where(entitlement_id: entitlement_ids)
 
-      @entitlement.destroy
+      if entitlements.size != entitlement_ids.size
+        entitlement_ids_not_found = entitlement_ids - entitlements.collect(&:entitlement_id)
+
+        entitlements.raise_record_not_found_exception!(
+          entitlement_ids_not_found,
+          entitlements.size,
+          entitlement_ids.size
+        )
+      end
+
+      @license_entitlements.transaction do
+        detached = @license_entitlements.delete(entitlements)
+
+        detached.each do |license_entitlement|
+          CreateWebhookEventService.new(
+            event: 'license.entitlement.detached',
+            account: current_account,
+            resource: license_entitlement.entitlement
+          ).execute
+        end
+      end
     end
 
     private
@@ -59,19 +82,27 @@ module Api::V1::Licenses::Relationships
       Keygen::Store::Request.store[:current_resource] = @license
     end
 
-    typed_parameters transform: true do
+    typed_parameters do
       options strict: true
 
-      on :create do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[license.entitlement license.entitlements]
-          param :relationships, type: :hash do
-            param :entitlement, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[entitlement entitlements]
-                param :id, type: :string
-              end
-            end
+      on :attach do
+        param :data, type: :array do
+          items type: :hash do
+            param :type, type: :string, inclusion: %w[entitlement entitlements], transform: -> (k, v) { [] }
+            param :id, type: :string, transform: -> (k, v) {
+              [:entitlement_id, v]
+            }
+          end
+        end
+      end
+
+      on :detach do
+        param :data, type: :array do
+          items type: :hash do
+            param :type, type: :string, inclusion: %w[entitlement entitlements], transform: -> (k, v) { [] }
+            param :id, type: :string, transform: -> (k, v) {
+              [:entitlement_id, v]
+            }
           end
         end
       end
