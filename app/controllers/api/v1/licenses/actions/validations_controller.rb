@@ -142,6 +142,9 @@ module Api::V1::Licenses::Actions
             param :fingerprints, type: :array, optional: true do
               items type: :string
             end
+            param :entitlements, type: :array, optional: true do
+              items type: :string
+            end
           end
         end
       end
@@ -158,6 +161,9 @@ module Api::V1::Licenses::Actions
             param :machine, type: :string, optional: true
             param :fingerprint, type: :string, optional: true
             param :fingerprints, type: :array, optional: true do
+              items type: :string
+            end
+            param :entitlements, type: :array, optional: true do
               items type: :string
             end
           end
