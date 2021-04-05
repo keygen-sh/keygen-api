@@ -65,7 +65,7 @@ module Api::V1::Licenses::Relationships
           forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
 
           return render_forbidden(
-            detail: "cannot detach entitlement '#{forbidden_entitlement_id}' granted by policy",
+            detail: "cannot detach entitlement '#{forbidden_entitlement_id}' (entitlement is attached through policy)",
             source: {
               pointer: "/data/#{forbidden_idx}/id"
             }
