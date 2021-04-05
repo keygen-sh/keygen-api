@@ -21,6 +21,8 @@ class Account < ApplicationRecord
   has_many :licenses
   has_many :machines
   has_many :entitlements
+  has_many :policy_entitlements
+  has_many :license_entitlements
   has_one :billing
 
   accepts_nested_attributes_for :users

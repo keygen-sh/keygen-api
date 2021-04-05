@@ -361,6 +361,32 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
   m.save validate: false
 end
 
+Given /^the (first|second|third|fourth|fifth) "license" has the following policy entitlements:$/ do |named_index, body|
+  parse_placeholders! body
+
+  license = @account.licenses.send(named_index)
+  codes = JSON.parse(body)
+
+  codes.each do |code|
+    entitlement = create(:entitlement, account: @account, code: code)
+
+    license.policy.policy_entitlements << create(:policy_entitlement, account: @account, policy: license.policy, entitlement: entitlement)
+  end
+end
+
+Given /^the (first|second|third|fourth|fifth) "license" has the following license entitlements:$/ do |named_index, body|
+  parse_placeholders! body
+
+  license = @account.licenses.send(named_index)
+  codes = JSON.parse(body)
+
+  codes.each do |code|
+    entitlement = create(:entitlement, account: @account, code: code)
+
+    license.license_entitlements << create(:license_entitlement, account: @account, license: license, entitlement: entitlement)
+  end
+end
+
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   parse_placeholders! body
 
