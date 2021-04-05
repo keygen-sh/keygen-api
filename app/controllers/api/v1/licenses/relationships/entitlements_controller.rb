@@ -34,13 +34,13 @@ module Api::V1::Licenses::Relationships
       @license_entitlements.transaction do
         attached = @license_entitlements.create!(entitlements)
 
-        attached.each do |license_entitlement|
-          CreateWebhookEventService.new(
-            event: 'license.entitlement.attached',
-            account: current_account,
-            resource: license_entitlement.entitlement
-          ).execute
-        end
+        CreateWebhookEventService.new(
+          event: 'license.entitlements.attached',
+          account: current_account,
+          resource: attached
+        ).execute
+
+        render jsonapi: attached
       end
     end
 
@@ -64,13 +64,11 @@ module Api::V1::Licenses::Relationships
       @license_entitlements.transaction do
         detached = @license_entitlements.delete(entitlements)
 
-        detached.each do |license_entitlement|
-          CreateWebhookEventService.new(
-            event: 'license.entitlement.detached',
-            account: current_account,
-            resource: license_entitlement.entitlement
-          ).execute
-        end
+        CreateWebhookEventService.new(
+          event: 'license.entitlements.detached',
+          account: current_account,
+          resource: detached
+        ).execute
       end
     end
 
