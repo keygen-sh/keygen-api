@@ -54,7 +54,10 @@ module Api::V1::Licenses::Relationships
       @license_entitlements.transaction do
         entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
 
-        # Block policy entitlements from being detached (must be detached from the policy)
+        # Block policy entitlements from being detached. These entitlements need to be detached
+        # via the policy. This request wouldn't succeed since non-existing entitlement IDs are
+        # currently noops, but responding with a 2xx status code is confusing for the end-user,
+        # so we're going to error out early for a better DX.
         if @policy_entitlements.exists?(entitlement_id: entitlement_ids)
           fobidden_entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
           forbidden_entitlement_ids = entitlement_ids & fobidden_entitlements.collect(&:entitlement_id)
