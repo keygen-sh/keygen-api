@@ -46,23 +46,12 @@ module Api::V1::Policies::Relationships
 
     def detach
       authorize @policy, :detach_entitlement?
-      @policy_entitlements = @policy.policy_entitlements
 
       entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
-      entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
+      entitlements = @policy.entitlements.find(entitlement_ids)
 
-      if entitlements.size != entitlement_ids.size
-        entitlement_ids_not_found = entitlement_ids - entitlements.collect(&:entitlement_id)
-
-        entitlements.raise_record_not_found_exception!(
-          entitlement_ids_not_found,
-          entitlements.size,
-          entitlement_ids.size
-        )
-      end
-
-      @policy_entitlements.transaction do
-        detached = @policy_entitlements.delete(entitlements)
+      @policy.policy_entitlements.transaction do
+        detached = @policy.entitlements.delete(entitlements)
 
         CreateWebhookEventService.new(
           event: 'policy.entitlements.detached',
