@@ -180,7 +180,18 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "200"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "already exists",
+        "source": {
+          "pointer": "/data/relationships/entitlement"
+        },
+        "code": "ENTITLEMENT_TAKEN"
+      }
+      """
 
   Scenario: Admin attempts to attach an entitlement to a license that already exists as a license entitlement
     Given I am an admin of account "test1"
