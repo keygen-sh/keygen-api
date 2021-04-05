@@ -19,6 +19,8 @@ EVENT_TYPES = %w[
   policy.updated
   policy.deleted
   policy.pool.popped
+  policy.entitlements.attached
+  policy.entitlements.detached
   license.created
   license.updated
   license.deleted
@@ -39,6 +41,8 @@ EVENT_TYPES = %w[
   license.reinstated
   license.policy.updated
   license.user.updated
+  license.entitlements.attached
+  license.entitlements.detached
   machine.created
   machine.updated
   machine.deleted
@@ -52,6 +56,9 @@ EVENT_TYPES = %w[
   token.generated
   token.regenerated
   token.revoked
+  entitlement.created
+  entitlement.updated
+  entitlement.deleted
   *
 ].freeze
 
