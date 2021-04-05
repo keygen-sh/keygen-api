@@ -21,6 +21,9 @@ PLACEHOLDERS = %w[
   user
   webhook_endpoint
   webhook_event
+  entitlement
+  policy_entitlement
+  license_entitlement
   current
   crypt
   date

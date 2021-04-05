@@ -10,21 +10,22 @@ module Api::V1::Policies::Relationships
     def index
       authorize @policy, :list_entitlements?
 
-      @entitlements = policy_scope apply_scopes(@policy.entitlements)
-      authorize @entitlements
+      @entitlements = apply_scopes(@policy.entitlements)
 
       render jsonapi: @entitlements
     end
 
     def show
       authorize @policy, :show_entitlement?
-      @entitlement = @policy.entitlements.find params[:id]
+
+      @entitlement = @policy.entitlements.find(params[:id])
 
       render jsonapi: @entitlement
     end
 
     def attach
       authorize @policy, :attach_entitlement?
+
       @policy_entitlements = @policy.policy_entitlements
 
       entitlements = entitlement_params.fetch(:data).map do |entitlement|
@@ -47,11 +48,12 @@ module Api::V1::Policies::Relationships
     def detach
       authorize @policy, :detach_entitlement?
 
-      entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
-      entitlements = @policy.entitlements.find(entitlement_ids)
+      @policy_entitlements = @policy.policy_entitlements
 
-      @policy.policy_entitlements.transaction do
-        detached = @policy.entitlements.delete(entitlements)
+      @policy_entitlements.transaction do
+        entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
+        entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
+        detached = @policy_entitlements.delete(entitlements)
 
         CreateWebhookEventService.new(
           event: 'policy.entitlements.detached',

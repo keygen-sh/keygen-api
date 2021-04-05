@@ -10,21 +10,22 @@ module Api::V1::Licenses::Relationships
     def index
       authorize @license, :list_entitlements?
 
-      @entitlements = policy_scope apply_scopes(@license.entitlements)
-      authorize @entitlements
+      @entitlements = apply_scopes(@license.entitlements)
 
       render jsonapi: @entitlements
     end
 
     def show
       authorize @license, :show_entitlement?
-      @entitlement = @license.entitlements.find params[:id]
+
+      @entitlement = @license.entitlements.find(params[:id])
 
       render jsonapi: @entitlement
     end
 
     def attach
       authorize @license, :attach_entitlement?
+
       @license_entitlements = @license.license_entitlements
 
       entitlements = entitlement_params.fetch(:data).map do |entitlement|
@@ -46,22 +47,29 @@ module Api::V1::Licenses::Relationships
 
     def detach
       authorize @license, :detach_entitlement?
+
       @license_entitlements = @license.license_entitlements
-
-      entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
-      entitlements = @license_entitlements.where(entitlement_id: entitlement_ids)
-
-      if entitlements.size != entitlement_ids.size
-        entitlement_ids_not_found = entitlement_ids - entitlements.collect(&:entitlement_id)
-
-        entitlements.raise_record_not_found_exception!(
-          entitlement_ids_not_found,
-          entitlements.size,
-          entitlement_ids.size
-        )
-      end
+      @policy_entitlements = @license.policy_entitlements
 
       @license_entitlements.transaction do
+        entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
+
+        # Block policy entitlements from being detached (must be detached from the policy)
+        if @policy_entitlements.exists?(entitlement_id: entitlement_ids)
+          fobidden_entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
+          forbidden_entitlement_ids = entitlement_ids & fobidden_entitlements.collect(&:entitlement_id)
+          forbidden_entitlement_id = forbidden_entitlement_ids.first
+          forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
+
+          return render_forbidden(
+            detail: "cannot detach entitlement '#{forbidden_entitlement_id}' granted by policy",
+            source: {
+              pointer: "/data/#{forbidden_idx}/id"
+            }
+          )
+        end
+
+        entitlements = @license_entitlements.where(entitlement_id: entitlement_ids)
         detached = @license_entitlements.delete(entitlements)
 
         CreateWebhookEventService.new(
