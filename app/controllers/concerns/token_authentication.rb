@@ -34,6 +34,13 @@ module TokenAuthentication
 
     current_bearer = current_token&.bearer
 
+    if (current_bearer.present? && current_bearer.account_id != current_account.id) ||
+       (current_token.present? && current_token.account_id != current_account.id)
+      Keygen.logger.error "[authentication] Account mismatch: account=#{current_account&.id || 'N/A'} token=#{current_token&.id || 'N/A'} bearer=#{current_bearer&.id || 'N/A'}"
+
+      raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
+    end
+
     Keygen::Store::Request.store[:current_token] = current_token
     Keygen::Store::Request.store[:current_bearer] = current_bearer
 
