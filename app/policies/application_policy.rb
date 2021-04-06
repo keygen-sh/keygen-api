@@ -59,7 +59,7 @@ class ApplicationPolicy
     def resolve
       case
       when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
-        scope.all
+        scope
       when scope.respond_to?(:bearer) && bearer.has_role?(:product, :user, :license)
         scope.bearer bearer.id
       when scope.respond_to?(:product) && bearer.has_role?(:product)
