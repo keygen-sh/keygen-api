@@ -76,7 +76,7 @@ class LicenseValidationService < BaseService
       if scope.present? && scope.key?(:entitlements)
         entitlements = scope[:entitlements]
 
-        return [false, "does not have all entitlements", :ENTITLEMENTS_NOT_MET] if license.entitlements.where(code: entitlements).count != entitlements.size
+        return [false, "is missing required entitlements", :ENTITLEMENTS_MISSING] if license.entitlements.where(code: entitlements).count != entitlements.size
       end
     end
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
