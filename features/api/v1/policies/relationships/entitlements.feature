@@ -342,17 +342,27 @@ Feature: Policy entitlements relationship
       {
         "data": [
           { "type": "entitlement", "id": "$entitlements[0]" },
-          { "type": "entitlement", "id": "d22692b1-0b4b-4cb7-9e3e-449e0fdf9cd8" },
+          { "type": "entitlement", "id": "818f1f34-676b-4e0b-ba57-a98d02263212" },
           { "type": "entitlement", "id": "$entitlements[2]" }
         ]
       }
       """
-    Then the response status should be "204"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "entitlement '818f1f34-676b-4e0b-ba57-a98d02263212' not found",
+        "source": {
+          "pointer": "/data/1"
+        }
+      }
+      """
     And the current account should have 0 "license-entitlement"
-    And the current account should have 1 "policy-entitlement"
+    And the current account should have 3 "policy-entitlement"
     And the current account should have 3 "entitlements"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to detach an entitlement from a policy for another account
