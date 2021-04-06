@@ -59,8 +59,8 @@ module Api::V1::Licenses::Relationships
         # currently noops, but responding with a 2xx status code is confusing for the end-user,
         # so we're going to error out early for a better DX.
         if @policy_entitlements.exists?(entitlement_id: entitlement_ids)
-          forbidden_entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
-          forbidden_entitlement_ids = entitlement_ids & forbidden_entitlements.collect(&:entitlement_id)
+          policy_entitlements_ids = @policy_entitlements.where(entitlement_id: entitlement_ids).pluck(:entitlement_id)
+          forbidden_entitlement_ids = entitlement_ids & policy_entitlements_ids
           forbidden_entitlement_id = forbidden_entitlement_ids.first
           forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
 
