@@ -205,11 +205,11 @@ Feature: License entitlements relationship
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists",
+        "detail": "already exists (entitlement is attached through policy)",
         "source": {
           "pointer": "/data/relationships/entitlement"
         },
-        "code": "ENTITLEMENT_TAKEN"
+        "code": "ENTITLEMENT_CONFLICT"
       }
       """
     And sidekiq should have 0 "webhook" jobs

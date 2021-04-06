@@ -14,6 +14,6 @@ class LicenseEntitlement < ApplicationRecord
   validates :entitlement, presence: { message: 'must exist' }, uniqueness: { message: 'already exists', scope: [:account_id, :license_id, :entitlement_id] }
 
   validate on: :create do
-    errors.add :entitlement, :taken, message: 'already exists' if policy.policy_entitlements.exists?(entitlement_id: entitlement_id)
+    errors.add :entitlement, :conflict, message: 'already exists (entitlement is attached through policy)' if policy.policy_entitlements.exists?(entitlement_id: entitlement_id)
   end
 end
