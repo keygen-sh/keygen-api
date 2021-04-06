@@ -26,55 +26,50 @@ module Api::V1::Policies::Relationships
     def attach
       authorize @policy, :attach_entitlement?
 
-      @policy_entitlements = @policy.policy_entitlements
-
-      entitlements = entitlement_params.fetch(:data).map do |entitlement|
+      entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
       end
 
-      @policy_entitlements.transaction do
-        attached = @policy_entitlements.create!(entitlements)
+      attached = @policy.policy_entitlements.create!(entitlements_data)
 
-        CreateWebhookEventService.new(
-          event: 'policy.entitlements.attached',
-          account: current_account,
-          resource: attached
-        ).execute
+      CreateWebhookEventService.new(
+        event: 'policy.entitlements.attached',
+        account: current_account,
+        resource: attached
+      ).execute
 
-        render jsonapi: attached
-      end
+      render jsonapi: attached
     end
 
     def detach
       authorize @policy, :detach_entitlement?
 
-      @policy_entitlements = @policy.policy_entitlements
+      entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
+      policy_entitlements = @policy.policy_entitlements.where(entitlement_id: entitlement_ids)
 
-      @policy_entitlements.transaction do
-        entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
+      # Ensure all entitlements exist. Deleting non-existing policy entitlements would be
+      # a noop, but responding with a 2xx status code is a confusing DX.
+      if policy_entitlements.size != entitlement_ids.size
+        policy_entitlement_ids = policy_entitlements.pluck(:entitlement_id)
+        invalid_entitlement_ids = entitlement_ids - policy_entitlement_ids
+        invalid_entitlement_id = invalid_entitlement_ids.first
+        invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
 
-        begin
-          detached = @policy.entitlements.delete(*entitlement_ids)
-
-          CreateWebhookEventService.new(
-            event: 'policy.entitlements.detached',
-            account: current_account,
-            resource: detached
-          ).execute
-        rescue ActiveRecord::RecordNotFound
-          existing_entitlement_ids = @policy.entitlements.where(id: entitlement_ids).pluck(:id)
-          invalid_entitlement_ids = entitlement_ids - existing_entitlement_ids
-          invalid_entitlement_id = invalid_entitlement_ids.first
-          invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
-
-          return render_unprocessable_entity(
-            detail: "entitlement '#{invalid_entitlement_id}' not found",
-            source: {
-              pointer: "/data/#{invalid_idx}"
-            }
-          )
-        end
+        return render_unprocessable_entity(
+          detail: "entitlement '#{invalid_entitlement_id}' not found",
+          source: {
+            pointer: "/data/#{invalid_idx}"
+          }
+        )
       end
+
+      detached = @policy.policy_entitlements.delete(policy_entitlements)
+
+      CreateWebhookEventService.new(
+        event: 'policy.entitlements.detached',
+        account: current_account,
+        resource: detached
+      ).execute
     end
 
     private

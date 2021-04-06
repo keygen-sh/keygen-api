@@ -22,7 +22,6 @@ class License < ApplicationRecord
   belongs_to :user
   belongs_to :policy
   has_many :license_entitlements, dependent: :delete_all
-  has_many :entitlements, through: :license_entitlements
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
@@ -123,7 +122,7 @@ class License < ApplicationRecord
   delegate :scheme, to: :policy
   delegate :pool?, to: :policy
 
-  def joined_entitlements
+  def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 
     entl.left_outer_joins(:policy_entitlements, :license_entitlements)
