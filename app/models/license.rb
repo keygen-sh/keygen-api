@@ -132,12 +132,6 @@ class License < ApplicationRecord
         )
   end
 
-  def entitlement_ids
-    entl = policy_entitlements + license_entitlements
-
-    entl.map(&:entitlement_id)
-  end
-
   def protected?
     return policy.protected? if protected.nil?
 
