@@ -16,6 +16,6 @@ class AddEntitlementEventTypes < ActiveRecord::Migration[6.1]
   end
 
   def down
-    EventType.where(EVENT_TYPES.map { |e| { event: e } }).delete_all
+    EventType.where(event: EVENT_TYPES).delete_all
   end
 end
