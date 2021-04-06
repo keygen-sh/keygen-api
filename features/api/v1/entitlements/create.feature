@@ -28,12 +28,25 @@ Feature: Create entitlements
           "type": "entitlements",
           "attributes": {
             "name": "Test Entitlement",
-            "code": "TEST_ENTITLEMENT"
+            "code": "TEST_ENTITLEMENT",
+            "metadata": {
+              "foo": "bar"
+            }
           }
         }
       }
       """
     Then the response status should be "201"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "name": "Test Entitlement",
+        "code": "TEST_ENTITLEMENT",
+        "metadata": {
+          "foo": "bar"
+        }
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

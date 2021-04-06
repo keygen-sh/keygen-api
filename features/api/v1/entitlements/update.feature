@@ -30,13 +30,24 @@ Feature: Update entitlements
           "type": "entitlements",
           "id": "$entitlements[0].id",
           "attributes": {
-            "code": "NEW_FEATURE"
+            "code": "NEW_FEATURE",
+            "metadata": {
+              "foo-bar": "baz-qux"
+            }
           }
         }
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an "entitlement" with the code "NEW_FEATURE"
+    And the JSON response should be an "entitlement" with the following attributes:
+      """
+      {
+        "code": "NEW_FEATURE",
+        "metadata": {
+          "fooBar": "baz-qux"
+        }
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
