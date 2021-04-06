@@ -52,14 +52,28 @@ module Api::V1::Policies::Relationships
 
       @policy_entitlements.transaction do
         entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
-        entitlements = @policy_entitlements.where(entitlement_id: entitlement_ids)
-        detached = @policy_entitlements.delete(entitlements)
 
-        CreateWebhookEventService.new(
-          event: 'policy.entitlements.detached',
-          account: current_account,
-          resource: detached
-        ).execute
+        begin
+          detached = @policy.entitlements.delete(*entitlement_ids)
+
+          CreateWebhookEventService.new(
+            event: 'policy.entitlements.detached',
+            account: current_account,
+            resource: detached
+          ).execute
+        rescue ActiveRecord::RecordNotFound
+          existing_entitlement_ids = @policy.entitlements.where(id: entitlement_ids).pluck(:id)
+          invalid_entitlement_ids = entitlement_ids - existing_entitlement_ids
+          invalid_entitlement_id = invalid_entitlement_ids.first
+          invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
+
+          return render_unprocessable_entity(
+            detail: "entitlement '#{invalid_entitlement_id}' not found",
+            source: {
+              pointer: "/data/#{invalid_idx}"
+            }
+          )
+        end
       end
     end
 
