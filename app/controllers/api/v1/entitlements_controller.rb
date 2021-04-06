@@ -68,7 +68,7 @@ module Api::V1
     private
 
     def set_entitlement
-      @entitlement = FindByAliasService.new(current_account.entitlements, params[:id], aliases: :code).call
+      @entitlement = current_account.entitlements.find(params[:id])
 
       Keygen::Store::Request.store[:current_resource] = @entitlement
     end
