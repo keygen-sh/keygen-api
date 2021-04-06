@@ -10,7 +10,7 @@ module Api::V1::Licenses::Relationships
     def index
       authorize @license, :list_entitlements?
 
-      @entitlements = apply_scopes(@license.joined_entitlements)
+      @entitlements = apply_scopes(@license.entitlements)
 
       render jsonapi: @entitlements
     end
@@ -18,7 +18,7 @@ module Api::V1::Licenses::Relationships
     def show
       authorize @license, :show_entitlement?
 
-      @entitlement = @license.joined_entitlements.find(params[:id])
+      @entitlement = @license.entitlements.find(params[:id])
 
       render jsonapi: @entitlement
     end
@@ -26,74 +26,69 @@ module Api::V1::Licenses::Relationships
     def attach
       authorize @license, :attach_entitlement?
 
-      @license_entitlements = @license.license_entitlements
-
-      entitlements = entitlement_params.fetch(:data).map do |entitlement|
+      entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
       end
 
-      @license_entitlements.transaction do
-        attached = @license_entitlements.create!(entitlements)
+      attached = @license.license_entitlements.create!(entitlements_data)
 
-        CreateWebhookEventService.new(
-          event: 'license.entitlements.attached',
-          account: current_account,
-          resource: attached
-        ).execute
+      CreateWebhookEventService.new(
+        event: 'license.entitlements.attached',
+        account: current_account,
+        resource: attached
+      ).execute
 
-        render jsonapi: attached
-      end
+      render jsonapi: attached
     end
 
     def detach
       authorize @license, :detach_entitlement?
 
-      @license_entitlements = @license.license_entitlements
-      @policy_entitlements = @license.policy_entitlements
+      entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
 
-      @license_entitlements.transaction do
-        entitlement_ids = entitlement_params.fetch(:data).collect { |e| e[:entitlement_id] }
+      # Block policy entitlements from being detached. These entitlements need to be detached
+      # via the policy. This request wouldn't detach the entitlements, but since non-existing
+      # license entitlement IDs are currently noops, responding with a 2xx status code is
+      # confusing for the end-user, so we're going to error out early for a better DX.
+      if @license.policy_entitlements.exists?(entitlement_id: entitlement_ids)
+        policy_entitlements_ids = @license.policy_entitlements.where(entitlement_id: entitlement_ids).pluck(:entitlement_id)
+        forbidden_entitlement_ids = entitlement_ids & policy_entitlements_ids
+        forbidden_entitlement_id = forbidden_entitlement_ids.first
+        forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
 
-        # Block policy entitlements from being detached. These entitlements need to be detached
-        # via the policy. This request wouldn't succeed since non-existing entitlement IDs are
-        # currently noops, but responding with a 2xx status code is confusing for the end-user,
-        # so we're going to error out early for a better DX.
-        if @policy_entitlements.exists?(entitlement_id: entitlement_ids)
-          policy_entitlements_ids = @policy_entitlements.where(entitlement_id: entitlement_ids).pluck(:entitlement_id)
-          forbidden_entitlement_ids = entitlement_ids & policy_entitlements_ids
-          forbidden_entitlement_id = forbidden_entitlement_ids.first
-          forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
-
-          return render_forbidden(
-            detail: "cannot detach entitlement '#{forbidden_entitlement_id}' (entitlement is attached through policy)",
-            source: {
-              pointer: "/data/#{forbidden_idx}"
-            }
-          )
-        end
-
-        begin
-          detached = @license.entitlements.delete(*entitlement_ids)
-
-          CreateWebhookEventService.new(
-            event: 'license.entitlements.detached',
-            account: current_account,
-            resource: detached
-          ).execute
-        rescue ActiveRecord::RecordNotFound
-          existing_entitlement_ids = @license.entitlements.where(id: entitlement_ids).pluck(:id)
-          invalid_entitlement_ids = entitlement_ids - existing_entitlement_ids
-          invalid_entitlement_id = invalid_entitlement_ids.first
-          invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
-
-          return render_unprocessable_entity(
-            detail: "entitlement '#{invalid_entitlement_id}' not found",
-            source: {
-              pointer: "/data/#{invalid_idx}"
-            }
-          )
-        end
+        return render_forbidden(
+          detail: "cannot detach entitlement '#{forbidden_entitlement_id}' (entitlement is attached through policy)",
+          source: {
+            pointer: "/data/#{forbidden_idx}"
+          }
+        )
       end
+
+      # Ensure all entitlements exist. Again, non-existing license entitlements would be
+      # a noop, but responding with a 2xx status code is a confusing DX.
+      license_entitlements = @license.license_entitlements.where(entitlement_id: entitlement_ids)
+
+      if license_entitlements.size != entitlement_ids.size
+        license_entitlement_ids = license_entitlements.pluck(:entitlement_id)
+        invalid_entitlement_ids = entitlement_ids - license_entitlement_ids
+        invalid_entitlement_id = invalid_entitlement_ids.first
+        invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
+
+        return render_unprocessable_entity(
+          detail: "entitlement '#{invalid_entitlement_id}' not found",
+          source: {
+            pointer: "/data/#{invalid_idx}"
+          }
+        )
+      end
+
+      detached = @license.license_entitlements.delete(license_entitlements)
+
+      CreateWebhookEventService.new(
+        event: 'license.entitlements.detached',
+        account: current_account,
+        resource: detached
+      ).execute
     end
 
     private
