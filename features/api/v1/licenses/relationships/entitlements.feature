@@ -27,6 +27,22 @@ Feature: License entitlements relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "entitlements"
 
+  Scenario: Admin retrieves the entitlements for a license key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 2 "policy-entitlements" for existing "policies"
+    And the current account has 1 "license" for existing "policies"
+    And the first "license" has the following attributes:
+      """
+      { "key": "example-license-key" }
+      """
+    And the current account has 5 "license-entitlements" for existing "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/example-license-key/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 7 "entitlements"
+
   Scenario: Admin attempts to retrieve the entitlements for a license of another account
     Given I am an admin of account "test2"
     And the current account is "test1"
