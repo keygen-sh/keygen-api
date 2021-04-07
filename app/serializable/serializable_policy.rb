@@ -62,6 +62,12 @@ class SerializablePolicy < SerializableBase
     end
   end
 
+  relationship :entitlements do
+    link :related do
+      @url_helpers.v1_account_policy_entitlements_path @object.account_id, @object
+    end
+  end
+
   link :self do
     @url_helpers.v1_account_policy_path @object.account_id, @object
   end
