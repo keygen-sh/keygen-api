@@ -69,6 +69,8 @@ class WebhookWorker
 
         # Automatically disable dead ngrok tunnel endpoints
         endpoint.disable!
+
+        return
       in endpoint: /\.ngrok\.io/, last_response_code: 504
         Keygen.logger.warn "[webhook_worker] Skipping retries for bad ngrok endpoint: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
@@ -83,6 +85,8 @@ class WebhookWorker
         raise FailedRequestError
       end
     end
+
+    Keygen.logger.info "[webhook_worker] Delivered webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
     Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=SSL_ERROR"
 
