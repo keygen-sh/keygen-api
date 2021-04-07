@@ -20,8 +20,14 @@ class WebhookWorker
       Account.find account_id
     end
 
-    endpoint = account.webhook_endpoints.find endpoint_id
-    event = account.webhook_events.find event_id
+    endpoint = account.webhook_endpoints.find_by(id: endpoint_id)
+    return if endpoint.nil?
+
+    event = account.webhook_events.find_by(id: event_id)
+    return if event.nil?
+
+    event_type = event.event_type
+    return unless endpoint.subscribed?(event_type.event)
 
     res = Request.post(endpoint.url, {
       headers: {
