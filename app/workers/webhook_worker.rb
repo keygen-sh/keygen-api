@@ -30,6 +30,9 @@ class WebhookWorker
     return unless endpoint.subscribed?(event_type.event)
 
     res = Request.post(endpoint.url, {
+      write_timeout: 15.seconds.to_i,
+      read_timeout: 15.seconds.to_i,
+      open_timeout: 15.seconds.to_i,
       headers: {
         "Content-Type" => "application/json",
         "X-Signature" => sign(
@@ -67,7 +70,9 @@ class WebhookWorker
       last_response_code: nil,
       last_response_body: 'SSL_ERROR'
     )
-  rescue Net::ReadTimeout, Net::OpenTimeout # Our request to the endpoint timed out
+  rescue Net::WriteTimeout, # Our request to the endpoint timed out
+         Net::ReadTimeout,
+         Net::OpenTimeout
     event.update!(
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT'
