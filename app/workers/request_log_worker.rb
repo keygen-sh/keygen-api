@@ -9,8 +9,11 @@ class RequestLogWorker
 
   def perform(account_id, req, res)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-      Account.find account_id
+      Account.find_by(id: account_id)
     end
+
+    # Skip request logs for non-existent accounts
+    return if account.nil?
 
     account.request_logs.create!(
       requestor_type: req['requestor_type'],
