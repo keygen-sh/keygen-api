@@ -263,6 +263,40 @@ describe CreateWebhookEventService do
     expect { create_webhook_event!(account, resource) }.to raise_error Exception
   end
 
+  context 'when an ngrok tunnel is used' do
+    let(:endpoint) { create(:webhook_endpoint, url: 'https://keygen.ngrok.io/webhooks', account: account) }
+
+    it 'should disable when endpoint is an invalid tunnel' do
+      allow(WebhookWorker::Request).to receive(:post) {
+        OpenStruct.new(code: 404, body: 'Tunnel foo.ngrok.io not found')
+      }
+
+      event = nil
+      expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+      expect(event).to_not be_nil
+      expect(event.last_response_body).to eq 'Tunnel foo.ngrok.io not found'
+      expect(event.last_response_code).to eq 404
+
+      expect { endpoint.reload }.to_not raise_error
+      expect(endpoint.subscriptions).to be_empty
+    end
+
+    it 'should not retry when endpoint is an unreachable tunnel' do
+      allow(WebhookWorker::Request).to receive(:post) {
+        OpenStruct.new(code: 504, body: '')
+      }
+
+      event = nil
+      expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+      expect(event).to_not be_nil
+      expect(event.last_response_code).to eq 504
+      expect(event.last_response_body).to eq ''
+
+      expect { endpoint.reload }.to_not raise_error
+      expect(endpoint.subscriptions).to_not be_empty
+    end
+  end
+
   context 'when serializing resources with sensitive secrets' do
     it 'the account payload should not contain private keys' do
       resource = create(:account)
