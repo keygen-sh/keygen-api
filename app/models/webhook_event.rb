@@ -20,4 +20,12 @@ class WebhookEvent < ApplicationRecord
 
     Sidekiq::Status.status(jid) rescue :queued
   end
+
+  def deconstruct
+    attributes.values
+  end
+
+  def deconstruct_keys(keys)
+    attributes.symbolize_keys
+  end
 end

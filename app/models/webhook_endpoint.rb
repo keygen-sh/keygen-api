@@ -23,4 +23,10 @@ class WebhookEndpoint < ApplicationRecord
   def subscribed?(event)
     !(subscriptions & ['*', event]).empty?
   end
+
+  def disable!
+    self.subscriptions = []
+
+    save!(validate: false, touch: false)
+  end
 end
