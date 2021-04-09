@@ -4252,7 +4252,7 @@ Feature: License validation actions
       """
       {
         "valid": false,
-        "detail": "is missing required entitlements",
+        "detail": "is missing one or more required entitlements",
         "constant": "ENTITLEMENTS_MISSING",
         "scope": {
           "entitlements": ["FEATURE_A", "FEATURE_B"]
@@ -4294,7 +4294,7 @@ Feature: License validation actions
       """
       {
         "valid": false,
-        "detail": "is missing required entitlements",
+        "detail": "is missing one or more required entitlements",
         "constant": "ENTITLEMENTS_MISSING",
         "scope": {
           "entitlements": ["ENTITLEMENT_A", "ENTITLEMENT_B", "ENTITLEMENT_C"]
