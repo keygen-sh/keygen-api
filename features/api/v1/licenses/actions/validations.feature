@@ -4351,6 +4351,44 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous validates a license key with an empty entitlement scope
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "key": "entitled-license-key"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "entitled-license-key",
+          "scope": {
+            "entitlements": []
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": false,
+        "detail": "entitlements scope is empty",
+        "constant": "ENTITLEMENTS_SCOPE_EMPTY",
+        "scope": {
+          "entitlements": []
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a license key using an invalid content type
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

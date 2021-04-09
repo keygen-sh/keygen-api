@@ -76,6 +76,8 @@ class LicenseValidationService < BaseService
       if scope.present? && scope.key?(:entitlements)
         entitlements = scope[:entitlements]
 
+        return [false, "entitlements scope is empty", :ENTITLEMENTS_SCOPE_EMPTY] if entitlements.empty?
+
         return [false, "is missing one or more required entitlements", :ENTITLEMENTS_MISSING] if license.entitlements.where(code: entitlements).count != entitlements.size
       end
     end
