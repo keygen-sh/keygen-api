@@ -50,7 +50,7 @@ class LicenseValidationService < BaseService
           else
             fp << scope[:fingerprint]
           end
-        end.compact
+        end.compact.uniq
 
         return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if fingerprints.empty?
 
