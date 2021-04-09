@@ -74,7 +74,7 @@ class LicenseValidationService < BaseService
       end
       # Check against entitlement scope requirements
       if scope.present? && scope.key?(:entitlements)
-        entitlements = scope[:entitlements]
+        entitlements = scope[:entitlements].uniq
 
         return [false, "entitlements scope is empty", :ENTITLEMENTS_SCOPE_EMPTY] if entitlements.empty?
 
