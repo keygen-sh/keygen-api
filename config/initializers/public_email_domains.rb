@@ -3054,6 +3054,7 @@ PUBLIC_EMAIL_DOMAINS = %w[
   promessage.com
   prontomail.com
   protonmail.com
+  pm.me
   psi.net
   psv-supporter.com
   ptd.net
