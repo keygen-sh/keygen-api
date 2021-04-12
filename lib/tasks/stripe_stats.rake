@@ -49,6 +49,8 @@ module Stripe
         p90_time_on_free: p90_time_on_free,
         p95_time_on_free: p95_time_on_free,
         p99_time_on_free: p99_time_on_free,
+        to_convert_sample_size: days_to_convert.size,
+        on_free_sample_size: days_on_free.size,
         conversion_rate_90d: conversion_rate_90d,
         conversion_rate_1y: conversion_rate_1y,
         conversion_rate_ytd: conversion_rate_ytd,
@@ -798,14 +800,14 @@ namespace :stripe do
       s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
-      s << "\e[34mTime-to-Convert:\e[0m\n"
+      s << "\e[34mTime-to-Convert:\e[34m (n=#{report.to_convert_sample_size})\e[0m\n"
       s << "\e[34m  - Latest: \e[36m#{report.latest_time_to_convert.to_s(:rounded, precision: 2)} days\e[34m (#{report.latest_converted_user.email} signed up #{time_ago_in_words(report.latest_converted_user.created)} ago)\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P90: \e[36m#{report.p90_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P95: \e[36m#{report.p95_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_to_convert.to_s(:rounded, precision: 2)} days\e[0m\n"
-      s << "\e[34mTime-on-Free:\e[34m (of those which convert)\e[0m\n"
+      s << "\e[34mTime-on-Free:\e[34m (n=#{report.on_free_sample_size})\e[0m\n"
       s << "\e[34m  - Latest: \e[36m#{report.latest_time_on_free.to_s(:rounded, precision: 2)} days\e[34m (#{report.latest_converted_free_user.email} signed up #{time_ago_in_words(report.latest_converted_free_user.created)} ago)\e[0m\n"
       s << "\e[34m  - Average: \e[36m#{report.average_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - Median: \e[36m#{report.median_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
