@@ -455,6 +455,14 @@ module Stripe
       (end_date - start_date) / 1.month
     end
 
+    def life_time_value_for(subscription)
+      invoices = invoices_for(subscription)
+      amounts = invoices.filter { |i| i.amount_paid > 0 }
+                        .map { |i| i.amount_paid }
+
+      amounts.sum(0.0) / 100
+    end
+
     def payment_method_for(customer)
       customer.invoice_settings.default_payment_method.presence || customer.default_source
     end
@@ -866,7 +874,7 @@ namespace :stripe do
 
       at_risk_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time.ceil
+        life_time_value = stats.life_time_value_for(subscription)
         customer = subscription.customer
 
         s << "\e[34m  - \e[33m#{customer.email}\e[34m is at-risk (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
@@ -876,7 +884,7 @@ namespace :stripe do
 
       canceling_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time.ceil
+        life_time_value = stats.life_time_value_for(subscription)
         customer = subscription.customer
 
         s << "\e[34m  - \e[31m#{customer.email}\e[34m is canceling (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
@@ -886,7 +894,7 @@ namespace :stripe do
 
       churned_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
-        life_time_value = stats.revenue_for(subscription) * life_time.ceil
+        life_time_value = stats.life_time_value_for(subscription)
         customer = subscription.customer
 
         s << "\e[34m  - \e[31m#{customer.email}\e[34m canceled #{time_ago_in_words(subscription.canceled_at || subscription.ended_at)} ago (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
