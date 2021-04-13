@@ -36,7 +36,9 @@ class RequestLogWorker
       user_agent: req['user_agent'],
       status: res['status']
     )
-  rescue Keygen::Error::NotFoundError
-    # Skip logging requests for accounts that do not exist
+  rescue Keygen::Error::NotFoundError,
+         PG::UniqueViolation
+    # NOTE(ezekg) Skip logging requests for accounts that do not exist
+    #             and for duplicate logs
   end
 end
