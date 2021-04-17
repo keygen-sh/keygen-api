@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_13_173613) do
+ActiveRecord::Schema.define(version: 2021_04_17_124736) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -338,7 +338,7 @@ ActiveRecord::Schema.define(version: 2021_04_13_173613) do
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
     t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc
-    t.index ["digest", "created_at", "account_id"], name: "index_tokens_on_digest_and_created_at_and_account_id", unique: true
+    t.index ["digest"], name: "index_tokens_on_digest", unique: true
     t.index ["id", "created_at", "account_id"], name: "index_tokens_on_id_and_created_at_and_account_id", unique: true
   end
 
