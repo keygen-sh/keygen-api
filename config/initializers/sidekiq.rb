@@ -37,14 +37,14 @@ Sidekiq.configure_server do |config|
     Sidekiq::Cron::Job.load_from_hash YAML.load_file(schedule_file)
   end
 
-  config.server_middleware do |chain|
-    chain.add SidekiqUniqueJobs::Middleware::Server
-    chain.add Sidekiq::Status::ServerMiddleware, expiration: 3.days
-  end
-
   config.client_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Client
     chain.add Sidekiq::Status::ClientMiddleware, expiration: 3.days
+  end
+
+  config.server_middleware do |chain|
+    chain.add Sidekiq::Status::ServerMiddleware, expiration: 3.days
+    chain.add SidekiqUniqueJobs::Middleware::Server
   end
 
   SidekiqUniqueJobs::Server.configure(config)
