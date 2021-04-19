@@ -498,13 +498,13 @@ Feature: License permit actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "2016-09-05T22:53:37.000Z"
+        "expiry": "2021-07-19 00:00:00+00:00"
       }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-12-04T22:53:37.000Z"
+    And the JSON response should be a "license" with the expiry "2021-10-17T00:00:00.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
