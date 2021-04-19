@@ -38,7 +38,7 @@ Sidekiq.configure_server do |config|
   end
 
   config.server_middleware do |chain|
-    chain.add SidekiqUniqueJobs::Middleware::Client
+    chain.add SidekiqUniqueJobs::Middleware::Server
     chain.add Sidekiq::Status::ServerMiddleware, expiration: 3.days
   end
 
