@@ -3,7 +3,7 @@
 class CreateWebhookEventsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :webhooks
+  sidekiq_options queue: :webhooks, lock: :until_executed
 
   def perform(event, account_id, data)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
