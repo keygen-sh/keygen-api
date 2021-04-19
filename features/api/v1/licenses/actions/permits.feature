@@ -211,20 +211,7 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/suspend"
     Then the response status should be "200"
@@ -237,18 +224,10 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": "$policies[0]",
         "suspended": true
       }
       """
@@ -263,20 +242,7 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license"
@@ -295,7 +261,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -322,7 +287,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -353,7 +317,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -379,18 +342,10 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": "$policies[0]",
         "suspended": true
       }
       """
@@ -406,18 +361,10 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": "$policies[0]",
         "suspended": false
       }
       """
@@ -432,18 +379,10 @@ Feature: License permit actions
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And all "policies" have the following attributes:
-      """
-      {
-        "duration": $time.1.month
-      }
-      """
     And the current account has 1 "license"
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": "$policies[0]",
         "suspended": true
       }
       """
@@ -465,7 +404,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -492,7 +430,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -524,7 +461,6 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
         "protected": true
       }
       """
@@ -554,7 +490,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month
+        "duration": $time.90.days.to_i
       }
       """
     And the current account has 1 "license"
@@ -568,7 +504,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the JSON response should be a "license" with the expiry "2016-12-04T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -581,7 +517,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.30.days
+        "duration": $time.30.days.to_i
       }
       """
     And the current account has 1 "license"
@@ -611,7 +547,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
+        "duration": $time.60.days.to_i,
         "protected": true
       }
       """
@@ -626,7 +562,7 @@ Feature: License permit actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
     Then the response status should be "200"
-    And the JSON response should be a "license" with the expiry "2016-10-05T22:53:37.000Z"
+    And the JSON response should be a "license" with the expiry "2016-11-04T22:53:37.000Z"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -639,7 +575,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
+        "duration": $time.30.days.to_i,
         "protected": true
       }
       """
@@ -671,7 +607,7 @@ Feature: License permit actions
     And all "policies" have the following attributes:
       """
       {
-        "duration": $time.1.month,
+        "duration": $time.30.days.to_i,
         "protected": true
       }
       """

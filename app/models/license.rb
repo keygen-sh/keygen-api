@@ -174,9 +174,9 @@ class License < ApplicationRecord
   end
 
   def renew!
-    return false if expiry.nil?
+    return false if expiry.nil? || policy.duration.nil?
 
-    self.expiry += ActiveSupport::Duration.build(policy.duration)
+    self.expiry += policy.duration
     save
   end
 
