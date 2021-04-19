@@ -498,7 +498,7 @@ Feature: License permit actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "2021-07-19 00:00:00+00:00"
+        "expiry": "2021-07-19T00:00:00.000Z"
       }
       """
     And I use an authentication token
