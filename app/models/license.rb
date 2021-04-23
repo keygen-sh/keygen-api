@@ -71,6 +71,9 @@ class License < ApplicationRecord
   }
 
   scope :search_user, -> (term) {
+    user_identifier = term.to_s
+    return where(user_id: user_identifier) if UUID_REGEX.match?(user_identifier)
+
     tsv_query = <<~SQL
       to_tsvector('simple', users.id::text)
       @@
@@ -83,9 +86,9 @@ class License < ApplicationRecord
       )
     SQL
 
-    joins(:user).where('users.email ILIKE ?', "%#{term}%")
+    joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
                 .or(
-                  joins(:user).where(tsv_query.squish, term.to_s)
+                  joins(:user).where(tsv_query.squish, user_identifier)
                 )
   }
 
