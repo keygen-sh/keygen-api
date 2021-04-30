@@ -65,30 +65,30 @@ class WebhookWorker
     if !ACCEPTABLE_CODES.include?(res.code)
       case event
       in endpoint: /\.ngrok\.io/, last_response_code: 404, last_response_body: /tunnel .+?\.ngrok\.io not found/i
-        Keygen.logger.warn "[webhook_worker] Disabling dead ngrok endpoint: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+        Keygen.logger.warn "[webhook_worker] Disabling dead ngrok endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
         # Automatically disable dead ngrok tunnel endpoints
         endpoint.disable!
 
         return
       in endpoint: /\.ngrok\.io/, last_response_code: 504
-        Keygen.logger.warn "[webhook_worker] Skipping retries for bad ngrok endpoint: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+        Keygen.logger.warn "[webhook_worker] Skipping retries for bad ngrok endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
         return
       in endpoint: /\.loca\.lt/, last_response_code: 504
-        Keygen.logger.warn "[webhook_worker] Skipping retries for bad localtunnel endpoint: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+        Keygen.logger.warn "[webhook_worker] Skipping retries for bad localtunnel endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
         return
       else
-        Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+        Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
         raise FailedRequestError
       end
     end
 
-    Keygen.logger.info "[webhook_worker] Delivered webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+    Keygen.logger.info "[webhook_worker] Delivered webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
   rescue OpenSSL::SSL::SSLError # Endpoint's SSL certificate is not showing as valid
-    Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=SSL_ERROR"
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=SSL_ERROR"
 
     event.update!(
       last_response_code: nil,
@@ -97,21 +97,21 @@ class WebhookWorker
   rescue Net::WriteTimeout, # Our request to the endpoint timed out
          Net::ReadTimeout,
          Net::OpenTimeout
-    Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=REQ_TIMEOUT"
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=REQ_TIMEOUT"
 
     event.update!(
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT'
     )
   rescue Errno::ECONNREFUSED # Stop sending requests when the connection is refused
-    Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=CONN_REFUSED"
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=CONN_REFUSED"
 
     event.update!(
       last_response_code: nil,
       last_response_body: 'CONN_REFUSED'
     )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
-    Keygen.logger.warn "[webhook_worker] Failed webhook event: account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=DNS_ERROR"
+    Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=DNS_ERROR"
 
     event.update!(
       last_response_code: nil,
