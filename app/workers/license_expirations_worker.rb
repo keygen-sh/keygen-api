@@ -2,8 +2,9 @@
 
 class LicenseExpirationsWorker
   include Sidekiq::Worker
+  include Sidekiq::Cronitor
 
-  sidekiq_options queue: :cron, lock: :until_executed
+  sidekiq_options queue: :cron, lock: :until_executed, cronitor: { key: 'nBWCsr' }
 
   def perform
     License.includes(:account, :policy).reorder(nil).where.not(expiry: nil).where(expiry: [3.days.ago..3.days.from_now]).find_each do |license|

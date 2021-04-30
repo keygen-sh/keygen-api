@@ -2,8 +2,9 @@
 
 class LicenseOverdueCheckInsWorker
   include Sidekiq::Worker
+  include Sidekiq::Cronitor
 
-  sidekiq_options queue: :cron, lock: :until_executed
+  sidekiq_options queue: :cron, lock: :until_executed, cronitor: { key: '5N6CbP' }
 
   def perform
     query = %[
