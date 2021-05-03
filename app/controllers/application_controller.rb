@@ -6,7 +6,8 @@ class ApplicationController < ActionController::API
   include Pundit
 
   before_action :disable_keep_alive_connections
-  before_action :force_jsonapi_response_format
+  before_action :add_content_security_policy_headers
+  before_action :add_jsonapi_content_type_headers
   before_action :send_rate_limiting_headers
   after_action :send_keygen_whoami_headers
   after_action :verify_authorized
@@ -322,7 +323,24 @@ class ApplicationController < ActionController::API
     response.headers["Connection"] = "close"
   end
 
-  def force_jsonapi_response_format
+  def add_content_security_policy_headers
+    response.headers["Report-To"] = <<~JSON.squish
+      {
+        "group": "csp-reports",
+        "max_age": 10886400,
+        "endpoints": [{
+          "url": "https://api.keygen.sh/-/csp-reports"
+        }]
+      }
+    JSON
+    response.headers["Content-Security-Policy"] = <<~DIRECTIVE.squish
+      default-src 'none';
+      report-uri /-/csp-reports;
+      report-to csp-reports;
+    DIRECTIVE
+  end
+
+  def add_jsonapi_content_type_headers
     accepted_content_types = HashWithIndifferentAccess.new(
       jsonapi: Mime::Type.lookup_by_extension(:jsonapi).to_s,
       json: Mime::Type.lookup_by_extension(:json).to_s
