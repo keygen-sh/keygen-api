@@ -64,15 +64,30 @@ class License < ApplicationRecord
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
-  # FIXME(ezekg) Hack to override pg_search with more performant query
-  # TODO(ezekg) Rip out pg_search
+  # FIXME(ezekg) Hack to override pg_search with more performant queries
+  # TODO(ezekg) Rip out pg_search completely
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_REGEX.match?(identifier)
+
+    where('id::text ILIKE ?', "%#{identifier}%")
+  }
+
   scope :search_key, -> (term) {
     where('key ILIKE ?', "%#{term}%")
   }
 
   scope :search_user, -> (term) {
     user_identifier = term.to_s
-    return where(user_id: user_identifier) if UUID_REGEX.match?(user_identifier)
+    return none if
+      user_identifier.empty?
+
+    return where(user_id: user_identifier) if
+      UUID_REGEX.match?(user_identifier)
 
     tsv_query = <<~SQL
       to_tsvector('simple', users.id::text)
