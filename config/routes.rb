@@ -8,6 +8,20 @@ Rails.application.routes.draw do
       { constraints: { format: "jsonapi" } }
     end
 
+  namespace "-" do
+    post 'csp-reports', to: proc { |env|
+      bytesize = env['rack.input'].size
+      next [422, {}, []] if bytesize > 10.kilobytes
+
+      payload = env['rack.input'].read
+      env['rack.input'].rewind
+
+      Rails.logger.warn "[csp-reports] CSP violation: size=#{bytesize} payload=#{payload}"
+
+      [202, {}, []]
+    }
+  end
+
   scope module: "api", **constraints do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
