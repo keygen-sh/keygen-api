@@ -25,21 +25,13 @@ class RequestLog < ApplicationRecord
   # FIXME(ezekg) Rip out pg_search for other models and replace with scopes
   scope :search_request_id, -> (term) {
     request_id = term.to_s
-    return where(request_id: request_id) if UUID_REGEX.match?(request_id)
+    return none if
+      request_id.empty?
 
-    query = <<~SQL
-      to_tsvector('simple', request_id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    return where(request_id: request_id) if
+      UUID_REGEX.match?(request_id)
 
-    where(query.squish, request_id)
+    where('request_id::text ILIKE ?', "%#{request_id}%")
   }
 
   scope :search_requestor, -> (type, id) {
