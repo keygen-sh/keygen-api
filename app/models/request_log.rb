@@ -62,19 +62,7 @@ class RequestLog < ApplicationRecord
     return where(requestor_id: requestor_id) if
       UUID_REGEX.match?(requestor_id)
 
-    query = <<~SQL
-      to_tsvector('simple', requestor_id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
-
-    where(query.squish, requestor_id)
+    where('requestor_id::text ILIKE ?', "%#{requestor_id}%")
   }
 
   scope :search_resource, -> (type, id) {
@@ -97,19 +85,7 @@ class RequestLog < ApplicationRecord
     return where(resource_id: resource_id) if
       UUID_REGEX.match?(resource_id)
 
-    query = <<~SQL
-      to_tsvector('simple', resource_id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
-
-    where(query.squish, resource_id)
+    where('resource_id::text ILIKE ?', "%#{resource_id}%")
   }
 
   scope :search_method, -> (term) {
@@ -125,18 +101,6 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_ip, -> (term) {
-    query = <<~SQL
-      to_tsvector('simple', ip::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
-
-    where(query.squish, term.to_s)
+    where('ip ILIKE ?', "%#{term}%")
   }
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_22_124159) do
+ActiveRecord::Schema.define(version: 2021_05_03_210028) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -287,16 +287,11 @@ ActiveRecord::Schema.define(version: 2021_04_22_124159) do
     t.text "response_signature"
     t.string "resource_type"
     t.uuid "resource_id"
-    t.index "to_tsvector('simple'::regconfig, (ip)::text)", name: "request_logs_tsv_ip_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, (request_id)::text)", name: "request_logs_tsv_request_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, (requestor_id)::text)", name: "request_logs_tsv_requestor_id_idx", using: :gin
-    t.index "to_tsvector('simple'::regconfig, (resource_id)::text)", name: "request_logs_tsv_resource_id_idx", using: :gin
     t.index ["ip", "account_id", "created_at"], name: "request_logs_top_ip_idx", where: "(ip IS NOT NULL)"
     t.index ["method", "url", "account_id", "created_at"], name: "request_logs_top_method_url_idx", where: "((method IS NOT NULL) AND (url IS NOT NULL))"
     t.index ["request_id", "created_at"], name: "request_logs_request_id_created_idx", unique: true
     t.index ["requestor_id", "requestor_type", "account_id", "created_at"], name: "request_logs_top_requestor_idx", where: "((requestor_id IS NOT NULL) AND (requestor_type IS NOT NULL))"
     t.index ["resource_id", "resource_type", "account_id", "created_at"], name: "request_logs_top_resource_idx", where: "((resource_id IS NOT NULL) AND (resource_type IS NOT NULL))"
-    t.index ["url"], name: "index_request_logs_on_url", using: :gin
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
