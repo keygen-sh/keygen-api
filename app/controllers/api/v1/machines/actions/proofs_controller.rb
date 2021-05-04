@@ -13,8 +13,16 @@ module Api::V1::Machines::Actions
 
       dataset = proof_params.dig(:meta, :dataset)
       proof = @machine.generate_proof(dataset: dataset)
+      meta = { proof: proof }
 
-      render jsonapi: @machine, meta: { proof: proof }
+      CreateWebhookEventService.new(
+        event: "machine.proofs.generated",
+        account: current_account,
+        resource: @machine,
+        meta: meta
+      ).execute
+
+      render jsonapi: @machine, meta: meta
     end
 
     private

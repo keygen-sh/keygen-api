@@ -50,6 +50,7 @@ EVENT_TYPES = %w[
   machine.heartbeat.pong
   machine.heartbeat.dead
   machine.heartbeat.reset
+  machine.proofs.generated
   key.created
   key.updated
   key.deleted

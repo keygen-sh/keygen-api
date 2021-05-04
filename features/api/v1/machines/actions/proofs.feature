@@ -20,6 +20,7 @@ Feature: Machine proof actions
   Scenario: Admin generates a proof for a machine with the default dataset
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "machines"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/generate-offline-proof"
@@ -51,6 +52,9 @@ Feature: Machine proof actions
       }
       """
     And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin generates a proof for a machine with a custom dataset
     Given I am an admin of account "test1"
