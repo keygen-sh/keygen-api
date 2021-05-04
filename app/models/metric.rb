@@ -53,6 +53,8 @@ class Metric < ApplicationRecord
     machine.heartbeat.ping
     machine.heartbeat.pong
     machine.heartbeat.dead
+    machine.heartbeat.reset
+    machine.proofs.generated
     key.created
     key.updated
     key.deleted
