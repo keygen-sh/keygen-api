@@ -44,7 +44,7 @@ class Machine < ApplicationRecord
     next if machine.policy.nil? || machine.license.nil?
     next if machine.policy.concurrent?
 
-    machines_count = machine.license.machines.count || 0
+    machines_count = machine.license.machines_count || 0
     next if machines_count == 0
 
     next unless (machines_count >= machine.policy.max_machines rescue false)

@@ -32,9 +32,9 @@ class LicenseValidationService < BaseService
       # Check against machine scope requirements
       if scope.present? && scope.key?(:machine)
         case
-        when !license.policy.floating? && license.machines.count == 0
+        when !license.policy.floating? && license.machines_count == 0
           return [false, "has no associated machine", :NO_MACHINE]
-        when license.policy.floating? && license.machines.count == 0
+        when license.policy.floating? && license.machines_count == 0
           return [false, "has no associated machines", :NO_MACHINES]
         else
           return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
@@ -55,9 +55,9 @@ class LicenseValidationService < BaseService
         return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if fingerprints.empty?
 
         case
-        when !license.policy.floating? && license.machines.count == 0
+        when !license.policy.floating? && license.machines_count == 0
           return [false, "has no associated machine", :NO_MACHINE]
-        when license.policy.floating? && license.machines.count == 0
+        when license.policy.floating? && license.machines_count == 0
           return [false, "has no associated machines", :NO_MACHINES]
         else
           case
@@ -84,13 +84,13 @@ class LicenseValidationService < BaseService
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
     return [true, "is valid", :VALID] if !license.policy.strict?
     # Check if license policy allows floating and if not, should have single activation
-    return [false, "must have exactly 1 associated machine", :NO_MACHINE] if !license.policy.floating? && license.machines.count == 0
+    return [false, "must have exactly 1 associated machine", :NO_MACHINE] if !license.policy.floating? && license.machines_count == 0
     # When not floating, license's machine count should not surpass 1
-    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if !license.policy.floating? && license.machines.count > 1
+    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if !license.policy.floating? && license.machines_count > 1
     # When floating, license should have at least 1 activation
-    return [false, "must have at least 1 associated machine", :NO_MACHINES] if license.policy.floating? && license.machines.count == 0
+    return [false, "must have at least 1 associated machine", :NO_MACHINES] if license.policy.floating? && license.machines_count == 0
     # When floating, license's machine count should not surpass what policy allows
-    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.policy.floating? && !license.policy.max_machines.nil? && license.machines.count > license.policy.max_machines
+    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.policy.floating? && !license.policy.max_machines.nil? && license.machines_count > license.policy.max_machines
     # Check if license has exceeded its CPU core limit
     return [false, "has too many associated machine cores", :TOO_MANY_CORES] if !license.policy.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.policy.max_cores
     # All good
