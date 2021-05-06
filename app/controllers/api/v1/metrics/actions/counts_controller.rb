@@ -35,7 +35,7 @@ module Api::V1::Metrics::Actions
           .map(&:id)
       end
 
-      json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
+      json = Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day

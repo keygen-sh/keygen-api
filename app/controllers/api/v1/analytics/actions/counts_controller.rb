@@ -10,7 +10,7 @@ module Api::V1::Analytics::Actions
     def count
       authorize :analytics, :read?
 
-      json = Rails.cache.fetch(cache_key_for(:count), expires_in: 1.minute) do
+      json = Rails.cache.fetch(cache_key_for(:count), expires_in: 10.minutes) do
         active_licensed_users = current_account.active_licensed_user_count
         active_licenses = current_account.licenses.active.count
         total_licenses = current_account.licenses.count
@@ -34,7 +34,7 @@ module Api::V1::Analytics::Actions
     def top_licenses_by_volume
       authorize :analytics, :read?
 
-      json = Rails.cache.fetch(cache_key_for(:top_licenses_by_volume), expires_in: 1.minute) do
+      json = Rails.cache.fetch(cache_key_for(:top_licenses_by_volume), expires_in: 10.minutes) do
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
@@ -74,7 +74,7 @@ module Api::V1::Analytics::Actions
     def top_urls_by_volume
       authorize :analytics, :read?
 
-      json = Rails.cache.fetch(cache_key_for(:top_urls_by_volume), expires_in: 1.minute) do
+      json = Rails.cache.fetch(cache_key_for(:top_urls_by_volume), expires_in: 10.minutes) do
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
@@ -116,7 +116,7 @@ module Api::V1::Analytics::Actions
     def top_ips_by_volume
       authorize :analytics, :read?
 
-      json = Rails.cache.fetch(cache_key_for(:top_ips_by_volume), expires_in: 1.minute) do
+      json = Rails.cache.fetch(cache_key_for(:top_ips_by_volume), expires_in: 10.minutes) do
         conn = ActiveRecord::Base.connection
 
         start_date = 13.days.ago.beginning_of_day
