@@ -10,5 +10,7 @@ class DestroyModelWorker
     model = klass.find_by! id: id
 
     model.destroy!
+  rescue ActiveRecord::RecordNotFound
+    # NOTE(ezekg) Already destroyed
   end
 end
