@@ -26,7 +26,7 @@ class PruneMetricsWorker
         count = metrics.limit(1_000)
                        .delete_all
 
-        Keygen.logger.info "[worker.prune-metrics] Pruned #{count} rows: account_id=#{account_id} batch=##{batch}"
+        Keygen.logger.info "[worker.prune-metrics] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
         break if count == 0
       end

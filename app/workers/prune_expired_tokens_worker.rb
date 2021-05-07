@@ -17,7 +17,7 @@ class PruneExpiredTokensWorker
       count = tokens.limit(10_000)
                     .delete_all
 
-      Keygen.logger.info "[worker.prune-expired-tokens] Pruned #{count} rows: batch=##{batch}"
+      Keygen.logger.info "[worker.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
 
       break if count == 0
     end
