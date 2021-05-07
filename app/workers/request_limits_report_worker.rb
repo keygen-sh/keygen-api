@@ -25,6 +25,8 @@ class RequestLimitsReportWorker
         next if request_count_for_week > 0
 
         if account.last_low_activity_lifeline_sent_at.nil?
+          Keygen.logger.info "[workers.request-limits-report] Sending low-activity lifelife email: account_id=#{account.id}"
+
           account.touch(:last_low_activity_lifeline_sent_at)
 
           # Random delay between 1 and n minutes
@@ -35,6 +37,8 @@ class RequestLimitsReportWorker
 
         next
       end
+
+      Keygen.logger.info "[workers.request-limits-report] Generating report: account_id=#{account.id}"
 
       admin = account.admins.first
       plan = account.plan
@@ -79,6 +83,8 @@ class RequestLimitsReportWorker
         if should_send_license_limit_notification
           account.touch(:last_license_limit_exceeded_sent_at)
 
+          Keygen.logger.info "[workers.request-limits-report] Sending license limit exceeded email: account_id=#{account.id}"
+
           AccountMailer.license_limit_exceeded(account: account, plan: plan, license_count: active_licensed_user_count, license_limit: license_limit).deliver_later
         end
 
@@ -91,6 +97,8 @@ class RequestLimitsReportWorker
         if should_send_request_limit_notification
           account.touch(:last_request_limit_exceeded_sent_at)
 
+          Keygen.logger.info "[workers.request-limits-report] Sending request limit exceeded email: account_id=#{account.id}"
+
           AccountMailer.request_limit_exceeded(account: account, plan: plan, request_count: request_count, request_limit: request_limit).deliver_later
         end
       rescue => e
@@ -101,6 +109,8 @@ class RequestLimitsReportWorker
 
       reports << report
     end
+
+    Keygen.logger.info "[workers.request-limits-report] Sending request limit report email: date=#{date} reports=#{reports.size}"
 
     ReportMailer.request_limits(date: date, reports: reports).deliver_now
   end
