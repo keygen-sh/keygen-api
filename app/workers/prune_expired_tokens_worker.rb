@@ -7,7 +7,7 @@ class PruneExpiredTokensWorker
   def perform
     batch = 0
 
-    Keygen.logger.info "[worker.prune-expired-tokens] Starting"
+    Keygen.logger.info "[workers.prune-expired-tokens] Starting"
 
     loop do
       tokens = Token.where('expiry is not null and expiry < ?', 90.days.ago)
@@ -17,11 +17,11 @@ class PruneExpiredTokensWorker
       count = tokens.limit(10_000)
                     .delete_all
 
-      Keygen.logger.info "[worker.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
+      Keygen.logger.info "[workers.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
 
       break if count == 0
     end
 
-    Keygen.logger.info "[worker.prune-expired-tokens] Done"
+    Keygen.logger.info "[workers.prune-expired-tokens] Done"
   end
 end

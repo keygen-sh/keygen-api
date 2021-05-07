@@ -10,13 +10,13 @@ class PruneRequestLogsWorker
                       .group('accounts.id')
                       .having('count(request_logs.id) > 0')
 
-    Keygen.logger.info "[worker.prune-request-logs] Starting: accounts=#{accounts.count}"
+    Keygen.logger.info "[workers.prune-request-logs] Starting: accounts=#{accounts.count}"
 
     accounts.find_each do |account|
       account_id = account.id
       batch = 0
 
-      Keygen.logger.info "[worker.prune-request-logs] Pruning rows: account_id=#{account_id}"
+      Keygen.logger.info "[workers.prune-request-logs] Pruning rows: account_id=#{account_id}"
 
       loop do
         logs = account.request_logs
@@ -26,12 +26,12 @@ class PruneRequestLogsWorker
         count = logs.limit(1_000)
                     .delete_all
 
-        Keygen.logger.info "[worker.prune-request-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+        Keygen.logger.info "[workers.prune-request-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
         break if count == 0
       end
     end
 
-    Keygen.logger.info "[worker.prune-request-logs] Done"
+    Keygen.logger.info "[workers.prune-request-logs] Done"
   end
 end
