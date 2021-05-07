@@ -22,7 +22,7 @@ module Api::V1
       authorize RequestLog
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute) do
-        request_logs = policy_scope apply_scopes(current_account.request_logs)
+        request_logs = policy_scope apply_scopes(current_account.request_logs.without_blobs )
         data = JSONAPI::Serializable::Renderer.new.render(request_logs, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
           class: {

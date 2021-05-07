@@ -15,6 +15,12 @@ class RequestLog < ApplicationRecord
 
   validates :account, presence: { message: "must exist" }
 
+  # NOTE(ezekg) A lot of the time, we don't need to load the request
+  #             or response body, e.g. when listing logs.
+  scope :without_blobs, -> {
+    select(self.attribute_names - %w[request_body response_body response_signature])
+  }
+
   scope :current_period, -> {
     date_start = 2.weeks.ago.beginning_of_day
     date_end = Time.current
