@@ -9,9 +9,27 @@ class SerializableRequestLog < SerializableBase
   attribute :status
   attribute :user_agent
   attribute :ip
-  attribute :request_body, if: -> { @object.respond_to?(:request_body) }
-  attribute :response_body, if: -> { @object.respond_to?(:response_body) }
-  attribute :response_signature, if: -> { @object.respond_to?(:response_signature) }
+  attribute :request_body do
+    if @object.respond_to?(:request_body)
+      @object.request_body
+    else
+      nil
+    end
+  end
+  attribute :response_signature do
+    if @object.respond_to?(:response_signature)
+      @object.response_signature
+    else
+      nil
+    end
+  end
+  attribute :response_body do
+    if @object.respond_to?(:response_body)
+      @object.response_body
+    else
+      nil
+    end
+  end
   attribute :created do
     @object.created_at
   end
