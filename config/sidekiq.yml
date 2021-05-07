@@ -1,12 +1,11 @@
 :concurrency: 15
 :queues:
-  - [cleanup, 1]
-  - [logs, 1]
-  - [default, 2]
-  - [metrics, 2]
-  - [mailers, 3]
-  - [webhooks, 4]
-  - [cron, 5]
-  - [billing, 6]
-  - [system, 7]
-  - [deletes, 8]
+  - critical
+  - deletes
+  - webhooks
+  - default
+  - mailers
+  - billing
+  - logs
+  - metrics
+  - cron
