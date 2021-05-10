@@ -113,7 +113,9 @@ module Api::V1
     private
 
     def set_machine
-      @machine = FindByAliasService.new(current_account.machines, params[:id], aliases: :fingerprint).call
+      scoped_machines = policy_scope apply_scopes(current_account.machines)
+
+      @machine = FindByAliasService.new(scoped_machines, params[:id], aliases: :fingerprint).call
 
       Keygen::Store::Request.store[:current_resource] = @machine
     end
