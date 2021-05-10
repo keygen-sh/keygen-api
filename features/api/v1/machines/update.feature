@@ -359,7 +359,7 @@ Feature: Update machine
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -480,7 +480,7 @@ Feature: Update machine
       """
       { "machine": { "name": "Office Mac" } }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
