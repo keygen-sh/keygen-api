@@ -113,7 +113,7 @@ module Api::V1
     private
 
     def set_machine
-      scoped_machines = policy_scope apply_scopes(current_account.machines)
+      scoped_machines = policy_scope(current_account.machines)
 
       @machine = FindByAliasService.new(scoped_machines, params[:id], aliases: :fingerprint).call
 
