@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ezekg/cronitor-sidekiq
-  revision: 096f9279969674976a1fb0dc26272eb65afacecd
-  ref: 096f9279969674976a1fb0dc26272eb65afacecd
+  revision: b758d175fb363ce603b5286b9b774fd9c2bb04b9
+  ref: b758d175fb363ce603b5286b9b774fd9c2bb04b9
   specs:
     sidekiq-cronitor (1.0.0)
       cronitor (~> 4.0)
