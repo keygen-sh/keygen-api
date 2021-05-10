@@ -15,8 +15,12 @@ class RecordMetricWorker
       Account.find account_id
     end
 
+    # Skip metric recording for non-existent accounts
+    return if account.nil?
+
     # TODO(ezekg) Should probably scope this to the account
     resource = resource_type.classify.constantize.find_by id: resource_id
+    recorded_at = Time.current
     data =
       if resource.present?
         { resource: resource.id }.tap { |data|
@@ -28,8 +32,10 @@ class RecordMetricWorker
         { resource: resource_id }
       end
 
-    account.metrics.create!(
-      event_type: event_type,
+    account.metrics.insert!(
+      event_type_id: event_type.id,
+      created_at: recorded_at,
+      updated_at: recorded_at,
       data: data
     )
   end

@@ -15,7 +15,7 @@ class RequestLogWorker
     # Skip request logs for non-existent accounts
     return if account.nil?
 
-    account.request_logs.create!(
+    account.request_logs.insert!(
       requestor_type: req['requestor_type'],
       requestor_id: req['requestor_id'],
 
@@ -24,6 +24,7 @@ class RequestLogWorker
 
       created_at: req['request_time'],
       updated_at: req['request_time'],
+
       request_id: req['request_id'],
       request_body: req['body'],
 
