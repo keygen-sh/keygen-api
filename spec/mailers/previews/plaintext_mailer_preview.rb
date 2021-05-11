@@ -6,8 +6,12 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.low_activity_lifeline account: account
   end
 
-  def trial_ending_soon
-    PlaintextMailer.trial_ending_soon account: account
+  def trial_ending_soon_without_payment_method
+    PlaintextMailer.trial_ending_soon_without_payment_method account: account
+  end
+
+  def trial_ending_soon_with_payment_method
+    PlaintextMailer.trial_ending_soon_with_payment_method account: account
   end
 
   def first_payment_succeeded

@@ -83,10 +83,14 @@ module Api::V1
         request_count_for_week = account.request_logs.where('request_logs.created_at > ?', 1.week.ago).count
 
         # Let the active account know that their trial is going to be ending
-        if billing.card.nil? && request_count_for_week > 0
+        if request_count_for_week > 0
           account.touch(:last_trial_will_end_sent_at)
 
-          PlaintextMailer.trial_ending_soon(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+          if billing.card.nil?
+            PlaintextMailer.trial_ending_soon_without_payment_method(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+          else
+            PlaintextMailer.trial_ending_soon_with_payment_method(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+          end
         end
       when "invoice.payment_succeeded"
         invoice = event.data.object
