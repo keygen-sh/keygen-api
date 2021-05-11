@@ -1,12 +1,3 @@
-GIT
-  remote: https://github.com/ezekg/cronitor-sidekiq
-  revision: b758d175fb363ce603b5286b9b774fd9c2bb04b9
-  ref: b758d175fb363ce603b5286b9b774fd9c2bb04b9
-  specs:
-    sidekiq-cronitor (1.0.0)
-      cronitor (~> 4.0)
-      sidekiq (~> 6.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -371,6 +362,9 @@ GEM
     sidekiq-cron (1.0.4)
       fugit (~> 1.1)
       sidekiq (>= 4.2.1)
+    sidekiq-cronitor (2.0.0)
+      cronitor (~> 4.0)
+      sidekiq (~> 6.0)
     sidekiq-status (1.1.0)
       chronic_duration
       sidekiq (>= 3.0)
@@ -473,7 +467,7 @@ DEPENDENCIES
   sendgrid-ruby
   sidekiq
   sidekiq-cron
-  sidekiq-cronitor!
+  sidekiq-cronitor (~> 2.0)
   sidekiq-status
   sidekiq-throttled
   sidekiq-unique-jobs
