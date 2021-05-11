@@ -44,6 +44,8 @@ class User < ApplicationRecord
   scope :metadata, -> (meta) { search_metadata meta }
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
+  scope :license, -> (id) { joins(:license).where licenses: id }
+  scope :user, -> (id) { where id: id }
   scope :admins, -> { roles :admin }
   scope :active, -> (status = true) {
     sub_query = License.where('"licenses"."user_id" = "users"."id"').select(1).arel.exists

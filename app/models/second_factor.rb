@@ -18,6 +18,9 @@ class SecondFactor < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
 
+  scope :product, -> (id) { joins(user: { licenses: :policy }).where policies: { product_id: id } }
+  scope :user, -> (id) { where user: id }
+
   def uri
     return nil if enabled?
 

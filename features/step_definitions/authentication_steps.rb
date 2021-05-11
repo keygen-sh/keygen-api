@@ -31,6 +31,20 @@ Given /^I do not have 2FA$/ do
   @bearer.second_factors.delete_all
 end
 
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "(user|admin)" does not have 2FA$/ do |named_index, user_role|
+  user = @account.users.roles(user_role).send(named_index)
+
+  user.second_factors.delete_all
+end
+
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "(user|admin)" has 2FA (disabled|enabled)$/ do |named_index, user_role, second_factor_status|
+  user = @account.users.roles(user_role).send(named_index)
+
+  @second_factor = SecondFactor.new user: user, account: user.account
+  @second_factor.enabled = second_factor_status == 'enabled'
+  @second_factor.save
+end
+
 Given /^I send the following headers:$/ do |body|
   parse_placeholders! body
   headers = JSON.parse body
