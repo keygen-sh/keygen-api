@@ -46,7 +46,7 @@ gem 'sidekiq-unique-jobs'
 gem 'sidekiq-status'
 gem 'sidekiq-cron'
 gem 'sidekiq-throttled'
-gem 'sidekiq-cronitor', git: 'https://github.com/ezekg/cronitor-sidekiq', ref: 'b758d175fb363ce603b5286b9b774fd9c2bb04b9'
+gem 'sidekiq-cronitor', '~> 2.0'
 
 # HTTP requests
 gem 'httparty'
