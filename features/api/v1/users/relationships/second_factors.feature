@@ -56,6 +56,130 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin lists a user's second factors and the user has 2FA disabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the first "user" has 2FA disabled
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "second-factor"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin lists a user's second factors and the user has 2FA enabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the first "user" has 2FA enabled
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "second-factor"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin lists a user's second factors and the user has no second factors
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the first "user" does not have 2FA
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "second-factors"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User lists second factors while having 2FA disabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA disabled
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "second-factors"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User lists second factors while having 2FA enabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "second-factors"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User lists second factors while having no second factor
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I do not have 2FA
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "second-factors"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User lists an admin's second factors
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the first "admin" has 2FA enabled
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/second-factors"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product lists an admin's second factors
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the first "admin" has 2FA enabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/second-factors"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product lists a user's second factors
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" has 2FA enabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   # Second factor show
   Scenario: Admin retrieves a second factor while having 2FA disabled
     Given the current account is "test1"
@@ -74,7 +198,7 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin retrieves a second factor while having 2FA disabled
+  Scenario: Admin retrieves a second factor while having 2FA enabled
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And I am an admin of account "test1"
@@ -87,6 +211,56 @@ Feature: Manage second factors for user
       { "enabled": true }
       """
     And the JSON response should be a "second-factor" without a uri
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User retrieves a second factor while having 2FA disabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA disabled
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "second-factor" with the following attributes:
+      """
+      { "enabled": false }
+      """
+    And the JSON response should be a "second-factor" with a uri
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User retrieves a second factor while having 2FA enabled
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "second-factor" with the following attributes:
+      """
+      { "enabled": true }
+      """
+    And the JSON response should be a "second-factor" without a uri
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product retrieve a user's second factor
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" has 2FA enabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/second-factors/$0"
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -117,6 +291,27 @@ Feature: Manage second factors for user
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I do not have 2FA
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/second-factors" with the following:
+      """
+      {
+        "meta": {
+          "password": "password"
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a second factor for a user with no other second factor and provides a correct password
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" does not have 2FA
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/second-factors" with the following:
       """
@@ -438,6 +633,59 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+   Scenario: User enables a second factor while having 2FA disabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA disabled
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second-factors",
+          "attributes": {
+            "enabled": true
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to enable a user's second factor
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" has 2FA disabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second_factor",
+          "attributes": {
+            "enabled": true
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   # Second factor disable
   Scenario: Admin disables a second factor while having 2FA disabled and providing a correct OTP
     Given the current account is "test1"
@@ -557,6 +805,59 @@ Feature: Manage second factors for user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User disables a second factor while having 2FA enabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second-factors",
+          "attributes": {
+            "enabled": false
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to disable a user's second factor
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" has 2FA enabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "second_factor",
+          "attributes": {
+            "enabled": false
+          }
+        },
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   # Second factor deletion
   Scenario: Admin deletes a second factor while having 2FA enabled and providing a correct OTP
     Given the current account is "test1"
@@ -615,6 +916,47 @@ Feature: Manage second factors for user
         }
       }
       """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User deletes a second factor while having 2FA enabled and providing a correct OTP
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I have 2FA enabled
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "204"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product attempts to delete a user's second factor
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the first "user" has 2FA enabled
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1/second-factors/$0" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
