@@ -78,4 +78,28 @@ class PlaintextMailer < ApplicationMailer
       TXT
     )
   end
+
+  def third_payment_succeeded(account:)
+    admin = account.admins.first
+
+    mail(
+      content_type: "text/plain",
+      to: admin.email,
+      subject: "Keygen <> #{account.name}",
+      body: <<~TXT
+        Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
+
+        Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $20 Amazon gift card.
+
+        You can leave a review here: https://reviews.capterra.com/new/168916?utm_campaign=vendor_request_paid
+
+        We're a bootstrapped company, and these reviews help us out a lot. You can reply to this email directly with any feedback or questions.
+
+        Thanks again!
+
+        --
+        Zeke, Founder <https://keygen.sh>
+      TXT
+    )
+  end
 end

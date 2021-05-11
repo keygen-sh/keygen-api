@@ -95,11 +95,14 @@ module Api::V1
       when "invoice.payment_succeeded"
         invoice = event.data.object
         billing = Billing.find_by customer_id: invoice.customer
-        return unless billing && invoice.total > 0
+        return unless billing.present? &&
+                      invoice.total > 0
 
-        # Ask for feedback after first successful payment
-        if billing.receipts.paid.empty?
+        case billing.receipts.paid.count
+        when 0
           PlaintextMailer.first_payment_succeeded(account: billing.account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+        when 2
+          PlaintextMailer.third_payment_succeeded(account: billing.account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
         end
 
         billing.receipts.create(
