@@ -4,7 +4,8 @@ require 'sidekiq'
 require 'sidekiq-unique-jobs'
 require 'sidekiq-status'
 require 'sidekiq-cron'
-require "sidekiq/throttled"
+require 'sidekiq/throttled'
+require 'sidekiq/web'
 
 SIDEKIQ_MAX_QUEUE_LATENCY =
   (ENV['SIDEKIQ_MAX_QUEUE_LATENCY'] || 30).to_i
@@ -19,6 +20,21 @@ class Sidekiq::Status::ClientMiddleware
   end
 end
 
+# Configure Sidekiq's web interface to use basic authentication
+Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
+  compare = -> (a, b) { Rack::Utils.secure_compare(a, b) }
+  hash = -> (v) { Digest::SHA256.hexdigest(v) }
+  env = -> (k) { ENV.fetch(k.to_s, '') }
+
+  compare[hash[user], hash[env[:SIDEKIQ_WEB_USER]]] &
+    compare[hash[password], hash[env[:SIDEKIQ_WEB_PASSWORD]]]
+end
+
+# Configure Sidekiq session middleware
+Sidekiq::Web.use ActionDispatch::Cookies
+Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session', path: '/-/sidekiq', same_site: :strict
+
+# Configure Sidekiq client
 Sidekiq.configure_client do |config|
   config.redis = { size: 5, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
 
@@ -28,6 +44,7 @@ Sidekiq.configure_client do |config|
   end
 end
 
+# Configure Sidekiq server
 Sidekiq.configure_server do |config|
   config.redis = { size: 25, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
 
@@ -50,8 +67,10 @@ Sidekiq.configure_server do |config|
   SidekiqUniqueJobs::Server.configure(config)
 end
 
+# Configure Sidekiq unique jobs
 SidekiqUniqueJobs.configure do |config|
   config.enabled = !Rails.env.test?
 end
 
+# Configure Sidekiq throttled
 Sidekiq::Throttled.setup!

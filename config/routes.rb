@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'sidekiq/web'
+require 'sidekiq_unique_jobs/web'
+
 Rails.application.routes.draw do
   constraints =
     if !Rails.env.development?
@@ -7,6 +10,8 @@ Rails.application.routes.draw do
     else
       { constraints: { format: "jsonapi" } }
     end
+
+  mount Sidekiq::Web, at: '/-/sidekiq'
 
   namespace "-" do
     post 'csp-reports', to: proc { |env|
