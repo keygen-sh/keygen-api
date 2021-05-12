@@ -11,7 +11,7 @@ module Api::V1
 
     # GET /webhook-events
     def index
-      @events = policy_scope apply_scopes(current_account.webhook_events.preload(:event_type))
+      @events = policy_scope apply_scopes(current_account.webhook_events.without_blobs.preload(:event_type))
       authorize @events
 
       render jsonapi: @events
