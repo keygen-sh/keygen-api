@@ -12,6 +12,12 @@ class WebhookEvent < ApplicationRecord
   validates :event_type, presence: { message: "must exist" }
   validates :endpoint, url: true, presence: true
 
+  # NOTE(ezekg) A lot of the time, we don't need to load the payload
+  #             or last response body, e.g. when listing events.
+  scope :without_blobs, -> {
+    select(self.attribute_names - %w[payload last_response_body])
+  }
+
   scope :events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
 
   def status

@@ -4,13 +4,25 @@ class SerializableWebhookEvent < SerializableBase
   type "webhook-events"
 
   attribute :endpoint
-  attribute :payload
+  attribute :payload do
+    if @object.respond_to?(:payload)
+      @object.payload
+    else
+      '[OMITTED]'
+    end
+  end
   attribute :event do
     @object.event_type.event
   end
   attribute :status
   attribute :last_response_code
-  attribute :last_response_body
+  attribute :last_response_body do
+    if @object.respond_to?(:last_response_body)
+      @object.last_response_body
+    else
+      '[OMITTED]'
+    end
+  end
   attribute :created do
     @object.created_at
   end
