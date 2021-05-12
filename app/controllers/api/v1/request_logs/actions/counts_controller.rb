@@ -15,8 +15,8 @@ module Api::V1::RequestLogs::Actions
         end_date = Time.current
         sql = <<~SQL
           SELECT
-            "request_logs"."created_at"::date AS date,
-            COUNT(*) AS count
+            "request_logs"."created_at"::date AS logs_date,
+            COUNT(*)                          AS logs_count
           FROM
             "request_logs"
           WHERE
@@ -26,7 +26,9 @@ module Api::V1::RequestLogs::Actions
               "request_logs"."created_at" <= #{conn.quote end_date}
             )
           GROUP BY
-            "request_logs"."created_at"::date
+            logs_date
+          ORDER BY
+            logs_count ASC
         SQL
 
         rows = conn.execute sql.squish
@@ -37,7 +39,7 @@ module Api::V1::RequestLogs::Actions
         {
           meta: dates.map { |d| [d.strftime('%Y-%m-%d'), 0] }.to_h
             .merge(
-              rows.map { |r| r.fetch_values('date', 'count') }.to_h
+              rows.map { |r| r.fetch_values('logs_date', 'logs_count') }.to_h
             )
         }
       end

@@ -44,8 +44,8 @@ module Api::V1::Metrics::Actions
           if event_type_ids.any?
             <<~SQL
               SELECT
-                "metrics"."created_at"::date AS date,
-                COUNT(*) AS count
+                "metrics"."created_at"::date AS metrics_date,
+                COUNT(*)                     AS metrics_count
               FROM
                 "metrics"
               WHERE
@@ -56,13 +56,15 @@ module Api::V1::Metrics::Actions
                 ) AND
                 "metrics"."event_type_id" IN (#{event_type_ids.map { |m| conn.quote(m) }.join(", ")})
               GROUP BY
-                "metrics"."created_at"::date
+                metrics_date
+              ORDER BY
+                metrics_count ASC
             SQL
           else
             <<~SQL
               SELECT
-                "metrics"."created_at"::date AS date,
-                COUNT(*) AS count
+                "metrics"."created_at"::date AS metrics_date,
+                COUNT(*)                     AS metrics_count
               FROM
                 "metrics"
               WHERE
@@ -72,7 +74,9 @@ module Api::V1::Metrics::Actions
                   "metrics"."created_at" <= #{conn.quote end_date}
                 )
               GROUP BY
-                "metrics"."created_at"::date
+                metrics_date
+              ORDER BY
+                metrics_count ASC
             SQL
           end
 
@@ -82,9 +86,9 @@ module Api::V1::Metrics::Actions
         dates = start_date.to_date..end_date.to_date
 
         {
-          meta: dates.map { |d| [d.strftime("%Y-%m-%d"), 0] }.to_h
+          meta: dates.map { |d| [d.strftime('%Y-%m-%d'), 0] }.to_h
             .merge(
-              rows.map { |r| r.fetch_values("date", "count") }.to_h
+              rows.map { |r| r.fetch_values('metrics_date', 'metrics_count') }.to_h
             )
         }
       end
