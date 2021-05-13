@@ -566,6 +566,7 @@ module Stripe
       @at_risk_subscriptions ||= subscriptions
         .filter { |s| s.status == 'past_due' }
         .filter { |s| !payment_method_for(s.customer).present? }
+        .filter { |s| life_time_value_for(s) > 0 }
     end
 
     def converted_subscriptions
