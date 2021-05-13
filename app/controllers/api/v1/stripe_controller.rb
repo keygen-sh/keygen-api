@@ -98,11 +98,18 @@ module Api::V1
         return unless billing.present? &&
                       invoice.total > 0
 
-        case billing.receipts.paid.count
-        when 0
-          PlaintextMailer.first_payment_succeeded(account: billing.account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
-        when 2
-          PlaintextMailer.third_payment_succeeded(account: billing.account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+        successful_payment_count = billing.receipts.paid.count + 1
+        account = billing.account
+
+        case successful_payment_count
+        when 1
+          PlaintextMailer.first_payment_succeeded(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+        when 3, 6, 12
+          if account.last_prompt_for_review_sent_at.nil?
+            account.touch :last_prompt_for_review_sent_at
+
+            PlaintextMailer.prompt_for_review(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+          end
         end
 
         billing.receipts.create(

@@ -79,7 +79,7 @@ class PlaintextMailer < ApplicationMailer
     )
   end
 
-  def third_payment_succeeded(account:)
+  def prompt_for_review(account:)
     admin = account.admins.first
 
     mail(
@@ -89,7 +89,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
 
-        Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $20 Amazon gift card.
+        Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $20 Amazon gift card (or account credit).
 
         You can leave a review here: https://reviews.capterra.com/new/168916?utm_campaign=vendor_request_paid
 

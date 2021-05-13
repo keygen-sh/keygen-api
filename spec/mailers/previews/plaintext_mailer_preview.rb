@@ -18,8 +18,8 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.first_payment_succeeded account: account
   end
 
-  def third_payment_succeeded
-    PlaintextMailer.third_payment_succeeded account: account
+  def prompt_for_review
+    PlaintextMailer.prompt_for_review account: account
   end
 
   private
