@@ -274,6 +274,85 @@ ActiveRecord::Schema.define(version: 2021_06_07_163343) do
     t.index ["id", "created_at"], name: "index_receipts_on_id_and_created_at", unique: true
   end
 
+  create_table "release_channels", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name"
+    t.string "key"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_channels_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_channels_on_account_id_and_key", unique: true
+  end
+
+  create_table "release_download_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "release_id", null: false
+    t.text "url"
+    t.integer "ttl"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_download_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["release_id"], name: "index_release_download_links_on_release_id"
+  end
+
+  create_table "release_entitlement_constraints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "release_id", null: false
+    t.uuid "entitlement_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "release_entls_acct_created_idx", order: { created_at: :desc }
+    t.index ["account_id", "release_id", "entitlement_id"], name: "release_entls_acct_rel_ent_ids_idx", unique: true
+    t.index ["entitlement_id"], name: "index_release_entitlement_constraints_on_entitlement_id"
+    t.index ["release_id"], name: "index_release_entitlement_constraints_on_release_id"
+  end
+
+  create_table "release_platforms", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name"
+    t.string "key"
+    t.jsonb "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_platforms_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
+  end
+
+  create_table "release_upload_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "release_id", null: false
+    t.text "url"
+    t.integer "ttl"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_upload_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["release_id"], name: "index_release_upload_links_on_release_id"
+  end
+
+  create_table "releases", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "product_id", null: false
+    t.uuid "release_platform_id", null: false
+    t.uuid "release_channel_id", null: false
+    t.string "name"
+    t.string "version"
+    t.string "key"
+    t.integer "size"
+    t.boolean "require_license_key", default: true
+    t.bigint "download_count", default: 0
+    t.jsonb "metadata"
+    t.datetime "yanked_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
+    t.index ["account_id", "product_id", "key"], name: "index_releases_on_account_id_and_product_id_and_key", unique: true
+    t.index ["account_id", "product_id", "release_platform_id", "release_channel_id", "version"], name: "releases_acct_prod_plat_chan_version_idx", unique: true
+    t.index ["account_id", "product_id", "require_license_key"], name: "releases_acct_prod_req_key_idx"
+    t.index ["product_id"], name: "index_releases_on_product_id"
+    t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
+    t.index ["release_platform_id"], name: "index_releases_on_release_platform_id"
+  end
+
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
     t.string "request_id"
