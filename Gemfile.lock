@@ -350,6 +350,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    semverse (3.0.0)
     sendgrid-actionmailer (3.1.1)
       mail (~> 2.7)
       sendgrid-ruby (~> 6.0)
@@ -465,6 +466,7 @@ DEPENDENCIES
   rspec-expectations
   rspec-rails (~> 3.5)
   sass-rails
+  semverse
   sendgrid-actionmailer
   sendgrid-ruby
   sidekiq

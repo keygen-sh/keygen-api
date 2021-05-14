@@ -23,6 +23,9 @@ class Account < ApplicationRecord
   has_many :entitlements
   has_many :policy_entitlements
   has_many :license_entitlements
+  has_many :releases
+  has_many :release_platforms
+  has_many :release_channels
   has_one :billing
 
   accepts_nested_attributes_for :users
