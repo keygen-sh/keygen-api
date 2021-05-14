@@ -174,6 +174,7 @@ Rails.application.routes.draw do
             resources "machines", only: [:index, :show]
             resources "tokens", only: [:index, :show]
             resources "users", only: [:index, :show]
+            resources "releases"
             member do
               post "tokens", to: "tokens#generate"
             end

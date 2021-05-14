@@ -68,6 +68,9 @@ gem 'sass-rails'
 # Logging
 gem 'lograge'
 
+# Semver
+gem 'semverse'
+
 group :production do
   # Monitoring/APM
   gem 'rails_autoscale_agent'
