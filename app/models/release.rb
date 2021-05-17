@@ -31,6 +31,10 @@ class Release < ApplicationRecord
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
 
+  scope :for_product, -> product {
+    where(product: product)
+  }
+
   scope :for_platform, -> platform {
     case platform
     when ReleasePlatform
