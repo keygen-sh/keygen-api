@@ -28,7 +28,9 @@ class ReleaseUpdateService < BaseService
               :channel
 
   def available_releases
-    @available_releases ||= product.releases.for_platform(platform).for_channel(channel)
+    @available_releases ||= account.releases.for_product(product)
+                                            .for_platform(platform)
+                                            .for_channel(channel)
   end
 
   def available_versions
