@@ -23,7 +23,7 @@ module Api::V1::Licenses::Relationships
         **kwargs
       )
       if token.valid?
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "token.generated",
           account: current_account,
           resource: token

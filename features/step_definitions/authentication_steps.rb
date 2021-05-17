@@ -9,7 +9,7 @@ Given /^I am(?: an?)? (admin|developer|sales agent|support agent|user|product|li
   @bearer =
     case role
     when "admin", "user", "developer", "sales agent", "support agent"
-      account.users.roles(role.parameterize.underscore).first
+      account.users.with_roles(role.parameterize.underscore).first
     when "product"
       account.products.first
     when "license"
@@ -32,13 +32,13 @@ Given /^I do not have 2FA$/ do
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "(user|admin)" does not have 2FA$/ do |named_index, user_role|
-  user = @account.users.roles(user_role).send(named_index)
+  user = @account.users.with_roles(user_role).send(named_index)
 
   user.second_factors.delete_all
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "(user|admin)" has 2FA (disabled|enabled)$/ do |named_index, user_role, second_factor_status|
-  user = @account.users.roles(user_role).send(named_index)
+  user = @account.users.with_roles(user_role).send(named_index)
 
   @second_factor = SecondFactor.new user: user, account: user.account
   @second_factor.enabled = second_factor_status == 'enabled'

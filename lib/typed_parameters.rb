@@ -58,10 +58,12 @@ class TypedParameters
     # and validate for unpermitted params
     if schema.strict?
       parser = ActionDispatch::Request.parameter_parsers[:jsonapi]
-      raise InvalidRequestError, "Request's content type and/or accept headers are unsupported (expected application/vnd.api+json)" if parser.nil?
+      raise InvalidRequestError, "content-type and/or accept headers are unsupported (expected application/vnd.api+json)" if
+        parser.nil?
 
       body = context.request.raw_post
-      body = '{}' unless body.present?
+      body = '{}' unless
+        body.present?
 
       segment = parser.call body
       schema.validate! segment
@@ -296,6 +298,7 @@ class TypedParameters
         params.merge! key => value
       end
     end
+    alias_method :query, :param
 
     def items(type:, &block)
       [VALID_TYPES.fetch(type.to_sym, nil), block]
@@ -329,6 +332,14 @@ class TypedParameters
           end
         end
         alias_method :typed_params, :typed_parameters
+
+        def typed_query(&block)
+          resource = controller_name.classify.underscore
+
+          define_method "#{resource}_query" do
+            @_typed_query ||= TypedParameters.build self, &block
+          end
+        end
       end
 
       private

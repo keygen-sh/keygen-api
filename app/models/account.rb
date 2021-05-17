@@ -52,7 +52,7 @@ class Account < ApplicationRecord
 
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
-  scope :plan, -> (id) { where plan: id }
+  scope :with_plan, -> (id) { where plan: id }
 
   after_commit :clear_cache!, on: [:update, :destroy]
 

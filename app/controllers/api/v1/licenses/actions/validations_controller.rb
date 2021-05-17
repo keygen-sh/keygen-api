@@ -26,7 +26,7 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at unless request.headers['origin'] == 'https://app.keygen.sh'
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
@@ -64,7 +64,7 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
@@ -111,7 +111,7 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,

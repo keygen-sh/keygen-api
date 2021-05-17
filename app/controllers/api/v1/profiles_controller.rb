@@ -21,25 +21,12 @@ module Api::V1
       renderer = JSONAPI::Serializable::Renderer.new
       rendered_bearer = renderer.render(current_bearer, {
         expose: { url_helpers: Rails.application.routes.url_helpers },
-        class: {
-          Account: SerializableAccount,
-          Product: SerializableProduct,
-          License: SerializableLicense,
-          User: SerializableUser,
-          Error: SerializableError,
-        }
+        class: SERIALIZABLE_CLASSES,
       })
 
       rendered_token = renderer.render(current_token, {
         expose: { url_helpers: Rails.application.routes.url_helpers },
-        class: {
-          Account: SerializableAccount,
-          Token: SerializableToken,
-          Product: SerializableProduct,
-          License: SerializableLicense,
-          User: SerializableUser,
-          Error: SerializableError,
-        }
+        class: SERIALIZABLE_CLASSES,
       })
 
       rendered_bearer.tap do |data|

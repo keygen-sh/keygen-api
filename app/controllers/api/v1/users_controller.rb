@@ -2,10 +2,10 @@
 
 module Api::V1
   class UsersController < Api::V1::BaseController
-    has_scope :metadata, type: :hash, only: :index
-    has_scope :roles, type: :array, default: [:user]
+    has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
+    has_scope(:roles, type: :array, default: [:user]) { |c, s, v| s.with_roles(v) }
+    has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope :active
-    has_scope :product
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: [:index, :create, :destroy]
@@ -34,7 +34,7 @@ module Api::V1
       authorize @user
 
       if @user.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "user.created",
           account: current_account,
           resource: @user
@@ -51,7 +51,7 @@ module Api::V1
       authorize @user
 
       if @user.update(user_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "user.updated",
           account: current_account,
           resource: @user
@@ -68,7 +68,7 @@ module Api::V1
       authorize @user
 
       if @user.destroy_async
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "user.deleted",
           account: current_account,
           resource: @user

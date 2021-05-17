@@ -25,7 +25,7 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.pause_subscription!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "account.subscription.paused",
           account: @account,
           resource: @account
@@ -43,7 +43,7 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.resume_subscription!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "account.subscription.resumed",
           account: @account,
           resource: @account
@@ -61,7 +61,7 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.cancel_subscription_at_period_end!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "account.subscription.canceled",
           account: @account,
           resource: @account
@@ -79,7 +79,7 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.renew_subscription!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "account.subscription.renewed",
           account: @account,
           resource: @account

@@ -39,7 +39,7 @@ module Api::V1::Users::Relationships
       end
 
       if @second_factor.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: 'second-factor.created',
           account: current_account,
           resource: @second_factor
@@ -62,7 +62,7 @@ module Api::V1::Users::Relationships
       end
 
       if @second_factor.update(second_factor_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: @second_factor.enabled? ? 'second-factor.enabled' : 'second-factor.disabled',
           account: current_account,
           resource: @second_factor
@@ -84,7 +84,7 @@ module Api::V1::Users::Relationships
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: 'second-factor.deleted',
         account: current_account,
         resource: @second_factor

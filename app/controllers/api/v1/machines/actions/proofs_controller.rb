@@ -15,7 +15,7 @@ module Api::V1::Machines::Actions
       proof = @machine.generate_proof(dataset: dataset)
       meta = { proof: proof }
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "machine.proofs.generated",
         account: current_account,
         resource: @machine,

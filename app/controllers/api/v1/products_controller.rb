@@ -28,7 +28,7 @@ module Api::V1
       authorize @product
 
       if @product.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "product.created",
           account: current_account,
           resource: @product
@@ -45,7 +45,7 @@ module Api::V1
       authorize @product
 
       if @product.update(product_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "product.updated",
           account: current_account,
           resource: @product
@@ -61,7 +61,7 @@ module Api::V1
     def destroy
       authorize @product
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "product.deleted",
         account: current_account,
         resource: @product

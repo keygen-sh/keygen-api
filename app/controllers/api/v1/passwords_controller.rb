@@ -12,7 +12,7 @@ module Api::V1
 
       token = @user.generate_password_reset_token
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "user.password-reset",
         account: current_account,
         resource: @user,

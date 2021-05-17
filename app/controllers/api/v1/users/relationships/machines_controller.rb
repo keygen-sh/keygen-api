@@ -2,9 +2,9 @@
 
 module Api::V1::Users::Relationships
   class MachinesController < Api::V1::BaseController
-    has_scope :fingerprint
-    has_scope :product
-    has_scope :license
+    has_scope(:fingerprint) { |c, s, v| s.with_fingerprint(v) }
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:license) { |c, s, v| s.for_license(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

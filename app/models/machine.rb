@@ -128,15 +128,15 @@ class Machine < ApplicationRecord
     end
   }
 
-  scope :metadata, -> (meta) { search_metadata meta }
-  scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
-  scope :hostname, -> (hostname) { where hostname: hostname }
-  scope :ip, -> (ip_address) { where ip: ip_address }
-  scope :license, -> (id) { where license: id }
-  scope :key, -> (key) { joins(:license).where licenses: { key: key } }
-  scope :user, -> (id) { joins(:license).where licenses: { user_id: id } }
-  scope :product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
-  scope :policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
+  scope :with_metadata, -> (meta) { search_metadata meta }
+  scope :with_fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
+  scope :with_hostname, -> (hostname) { where hostname: hostname }
+  scope :with_ip, -> (ip_address) { where ip: ip_address }
+  scope :for_license, -> (id) { where license: id }
+  scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
+  scope :for_user, -> (id) { joins(:license).where licenses: { user_id: id } }
+  scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
+  scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)

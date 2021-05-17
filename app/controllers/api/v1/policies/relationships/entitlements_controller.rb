@@ -32,7 +32,7 @@ module Api::V1::Policies::Relationships
 
       attached = @policy.policy_entitlements.create!(entitlements_data)
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: 'policy.entitlements.attached',
         account: current_account,
         resource: attached
@@ -65,7 +65,7 @@ module Api::V1::Policies::Relationships
 
       detached = @policy.policy_entitlements.delete(policy_entitlements)
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: 'policy.entitlements.detached',
         account: current_account,
         resource: detached

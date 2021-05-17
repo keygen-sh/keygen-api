@@ -2,9 +2,9 @@
 
 module Api::V1::Users::Relationships
   class LicensesController < Api::V1::BaseController
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:policy) { |c, s, v| s.for_policy(v) }
     has_scope :suspended
-    has_scope :product
-    has_scope :policy
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
