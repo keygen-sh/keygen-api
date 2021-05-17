@@ -32,7 +32,7 @@ class LicenseOverdueCheckInsWorker
         next if !license.next_check_in_at.nil? &&
                 license.next_check_in_at < 12.hours.ago
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.check-in-overdue",
           account: license.account,
           resource: license
@@ -44,7 +44,7 @@ class LicenseOverdueCheckInsWorker
         next if !license.last_check_in_soon_event_sent_at.nil? &&
                 license.last_check_in_soon_event_sent_at > 24.hours.ago
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.check-in-required-soon",
           account: license.account,
           resource: license

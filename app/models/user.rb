@@ -20,6 +20,8 @@ class User < ApplicationRecord
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :products, -> { select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').reorder(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
+  has_many :license_entitlements, through: :licenses
+  has_many :policy_entitlements, through: :licenses
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_one :role, as: :resource, dependent: :destroy
@@ -77,12 +79,12 @@ class User < ApplicationRecord
     end
   }
 
-  scope :metadata, -> (meta) { search_metadata meta }
-  scope :roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
-  scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
-  scope :license, -> (id) { joins(:license).where licenses: id }
-  scope :user, -> (id) { where id: id }
-  scope :admins, -> { roles :admin }
+  scope :with_metadata, -> (meta) { search_metadata meta }
+  scope :with_roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
+  scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
+  scope :for_license, -> (id) { joins(:license).where licenses: id }
+  scope :for_user, -> (id) { where id: id }
+  scope :admins, -> { with_roles :admin }
   scope :active, -> (status = true) {
     sub_query = License.where('"licenses"."user_id" = "users"."id"').select(1).arel.exists
 
@@ -92,6 +94,16 @@ class User < ApplicationRecord
       where.not(sub_query)
     end
   }
+
+  def entitlements
+    entl = Entitlement.where(account_id: account_id).distinct
+
+    entl.left_outer_joins(:policy_entitlements, :license_entitlements)
+        .where(policy_entitlements: { policy_id: licenses.reorder(nil).select(:policy_id) })
+        .or(
+          entl.where(license_entitlements: { license_id: licenses.reorder(nil).select(:id) })
+        )
+  end
 
   def full_name
     return nil if first_name.nil? || last_name.nil?

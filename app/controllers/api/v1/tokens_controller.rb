@@ -56,7 +56,7 @@ module Api::V1
             **kwargs
           )
           if token.valid?
-            CreateWebhookEventService.call(
+            BroadcastEventService.call(
               event: "token.generated",
               account: current_account,
               resource: token
@@ -93,7 +93,7 @@ module Api::V1
 
         tok.regenerate!
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "token.regenerated",
           account: current_account,
           resource: tok
@@ -111,7 +111,7 @@ module Api::V1
 
       @token.regenerate!
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "token.regenerated",
         account: current_account,
         resource: @token
@@ -124,7 +124,7 @@ module Api::V1
     def revoke
       authorize @token
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "token.revoked",
         account: current_account,
         resource: @token

@@ -2,8 +2,8 @@
 
 module Api::V1
   class KeysController < Api::V1::BaseController
-    has_scope :product
-    has_scope :policy
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:policy) { |c, s, v| s.for_policy(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -31,7 +31,7 @@ module Api::V1
       authorize @key
 
       if @key.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "key.created",
           account: current_account,
           resource: @key
@@ -48,7 +48,7 @@ module Api::V1
       authorize @key
 
       if @key.update(key_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "key.updated",
           account: current_account,
           resource: @key
@@ -64,7 +64,7 @@ module Api::V1
     def destroy
       authorize @key
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "key.deleted",
         account: current_account,
         resource: @key

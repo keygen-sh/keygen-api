@@ -16,7 +16,7 @@ module Api::V1::Licenses::Actions
         @license.save!
       end
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "license.usage.incremented",
         account: current_account,
         resource: @license
@@ -44,7 +44,7 @@ module Api::V1::Licenses::Actions
         @license.save!
       end
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "license.usage.decremented",
         account: current_account,
         resource: @license
@@ -68,7 +68,7 @@ module Api::V1::Licenses::Actions
       authorize @license
 
       if @license.update(uses: 0)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.usage.reset",
           account: current_account,
           resource: @license

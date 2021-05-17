@@ -12,11 +12,7 @@ module Api::V1
         plans = apply_scopes(Plan.visible).reorder('price ASC NULLS FIRST')
         data = JSONAPI::Serializable::Renderer.new.render(plans, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: {
-            Account: SerializableAccount,
-            Plan: SerializablePlan,
-            Error: SerializableError
-          }
+          class: SERIALIZABLE_CLASSES,
         })
 
         data

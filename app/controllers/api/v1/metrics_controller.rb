@@ -4,9 +4,8 @@ module Api::V1
   class MetricsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index
     has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
-
-    # TODO(ezekg) Rename metrics => events
-    has_scope :metrics, type: :array
+    has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
+    has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -21,11 +20,7 @@ module Api::V1
         metrics = policy_scope apply_scopes(current_account.metrics.preload(:event_type))
         data = JSONAPI::Serializable::Renderer.new.render(metrics, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: {
-            Account: SerializableAccount,
-            Metric: SerializableMetric,
-            Error: SerializableError
-          }
+          class: SERIALIZABLE_CLASSES,
         })
 
         data.tap do |d|

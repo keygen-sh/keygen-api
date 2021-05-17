@@ -2,7 +2,7 @@
 
 module Api::V1
   class PoliciesController < Api::V1::BaseController
-    has_scope :product
+    has_scope(:product) { |c, s, v| s.for_product(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -30,7 +30,7 @@ module Api::V1
       authorize @policy
 
       if @policy.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "policy.created",
           account: current_account,
           resource: @policy
@@ -47,7 +47,7 @@ module Api::V1
       authorize @policy
 
       if @policy.update(policy_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "policy.updated",
           account: current_account,
           resource: @policy
@@ -63,7 +63,7 @@ module Api::V1
     def destroy
       authorize @policy
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "policy.deleted",
         account: current_account,
         resource: @policy

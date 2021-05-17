@@ -172,12 +172,12 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
-  scope :metadata, -> (meta) { search_metadata meta }
-  scope :policy, -> (id) { where policy: id }
-  scope :user, -> (id) { where user: id }
-  scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
-  scope :machine, -> (id) { joins(:machines).where machines: { id: id } }
-  scope :fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
+  scope :with_metadata, -> (meta) { search_metadata meta }
+  scope :for_policy, -> (id) { where policy: id }
+  scope :for_user, -> (id) { where user: id }
+  scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
+  scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
+  scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
 
   delegate :requires_check_in?, to: :policy
   delegate :check_in_interval, to: :policy

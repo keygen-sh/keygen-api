@@ -28,7 +28,7 @@ module Api::V1::Accounts::Relationships
       )
 
       if status
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "account.billing.updated",
           account: @account,
           resource: @billing

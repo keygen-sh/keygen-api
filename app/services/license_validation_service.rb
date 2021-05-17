@@ -62,11 +62,11 @@ class LicenseValidationService < BaseService
         else
           case
           when license.policy.fingerprint_match_most?
-            return [false, "fingerprint scope does not match enough associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
+            return [false, "fingerprint scope does not match enough associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
           when license.policy.fingerprint_match_all?
-            return [false, "fingerprint scope does not match all associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).count < fingerprints.size
+            return [false, "fingerprint scope does not match all associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).count < fingerprints.size
           else
-            return [false, "fingerprint scope does not match any associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.fingerprint(fingerprints).empty?
+            return [false, "fingerprint scope does not match any associated machines", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).empty?
           end
         end
       else

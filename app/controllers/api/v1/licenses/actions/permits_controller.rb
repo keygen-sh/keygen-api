@@ -14,7 +14,7 @@ module Api::V1::Licenses::Actions
       if !@license.policy.requires_check_in?
         render_unprocessable_entity detail: "cannot be checked in because the policy does not require it"
       elsif @license.check_in!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.checked-in",
           account: current_account,
           resource: @license
@@ -38,7 +38,7 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.renew!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.renewed",
           account: current_account,
           resource: @license
@@ -54,7 +54,7 @@ module Api::V1::Licenses::Actions
     def revoke
       authorize @license
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "license.revoked",
         account: current_account,
         resource: @license
@@ -75,7 +75,7 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.suspend!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.suspended",
           account: current_account,
           resource: @license
@@ -99,7 +99,7 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.reinstate!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.reinstated",
           account: current_account,
           resource: @license

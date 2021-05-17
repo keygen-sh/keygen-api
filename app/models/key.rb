@@ -34,6 +34,6 @@ class Key < ApplicationRecord
     errors.add :key, :conflict, message: "is already being used as a license's key" if account.licenses.exists? key: key
   end
 
-  scope :policy, -> (id) { where policy: id }
-  scope :product, -> (id) { joins(:policy).where policies: { product_id: id } }
+  scope :for_policy, -> (id) { where policy: id }
+  scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
 end

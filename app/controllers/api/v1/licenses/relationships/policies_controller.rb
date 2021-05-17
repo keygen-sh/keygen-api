@@ -63,7 +63,7 @@ module Api::V1::Licenses::Relationships
       end
 
       if @license.update(policy: new_policy)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.policy.updated",
           account: current_account,
           resource: @license

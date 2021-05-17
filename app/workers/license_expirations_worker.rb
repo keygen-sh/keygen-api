@@ -18,7 +18,7 @@ class LicenseExpirationsWorker
         # Stop sending events after 12 hours have passed (allowing at max 2 events to be sent in total)
         next if license.expiry < 12.hours.ago
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.expired",
           account: license.account,
           resource: license
@@ -30,7 +30,7 @@ class LicenseExpirationsWorker
         next if !license.last_expiring_soon_event_sent_at.nil? &&
                 license.last_expiring_soon_event_sent_at > 24.hours.ago
 
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.expiring-soon",
           account: license.account,
           resource: license

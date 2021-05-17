@@ -35,8 +35,8 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-overdue' }
 
     it 'should send a license.check-in-overdue webhook event' do
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).to receive(:call)
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      expect_any_instance_of(BroadcastEventService).to receive(:call)
 
       create :license, :day_check_in, last_check_in_at: 25.hours.ago, account: account
 
@@ -47,8 +47,8 @@ describe LicenseOverdueCheckInsWorker do
     it 'should send multiple license.check-in-overdue webhook events' do
       events = 0
 
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
 
       create :license, :day_check_in, last_check_in_at: 42.hours.ago, account: account
       create :license, :day_check_in, last_check_in_at: 30.hours.ago, account: account
@@ -78,8 +78,8 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-overdue' }
 
     it 'should not send a license.check-in-overdue webhook event' do
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).not_to receive(:call)
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
 
       create :license, :week_check_in, last_check_in_at: 3.days.from_now, account: account
 
@@ -103,8 +103,8 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-required-soon' }
 
     it 'should send a license.check-in-required-soon webhook event' do
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).to receive(:call)
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      expect_any_instance_of(BroadcastEventService).to receive(:call)
 
       create :license, :day_check_in, last_check_in_at: 1.day.from_now, account: account
 
@@ -115,8 +115,8 @@ describe LicenseOverdueCheckInsWorker do
     it 'should send multiple license.check-in-required-soon webhook event' do
       events = 0
 
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      allow_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      allow_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
 
       create :license, :day_check_in, last_check_in_at: 4.days.from_now, account: account
       create :license, :day_check_in, last_check_in_at: 2.days.from_now, account: account
@@ -145,8 +145,8 @@ describe LicenseOverdueCheckInsWorker do
     let(:event) { 'license.check-in-required-soon' }
 
     it 'should not send a license.expiring-soon webhook event' do
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).not_to receive(:call)
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
 
       create :license, :month_check_in, last_check_in_at: 1.month.from_now, account: account
 

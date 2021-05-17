@@ -45,7 +45,7 @@ class RequestLimitsReportWorker
 
       request_limit = plan.max_reqs
 
-      admin_count = account.users.roles(:admin, :developer, :sales_agent, :support_agent).count
+      admin_count = account.users.with_roles(:admin, :developer, :sales_agent, :support_agent).count
       admin_limit = plan.max_admins
 
       product_count = account.products.count

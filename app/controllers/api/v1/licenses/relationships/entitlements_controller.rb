@@ -32,7 +32,7 @@ module Api::V1::Licenses::Relationships
 
       attached = @license.license_entitlements.create!(entitlements_data)
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: 'license.entitlements.attached',
         account: current_account,
         resource: attached
@@ -84,7 +84,7 @@ module Api::V1::Licenses::Relationships
 
       detached = @license.license_entitlements.delete(license_entitlements)
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: 'license.entitlements.detached',
         account: current_account,
         resource: detached

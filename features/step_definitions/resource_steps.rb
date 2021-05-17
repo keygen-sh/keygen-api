@@ -128,7 +128,7 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
 
   model =
     if resource == "users"
-      @account.send(resource).roles :user
+      @account.send(resource).with_roles :user
     else
       @account.send resource
     end
@@ -162,7 +162,7 @@ Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
 
   model =
     if resource == "users"
-      @account.send(resource).roles :user
+      @account.send(resource).with_roles :user
     else
       @account.send resource
     end
@@ -209,7 +209,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product 
 
   model =
     if resource == "users"
-      @account.send(resource).roles :user
+      @account.send(resource).with_roles :user
     else
       @account.send resource
     end
@@ -450,7 +450,7 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   when /^admins?$/
     expect(@account.users.admins.count).to eq count.to_i
   when /^users?$/
-    expect(@account.users.roles(:user).count).to eq count.to_i
+    expect(@account.users.with_roles(:user).count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
@@ -469,7 +469,7 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, reso
   when /^admins?$/
     expect(account.users.admins.count).to eq count.to_i
   when /^users?$/
-    expect(account.users.roles(:user).count).to eq count.to_i
+    expect(account.users.with_roles(:user).count).to eq count.to_i
   else
     expect(account.send(resource.pluralize.underscore).count).to eq count.to_i
   end

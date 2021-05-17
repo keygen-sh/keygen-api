@@ -26,7 +26,7 @@ module Api::V1::Policies::Relationships
     # DELETE /policies/1/pool
     def pop
       if key = @policy.pop!
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "policy.pool.popped",
           account: current_account,
           resource: key

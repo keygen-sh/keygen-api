@@ -81,7 +81,7 @@ class Policy < ApplicationRecord
     errors.add :scheme, :invalid, message: "must be encrypted when using LEGACY_ENCRYPT scheme" if !encrypted? && legacy_scheme?
   end
 
-  scope :product, -> (id) { where product: id }
+  scope :for_product, -> (id) { where product: id }
 
   def pool?
     use_pool

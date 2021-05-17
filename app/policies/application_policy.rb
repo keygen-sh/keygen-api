@@ -54,10 +54,6 @@ class ApplicationPolicy
 
   protected
 
-  def scope
-    Pundit.policy_scope! bearer, resource.class
-  end
-
   def account
     context.account
   end
@@ -68,6 +64,10 @@ class ApplicationPolicy
 
   def token
     context.token
+  end
+
+  def scope
+    Pundit.policy_scope! bearer, resource.class
   end
 
   def assert_account_scoped!
@@ -87,6 +87,8 @@ class ApplicationPolicy
     end
   end
 
+  private
+
   class Scope
     attr_reader :context, :scope
 
@@ -99,18 +101,20 @@ class ApplicationPolicy
       case
       when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
         scope
-      when scope.respond_to?(:bearer) && bearer.has_role?(:product, :user, :license)
-        scope.bearer bearer.id
-      when scope.respond_to?(:product) && bearer.has_role?(:product)
-        scope.product bearer.id
-      when scope.respond_to?(:user) && bearer.has_role?(:user)
-        scope.user bearer.id
-      when scope.respond_to?(:license) && bearer.has_role?(:license)
-        scope.license bearer.id
+      when scope.respond_to?(:for_bearer) && bearer.has_role?(:product, :user, :license)
+        scope.for_bearer bearer.id
+      when scope.respond_to?(:for_product) && bearer.has_role?(:product)
+        scope.for_product bearer.id
+      when scope.respond_to?(:for_user) && bearer.has_role?(:user)
+        scope.for_user bearer.id
+      when scope.respond_to?(:for_license) && bearer.has_role?(:license)
+        scope.for_license bearer.id
       else
         scope.none
       end
-    rescue NoMethodError
+    rescue NoMethodError => e
+      Keygen.logger.exception(e)
+
       scope.none
     end
 
