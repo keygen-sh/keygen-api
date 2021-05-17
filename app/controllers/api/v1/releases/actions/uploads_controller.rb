@@ -10,6 +10,7 @@ module Api::V1::Releases::Actions
     def show
       authorize release
 
+      # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
       signer = Aws::S3::Presigner.new
       ttl = 60.seconds.to_i
       url = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
