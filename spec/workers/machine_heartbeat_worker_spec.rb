@@ -39,8 +39,8 @@ describe MachineHeartbeatWorker do
     let(:heartbeat_at) { nil }
 
     it 'should not send a webhook event' do
-      allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).not_to receive(:call)
+      allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+      expect_any_instance_of(BroadcastEventService).not_to receive(:call)
 
       worker.perform_async machine.id
       worker.drain
@@ -63,8 +63,8 @@ describe MachineHeartbeatWorker do
       it 'should send a machine.heartbeat.pong webhook event' do
         events = 0
 
-        allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
+        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
 
         worker.perform_async machine.id
         worker.drain
@@ -88,8 +88,8 @@ describe MachineHeartbeatWorker do
       it 'should send a machine.heartbeat.dead webhook event' do
         events = 0
 
-        allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
+        allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+        expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
 
         worker.perform_async machine.id
         worker.drain

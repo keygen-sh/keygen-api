@@ -2,7 +2,7 @@
 
 module Api::V1::Metrics::Actions
   class CountsController < Api::V1::BaseController
-    has_scope :metrics, type: :array
+    has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class CreateWebhookEventService < BaseService
-
+class BroadcastEventService < BaseService
   def initialize(event:, account:, resource:, meta: nil)
     @event    = event
     @account  = account
@@ -12,29 +11,9 @@ class CreateWebhookEventService < BaseService
   def call
     options = {
       expose: { url_helpers: Rails.application.routes.url_helpers, context: :webhook },
-      class: {
-        Account: SerializableAccount,
-        Token: SerializableToken,
-        Product: SerializableProduct,
-        Policy: SerializablePolicy,
-        User: SerializableUser,
-        License: SerializableLicense,
-        Machine: SerializableMachine,
-        Key: SerializableKey,
-        Billing: SerializableBilling,
-        Plan: SerializablePlan,
-        WebhookEndpoint: SerializableWebhookEndpoint,
-        WebhookEvent: SerializableWebhookEvent,
-        Metric: SerializableMetric,
-        SecondFactor: SerializableSecondFactor,
-        LicenseEntitlement: SerializableLicenseEntitlement,
-        PolicyEntitlement: SerializablePolicyEntitlement,
-        Entitlement: SerializableEntitlement,
-        Error: SerializableError
-      }
+      class: SERIALIZABLE_CLASSES,
     }
 
-    # TODO: Move this out of the webhook event service
     begin
       RecordMetricService.call(
         metric: event,

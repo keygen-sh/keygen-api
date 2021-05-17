@@ -2,8 +2,8 @@
 
 module Api::V1::Products::Relationships
   class ReleasesController < Api::V1::BaseController
-    has_scope(:platform, only: :index) { |_, s, v| s.for_platform(v) }
-    has_scope(:channel, default: 'stable', only: :index) { |_, s, v|
+    has_scope(:platform, only: :index) { |c, s, v| s.for_platform(v) }
+    has_scope(:channel, default: 'stable', only: :index) { |c, s, v|
       s.for_channel(v)
     }
 
@@ -24,15 +24,6 @@ module Api::V1::Products::Relationships
       authorize release
 
       render jsonapi: release
-    end
-
-    def create
-    end
-
-    def update
-    end
-
-    def destroy
     end
 
     private

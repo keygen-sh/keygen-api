@@ -25,7 +25,7 @@ module Api::V1
       authorize @entitlement
 
       if @entitlement.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "entitlement.created",
           account: current_account,
           resource: @entitlement
@@ -41,7 +41,7 @@ module Api::V1
       authorize @entitlement
 
       if @entitlement.update(entitlement_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "entitlement.updated",
           account: current_account,
           resource: @entitlement
@@ -56,7 +56,7 @@ module Api::V1
     def destroy
       authorize @entitlement
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "entitlement.deleted",
         account: current_account,
         resource: @entitlement

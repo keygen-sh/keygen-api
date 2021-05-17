@@ -30,7 +30,7 @@ module Api::V1::Licenses::Relationships
       end
 
       if @license.update(user: user)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.user.updated",
           account: current_account,
           resource: @license

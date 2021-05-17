@@ -18,7 +18,7 @@ class WebhookEvent < ApplicationRecord
     select(self.attribute_names - %w[payload last_response_body])
   }
 
-  scope :events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
+  scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
 
   def status
     return :queued if updated_at.nil?

@@ -7,7 +7,7 @@ require 'sidekiq/testing'
 
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
-describe CreateWebhookEventService do
+describe BroadcastEventService do
   let(:account) { create(:account) }
   let(:endpoint) { create(:webhook_endpoint, account: account) }
   let(:resource) { create(:license, account: account) }
@@ -15,7 +15,7 @@ describe CreateWebhookEventService do
   def create_webhook_event!(account, resource)
     throw if endpoint.nil?
 
-    CreateWebhookEventService.call(
+    BroadcastEventService.call(
       event: 'license.created',
       account: account,
       resource: resource
@@ -29,7 +29,7 @@ describe CreateWebhookEventService do
   def create_validation_webhook_event!(account, resource, meta)
     throw if endpoint.nil?
 
-    CreateWebhookEventService.call(
+    BroadcastEventService.call(
       event: 'license.validation.succeeded',
       account: account,
       resource: resource,
@@ -44,26 +44,7 @@ describe CreateWebhookEventService do
   def jsonapi_render(model, options = nil)
     opts = {
       expose: { url_helpers: Rails.application.routes.url_helpers },
-      class: {
-        Account: SerializableAccount,
-        Token: SerializableToken,
-        Product: SerializableProduct,
-        Policy: SerializablePolicy,
-        User: SerializableUser,
-        License: SerializableLicense,
-        Machine: SerializableMachine,
-        Key: SerializableKey,
-        Billing: SerializableBilling,
-        Plan: SerializablePlan,
-        WebhookEndpoint: SerializableWebhookEndpoint,
-        WebhookEvent: SerializableWebhookEvent,
-        Metric: SerializableMetric,
-        SecondFactor: SerializableSecondFactor,
-        LicenseEntitlement: SerializableLicenseEntitlement,
-        PolicyEntitlement: SerializablePolicyEntitlement,
-        Entitlement: SerializableEntitlement,
-        Error: SerializableError
-      }
+      class: SERIALIZABLE_CLASSES,
     }
 
     opts.merge! options unless options.nil?

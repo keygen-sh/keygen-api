@@ -5,9 +5,6 @@ class SerializableRelease < SerializableBase
 
   attribute :name
   attribute :key
-  attribute :gated do
-    @object.gated?
-  end
   attribute :size
   attribute :version
   attribute :semver do
@@ -29,6 +26,9 @@ class SerializableRelease < SerializableBase
   end
   attribute :updated do
     @object.updated_at
+  end
+  attribute :yanked do
+    @object.yanked_at
   end
 
   relationship :account do
@@ -75,6 +75,6 @@ class SerializableRelease < SerializableBase
   end
 
   link :self do
-    @url_helpers.v1_account_product_release_path @object.account_id, @object.product_id, @object.id
+    @url_helpers.v1_account_release_path @object.account_id, @object.id
   end
 end

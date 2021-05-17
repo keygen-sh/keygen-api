@@ -157,7 +157,7 @@ Rails.application.routes.draw do
               end
             end
             resources "licenses", only: [:index, :show]
-            resource "product", only: [:index, :show]
+            resource "product", only: [:show]
             resources "entitlements", only: [:index, :show] do
               collection do
                 post "/", to: "entitlements#attach", as: "attach"
@@ -177,6 +177,26 @@ Rails.application.routes.draw do
             resources "releases"
             member do
               post "tokens", to: "tokens#generate"
+            end
+          end
+        end
+
+        resources "releases" do
+          scope module: "releases/relationships" do
+            resource "product", only: [:show]
+            resource "platform", only: [:show]
+            resource "channel", only: [:show]
+          end
+          member do
+            scope "actions", module: "releases/actions" do
+              post "download", to: "files#download_file"
+              post "upload", to: "files#upload_file"
+              post "yank", to: "files#yank_file"
+            end
+          end
+          collection do
+            scope "actions", module: "releases/actions" do
+              get "update", to: "updates#download_update"
             end
           end
         end

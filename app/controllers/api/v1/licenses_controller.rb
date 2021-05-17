@@ -2,14 +2,14 @@
 
 module Api::V1
   class LicensesController < Api::V1::BaseController
-    has_scope :metadata, type: :hash, only: :index
+    has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:policy) { |c, s, v| s.for_policy(v) }
+    has_scope(:user) { |c, s, v| s.for_user(v) }
+    has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope :suspended
     has_scope :expired
     has_scope :unassigned
-    has_scope :product
-    has_scope :policy
-    has_scope :user
-    has_scope :machine
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -37,7 +37,7 @@ module Api::V1
       authorize @license
 
       if @license.save
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.created",
           account: current_account,
           resource: @license
@@ -54,7 +54,7 @@ module Api::V1
       authorize @license
 
       if @license.update(license_params)
-        CreateWebhookEventService.call(
+        BroadcastEventService.call(
           event: "license.updated",
           account: current_account,
           resource: @license
@@ -70,7 +70,7 @@ module Api::V1
     def destroy
       authorize @license
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "license.deleted",
         account: current_account,
         resource: @license

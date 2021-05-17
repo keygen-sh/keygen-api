@@ -36,7 +36,7 @@ module Api::V1::Accounts::Relationships
       if status
         if @account.billing.update(state: :pending) &&
            @account.update(plan: @plan)
-          CreateWebhookEventService.call(
+          BroadcastEventService.call(
             event: "account.plan.updated",
             account: @account,
             resource: @plan

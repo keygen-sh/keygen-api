@@ -17,7 +17,7 @@ module Api::V1::Products::Relationships
         expiry: nil
       )
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "token.generated",
         account: current_account,
         resource: token

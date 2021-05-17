@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rubygems/version'
-
 class Release < ApplicationRecord
   include Limitable
   include Pageable
@@ -11,6 +9,7 @@ class Release < ApplicationRecord
   belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id
   belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id
   has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint'
+  has_many :entitlements, through: :entitlement_constraints
   has_many :download_links, class_name: 'ReleaseDownloadLink'
   has_many :upload_links, class_name: 'ReleaseUploadLink'
 
@@ -26,7 +25,7 @@ class Release < ApplicationRecord
   validates :version,
     presence: true,
     semver: true,
-    uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id] }
+    uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id release_channel_id] }
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
@@ -54,12 +53,12 @@ class Release < ApplicationRecord
       end
 
     case key.to_sym
-    when :stable     then self.stable
-    when :rc         then self.rc
-    when :beta       then self.beta
-    when :alpha      then self.alpha
-    when :dev        then self.dev
-    else                  self.none
+    when :stable then self.stable
+    when :rc     then self.rc
+    when :beta   then self.beta
+    when :alpha  then self.alpha
+    when :dev    then self.dev
+    else              self.none
     end
   }
 
@@ -70,19 +69,11 @@ class Release < ApplicationRecord
   scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
   scope :dev, -> { for_channel_key(%i(dev)) }
 
-  scope :ungated, -> { where(require_license_key: false) }
-  scope :gated, -> { where(require_license_key: true) }
+  scope :unyanked, -> { where(yanked_at: nil) }
+  scope :yanked, -> { where.not(yanked_at: nil) }
 
   def semver
     Semverse::Version.new(version)
-  end
-
-  def gated?
-    !!require_license_key
-  end
-
-  def ungated?
-    !gated?
   end
 
   def stable?

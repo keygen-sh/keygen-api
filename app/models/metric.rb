@@ -73,9 +73,8 @@ class Metric < ApplicationRecord
   validates :event_type, presence: { message: "must exist" }
   validates :data, presence: true
 
-  # TODO(ezekg) Rename metrics => events
-  scope :metrics, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
-  scope :current_period, -> {
+  scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
+  scope :for_current_period, -> {
     date_start = 2.weeks.ago.beginning_of_day
     date_end = Time.current
 

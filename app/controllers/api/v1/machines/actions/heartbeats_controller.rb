@@ -15,7 +15,7 @@ module Api::V1::Machines::Actions
         render_unprocessable_resource(@machine) and return
       end
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "machine.heartbeat.reset",
         account: current_account,
         resource: @machine
@@ -36,7 +36,7 @@ module Api::V1::Machines::Actions
         render_unprocessable_resource(@machine) and return
       end
 
-      CreateWebhookEventService.call(
+      BroadcastEventService.call(
         event: "machine.heartbeat.ping",
         account: current_account,
         resource: @machine

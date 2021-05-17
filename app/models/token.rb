@@ -36,7 +36,7 @@ class Token < ApplicationRecord
     token.errors.add :deactivations, :limit_exceeded, message: "exceeds maximum allowed (#{token.max_deactivations})"
   end
 
-  scope :bearer, -> (id) { where bearer: id }
+  scope :for_bearer, -> (id) { where bearer: id }
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.

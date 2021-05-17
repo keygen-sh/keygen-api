@@ -6,11 +6,11 @@ module Api::V1
     has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
     has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
-    has_scope(:request) { |_, s, v| s.search_request_id(v) }
-    has_scope(:ip) { |_, s, v| s.search_ip(v) }
-    has_scope(:method) { |_, s, v| s.search_method(v) }
-    has_scope(:url) { |_, s, v| s.search_url(v) }
-    has_scope(:status) { |_, s, v| s.search_status(v) }
+    has_scope(:request) { |c, s, v| s.search_request_id(v) }
+    has_scope(:ip) { |c, s, v| s.search_ip(v) }
+    has_scope(:method) { |c, s, v| s.search_method(v) }
+    has_scope(:url) { |c, s, v| s.search_url(v) }
+    has_scope(:status) { |c, s, v| s.search_status(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -25,11 +25,7 @@ module Api::V1
         request_logs = policy_scope apply_scopes(current_account.request_logs.without_blobs )
         data = JSONAPI::Serializable::Renderer.new.render(request_logs, {
           expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: {
-            Account: SerializableAccount,
-            RequestLog: SerializableRequestLog,
-            Error: SerializableError
-          }
+          class: SERIALIZABLE_CLASSES,
         })
 
         data.tap do |d|
