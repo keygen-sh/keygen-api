@@ -64,6 +64,13 @@ class Metric < ApplicationRecord
     entitlement.created
     entitlement.updated
     entitlement.deleted
+    release.created
+    release.updated
+    release.deleted
+    release.downloaded
+    release.update-downloaded
+    release.uploaded
+    release.yanked
   ].freeze
 
   belongs_to :account
