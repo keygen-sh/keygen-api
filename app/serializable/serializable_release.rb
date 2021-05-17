@@ -5,6 +5,15 @@ class SerializableRelease < SerializableBase
 
   attribute :name
   attribute :key
+  attribute :platform do
+    @object.platform.key
+  end
+  attribute :channel do
+    @object.channel.key
+  end
+  attribute :downloads do
+    @object.download_count
+  end
   attribute :size
   attribute :version
   attribute :semver do
@@ -45,32 +54,6 @@ class SerializableRelease < SerializableBase
     end
     link :related do
       @url_helpers.v1_account_product_path @object.account_id, @object.product_id
-    end
-  end
-  relationship :platform do
-    linkage always: true do
-      { type: :platforms, id: @object.release_platform_id }
-    end
-    link :related do
-      # TODO(ezekg)
-    end
-  end
-  relationship :channel do
-    linkage always: true do
-      { type: :channels, id: @object.release_channel_id }
-    end
-    link :related do
-      # TODO(ezekg)
-    end
-  end
-  relationship :downloads do
-    link :related do
-      # TODO(ezekg)
-    end
-    meta do
-      {
-        count: @object.download_count
-      }
     end
   end
 

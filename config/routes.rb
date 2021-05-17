@@ -182,21 +182,16 @@ Rails.application.routes.draw do
         end
 
         resources "releases" do
-          scope module: "releases/relationships" do
-            resource "product", only: [:show]
-            resource "platform", only: [:show]
-            resource "channel", only: [:show]
-          end
           member do
             scope "actions", module: "releases/actions" do
-              post "download", to: "files#download_file"
-              post "upload", to: "files#upload_file"
-              post "yank", to: "files#yank_file"
+              get "download", to: "uploads#show"
+              put "upload", to: "uploads#create"
+              delete "yank", to: "uploads#destroy"
             end
           end
           collection do
             scope "actions", module: "releases/actions" do
-              get "update", to: "updates#download_update"
+              get "update", to: "updates#check_for_update"
             end
           end
         end

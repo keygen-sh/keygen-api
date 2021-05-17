@@ -6,7 +6,7 @@ module Api::V1::Releases::Actions
     before_action :require_active_subscription!
     before_action :authenticate_with_token
 
-    def download_update
+    def check_for_update
       kwargs = update_query.to_h.symbolize_keys.slice(
         :product,
         :platform,
@@ -19,23 +19,28 @@ module Api::V1::Releases::Actions
         account: current_account,
         **kwargs
       )
-      authorize updater.current
+      authorize updater.current_release if
+        updater.current_release.present?
 
-      if updater.next.present?
-        authorize updater.next
+      if updater.next_release.present?
+        authorize updater.next_release
 
-        # TODO(ezekg) Add location header pointing to S3
+        signer = Aws::S3::Presigner.new
+        ttl = 60.seconds.to_i
+        url = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: updater.next_release.s3_object_key, expires_in: ttl)
+        link = updater.next_release.download_links.create!(account: current_account, url: url, ttl: ttl)
 
         BroadcastEventService.call(
-          event: 'release.downloaded-update',
+          event: 'release.update-downloaded',
           account: current_account,
-          resource: updater.next,
+          resource: updater.next_release,
           meta: {
-            version: updater.current.version,
+            prev_version: updater.current_version,
+            next_version: updater.next_version,
           }
         )
 
-        render jsonapi: updater.next, status: :see_other, location: ''
+        render jsonapi: updater.next_release, status: :see_other, location: link.url
       else
         render status: :no_content
       end
@@ -56,7 +61,7 @@ module Api::V1::Releases::Actions
     private
 
     typed_query do
-      on :download_update do
+      on :check_for_update do
         query :product, type: :string
         query :platform, type: :string
         query :version, type: :string

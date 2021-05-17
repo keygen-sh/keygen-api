@@ -12,7 +12,7 @@ module Api::V1
     before_action :set_release, only: [:show, :update, :destroy]
 
     def index
-      releases = apply_scopes(current_account.releases)
+      releases = apply_scopes(current_account.releases.preload(:platform, :channel))
       authorize releases
 
       render jsonapi: releases

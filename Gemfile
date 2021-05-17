@@ -68,7 +68,8 @@ gem 'sass-rails'
 # Logging
 gem 'lograge'
 
-# Semver
+# Dist
+gem 'aws-sdk-s3', '~> 1'
 gem 'semverse'
 
 group :production do
