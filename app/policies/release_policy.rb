@@ -24,7 +24,7 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def download_update?
+  def check_for_update?
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (

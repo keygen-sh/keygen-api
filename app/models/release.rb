@@ -72,6 +72,10 @@ class Release < ApplicationRecord
   scope :unyanked, -> { where(yanked_at: nil) }
   scope :yanked, -> { where.not(yanked_at: nil) }
 
+  def s3_object_key
+    "rels/#{account_id}/#{id}/#{key}"
+  end
+
   def semver
     Semverse::Version.new(version)
   end

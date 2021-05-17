@@ -51,8 +51,10 @@ class ReleaseUpdateService < BaseService
       end
 
     UpdateResult.new(
-      current: current_release,
-      next: next_release,
+      current_version: current_version,
+      current_release: current_release,
+      next_version: next_version,
+      next_release: next_release,
     )
   end
 

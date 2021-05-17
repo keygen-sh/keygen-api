@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 module Api::V1::Releases::Actions
-  class FilesController < Api::V1::BaseController
+  class UploadsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_release
 
-    def download_file
+    def show
       authorize release
 
-      # TODO(ezekg) Generate signed S3 download for file
+      signer = Aws::S3::Presigner.new
+      ttl = 60.seconds.to_i
+      url = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+      link = release.download_links.create!(account: current_account, url: url, ttl: ttl)
 
       BroadcastEventService.call(
         event: 'release.downloaded',
@@ -18,13 +21,16 @@ module Api::V1::Releases::Actions
         resource: release
       )
 
-      render jsonapi: release
+      render jsonapi: release, status: :see_other, location: link.url
     end
 
-    def upload_file
+    def create
       authorize release
 
-      # TODO(ezekg) Generate signed S3 upload for file
+      signer = Aws::S3::Presigner.new
+      ttl = 60.seconds.to_i
+      url = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+      link = release.upload_links.create!(account: current_account, url: url, ttl: ttl)
 
       BroadcastEventService.call(
         event: 'release.uploaded',
@@ -32,13 +38,14 @@ module Api::V1::Releases::Actions
         resource: release
       )
 
-      render jsonapi: release
+      render jsonapi: release, status: :temporary_redirect, location: link.url
     end
 
-    def yank_file
+    def destroy
       authorize release
 
-      # TODO(ezekg) Delete S3 file
+      s3 = Aws::S3::Client.new
+      s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
 
       release.touch :yanked_at
 
