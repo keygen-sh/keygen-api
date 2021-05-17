@@ -11,9 +11,10 @@ module Api::V1::Releases::Actions
       authorize release
 
       # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
-      signer = Aws::S3::Presigner.new
+      s3 = Aws::S3::Client.new
+      obj = s3.head_object(bucket: 'keygen-dist', key: release.s3_object_key)
       ttl = 60.seconds.to_i
-      url = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+      url = obj.presigned_url(expires_in: ttl)
       link = release.download_links.create!(account: current_account, url: url, ttl: ttl)
 
       BroadcastEventService.call(
@@ -23,6 +24,8 @@ module Api::V1::Releases::Actions
       )
 
       render jsonapi: release, status: :see_other, location: link.url
+    rescue Aws::S3::Errors::NotFound
+      render_unprocessable_entity detail: 'upload does not exist or is unavailable', code: :RELEASE_UPLOAD_UNAVAILABLE
     end
 
     def create
@@ -46,7 +49,8 @@ module Api::V1::Releases::Actions
       authorize release
 
       s3 = Aws::S3::Client.new
-      s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
+      obj = s3.head_object(bucket: 'keygen-dist', key: release.s3_object_key)
+      obj.delete
 
       release.touch :yanked_at
 
@@ -57,6 +61,8 @@ module Api::V1::Releases::Actions
       )
 
       render jsonapi: release
+    rescue Aws::S3::Errors::NotFound
+      render_unprocessable_entity detail: 'upload does not exist or is unavailable', code: :RELEASE_UPLOAD_UNAVAILABLE
     end
 
     private
