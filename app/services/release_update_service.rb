@@ -46,9 +46,9 @@ class ReleaseUpdateService < BaseService
       semver     = Semverse::Version.new(constrain_version)
       constraint =
         if channel.present?
-          "~> #{semver.major}-#{semver.minor}-#{channel}"
+          "~> #{semver.major}.#{semver.minor}-#{channel}"
         else
-          "~> #{semver.major}-#{semver.minor}"
+          "~> #{semver.major}.#{semver.minor}"
         end
 
       return Semverse::Constraint.satisfy_best(
