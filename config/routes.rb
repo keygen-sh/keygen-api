@@ -183,6 +183,12 @@ Rails.application.routes.draw do
 
         resources "releases" do
           scope module: "releases/relationships" do
+            resources "constraints", only: [:index, :show] do
+              collection do
+                post "/", to: "constraints#attach", as: "attach"
+                delete "/", to: "constraints#detach", as: "detach"
+              end
+            end
             resource "blob", only: [:show, :destroy] do
               put :create
             end
