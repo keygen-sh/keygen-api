@@ -41,8 +41,8 @@ describe BroadcastEventService do
     event
   end
 
-  def jsonapi_render(model, options = nil)
-    JSONAPI::Serializable::Renderer.new.render(model, options).to_json
+  def jsonapi_render(model, options = {})
+    Keygen::JSONAPI::Renderer.new.render(model, options).to_json
   end
 
   before do

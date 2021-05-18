@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableUser < SerializableBase
+class UserSerializer < BaseSerializer
   type :users
 
   attribute :full_name

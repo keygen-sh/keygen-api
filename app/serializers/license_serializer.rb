@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableLicense < SerializableBase
+class LicenseSerializer < BaseSerializer
   type :licenses
 
   attribute :name

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class SerializablePolicyEntitlement < SerializableBase
-  type "policy-entitlements"
+class LicenseEntitlementSerializer < BaseSerializer
+  type "license-entitlements"
 
   attribute :created do
     @object.created_at
@@ -28,16 +28,16 @@ class SerializablePolicyEntitlement < SerializableBase
     end
   end
 
-  relationship :policy do
+  relationship :license do
     linkage always: true do
-      { type: :polices, id: @object.policy_id }
+      { type: :licenses, id: @object.license_id }
     end
     link :related do
-      @url_helpers.v1_account_policy_path @object.account_id, @object.policy_id
+      @url_helpers.v1_account_license_path @object.account_id, @object.license_id
     end
   end
 
   link :related do
-    @url_helpers.v1_account_policy_entitlement_path @object.account_id, @object.policy_id, @object.entitlement_id
+    @url_helpers.v1_account_license_entitlement_path @object.account_id, @object.license_id, @object.entitlement_id
   end
 end

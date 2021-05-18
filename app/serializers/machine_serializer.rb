@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableMachine < SerializableBase
+class MachineSerializer < BaseSerializer
   type :machines
 
   attribute :fingerprint

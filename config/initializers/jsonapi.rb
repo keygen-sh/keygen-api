@@ -17,7 +17,12 @@ ActionDispatch::Request.parameter_parsers[:jsonapi] = -> (raw_post) {
   data.with_indifferent_access
 }
 
-# Update jsonapi-rails configuration to not render jsonapi version
 JSONAPI::Rails.configure do |config|
+  logger       = Logger.new(STDOUT)
+  logger.level = Logger::WARN
+
+  # Dynamic serializer class resolver
+  config.jsonapi_class  = -> klass { "#{klass}Serializer".safe_constantize }
   config.jsonapi_object = nil
+  config.logger         = logger
 end
