@@ -318,6 +318,17 @@ ActiveRecord::Schema.define(version: 2021_06_07_163343) do
     t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
   end
 
+  create_table "release_update_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "release_id", null: false
+    t.text "url"
+    t.integer "ttl"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_update_links_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["release_id"], name: "index_release_update_links_on_release_id"
+  end
+
   create_table "release_upload_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "release_id", null: false
@@ -343,6 +354,7 @@ ActiveRecord::Schema.define(version: 2021_06_07_163343) do
     t.datetime "yanked_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "update_count", default: 0
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "key"], name: "index_releases_on_account_id_and_product_id_and_key", unique: true
     t.index ["account_id", "product_id", "release_platform_id", "release_channel_id", "version"], name: "releases_acct_prod_plat_chan_version_idx", unique: true

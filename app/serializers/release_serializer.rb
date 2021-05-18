@@ -14,6 +14,9 @@ class ReleaseSerializer < BaseSerializer
   attribute :downloads do
     @object.download_count
   end
+  attribute :updates do
+    @object.update_count
+  end
   attribute :size
   attribute :version
   attribute :semver do

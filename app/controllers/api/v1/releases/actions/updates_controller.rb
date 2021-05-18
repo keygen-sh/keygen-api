@@ -34,7 +34,7 @@ module Api::V1::Releases::Actions
         signer = Aws::S3::Presigner.new
         ttl    = 60.seconds.to_i
         url    = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: updater.next_release.s3_object_key, expires_in: ttl)
-        link   = updater.next_release.download_links.create!(account: current_account, url: url, ttl: ttl)
+        link   = updater.next_release.update_links.create!(account: current_account, url: url, ttl: ttl)
 
         BroadcastEventService.call(
           event: 'release.update-downloaded',
@@ -46,7 +46,7 @@ module Api::V1::Releases::Actions
           }
         )
 
-        render jsonapi: updater.next_release, status: :see_other, location: link.url
+        render jsonapi: link, status: :see_other, location: link.url
       else
         render status: :no_content
       end
