@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableProduct < SerializableBase
+class ProductSerializer < BaseSerializer
   type :products
 
   attribute :name

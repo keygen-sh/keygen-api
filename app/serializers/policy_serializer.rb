@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializablePolicy < SerializableBase
+class PolicySerializer < BaseSerializer
   type :policies
 
   attribute :name

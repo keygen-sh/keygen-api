@@ -17,7 +17,7 @@ gem 'hiredis'
 
 # JSON API serializers
 gem 'json', '~> 2.3.0'
-gem 'jsonapi-rails', '0.3.1'
+gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 
 # Billing and subscriptions

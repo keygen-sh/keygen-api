@@ -20,7 +20,7 @@ class RetryWebhookEventService < BaseService
       event_type: event.event_type
     )
 
-    payload = JSONAPI::Serializable::Renderer.new.render(new_event, expose: { context: :webhook }).to_json
+    payload = Keygen::JSONAPI::Renderer.new(context: :webhook).render(new_event).to_json
 
     jid = WebhookWorker.perform_async(
       account.id,

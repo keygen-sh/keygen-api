@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Keygen
   class Logger
     def self.exception(e, context: nil)

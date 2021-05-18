@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableRequestLog < SerializableBase
+class RequestLogSerializer < BaseSerializer
   type "request-logs"
 
   attribute :request_id

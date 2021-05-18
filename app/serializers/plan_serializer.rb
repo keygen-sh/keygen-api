@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializablePlan < SerializableBase
+class PlanSerializer < BaseSerializer
   type :plans
 
   attribute :name

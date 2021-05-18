@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-class SerializableWebhookEndpoint < SerializableBase
-  type "webhook-endpoints"
+class EntitlementSerializer < BaseSerializer
+  type "entitlements"
 
-  attribute :url
-  attribute :subscriptions
-  attribute :signature_algorithm
+  attribute :name
+  attribute :code
+  attribute :metadata do
+    @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
+  end
   attribute :created do
     @object.created_at
   end
@@ -23,6 +25,6 @@ class SerializableWebhookEndpoint < SerializableBase
   end
 
   link :self do
-    @url_helpers.v1_account_webhook_endpoint_path @object.account_id, @object
+    @url_helpers.v1_account_entitlement_path @object.account_id, @object
   end
 end

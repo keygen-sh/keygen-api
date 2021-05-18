@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-class SerializableEntitlement < SerializableBase
-  type "entitlements"
+class ReleaseDownloadLinkSerializer < BaseSerializer
+  type 'release-download-links'
 
-  attribute :name
-  attribute :code
-  attribute :metadata do
-    @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
-  end
+  attribute :url
+  attribute :ttl
   attribute :created do
     @object.created_at
   end
@@ -23,8 +20,12 @@ class SerializableEntitlement < SerializableBase
       @url_helpers.v1_account_path @object.account_id
     end
   end
-
-  link :self do
-    @url_helpers.v1_account_entitlement_path @object.account_id, @object
+  relationship :release do
+    linkage always: true do
+      { type: :releases, id: @object.release_id }
+    end
+    link :related do
+      @url_helpers.v1_account_release_path @object.account_id, @object.release_id
+    end
   end
 end

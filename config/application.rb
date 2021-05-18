@@ -69,6 +69,7 @@ module Keygen
 
     # Add services/validators to autoload path
     config.autoload_paths += %W[
+      #{config.root}/app/serializers
       #{config.root}/app/validators
       #{config.root}/app/services
     ]
