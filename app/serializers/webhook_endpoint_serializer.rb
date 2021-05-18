@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class WebhookEndpointSerializer < BaseSerializer
-  type "webhook-endpoints"
+  type 'webhook-endpoints'
 
   attribute :url
   attribute :subscriptions

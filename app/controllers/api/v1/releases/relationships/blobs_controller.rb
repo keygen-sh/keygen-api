@@ -47,9 +47,9 @@ module Api::V1::Releases::Relationships
       authorize release, :upload?
 
       signer = Aws::S3::Presigner.new
-      ttl = 60.seconds.to_i
-      url = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
-      link = release.upload_links.create!(account: current_account, url: url, ttl: ttl)
+      ttl    = 60.seconds.to_i
+      url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+      link   = release.upload_links.create!(account: current_account, url: url, ttl: ttl)
 
       BroadcastEventService.call(
         event: 'release.uploaded',

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class WebhookEventSerializer < BaseSerializer
-  type "webhook-events"
+  type 'webhook-events'
 
   attribute :endpoint
   attribute :payload do
