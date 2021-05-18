@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PolicyEntitlementSerializer < BaseSerializer
-  type "policy-entitlements"
+  type 'policy-entitlements'
 
   attribute :created do
     @object.created_at

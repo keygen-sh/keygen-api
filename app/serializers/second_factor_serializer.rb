@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SecondFactorSerializer < BaseSerializer
-  type "second-factors"
+  type 'second-factors'
 
   attribute :uri, if: -> { @object.uri.present? && @context != :webhook } do
     @object.uri
