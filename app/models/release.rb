@@ -8,10 +8,10 @@ class Release < ApplicationRecord
   belongs_to :product
   belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id
   belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id
-  has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint'
+  has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint', dependent: :delete_all
   has_many :entitlements, through: :entitlement_constraints
-  has_many :download_links, class_name: 'ReleaseDownloadLink'
-  has_many :upload_links, class_name: 'ReleaseUploadLink'
+  has_many :download_links, class_name: 'ReleaseDownloadLink', dependent: :delete_all
+  has_many :upload_links, class_name: 'ReleaseUploadLink', dependent: :delete_all
 
   validates :account,
     presence: { message: 'must exist' }
