@@ -11,6 +11,7 @@ class Release < ApplicationRecord
   has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint', dependent: :delete_all
   has_many :entitlements, through: :entitlement_constraints
   has_many :download_links, class_name: 'ReleaseDownloadLink', dependent: :delete_all
+  has_many :update_links, class_name: 'ReleaseUpdateLink', dependent: :delete_all
   has_many :upload_links, class_name: 'ReleaseUploadLink', dependent: :delete_all
 
   validates :account,
