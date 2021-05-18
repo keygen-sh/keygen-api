@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableKey < SerializableBase
+class KeySerializer < BaseSerializer
   type :keys
 
   attribute :key

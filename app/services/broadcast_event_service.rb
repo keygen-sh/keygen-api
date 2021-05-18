@@ -10,27 +10,31 @@ class BroadcastEventService < BaseService
 
   def call
     begin
-      RecordMetricService.call(
-        metric: event,
-        account: account,
-        resource: resource
-      )
-    rescue
-      # noop
+      RecordMetricService.call(metric: event, account: account, resource: resource)
+    rescue => e
+      Keygen.logger.exception(e)
     end
 
     # Append meta to options for resource payload and serialize
     # for the async event creation worker
-    options = { expose: { context: :webhook } }
-    options.merge! meta: @meta.transform_keys { |k| k.to_s.camelize(:lower) } unless meta.nil?
+    begin
+      options = {}
+      options.merge! meta: meta.transform_keys { |k| k.to_s.camelize(:lower) } unless meta.nil?
 
-    payload = JSONAPI::Serializable::Renderer.new.render(resource, options).to_json
+      payload = Keygen::JSONAPI::Renderer.new(context: :webhook)
+                                         .render(resource, options)
+                                         .to_json
 
-    CreateWebhookEventsWorker.perform_async(
-      event,
-      account.id,
-      payload
-    )
+      CreateWebhookEventsWorker.perform_async(
+        event,
+        account.id,
+        payload
+      )
+    rescue => e
+      Keygen.logger.exception(e)
+
+      raise e
+    end
   end
 
   private

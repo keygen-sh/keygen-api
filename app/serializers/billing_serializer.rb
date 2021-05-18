@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableBilling < SerializableBase
+class BillingSerializer < BaseSerializer
   type :billings
 
   attribute :subscription_status

@@ -24,7 +24,7 @@ class CreateWebhookEventsWorker
       )
 
       # Serialize the event and decode so we can use in webhook job
-      payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, expose: { context: :webhook })
+      payload = Keygen::JSONAPI::Renderer.new(context: :webhook).render(webhook_event)
 
       # Set the payload attr of the webhook (since it's incomplete at the moment)
       payload[:data][:attributes][:payload] = data

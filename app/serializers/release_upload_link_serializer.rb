@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-class SerializableMetric < SerializableBase
-  type :metrics
+class ReleaseUploadLinkSerializer < BaseSerializer
+  type 'release-upload-links'
 
-  attribute :metric do
-    @object.event_type.event
-  end
-  attribute :data
+  attribute :url
+  attribute :ttl
   attribute :created do
     @object.created_at
   end
@@ -22,8 +20,12 @@ class SerializableMetric < SerializableBase
       @url_helpers.v1_account_path @object.account_id
     end
   end
-
-  link :self do
-    @url_helpers.v1_account_metric_path @object.account_id, @object
+  relationship :release do
+    linkage always: true do
+      { type: :releases, id: @object.release_id }
+    end
+    link :related do
+      @url_helpers.v1_account_release_path @object.account_id, @object.release_id
+    end
   end
 end

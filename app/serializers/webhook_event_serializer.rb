@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableWebhookEvent < SerializableBase
+class WebhookEventSerializer < BaseSerializer
   type "webhook-events"
 
   attribute :endpoint

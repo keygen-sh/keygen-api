@@ -6,7 +6,9 @@ module Pagination
   # Overload render method to append pagination links to response
   included do
     def render(args)
-      super args.merge links: pagination_links(args[:jsonapi]) unless performed?
+      resource = args[:jsonapi]
+
+      super args.merge(links: pagination_links(resource)) unless performed?
     rescue => e # TODO: Let's not catch everything here
       Keygen.logger.exception e
 

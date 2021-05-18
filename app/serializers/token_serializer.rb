@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableToken < SerializableBase
+class TokenSerializer < BaseSerializer
   type :tokens
 
   attribute :kind

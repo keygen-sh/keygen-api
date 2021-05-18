@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SerializableRelease < SerializableBase
+class ReleaseSerializer < BaseSerializer
   type :releases
 
   attribute :name
@@ -53,11 +53,16 @@ class SerializableRelease < SerializableBase
       { type: :products, id: @object.product_id }
     end
     link :related do
-      @url_helpers.v1_account_product_path @object.account_id, @object.product_id
+      @url_helpers.v1_account_release_product_path @object.account_id, @object
+    end
+  end
+  relationship :blob do
+    link :related do
+      @url_helpers.v1_account_release_blob_path @object.account_id, @object
     end
   end
 
   link :self do
-    @url_helpers.v1_account_release_path @object.account_id, @object.id
+    @url_helpers.v1_account_release_path @object.account_id, @object
   end
 end
