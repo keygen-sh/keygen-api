@@ -38,6 +38,6 @@ class ReleaseEntitlementConstraintSerializer < BaseSerializer
   end
 
   link :related do
-    @url_helpers.v1_account_release_constraint_path @object.account_id, @object.release_id, @object.entitlement_id
+    @url_helpers.v1_account_release_constraint_path @object.account_id, @object.release_id, @object
   end
 end
