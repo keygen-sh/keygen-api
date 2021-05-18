@@ -18,10 +18,7 @@ module Api::V1
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
         metrics = policy_scope apply_scopes(current_account.metrics.preload(:event_type))
-        data = JSONAPI::Serializable::Renderer.new.render(metrics, {
-          expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: SERIALIZABLE_CLASSES,
-        })
+        data = JSONAPI::Serializable::Renderer.new.render(metrics)
 
         data.tap do |d|
           d[:links] = pagination_links(metrics)

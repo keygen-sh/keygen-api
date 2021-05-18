@@ -9,11 +9,6 @@ class BroadcastEventService < BaseService
   end
 
   def call
-    options = {
-      expose: { url_helpers: Rails.application.routes.url_helpers, context: :webhook },
-      class: SERIALIZABLE_CLASSES,
-    }
-
     begin
       RecordMetricService.call(
         metric: event,
@@ -26,7 +21,9 @@ class BroadcastEventService < BaseService
 
     # Append meta to options for resource payload and serialize
     # for the async event creation worker
-    options.merge! meta: @meta.transform_keys { |k| k.to_s.camelize :lower } unless @meta.nil?
+    options = { expose: { context: :webhook } }
+    options.merge! meta: @meta.transform_keys { |k| k.to_s.camelize(:lower) } unless meta.nil?
+
     payload = JSONAPI::Serializable::Renderer.new.render(resource, options).to_json
 
     CreateWebhookEventsWorker.perform_async(
