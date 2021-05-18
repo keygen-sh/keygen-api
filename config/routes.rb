@@ -186,6 +186,8 @@ Rails.application.routes.draw do
             resource "blob", only: [:show, :destroy] do
               put :create
             end
+            resource "platform", only: [:show]
+            resource "channel", only: [:show]
             resource "product", only: [:show]
           end
           collection do
