@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RequestLogSerializer < BaseSerializer
-  type "request-logs"
+  type 'request-logs'
 
   attribute :request_id
   attribute :url

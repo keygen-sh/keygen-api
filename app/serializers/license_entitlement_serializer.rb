@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LicenseEntitlementSerializer < BaseSerializer
-  type "license-entitlements"
+  type 'license-entitlements'
 
   attribute :created do
     @object.created_at
