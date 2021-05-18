@@ -10,17 +10,17 @@ module Api::V1::Releases::Relationships
     def index
       authorize release, :list_constraints?
 
-      entitlements = apply_scopes(release.entitlements)
+      constraints = apply_scopes(release.entitlement_constraints)
 
-      render jsonapi: entitlements
+      render jsonapi: constraints
     end
 
     def show
       authorize release, :show_constraint?
 
-      entitlement = release.entitlements.find(params[:id])
+      constraint = release.entitlement_constraints.find(params[:id])
 
-      render jsonapi: entitlement
+      render jsonapi: constraint
     end
 
     def attach
