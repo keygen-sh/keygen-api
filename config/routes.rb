@@ -182,12 +182,11 @@ Rails.application.routes.draw do
         end
 
         resources "releases" do
-          member do
-            scope "actions", module: "releases/actions" do
-              get "download", to: "uploads#show"
-              put "upload", to: "uploads#create"
-              delete "yank", to: "uploads#destroy"
+          scope module: "releases/relationships" do
+            resource "blob", only: [:show, :destroy] do
+              put :create
             end
+            resource "product", only: [:show]
           end
           collection do
             scope "actions", module: "releases/actions" do
