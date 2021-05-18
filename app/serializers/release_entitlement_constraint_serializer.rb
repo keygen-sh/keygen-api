@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-class ReleaseUploadLinkSerializer < BaseSerializer
-  type 'release-upload-links'
+class ReleaseEntitlementConstraintSerializer < BaseSerializer
+  type "release-entitlement-constraints"
 
-  attribute :url
-  attribute :ttl
   attribute :created do
     @object.created_at
   end
@@ -20,6 +18,16 @@ class ReleaseUploadLinkSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
+
+  relationship :entitlement do
+    linkage always: true do
+      { type: :entitlements, id: @object.entitlement_id }
+    end
+    link :related do
+      @url_helpers.v1_account_entitlement_path @object.account_id, @object.entitlement_id
+    end
+  end
+
   relationship :release do
     linkage always: true do
       { type: :releases, id: @object.release_id }
@@ -30,6 +38,6 @@ class ReleaseUploadLinkSerializer < BaseSerializer
   end
 
   link :related do
-    @url_helpers.v1_account_release_blob_path @object.account_id, @object
+    @url_helpers.v1_account_release_constraint_path @object.account_id, @object.release_id, @object.entitlement_id
   end
 end

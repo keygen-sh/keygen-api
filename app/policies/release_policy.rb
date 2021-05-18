@@ -42,4 +42,24 @@ class ReleasePolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
+
+  def list_constraints?
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
+  def show_constraint?
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
+  def attach_constraint?
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
+  def detach_constraint?
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
 end

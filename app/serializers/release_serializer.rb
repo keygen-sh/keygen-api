@@ -56,6 +56,11 @@ class ReleaseSerializer < BaseSerializer
       @url_helpers.v1_account_release_product_path @object.account_id, @object
     end
   end
+  relationship :constraints do
+    link :related do
+      @url_helpers.v1_account_release_constraints_path @object.account_id, @object
+    end
+  end
   relationship :blob do
     link :related do
       @url_helpers.v1_account_release_blob_path @object.account_id, @object
