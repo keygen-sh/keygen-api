@@ -10,10 +10,7 @@ module Api::V1
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.hour, race_condition_ttl: 1.minute) do
         plans = apply_scopes(Plan.visible).reorder('price ASC NULLS FIRST')
-        data = JSONAPI::Serializable::Renderer.new.render(plans, {
-          expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: SERIALIZABLE_CLASSES,
-        })
+        data = JSONAPI::Serializable::Renderer.new.render(plans)
 
         data
       end

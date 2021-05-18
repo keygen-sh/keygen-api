@@ -23,10 +23,7 @@ module Api::V1
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
         request_logs = policy_scope apply_scopes(current_account.request_logs.without_blobs )
-        data = JSONAPI::Serializable::Renderer.new.render(request_logs, {
-          expose: { url_helpers: Rails.application.routes.url_helpers },
-          class: SERIALIZABLE_CLASSES,
-        })
+        data = JSONAPI::Serializable::Renderer.new.render(request_logs)
 
         data.tap do |d|
           d[:links] = pagination_links(request_logs)

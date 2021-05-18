@@ -19,15 +19,8 @@ module Api::V1
       # FIXME(ezekg) Move JSONAPI rendering into a service so that it's easier to
       #              switch to Netflix's JSONAPI lib, and also less verbose.
       renderer = JSONAPI::Serializable::Renderer.new
-      rendered_bearer = renderer.render(current_bearer, {
-        expose: { url_helpers: Rails.application.routes.url_helpers },
-        class: SERIALIZABLE_CLASSES,
-      })
-
-      rendered_token = renderer.render(current_token, {
-        expose: { url_helpers: Rails.application.routes.url_helpers },
-        class: SERIALIZABLE_CLASSES,
-      })
+      rendered_bearer = renderer.render(current_bearer)
+      rendered_token = renderer.render(current_token)
 
       rendered_bearer.tap do |data|
         token_payload = rendered_token[:data]
