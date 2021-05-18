@@ -73,7 +73,7 @@ class Release < ApplicationRecord
   scope :yanked, -> { where.not(yanked_at: nil) }
 
   def s3_object_key
-    "rels/#{account_id}/#{id}/#{key}"
+    "blobs/#{account_id}/#{id}/#{key}"
   end
 
   def semver

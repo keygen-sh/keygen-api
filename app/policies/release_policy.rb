@@ -24,7 +24,7 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def check_for_update?
+  def download?
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
@@ -33,21 +33,12 @@ class ReleasePolicy < ApplicationPolicy
       )
   end
 
-  def download_file?
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      resource.product == bearer ||
-      (
-        resource.entitlement_constraints.any? &&
-        (resource.entitlements & bearer.entitlements).any?
-      )
-  end
-
-  def upload_file?
+  def upload?
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
 
-  def yank_file?
+  def yank?
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
