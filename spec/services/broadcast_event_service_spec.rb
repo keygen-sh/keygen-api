@@ -42,14 +42,7 @@ describe BroadcastEventService do
   end
 
   def jsonapi_render(model, options = nil)
-    opts = {
-      expose: { url_helpers: Rails.application.routes.url_helpers },
-      class: SERIALIZABLE_CLASSES,
-    }
-
-    opts.merge! options unless options.nil?
-
-    JSONAPI::Serializable::Renderer.new.render(model, opts).to_json
+    JSONAPI::Serializable::Renderer.new.render(model, options).to_json
   end
 
   before do

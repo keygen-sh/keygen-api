@@ -1,36 +1,10 @@
 # frozen_string_literal: true
 
-Rails.application.reloader.to_prepare do
-  SERIALIZABLE_CLASSES = {
-    Account: SerializableAccount,
-    Billing: SerializableBilling,
-    Entitlement: SerializableEntitlement,
-    Error: SerializableError,
-    Key: SerializableKey,
-    LicenseEntitlement: SerializableLicenseEntitlement,
-    License: SerializableLicense,
-    Machine: SerializableMachine,
-    Metric: SerializableMetric,
-    Plan: SerializablePlan,
-    PolicyEntitlement: SerializablePolicyEntitlement,
-    Policy: SerializablePolicy,
-    Product: SerializableProduct,
-    Release: SerializableRelease,
-    RequestLog: SerializableRequestLog,
-    SecondFactor: SerializableSecondFactor,
-    Token: SerializableToken,
-    User: SerializableUser,
-    WebhookEndpoint: SerializableWebhookEndpoint,
-    WebhookEvent: SerializableWebhookEvent,
-  }
-end
-
 # Register JSON API mime-type
 Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
   application/vnd.keygen+json
   application/vnd.api+json
   application/json
-  text/x-json
 ]
 
 # Register parameter parser for JSON API mime-type to transform param keys from

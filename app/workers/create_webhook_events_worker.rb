@@ -10,11 +10,6 @@ class CreateWebhookEventsWorker
       Account.find account_id
     end
 
-    options = {
-      expose: { url_helpers: Rails.application.routes.url_helpers, context: :webhook },
-      class: SERIALIZABLE_CLASSES,
-    }
-
     account.webhook_endpoints.find_each do |endpoint|
       next unless endpoint.subscribed? event
 
@@ -29,7 +24,7 @@ class CreateWebhookEventsWorker
       )
 
       # Serialize the event and decode so we can use in webhook job
-      payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, options)
+      payload = JSONAPI::Serializable::Renderer.new.render(webhook_event, expose: { context: :webhook })
 
       # Set the payload attr of the webhook (since it's incomplete at the moment)
       payload[:data][:attributes][:payload] = data
