@@ -4,8 +4,16 @@ class TypedParameters
   class InvalidParameterError < StandardError
     attr_reader :source
 
-    def initialize(pointer:)
-      @source = { pointer: "/#{pointer}" }
+    def initialize(type:, param:)
+      @source =
+        case type
+        when :parameter
+          { parameter: "#{param}" }
+        when :pointer
+          { pointer: "/#{param}" }
+        else
+          nil
+        end
     end
   end
   class UnpermittedParametersError < StandardError; end
@@ -172,7 +180,7 @@ class TypedParameters
       handlers.merge! action => block
     end
 
-    def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, allow_non_scalars: false, inclusion: [], transform: nil, &block)
+    def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, allow_non_scalars: false, inclusion: [], transform: nil, source: :pointer, &block)
       return if optional && !context.params.key?(key.to_s)
 
       real_type = VALID_TYPES.fetch type.to_sym, nil
@@ -194,24 +202,24 @@ class TypedParameters
           begin
             value = COERCABLE_TYPES[type.to_sym].call value
           rescue
-            raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced"
+            raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced"
           end
         else
-          raise InvalidParameterError.new(pointer: keys.join("/")), "could not be coerced (expected one of #{COERCABLE_TYPES.keys.join ", "})"
+          raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced (expected one of #{COERCABLE_TYPES.keys.join ", "})"
         end
       end
 
       case
       when real_type.nil?
-        raise InvalidParameterError.new(pointer: keys.join("/")), "type is invalid (expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type is invalid (expected one of #{VALID_TYPES.keys.join ", "})"
       when value.nil? && !optional && !allow_nil
-        raise InvalidParameterError.new(pointer: keys.join("/")), "is missing"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
       when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
-        raise InvalidParameterError.new(pointer: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
       when value.blank? && !allow_blank
-        raise InvalidParameterError.new(pointer: keys.join("/")), "cannot be blank"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "cannot be blank"
       end
 
       transforms.merge! key => transform if transform.present?
@@ -245,18 +253,18 @@ class TypedParameters
                   v.each do |k, v|
                     next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
-                    raise InvalidParameterError.new(pointer: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
+                    raise InvalidParameterError.new(type: source, param: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
                   end
                 when Array
                   v.each_with_index do |v, i|
                     next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
-                    raise InvalidParameterError.new(pointer: (keys << i).join("/")), "unpermitted type (expected nested array of scalar types)"
+                    raise InvalidParameterError.new(type: source, param: (keys << i).join("/")), "unpermitted type (expected nested array of scalar types)"
                   end
                 end
               end
             else
-              raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected object of scalar types)"
+              raise InvalidParameterError.new(type: source, param: keys.join("/")), "unpermitted type (expected object of scalar types)"
             end
           end
 
@@ -269,7 +277,7 @@ class TypedParameters
           if index = value.index { |v| !Helper.compare_types(v.class, arr_type) }
             keys << index
 
-            raise InvalidParameterError.new(pointer: keys.join("/")), "type mismatch (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (expected array of #{Helper.class_type(arr_type).pluralize})"
           end
 
           # TODO: Handle array type here as well
@@ -290,7 +298,7 @@ class TypedParameters
           if index = value.index { |v| !SCALAR_TYPES[Helper.class_type(v.class).to_sym] }
             keys << index
 
-            raise InvalidParameterError.new(pointer: keys.join("/")), "unpermitted type (expected array of scalar types)"
+            raise InvalidParameterError.new(type: source, param: keys.join("/")), "unpermitted type (expected array of scalar types)"
           end
           params.merge! key => value
         end
@@ -298,7 +306,10 @@ class TypedParameters
         params.merge! key => value
       end
     end
-    alias_method :query, :param
+
+    def query(key, **kwargs, &block)
+      param(key, **kwargs.merge(source: :parameter))
+    end
 
     def items(type:, &block)
       [VALID_TYPES.fetch(type.to_sym, nil), block]

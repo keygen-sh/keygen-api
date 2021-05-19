@@ -7,6 +7,7 @@ class Release < ApplicationRecord
   belongs_to :account
   belongs_to :product
   belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id
+  belongs_to :filetype, class_name: 'ReleaseFiletype', foreign_key: :release_filetype_id
   belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id
   has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint', dependent: :delete_all
   has_many :entitlements, through: :entitlement_constraints
@@ -18,6 +19,8 @@ class Release < ApplicationRecord
     presence: { message: 'must exist' }
   validates :product,
     presence: { message: 'must exist' }
+  validates :filetype,
+    presence: { message: 'must exist' }
   validates :platform,
     presence: { message: 'must exist' }
   validates :channel,
@@ -26,10 +29,12 @@ class Release < ApplicationRecord
   validates :version,
     presence: true,
     semver: true,
-    uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id release_channel_id] }
+    uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id] }
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
+  validates :filesize,
+    numericality: { greater_than_or_equal_to: 0 }
 
   scope :for_product, -> product {
     where(product: product)
@@ -41,6 +46,15 @@ class Release < ApplicationRecord
       where(platform: platform)
     else
       joins(:platform).where(platform: { key: platform.to_s })
+    end
+  }
+
+  scope :for_filetype, -> filetype {
+    case filetype
+    when ReleasePlatform
+      where(filetype: filetype)
+    else
+      joins(:filetype).where(filetype: { key: filetype.to_s })
     end
   }
 

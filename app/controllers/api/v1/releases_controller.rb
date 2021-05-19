@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
+    has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -12,7 +13,7 @@ module Api::V1
     before_action :set_release, only: [:show, :update, :destroy]
 
     def index
-      releases = apply_scopes(current_account.releases.preload(:platform, :channel))
+      releases = apply_scopes(current_account.releases.preload(:platform, :filetype, :channel))
       authorize releases
 
       render jsonapi: releases
