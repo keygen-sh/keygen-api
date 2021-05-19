@@ -5,20 +5,74 @@ module Api::V1::Releases::Actions
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
+    before_action :set_release, only: %i[check_for_update_by_id]
 
-    def check_for_update
+    def check_for_update_by_query
+      skip_authorization # Handled downstream
+
       kwargs = update_query.to_h.symbolize_keys.slice(
         :product,
         :platform,
         :filetype,
         :version,
         :constraint,
-        :channel
+        :channel,
       )
 
+      check_for_update(**kwargs)
+    rescue ReleaseUpdateService::InvalidProductError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_PRODUCT, source: { parameter: :product }
+    rescue ReleaseUpdateService::InvalidPlatformError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_PLATFORM, source: { parameter: :platform }
+    rescue ReleaseUpdateService::InvalidFiletypeError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_FILETYPE, source: { parameter: :filetype }
+    rescue ReleaseUpdateService::InvalidVersionError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_VERSION, source: { parameter: :version }
+    rescue ReleaseUpdateService::InvalidConstraintError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_CONSTRAINT, source: { parameter: :constraint }
+    rescue ReleaseUpdateService::InvalidChannelError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_CHANNEL, source: { parameter: :channel }
+    end
+
+    def check_for_update_by_id
+      authorize release, :download? if
+        release.present?
+
+      kwargs = update_query.to_h.symbolize_keys
+        .slice(:constraint, :channel)
+        .merge(
+          product: release.product,
+          platform: release.platform,
+          filetype: release.filetype,
+          version: release.version,
+        )
+
+      check_for_update(**kwargs)
+    rescue ReleaseUpdateService::InvalidConstraintError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_CONSTRAINT, source: { parameter: :constraint }
+    rescue ReleaseUpdateService::InvalidChannelError => e
+      render_bad_request detail: e.message, code: :INVALID_UPDATE_CHANNEL, source: { parameter: :channel }
+    rescue ReleaseUpdateService::InvalidProductError,
+           ReleaseUpdateService::InvalidPlatformError,
+           ReleaseUpdateService::InvalidFiletypeError,
+           ReleaseUpdateService::InvalidVersionError,
+      render_unprocessable_entity
+    end
+
+    private
+
+    attr_reader :release
+
+    def set_release
+      @release = current_account.releases.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = release
+    end
+
+    def check_for_update(**kwargs)
       updater = ReleaseUpdateService.call(
         account: current_account,
-        **kwargs
+        **kwargs,
       )
       authorize updater.current_release, :download? if
         updater.current_release.present?
@@ -51,32 +105,25 @@ module Api::V1::Releases::Actions
       else
         render status: :no_content
       end
-    rescue ReleaseUpdateService::InvalidAccountError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_ACCOUNT, source: { parameter: :account }
-    rescue ReleaseUpdateService::InvalidProductError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_PRODUCT, source: { parameter: :product }
-    rescue ReleaseUpdateService::InvalidPlatformError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_PLATFORM, source: { parameter: :platform }
-    rescue ReleaseUpdateService::InvalidVersionError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_VERSION, source: { parameter: :version }
-    rescue ReleaseUpdateService::InvalidConstraintError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_CONSTRAINT, source: { parameter: :constraint }
-    rescue ReleaseUpdateService::InvalidChannelError => e
-      render_bad_request detail: e.message, code: :INVALID_UPDATE_CHANNEL, source: { parameter: :channel }
     rescue Aws::S3::Errors::NotFound
       Keygen.logger.warn "[releases.updates] No blob found: account=#{current_account.id} current_release=#{updater.current_release&.id} current_version=#{updater.current_version} next_release=#{updater.next_release&.id} next_version=#{updater.next_version}"
 
+      # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
+      #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
       render status: :no_content
     end
 
-    private
-
     typed_query do
-      on :check_for_update do
+      on :check_for_update_by_query do
         query :product, type: :string
         query :platform, type: :string
         query :filetype, type: :string
         query :version, type: :string
+        query :constraint, type: :string, optional: true
+        query :channel, type: :string, optional: true
+      end
+
+      on :check_for_update_by_id do
         query :constraint, type: :string, optional: true
         query :channel, type: :string, optional: true
       end
