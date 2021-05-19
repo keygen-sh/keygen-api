@@ -307,6 +307,16 @@ ActiveRecord::Schema.define(version: 2021_06_07_163343) do
     t.index ["release_id"], name: "index_release_entitlement_constraints_on_release_id"
   end
 
+  create_table "release_filetypes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name"
+    t.string "key"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
+  end
+
   create_table "release_platforms", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.string "name"
@@ -348,18 +358,20 @@ ActiveRecord::Schema.define(version: 2021_06_07_163343) do
     t.string "name"
     t.string "version"
     t.string "key"
-    t.integer "size"
+    t.integer "filesize"
     t.bigint "download_count", default: 0
     t.jsonb "metadata"
     t.datetime "yanked_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "update_count", default: 0
+    t.uuid "release_filetype_id", null: false
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "key"], name: "index_releases_on_account_id_and_product_id_and_key", unique: true
-    t.index ["account_id", "product_id", "release_platform_id", "release_channel_id", "version"], name: "releases_acct_prod_plat_chan_version_idx", unique: true
+    t.index ["account_id", "product_id", "release_platform_id", "release_channel_id", "release_filetype_id", "version"], name: "releases_acct_prod_plat_chan_type_ver_idx", unique: true
     t.index ["product_id"], name: "index_releases_on_product_id"
     t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
+    t.index ["release_filetype_id"], name: "index_releases_on_release_filetype_id"
     t.index ["release_platform_id"], name: "index_releases_on_release_platform_id"
   end
 

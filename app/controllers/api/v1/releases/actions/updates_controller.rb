@@ -10,6 +10,7 @@ module Api::V1::Releases::Actions
       kwargs = update_query.to_h.symbolize_keys.slice(
         :product,
         :platform,
+        :filetype,
         :version,
         :constraint,
         :channel
@@ -74,6 +75,7 @@ module Api::V1::Releases::Actions
       on :check_for_update do
         query :product, type: :string
         query :platform, type: :string
+        query :filetype, type: :string
         query :version, type: :string
         query :constraint, type: :string, optional: true
         query :channel, type: :string, optional: true

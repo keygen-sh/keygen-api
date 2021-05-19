@@ -4,12 +4,13 @@ class ReleaseUpdateService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidProductError < StandardError; end
   class InvalidPlatformError < StandardError; end
+  class InvalidFiletypeError < StandardError; end
   class InvalidVersionError < StandardError; end
   class InvalidConstraintError < StandardError; end
   class InvalidChannelError < StandardError; end
   class UpdateResult < OpenStruct; end
 
-  def initialize(account:, product:, platform:, version:, constraint: nil, channel: 'stable')
+  def initialize(account:, product:, platform:, filetype:, version:, constraint: nil, channel: 'stable')
     raise InvalidAccountError.new('account must be present') unless
       account.present?
 
@@ -18,6 +19,9 @@ class ReleaseUpdateService < BaseService
 
     raise InvalidPlatformError.new('platform must be present') unless
       platform.present?
+
+    raise InvalidFiletypeError.new('filetype must be present') unless
+      filetype.present?
 
     raise InvalidVersionError.new('current version must be present') unless
       version.present?
@@ -28,6 +32,7 @@ class ReleaseUpdateService < BaseService
     @account    = account
     @product    = product
     @platform   = platform
+    @filetype   = filetype
     @version    = version
     @constraint = constraint
     @channel    = channel
@@ -63,6 +68,7 @@ class ReleaseUpdateService < BaseService
   attr_reader :account,
               :product,
               :platform,
+              :filetype,
               :version,
               :constraint,
               :channel
@@ -70,6 +76,7 @@ class ReleaseUpdateService < BaseService
   def available_releases
     @available_releases ||= account.releases.for_product(product)
                                             .for_platform(platform)
+                                            .for_filetype(filetype)
                                             .for_channel(channel)
   end
 
