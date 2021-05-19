@@ -6,14 +6,18 @@ class Release < ApplicationRecord
 
   belongs_to :account
   belongs_to :product
-  belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id
-  belongs_to :filetype, class_name: 'ReleaseFiletype', foreign_key: :release_filetype_id
-  belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id
+  belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id, autosave: true
+  belongs_to :filetype, class_name: 'ReleaseFiletype', foreign_key: :release_filetype_id, autosave: true
+  belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id, autosave: true
   has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint', dependent: :delete_all
   has_many :entitlements, through: :entitlement_constraints
   has_many :download_links, class_name: 'ReleaseDownloadLink', dependent: :delete_all
   has_many :update_links, class_name: 'ReleaseUpdateLink', dependent: :delete_all
   has_many :upload_links, class_name: 'ReleaseUploadLink', dependent: :delete_all
+
+  accepts_nested_attributes_for :platform
+  accepts_nested_attributes_for :filetype
+  accepts_nested_attributes_for :channel
 
   validates :account,
     presence: { message: 'must exist' }
@@ -34,6 +38,7 @@ class Release < ApplicationRecord
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
   validates :filesize,
+    allow_blank: true,
     numericality: { greater_than_or_equal_to: 0 }
 
   scope :for_product, -> product {
@@ -113,5 +118,19 @@ class Release < ApplicationRecord
 
   def dev?
     channel.key == 'dev'
+  end
+
+  private
+
+  def validate_associated_records_for_platform
+    self.platform = account.release_platforms.find_or_initialize_by(key: platform.key)
+  end
+
+  def validate_associated_records_for_filetype
+    self.filetype = account.release_filetypes.find_or_initialize_by(key: filetype.key)
+  end
+
+  def validate_associated_records_for_channel
+    self.channel = account.release_channels.find_or_initialize_by(key: channel.key)
   end
 end
