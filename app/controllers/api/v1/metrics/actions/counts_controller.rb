@@ -12,14 +12,13 @@ module Api::V1::Metrics::Actions
     def count
       authorize Metric
 
-      # TODO(ezekg) Cache this in-memory on event type model?
-      event_types = EventType.select(:id, :event)
       event_params = params[:metrics]
       event_type_ids = []
 
       # This not only blocks counts for invalid event types but it is also our
       # first defense from SQL injection below
       if event_params.present?
+        event_types = EventType.select(:id, :event)
         valid_events = event_types.map(&:event)
 
         if (event_params - valid_events).any?
