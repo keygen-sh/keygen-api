@@ -100,10 +100,17 @@ class ReleaseUpdateService < BaseService
                                .reject { |v| v <= current_semver }
 
     if constraint.present?
+      prerelease =
+        if channel.instance_of?(ReleaseChannel)
+          channel.key
+        else
+          channel
+        end
+
       semver = Semverse::Version.new(constraint)
       rule   =
-        if channel.present?
-          "~> #{semver.major}.#{semver.minor}-#{channel}"
+        if prerelease.present?
+          "~> #{semver.major}.#{semver.minor}-#{prerelease}"
         else
           "~> #{semver.major}.#{semver.minor}"
         end
@@ -116,7 +123,7 @@ class ReleaseUpdateService < BaseService
 
     semvers.sort.last
   rescue Semverse::InvalidVersionFormat
-    raise InvalidConstraintError.new 'version constraint must be a valid semver: x.y or x.y-rc.1'
+    raise InvalidConstraintError.new 'version constraint must be valid: x.y'
   rescue Semverse::NoSolutionError
     nil
   end

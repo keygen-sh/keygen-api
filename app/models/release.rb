@@ -47,7 +47,8 @@ class Release < ApplicationRecord
 
   scope :for_platform, -> platform {
     case platform
-    when ReleasePlatform
+    when ReleasePlatform,
+         UUID_REGEX
       where(platform: platform)
     else
       joins(:platform).where(platform: { key: platform.to_s })
@@ -56,7 +57,8 @@ class Release < ApplicationRecord
 
   scope :for_filetype, -> filetype {
     case filetype
-    when ReleasePlatform
+    when ReleaseFiletype,
+         UUID_REGEX
       where(filetype: filetype)
     else
       joins(:filetype).where(filetype: { key: filetype.to_s })

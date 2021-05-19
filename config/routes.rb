@@ -196,9 +196,14 @@ Rails.application.routes.draw do
             resource "channel", only: [:show]
             resource "product", only: [:show]
           end
+          member do
+            scope "actions", module: "releases/actions" do
+              get "update", to: "updates#check_for_update_by_id"
+            end
+          end
           collection do
             scope "actions", module: "releases/actions" do
-              get "update", to: "updates#check_for_update"
+              get "update", to: "updates#check_for_update_by_query"
             end
           end
         end
