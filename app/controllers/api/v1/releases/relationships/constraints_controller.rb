@@ -95,7 +95,7 @@ module Api::V1::Releases::Relationships
       on :attach do
         param :data, type: :array do
           items type: :hash do
-            param :type, type: :string, inclusion: %w[release-constraint release-constraints], transform: -> (k, v) { [] }
+            param :type, type: :string, inclusion: %w[release-entitlement-constraint release-entitlement-constraints], transform: -> (k, v) { [] }
             param :relationships, type: :hash do
               param :entitlement, type: :hash do
                 param :data, type: :hash do
@@ -111,7 +111,7 @@ module Api::V1::Releases::Relationships
       on :detach do
         param :data, type: :array do
           items type: :hash do
-            param :type, type: :string, inclusion: %w[release-constraint release-constraints], transform: -> (k, v) { [] }
+            param :type, type: :string, inclusion: %w[release-entitlement-constraint release-entitlement-constraints], transform: -> (k, v) { [] }
             param :relationships, type: :hash do
               param :entitlement, type: :hash do
                 param :data, type: :hash do
