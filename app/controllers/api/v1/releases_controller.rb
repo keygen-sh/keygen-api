@@ -29,7 +29,7 @@ module Api::V1
       release = current_account.releases.new release_params
       authorize release
 
-      if @release.save
+      if release.save
         BroadcastEventService.call(
           event: 'release.created',
           account: current_account,
@@ -90,8 +90,25 @@ module Api::V1
             param :name, type: :string, optional: true
             param :key, type: :string
             param :version, type: :string
-            param :size, type: :integer, optional: true
+            param :platform, type: :string, transform: -> (k, v) {
+              [:platform_attributes, { key: v.downcase }]
+            }
+            param :filetype, type: :string, transform: -> (k, v) {
+              [:filetype_attributes, { key: v.downcase }]
+            }
+            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
+              [:channel_attributes, { key: v.downcase }]
+            }
+            param :filesize, type: :integer, optional: true
             param :metadata, type: :hash, optional: true
+          end
+          param :relationships, type: :hash do
+            param :product, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[product products]
+                param :id, type: :string
+              end
+            end
           end
         end
       end
@@ -102,7 +119,7 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :size, type: :integer, optional: true
+            param :filesize, type: :integer, optional: true
             param :metadata, type: :hash, optional: true
           end
         end
