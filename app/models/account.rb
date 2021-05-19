@@ -25,10 +25,11 @@ class Account < ApplicationRecord
   has_many :license_entitlements
   has_many :releases
   has_many :release_platforms
+  has_many :release_filetypes
   has_many :release_channels
   has_one :billing
 
-  accepts_nested_attributes_for :users
+  accepts_nested_attributes_for :users, limit: 10
 
   before_create :set_founding_users_roles!
 
