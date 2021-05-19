@@ -2,10 +2,10 @@
 
 module Api::V1::Products::Relationships
   class ReleasesController < Api::V1::BaseController
-    has_scope(:platform, only: :index) { |c, s, v| s.for_platform(v) }
-    has_scope(:channel, default: 'stable', only: :index) { |c, s, v|
-      s.for_channel(v)
-    }
+    has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
+    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
+    has_scope(:platform) { |c, s, v| s.for_platform(v) }
+    has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -13,7 +13,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      releases = apply_scopes(product.releases)
+      releases = apply_scopes(product.releases.preload(:platform, :filetype, :channel))
       authorize releases
 
       render jsonapi: releases

@@ -11,13 +11,16 @@ class ReleaseSerializer < BaseSerializer
   attribute :channel do
     @object.channel.key
   end
+  attribute :filetype do
+    @object.filetype.key
+  end
+  attribute :filesize
   attribute :downloads do
     @object.download_count
   end
   attribute :updates do
     @object.update_count
   end
-  attribute :size
   attribute :version
   attribute :semver do
     semver = @object.semver
