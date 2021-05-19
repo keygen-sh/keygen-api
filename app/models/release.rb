@@ -97,11 +97,15 @@ class Release < ApplicationRecord
   end
 
   def semver
-    Semverse::Version.new(version)
+    @semver ||= Semverse::Version.new(version)
   end
 
   def stable?
     channel.key == 'stable'
+  end
+
+  def pre_release?
+    !stable?
   end
 
   def rc?
@@ -127,10 +131,22 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_filetype
+    errors.add(:key, :extension_invalid, message: "key extension does not match filetype (expected #{filetype.key})") unless
+      key.ends_with?(filetype.key)
+
     self.filetype = account.release_filetypes.find_or_initialize_by(key: filetype.key)
   end
 
   def validate_associated_records_for_channel
+    case
+    when pre_release?
+      errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.x-#{channel.key}.v got #{semver})") if
+        semver.pre_release.nil? || !semver.pre_release.include?(channel.key)
+    when stable?
+      errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.x got #{semver})") if
+        semver.pre_release.present?
+    end
+
     self.channel = account.release_channels.find_or_initialize_by(key: channel.key)
   end
 end
