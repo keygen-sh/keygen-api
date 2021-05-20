@@ -32,18 +32,19 @@ module Api::V1::Releases::Actions
       render_bad_request detail: e.message, code: :INVALID_UPDATE_CONSTRAINT, source: { parameter: :constraint }
     rescue ReleaseUpdateService::InvalidChannelError => e
       render_bad_request detail: e.message, code: :INVALID_UPDATE_CHANNEL, source: { parameter: :channel }
+    rescue Pundit::NotAuthorizedError
+      render status: :no_content
     end
 
     def check_for_update_by_id
-      authorize release, :download? if
-        release.present?
+      skip_authorization # Handled downstream
 
       kwargs = update_query.to_h.symbolize_keys
         .slice(:constraint, :channel)
         .merge(
-          product: release.product,
-          platform: release.platform,
-          filetype: release.filetype,
+          product: release.product_id,
+          platform: release.platform_id,
+          filetype: release.filetype_id,
           version: release.version,
         )
 
@@ -55,8 +56,10 @@ module Api::V1::Releases::Actions
     rescue ReleaseUpdateService::InvalidProductError,
            ReleaseUpdateService::InvalidPlatformError,
            ReleaseUpdateService::InvalidFiletypeError,
-           ReleaseUpdateService::InvalidVersionError,
+           ReleaseUpdateService::InvalidVersionError
       render_unprocessable_entity
+    rescue Pundit::NotAuthorizedError
+      render status: :no_content
     end
 
     private
@@ -64,7 +67,7 @@ module Api::V1::Releases::Actions
     attr_reader :release
 
     def set_release
-      @release = current_account.releases.find params[:id]
+      @release = current_account.releases.find(params[:id])
 
       Keygen::Store::Request.store[:current_resource] = release
     end
@@ -90,18 +93,19 @@ module Api::V1::Releases::Actions
         ttl    = 60.seconds.to_i
         url    = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: updater.next_release.s3_object_key, expires_in: ttl)
         link   = updater.next_release.update_links.create!(account: current_account, url: url, ttl: ttl)
+        meta   = {
+          current: updater.current_version,
+          next: updater.next_version,
+        }
 
         BroadcastEventService.call(
           event: 'release.update-downloaded',
           account: current_account,
           resource: updater.next_release,
-          meta: {
-            current_version: updater.current_version,
-            next_version: updater.next_version,
-          }
+          meta: meta,
         )
 
-        render jsonapi: link, status: :see_other, location: link.url
+        render jsonapi: link, meta: meta, status: :see_other, location: link.url
       else
         render status: :no_content
       end

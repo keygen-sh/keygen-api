@@ -8,6 +8,10 @@ class Release < ApplicationRecord
     inverse_of: :releases
   belongs_to :product,
     inverse_of: :releases
+  has_many :users,
+    through: :product
+  has_many :licenses,
+    through: :product
   belongs_to :platform,
     class_name: 'ReleasePlatform',
     foreign_key: :release_platform_id,
@@ -25,7 +29,7 @@ class Release < ApplicationRecord
     autosave: true
   has_many :entitlement_constraints,
     class_name: 'ReleaseEntitlementConstraint',
-    inverse_of: :release_entitlement_constraints,
+    inverse_of: :release,
     dependent: :delete_all
   has_many :entitlements,
     through: :entitlement_constraints
@@ -72,6 +76,14 @@ class Release < ApplicationRecord
     where(product: product)
   }
 
+  scope :for_user, -> user {
+    joins(:users).where(users: { id: user })
+  }
+
+  scope :for_license, -> license {
+    joins(:licenses).where(licenses: { id: license })
+  }
+
   scope :for_platform, -> platform {
     case platform
     when ReleasePlatform,
@@ -93,21 +105,22 @@ class Release < ApplicationRecord
   }
 
   scope :for_channel, -> channel {
-    key =
-      case channel
-      when ReleaseChannel
-        channel.key
-      else
-        channel.to_s
-      end
-
-    case key.to_sym
-    when :stable then self.stable
-    when :rc     then self.rc
-    when :beta   then self.beta
-    when :alpha  then self.alpha
-    when :dev    then self.dev
-    else              self.none
+    case channel
+    when ReleaseChannel,
+         UUID_REGEX
+      where(channel: channel)
+    when 'stable'
+      self.stable
+    when 'rc'
+      self.rc
+    when 'beta'
+      self.beta
+    when 'alpha'
+      self.alpha
+    when 'dev'
+      self.dev
+    else
+      self.none
     end
   }
 
@@ -120,6 +133,18 @@ class Release < ApplicationRecord
 
   scope :unyanked, -> { where(yanked_at: nil) }
   scope :yanked, -> { where.not(yanked_at: nil) }
+
+  def platform_id
+    release_platform_id
+  end
+
+  def filetype_id
+    release_filetype_id
+  end
+
+  def channel_id
+    release_channel_id
+  end
 
   def s3_object_key
     "blobs/#{account_id}/#{id}/#{key}"

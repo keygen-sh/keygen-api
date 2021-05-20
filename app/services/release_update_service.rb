@@ -42,8 +42,7 @@ class ReleaseUpdateService < BaseService
     current_version = current_semver.to_s
     current_release =
       if current_version.present?
-        available_releases.preload(:product, :platform, :filetype, :channel)
-                          .find_by(version: current_version)
+        available_releases.find_by(version: current_version)
       else
         nil
       end
@@ -51,8 +50,7 @@ class ReleaseUpdateService < BaseService
     next_version = next_semver.to_s
     next_release =
       if next_version.present?
-        unyanked_releases.preload(:product, :platform, :filetype, :channel)
-                         .find_by(version: next_version)
+        unyanked_releases.find_by(version: next_version)
       else
         nil
       end

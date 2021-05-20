@@ -28,8 +28,14 @@ class ReleasePolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
-        resource.entitlement_constraints.any? &&
-        (resource.entitlements & bearer.entitlements).any?
+        (
+          # Assert current bearer is a user of the product that has a non-expired/suspended
+          # license or that the bearer is itselt a license for the product that is valid
+          (bearer.has_role?(:user) && bearer.licenses.for_product(resource.product).any? { |l| !l.expired? && !l.suspended? }) ||
+          (bearer.has_role?(:license) && !bearer.expired? && !bearer.suspended? && bearer.product == resource.product)
+        ) &&
+        # Assert bearer satisfies all entitlement constraints
+        (resource.entitlements & bearer.entitlements).size == resource.entitlements.size
       )
   end
 
