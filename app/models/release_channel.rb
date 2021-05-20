@@ -4,7 +4,10 @@ class ReleaseChannel < ApplicationRecord
   include Limitable
   include Pageable
 
-  belongs_to :account
+  belongs_to :account,
+    inverse_of: :release_channels
+  has_many :releases,
+    inverse_of: :channel
 
   validates :account,
     presence: { message: 'must exist' }
