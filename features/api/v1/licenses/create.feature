@@ -1701,9 +1701,9 @@ Feature: Create license
       {
         "data": {
           "type": "licenses",
-          "id": "871e4576-ceca-491a-9741-fddf0082b567",
+          "id": "00000000-ceca-491a-9741-fddf0082b567",
           "attributes": {
-            "key": "id=871e4576-ceca-491a-9741-fddf0082b567"
+            "key": "id=00000000-ceca-491a-9741-fddf0082b567"
           },
           "relationships": {
             "policy": {
@@ -1718,8 +1718,8 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the id "871e4576-ceca-491a-9741-fddf0082b567"
-    And the JSON response should be a "license" with the signed key of "id=871e4576-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the JSON response should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
+    And the JSON response should be a "license" with the signed key of "id=00000000-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1740,7 +1740,7 @@ Feature: Create license
     And the first "license" has the following attributes:
       """
       {
-        "id": "871e4576-ceca-491a-9741-fddf0082b567"
+        "id": "00000000-ceca-491a-9741-fddf0082b567"
       }
       """
     And I use an authentication token
@@ -1749,9 +1749,9 @@ Feature: Create license
       {
         "data": {
           "type": "licenses",
-          "id": "871e4576-ceca-491a-9741-fddf0082b567",
+          "id": "00000000-ceca-491a-9741-fddf0082b567",
           "attributes": {
-            "key": "id=871e4576-ceca-491a-9741-fddf0082b567"
+            "key": "id=00000000-ceca-491a-9741-fddf0082b567"
           },
           "relationships": {
             "policy": {
@@ -2138,6 +2138,50 @@ Feature: Create license
       {
         "title": "Bad request",
         "detail": "Unpermitted parameters: protected"
+      }
+      """
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a license for themself with a pre-determined ID
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "00000000-f0c3-42d0-83bb-2c95df786823",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: id"
       }
       """
     And the current account should have 0 "licenses"
@@ -2682,6 +2726,56 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
+    And the JSON response should be a "license" that is protected
+    And the JSON response should be a "license" that is requireCheckIn
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a license with a pre-determined ID
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "requireCheckIn": true,
+        "checkInInterval": "month",
+        "checkInIntervalCount": 3,
+        "protected": true
+      }
+      """
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "00000000-e0e1-4c06-a313-cba8cce6be00",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the id "00000000-e0e1-4c06-a313-cba8cce6be00"
     And the JSON response should be a "license" that is protected
     And the JSON response should be a "license" that is requireCheckIn
     And sidekiq should have 1 "webhook" job
