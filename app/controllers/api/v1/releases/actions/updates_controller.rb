@@ -8,8 +8,6 @@ module Api::V1::Releases::Actions
     before_action :set_release, only: %i[check_for_update_by_id]
 
     def check_for_update_by_query
-      skip_authorization # Handled downstream
-
       kwargs = update_query.to_h.symbolize_keys.slice(
         :product,
         :platform,
@@ -37,8 +35,6 @@ module Api::V1::Releases::Actions
     end
 
     def check_for_update_by_id
-      skip_authorization # Handled downstream
-
       kwargs = update_query.to_h.symbolize_keys
         .slice(:constraint, :channel)
         .merge(
@@ -77,8 +73,6 @@ module Api::V1::Releases::Actions
         account: current_account,
         **kwargs,
       )
-      authorize updater.current_release, :download? if
-        updater.current_release.present?
 
       if updater.next_release.present?
         authorize updater.next_release, :download?
@@ -107,10 +101,18 @@ module Api::V1::Releases::Actions
 
         render jsonapi: link, meta: meta, status: :see_other, location: link.url
       else
+        if updater.current_release.present?
+          authorize updater.current_release, :download?
+        else
+          # When current and next release are nil, we can skip authorization,
+          # since there's nothing to assert authorization for.
+          skip_authorization
+        end
+
         render status: :no_content
       end
     rescue Aws::S3::Errors::NotFound
-      Keygen.logger.warn "[releases.updates] No blob found: account=#{current_account.id} current_release=#{updater.current_release&.id} current_version=#{updater.current_version} next_release=#{updater.next_release&.id} next_version=#{updater.next_version}"
+      Keygen.logger.warn "[releases.check_for_update] No blob found: account=#{current_account.id} current_release=#{updater.current_release&.id} current_version=#{updater.current_version} next_release=#{updater.next_release&.id} next_version=#{updater.next_version}"
 
       # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
       #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
