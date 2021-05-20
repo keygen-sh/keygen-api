@@ -21,7 +21,7 @@ class RequestLog < ApplicationRecord
     select(self.attribute_names - %w[request_body response_body response_signature])
   }
 
-  scope :current_period, -> {
+  scope :for_current_period, -> {
     date_start = 2.weeks.ago.beginning_of_day
     date_end = Time.current
 
