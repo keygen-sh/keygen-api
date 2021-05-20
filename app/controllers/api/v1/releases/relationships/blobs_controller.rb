@@ -31,7 +31,7 @@ module Api::V1::Releases::Relationships
       BroadcastEventService.call(
         event: 'release.downloaded',
         account: current_account,
-        resource: link
+        resource: release
       )
 
       render jsonapi: link, status: :see_other, location: link.url
@@ -54,7 +54,7 @@ module Api::V1::Releases::Relationships
       BroadcastEventService.call(
         event: 'release.uploaded',
         account: current_account,
-        resource: link
+        resource: release
       )
 
       render jsonapi: link, status: :temporary_redirect, location: link.url
