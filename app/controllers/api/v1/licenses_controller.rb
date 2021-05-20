@@ -93,6 +93,7 @@ module Api::V1
       on :create do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[license licenses]
+          param :id, type: :string, optional: true
           param :attributes, type: :hash, optional: true do
             param :name, type: :string, optional: true
             param :key, type: :string, optional: true

@@ -1684,6 +1684,154 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID and key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "871e4576-ceca-491a-9741-fddf0082b567",
+          "attributes": {
+            "key": "id=871e4576-ceca-491a-9741-fddf0082b567"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the id "871e4576-ceca-491a-9741-fddf0082b567"
+    And the JSON response should be a "license" with the signed key of "id=871e4576-ceca-491a-9741-fddf0082b567" using "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID that conflicts with another license
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "id": "871e4576-ceca-491a-9741-fddf0082b567"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "871e4576-ceca-491a-9741-fddf0082b567",
+          "attributes": {
+            "key": "id=871e4576-ceca-491a-9741-fddf0082b567"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 1 "license"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must not conflict with another license",
+        "source": {
+          "pointer": "/data/id"
+        },
+        "code": "ID_CONFLICT"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID that is not a UUID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "1",
+          "attributes": {
+            "key": "id=1"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the current account should have 0 "licenses"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a valid UUID",
+        "source": {
+          "pointer": "/data/id"
+        },
+        "code": "ID_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"
