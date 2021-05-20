@@ -5,8 +5,10 @@ class ReleaseEntitlementConstraint < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :release
-  belongs_to :entitlement
+  belongs_to :release,
+    inverse_of: :entitlement_constraints
+  belongs_to :entitlement,
+    inverse_of: :release_entitlement_constraints
 
   validates :account,
     presence: { message: 'must exist' }

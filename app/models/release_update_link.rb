@@ -5,7 +5,9 @@ class ReleaseUpdateLink < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :release, counter_cache: :update_count
+  belongs_to :release,
+    counter_cache: :update_count,
+    inverse_of: :update_links
 
   validates :account,
     presence: { message: 'must exist' }

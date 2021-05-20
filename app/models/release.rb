@@ -4,16 +4,43 @@ class Release < ApplicationRecord
   include Limitable
   include Pageable
 
-  belongs_to :account
-  belongs_to :product
-  belongs_to :platform, class_name: 'ReleasePlatform', foreign_key: :release_platform_id, autosave: true
-  belongs_to :filetype, class_name: 'ReleaseFiletype', foreign_key: :release_filetype_id, autosave: true
-  belongs_to :channel, class_name: 'ReleaseChannel', foreign_key: :release_channel_id, autosave: true
-  has_many :entitlement_constraints, class_name: 'ReleaseEntitlementConstraint', dependent: :delete_all
-  has_many :entitlements, through: :entitlement_constraints
-  has_many :download_links, class_name: 'ReleaseDownloadLink', dependent: :delete_all
-  has_many :update_links, class_name: 'ReleaseUpdateLink', dependent: :delete_all
-  has_many :upload_links, class_name: 'ReleaseUploadLink', dependent: :delete_all
+  belongs_to :account,
+    inverse_of: :releases
+  belongs_to :product,
+    inverse_of: :releases
+  belongs_to :platform,
+    class_name: 'ReleasePlatform',
+    foreign_key: :release_platform_id,
+    inverse_of: :releases,
+    autosave: true
+  belongs_to :filetype,
+    class_name: 'ReleaseFiletype',
+    foreign_key: :release_filetype_id,
+    inverse_of: :releases,
+    autosave: true
+  belongs_to :channel,
+    class_name: 'ReleaseChannel',
+    foreign_key: :release_channel_id,
+    inverse_of: :releases,
+    autosave: true
+  has_many :entitlement_constraints,
+    class_name: 'ReleaseEntitlementConstraint',
+    inverse_of: :release_entitlement_constraints,
+    dependent: :delete_all
+  has_many :entitlements,
+    through: :entitlement_constraints
+  has_many :download_links,
+    class_name: 'ReleaseDownloadLink',
+    inverse_of: :release,
+    dependent: :delete_all
+  has_many :update_links,
+    class_name: 'ReleaseUpdateLink',
+    inverse_of: :release,
+    dependent: :delete_all
+  has_many :upload_links,
+    class_name: 'ReleaseUploadLink',
+    inverse_of: :release,
+    dependent: :delete_all
 
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :filetype
