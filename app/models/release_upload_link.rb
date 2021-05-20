@@ -5,7 +5,8 @@ class ReleaseUploadLink < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :release
+  belongs_to :release,
+    inverse_of: :upload_links
 
   validates :account,
     presence: { message: 'must exist' }
