@@ -45,6 +45,14 @@ class License < ApplicationRecord
    # Validate this association only if we've been given a user (because it's optional)
   validates :user, presence: { message: "must exist" }, unless: -> { user_id.nil? }
 
+  validate on: :create, if: -> { id_before_type_cast.present? } do
+    errors.add :id, :invalid, message: 'must be a valid UUID' if
+      !UUID_REGEX.match?(id_before_type_cast)
+
+    errors.add :id, :conflict, message: 'must not conflict with another license' if
+      account.licenses.exists?(id)
+  end
+
   validate on: :create, unless: -> { policy.nil? } do
     errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if key.present? && key =~ UUID_REGEX && account.licenses.exists?(key)
 

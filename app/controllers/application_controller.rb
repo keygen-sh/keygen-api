@@ -255,6 +255,9 @@ class ApplicationController < ActionController::API
           pointer = "/data/relationships/#{src.join '/'}"
         elsif path.first == "base"
           pointer = "/data"
+        elsif path.first == "id" &&
+              path.size == 1
+          pointer = "/data/id"
         else
           pointer = "/data/attributes/#{src.join '/'}"
         end
