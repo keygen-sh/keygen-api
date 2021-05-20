@@ -30,6 +30,6 @@ class ReleaseUploadLinkSerializer < BaseSerializer
   end
 
   link :related do
-    @url_helpers.v1_account_release_blob_path @object.account_id, @object
+    @url_helpers.v1_account_release_blob_path @object.account_id, @object.release_id
   end
 end
