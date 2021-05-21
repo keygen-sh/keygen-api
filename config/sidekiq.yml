@@ -2,12 +2,12 @@
 :queues:
   # NOTE(ezekg) The higher the weight, the more often it is checked.
   - [critical, 10]
-  - [deletes, 6]
+  - [deletes, 6] # Deprecated
   - [webhooks, 5]
   - [default, 4]
   - [mailers, 3]
   - [billing, 2]
   - [metrics, 1]
-  - [system, 1]
+  - [system, 1] # Deprecated
   - [logs, 1]
   - [cron, 1]
