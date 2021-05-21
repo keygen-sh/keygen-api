@@ -77,11 +77,11 @@ class ReleaseUpdateService < BaseService
     @available_releases ||= account.releases.for_product(product)
                                             .for_platform(platform)
                                             .for_filetype(filetype)
-                                            .for_channel(channel)
   end
 
   def unyanked_releases
-    @unyanked_releases ||= available_releases.unyanked
+    @unyanked_releases ||= available_releases.for_channel(channel)
+                                             .unyanked
   end
 
   def unyanked_versions
@@ -107,24 +107,35 @@ class ReleaseUpdateService < BaseService
           channel
         end
 
-      semver = Semverse::Version.new(constraint)
-      rule   =
-        if prerelease.present?
-          "~> #{semver.major}.#{semver.minor}-#{prerelease}"
-        else
-          "~> #{semver.major}.#{semver.minor}"
-        end
+      op, major, minor, patch, prerelease_tag, build_tag =
+        Semverse::Constraint.split(constraint)
 
-      return Semverse::Constraint.satisfy_best(
+      raise InvalidConstraintError.new 'version constraint cannot contain prerelease tag (use channel)' if
+        prerelease_tag.present?
+
+      raise InvalidConstraintError.new 'version constraint cannot contain build tag' if
+        build_tag.present?
+
+      rule  = "~> #{major}"
+      rule += ".#{minor}" if minor.present?
+      rule += ".#{patch}" if patch.present?
+      rule += "-#{prerelease}" if
+        prerelease.present? && prerelease != 'stable'
+
+      semver = Semverse::Constraint.satisfy_best(
         [Semverse::Constraint.new(rule)],
         semvers
       )
+
+      return semver
     end
 
     semvers.sort.last
-  rescue Semverse::InvalidVersionFormat
-    raise InvalidConstraintError.new 'version constraint must be valid: x.y'
-  rescue Semverse::NoSolutionError
+  rescue Semverse::InvalidConstraintFormat
+    raise InvalidConstraintError.new 'version constraint must be valid: x, x.y, x.y.z'
+  rescue Semverse::NoSolutionError => e
+    Keygen.logger.warn "[release_update_service] No solution found: current=#{current_semver} constraint=#{constraint} rule=(#{rule}) versions=(#{semvers.join(', ')})"
+
     nil
   end
 end
