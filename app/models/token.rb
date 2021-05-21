@@ -102,36 +102,56 @@ class Token < ApplicationRecord
     expiry < Time.current
   end
 
+  def orphaned_token?
+    bearer.nil?
+  end
+
   def product_token?
+    return false if orphaned_token?
+
     bearer.has_role? :product
   end
 
   def admin_token?
+    return false if orphaned_token?
+
     bearer.has_role? :admin
   end
 
   def developer_token?
+    return false if orphaned_token?
+
     bearer.has_role? :developer
   end
 
   def sales_token?
+    return false if orphaned_token?
+
     bearer.has_role? :sales_agent
   end
 
   def support_token?
+    return false if orphaned_token?
+
     bearer.has_role? :support_agent
   end
 
   def user_token?
+    return false if orphaned_token?
+
     bearer.has_role? :user
   end
 
   def activation_token?
+    return false if orphaned_token?
+
     bearer.has_role? :license
   end
 
   def kind
     case
+    when orphaned_token?
+      "orphaned-token"
     when product_token?
       "product-token"
     when admin_token?
