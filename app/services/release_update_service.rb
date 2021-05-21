@@ -50,7 +50,7 @@ class ReleaseUpdateService < BaseService
     next_version = next_semver.to_s
     next_release =
       if next_version.present?
-        unyanked_releases.find_by(version: next_version)
+        available_updates.find_by(version: next_version)
       else
         nil
       end
@@ -79,14 +79,14 @@ class ReleaseUpdateService < BaseService
                                             .for_filetype(filetype)
   end
 
-  def unyanked_releases
-    @unyanked_releases ||= available_releases.for_channel(channel)
+  def available_updates
+    @available_updates ||= available_releases.for_channel(channel)
                                              .unyanked
   end
 
-  def unyanked_versions
-    @unyanked_versions ||= unyanked_releases.limit(10_000)
-                                            .pluck(:version)
+  def update_versions
+    @update_versions ||= available_updates.limit(10_000)
+                                          .pluck(:version)
   end
 
   def current_semver
@@ -96,8 +96,8 @@ class ReleaseUpdateService < BaseService
   end
 
   def next_semver
-    semvers = unyanked_versions.map { |v| Semverse::Version.new(v) }
-                               .reject { |v| v <= current_semver }
+    semvers = update_versions.map { |v| Semverse::Version.new(v) }
+                             .reject { |v| v <= current_semver }
 
     if constraint.present?
       prerelease =
