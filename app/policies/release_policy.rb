@@ -28,14 +28,11 @@ class ReleasePolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
-        (
-          # Assert current bearer is a user of the product that has a non-expired/suspended
-          # license or that the bearer is itselt a license for the product that is valid
-          (bearer.has_role?(:user) && bearer.licenses.for_product(resource.product).any? { |l| !l.expired? && !l.suspended? }) ||
-          (bearer.has_role?(:license) && !bearer.expired? && !bearer.suspended? && bearer.product == resource.product)
-        ) &&
-        # Assert bearer satisfies all entitlement constraints
-        (resource.entitlements & bearer.entitlements).size == resource.entitlements.size
+        # Assert current bearer is a user of the product that has a non-expired/suspended
+        # license or that the bearer is itself a license for the product that is valid,
+        # and then assert that the license satifies all entitlement constraints.
+        (bearer.has_role?(:user) && has_valid_license(bearer)) ||
+        (bearer.has_role?(:license) && valid_license?(bearer))
       )
   end
 
@@ -67,5 +64,24 @@ class ReleasePolicy < ApplicationPolicy
   def detach_constraint?
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
+  end
+
+  private
+
+  def has_valid_license?(user)
+    user.licenses.for_product(resource.product).any? { |l| valid_license?(l) }
+  end
+
+  def valid_license?(license)
+    within_expiry_window?(license) && has_entitlements?(license) &&
+      resource.product == license.product
+  end
+
+  def within_expiry_window?(license)
+    license.expiry.nil? || resource.created_at < license.expiry
+  end
+
+  def has_entitlements?(license)
+    (resource.entitlements & license.entitlements).size == resource.entitlements.size
   end
 end
