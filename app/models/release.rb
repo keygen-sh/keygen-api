@@ -134,6 +134,8 @@ class Release < ApplicationRecord
   scope :unyanked, -> { where(yanked_at: nil) }
   scope :yanked, -> { where.not(yanked_at: nil) }
 
+  scope :with_version, -> version { where(version: version) }
+
   def platform_id
     release_platform_id
   end
