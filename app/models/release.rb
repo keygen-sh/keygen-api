@@ -198,10 +198,10 @@ class Release < ApplicationRecord
   def validate_associated_records_for_channel
     case
     when pre_release?
-      errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.x-#{channel.key}.v got #{semver})") if
+      errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.z-#{channel.key}.n got #{semver})") if
         semver.pre_release.nil? || !semver.pre_release.include?(channel.key)
     when stable?
-      errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.x got #{semver})") if
+      errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.z got #{semver})") if
         semver.pre_release.present?
     end
 
