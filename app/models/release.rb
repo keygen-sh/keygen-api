@@ -182,6 +182,8 @@ class Release < ApplicationRecord
 
   def validate_associated_records_for_platform
     self.platform = account.release_platforms.find_or_initialize_by(key: platform.key)
+  rescue ActiveRecord::RecordNotUnique
+    retry
   end
 
   def validate_associated_records_for_filetype
@@ -189,6 +191,8 @@ class Release < ApplicationRecord
       key.ends_with?(filetype.key)
 
     self.filetype = account.release_filetypes.find_or_initialize_by(key: filetype.key)
+  rescue ActiveRecord::RecordNotUnique
+    retry
   end
 
   def validate_associated_records_for_channel
@@ -202,5 +206,7 @@ class Release < ApplicationRecord
     end
 
     self.channel = account.release_channels.find_or_initialize_by(key: channel.key)
+  rescue ActiveRecord::RecordNotUnique
+    retry
   end
 end
