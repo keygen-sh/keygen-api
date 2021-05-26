@@ -47,7 +47,7 @@ module Api::V1::Accounts::Relationships
       @billing = @account&.billing
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :update do

@@ -321,13 +321,13 @@ class TypedParameters
 
     included do
       class << self
-        def typed_parameters(transform: false, &block)
+        def typed_parameters(format: nil, &block)
           resource = controller_name.classify.underscore
           method = lambda do
             @_typed_parameters ||= TypedParameters.build self, &block
 
-            if transform
-              _transform_parameters! @_typed_parameters
+            if format == :jsonapi
+              deserialize_jsonapi_parameters(@_typed_parameters)
             else
               @_typed_parameters
             end
@@ -355,20 +355,14 @@ class TypedParameters
 
       private
 
-      def _transform_parameters!(parameters)
+      def deserialize_jsonapi_parameters(parameters)
         transformer = -> (params, data) {
           params.merge! data.slice(:id)
           params.merge! data.fetch(:attributes, {})
           params.merge! data.fetch(:relationships, nil)&.map { |key, rel|
-            dat = rel.fetch :data, nil
-            next if dat.nil?
+            d = rel.fetch(:data, nil)
 
-            case dat
-            when Array
-              _transform_data_array! dat
-            when Hash
-              _transform_data_hash! dat
-            end
+            deserialize_jsonapi_data(d)
           }&.compact&.reduce(:merge) || {}
         }
 
@@ -383,47 +377,87 @@ class TypedParameters
         end
       end
 
-      def _transform_data_array!(datum)
+      def deserialize_jsonapi_data_array(datum)
         store = {}
 
         datum.each do |data|
           type = data.fetch(:type).pluralize.underscore
 
           case
-          when data.key?(:attributes)
-            attrs = data.fetch(:attributes, {}).merge data.slice(:id)
-            attrs_key = "#{type}_attributes"
-            store.key?(attrs_key) ? store[attrs_key] << attrs : store.merge!(attrs_key => [attrs])
-          when data.key?(:relationships)
-            # TODO(ezekg) Handle relationships
+          when data.key?(:relationships),
+               data.key?(:attributes)
+            id    = data.slice(:id)
+            attrs = data.fetch(:attributes, {})
+            rels  = data.fetch(:relationships, {}).map { |key, rel|
+              d = rel.fetch :data, nil
+
+              deserialize_jsonapi_data(d)
+            }.compact.reduce(:merge) || {}
+
+            assoc_key   = "#{type}_attributes"
+            assoc_attrs = {}.merge(id, attrs, rels)
+
+            if store.key?(assoc_key)
+              store[assoc_key] << assoc_attrs
+            else
+              store.merge!(assoc_key => [assoc_attrs])
+            end
           else
-            id = data.fetch :id, nil
             ids_key = "#{type}_ids"
-            store.key?(ids_key) ? store[ids_key] << id : store.merge!(ids_key => [id])
+            id = data.fetch(:id, nil)
+
+            if store.key?(ids_key)
+              store[ids_key] << id
+            else
+              store.merge!(ids_key => [id])
+            end
           end
         end
 
         store
       end
 
-      def _transform_data_hash!(data)
+      def deserialize_jsonapi_data_hash(data)
         store = {}
         type = data.fetch(:type).singularize.underscore
 
         case
-        when data.key?(:attributes)
-          attrs = data.fetch(:attributes, {}).merge data.slice(:id)
-          attrs_key = "#{type}_attributes"
-          store.merge! attrs_key => attrs
-        when data.key?(:relationships)
-          # TODO(ezekg) Handle relationships
+        when data.key?(:relationships),
+             data.key?(:attributes)
+          id    = data.slice(:id)
+          attrs = data.fetch(:attributes, {})
+          rels  = data.fetch(:relationships, {}).map { |key, rel|
+            d = rel.fetch(:data, nil)
+
+            deserialize_jsonapi_data(d)
+          }.compact.reduce(:merge) || {}
+
+          puts dt: :hash, id: id, attrs: attrs, rels: rels
+
+          assoc_key   = "#{type}_attributes"
+          assoc_attrs = {}.merge(id, attrs, rels)
+
+          store.merge!(assoc_key => assoc_attrs)
         else
-          id = data.fetch :id, nil
           id_key = "#{type}_id"
-          store.merge! id_key => id if !id.nil?
+          id = data.fetch(:id, nil)
+
+          store.merge!(id_key => id) unless
+            id.nil?
         end
 
         store
+      end
+
+      def deserialize_jsonapi_data(data)
+        case data
+        when Array
+          deserialize_jsonapi_data_array(data)
+        when Hash
+          deserialize_jsonapi_data_hash(data)
+        else
+          nil
+        end
       end
     end
   end

@@ -82,7 +82,7 @@ module Api::V1
       Keygen::Store::Request.store[:current_resource] = release
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :create do
@@ -109,6 +109,21 @@ module Api::V1
               param :data, type: :hash do
                 param :type, type: :string, inclusion: %w[product products]
                 param :id, type: :string
+              end
+            end
+            param :constraints, type: :hash, optional: true do
+              param :data, type: :array do
+                items type: :hash do
+                  param :type, type: :string, inclusion: %w[constraint constraints]
+                  param :relationships, type: :hash do
+                    param :entitlement, type: :hash do
+                      param :data, type: :hash do
+                        param :type, type: :string, inclusion: %w[entitlement entitlements]
+                        param :id, type: :string
+                      end
+                    end
+                  end
+                end
               end
             end
           end

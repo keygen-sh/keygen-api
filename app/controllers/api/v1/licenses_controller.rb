@@ -87,7 +87,7 @@ module Api::V1
       Keygen::Store::Request.store[:current_resource] = @license
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :create do

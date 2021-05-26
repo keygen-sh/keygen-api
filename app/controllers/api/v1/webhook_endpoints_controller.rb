@@ -58,7 +58,7 @@ module Api::V1
       @endpoint = current_account.webhook_endpoints.find params[:id]
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :create do
