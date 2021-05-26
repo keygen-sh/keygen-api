@@ -577,7 +577,7 @@ Feature: Create release
         "detail": "must exist",
         "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
         "source": {
-          "pointer": "/data/relationships/constraints/0/entitlement"
+          "pointer": "/data/relationships/constraints/data/0/relationships/entitlement"
         }
       }
       """
@@ -588,7 +588,7 @@ Feature: Create release
         "detail": "must exist",
         "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
         "source": {
-          "pointer": "/data/relationships/constraints/1/entitlement"
+          "pointer": "/data/relationships/constraints/data/1/relationships/entitlement"
         }
       }
       """
