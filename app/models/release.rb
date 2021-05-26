@@ -46,7 +46,7 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete_all
 
-  accepts_nested_attributes_for :constraints
+  accepts_nested_attributes_for :constraints, limit: 20
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
@@ -213,5 +213,9 @@ class Release < ApplicationRecord
     self.channel = account.release_channels.find_or_create_by(key: channel.key)
   rescue ActiveRecord::RecordNotUnique
     retry
+  end
+
+  def validate_associated_records_for_constraints
+    constraints.each { |c| c.account = account }
   end
 end

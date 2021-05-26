@@ -55,7 +55,7 @@ module Api::V1
       @account = @current_account
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :create do

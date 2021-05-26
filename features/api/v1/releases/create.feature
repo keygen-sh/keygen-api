@@ -449,3 +449,62 @@ Feature: Create release
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a release with entitlement constraints
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "entitlements"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Product Version 2 (Beta)",
+            "key": "Product-2.0.0-alpha1.dmg",
+            "version": "2.0.0-alpha1",
+            "platform": "darwin",
+            "filetype": "dmg",
+            "channel": "alpha"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            },
+            "constraints": {
+              "data": [
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "$entitlements[0]" }
+                    }
+                  }
+                },
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "$entitlements[1]" }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release"
+    And the current account should have 2 "release-entitlement-constraints"
+    And the current account should have 3 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job

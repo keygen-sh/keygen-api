@@ -471,4 +471,25 @@ describe TypedParameters do
 
     # TODO: Write additional specs for param transformations
   end
+
+  # context "format" do
+  #   it "should deserialize a JSONAPI payload" do
+  #     params = lambda {
+  #       ctx = request type: 'user', id: '1', attributes: { email: 'zeke@keygen.example' }
+
+  #       TypedParameters.build ctx, format: :jsonapi do
+  #         options strict: true
+
+  #         on :create do
+  #           param :type, type: :string
+  #           param :id, type: :string
+  #           param :attributes, type: :hash do
+  #             param :email, type: :string
+  #           end
+  #         end
+  #       end
+  #     }
+  #     expect(params.call).to eq foo: 1
+  #   end
+  # end
 end

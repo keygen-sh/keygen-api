@@ -89,7 +89,7 @@ module Api::V1::Releases::Relationships
       Keygen::Store::Request.store[:current_resource] = release
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :attach do
