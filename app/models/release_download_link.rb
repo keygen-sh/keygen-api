@@ -12,7 +12,8 @@ class ReleaseDownloadLink < ApplicationRecord
   validates :account,
     presence: { message: 'must exist' }
   validates :release,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 
   validates :url,
     presence: true

@@ -13,8 +13,10 @@ class ReleaseEntitlementConstraint < ApplicationRecord
   validates :account,
     presence: { message: 'must exist' }
   validates :release,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :entitlement,
     presence: { message: 'must exist' },
-    uniqueness: { message: 'already exists', scope: %i[account_id release_id entitlement_id] }
+    uniqueness: { message: 'already exists', scope: %i[account_id release_id entitlement_id] },
+    scope: { by: :account_id }
 end
