@@ -255,7 +255,7 @@ class ApplicationController < ActionController::API
               when :base
                 resource.class.name.underscore
               else
-                attr.to_s
+                attr.to_s.gsub(/\[\d+\]/, '') # Remove indexes
               end
             code =
               case detail
