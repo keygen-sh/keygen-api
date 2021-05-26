@@ -102,7 +102,7 @@ module Api::V1::Users::Relationships
       Keygen::Store::Request.store[:current_resource] = @user
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :create do

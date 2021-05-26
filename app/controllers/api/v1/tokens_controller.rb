@@ -139,7 +139,7 @@ module Api::V1
       @token = current_account.tokens.find params[:id]
     end
 
-    typed_parameters transform: true do
+    typed_parameters format: :jsonapi do
       options strict: true
 
       on :generate do
