@@ -54,13 +54,17 @@ class Release < ApplicationRecord
   validates :account,
     presence: { message: 'must exist' }
   validates :product,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :filetype,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :platform,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :channel,
-    presence: { message: 'must exist' }
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 
   validates :version,
     presence: true,
@@ -216,6 +220,6 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_constraints
-    constraints.each { |c| c.account = account }
+    constraints.each { |c| c.account = account unless c.account.present? }
   end
 end
