@@ -56,12 +56,12 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def attach_constraint?
+  def attach_constraints?
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
 
-  def detach_constraint?
+  def detach_constraints?
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
