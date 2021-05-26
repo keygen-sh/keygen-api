@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseEntitlementConstraintSerializer < BaseSerializer
-  type 'release-entitlement-constraints'
+  type 'constraints'
 
   attribute :created do
     @object.created_at

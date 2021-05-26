@@ -27,12 +27,12 @@ class Release < ApplicationRecord
     foreign_key: :release_channel_id,
     inverse_of: :releases,
     autosave: true
-  has_many :entitlement_constraints,
+  has_many :constraints,
     class_name: 'ReleaseEntitlementConstraint',
     inverse_of: :release,
     dependent: :delete_all
   has_many :entitlements,
-    through: :entitlement_constraints
+    through: :constraints
   has_many :download_links,
     class_name: 'ReleaseDownloadLink',
     inverse_of: :release,
@@ -46,6 +46,7 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete_all
 
+  accepts_nested_attributes_for :constraints
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
@@ -154,6 +155,8 @@ class Release < ApplicationRecord
 
   def semver
     @semver ||= Semverse::Version.new(version)
+  rescue Semverse::InvalidVersionFormat
+    nil
   end
 
   def stable?
@@ -201,10 +204,10 @@ class Release < ApplicationRecord
     case
     when pre_release?
       errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.z-#{channel.key}.n got #{semver})") if
-        semver.pre_release.nil? || !semver.pre_release.starts_with?(channel.key)
+        semver&.pre_release.nil? || !semver&.pre_release.starts_with?(channel.key)
     when stable?
       errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.z got #{semver})") if
-        semver.pre_release.present?
+        semver&.pre_release.present?
     end
 
     self.channel = account.release_channels.find_or_create_by(key: channel.key)

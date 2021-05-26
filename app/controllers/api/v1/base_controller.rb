@@ -5,7 +5,7 @@ module Api::V1
     include TypedParameters::ControllerMethods
     include DefaultHeaders
     include RateLimiting
-    include RequireActiveSubscription
+    include CurrentAccountConstraints
     include CurrentAccountScope
     include TokenAuthentication
     include SharedScopes

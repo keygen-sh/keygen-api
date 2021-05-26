@@ -372,7 +372,7 @@ class TypedParameters
           }&.compact&.reduce(:merge) || {}
         }
 
-        # TODO: Handle meta here as well?
+        # TODO(ezekg) Handle meta here as well?
         parameters.inject(HashWithIndifferentAccess.new) do |params, (_, data)|
           case data
           when Array
@@ -387,16 +387,19 @@ class TypedParameters
         store = {}
 
         datum.each do |data|
-          type = data.fetch(:type).pluralize
+          type = data.fetch(:type).pluralize.underscore
 
-          if data.key? :attributes
+          case
+          when data.key?(:attributes)
             attrs = data.fetch(:attributes, {}).merge data.slice(:id)
             attrs_key = "#{type}_attributes"
             store.key?(attrs_key) ? store[attrs_key] << attrs : store.merge!(attrs_key => [attrs])
+          when data.key?(:relationships)
+            # TODO(ezekg) Handle relationships
           else
             id = data.fetch :id, nil
-            id_key = "#{type}_id"
-            store.merge! id_key => id if !id.nil?
+            ids_key = "#{type}_ids"
+            store.key?(ids_key) ? store[ids_key] << id : store.merge!(ids_key => [id])
           end
         end
 
@@ -405,12 +408,15 @@ class TypedParameters
 
       def _transform_data_hash!(data)
         store = {}
-        type = data.fetch(:type).singularize
+        type = data.fetch(:type).singularize.underscore
 
-        if data.key? :attributes
+        case
+        when data.key?(:attributes)
           attrs = data.fetch(:attributes, {}).merge data.slice(:id)
           attrs_key = "#{type}_attributes"
           store.merge! attrs_key => attrs
+        when data.key?(:relationships)
+          # TODO(ezekg) Handle relationships
         else
           id = data.fetch :id, nil
           id_key = "#{type}_id"
