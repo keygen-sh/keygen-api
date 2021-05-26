@@ -3007,6 +3007,61 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product attempts to create a license for a user of another account
+    Given the account "test2" has 2 "users"
+    And the second "user" of account "test2" has the following attributes:
+      """
+      {
+        "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5"
+      }
+      """
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current product has 1 "policy"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "cc259aaf-041e-4b91-84f9-92034f5b02d5"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "USER_BLANK",
+        "source": {
+          "pointer": "/data/relationships/user"
+        }
+      }
+      """
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin sends invalid JSON while attempting to create a license
     Given I am an admin of account "test1"
     And the current account is "test1"

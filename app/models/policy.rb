@@ -52,7 +52,9 @@ class Policy < ApplicationRecord
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
   validates :account, presence: { message: "must exist" }
-  validates :product, presence: { message: "must exist" }
+  validates :product,
+    presence: { message: "must exist" },
+    scope: { by: :account_id }
 
   validates :name, presence: true
   validates :duration, numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true, allow_blank: true

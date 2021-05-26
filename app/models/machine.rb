@@ -30,7 +30,9 @@ class Machine < ApplicationRecord
   after_destroy :update_machines_core_count_on_destroy
 
   validates :account, presence: { message: "must exist" }
-  validates :license, presence: { message: "must exist" }
+  validates :license,
+    presence: { message: "must exist" },
+    scope: { by: :account_id }
 
   validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
 

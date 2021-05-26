@@ -40,10 +40,15 @@ class License < ApplicationRecord
   after_create :set_role
 
   validates :account, presence: { message: "must exist" }
-  validates :policy, presence: { message: "must exist" }
+  validates :policy,
+    presence: { message: "must exist" },
+    scope: { by: :account_id }
 
-   # Validate this association only if we've been given a user (because it's optional)
-  validates :user, presence: { message: "must exist" }, unless: -> { user_id.nil? }
+  # Validate this association only if we've been given a user (because it's optional)
+  validates :user,
+    presence: { message: "must exist" },
+    scope: { by: :account_id },
+    unless: -> { user_id.nil? }
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if

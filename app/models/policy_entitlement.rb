@@ -9,6 +9,11 @@ class PolicyEntitlement < ApplicationRecord
   belongs_to :entitlement
 
   validates :account, presence: { message: 'must exist' }
-  validates :policy, presence: { message: 'must exist' }
-  validates :entitlement, presence: { message: 'must exist' }, uniqueness: { message: 'already exists', scope: [:account_id, :policy_id, :entitlement_id] }
+  validates :policy,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
+  validates :entitlement,
+    uniqueness: { message: 'already exists', scope: [:account_id, :policy_id, :entitlement_id] },
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 end
