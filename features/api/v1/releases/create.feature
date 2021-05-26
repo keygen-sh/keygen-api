@@ -508,3 +508,90 @@ Feature: Create release
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a release with entitlement constraints that belong to another account
+    Given the account "test2" has 2 "entitlements"
+    And the first "entitlement" of account "test2" has the following attributes:
+      """
+      { "id": "2f9397b0-bbde-4219-a761-1307f338261f" }
+      """
+    And the second "entitlement" of account "test2" has the following attributes:
+      """
+      { "id": "481cc294-3f91-4efe-b471-90d14ecd5887" }
+      """
+    And I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Product Version 2 (Beta)",
+            "key": "Product-2.0.0-alpha1.dmg",
+            "version": "2.0.0-alpha1",
+            "platform": "darwin",
+            "filetype": "dmg",
+            "channel": "alpha"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            },
+            "constraints": {
+              "data": [
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "2f9397b0-bbde-4219-a761-1307f338261f" }
+                    }
+                  }
+                },
+                {
+                  "type": "constraint",
+                  "relationships": {
+                    "entitlement": {
+                      "data": { "type": "entitlement", "id": "481cc294-3f91-4efe-b471-90d14ecd5887" }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
+        "source": {
+          "pointer": "/data/relationships/constraints/0/entitlement"
+        }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
+        "source": {
+          "pointer": "/data/relationships/constraints/1/entitlement"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job

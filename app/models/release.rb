@@ -30,7 +30,9 @@ class Release < ApplicationRecord
   has_many :constraints,
     class_name: 'ReleaseEntitlementConstraint',
     inverse_of: :release,
-    dependent: :delete_all
+    dependent: :delete_all,
+    index_errors: true,
+    autosave: true
   has_many :entitlements,
     through: :constraints
   has_many :download_links,
@@ -220,6 +222,16 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_constraints
-    constraints.each { |c| c.account = account unless c.account.present? }
+    constraints.each_with_index do |constraint, i|
+      constraint.account = account if
+        constraint.account.nil?
+
+      next if
+        constraint.valid?
+
+      constraint.errors.each do |err|
+        errors.import(err, attribute: "constraints[#{i}].#{err.attribute}")
+      end
+    end
   end
 end

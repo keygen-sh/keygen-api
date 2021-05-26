@@ -632,7 +632,13 @@ end
 Then /^the JSON response should (?:contain|be) an array of (\d+) errors?$/ do |count|
   json = JSON.parse last_response.body
 
-  expect(json["errors"].length).to eq count.to_i
+  expect(json["errors"].size).to eq count.to_i
+end
+
+Then /^the JSON response should (?:contain|be) an array of errors?$/ do
+  json = JSON.parse last_response.body
+
+  expect(json["errors"].size).to be >= 1
 end
 
 Given /^the (\w+) error should have the following properties:$/ do |i, body|
