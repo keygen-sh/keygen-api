@@ -10,8 +10,9 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
+    before_action :require_paid_subscription!, only: %i[create update destroy]
     before_action :authenticate_with_token!
-    before_action :set_release, only: [:show, :update, :destroy]
+    before_action :set_release, only: %i[show update destroy]
 
     def index
       releases = policy_scope apply_scopes(current_account.releases.preload(:platform, :filetype, :channel))
