@@ -6,7 +6,7 @@ class ReleaseEntitlementConstraint < ApplicationRecord
 
   belongs_to :account
   belongs_to :release,
-    inverse_of: :entitlement_constraints
+    inverse_of: :constraints
   belongs_to :entitlement,
     inverse_of: :release_entitlement_constraints
 

@@ -10,7 +10,7 @@ module Api::V1::Releases::Relationships
     def index
       authorize release, :list_constraints?
 
-      constraints = apply_scopes(release.entitlement_constraints)
+      constraints = apply_scopes(release.constraints)
 
       render jsonapi: constraints
     end
@@ -18,7 +18,7 @@ module Api::V1::Releases::Relationships
     def show
       authorize release, :show_constraint?
 
-      constraint = release.entitlement_constraints.find(params[:id])
+      constraint = release.constraints.find(params[:id])
 
       render jsonapi: constraint
     end
@@ -32,7 +32,7 @@ module Api::V1::Releases::Relationships
           constraint.merge(account_id: current_account.id)
         }
 
-      attached = release.entitlement_constraints.create!(constraints_data)
+      attached = release.constraints.create!(constraints_data)
 
       BroadcastEventService.new(
         event: 'release.constraints.attached',
@@ -51,7 +51,7 @@ module Api::V1::Releases::Relationships
         .compact
         .uniq
 
-      release_constraints = release.entitlement_constraints.where(entitlement_id: entitlement_ids)
+      release_constraints = release.constraints.where(entitlement_id: entitlement_ids)
 
       # Ensure all entitlement constraints exist. Deleting non-existent constraints would be
       # a noop, but responding with a 2xx status code is a confusing DX.
@@ -69,7 +69,7 @@ module Api::V1::Releases::Relationships
         )
       end
 
-      detached = release.entitlement_constraints.delete(release_constraints)
+      detached = release.constraints.delete(release_constraints)
 
       BroadcastEventService.new(
         event: 'release.constraints.detached',
@@ -95,7 +95,7 @@ module Api::V1::Releases::Relationships
       on :attach do
         param :data, type: :array do
           items type: :hash do
-            param :type, type: :string, inclusion: %w[release-entitlement-constraint release-entitlement-constraints], transform: -> (k, v) { [] }
+            param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
             param :relationships, type: :hash do
               param :entitlement, type: :hash do
                 param :data, type: :hash do
@@ -111,7 +111,7 @@ module Api::V1::Releases::Relationships
       on :detach do
         param :data, type: :array do
           items type: :hash do
-            param :type, type: :string, inclusion: %w[release-entitlement-constraint release-entitlement-constraints], transform: -> (k, v) { [] }
+            param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
             param :relationships, type: :hash do
               param :entitlement, type: :hash do
                 param :data, type: :hash do
