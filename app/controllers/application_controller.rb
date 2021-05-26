@@ -211,20 +211,28 @@ class ApplicationController < ActionController::API
 
       errs.each_with_index.map do |err, i|
         # Transform users[0].email into [users, 0, email] so that we can put it
-        # back together as a proper pointer: users/data/0/attributes/email
+        # back together as a proper pointer: /users/data/0/attributes/email
         path = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
         src = path.map { |p| p.to_s.camelize :lower }
         pointer = nil
 
         if resource.class.reflect_on_association(path.first)
-          if err != "must exist" && src.size > 1
-            src.insert 1, :data # Make sure our pointer is JSONAPI compliant
+          # FIXME(ezekg) Matching on error message is dirty
+          case
+          when err == "must exist" && src.size > 1
+            src.insert 1, :data
+            src.insert -2, :relationships
+          when err != "must exist" && src.size > 1
+            src.insert 1, :data
             src.insert -2, :attributes
           end
 
           # On account creation, the users association is actually called admins
           # and is used to define the founding admins of the account
-          src[0] = "admins" if resource.is_a?(Account) && path.first == "users" && action_name == "create"
+          src[0] = "admins" if
+            resource.is_a?(Account) &&
+            action_name == "create" &&
+            path.first == "users"
 
           pointer = "/data/relationships/#{src.join '/'}"
         elsif path.first == "base"
