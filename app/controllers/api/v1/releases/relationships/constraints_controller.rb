@@ -24,7 +24,7 @@ module Api::V1::Releases::Relationships
     end
 
     def attach
-      authorize release, :attach_constraint?
+      authorize release, :attach_constraints?
 
       constraints_data = constraint_params
         .uniq { |constraint| constraint[:entitlement_id] }
@@ -44,7 +44,7 @@ module Api::V1::Releases::Relationships
     end
 
     def detach
-      authorize release, :detach_constraint?
+      authorize release, :detach_constraints?
 
       entitlement_ids = constraint_params
         .map { |e| e[:entitlement_id] }
@@ -53,7 +53,7 @@ module Api::V1::Releases::Relationships
 
       release_constraints = release.entitlement_constraints.where(entitlement_id: entitlement_ids)
 
-      # Ensure all entitlement constraints exist. Deleting non-existing constraints would be
+      # Ensure all entitlement constraints exist. Deleting non-existent constraints would be
       # a noop, but responding with a 2xx status code is a confusing DX.
       if release_constraints.size != entitlement_ids.size
         release_entitlement_ids = release_constraints.pluck(:entitlement_id)
