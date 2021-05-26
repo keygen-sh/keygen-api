@@ -13,7 +13,9 @@ class Token < ApplicationRecord
   attr_reader :raw
 
   validates :account, presence: true
-  validates :bearer, presence: true
+  validates :bearer,
+    scope: { by: :account_id },
+    presence: true
 
   validates :max_activations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
   validates :max_deactivations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?

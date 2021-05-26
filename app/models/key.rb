@@ -19,7 +19,9 @@ class Key < ApplicationRecord
   has_one :product, through: :policy
 
   validates :account, presence: { message: "must exist" }
-  validates :policy, presence: { message: "must exist" }
+  validates :policy,
+    presence: { message: "must exist" },
+    scope: { by: :account_id }
 
   validates :key, presence: true, allow_blank: false, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }
 
