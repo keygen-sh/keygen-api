@@ -71,15 +71,15 @@ class ApplicationPolicy
   end
 
   def assert_account_scoped!
-    raise NotAuthorizedError, reason: 'account mismatch for bearer' unless
+    raise Pundit::NotAuthorizedError, reason: 'account mismatch for bearer' unless
       bearer.nil? || bearer.account_id == account.id
 
     case
     when resource.respond_to?(:all?)
-      raise NotAuthorizedError, reason: 'account mismatch for resources' unless
+      raise Pundit::NotAuthorizedError, reason: 'account mismatch for resources' unless
         resource.all? { |r| r.account_id == account.id }
     when resource.respond_to?(:account_id)
-      raise NotAuthorizedError, reason: 'account mismatch for resource' unless
+      raise Pundit::NotAuthorizedError, reason: 'account mismatch for resource' unless
         resource.account_id == account.id
     else
       # NOTE(ezekg) We likely passed in the model class directly, e.g. `authorize(RequestLog)`,
