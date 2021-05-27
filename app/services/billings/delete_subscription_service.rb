@@ -11,7 +11,9 @@ module Billings
     def execute
       c = Billings::Subscription.retrieve(subscription)
       c.delete(at_period_end: at_period_end)
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 

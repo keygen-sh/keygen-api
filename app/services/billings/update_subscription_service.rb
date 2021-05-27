@@ -15,7 +15,9 @@ module Billings
       c.plan      = plan
 
       c.save
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 

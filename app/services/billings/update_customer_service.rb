@@ -19,7 +19,9 @@ module Billings
         coupon.nil?
 
       c.save
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 

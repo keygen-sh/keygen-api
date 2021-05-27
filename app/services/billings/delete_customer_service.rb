@@ -10,7 +10,9 @@ module Billings
     def execute
       c = Billings::Customer.retrieve(customer)
       c.delete
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 
