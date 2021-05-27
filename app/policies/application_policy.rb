@@ -1,22 +1,28 @@
 # frozen_string_literal: true
 
 class ApplicationPolicy
-  attr_reader :bearer, :resource
+  attr_reader :context, :resource
 
-  def initialize(bearer, resource)
-    @bearer = bearer
+  def initialize(context, resource)
+    @context  = context
     @resource = resource
   end
 
   def index?
+    assert_account_scoped!
+
     false
   end
 
   def show?
-    scope.where(id: resource.id).exists?
+    assert_account_scoped!
+
+    false
   end
 
   def create?
+    assert_account_scoped!
+
     false
   end
 
@@ -25,6 +31,8 @@ class ApplicationPolicy
   end
 
   def update?
+    assert_account_scoped!
+
     false
   end
 
@@ -33,27 +41,58 @@ class ApplicationPolicy
   end
 
   def destroy?
+    assert_account_scoped!
+
     false
   end
 
   def search?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
+
+  protected
 
   def scope
     Pundit.policy_scope! bearer, resource.class
   end
 
   def account
-    resource.account rescue bearer.account
+    context.account
+  end
+
+  def bearer
+    context.bearer
+  end
+
+  def token
+    context.token
+  end
+
+  def assert_account_scoped!
+    raise NotAuthorizedError, reason: 'account mismatch for bearer' unless
+      bearer.nil? || bearer.account_id == account.id
+
+    case
+    when resource.respond_to?(:all?)
+      raise NotAuthorizedError, reason: 'account mismatch for resources' unless
+        resource.all? { |r| r.account_id == account.id }
+    when resource.respond_to?(:account_id)
+      raise NotAuthorizedError, reason: 'account mismatch for resource' unless
+        resource.account_id == account.id
+    else
+      # NOTE(ezekg) We likely passed in the model class directly, e.g. `authorize(RequestLog)`,
+      #             so we can assume the action is scoping itself correctly.
+    end
   end
 
   class Scope
-    attr_reader :bearer, :scope
+    attr_reader :context, :scope
 
-    def initialize(bearer, scope)
-      @bearer = bearer
-      @scope = scope
+    def initialize(context, scope)
+      @context = context
+      @scope   = scope
     end
 
     def resolve
@@ -73,6 +112,20 @@ class ApplicationPolicy
       end
     rescue NoMethodError
       scope.none
+    end
+
+    private
+
+    def account
+      context.account
+    end
+
+    def bearer
+      context.bearer
+    end
+
+    def token
+      context.token
     end
   end
 end

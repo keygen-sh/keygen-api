@@ -8,8 +8,8 @@ class ApplicationController < ActionController::API
   before_action :disable_keep_alive_connections
   before_action :add_content_security_policy_headers
   before_action :add_jsonapi_content_type_headers
-  before_action :send_rate_limiting_headers
-  after_action :send_keygen_whoami_headers
+  before_action :add_rate_limiting_headers
+  after_action :add_keygen_whoami_headers
   after_action :verify_authorized
 
   rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
@@ -85,7 +85,11 @@ class ApplicationController < ActionController::API
   attr_accessor :current_token
 
   def pundit_user
-    current_bearer
+    AuthorizationContext.new(
+      account: current_account,
+      bearer: current_bearer,
+      token: current_token,
+    )
   end
 
   def rate_limiting_info
@@ -365,7 +369,7 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def send_rate_limiting_headers
+  def add_rate_limiting_headers
     info = rate_limiting_info
     return if info.nil?
 
@@ -378,11 +382,13 @@ class ApplicationController < ActionController::API
     Keygen.logger.exception e
   end
 
-  def send_keygen_whoami_headers
+  def add_keygen_whoami_headers
     response.headers["X-Keygen-Account-Id"] = current_account&.id
-    response.headers["X-Keygen-Bearer-Id"] = current_bearer&.id
-    response.headers["X-Keygen-Token-Id"] = current_token&.id
+    response.headers["X-Keygen-Bearer-Id"]  = current_bearer&.id
+    response.headers["X-Keygen-Token-Id"]   = current_token&.id
   rescue => e
     Keygen.logger.exception e
   end
+
+  class AuthorizationContext < OpenStruct; end
 end
