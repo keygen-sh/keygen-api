@@ -2,36 +2,53 @@
 
 World Rack::Test::Methods
 
-Then /^sidekiq should have (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |count, resource, queued_at|
-  case resource
-  when "webhook"
-    CreateWebhookEventsWorker.drain # Make sure our webhooks are created
-  when "metric"
-    resource = "record_metric" # We renamed this worker
-  when "request-log"
-    resource = "request_log"
-  when "heartbeat"
-    resource = "machine_heartbeat"
+Then /^sidekiq should have (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
+  worker_name =
+    case worker_name
+    when "metric"
+      "record_metric_worker" # We renamed this worker
+    when "request-log"
+      "request_log_worker"
+    when "heartbeat"
+      "machine_heartbeat_worker"
+    else
+      "#{worker_name.singularize.underscore}_worker"
+    end
+
+  # Drain certain queues before count
+  case worker_name
+  when "webhook_worker"
+    CreateWebhookEventsWorker.drain
   end
 
-  worker = "#{resource.singularize.underscore}_worker"
+  # Count queued jobs
+  worker_class = worker_name.classify.constantize
+  worker_count = worker_class.jobs.size
 
-  expect(worker.classify.constantize.jobs.size).to eq count.to_i
+  expect(worker_count).to eq expected_count.to_i
 
-  if queued_at.present?
-    job = worker.classify.constantize.jobs.last
-    n, m = queued_at.split ' '
+  # Drain certain queues after count
+  case worker_name
+  when "initialize_billing_worker"
+    InitializeBillingWorker.drain
+  end
 
-    dt = n.to_f.send(m)
-    t1 = job['at']
-    t2 = dt.from_now.to_f
+  # Future queueing
+  next unless
+    queued_at.present?
 
-    case m
-    when 'seconds', 'minutes'
-      expect(t1).to be_within(3.seconds).of t2
-    else
-      expect(t1).to be_within(1.minute).of t2
-    end
+  job  = worker_class.jobs.last
+  n, m = queued_at.split ' '
+
+  dt = n.to_f.send(m)
+  t1 = job['at']
+  t2 = dt.from_now.to_f
+
+  case m
+  when 'seconds', 'minutes'
+    expect(t1).to be_within(3.seconds).of t2
+  else
+    expect(t1).to be_within(1.minute).of t2
   end
 end
 

@@ -4,6 +4,9 @@ module Billable
   extend ActiveSupport::Concern
 
   included do
+    # Virtual attribute for tracking referrals
+    attr_accessor :referral_id
+
     after_commit :initialize_billing, on: :create
 
     Billing::AVAILABLE_EVENTS.each do |event|
@@ -25,6 +28,6 @@ module Billable
   end
 
   def initialize_billing
-    InitializeBillingWorker.perform_async id
+    InitializeBillingWorker.perform_async(id, referral_id)
   end
 end

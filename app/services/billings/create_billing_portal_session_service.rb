@@ -8,8 +8,8 @@ module Billings
     end
 
     def execute
-      Billings::BaseService::BillingPortal::Session.create customer: customer
-    rescue Billings::BaseService::Error
+      Billings::BillingPortal::Session.create(customer: customer)
+    rescue Billings::Error
       nil
     end
 

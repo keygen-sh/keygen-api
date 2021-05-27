@@ -3,21 +3,24 @@
 module Billings
   class CreateCustomerService < BaseService
 
-    def initialize(account:)
-      @account = account
+    def initialize(account:, metadata: nil)
+      @account  = account
+      @metadata = metadata
     end
 
     def execute
-      Billings::BaseService::Customer.create(
+      Billings::Customer.create(
         description: "#{account.name} (#{account.slug})",
-        email: account.admins.first.email
+        email: account.admins.first.email,
+        metadata: metadata,
       )
-    rescue Billings::BaseService::Error
+    rescue Billings::Error
       nil
     end
 
     private
 
-    attr_reader :account
+    attr_reader :account,
+                :metadata
   end
 end

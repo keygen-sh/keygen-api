@@ -9,11 +9,13 @@ module Billings
     end
 
     def execute
-      c = Billings::BaseService::Subscription.retrieve subscription
+      c = Billings::Subscription.retrieve(subscription)
+
       c.trial_end = 'now'
-      c.plan = plan
+      c.plan      = plan
+
       c.save
-    rescue Billings::BaseService::Error
+    rescue Billings::Error
       nil
     end
 
