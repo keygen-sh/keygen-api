@@ -8,9 +8,9 @@ module Billings
     end
 
     def execute
-      c = Billings::BaseService::Customer.retrieve customer
+      c = Billings::Customer.retrieve(customer)
       c.delete
-    rescue Billings::BaseService::Error
+    rescue Billings::Error
       nil
     end
 

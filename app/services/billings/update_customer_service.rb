@@ -10,11 +10,16 @@ module Billings
     end
 
     def execute
-      c = Billings::BaseService::Customer.retrieve customer
-      c.card   = token unless token.nil?
-      c.coupon = coupon unless coupon.nil?
+      c = Billings::Customer.retrieve(customer)
+
+      c.card = token unless
+        token.nil?
+
+      c.coupon = coupon unless
+        coupon.nil?
+
       c.save
-    rescue Billings::BaseService::Error
+    rescue Billings::Error
       nil
     end
 

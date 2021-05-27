@@ -5,17 +5,17 @@ class InitializeBillingWorker
 
   sidekiq_options queue: :billing
 
-  def perform(account_id)
-    account = Account.find account_id
+  def perform(account_id, referral_id)
+    account = Account.find(account_id)
+    return unless
+      account.billing.nil?
 
-    if account.billing.nil?
-      customer = Billings::CreateCustomerService.new(
-        account: account
-      ).execute
+    service  = Billings::CreateCustomerService.new(account: account, metadata: { referral: referral_id })
+    customer = service.execute
 
-      account.billing = Billing.create!(
-        customer_id: customer.id
-      )
-    end
+    account.create_billing!(
+      customer_id: customer.id,
+      referral_id: referral_id,
+    )
   end
 end

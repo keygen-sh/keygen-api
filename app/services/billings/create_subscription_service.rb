@@ -10,14 +10,12 @@ module Billings
     end
 
     def execute
-      params = {
+      Billings::Subscription.create(
         customer: customer,
         trial_end: trial_end,
-        plan: plan
-      }
-
-      Billings::BaseService::Subscription.create params
-    rescue Billings::BaseService::Error
+        plan: plan,
+      )
+    rescue Billings::Error
       nil
     end
 

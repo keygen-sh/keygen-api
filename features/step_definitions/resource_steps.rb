@@ -473,6 +473,20 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, reso
   end
 end
 
+Then /^the account "([^\"]*)" should have a referral of "([^\"]*)"$/ do |account_id, referral_id|
+  account = FindByAliasService.new(Account, account_id, aliases: :slug).call
+  billing = account.billing
+
+  expect(billing.referral_id).to eq referral_id
+end
+
+Then /^the account "([^\"]*)" should not have a referral$/ do |account_id|
+  account = FindByAliasService.new(Account, account_id, aliases: :slug).call
+  billing = account.billing
+
+  expect(billing.referral_id).to be_nil
+end
+
 Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, body|
   parse_placeholders! body
 

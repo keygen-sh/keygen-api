@@ -9,9 +9,9 @@ module Billings
     end
 
     def execute
-      c = Billings::BaseService::Subscription.retrieve subscription
-      c.delete at_period_end: at_period_end
-    rescue Billings::BaseService::Error
+      c = Billings::Subscription.retrieve(subscription)
+      c.delete(at_period_end: at_period_end)
+    rescue Billings::Error
       nil
     end
 

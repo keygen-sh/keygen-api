@@ -17,7 +17,7 @@ module Api::V1
 
     # POST /accounts
     def create
-      @account = Account.new account_params
+      @account = Account.new account_params.merge(referral_id: account_meta[:referral])
       authorize @account
 
       if @account.save
@@ -89,6 +89,9 @@ module Api::V1
               end
             end
           end
+        end
+        param :meta, type: :hash, optional: true do
+          param :referral, type: :string, optional: true
         end
       end
 
