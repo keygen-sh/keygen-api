@@ -3,10 +3,14 @@
 class MachinePolicy < ApplicationPolicy
 
   def index?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :user, :license)
   end
 
   def show?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
@@ -14,6 +18,8 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((resource.license.nil? || !resource.license.protected?) && resource.user == bearer) ||
       resource.product == bearer ||
@@ -21,12 +27,16 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def update?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
       resource.product == bearer
   end
 
   def destroy?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
       resource.product == bearer ||
@@ -34,6 +44,8 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def ping_heartbeat?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer) ||
       (!resource.license.protected? && resource.user == bearer) ||
       resource.product == bearer ||
@@ -41,11 +53,15 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def reset_heartbeat?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
   end
 
   def generate_offline_proof?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
       resource.product == bearer ||
