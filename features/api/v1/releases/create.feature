@@ -42,7 +42,11 @@ Feature: Create release
             "version": "1.0.0",
             "platform": "darwin",
             "filetype": "dmg",
-            "channel": "stable"
+            "channel": "stable",
+            "filesize": 209715200,
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
           },
           "relationships": {
             "product": {
@@ -56,12 +60,21 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the name "Launch Release"
-    And the JSON response should be a "release" with the key "Product-1.0.0.dmg"
-    And the JSON response should be a "release" with the version "1.0.0"
-    And the JSON response should be a "release" with the platform "darwin"
-    And the JSON response should be a "release" with the filetype "dmg"
-    And the JSON response should be a "release" with the channel "stable"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Launch Release",
+        "key": "Product-1.0.0.dmg",
+        "version": "1.0.0",
+        "platform": "darwin",
+        "filetype": "dmg",
+        "channel": "stable",
+        "filesize": 209715200,
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -174,6 +187,54 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates an rc release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null,
+            "key": "Product-1.0.0-rc.99.zip",
+            "version": "1.0.0-rc.99",
+            "platform": "macos",
+            "filetype": "zip",
+            "channel": "rc",
+            "filesize": 1342177280
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": null,
+        "key": "Product-1.0.0-rc.99.zip",
+        "version": "1.0.0-rc.99",
+        "platform": "macos",
+        "filetype": "zip",
+        "channel": "rc",
+        "filesize": 1342177280
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates an alpha release
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -205,12 +266,118 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "release" with the name "Alpha Release"
-    And the JSON response should be a "release" with the key "Product-1.0.0-alpha.1.exe"
-    And the JSON response should be a "release" with the version "1.0.0-alpha.1"
-    And the JSON response should be a "release" with the platform "win32"
-    And the JSON response should be a "release" with the filetype "exe"
-    And the JSON response should be a "release" with the channel "alpha"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Alpha Release",
+        "key": "Product-1.0.0-alpha.1.exe",
+        "version": "1.0.0-alpha.1",
+        "platform": "win32",
+        "filetype": "exe",
+        "channel": "alpha",
+        "filesize": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a beta release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null,
+            "key": "Product-2.0.0-beta.1.tar.gz",
+            "version": "2.0.0-beta.1",
+            "platform": "linux",
+            "filetype": "tar.gz",
+            "channel": "beta"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": null,
+        "key": "Product-2.0.0-beta.1.tar.gz",
+        "version": "2.0.0-beta.1",
+        "platform": "linux",
+        "filetype": "tar.gz",
+        "channel": "beta",
+        "filesize": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a dev release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null,
+            "key": "Product-3.0.0-dev.9+build.93214.tar.gz",
+            "version": "3.0.0-dev.9+build.93214",
+            "platform": "linux",
+            "filetype": "tar.gz",
+            "channel": "dev",
+            "metadata": {
+              "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": null,
+        "key": "Product-3.0.0-dev.9+build.93214.tar.gz",
+        "version": "3.0.0-dev.9+build.93214",
+        "platform": "linux",
+        "filetype": "tar.gz",
+        "channel": "dev",
+        "filesize": null,
+        "metadata": {
+          "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
+        }
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
