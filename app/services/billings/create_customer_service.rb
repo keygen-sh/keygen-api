@@ -14,7 +14,9 @@ module Billings
         email: account.admins.first.email,
         metadata: metadata,
       )
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 

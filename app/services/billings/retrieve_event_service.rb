@@ -9,7 +9,9 @@ module Billings
 
     def execute
       Billings::Event.retrieve(event)
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 

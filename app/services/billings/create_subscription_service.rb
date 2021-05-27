@@ -15,7 +15,9 @@ module Billings
         trial_end: trial_end,
         plan: plan,
       )
-    rescue Billings::Error
+    rescue Billings::Error => e
+      Keygen.logger.exception(e)
+
       nil
     end
 
