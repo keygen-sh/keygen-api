@@ -72,7 +72,7 @@ class Release < ApplicationRecord
     presence: true,
     semver: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id] }
-  validates :key,
+  validates :filename,
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
   validates :filesize,
@@ -156,7 +156,7 @@ class Release < ApplicationRecord
   end
 
   def s3_object_key
-    "blobs/#{account_id}/#{id}/#{key}"
+    "blobs/#{account_id}/#{id}/#{filename}"
   end
 
   def semver
@@ -198,8 +198,8 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_filetype
-    errors.add(:key, :extension_invalid, message: "key extension does not match filetype (expected #{filetype.key})") unless
-      key.ends_with?(filetype.key)
+    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") unless
+      filename.ends_with?(filetype.key)
 
     self.filetype = account.release_filetypes.find_or_create_by(key: filetype.key)
   rescue ActiveRecord::RecordNotUnique

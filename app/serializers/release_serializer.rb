@@ -4,17 +4,17 @@ class ReleaseSerializer < BaseSerializer
   type :releases
 
   attribute :name
-  attribute :key
+  attribute :filename
+  attribute :filetype do
+    @object.filetype.key
+  end
+  attribute :filesize
   attribute :platform do
     @object.platform.key
   end
   attribute :channel do
     @object.channel.key
   end
-  attribute :filetype do
-    @object.filetype.key
-  end
-  attribute :filesize
   attribute :downloads do
     @object.download_count
   end
