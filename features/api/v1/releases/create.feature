@@ -38,12 +38,12 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Launch Release",
-            "key": "Product-1.0.0.dmg",
-            "version": "1.0.0",
-            "platform": "darwin",
+            "filename": "Product-1.0.0.dmg",
             "filetype": "dmg",
-            "channel": "stable",
             "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0",
             "metadata": {
               "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
             }
@@ -64,12 +64,19 @@ Feature: Create release
       """
       {
         "name": "Launch Release",
-        "key": "Product-1.0.0.dmg",
-        "version": "1.0.0",
-        "platform": "darwin",
+        "filename": "Product-1.0.0.dmg",
         "filetype": "dmg",
-        "channel": "stable",
         "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
         "metadata": {
           "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
         }
@@ -99,11 +106,11 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Duplicate Release",
-            "key": "Product-1.0.0.dmg",
-            "version": "1.0.0",
-            "platform": "darwin",
+            "filename": "Product-1.0.0.dmg",
             "filetype": "dmg",
-            "channel": "stable"
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0"
           },
           "relationships": {
             "product": {
@@ -133,7 +140,7 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a duplicate release (by key)
+  Scenario: Admin creates a duplicate release (by filename)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -142,7 +149,7 @@ Feature: Create release
     And the first "release" has the following attributes:
       """
       {
-        "key": "Product-1.0.0.dmg"
+        "filename": "Product-1.0.0.dmg"
       }
       """
     And I use an authentication token
@@ -153,11 +160,11 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Duplicate Release",
-            "key": "Product-1.0.0.dmg",
-            "version": "1.0.0",
-            "platform": "darwin",
+            "filename": "Product-1.0.0.dmg",
             "filetype": "dmg",
-            "channel": "stable"
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0"
           },
           "relationships": {
             "product": {
@@ -177,9 +184,9 @@ Feature: Create release
       {
         "title": "Unprocessable resource",
         "detail": "already exists",
-        "code": "KEY_TAKEN",
+        "code": "FILENAME_TAKEN",
         "source": {
-          "pointer": "/data/attributes/key"
+          "pointer": "/data/attributes/filename"
         }
       }
       """
@@ -200,12 +207,12 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "key": "Product-1.0.0-rc.99.zip",
-            "version": "1.0.0-rc.99",
-            "platform": "macos",
+            "filename": "Product-1.0.0-rc.99.zip",
             "filetype": "zip",
+            "filesize": 1342177280,
+            "platform": "macos",
             "channel": "rc",
-            "filesize": 1342177280
+            "version": "1.0.0-rc.99"
           },
           "relationships": {
             "product": {
@@ -223,12 +230,19 @@ Feature: Create release
       """
       {
         "name": null,
-        "key": "Product-1.0.0-rc.99.zip",
-        "version": "1.0.0-rc.99",
-        "platform": "macos",
+        "filename": "Product-1.0.0-rc.99.zip",
         "filetype": "zip",
+        "filesize": 1342177280,
+        "platform": "macos",
         "channel": "rc",
-        "filesize": 1342177280
+        "version": "1.0.0-rc.99",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": "rc.99",
+          "build": null
+        }
       }
       """
     And sidekiq should have 1 "webhook" job
@@ -248,11 +262,11 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
-            "key": "Product-1.0.0-alpha.1.exe",
-            "version": "1.0.0-alpha.1",
-            "platform": "win32",
+            "filename": "Product-1.0.0-alpha.1.exe",
             "filetype": "exe",
-            "channel": "alpha"
+            "platform": "win32",
+            "channel": "alpha",
+            "version": "1.0.0-alpha.1"
           },
           "relationships": {
             "product": {
@@ -270,12 +284,19 @@ Feature: Create release
       """
       {
         "name": "Alpha Release",
-        "key": "Product-1.0.0-alpha.1.exe",
-        "version": "1.0.0-alpha.1",
-        "platform": "win32",
+        "filename": "Product-1.0.0-alpha.1.exe",
         "filetype": "exe",
+        "filesize": null,
+        "platform": "win32",
         "channel": "alpha",
-        "filesize": null
+        "version": "1.0.0-alpha.1",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": "alpha.1",
+          "build": null
+        }
       }
       """
     And sidekiq should have 1 "webhook" job
@@ -295,8 +316,8 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "key": "Product-2.0.0-beta.1.tar.gz",
-            "version": "2.0.0-beta.1",
+            "filename": "Product-2.11.0-beta.1.tar.gz",
+            "version": "2.11.0-beta.1",
             "platform": "linux",
             "filetype": "tar.gz",
             "channel": "beta"
@@ -317,12 +338,19 @@ Feature: Create release
       """
       {
         "name": null,
-        "key": "Product-2.0.0-beta.1.tar.gz",
-        "version": "2.0.0-beta.1",
+        "filename": "Product-2.11.0-beta.1.tar.gz",
+        "version": "2.11.0-beta.1",
         "platform": "linux",
         "filetype": "tar.gz",
         "channel": "beta",
-        "filesize": null
+        "filesize": null,
+        "semver": {
+          "major": 2,
+          "minor": 11,
+          "patch": 0,
+          "prerelease": "beta.1",
+          "build": null
+        }
       }
       """
     And sidekiq should have 1 "webhook" job
@@ -342,10 +370,10 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "key": "Product-3.0.0-dev.9+build.93214.tar.gz",
+            "filename": "Product-3.0.0-dev.9+build.93214.tar.gz",
+            "filetype": "tar.gz",
             "version": "3.0.0-dev.9+build.93214",
             "platform": "linux",
-            "filetype": "tar.gz",
             "channel": "dev",
             "metadata": {
               "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
@@ -367,12 +395,19 @@ Feature: Create release
       """
       {
         "name": null,
-        "key": "Product-3.0.0-dev.9+build.93214.tar.gz",
-        "version": "3.0.0-dev.9+build.93214",
-        "platform": "linux",
+        "filename": "Product-3.0.0-dev.9+build.93214.tar.gz",
         "filetype": "tar.gz",
-        "channel": "dev",
         "filesize": null,
+        "platform": "linux",
+        "channel": "dev",
+        "version": "3.0.0-dev.9+build.93214",
+        "semver": {
+          "major": 3,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": "dev.9",
+          "build": "build.93214"
+        },
         "metadata": {
           "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
         }
@@ -395,11 +430,11 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
-            "key": "Product-1.0.0-alpha.1.exe",
-            "version": "1.0.0-alpha.1",
-            "platform": "win32",
+            "filename": "Product-1.0.0-alpha.1.exe",
             "filetype": "exe",
-            "channel": "stable"
+            "platform": "win32",
+            "channel": "stable",
+            "version": "1.0.0-alpha.1"
           },
           "relationships": {
             "product": {
@@ -442,7 +477,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
-            "key": "Product-1.0.0-alpha.1.exe",
+            "filename": "Product-1.0.0-alpha.1.exe",
             "version": "1.0.0-alpha.1",
             "platform": "win32",
             "filetype": "exe",
@@ -489,7 +524,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Release Candidate #1",
-            "key": "Product-2.0.0-rc.1.zip",
+            "filename": "Product-2.0.0-rc.1.zip",
             "version": "2.0.0-rc.1",
             "platform": "win32",
             "filetype": "exe",
@@ -512,10 +547,10 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "key extension does not match filetype (expected exe)",
-        "code": "KEY_EXTENSION_INVALID",
+        "detail": "filename extension does not match filetype (expected exe)",
+        "code": "FILENAME_EXTENSION_INVALID",
         "source": {
-          "pointer": "/data/attributes/key"
+          "pointer": "/data/attributes/filename"
         }
       }
       """
@@ -536,7 +571,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Bad Version: Invalid",
-            "key": "Product.zip",
+            "filename": "Product.zip",
             "version": "1.2.34.56789",
             "platform": "win32",
             "filetype": "zip",
@@ -583,7 +618,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Bad Version: Prefix",
-            "key": "Product.zip",
+            "filename": "Product.zip",
             "version": "v1.2.34",
             "platform": "win32",
             "filetype": "zip",
@@ -631,7 +666,7 @@ Feature: Create release
           "type": "release",
           "attributes": {
             "name": "Product Version 2 (Beta)",
-            "key": "Product-2.0.0-alpha1.dmg",
+            "filename": "Product-2.0.0-alpha1.dmg",
             "version": "2.0.0-alpha1",
             "platform": "darwin",
             "filetype": "dmg",
@@ -698,7 +733,7 @@ Feature: Create release
           "type": "release",
           "attributes": {
             "name": "Product Version 2 (Beta)",
-            "key": "Product-2.0.0-alpha1.dmg",
+            "filename": "Product-2.0.0-alpha1.dmg",
             "version": "2.0.0-alpha1",
             "platform": "darwin",
             "filetype": "dmg",

@@ -3,9 +3,9 @@
 FactoryGirl.define do
   factory :release do
     name { Faker::App.name }
-    key { "#{name}-#{version}.dmg" }
-    version { Faker::App.semantic_version }
+    filename { "#{name}-#{version}.dmg" }
     filesize { Faker::Number.between(from: 1.megabyte.to_i, to: 1.gigabyte.to_i) }
+    version { Faker::App.semantic_version }
 
     account nil
     product nil

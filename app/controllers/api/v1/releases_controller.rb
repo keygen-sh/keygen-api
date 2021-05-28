@@ -90,18 +90,18 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :key, type: :string
-            param :version, type: :string
-            param :platform, type: :string, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase }]
-            }
+            param :filename, type: :string
+            param :filesize, type: :integer, optional: true
             param :filetype, type: :string, transform: -> (k, v) {
               [:filetype_attributes, { key: v.downcase }]
+            }
+            param :platform, type: :string, transform: -> (k, v) {
+              [:platform_attributes, { key: v.downcase }]
             }
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
               [:channel_attributes, { key: v.downcase }]
             }
-            param :filesize, type: :integer, optional: true
+            param :version, type: :string
             param :metadata, type: :hash, optional: true
           end
           param :relationships, type: :hash do
