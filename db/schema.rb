@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_27_193718) do
+ActiveRecord::Schema.define(version: 2021_05_31_130928) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -33,6 +33,8 @@ ActiveRecord::Schema.define(version: 2021_05_27_193718) do
     t.datetime "last_license_limit_exceeded_sent_at"
     t.datetime "last_request_limit_exceeded_sent_at"
     t.datetime "last_prompt_for_review_sent_at"
+    t.text "ed25519_private_key"
+    t.text "ed25519_public_key"
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"

@@ -28,6 +28,7 @@ gem 'pundit'
 
 # Cryptography
 gem 'openssl'
+gem 'ed25519'
 gem 'jwt'
 
 # 2FA/TOTP

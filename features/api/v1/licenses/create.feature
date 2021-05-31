@@ -1832,6 +1832,109 @@ Feature: Create license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license using scheme ED25519_SIGN for a user of their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0].id",
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+      """
+      {
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": $policies[0].duration
+        },
+        "user": null,
+        "license": {
+          "id": "$licenses[0].id",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme ED25519_SIGN with a pre-determined key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "ed25519-signed-payload"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the signed key of "ed25519-signed-payload" using "ED25519_SIGN"
+    And the JSON response should be a "license" with the scheme "ED25519_SIGN"
+    And the JSON response should be a "license" that is not encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"

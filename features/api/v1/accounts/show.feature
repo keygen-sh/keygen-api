@@ -21,7 +21,13 @@ Feature: Show account
     And the JSON response should be an "account"
     And the JSON response should be an "account" with the following meta:
       """
-      { "publicKey": "$~accounts[0].public_key" }
+      {
+        "publicKey": "$~accounts[0].public_key",
+        "keys": {
+          "ed25519": "$~accounts[0].ed25519_public_key",
+          "rsa2048": "$~accounts[0].public_key"
+        }
+      }
       """
     And sidekiq should have 0 "request-log" jobs
 

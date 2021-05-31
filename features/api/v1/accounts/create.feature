@@ -44,7 +44,13 @@ Feature: Create account
     And the JSON response should be an "account" with the slug "google"
     And the JSON response should be an "account" with the following meta:
       """
-      { "publicKey": "$~accounts[0].public_key" }
+      {
+        "publicKey": "$~accounts[0].public_key",
+        "keys": {
+          "ed25519": "$~accounts[0].ed25519_public_key",
+          "rsa2048": "$~accounts[0].public_key"
+        }
+      }
       """
     And the account should receive a "welcome" email
     And sidekiq should have 1 "initialize-billing" job
