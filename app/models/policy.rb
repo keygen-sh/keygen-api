@@ -13,6 +13,7 @@ class Policy < ApplicationRecord
     RSA_2048_JWT_RS256
     RSA_2048_PKCS1_SIGN_V2
     RSA_2048_PKCS1_PSS_SIGN_V2
+    ED25519_SIGN
   ].freeze
 
   FINGERPRINT_UNIQUENESS_STRATEGIES = %w[

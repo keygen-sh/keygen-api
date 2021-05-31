@@ -75,6 +75,10 @@ FactoryGirl.define do
       association :policy, :rsa_2048_pkcs1_pss_sign_v2, strategy: :build
     end
 
+    trait :ed25519_sign do
+      association :policy, :ed25519_sign, strategy: :build
+    end
+
     trait :day_check_in do
       association :policy, :day_check_in, strategy: :build
     end

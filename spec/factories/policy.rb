@@ -74,6 +74,11 @@ FactoryGirl.define do
       encrypted false
     end
 
+    trait :ed25519_sign do
+      scheme 'ED25519_SIGN'
+      encrypted false
+    end
+
     trait :day_check_in do
       require_check_in true
       check_in_interval 'day'

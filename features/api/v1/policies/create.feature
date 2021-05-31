@@ -1492,6 +1492,40 @@ Feature: Create policy
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy using scheme ED25519_SIGN for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Ed25519",
+            "scheme": "ED25519_SIGN"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the scheme "ED25519_SIGN"
+    And the JSON response should be a "policy" that is not encrypted
+    And the JSON response should be a "policy" with the name "Ed25519"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a legacy encrypted policy without a scheme for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
