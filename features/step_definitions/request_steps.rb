@@ -300,6 +300,20 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (
     expect(prefix).to eq "key"
     expect(key).to eq val
     expect(res).to be true
+  when 'ED25519_SIGN'
+    verify_key = Ed25519::VerifyKey.new [@account.ed25519_public_key].pack('H*')
+    signing_data, encoded_sig = json.dig('data', 'attributes', 'key').to_s.split('.')
+    signing_prefix, encoded_key = signing_data.split('/')
+    key = Base64.urlsafe_decode64 encoded_key
+    sig = Base64.urlsafe_decode64 encoded_sig
+    val = value.to_s
+
+    ok = verify_key.verify(sig, signing_data)
+
+    expect(json.dig('data', 'type')).to eq resource.pluralize
+    expect(signing_prefix).to eq 'key'
+    expect(key).to eq val
+    expect(ok).to be true
   else
     raise "unknown encryption scheme"
   end
@@ -524,6 +538,19 @@ Then /^the JSON response should a "license" that contains a valid "([^\"]*)" key
 
     sig = Base64.urlsafe_decode64 encoded_sig
     ok = pub.verify_pss digest, sig, "key/#{encoded_dataset}", salt_length: :auto, mgf1_hash: "SHA256" rescue false
+
+    expect(ok).to be true
+  when 'ED25519_SIGN'
+    verify_key = Ed25519::VerifyKey.new [@account.ed25519_public_key].pack('H*')
+    signing_data, encoded_sig = json.dig('data', 'attributes', 'key').to_s.split('.')
+    signing_prefix, encoded_dataset = signing_data.split('/')
+    dataset = JSON.parse(Base64.urlsafe_decode64(encoded_dataset))
+
+    expect(dataset).to include expected_dataset
+    expect(signing_prefix).to eq 'key'
+
+    sig = Base64.urlsafe_decode64 encoded_sig
+    ok = verify_key.verify(sig, signing_data)
 
     expect(ok).to be true
   else

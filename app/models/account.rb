@@ -34,7 +34,8 @@ class Account < ApplicationRecord
   before_create -> { self.slug = slug.downcase }
 
   before_create :generate_secret_key!
-  before_create :generate_keys!
+  before_create :generate_rsa_keys!
+  before_create :generate_ed25519_keys!
 
   validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
@@ -243,7 +244,7 @@ class Account < ApplicationRecord
   end
   alias_method :regenerate_secret_key!, :generate_secret_key!
 
-  def generate_keys!
+  def generate_rsa_keys!
     priv = if private_key.nil?
              OpenSSL::PKey::RSA.generate RSA_KEY_SIZE
            else
@@ -251,8 +252,23 @@ class Account < ApplicationRecord
            end
     pub = priv.public_key
 
+    # TODO(ezekg) Rename to rsa_private_key and rsa_public_key
     self.private_key = priv.to_pem
     self.public_key = pub.to_pem
   end
-  alias_method :regenerate_keys!, :generate_keys!
+  alias_method :regenerate_rsa_keys!, :generate_rsa_keys!
+
+  def generate_ed25519_keys!
+    priv =
+      if ed25519_private_key.present?
+        Ed25519::SigningKey.new([ed25519_private_key].pack("H*"))
+      else
+        Ed25519::SigningKey.generate
+      end
+    pub = priv.verify_key
+
+    self.ed25519_private_key = priv.to_bytes.unpack1("H*")
+    self.ed25519_public_key = pub.to_bytes.unpack1("H*")
+  end
+  alias_method :regenerate_ed25519_keys!, :generate_ed25519_keys!
 end
