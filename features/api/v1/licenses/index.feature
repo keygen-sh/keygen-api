@@ -94,12 +94,20 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?page[number]=1&page[size]=-250"
     Then the response status should be "400"
 
-  Scenario: Admin retrieves a paginated list of licenses with an invalid page number
+  Scenario: Admin retrieves a paginated list of licenses with an invalid page number (negative)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 20 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?page[number]=-1&page[size]=10"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves a paginated list of licenses with an invalid page number (type)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "licenses"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?page%5Bnumber%5D%3D=0"
     Then the response status should be "400"
 
   Scenario: Admin retrieves all licenses without a limit for their account

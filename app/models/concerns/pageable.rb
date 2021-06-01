@@ -16,12 +16,19 @@ module Pageable
 
   included do
     scope :page, -> (number, size) {
+      raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page number must be a number" unless
+        number.respond_to?(:to_i)
+
+      raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page size must be a number" unless
+        size.respond_to?(:to_i)
+
       number = number.to_i
       size = size.to_i
 
       if number < PAGE_LOWER
         raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page number must be a number greater than #{PAGE_LOWER - 1} (got #{number})"
       end
+
       if size < SIZE_LOWER || size > SIZE_UPPER
         raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page size must be a number between #{SIZE_LOWER} and #{SIZE_UPPER} (got #{size})"
       end
