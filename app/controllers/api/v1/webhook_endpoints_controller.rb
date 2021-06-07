@@ -69,6 +69,7 @@ module Api::V1
             param :subscriptions, type: :array, optional: true do
               items type: :string
             end
+            param :signature_algorithm, type: :string, optional: true
           end
         end
       end
@@ -82,6 +83,7 @@ module Api::V1
             param :subscriptions, type: :array, optional: true do
               items type: :string
             end
+            param :signature_algorithm, type: :string, optional: true
           end
         end
       end

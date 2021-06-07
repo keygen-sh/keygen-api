@@ -29,14 +29,17 @@ class WebhookWorker
     event_type = event.event_type
     return unless endpoint.subscribed?(event_type.event)
 
-    date        = Time.current
-    sig, digest = generate_response_signature(
+    date   = Time.current
+    uri    = URI.parse(endpoint.url)
+    digest = generate_digest_header(body: payload)
+    sig    = generate_signature_header(
       algorithm: endpoint.signature_algorithm.presence || :ed25519,
       account: account,
       date: date,
       method: 'POST',
-      uri: endpoint.url,
-      body: payload,
+      host: uri.host,
+      uri: [uri.path.presence || '/', uri.query.presence].compact.join('?'),
+      digest: digest,
     )
 
     headers = {

@@ -25,12 +25,21 @@ module SignatureHeader
 
   attr_reader :signature_algorithm
 
-  def generate_response_signature(algorithm:, account:, date:, method:, uri:, body:)
-    signing_data, digest = generate_response_signing_data_and_digest(
+  def generate_digest_header(body:)
+    sha256 = OpenSSL::Digest::SHA256.new
+    digest = sha256.digest(body)
+    enc    = Base64.strict_encode64(digest)
+
+    "SHA-256=#{enc}"
+  end
+
+  def generate_signature_header(algorithm:, account:, date:, method:, host:, uri:, digest:)
+    signing_data = generate_signing_data(
       date: date,
       method: method,
+      host: host,
       uri: uri,
-      body: body,
+      digest: digest,
     )
 
     signature = sign_response_data(
@@ -39,10 +48,7 @@ module SignatureHeader
       data: signing_data,
     )
 
-    [
-      %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) digest date"),
-      digest,
-    ]
+    %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) host digest date")
   end
 
   def validate_accept_signature_header
@@ -63,24 +69,24 @@ module SignatureHeader
     response.headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: current_account, data: body) if
       current_account.created_at < LEGACY_SIGNATURE_UNTIL
 
-    # Ensure that the date header matches date in signature
-    response.headers['Date'] = date.httpdate
-
     # Skip non-legacy signature header if algorithm is invalid
     return if
       signature_algorithm.nil?
 
     # Depending on the algorithm, we may have a digest as well
-    sig, digest = generate_response_signature(
+    digest = generate_digest_header(body: body)
+    sig    = generate_signature_header(
       algorithm: signature_algorithm,
       account: current_account,
       date: date,
       method: request.method,
+      host: 'api.keygen.sh',
       uri: request.original_fullpath,
-      body: body,
+      digest: digest,
     )
 
-    response.headers['Digest']           = "SHA-256=#{digest}"
+    response.headers['Date']             = date.httpdate
+    response.headers['Digest']           = digest
     response.headers['Keygen-Signature'] = sig
   rescue => e
     Keygen.logger.exception(e)
@@ -109,15 +115,15 @@ module SignatureHeader
   # NOTE(ezekg) We're using strict_encode64 because encode64 adds a newline
   #             every 60 chars, which results in an invalid HTTP header.
 
-  def generate_response_signing_data_and_digest(date:, method:, uri:, body:)
-    digest = sign_with_sha256(data: body)
-    data   = [
-      "(request-target): #{method.downcase} #{uri}",
+  def generate_signing_data(date:, method:, host:, uri:, digest:)
+    data = [
+      "(request-target): #{method.downcase} #{uri.presence || '/'}",
+      "host: #{host}",
       "digest: #{digest}",
       "date: #{date.httpdate}",
-    ].join('\n')
+    ]
 
-    [data, digest]
+    data.join('\n')
   end
 
   def parse_accept_signature(accept_signature)
@@ -137,13 +143,6 @@ module SignatureHeader
 
   def supports_signature_algorithm?(algorithm)
     SUPPORTED_SIGNATURE_ALGORITHMS.include?(algorithm.to_s.downcase)
-  end
-
-  def sign_with_sha256(data:)
-    sha256 = OpenSSL::Digest::SHA256.new
-    digest = sha256.digest(data)
-
-    Base64.strict_encode64(digest)
   end
 
   def sign_with_ed25519(key:, data:)
