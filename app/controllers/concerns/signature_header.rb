@@ -33,6 +33,7 @@ module SignatureHeader
     "SHA-256=#{enc}"
   end
 
+  # See: https://tools.ietf.org/id/draft-cavage-http-signatures-08.html#rfc.section.4
   def generate_signature_header(algorithm:, account:, date:, method:, host:, uri:, digest:)
     signing_data = generate_signing_data(
       date: date,
