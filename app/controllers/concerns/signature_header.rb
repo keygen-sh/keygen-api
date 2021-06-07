@@ -28,7 +28,7 @@ module SignatureHeader
     digest = sha256.digest(body)
     enc    = Base64.strict_encode64(digest)
 
-    "SHA-256=#{enc}"
+    "sha-256=#{enc}"
   end
 
   # See: https://tools.ietf.org/id/draft-cavage-http-signatures-08.html#rfc.section.4
