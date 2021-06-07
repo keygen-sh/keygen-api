@@ -718,6 +718,12 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
     expect(signature).to be_a String
     expect(headers).to eq %w[(request-target) host digest date]
 
+    sha256 = OpenSSL::Digest::SHA256.new
+    digest = sha256.digest(res.body)
+    enc    = Base64.strict_encode64(digest)
+
+    expect("sha-256=#{enc}").to eq res.headers['Digest']
+
     ok = SignatureHelper.verify(
       account: account,
       method: req.request_method,
