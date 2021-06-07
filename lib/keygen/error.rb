@@ -23,5 +23,7 @@ module Keygen
         super message, model, primary_key, id
       end
     end
+
+    class BadRequestError < StandardError; end
   end
 end

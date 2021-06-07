@@ -3,13 +3,14 @@
 class ApplicationController < ActionController::API
   PUBLIC_RATE_LIMIT_KEYS = %w[req/ip/burst/30s req/ip/burst/2m req/ip/burst/5m req/ip/burst/10m]
 
+  include SignatureHeader
   include Pundit
 
-  before_action :disable_keep_alive_connections
+  before_action :add_close_keep_alive_connection_header
   before_action :add_content_security_policy_headers
   before_action :add_jsonapi_content_type_headers
   before_action :add_rate_limiting_headers
-  after_action :add_keygen_whoami_headers
+  around_action :add_keygen_headers
   after_action :verify_authorized
 
   rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
@@ -17,6 +18,7 @@ class ApplicationController < ActionController::API
   rescue_from TypedParameters::InvalidRequestError, with: -> (err) { render_bad_request detail: err.message }
   rescue_from Keygen::Error::InvalidScopeError, with: -> (err) { render_bad_request detail: err.message, source: err.source }
   rescue_from Keygen::Error::UnauthorizedError, with: -> (err) { render_unauthorized code: err.code }
+  rescue_from Keygen::Error::BadRequestError, with: -> err { render_bad_request detail: err.message }
   rescue_from Keygen::Error::NotFoundError, with: -> (err) {
     if err.model.present? && err.id.present?
       id = Array.wrap(err.id).first
@@ -326,7 +328,7 @@ class ApplicationController < ActionController::API
     render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
   end
 
-  def disable_keep_alive_connections
+  def add_close_keep_alive_connection_header
     response.headers["Connection"] = "close"
   end
 
@@ -382,12 +384,25 @@ class ApplicationController < ActionController::API
     Keygen.logger.exception e
   end
 
-  def add_keygen_whoami_headers
-    response.headers["X-Keygen-Account-Id"] = current_account&.id
-    response.headers["X-Keygen-Bearer-Id"]  = current_bearer&.id
-    response.headers["X-Keygen-Token-Id"]   = current_token&.id
+  def add_whoami_headers
+    response.headers["Keygen-Account-Id"] = current_account&.id if
+      current_account&.id.present?
+    response.headers["Keygen-Bearer-Id"] = current_bearer&.id if
+      current_bearer&.id.present?
+    response.headers["Keygen-Token-Id"] = current_token&.id if
+      current_token&.id.present?
   rescue => e
     Keygen.logger.exception e
+  end
+
+  def add_keygen_headers
+    validate_accept_signature_header
+
+    yield
+
+    add_signature_header
+  ensure
+    add_whoami_headers
   end
 
   class AuthorizationContext < OpenStruct; end

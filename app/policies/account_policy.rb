@@ -2,6 +2,10 @@
 
 class AccountPolicy < ApplicationPolicy
 
+  def index?
+    false
+  end
+
   def show?
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
   end
