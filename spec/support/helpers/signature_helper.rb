@@ -37,7 +37,7 @@ class SignatureHelper
     sha256       = OpenSSL::Digest::SHA256.new
     digest_bytes = sha256.digest(body)
     enc_digest   = Base64.strict_encode64(digest_bytes)
-    digest       = "SHA-256=#{enc_digest}"
+    digest       = "sha-256=#{enc_digest}"
     signing_data = [
       "(request-target): #{method.downcase} #{uri.presence || '/'}",
       "host: #{host}",
