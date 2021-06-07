@@ -716,7 +716,7 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
 
     expect(keyid).to eq account.id
     expect(signature).to be_a String
-    expect(headers).to eq %w[(request-target) host digest date]
+    expect(headers).to eq %w[(request-target) host date digest]
 
     sha256 = OpenSSL::Digest::SHA256.new
     digest = sha256.digest(res.body)
