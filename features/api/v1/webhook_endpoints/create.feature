@@ -33,6 +33,7 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "201"
     And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
     And the JSON response should be a "webhook-endpoint" with the following "subscriptions":
       """
       ["*"]
@@ -100,6 +101,69 @@ Feature: Create webhook endpoint
         "code": "SUBSCRIPTIONS_TOO_SHORT"
       }
       """
+
+  Scenario: Admin creates a webhook endpoint for their account with an Ed25519 signature algorithm
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com/?token=xxx",
+            "signatureAlgorithm": "ed25519"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com/?token=xxx"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "ed25519"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for their account with an RSA-PKCS1-PSS signature algorithm
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com",
+            "signatureAlgorithm": "rsa-pss-sha256"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "rsa-pss-sha256"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin creates a webhook endpoint for their account with an RSA-PKCS1 signature algorithm
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com/",
+            "signatureAlgorithm": "rsa-sha256"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "webhook-endpoint" with the url "https://example.com/"
+    And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "rsa-sha256"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Admin creates a webhook endpoint for their account with an invalid domain
     Given I am an admin of account "test1"
