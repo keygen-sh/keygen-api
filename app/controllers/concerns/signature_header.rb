@@ -54,7 +54,7 @@ module SignatureHeader
 
   def validate_accept_signature_header
     accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
-    signature_params = parse_accept_signature(accept_signature)
+    signature_params = parse_accept_signature_header(accept_signature)
 
     @signature_algorithm ||= signature_params[:algorithm]
   end
@@ -127,7 +127,7 @@ module SignatureHeader
     data.join('\n')
   end
 
-  def parse_accept_signature(accept_signature)
+  def parse_accept_signature_header(accept_signature)
     data = ACCEPT_SIGNATURE_REGEX.match(accept_signature)
 
     raise Keygen::Error::BadRequestError, 'invalid accept-signature header (malformed)' unless
