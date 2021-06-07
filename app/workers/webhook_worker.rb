@@ -8,7 +8,7 @@ class WebhookWorker
 
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
-  include Signable
+  include SignatureHeader
 
   sidekiq_options queue: :webhooks, retry: 15, lock: :until_executed, dead: false
   sidekiq_retry_in do |count|
@@ -17,7 +17,7 @@ class WebhookWorker
 
   def perform(account_id, event_id, endpoint_id, payload)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-      Account.find account_id
+      Account.find(account_id)
     end
 
     endpoint = account.webhook_endpoints.find_by(id: endpoint_id)
@@ -29,18 +29,33 @@ class WebhookWorker
     event_type = event.event_type
     return unless endpoint.subscribed?(event_type.event)
 
+    date        = Time.current
+    sig, digest = generate_response_signature(
+      algorithm: endpoint.signature_algorithm.presence || :ed25519,
+      account: account,
+      date: date,
+      method: 'POST',
+      uri: endpoint.url,
+      body: payload,
+    )
+
+    headers = {
+      'Content-Type' => 'application/json',
+      'Date' => date.httpdate,
+      'Digest' => digest,
+      'Keygen-Signature' => sig,
+    }
+
+    # NOTE(ezekg) Legacy signatures are deprecated
+    headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: account, data: payload) if
+      account.created_at < SignatureHeader::LEGACY_SIGNATURE_UNTIL
+
     res = Request.post(endpoint.url, {
       write_timeout: 15.seconds.to_i,
       read_timeout: 15.seconds.to_i,
       open_timeout: 15.seconds.to_i,
-      headers: {
-        "Content-Type" => "application/json",
-        "X-Signature" => sign(
-          key: account.private_key,
-          data: payload
-        )
-      },
-      body: payload
+      headers: headers,
+      body: payload,
     })
 
     # TODO(ezekg) Remove this error handling after we know everything is working
