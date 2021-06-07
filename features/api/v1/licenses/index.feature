@@ -24,6 +24,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be an array with 3 "licenses"
 
   Scenario: Developer retrieves all licenses for their account

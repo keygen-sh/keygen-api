@@ -2,14 +2,14 @@
 
 World Rack::Test::Methods
 
-Given /^I send and accept HTML$/ do
-  header "Content-Type", "text/html"
-  header "Accept", "text/html"
-end
-
 Given /^I send and accept JSON$/ do
   header "Content-Type", "application/vnd.api+json"
   header "Accept", "application/vnd.api+json"
+
+  # Random accept signature
+  algorithms = %w[ed25519 rsa-pss-sha256 rsa-sha256]
+
+  header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}")
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
@@ -681,15 +681,88 @@ Then /^the response should contain the following raw headers:$/ do |body|
 
 end
 
-Then /^the response should contain a valid signature header for "(\w+)"$/ do |id|
-  account = FindByAliasService.new(Account, id, aliases: :slug).call
-  pub = OpenSSL::PKey::RSA.new account.public_key
-  digest = OpenSSL::Digest::SHA256.new
+Then /^the response should contain a valid(?: "([^"]+)")? signature header for "(\w+)"$/ do |signature_algorithm, account_id|
+  account = FindByAliasService.new(Account, account_id, aliases: :slug).call
+  req     = last_request
+  res     = last_response
 
-  sig = Base64.strict_decode64 last_response.headers['X-Signature']
-  body = last_response.body.to_s
+  # Legacy signature header
+  begin
+    pub     = OpenSSL::PKey::RSA.new(account.public_key)
+    digest  = OpenSSL::Digest::SHA256.new
+    enc_sig = res.headers['X-Signature']
+    sig     = Base64.strict_decode64(enc_sig)
+    body    = res.body.to_s
+    ok      = pub.verify(digest, sig, body) rescue false
 
-  res = pub.verify digest, sig, body rescue false
+    expect(ok).to be true
+  end
 
-  expect(res).to be true
+  # Signature header
+  begin
+    signature_header = res.headers['Keygen-Signature']
+    signature_regex  = %r{
+      \A
+      (keyid="(?<keyid>[^"]+)")?
+      (\s*,\s*)
+      (algorithm="(?<algorithm>[^"]+)")
+      (\s*,\s*)
+      (signature="(?<signature>[^"]+)")
+      (\s*,\s*)
+      (headers="(?<headers>[^"]+)")
+      (\s*;\s*)?
+      \z
+    }xi
+
+    signature_attrs = signature_regex.match(signature_header)
+    expect(signature_attrs).to_not eq nil
+
+    keyid     = signature_attrs[:keyid]
+    algorithm = signature_attrs[:algorithm]
+    signature = signature_attrs[:signature]
+    headers   = signature_attrs[:headers].split(' ')
+
+    if signature_algorithm.present?
+      expect(algorithm).to eq signature_algorithm
+    else
+      expect(algorithm).to satisfy { |v| %w[ed25519 rsa-pss-sha256 rsa-sha256].include?(v) }
+    end
+
+    expect(keyid).to eq account.id
+    expect(signature).to be_a String
+    expect(headers).to eq %w[(request-target) digest date]
+
+    # Reconstruct signing data
+    auth_header  = res.headers['Authorization']
+    date_header  = res.headers['Date']
+    sig_bytes    = Base64.strict_decode64(signature)
+    sha256       = OpenSSL::Digest::SHA256.new
+    digest_bytes = sha256.digest(res.body)
+    digest       = Base64.strict_encode64(digest_bytes)
+    signing_data = [
+      "(request-target): #{req.request_method.downcase} #{req.fullpath}",
+      "digest: #{digest}",
+      "date: #{date_header}",
+    ].join('\n')
+
+    case algorithm
+    when 'ed25519'
+      verify_key  = Ed25519::VerifyKey.new [account.ed25519_public_key].pack('H*')
+      ok          = verify_key.verify(sig_bytes, signing_data) rescue false
+
+      expect(ok).to be true
+    when 'rsa-pss-sha256'
+      pub = OpenSSL::PKey::RSA.new(account.public_key)
+      ok  = pub.verify_pss(sha256, sig_bytes, signing_data, salt_length: :auto, mgf1_hash: 'SHA256') rescue false
+
+      expect(ok).to be true
+    when 'rsa-sha256'
+      pub = OpenSSL::PKey::RSA.new(account.public_key)
+      ok  = pub.verify(sha256, sig_bytes, signing_data) rescue false
+
+      expect(ok).to be true
+    else
+      raise 'unknown signature algorithm'
+    end
+  end
 end

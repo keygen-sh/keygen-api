@@ -4,7 +4,7 @@ module Api::V1::Products::Relationships
   class UsersController < Api::V1::BaseController
     has_scope :roles, type: :array, default: [:user]
 
-    before_action :scope_to_current_account!
+    prepend_before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product

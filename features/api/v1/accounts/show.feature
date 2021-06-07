@@ -18,6 +18,7 @@ Feature: Show account
     And I use an authentication token
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be an "account"
     And the JSON response should be an "account" with the following meta:
       """
@@ -185,3 +186,67 @@ Feature: Show account
       """
     When I send a GET request to "/accounts/test1"
     Then the response status should be "400"
+
+  Scenario: Admin retrieves their account, accepting an ed25519 signature algorithm
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "algorithm=\"ed25519\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    And the response should contain a valid "ed25519" signature header for "test1"
+    Then the response status should be "200"
+
+  Scenario: Admin retrieves their account, accepting an rsa-pss-sha256 signature algorithm
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "algorithm=\"rsa-pss-sha256\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    And the response should contain a valid "rsa-pss-sha256" signature header for "test1"
+    Then the response status should be "200"
+
+  Scenario: Admin retrieves their account, accepting an rsa-sha256 signature algorithm
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "algorithm=\"rsa-sha256\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    And the response should contain a valid "rsa-sha256" signature header for "test1"
+    Then the response status should be "200"
+
+  Scenario: Admin retrieves their account, accepting an invalid signature algorithm
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "algorithm=\"rsa-sha1\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves their account, accepting an invalid signature keyid
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "keyid=\"1\" algorithm=\"ed25519\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
+
+  Scenario: Admin retrieves their account, accepting a valid signature keyid
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "keyid=\"$accounts[0].id\", algorithm=\"ed25519\"" }
+      """
+    When I send a GET request to "/accounts/test1"
+    And the response should contain a valid "ed25519" signature header for "test1"
+    Then the response status should be "200"
