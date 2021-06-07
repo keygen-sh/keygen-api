@@ -47,7 +47,7 @@ module SignatureHeader
       data: signing_data,
     )
 
-    %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) host digest date")
+    %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) host date digest")
   end
 
   def validate_accept_signature_header
@@ -128,8 +128,8 @@ module SignatureHeader
     data = [
       "(request-target): #{method.downcase} #{uri.presence || '/'}",
       "host: #{host}",
-      "digest: #{digest}",
       "date: #{date.httpdate}",
+      "digest: #{digest}",
     ]
 
     data.join('\n')

@@ -41,8 +41,8 @@ class SignatureHelper
     signing_data = [
       "(request-target): #{method.downcase} #{uri.presence || '/'}",
       "host: #{host}",
-      "digest: #{digest}",
       "date: #{date_header}",
+      "digest: #{digest}",
     ].join('\n')
 
     return false unless
