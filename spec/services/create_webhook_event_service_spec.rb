@@ -346,4 +346,142 @@ describe CreateWebhookEventService do
       expect(attrs.key?('password')).to eq false
     end
   end
+
+  context 'when signature algorithm is ed25519' do
+    let(:endpoint) { create(:webhook_endpoint, url: 'https://webhooks.keygen.example', signature_algorithm: 'ed25519', account: account) }
+
+    it 'should have a valid legacy signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body = options.fetch(:body)
+
+        ok = SignatureHelper.verify_legacy(account: account, signature: headers['X-Signature'], body: body)
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+
+    it 'should have a valid signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body    = options.fetch(:body)
+        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
+        uri     = URI.parse(endpoint.url)
+
+        ok = SignatureHelper.verify(
+          account: account,
+          method: 'POST',
+          host: uri.host,
+          uri: uri.path,
+          body: body,
+          signature_algorithm: 'ed25519',
+          signature_header: attrs[:signature],
+          digest_header: headers['Digest'],
+          date_header: headers['Date'],
+        )
+
+        expect(attrs).to include keyid: account.id, algorithm: 'ed25519'
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+  end
+
+  context 'when signature algorithm is rsa-pss-sha256' do
+    let(:endpoint) { create(:webhook_endpoint, url: 'https://keygen.example/webhooks', signature_algorithm: 'rsa-pss-sha256', account: account) }
+
+    it 'should have a valid legacy signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body = options.fetch(:body)
+
+        ok = SignatureHelper.verify_legacy(account: account, signature: headers['X-Signature'], body: body)
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+
+    it 'should have a valid signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body    = options.fetch(:body)
+        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
+        uri     = URI.parse(endpoint.url)
+
+        ok = SignatureHelper.verify(
+          account: account,
+          method: 'POST',
+          host: uri.host,
+          uri: uri.path,
+          body: body,
+          signature_algorithm: 'rsa-pss-sha256',
+          signature_header: attrs[:signature],
+          digest_header: headers['Digest'],
+          date_header: headers['Date'],
+        )
+
+        expect(attrs).to include keyid: account.id, algorithm: 'rsa-pss-sha256'
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+  end
+
+  context 'when signature algorithm is rsa-sha256' do
+    let(:endpoint) { create(:webhook_endpoint, url: "https://keygen.example/hooks?token=#{SecureRandom.hex}", signature_algorithm: 'rsa-sha256', account: account) }
+
+    it 'should have a valid legacy signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body = options.fetch(:body)
+
+        ok = SignatureHelper.verify_legacy(account: account, signature: headers['X-Signature'], body: body)
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+
+    it 'should have a valid signature header' do
+      allow(WebhookWorker::Request).to receive(:post) { |url, options|
+        headers = options.fetch(:headers)
+        body    = options.fetch(:body)
+        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
+        uri     = URI.parse(endpoint.url)
+
+        ok = SignatureHelper.verify(
+          account: account,
+          method: 'POST',
+          host: uri.host,
+          uri: "#{uri.path}?#{uri.query}",
+          body: body,
+          signature_algorithm: 'rsa-sha256',
+          signature_header: attrs[:signature],
+          digest_header: headers['Digest'],
+          date_header: headers['Date'],
+        )
+
+        expect(attrs).to include keyid: account.id, algorithm: 'rsa-sha256'
+        expect(ok).to eq true
+
+        OpenStruct.new(code: 200, body: '')
+      }
+
+      create_webhook_event!(account, resource)
+    end
+  end
 end

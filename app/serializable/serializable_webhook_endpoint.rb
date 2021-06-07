@@ -5,6 +5,7 @@ class SerializableWebhookEndpoint < SerializableBase
 
   attribute :url
   attribute :subscriptions
+  attribute :signature_algorithm
   attribute :created do
     @object.created_at
   end

@@ -681,7 +681,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
 
 end
 
-Then /^the response should contain a valid(?: "([^"]+)")? signature header for "(\w+)"$/ do |signature_algorithm, account_id|
+Then /^the response should contain a valid(?: "([^"]+)")? signature header for "(\w+)"$/ do |expected_algorithm, account_id|
   account = FindByAliasService.new(Account, account_id, aliases: :slug).call
   req     = last_request
   res     = last_response
@@ -700,69 +700,36 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
 
   # Signature header
   begin
-    signature_header = res.headers['Keygen-Signature']
-    signature_regex  = %r{
-      \A
-      (keyid="(?<keyid>[^"]+)")?
-      (\s*,\s*)
-      (algorithm="(?<algorithm>[^"]+)")
-      (\s*,\s*)
-      (signature="(?<signature>[^"]+)")
-      (\s*,\s*)
-      (headers="(?<headers>[^"]+)")
-      (\s*;\s*)?
-      \z
-    }xi
+    attrs = SignatureHelper.parse(res.headers['Keygen-Signature'])
+    expect(attrs).to_not eq nil
 
-    signature_attrs = signature_regex.match(signature_header)
-    expect(signature_attrs).to_not eq nil
+    keyid     = attrs[:keyid]
+    algorithm = attrs[:algorithm]
+    signature = attrs[:signature]
+    headers   = attrs[:headers]
 
-    keyid     = signature_attrs[:keyid]
-    algorithm = signature_attrs[:algorithm]
-    signature = signature_attrs[:signature]
-    headers   = signature_attrs[:headers].split(' ')
-
-    if signature_algorithm.present?
-      expect(algorithm).to eq signature_algorithm
+    if expected_algorithm.present?
+      expect(algorithm).to eq expected_algorithm
     else
       expect(algorithm).to satisfy { |v| %w[ed25519 rsa-pss-sha256 rsa-sha256].include?(v) }
     end
 
     expect(keyid).to eq account.id
     expect(signature).to be_a String
-    expect(headers).to eq %w[(request-target) digest date]
+    expect(headers).to eq %w[(request-target) host digest date]
 
-    # Reconstruct signing data
-    auth_header  = res.headers['Authorization']
-    date_header  = res.headers['Date']
-    sig_bytes    = Base64.strict_decode64(signature)
-    sha256       = OpenSSL::Digest::SHA256.new
-    digest_bytes = sha256.digest(res.body)
-    digest       = Base64.strict_encode64(digest_bytes)
-    signing_data = [
-      "(request-target): #{req.request_method.downcase} #{req.fullpath}",
-      "digest: #{digest}",
-      "date: #{date_header}",
-    ].join('\n')
+    ok = SignatureHelper.verify(
+      account: account,
+      method: req.request_method,
+      host: 'api.keygen.sh',
+      uri: req.fullpath,
+      body: res.body,
+      signature_algorithm: algorithm,
+      signature_header: signature,
+      digest_header: res.headers['Digest'],
+      date_header: res.headers['Date'],
+    )
 
-    case algorithm
-    when 'ed25519'
-      verify_key  = Ed25519::VerifyKey.new [account.ed25519_public_key].pack('H*')
-      ok          = verify_key.verify(sig_bytes, signing_data) rescue false
-
-      expect(ok).to be true
-    when 'rsa-pss-sha256'
-      pub = OpenSSL::PKey::RSA.new(account.public_key)
-      ok  = pub.verify_pss(sha256, sig_bytes, signing_data, salt_length: :auto, mgf1_hash: 'SHA256') rescue false
-
-      expect(ok).to be true
-    when 'rsa-sha256'
-      pub = OpenSSL::PKey::RSA.new(account.public_key)
-      ok  = pub.verify(sha256, sig_bytes, signing_data) rescue false
-
-      expect(ok).to be true
-    else
-      raise 'unknown signature algorithm'
-    end
+    expect(ok).to be true
   end
 end
