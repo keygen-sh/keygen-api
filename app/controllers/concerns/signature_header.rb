@@ -23,8 +23,6 @@ module SignatureHeader
       Time.parse('2552-01-01T00:00:00.000Z').freeze
     end
 
-  attr_reader :signature_algorithm
-
   def generate_digest_header(body:)
     sha256 = OpenSSL::Digest::SHA256.new
     digest = sha256.digest(body)
@@ -54,9 +52,16 @@ module SignatureHeader
 
   def validate_accept_signature_header
     accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
-    signature_params = parse_accept_signature_header(accept_signature)
+    data = parse_accept_signature_header(accept_signature)
 
-    @signature_algorithm ||= signature_params[:algorithm]
+    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (malformed)' unless
+      data.present?
+
+    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (unsupported algorithm)' unless
+      supports_signature_algorithm?(data[:algorithm])
+
+    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (keyid not found)' if
+      data[:keyid].present? && data[:keyid] != current_account.id
   end
 
   def add_signature_header
@@ -66,18 +71,21 @@ module SignatureHeader
     body = response.body
     date = Time.current
 
-    # NOTE(ezekg) Legacy signatures are deprecated
+    # NOTE(ezekg) Legacy signatures are deprecated and only show for old accounts
     response.headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: current_account, data: body) if
       current_account.created_at < LEGACY_SIGNATURE_UNTIL
 
     # Skip non-legacy signature header if algorithm is invalid
-    return if
-      signature_algorithm.nil?
+    accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
+    signature_params = parse_accept_signature_header(accept_signature)
+    algorithm        = signature_params[:algorithm]
+    return unless
+      algorithm.present? && supports_signature_algorithm?(algorithm)
 
     # Depending on the algorithm, we may have a digest as well
     digest = generate_digest_header(body: body)
     sig    = generate_signature_header(
-      algorithm: signature_algorithm,
+      algorithm: algorithm,
       account: current_account,
       date: date,
       method: request.method,
@@ -128,18 +136,7 @@ module SignatureHeader
   end
 
   def parse_accept_signature_header(accept_signature)
-    data = ACCEPT_SIGNATURE_REGEX.match(accept_signature)
-
-    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (malformed)' unless
-      data.present?
-
-    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (unsupported algorithm)' unless
-      supports_signature_algorithm?(data[:algorithm])
-
-    raise Keygen::Error::BadRequestError, 'invalid accept-signature header (keyid not found)' if
-      data[:keyid].present? && data[:keyid] != current_account.id
-
-    data
+    ACCEPT_SIGNATURE_REGEX.match(accept_signature)
   end
 
   def supports_signature_algorithm?(algorithm)
