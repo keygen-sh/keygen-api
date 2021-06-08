@@ -165,6 +165,36 @@ Feature: Create webhook endpoint
     And the JSON response should be a "webhook-endpoint" with the signatureAlgorithm "rsa-sha256"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin creates a webhook endpoint for their account with an invalid signature algorithm
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com/",
+            "signatureAlgorithm": "sha1"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response should contain a valid signature header for "test1"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported signature algorithm",
+        "source": {
+          "pointer": "/data/attributes/signatureAlgorithm"
+        },
+        "code": "SIGNATURE_ALGORITHM_NOT_ALLOWED"
+      }
+      """
+
   Scenario: Admin creates a webhook endpoint for their account with an invalid domain
     Given I am an admin of account "test1"
     And the current account is "test1"
