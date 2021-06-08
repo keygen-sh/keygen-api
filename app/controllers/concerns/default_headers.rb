@@ -42,6 +42,11 @@ module DefaultHeaders
 
   def add_default_headers
     yield
+  rescue => e
+    # Ensure all exceptions are properly dealt with before we process our
+    # signature headers. E.g. rescuing not found errors and rendering
+    # a 404. Otherwise, the response body may be blank.
+    rescue_with_handler(e) || raise
   ensure
     add_close_keep_alive_connection_header
     add_content_security_policy_headers
