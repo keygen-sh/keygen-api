@@ -17,6 +17,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Anonymous quick validates a check-in license that is valid
     Given the current account is "test1"
@@ -40,6 +41,7 @@ Feature: License validation actions
       """
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -74,6 +76,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -115,6 +118,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -161,6 +165,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -207,6 +212,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -253,6 +259,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -292,6 +299,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -331,6 +339,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -373,6 +382,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -415,6 +425,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -446,6 +457,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -478,6 +490,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -510,6 +523,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -539,6 +553,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/foo-bar/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -573,6 +588,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -607,6 +623,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -640,6 +657,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -673,6 +691,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -706,6 +725,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -739,6 +759,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -757,6 +778,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Anonymous validates a check-in license that is valid
     Given the current account is "test1"
@@ -780,6 +802,7 @@ Feature: License validation actions
       """
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -808,6 +831,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -842,6 +866,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -882,6 +907,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -922,6 +948,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -962,6 +989,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1001,6 +1029,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1042,6 +1071,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1091,6 +1121,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1130,6 +1161,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1161,6 +1193,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1193,6 +1226,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1229,6 +1263,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/a-b-c-d-e/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1254,6 +1289,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1295,6 +1331,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1336,6 +1373,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1384,6 +1422,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1432,6 +1471,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1480,6 +1520,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1535,6 +1576,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1585,6 +1627,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1628,6 +1671,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1669,6 +1713,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1711,6 +1756,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1760,6 +1806,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1809,6 +1856,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1841,6 +1889,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1874,6 +1923,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1907,6 +1957,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1940,6 +1991,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -1973,6 +2025,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2004,6 +2057,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2022,6 +2076,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2040,6 +2095,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2057,6 +2113,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2075,6 +2132,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2093,6 +2151,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2110,6 +2169,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2127,6 +2187,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2143,6 +2204,7 @@ Feature: License validation actions
     And the current account is "test1"
     When I send a POST request to "/accounts/test1/licenses/actions/validate-key"
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Anonymous validates a valid license by key
     Given the current account is "test1"
@@ -2165,6 +2227,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -2196,6 +2259,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2227,6 +2291,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2258,6 +2323,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2289,6 +2355,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2312,6 +2379,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2335,6 +2403,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2358,6 +2427,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2381,6 +2451,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2404,6 +2475,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2427,6 +2499,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2450,6 +2523,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2473,6 +2547,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2496,6 +2571,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2519,6 +2595,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2542,6 +2619,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2565,6 +2643,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2588,6 +2667,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2611,6 +2691,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2647,6 +2728,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2678,6 +2760,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2709,6 +2792,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -2745,6 +2829,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2786,6 +2871,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2827,6 +2913,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2875,6 +2962,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2923,6 +3011,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -2966,6 +3055,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3009,6 +3099,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3057,6 +3148,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3105,6 +3197,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3147,6 +3240,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3199,6 +3293,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3252,6 +3347,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3307,6 +3403,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3361,6 +3458,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3414,6 +3512,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3465,6 +3564,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3516,6 +3616,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3570,6 +3671,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3623,6 +3725,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3677,6 +3780,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3728,6 +3832,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3780,6 +3885,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3821,6 +3927,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3862,6 +3969,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3903,6 +4011,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -3952,6 +4061,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4001,6 +4111,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4040,6 +4151,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4079,6 +4191,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4118,6 +4231,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4157,6 +4271,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4196,6 +4311,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4212,6 +4328,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: License attempts to quick validate another license
     Given the current account is "test1"
@@ -4220,6 +4337,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/actions/validate"
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: License validates their license
     Given the current account is "test1"
@@ -4228,6 +4346,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: License attempts to validate another license
     Given the current account is "test1"
@@ -4236,6 +4355,7 @@ Feature: License validation actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/actions/validate"
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
 
   Scenario: Anonymous validates a license and sends a nonce
     Given the current account is "test1"
@@ -4258,6 +4378,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4293,6 +4414,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
@@ -4328,6 +4450,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4364,6 +4487,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4406,6 +4530,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4452,6 +4577,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4494,6 +4620,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
@@ -4532,6 +4659,7 @@ Feature: License validation actions
       }
       """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
