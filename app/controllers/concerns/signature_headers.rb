@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SignatureHeader
+module SignatureHeaders
   extend ActiveSupport::Concern
 
   SUPPORTED_SIGNATURE_ALGORITHMS = %w[ed25519 rsa-pss-sha256 rsa-sha256].freeze
@@ -32,7 +32,13 @@ module SignatureHeader
   end
 
   # See: https://tools.ietf.org/id/draft-cavage-http-signatures-08.html#rfc.section.4
-  def generate_signature_header(algorithm:, account:, date:, method:, host:, uri:, digest:)
+  def generate_signature_header(account:, algorithm:, keyid:, date:, method:, host:, uri:, digest:)
+    return nil if
+      account.nil?
+
+    return nil if
+      keyid.present? && account.id != keyid
+
     signing_data = generate_signing_data(
       date: date,
       method: method,
@@ -50,7 +56,10 @@ module SignatureHeader
     %(keyid="#{account.id}", algorithm="#{algorithm}", signature="#{signature}", headers="(request-target) host date digest")
   end
 
-  def validate_accept_signature_header
+  def validate_accept_signature_header!
+    return if
+      current_account.nil?
+
     accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
     data = parse_accept_signature_header(accept_signature)
 
@@ -64,7 +73,7 @@ module SignatureHeader
       data[:keyid].present? && data[:keyid] != current_account.id
   end
 
-  def add_signature_header
+  def add_signature_headers
     return if
       current_account.nil?
 
@@ -79,14 +88,16 @@ module SignatureHeader
     accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
     signature_params = parse_accept_signature_header(accept_signature)
     algorithm        = signature_params[:algorithm]
+    keyid            = signature_params[:keyid]
     return unless
       algorithm.present? && supports_signature_algorithm?(algorithm)
 
     # Depending on the algorithm, we may have a digest as well
     digest = generate_digest_header(body: body)
     sig    = generate_signature_header(
-      algorithm: algorithm,
       account: current_account,
+      algorithm: algorithm,
+      keyid: keyid,
       date: date,
       method: request.method,
       host: 'api.keygen.sh',
@@ -96,7 +107,7 @@ module SignatureHeader
 
     response.headers['Date']             = date.httpdate
     response.headers['Digest']           = digest
-    response.headers['Keygen-Signature'] = sig
+    response.headers['Keygen-Signature'] = sig if sig.present?
   rescue => e
     Keygen.logger.exception(e)
   end

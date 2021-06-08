@@ -6,7 +6,7 @@ module Api::V1::Products::Relationships
     has_scope :license
     has_scope :user
 
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_product

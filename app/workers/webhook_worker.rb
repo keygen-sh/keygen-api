@@ -8,7 +8,7 @@ class WebhookWorker
 
   include Sidekiq::Worker
   include Sidekiq::Status::Worker
-  include SignatureHeader
+  include SignatureHeaders
 
   sidekiq_options queue: :webhooks, retry: 15, lock: :until_executed, dead: false
   sidekiq_retry_in do |count|
@@ -33,8 +33,9 @@ class WebhookWorker
     uri    = URI.parse(endpoint.url)
     digest = generate_digest_header(body: payload)
     sig    = generate_signature_header(
-      algorithm: endpoint.signature_algorithm.presence || :ed25519,
       account: account,
+      algorithm: endpoint.signature_algorithm.presence || :ed25519,
+      keyid: nil,
       date: date,
       method: 'POST',
       host: uri.host,
@@ -51,7 +52,7 @@ class WebhookWorker
 
     # NOTE(ezekg) Legacy signatures are deprecated
     headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: account, data: payload) if
-      account.created_at < SignatureHeader::LEGACY_SIGNATURE_UNTIL
+      account.created_at < SignatureHeaders::LEGACY_SIGNATURE_UNTIL
 
     res = Request.post(endpoint.url, {
       write_timeout: 15.seconds.to_i,
