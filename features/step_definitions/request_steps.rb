@@ -10,7 +10,7 @@ Given /^I send and accept JSON$/ do
   algorithms = %w[ed25519 rsa-pss-sha256 rsa-sha256]
 
   header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}") if
-    [0, 1, 2, 3, 4, 5].sample == 0 # Dice roll to test for no header
+    rand(0...6) == 0 # Dice roll to test for no header
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
