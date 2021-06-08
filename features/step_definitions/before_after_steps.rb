@@ -35,17 +35,19 @@ After do |scenario|
   if scenario.failed?
     Cucumber.wants_to_quit = true
 
+    req_headers = last_request.env
+      .select { |k, v| k.start_with? 'HTTP_'}
+      .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
+
     log JSON.pretty_generate(
       request: {
         url: last_request.url,
-        # headers: {
-        #   authorization: last_request.get_header('Authorization')
-        # },
+        headers: req_headers,
         body: (JSON.parse(last_request.body.string) rescue nil)
       },
       response: {
         status: last_response.status,
-        # headers: last_response.headers,
+        headers: (last_response.headers.to_h rescue {}),
         body: (JSON.parse(last_response.body) rescue nil)
       }
     )
