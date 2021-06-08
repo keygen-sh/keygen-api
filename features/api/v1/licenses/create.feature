@@ -302,6 +302,7 @@ Feature: Create license
       }
       """
     Then the response status should be "422"
+    And the response should contain a valid signature header for "test1"
     And the first error should have the following properties:
       """
       {

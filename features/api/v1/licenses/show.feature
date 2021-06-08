@@ -257,6 +257,7 @@ Feature: Show license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/invalid"
     Then the response status should be "404"
+    And the response should contain a valid signature header for "test1"
     And the first error should have the following properties:
       """
       {

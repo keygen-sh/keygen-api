@@ -240,6 +240,7 @@ Feature: Update license
       }
       """
     Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -317,6 +318,7 @@ Feature: Update license
       }
       """
     Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

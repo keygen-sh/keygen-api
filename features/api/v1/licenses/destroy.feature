@@ -61,6 +61,7 @@ Feature: Delete license
     And the current account has 3 "licenses"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$2"
+    And the response should contain a valid signature header for "test1"
     Then the response status should be "403"
     And the current account should have 3 "licenses"
 
@@ -123,6 +124,7 @@ Feature: Delete license
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$1"
     Then the response status should be "401"
+    And the response should contain a valid signature header for "test1"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
