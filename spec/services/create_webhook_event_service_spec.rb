@@ -368,7 +368,6 @@ describe CreateWebhookEventService do
       allow(WebhookWorker::Request).to receive(:post) { |url, options|
         headers = options.fetch(:headers)
         body    = options.fetch(:body)
-        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
         uri     = URI.parse(endpoint.url)
 
         ok = SignatureHelper.verify(
@@ -378,12 +377,11 @@ describe CreateWebhookEventService do
           uri: uri.path,
           body: body,
           signature_algorithm: 'ed25519',
-          signature_header: attrs[:signature],
+          signature_header: headers['Keygen-Signature'],
           digest_header: headers['Digest'],
           date_header: headers['Date'],
         )
 
-        expect(attrs).to include keyid: account.id, algorithm: 'ed25519'
         expect(ok).to eq true
 
         OpenStruct.new(code: 200, body: '')
@@ -414,7 +412,6 @@ describe CreateWebhookEventService do
       allow(WebhookWorker::Request).to receive(:post) { |url, options|
         headers = options.fetch(:headers)
         body    = options.fetch(:body)
-        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
         uri     = URI.parse(endpoint.url)
 
         ok = SignatureHelper.verify(
@@ -424,12 +421,11 @@ describe CreateWebhookEventService do
           uri: uri.path,
           body: body,
           signature_algorithm: 'rsa-pss-sha256',
-          signature_header: attrs[:signature],
+          signature_header: headers['Keygen-Signature'],
           digest_header: headers['Digest'],
           date_header: headers['Date'],
         )
 
-        expect(attrs).to include keyid: account.id, algorithm: 'rsa-pss-sha256'
         expect(ok).to eq true
 
         OpenStruct.new(code: 200, body: '')
@@ -460,7 +456,6 @@ describe CreateWebhookEventService do
       allow(WebhookWorker::Request).to receive(:post) { |url, options|
         headers = options.fetch(:headers)
         body    = options.fetch(:body)
-        attrs   = SignatureHelper.parse(headers['Keygen-Signature'])
         uri     = URI.parse(endpoint.url)
 
         ok = SignatureHelper.verify(
@@ -470,12 +465,11 @@ describe CreateWebhookEventService do
           uri: "#{uri.path}?#{uri.query}",
           body: body,
           signature_algorithm: 'rsa-sha256',
-          signature_header: attrs[:signature],
+          signature_header: headers['Keygen-Signature'],
           digest_header: headers['Digest'],
           date_header: headers['Date'],
         )
 
-        expect(attrs).to include keyid: account.id, algorithm: 'rsa-sha256'
         expect(ok).to eq true
 
         OpenStruct.new(code: 200, body: '')

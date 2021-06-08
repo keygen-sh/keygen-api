@@ -33,9 +33,20 @@ class SignatureHelper
   end
 
   def self.verify(account:, method:, host:, uri:, body:, signature_algorithm:, signature_header:, digest_header:, date_header:)
-    sig_bytes    = Base64.strict_decode64(signature_header)
+    sig_attrs = self.parse(signature_header)
+
+    return false if
+      sig_attrs[:keyid].present? && sig_attrs[:keyid] != account.id
+
+    return false if
+      sig_attrs[:algorithm] != signature_algorithm
+
+    return false if
+      !sig_attrs[:signature].present?
+
+    sig_bytes    = Base64.strict_decode64(sig_attrs[:signature])
     sha256       = OpenSSL::Digest::SHA256.new
-    digest_bytes = sha256.digest(body)
+    digest_bytes = sha256.digest(body.presence || '')
     enc_digest   = Base64.strict_encode64(digest_bytes)
     digest       = "sha-256=#{enc_digest}"
     signing_data = [
@@ -45,8 +56,8 @@ class SignatureHelper
       "digest: #{digest}",
     ].join('\n')
 
-    return false unless
-      digest == digest_header
+    return false if
+      digest != digest_header
 
     ok = false
 
