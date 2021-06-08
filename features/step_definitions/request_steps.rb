@@ -9,7 +9,8 @@ Given /^I send and accept JSON$/ do
   # Random accept signature
   algorithms = %w[ed25519 rsa-pss-sha256 rsa-sha256]
 
-  header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}")
+  header 'Keygen-Accept-Signature', %(algorithm="#{algorithms.sample}") if
+    [0, 1, 2, 3, 4, 5].sample == 0 # Dice roll to test for no header
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
@@ -731,7 +732,7 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
       uri: req.fullpath,
       body: res.body,
       signature_algorithm: algorithm,
-      signature_header: signature,
+      signature_header: res.headers['Keygen-Signature'],
       digest_header: res.headers['Digest'],
       date_header: res.headers['Date'],
     )
