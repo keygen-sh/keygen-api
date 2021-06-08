@@ -36,6 +36,8 @@ module DefaultHeaders
     elsif !accepted.empty?
       response.headers['Content-Type'] = accepted.first.strip
     else
+      response.headers['Content-Type'] = accepted_content_types[:jsonapi]
+
       render_bad_request detail: "Unsupported accept header: #{content_type}"
     end
   end
