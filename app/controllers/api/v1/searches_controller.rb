@@ -5,7 +5,7 @@ module Api::V1
     DISALLOWED_SEARCH_QUERY_CHARS = /['?\\‘’]/.freeze
     MINIMUM_SEARCH_QUERY_SIZE = 3.freeze
 
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 

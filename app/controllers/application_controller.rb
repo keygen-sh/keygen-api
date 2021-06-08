@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  PUBLIC_RATE_LIMIT_KEYS = %w[req/ip/burst/30s req/ip/burst/2m req/ip/burst/5m req/ip/burst/10m]
-
-  include SignatureHeader
+  include DefaultHeaders
+  include RateLimiting
   include Pundit
 
-  before_action :add_close_keep_alive_connection_header
-  before_action :add_content_security_policy_headers
-  before_action :add_jsonapi_content_type_headers
-  before_action :add_rate_limiting_headers
-  around_action :add_keygen_headers
   after_action :verify_authorized
 
   rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
@@ -92,32 +86,6 @@ class ApplicationController < ActionController::API
       bearer: current_bearer,
       token: current_token,
     )
-  end
-
-  def rate_limiting_info
-    throttle_data = (request.env["rack.attack.throttle_data"] || {}).slice(*PUBLIC_RATE_LIMIT_KEYS)
-    return unless throttle_data.present?
-
-    key, data = throttle_data.max_by { |k, v| v[:count].to_f / v[:limit].to_f * 100 }
-    return unless data.present?
-
-    window = key.split('/').last
-    period = data[:period].to_i
-    count = data[:count].to_i
-    limit = data[:limit].to_i
-    now = Time.current
-
-    {
-      window: window,
-      count: count,
-      limit: limit,
-      remaining: [0, limit - count].max,
-      reset: (now + (period - now.to_i % period)).to_i,
-    }
-  rescue => e
-    Keygen.logger.exception e
-
-    nil
   end
 
   private
@@ -326,83 +294,6 @@ class ApplicationController < ActionController::API
       end
 
     render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
-  end
-
-  def add_close_keep_alive_connection_header
-    response.headers["Connection"] = "close"
-  end
-
-  def add_content_security_policy_headers
-    response.headers["Report-To"] = <<~JSON.squish
-      {
-        "group": "csp-reports",
-        "max_age": 10886400,
-        "endpoints": [{
-          "url": "https://api.keygen.sh/-/csp-reports"
-        }]
-      }
-    JSON
-    response.headers["Content-Security-Policy"] = <<~DIRECTIVE.squish
-      default-src 'none';
-      report-uri /-/csp-reports;
-      report-to csp-reports;
-    DIRECTIVE
-  end
-
-  def add_jsonapi_content_type_headers
-    accepted_content_types = HashWithIndifferentAccess.new(
-      jsonapi: Mime::Type.lookup_by_extension(:jsonapi).to_s,
-      json: Mime::Type.lookup_by_extension(:json).to_s
-    )
-
-    content_type = request.headers["Accept"]&.strip
-    accepted = if content_type.present?
-                 accepted_content_types.values & content_type.split(/,\s*/)
-               else
-                 []
-               end
-
-    if content_type.nil? || content_type.include?("*/*")
-      response.headers["Content-Type"] = accepted_content_types[:jsonapi]
-    elsif !accepted.empty?
-      response.headers["Content-Type"] = accepted.first.strip
-    else
-      render_bad_request detail: "Unsupported accept header: #{content_type}"
-    end
-  end
-
-  def add_rate_limiting_headers
-    info = rate_limiting_info
-    return if info.nil?
-
-    response.headers["X-RateLimit-Window"]    = info[:window]
-    response.headers["X-RateLimit-Count"]     = info[:count]
-    response.headers["X-RateLimit-Limit"]     = info[:limit]
-    response.headers["X-RateLimit-Remaining"] = info[:remaining]
-    response.headers["X-RateLimit-Reset"]     = info[:reset]
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def add_whoami_headers
-    response.headers["Keygen-Account-Id"] = current_account&.id if
-      current_account&.id.present?
-    response.headers["Keygen-Bearer-Id"] = current_bearer&.id if
-      current_bearer&.id.present?
-    response.headers["Keygen-Token-Id"] = current_token&.id if
-      current_token&.id.present?
-  rescue => e
-    Keygen.logger.exception e
-  end
-
-  def add_keygen_headers
-    validate_accept_signature_header
-
-    yield
-
-    add_signature_header
-  ensure
-    add_whoami_headers
   end
 
   class AuthorizationContext < OpenStruct; end
