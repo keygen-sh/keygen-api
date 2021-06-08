@@ -2,7 +2,7 @@
 
 module Api::V1::Licenses::Actions
   class ValidationsController < Api::V1::BaseController
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[validate_by_key]
     before_action :set_license, only: %i[quick_validate_by_id validate_by_id]

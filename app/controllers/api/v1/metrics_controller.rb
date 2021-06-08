@@ -8,7 +8,7 @@ module Api::V1
     # TODO(ezekg) Rename metrics => events
     has_scope :metrics, type: :array
 
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_metric, only: [:show]

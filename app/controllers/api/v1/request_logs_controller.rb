@@ -12,7 +12,7 @@ module Api::V1
     has_scope(:url) { |_, s, v| s.search_url(v) }
     has_scope(:status) { |_, s, v| s.search_status(v) }
 
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_request_log, only: [:show]

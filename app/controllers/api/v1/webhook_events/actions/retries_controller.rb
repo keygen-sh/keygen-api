@@ -2,7 +2,7 @@
 
 module Api::V1::WebhookEvents::Actions
   class RetriesController < Api::V1::BaseController
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_event

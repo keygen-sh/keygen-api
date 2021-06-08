@@ -2,7 +2,7 @@
 
 module Api::V1::Accounts::Relationships
   class PlansController < Api::V1::BaseController
-    prepend_before_action :scope_to_current_account!
+    before_action :scope_to_current_account!
     before_action :authenticate_with_token!
     before_action :set_account
 

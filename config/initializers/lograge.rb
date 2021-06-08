@@ -5,7 +5,7 @@ Rails.application.configure do
   config.lograge.enabled = true
 
   config.lograge.custom_payload do |controller|
-    rate_limit_info = controller.rate_limiting_info || {}
+    rate_limit_data = controller.rate_limiting_data || {}
     account_id = controller.current_account&.id
     account_slug = controller.current_account&.slug
     bearer_type = controller.current_bearer&.class&.name&.underscore
@@ -67,14 +67,14 @@ Rails.application.configure do
 
     rate_limit_logs =
       {}.tap do |log|
-        next if rate_limit_info.nil?
+        next if rate_limit_data.nil?
 
-        log[:rate_limited] = rate_limit_info[:count].to_i > rate_limit_info[:limit].to_i
-        log[:rate_reset] = Time.at(rate_limit_info[:reset]) rescue nil
-        log[:rate_window] = rate_limit_info[:window].to_i
-        log[:rate_count] = rate_limit_info[:count].to_i
-        log[:rate_limit] = rate_limit_info[:limit].to_i
-        log[:rate_remaining] = rate_limit_info[:remaining].to_i
+        log[:rate_limited] = rate_limit_data[:count].to_i > rate_limit_data[:limit].to_i
+        log[:rate_reset] = Time.at(rate_limit_data[:reset]) rescue nil
+        log[:rate_window] = rate_limit_data[:window].to_i
+        log[:rate_count] = rate_limit_data[:count].to_i
+        log[:rate_limit] = rate_limit_data[:limit].to_i
+        log[:rate_remaining] = rate_limit_data[:remaining].to_i
       end
 
     {
