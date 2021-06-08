@@ -25,7 +25,7 @@ module SignatureHeaders
 
   def generate_digest_header(body:)
     sha256 = OpenSSL::Digest::SHA256.new
-    digest = sha256.digest(body)
+    digest = sha256.digest(body.presence || '')
     enc    = Base64.strict_encode64(digest)
 
     "sha-256=#{enc}"
