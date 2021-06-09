@@ -103,6 +103,12 @@ module Keygen
           Rails.logger.error e
         end
 
+        begin
+          http_date = Time.httpdate(headers['Date'])
+        rescue => e
+          Rails.logger.error e
+        end
+
         # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
         begin
           res_body =
@@ -115,6 +121,12 @@ module Keygen
           Rails.logger.error e
         end
 
+        begin
+          res_sig = headers['X-Signature'] || headers['Keygen-Signature']
+        rescue => e
+          Rails.logger.error e
+        end
+
         RequestLogWorker.perform_async(
           account_id,
           {
@@ -122,7 +134,7 @@ module Keygen
             requestor_id: requestor&.id,
             resource_type: resource&.class&.name,
             resource_id: resource&.id,
-            request_time: Time.current,
+            request_time: http_date || Time.current,
             request_id: req.request_id,
             body: filtered_req_body,
             url: req.original_fullpath,
@@ -132,7 +144,7 @@ module Keygen
           },
           {
             body: res_body,
-            signature: headers['X-Signature'],
+            signature: res_sig,
             status: status,
           }
         )
