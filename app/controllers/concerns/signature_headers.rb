@@ -108,6 +108,7 @@ module SignatureHeaders
     response.headers['Date']             = date.httpdate
     response.headers['Digest']           = digest
     response.headers['Keygen-Signature'] = sig if sig.present?
+    response.date                        = date
   rescue => e
     Keygen.logger.exception(e)
   end
