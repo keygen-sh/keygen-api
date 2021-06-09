@@ -143,7 +143,7 @@ module SignatureHeaders
       "digest: #{digest}",
     ]
 
-    data.join('\n')
+    data.join("\n")
   end
 
   def parse_accept_signature_header(accept_signature)
