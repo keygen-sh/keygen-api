@@ -54,7 +54,7 @@ class SignatureHelper
       "host: #{host}",
       "date: #{date_header}",
       "digest: #{digest}",
-    ].join('\n')
+    ].join("\n")
 
     return false if
       digest != digest_header
