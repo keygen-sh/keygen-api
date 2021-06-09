@@ -21,25 +21,27 @@ module DefaultHeaders
   def validate_accept_and_add_content_type_headers!
     accepted_content_types = HashWithIndifferentAccess.new(
       jsonapi: Mime::Type.lookup_by_extension(:jsonapi).to_s,
-      json: Mime::Type.lookup_by_extension(:json).to_s
+      json: Mime::Type.lookup_by_extension(:json).to_s,
     )
 
     content_type = request.headers['Accept']&.strip
-    accepted = if content_type.present?
-                 accepted_content_types.values & content_type.split(/,\s*/)
-               else
-                 []
-               end
-
     if content_type.nil? || content_type.include?('*/*')
       response.headers['Content-Type'] = accepted_content_types[:jsonapi]
-    elsif !accepted.empty?
-      response.headers['Content-Type'] = accepted.first.strip
-    else
+
+      return
+    end
+
+    selected_content_types = accepted_content_types.values &
+                             content_type.split(/,\s*/)
+    if selected_content_types.empty?
       response.headers['Content-Type'] = accepted_content_types[:jsonapi]
 
-      render_bad_request detail: "Unsupported accept header: #{content_type}"
+      render_bad_request(detail: "The content type of the request is not supported (check accept header)", code: 'ACCEPT_INVALID')
+
+      return
     end
+
+    response.headers['Content-Type'] = selected_content_types.first.strip
   end
 
   def add_default_headers
