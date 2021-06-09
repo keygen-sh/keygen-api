@@ -106,12 +106,14 @@ module SignatureHeaders
       digest: digest,
     )
 
-    response.headers['Date']   = httpdate
-    response.headers['Digest'] = digest
-
-    response.headers['Keygen-Date']      = httpdate
-    response.headers['Keygen-Digest']    = digest
+    response.headers['Host']             = 'api.keygen.sh'
+    response.headers['Date']             = httpdate
+    response.headers['Digest']           = digest
     response.headers['Keygen-Signature'] = sig if sig.present?
+
+    # For debugging purposes
+    response.headers['Keygen-Date']   = httpdate
+    response.headers['Keygen-Digest'] = digest
   rescue => e
     Keygen.logger.exception(e)
   end
