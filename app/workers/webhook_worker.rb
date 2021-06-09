@@ -29,14 +29,15 @@ class WebhookWorker
     event_type = event.event_type
     return unless endpoint.subscribed?(event_type.event)
 
-    date   = Time.current
-    uri    = URI.parse(endpoint.url)
-    digest = generate_digest_header(body: payload)
-    sig    = generate_signature_header(
+    date     = Time.current
+    httpdate = date.httpdate
+    uri      = URI.parse(endpoint.url)
+    digest   = generate_digest_header(body: payload)
+    sig      = generate_signature_header(
       account: account,
       algorithm: endpoint.signature_algorithm.presence || :ed25519,
       keyid: nil,
-      date: date,
+      date: httpdate,
       method: 'POST',
       host: uri.host,
       uri: [uri.path.presence || '/', uri.query.presence].compact.join('?'),
@@ -45,7 +46,7 @@ class WebhookWorker
 
     headers = {
       'Content-Type' => 'application/json',
-      'Date' => date.httpdate,
+      'Date' => httpdate,
       'Digest' => digest,
       'Keygen-Signature' => sig,
     }
