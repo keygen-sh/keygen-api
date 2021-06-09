@@ -36,7 +36,7 @@ After do |scenario|
     Cucumber.wants_to_quit = true
 
     req_headers = last_request.env
-      .select { |k, v| k.start_with? 'HTTP_'}
+      .select { |k, v| k.start_with?('HTTP_') }
       .transform_keys { |k| k.sub(/^HTTP_/, '').split('_').map(&:capitalize).join('-') } rescue {}
 
     log JSON.pretty_generate(
