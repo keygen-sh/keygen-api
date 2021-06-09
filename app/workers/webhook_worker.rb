@@ -48,6 +48,8 @@ class WebhookWorker
       'Content-Type' => 'application/json',
       'Date' => httpdate,
       'Digest' => digest,
+      'Keygen-Date' => httpdate,
+      'Keygen-Digest' => digest,
       'Keygen-Signature' => sig,
     }
 
