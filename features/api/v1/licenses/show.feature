@@ -129,7 +129,8 @@ Feature: Show license
       """
       {
         "title": "Bad request",
-        "detail": "Unsupported accept header: text/plain, text/html"
+        "detail": "The content type of the request is not supported (check accept header)",
+        "code": "ACCEPT_INVALID"
       }
       """
 
