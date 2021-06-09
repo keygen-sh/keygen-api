@@ -18,7 +18,7 @@ module SignatureHeaders
 
   LEGACY_SIGNATURE_UNTIL =
     if Rails.env.production?
-      Time.parse('2021-06-07T00:00:00.000Z').freeze
+      Time.parse('2021-06-11T00:00:00.000Z').freeze
     else
       Time.parse('2552-01-01T00:00:00.000Z').freeze
     end
