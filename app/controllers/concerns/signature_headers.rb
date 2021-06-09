@@ -77,8 +77,9 @@ module SignatureHeaders
     return if
       current_account.nil?
 
-    body = response.body
-    date = Time.current
+    body     = response.body
+    date     = Time.current
+    httpdate = date.httpdate
 
     # NOTE(ezekg) Legacy signatures are deprecated and only show for old accounts
     response.headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: current_account, data: body) if
@@ -98,17 +99,16 @@ module SignatureHeaders
       account: current_account,
       algorithm: algorithm,
       keyid: keyid,
-      date: date,
+      date: httpdate,
       method: request.method,
       host: 'api.keygen.sh',
       uri: request.original_fullpath,
       digest: digest,
     )
 
-    response.headers['Date']             = date.httpdate
+    response.headers['Date']             = httpdate
     response.headers['Digest']           = digest
     response.headers['Keygen-Signature'] = sig if sig.present?
-    response.date                        = date
   rescue => e
     Keygen.logger.exception(e)
   end
@@ -140,7 +140,7 @@ module SignatureHeaders
     data = [
       "(request-target): #{method.downcase} #{uri.presence || '/'}",
       "host: #{host}",
-      "date: #{date.httpdate}",
+      "date: #{date}",
       "digest: #{digest}",
     ]
 
