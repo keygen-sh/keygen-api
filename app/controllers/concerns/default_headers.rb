@@ -57,6 +57,7 @@ module DefaultHeaders
     add_rate_limiting_headers
     add_signature_headers
     add_whoami_headers
+    add_version_header
   end
 
   def add_close_keep_alive_connection_header
@@ -102,5 +103,9 @@ module DefaultHeaders
       current_token&.id.present?
   rescue => e
     Keygen.logger.exception e
+  end
+
+  def add_version_header
+    response.headers['Keygen-Version'] = '1.0'
   end
 end
