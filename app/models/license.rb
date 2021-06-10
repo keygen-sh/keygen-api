@@ -73,7 +73,7 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
-  validates :key, length: { minimum: 1, maximum: 1.megabyte }, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { key.nil? }
+  validates :key, length: { minimum: 1, maximum: 100.kilobytes }, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 
