@@ -52,6 +52,7 @@ class WebhookWorker
       'Keygen-Date' => httpdate,
       'Keygen-Digest' => digest,
       'Keygen-Signature' => sig,
+      'Keygen-Version' => '1.0',
     }
 
     # NOTE(ezekg) Legacy signatures are deprecated
