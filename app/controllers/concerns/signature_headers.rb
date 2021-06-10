@@ -88,8 +88,11 @@ module SignatureHeaders
     # Skip non-legacy signature header if algorithm is invalid
     accept_signature = request.headers['Keygen-Accept-Signature'].presence || DEFAULT_ACCEPT_SIGNATURE
     signature_params = parse_accept_signature_header(accept_signature)
-    algorithm        = signature_params[:algorithm]
-    keyid            = signature_params[:keyid]
+    return unless
+      signature_params.present?
+
+    algorithm = signature_params[:algorithm]
+    keyid     = signature_params[:keyid]
     return unless
       algorithm.present? && supports_signature_algorithm?(algorithm)
 
