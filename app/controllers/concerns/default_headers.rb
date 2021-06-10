@@ -52,16 +52,11 @@ module DefaultHeaders
     # a 404. Otherwise, the response body may be blank.
     rescue_with_handler(e) || raise
   ensure
-    add_close_keep_alive_connection_header
     add_content_security_policy_headers
     add_rate_limiting_headers
     add_signature_headers
     add_whoami_headers
     add_version_header
-  end
-
-  def add_close_keep_alive_connection_header
-    response.headers['Connection'] = 'close'
   end
 
   def add_content_security_policy_headers
