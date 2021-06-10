@@ -250,3 +250,13 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     And the response should contain a valid "ed25519" signature header for "test1"
     Then the response status should be "200"
+
+  Scenario: Admin retrieves their account with a malformed accept signature header
+    Given I am an admin of account "test1"
+    And I use an authentication token
+    And I send the following headers:
+      """
+      { "Keygen-Accept-Signature": "<algorithm:rsa>" }
+      """
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "400"
