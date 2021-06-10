@@ -45,6 +45,7 @@ class WebhookWorker
     )
 
     headers = {
+      'User-Agent' => 'Keygen/1.0 (+https://keygen.sh/docs/api/#webhooks)',
       'Content-Type' => 'application/json',
       'Date' => httpdate,
       'Digest' => digest,
