@@ -6,9 +6,10 @@ module DefaultHeaders
   include RateLimiting
 
   included do
-    # NOTE(ezekg Run header validations after current account has been set, but before
-    #            the controller action is processed.
-    after_current_account :validate_accept_and_add_content_type_headers!
+    before_action :validate_accept_and_add_content_type_headers!
+
+    # NOTE(ezekg Run signature header validations after current account has been set, but
+    #            before the controller action is processed.
     after_current_account :validate_accept_signature_header!
 
     # NOTE(ezekg) We're using an *around* action here to ensure these headers are always
