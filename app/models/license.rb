@@ -94,6 +94,13 @@ class License < ApplicationRecord
     where('key ILIKE ?', "%#{term}%")
   }
 
+  scope :search_metadata, -> (terms) {
+    query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                 .to_json
+
+    where('"licenses"."metadata" @> ?', query)
+  }
+
   scope :search_user, -> (term) {
     user_identifier = term.to_s
     return none if

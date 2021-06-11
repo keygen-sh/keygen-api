@@ -52,16 +52,17 @@ module Api::V1
               )
             end
 
-            value.each do |k, v|
-              if v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE
-                return render_bad_request(
-                  detail: "search query for '#{k.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
-                  source: { pointer: "/meta/query/metadata/#{k.camelize(:lower)}" }
-                )
-              end
+            if value.any? { |k, v| v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE }
+              keypair = value.find { |k, v| v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE }
+              key     = keypair.first
 
-              res = res.search_metadata k => v
+              return render_bad_request(
+                detail: "search query for '#{key.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+                source: { pointer: "/meta/query/metadata/#{key.camelize(:lower)}" }
+              )
             end
+
+            res = res.search_metadata(value)
           else
             if value.is_a?(String) && value.size < MINIMUM_SEARCH_QUERY_SIZE
               return render_bad_request(

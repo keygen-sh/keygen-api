@@ -92,6 +92,13 @@ class Machine < ApplicationRecord
     where('fingerprint ILIKE ?', "%#{term}%")
   }
 
+  scope :search_metadata, -> (terms) {
+    query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                 .to_json
+
+    where('"machines"."metadata" @> ?', query)
+  }
+
   scope :metadata, -> (meta) { search_metadata meta }
   scope :fingerprint, -> (fingerprint) { where fingerprint: fingerprint }
   scope :hostname, -> (hostname) { where hostname: hostname }

@@ -41,6 +41,13 @@ class User < ApplicationRecord
     where('email ILIKE ?', "%#{term}%")
   }
 
+  scope :search_metadata, -> (terms) {
+    query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                 .to_json
+
+    where('"users"."metadata" @> ?', query)
+  }
+
   scope :metadata, -> (meta) { search_metadata meta }
   scope :roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
   scope :product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }

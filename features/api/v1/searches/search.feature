@@ -632,7 +632,7 @@ Feature: Search
           "type": "license",
           "query": {
             "metadata": {
-              "customer_id": "abfdcc31"
+              "customer_id": "abfdcc31-d5dd-4a20-b982-a81b9d89dec6"
             }
           }
         }
@@ -662,7 +662,7 @@ Feature: Search
           "type": "users",
           "query": {
             "metadata": {
-              "customerId": "abfdcc31"
+              "customerId": "51e9a648"
             }
           }
         }
@@ -701,7 +701,7 @@ Feature: Search
       }
       """
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "user"
+    And the JSON response should be an array with 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
