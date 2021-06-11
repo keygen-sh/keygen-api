@@ -27,6 +27,9 @@ class ReportMailer < ApplicationMailer
     @free_user_count = @reports.filter { |r| r.account.plan&.free? }.size
     @paid_user_count = @reports.filter { |r| r.account.plan&.paid? }.size
 
+    @new_accounts = Account.where(created_at: date.all_day).limit(25)
+    @new_products = Product.where(created_at: date.all_day).limit(25)
+
     mail subject: "Request limits report for #{date.strftime '%m/%d/%Y'}"
   end
 end
