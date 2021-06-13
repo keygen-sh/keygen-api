@@ -40,7 +40,7 @@ class RequestLimitsReportWorker
 
       Keygen.logger.info "[workers.request-limits-report] Generating report: account_id=#{account.id}"
 
-      admin = account.admins.first
+      admin = account.admins.last
       plan = account.plan
 
       request_limit = plan.max_reqs

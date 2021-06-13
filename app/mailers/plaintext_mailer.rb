@@ -4,7 +4,7 @@ class PlaintextMailer < ApplicationMailer
   default from: "Zeke Gabrielse <zeke@keygen.sh>"
 
   def low_activity_lifeline(account:)
-    admin = account.admins.first
+    admin = account.admins.last
 
     mail(
       content_type: "text/plain",
@@ -22,7 +22,7 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def trial_ending_soon_without_payment_method(account:)
-    admin = account.admins.first
+    admin = account.admins.last
 
     mail(
       content_type: "text/plain",
@@ -44,7 +44,7 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def trial_ending_soon_with_payment_method(account:)
-    admin = account.admins.first
+    admin = account.admins.last
 
     mail(
       content_type: "text/plain",
@@ -62,7 +62,7 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def first_payment_succeeded(account:)
-    admin = account.admins.first
+    admin = account.admins.last
     call_to_actions = [
       %(If I could ask one question -- how did you hear about Keygen?),
       %(Do you have any feedback on how we can make Keygen better?),
@@ -88,7 +88,7 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def prompt_for_review(account:)
-    admin = account.admins.first
+    admin = account.admins.last
 
     mail(
       content_type: "text/plain",
