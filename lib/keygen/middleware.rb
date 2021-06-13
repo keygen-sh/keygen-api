@@ -43,7 +43,7 @@ module Keygen
             Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
           end
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception(e)
         end
 
         [status, headers, res]
@@ -100,13 +100,18 @@ module Keygen
               nil
             end
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception(e)
         end
 
         begin
-          http_date = Time.httpdate(headers['Date'])
+          http_date =
+            if headers.key?('Date')
+              Time.httpdate(headers['Date'])
+            else
+              Time.current.httpdate
+            end
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception(e)
         end
 
         # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
@@ -118,13 +123,13 @@ module Keygen
               res.first
             end
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception(e)
         end
 
         begin
           res_sig = headers['X-Signature'] || headers['Keygen-Signature']
         rescue => e
-          Rails.logger.error e
+          Keygen.logger.exception(e)
         end
 
         RequestLogWorker.perform_async(
@@ -151,7 +156,7 @@ module Keygen
 
         [status, headers, res]
       rescue => e
-        Rails.logger.error e
+        Keygen.logger.exception(e)
 
         raise e
       end
@@ -220,7 +225,7 @@ module Keygen
         else
           if e.is_a?(ArgumentError)
             # Special case (report error and consider this a bug)
-            Rails.logger.error e
+            Keygen.logger.exception(e)
 
             [
               400,
@@ -286,7 +291,7 @@ module Keygen
       rescue Rack::Timeout::RequestTimeoutException,
              Rack::Timeout::Error,
              Timeout::Error => e
-        Rails.logger.error e
+        Keygen.logger.exception(e)
 
         [
           503,
