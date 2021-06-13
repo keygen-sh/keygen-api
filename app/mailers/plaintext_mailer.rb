@@ -64,9 +64,12 @@ class PlaintextMailer < ApplicationMailer
   def first_payment_succeeded(account:)
     admin = account.admins.first
     call_to_actions = [
-      'If I could ask one question -- how did you hear about Keygen?',
-      'Do you have any feedback on how we can make Keygen better?',
-      'Is there anything we can do better?',
+      %(If I could ask one question -- how did you hear about Keygen?),
+      %(Do you have any feedback on how we can make Keygen better?),
+      %(Is there anything we can do better?),
+      %(What's one thing we could improve?),
+      %(How did you hear about us?),
+      %(Has Keygen helped you meet your licensing goals?),
     ]
 
     mail(
