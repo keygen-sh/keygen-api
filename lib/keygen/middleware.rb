@@ -108,7 +108,7 @@ module Keygen
             if headers.key?('Date')
               Time.httpdate(headers['Date'])
             else
-              Time.current.httpdate
+              Time.current
             end
         rescue => e
           Keygen.logger.exception(e)
