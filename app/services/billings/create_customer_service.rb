@@ -9,10 +9,14 @@ module Billings
     end
 
     def call
+      data = { account_id: account.id }
+      data.merge!(metadata) if
+        metadata.present?
+
       Billings::Customer.create(
         description: "#{account.name} (#{account.slug})",
         email: account.admins.first.email,
-        metadata: metadata,
+        metadata: data,
       )
     rescue Billings::Error => e
       Keygen.logger.exception(e)
