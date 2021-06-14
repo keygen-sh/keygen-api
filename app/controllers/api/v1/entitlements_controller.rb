@@ -25,11 +25,11 @@ module Api::V1
       authorize @entitlement
 
       if @entitlement.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "entitlement.created",
           account: current_account,
           resource: @entitlement
-        ).execute
+        )
 
         render jsonapi: @entitlement, status: :created, location: v1_account_entitlement_url(@entitlement.account, @entitlement)
       else
@@ -41,11 +41,11 @@ module Api::V1
       authorize @entitlement
 
       if @entitlement.update(entitlement_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "entitlement.updated",
           account: current_account,
           resource: @entitlement
-        ).execute
+        )
 
         render jsonapi: @entitlement
       else
@@ -56,11 +56,11 @@ module Api::V1
     def destroy
       authorize @entitlement
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "entitlement.deleted",
         account: current_account,
         resource: @entitlement
-      ).execute
+      )
 
       @entitlement.destroy
     end

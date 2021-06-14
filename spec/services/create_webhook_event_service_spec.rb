@@ -15,11 +15,11 @@ describe CreateWebhookEventService do
   def create_webhook_event!(account, resource)
     throw if endpoint.nil?
 
-    CreateWebhookEventService.new(
+    CreateWebhookEventService.call(
       event: 'license.created',
       account: account,
       resource: resource
-    ).execute
+    )
 
     event = account.webhook_events.last
 
@@ -29,12 +29,12 @@ describe CreateWebhookEventService do
   def create_validation_webhook_event!(account, resource, meta)
     throw if endpoint.nil?
 
-    CreateWebhookEventService.new(
+    CreateWebhookEventService.call(
       event: 'license.validation.succeeded',
       account: account,
       resource: resource,
       meta: meta
-    ).execute
+    )
 
     event = account.webhook_events.last
 

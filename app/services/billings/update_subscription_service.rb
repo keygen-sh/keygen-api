@@ -8,7 +8,7 @@ module Billings
       @plan         = plan
     end
 
-    def execute
+    def call
       c = Billings::Subscription.retrieve(subscription)
 
       c.trial_end = 'now'

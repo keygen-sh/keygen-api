@@ -32,11 +32,11 @@ module Api::V1::Policies::Relationships
 
       attached = @policy.policy_entitlements.create!(entitlements_data)
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: 'policy.entitlements.attached',
         account: current_account,
         resource: attached
-      ).execute
+      )
 
       render jsonapi: attached
     end
@@ -65,11 +65,11 @@ module Api::V1::Policies::Relationships
 
       detached = @policy.policy_entitlements.delete(policy_entitlements)
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: 'policy.entitlements.detached',
         account: current_account,
         resource: detached
-      ).execute
+      )
     end
 
     private

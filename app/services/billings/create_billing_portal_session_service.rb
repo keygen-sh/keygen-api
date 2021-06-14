@@ -7,7 +7,7 @@ module Billings
       @customer = customer
     end
 
-    def execute
+    def call
       Billings::BillingPortal::Session.create(customer: customer)
     rescue Billings::Error => e
       Keygen.logger.exception(e)

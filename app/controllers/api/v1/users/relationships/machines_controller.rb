@@ -21,7 +21,7 @@ module Api::V1::Users::Relationships
 
     # GET /users/1/machines/1
     def show
-      @machine = FindByAliasService.new(@user.machines, params[:id], aliases: :fingerprint).call
+      @machine = FindByAliasService.call(scope: @user.machines, identifier: params[:id], aliases: :fingerprint)
       authorize @machine
 
       render jsonapi: @machine
@@ -30,7 +30,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:user_id], aliases: :email).call
+      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
       authorize @user, :show?
 
       Keygen::Store::Request.store[:current_resource] = @user

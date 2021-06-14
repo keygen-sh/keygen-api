@@ -12,14 +12,14 @@ module Api::V1
 
       token = @user.generate_password_reset_token
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "user.password-reset",
         account: current_account,
         resource: @user,
         meta: {
           password_reset_token: token
         }
-      ).execute
+      )
 
       if password_params[:meta][:deliver] != false # nil or true = send email
         @user.send_password_reset_email token: token

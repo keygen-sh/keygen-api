@@ -33,9 +33,9 @@ class Billing < ApplicationRecord
 
     event :pause_subscription do
       transitions from: %i[trialing subscribed], to: :paused, after: -> {
-        Billings::DeleteSubscriptionService.new(
+        Billings::DeleteSubscriptionService.call(
           subscription: subscription_id
-        ).execute
+        )
       }
     end
 
@@ -43,20 +43,20 @@ class Billing < ApplicationRecord
       transitions from: %i[paused], to: :pending, after: -> {
         # Setting a trial allows us to continue to use the previously 'paused'
         # subscription's billing cycle
-        Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.call(
           customer: customer_id,
           trial_end: subscription_period_end.to_i,
           plan: plan.plan_id
-        ).execute
+        )
       }
     end
 
     event :cancel_subscription_at_period_end do
       transitions from: %i[pending trialing subscribed], to: :canceling, after: -> {
-        Billings::DeleteSubscriptionService.new(
+        Billings::DeleteSubscriptionService.call(
           subscription: subscription_id,
           at_period_end: true
-        ).execute
+        )
       }
     end
 
@@ -64,19 +64,19 @@ class Billing < ApplicationRecord
       transitions from: %i[pending trialing subscribed canceling], to: :canceled, after: -> {
         AccountMailer.subscription_canceled(account: account).deliver_later if %i[subscribed canceling].include?(aasm.from_state)
 
-        Billings::DeleteSubscriptionService.new(
+        Billings::DeleteSubscriptionService.call(
           subscription: subscription_id,
           at_period_end: false
-        ).execute
+        )
       }
     end
 
     event :renew_subscription do
       transitions from: %i[canceling], to: :pending, after: -> {
-        Billings::UpdateSubscriptionService.new(
+        Billings::UpdateSubscriptionService.call(
           subscription: subscription_id,
           plan: plan.plan_id
-        ).execute
+        )
       }
     end
   end
@@ -100,8 +100,8 @@ class Billing < ApplicationRecord
   private
 
   def close_customer_account
-    Billings::DeleteCustomerService.new(
+    Billings::DeleteCustomerService.call(
       customer: customer_id
-    ).execute
+    )
   end
 end

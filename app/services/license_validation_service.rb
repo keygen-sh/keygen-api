@@ -7,7 +7,7 @@ class LicenseValidationService < BaseService
     @scope   = scope
   end
 
-  def execute
+  def call
     return [false, "does not exist", :NOT_FOUND] if license.nil?
     # Check if license is suspended
     return [false, "is suspended", :SUSPENDED] if license.suspended?

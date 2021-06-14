@@ -15,12 +15,12 @@ module Api::V1::Machines::Actions
       proof = @machine.generate_proof(dataset: dataset)
       meta = { proof: proof }
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.proofs.generated",
         account: current_account,
         resource: @machine,
         meta: meta
-      ).execute
+      )
 
       render jsonapi: @machine, meta: meta
     end
@@ -28,7 +28,7 @@ module Api::V1::Machines::Actions
     private
 
     def set_machine
-      @machine = FindByAliasService.new(current_account.machines, params[:id], aliases: :fingerprint).call
+      @machine = FindByAliasService.call(scope: current_account.machines, identifier: params[:id], aliases: :fingerprint)
 
       Keygen::Store::Request.store[:current_resource] = @machine
     end

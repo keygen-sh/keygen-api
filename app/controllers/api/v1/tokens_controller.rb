@@ -50,17 +50,17 @@ module Api::V1
             kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
           end
 
-          token = TokenGeneratorService.new(
+          token = TokenGeneratorService.call(
             account: current_account,
             bearer: user,
             **kwargs
-          ).execute
+          )
           if token.valid?
-            CreateWebhookEventService.new(
+            CreateWebhookEventService.call(
               event: "token.generated",
               account: current_account,
               resource: token
-            ).execute
+            )
 
             render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
           else
@@ -79,10 +79,10 @@ module Api::V1
       skip_authorization
 
       authenticate_with_http_token do |token, options|
-        tok = TokenAuthenticationService.new(
+        tok = TokenAuthenticationService.call(
           account: current_account,
           token: token
-        ).execute
+        )
 
         next if tok.nil?
 
@@ -93,11 +93,11 @@ module Api::V1
 
         tok.regenerate!
 
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "token.regenerated",
           account: current_account,
           resource: tok
-        ).execute
+        )
 
         render jsonapi: tok and return
       end
@@ -111,11 +111,11 @@ module Api::V1
 
       @token.regenerate!
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "token.regenerated",
         account: current_account,
         resource: @token
-      ).execute
+      )
 
       render jsonapi: @token
     end
@@ -124,11 +124,11 @@ module Api::V1
     def revoke
       authorize @token
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "token.revoked",
         account: current_account,
         resource: @token
-      ).execute
+      )
 
       @token.destroy_async
     end

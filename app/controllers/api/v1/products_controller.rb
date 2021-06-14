@@ -28,11 +28,11 @@ module Api::V1
       authorize @product
 
       if @product.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "product.created",
           account: current_account,
           resource: @product
-        ).execute
+        )
 
         render jsonapi: @product, status: :created, location: v1_account_product_url(@product.account, @product)
       else
@@ -45,11 +45,11 @@ module Api::V1
       authorize @product
 
       if @product.update(product_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "product.updated",
           account: current_account,
           resource: @product
-        ).execute
+        )
 
         render jsonapi: @product
       else
@@ -61,11 +61,11 @@ module Api::V1
     def destroy
       authorize @product
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "product.deleted",
         account: current_account,
         resource: @product
-      ).execute
+      )
 
       @product.destroy_async
     end

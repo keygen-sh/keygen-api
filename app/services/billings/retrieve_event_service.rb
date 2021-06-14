@@ -7,7 +7,7 @@ module Billings
       @event = event
     end
 
-    def execute
+    def call
       Billings::Event.retrieve(event)
     rescue Billings::Error => e
       Keygen.logger.exception(e)

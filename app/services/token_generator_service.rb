@@ -10,7 +10,7 @@ class TokenGeneratorService < BaseService
     @max_deactivations = max_deactivations
   end
 
-  def execute
+  def call
     return nil if account.nil? || bearer.nil?
 
     token = bearer.tokens.create(

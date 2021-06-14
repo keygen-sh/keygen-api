@@ -40,7 +40,7 @@ describe MachineHeartbeatWorker do
 
     it 'should not send a webhook event' do
       allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-      expect_any_instance_of(CreateWebhookEventService).not_to receive(:execute)
+      expect_any_instance_of(CreateWebhookEventService).not_to receive(:call)
 
       worker.perform_async machine.id
       worker.drain
@@ -64,7 +64,7 @@ describe MachineHeartbeatWorker do
         events = 0
 
         allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(CreateWebhookEventService).to receive(:execute) { events += 1 }
+        expect_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
 
         worker.perform_async machine.id
         worker.drain
@@ -89,7 +89,7 @@ describe MachineHeartbeatWorker do
         events = 0
 
         allow(CreateWebhookEventService).to receive(:new).with(hash_including(event: event)).and_call_original
-        expect_any_instance_of(CreateWebhookEventService).to receive(:execute) { events += 1 }
+        expect_any_instance_of(CreateWebhookEventService).to receive(:call) { events += 1 }
 
         worker.perform_async machine.id
         worker.drain

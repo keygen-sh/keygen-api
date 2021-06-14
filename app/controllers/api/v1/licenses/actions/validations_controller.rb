@@ -11,7 +11,7 @@ module Api::V1::Licenses::Actions
     def quick_validate_by_id
       authorize @license
 
-      valid, detail, constant = LicenseValidationService.new(license: @license, scope: false).execute
+      valid, detail, constant = LicenseValidationService.call(license: @license, scope: false)
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
         valid: valid,
@@ -26,12 +26,12 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at unless request.headers['origin'] == 'https://app.keygen.sh'
 
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
           meta: meta
-        ).execute
+        )
       end
 
       render jsonapi: @license, meta: meta
@@ -41,7 +41,7 @@ module Api::V1::Licenses::Actions
     def validate_by_id
       authorize @license
 
-      valid, detail, constant = LicenseValidationService.new(license: @license, scope: validation_params.dig(:meta, :scope)).execute
+      valid, detail, constant = LicenseValidationService.call(license: @license, scope: validation_params.dig(:meta, :scope))
       meta = {
         ts: Time.current,
         valid: valid,
@@ -64,12 +64,12 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at
 
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
           meta: meta
-        ).execute
+        )
       end
 
       render jsonapi: @license, meta: meta
@@ -79,16 +79,16 @@ module Api::V1::Licenses::Actions
     def validate_by_key
       skip_authorization
 
-      @license = LicenseKeyLookupService.new(
+      @license = LicenseKeyLookupService.call(
         account: current_account,
         key: validation_params[:meta][:key],
         # Since we've added new encryption schemes, we only want to alter
         # the lookup for legacy encrypted licenses.
         legacy_encrypted: validation_params[:meta][:legacy_encrypted] == true ||
                           validation_params[:meta][:encrypted] == true
-      ).execute
+      )
 
-      valid, detail, constant = LicenseValidationService.new(license: @license, scope: validation_params[:meta][:scope]).execute
+      valid, detail, constant = LicenseValidationService.call(license: @license, scope: validation_params[:meta][:scope])
       meta = {
         ts: Time.current,
         valid: valid,
@@ -111,12 +111,12 @@ module Api::V1::Licenses::Actions
 
         @license.touch :last_validated_at
 
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
           resource: @license,
           meta: meta
-        ).execute
+        )
       end
 
       render jsonapi: @license, meta: meta
@@ -125,7 +125,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
     end
 
     typed_parameters do

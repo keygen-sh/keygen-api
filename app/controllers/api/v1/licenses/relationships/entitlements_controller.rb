@@ -32,11 +32,11 @@ module Api::V1::Licenses::Relationships
 
       attached = @license.license_entitlements.create!(entitlements_data)
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: 'license.entitlements.attached',
         account: current_account,
         resource: attached
-      ).execute
+      )
 
       render jsonapi: attached
     end
@@ -84,17 +84,17 @@ module Api::V1::Licenses::Relationships
 
       detached = @license.license_entitlements.delete(license_entitlements)
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: 'license.entitlements.detached',
         account: current_account,
         resource: detached
-      ).execute
+      )
     end
 
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:license_id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
       authorize @license, :show?
 
       Keygen::Store::Request.store[:current_resource] = @license

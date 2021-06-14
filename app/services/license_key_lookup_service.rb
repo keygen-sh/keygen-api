@@ -9,7 +9,7 @@ class LicenseKeyLookupService < BaseService
     @legacy_encrypted = legacy_encrypted
   end
 
-  def execute
+  def call
     licenses = account.licenses
 
     # FIXME(ezekg) So wrong but it's my own dang vault: hashing != encryption

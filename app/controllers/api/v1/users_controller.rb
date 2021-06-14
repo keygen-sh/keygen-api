@@ -34,11 +34,11 @@ module Api::V1
       authorize @user
 
       if @user.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "user.created",
           account: current_account,
           resource: @user
-        ).execute
+        )
 
         render jsonapi: @user, status: :created, location: v1_account_user_url(@user.account, @user)
       else
@@ -51,11 +51,11 @@ module Api::V1
       authorize @user
 
       if @user.update(user_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "user.updated",
           account: current_account,
           resource: @user
-        ).execute
+        )
 
         render jsonapi: @user
       else
@@ -68,11 +68,11 @@ module Api::V1
       authorize @user
 
       if @user.destroy_async
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "user.deleted",
           account: current_account,
           resource: @user
-        ).execute
+        )
 
         head :no_content
       else
@@ -83,7 +83,7 @@ module Api::V1
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:id].downcase, aliases: :email).call
+      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id].downcase, aliases: :email)
 
       Keygen::Store::Request.store[:current_resource] = @user
     end

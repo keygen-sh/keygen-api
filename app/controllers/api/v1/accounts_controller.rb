@@ -32,11 +32,11 @@ module Api::V1
       authorize @account
 
       if @account.update(account_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.updated",
           account: @account,
           resource: @account
-        ).execute
+        )
 
         render jsonapi: @account
       else

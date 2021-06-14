@@ -1,5 +1,5 @@
-class FindByAliasService
-  def initialize(scope, identifier, aliases:)
+class FindByAliasService < BaseService
+  def initialize(scope:, identifier:, aliases:)
     @table_name = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
     @model_name = scope.model_name.name
     @scope = scope

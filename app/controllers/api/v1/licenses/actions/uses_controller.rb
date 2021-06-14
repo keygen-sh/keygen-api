@@ -16,11 +16,11 @@ module Api::V1::Licenses::Actions
         @license.save!
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "license.usage.incremented",
         account: current_account,
         resource: @license
-      ).execute
+      )
 
       render jsonapi: @license
     rescue ActiveRecord::RecordNotSaved,
@@ -44,11 +44,11 @@ module Api::V1::Licenses::Actions
         @license.save!
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "license.usage.decremented",
         account: current_account,
         resource: @license
-      ).execute
+      )
 
       render jsonapi: @license
     rescue ActiveRecord::RecordNotSaved,
@@ -68,11 +68,11 @@ module Api::V1::Licenses::Actions
       authorize @license
 
       if @license.update(uses: 0)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.usage.reset",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -83,7 +83,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
       Keygen::Store::Request.store[:current_resource] = @license
     end

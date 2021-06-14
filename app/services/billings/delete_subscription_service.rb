@@ -8,7 +8,7 @@ module Billings
       @at_period_end = at_period_end
     end
 
-    def execute
+    def call
       c = Billings::Subscription.retrieve(subscription)
       c.delete(at_period_end: at_period_end)
     rescue Billings::Error => e

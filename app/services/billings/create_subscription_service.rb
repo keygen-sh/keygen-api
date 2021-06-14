@@ -9,7 +9,7 @@ module Billings
       @trial_end = trial_end
     end
 
-    def execute
+    def call
       Billings::Subscription.create(
         customer: customer,
         trial_end: trial_end,

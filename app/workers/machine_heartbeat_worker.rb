@@ -12,19 +12,19 @@ class MachineHeartbeatWorker
     return unless machine&.requires_heartbeat?
 
     if machine.heartbeat_dead?
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.heartbeat.dead",
         account: machine.account,
         resource: machine
-      ).execute
+      )
 
       machine.destroy! if machine.policy.deactivate_dead_machines?
     else
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.heartbeat.pong",
         account: machine.account,
         resource: machine
-      ).execute
+      )
     end
   end
 end

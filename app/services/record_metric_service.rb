@@ -8,7 +8,7 @@ class RecordMetricService < BaseService
     @resource = resource
   end
 
-  def execute
+  def call
     return if /^account/ =~ metric # We don't care about account events
 
     # FIXME(ezekg) Entitlement attach/detach events can be an array of resources. Need to

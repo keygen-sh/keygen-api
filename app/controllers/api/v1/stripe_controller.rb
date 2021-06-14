@@ -10,7 +10,7 @@ module Api::V1
       # Let external service know that we received the webhook
       head :accepted
 
-      event = Billings::RetrieveEventService.new(event: params[:id]).execute
+      event = Billings::RetrieveEventService.call(event: params[:id])
       return unless event
 
       case event.type
@@ -137,10 +137,10 @@ module Api::V1
         return unless billing && billing.subscription_id.nil?
 
         # Create a trial subscription (possibly without a payment method)
-        Billings::CreateSubscriptionService.new(
+        Billings::CreateSubscriptionService.call(
           customer: billing.customer_id,
           plan: billing.plan.plan_id
-        ).execute
+        )
       end
     end
   end

@@ -31,11 +31,11 @@ module Api::V1
       authorize @key
 
       if @key.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "key.created",
           account: current_account,
           resource: @key
-        ).execute
+        )
 
         render jsonapi: @key, status: :created, location: v1_account_key_url(@key.account, @key)
       else
@@ -48,11 +48,11 @@ module Api::V1
       authorize @key
 
       if @key.update(key_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "key.updated",
           account: current_account,
           resource: @key
-        ).execute
+        )
 
         render jsonapi: @key
       else
@@ -64,11 +64,11 @@ module Api::V1
     def destroy
       authorize @key
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "key.deleted",
         account: current_account,
         resource: @key
-      ).execute
+      )
 
       @key.destroy_async
     end
