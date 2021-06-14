@@ -3,7 +3,7 @@
 World Rack::Test::Methods
 
 Given /^the account "([^\"]*)" is (\w+)$/ do |id, state|
-  account = FindByAliasService.new(Account, id, aliases: :slug).call
+  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
 
   # Set up a fake subscription
   customer = create :customer, :with_card
@@ -42,13 +42,13 @@ Given /^the account does not have a card on file$/ do
 end
 
 Given /^the account "([^\"]*)" does have a card on file$/ do |id|
-  account = FindByAliasService.new(Account, id, aliases: :slug).call
+  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
 
   account.billing.update card_brand: 'Visa', card_last4: '4242', card_expiry: 2.years.from_now
 end
 
 Given /^the account "([^\"]*)" does not have a card on file$/ do |id|
-  account = FindByAliasService.new(Account, id, aliases: :slug).call
+  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
 
   account.billing.update card_brand: nil, card_last4: nil, card_expiry: nil
 end
@@ -81,12 +81,12 @@ end
 Given /^we are receiving Stripe webhook events$/ do
   @events = []
 
-  allow_any_instance_of(Billings::CreateSubscriptionService).to receive(:execute) { @events << :subscription_created }
-  allow_any_instance_of(Billings::DeleteSubscriptionService).to receive(:execute) { @events << :subscription_deleted }
-  allow_any_instance_of(Billings::UpdateSubscriptionService).to receive(:execute) { @events << :subscription_updated }
-  allow_any_instance_of(Billings::CreateCustomerService).to receive(:execute) { @events << :customer_created }
-  allow_any_instance_of(Billings::DeleteCustomerService).to receive(:execute) { @events << :customer_deleted }
-  allow_any_instance_of(Billings::UpdateCustomerService).to receive(:execute) { @events << :customer_updated }
+  allow_any_instance_of(Billings::CreateSubscriptionService).to receive(:call) { @events << :subscription_created }
+  allow_any_instance_of(Billings::DeleteSubscriptionService).to receive(:call) { @events << :subscription_deleted }
+  allow_any_instance_of(Billings::UpdateSubscriptionService).to receive(:call) { @events << :subscription_updated }
+  allow_any_instance_of(Billings::CreateCustomerService).to receive(:call) { @events << :customer_created }
+  allow_any_instance_of(Billings::DeleteCustomerService).to receive(:call) { @events << :customer_deleted }
+  allow_any_instance_of(Billings::UpdateCustomerService).to receive(:call) { @events << :customer_updated }
 end
 
 Given /^there is an incoming "([^\"]*)" event(?: with an? "([^\"]*)" status)?$/ do |type, status|

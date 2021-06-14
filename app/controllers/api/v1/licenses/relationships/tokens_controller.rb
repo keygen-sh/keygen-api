@@ -17,17 +17,17 @@ module Api::V1::Licenses::Relationships
         :expiry
       )
 
-      token = TokenGeneratorService.new(
+      token = TokenGeneratorService.call(
         account: current_account,
         bearer: @license,
         **kwargs
-      ).execute
+      )
       if token.valid?
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "token.generated",
           account: current_account,
           resource: token
-        ).execute
+        )
 
         render jsonapi: token
       else
@@ -61,7 +61,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:license_id] || params[:id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id] || params[:id], aliases: :key)
       authorize @license, :show?
 
       Keygen::Store::Request.store[:current_resource] = @license

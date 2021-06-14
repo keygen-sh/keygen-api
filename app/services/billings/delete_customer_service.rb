@@ -7,7 +7,7 @@ module Billings
       @customer = customer
     end
 
-    def execute
+    def call
       c = Billings::Customer.retrieve(customer)
       c.delete
     rescue Billings::Error => e

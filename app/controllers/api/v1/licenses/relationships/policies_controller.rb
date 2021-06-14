@@ -63,11 +63,11 @@ module Api::V1::Licenses::Relationships
       end
 
       if @license.update(policy: new_policy)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.policy.updated",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -78,7 +78,7 @@ module Api::V1::Licenses::Relationships
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:license_id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
       authorize @license, :show?
 
       Keygen::Store::Request.store[:current_resource] = @license

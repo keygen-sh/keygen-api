@@ -9,7 +9,7 @@ module Billings
       @coupon   = coupon
     end
 
-    def execute
+    def call
       c = Billings::Customer.retrieve(customer)
 
       c.card = token unless

@@ -26,7 +26,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:user_id], aliases: :email).call
+      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
       authorize @user, :show?
 
       Keygen::Store::Request.store[:current_resource] = @user

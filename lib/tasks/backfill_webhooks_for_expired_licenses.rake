@@ -14,11 +14,11 @@ task backfill_webhooks_for_expired_licenses: :environment do
     when license.expired?
       next unless license.last_expiration_event_sent_at.nil?
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "license.expired",
         account: license.account,
         resource: license
-      ).execute
+      )
 
       license.update last_expiration_event_sent_at: Time.current
     end

@@ -37,11 +37,11 @@ module Api::V1
       authorize @license
 
       if @license.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.created",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license, status: :created, location: v1_account_license_url(@license.account, @license)
       else
@@ -54,11 +54,11 @@ module Api::V1
       authorize @license
 
       if @license.update(license_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.updated",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -70,11 +70,11 @@ module Api::V1
     def destroy
       authorize @license
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "license.deleted",
         account: current_account,
         resource: @license
-      ).execute
+      )
 
       @license.destroy_async
     end
@@ -82,7 +82,7 @@ module Api::V1
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
       Keygen::Store::Request.store[:current_resource] = @license
     end

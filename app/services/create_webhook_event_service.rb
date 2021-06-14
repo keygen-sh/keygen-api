@@ -9,7 +9,7 @@ class CreateWebhookEventService < BaseService
     @meta     = meta
   end
 
-  def execute
+  def call
     options = {
       expose: { url_helpers: Rails.application.routes.url_helpers, context: :webhook },
       class: {
@@ -36,11 +36,11 @@ class CreateWebhookEventService < BaseService
 
     # TODO: Move this out of the webhook event service
     begin
-      RecordMetricService.new(
+      RecordMetricService.call(
         metric: event,
         account: account,
         resource: resource
-      ).execute
+      )
     rescue
       # noop
     end

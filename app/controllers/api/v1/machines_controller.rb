@@ -53,11 +53,11 @@ module Api::V1
       end
 
       if @machine.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "machine.created",
           account: current_account,
           resource: @machine
-        ).execute
+        )
 
         render jsonapi: @machine, status: :created, location: v1_account_machine_url(@machine.account, @machine)
       else
@@ -70,11 +70,11 @@ module Api::V1
       authorize @machine
 
       if @machine.update(machine_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "machine.updated",
           account: current_account,
           resource: @machine
-        ).execute
+        )
 
         render jsonapi: @machine
       else
@@ -101,11 +101,11 @@ module Api::V1
         end
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.deleted",
         account: current_account,
         resource: @machine
-      ).execute
+      )
 
       @machine.destroy
     end
@@ -115,7 +115,7 @@ module Api::V1
     def set_machine
       scoped_machines = policy_scope(current_account.machines)
 
-      @machine = FindByAliasService.new(scoped_machines, params[:id], aliases: :fingerprint).call
+      @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
       Keygen::Store::Request.store[:current_resource] = @machine
     end

@@ -39,11 +39,11 @@ module Api::V1::Users::Relationships
       end
 
       if @second_factor.save
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: 'second-factor.created',
           account: current_account,
           resource: @second_factor
-        ).execute
+        )
 
         render jsonapi: @second_factor, status: :created, location: v1_account_user_second_factor_url(@second_factor.account, @second_factor.user, @second_factor)
       else
@@ -62,11 +62,11 @@ module Api::V1::Users::Relationships
       end
 
       if @second_factor.update(second_factor_params)
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: @second_factor.enabled? ? 'second-factor.enabled' : 'second-factor.disabled',
           account: current_account,
           resource: @second_factor
-        ).execute
+        )
 
         render jsonapi: @second_factor
       else
@@ -84,11 +84,11 @@ module Api::V1::Users::Relationships
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: 'second-factor.deleted',
         account: current_account,
         resource: @second_factor
-      ).execute
+      )
 
       @second_factor.destroy
     end
@@ -96,7 +96,7 @@ module Api::V1::Users::Relationships
     private
 
     def set_user
-      @user = FindByAliasService.new(current_account.users, params[:user_id], aliases: :email).call
+      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
       authorize @user, :show?
 
       Keygen::Store::Request.store[:current_resource] = @user

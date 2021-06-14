@@ -14,11 +14,11 @@ module Api::V1::Licenses::Actions
       if !@license.policy.requires_check_in?
         render_unprocessable_entity detail: "cannot be checked in because the policy does not require it"
       elsif @license.check_in!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.checked-in",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -38,11 +38,11 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.renew!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.renewed",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -54,11 +54,11 @@ module Api::V1::Licenses::Actions
     def revoke
       authorize @license
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "license.revoked",
         account: current_account,
         resource: @license
-      ).execute
+      )
 
       @license.destroy_async
     end
@@ -75,11 +75,11 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.suspend!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.suspended",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -99,11 +99,11 @@ module Api::V1::Licenses::Actions
           }
         })
       elsif @license.reinstate!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "license.reinstated",
           account: current_account,
           resource: @license
-        ).execute
+        )
 
         render jsonapi: @license
       else
@@ -114,7 +114,7 @@ module Api::V1::Licenses::Actions
     private
 
     def set_license
-      @license = FindByAliasService.new(current_account.licenses, params[:id], aliases: :key).call
+      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
       Keygen::Store::Request.store[:current_resource] = @license
     end

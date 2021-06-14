@@ -11,17 +11,17 @@ module Api::V1::Products::Relationships
     def generate
       authorize @product
 
-      token = TokenGeneratorService.new(
+      token = TokenGeneratorService.call(
         account: current_account,
         bearer: @product,
         expiry: nil
-      ).execute
+      )
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "token.generated",
         account: current_account,
         resource: token
-      ).execute
+      )
 
       render jsonapi: token
     end

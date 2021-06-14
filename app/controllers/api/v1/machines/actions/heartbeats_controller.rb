@@ -15,11 +15,11 @@ module Api::V1::Machines::Actions
         render_unprocessable_resource(@machine) and return
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.heartbeat.reset",
         account: current_account,
         resource: @machine
-      ).execute
+      )
 
       render jsonapi: @machine
     end
@@ -36,11 +36,11 @@ module Api::V1::Machines::Actions
         render_unprocessable_resource(@machine) and return
       end
 
-      CreateWebhookEventService.new(
+      CreateWebhookEventService.call(
         event: "machine.heartbeat.ping",
         account: current_account,
         resource: @machine
-      ).execute
+      )
 
       # Queue up heartbeat worker which will handle deactivating dead machines
       MachineHeartbeatWorker.perform_in(
@@ -54,7 +54,7 @@ module Api::V1::Machines::Actions
     private
 
     def set_machine
-      @machine = FindByAliasService.new(current_account.machines, params[:id], aliases: :fingerprint).call
+      @machine = FindByAliasService.call(scope: current_account.machines, identifier: params[:id], aliases: :fingerprint)
 
       Keygen::Store::Request.store[:current_resource] = @machine
     end

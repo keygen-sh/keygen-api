@@ -6,7 +6,7 @@ class RetryWebhookEventService < BaseService
     @event = event
   end
 
-  def execute
+  def call
     account = event.account
 
     # FIXME(ezekg) Add an association so we don't have to do this stupid lookup

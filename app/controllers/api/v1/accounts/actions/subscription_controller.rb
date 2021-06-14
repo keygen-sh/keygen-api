@@ -9,7 +9,7 @@ module Api::V1::Accounts::Actions
     def manage
       authorize @account
 
-      session = Billings::CreateBillingPortalSessionService.new(customer: @account.billing.customer_id).execute
+      session = Billings::CreateBillingPortalSessionService.call(customer: @account.billing.customer_id)
 
       if session
         headers['Location'] = session.url
@@ -25,11 +25,11 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.pause_subscription!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.subscription.paused",
           account: @account,
           resource: @account
-        ).execute
+        )
 
         render_meta status: "paused"
       else
@@ -43,11 +43,11 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.resume_subscription!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.subscription.resumed",
           account: @account,
           resource: @account
-        ).execute
+        )
 
         render_meta status: "resumed"
       else
@@ -61,11 +61,11 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.cancel_subscription_at_period_end!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.subscription.canceled",
           account: @account,
           resource: @account
-        ).execute
+        )
 
         render_meta status: "canceling"
       else
@@ -79,11 +79,11 @@ module Api::V1::Accounts::Actions
       authorize @account
 
       if @account.renew_subscription!
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.subscription.renewed",
           account: @account,
           resource: @account
-        ).execute
+        )
 
         render_meta status: "renewed"
       else

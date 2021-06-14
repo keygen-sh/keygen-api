@@ -8,7 +8,7 @@ module Billings
       @metadata = metadata
     end
 
-    def execute
+    def call
       Billings::Customer.create(
         description: "#{account.name} (#{account.slug})",
         email: account.admins.first.email,

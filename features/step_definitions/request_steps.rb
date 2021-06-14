@@ -683,7 +683,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
 end
 
 Then /^the response should contain a valid(?: "([^"]+)")? signature header for "(\w+)"$/ do |expected_algorithm, account_id|
-  account = FindByAliasService.new(Account, account_id, aliases: :slug).call
+  account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
   req     = last_request
   res     = last_response
 

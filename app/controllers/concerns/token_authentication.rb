@@ -27,10 +27,10 @@ module TokenAuthentication
     end
 
     @current_token_value = token
-    @current_token = TokenAuthenticationService.new(
+    @current_token = TokenAuthenticationService.call(
       account: current_account,
       token: token
-    ).execute
+    )
 
     current_bearer = current_token&.bearer
 

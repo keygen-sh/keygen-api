@@ -10,8 +10,7 @@ class InitializeBillingWorker
     return unless
       account.billing.nil?
 
-    service  = Billings::CreateCustomerService.new(account: account, metadata: { referral: referral_id })
-    customer = service.execute
+    customer  = Billings::CreateCustomerService.call(account: account, metadata: { referral: referral_id })
 
     account.create_billing!(
       customer_id: customer.id,

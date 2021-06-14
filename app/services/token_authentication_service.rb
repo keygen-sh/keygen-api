@@ -8,7 +8,7 @@ class TokenAuthenticationService < BaseService
     @token   = token
   end
 
-  def execute
+  def call
     return nil unless account.present? && token.present?
 
     # TODO(ezekg) This can't handle token versions beyond v9 (2 chars)

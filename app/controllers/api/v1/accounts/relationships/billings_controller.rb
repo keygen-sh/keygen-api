@@ -21,18 +21,18 @@ module Api::V1::Accounts::Relationships
 
       authorize @billing
 
-      status = Billings::UpdateCustomerService.new(
+      status = Billings::UpdateCustomerService.call(
         customer: @billing.customer_id,
         token: billing_params[:token],
         coupon: billing_params[:coupon]
-      ).execute
+      )
 
       if status
-        CreateWebhookEventService.new(
+        CreateWebhookEventService.call(
           event: "account.billing.updated",
           account: @account,
           resource: @billing
-        ).execute
+        )
 
         head :accepted
       else
