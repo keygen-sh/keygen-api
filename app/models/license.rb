@@ -96,6 +96,19 @@ class License < ApplicationRecord
 
   scope :search_metadata, -> (terms) {
     query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                 .transform_values { |v|
+                   # FIXME(ezekg) Need to figure out a better way to parse querystring
+                   #              search params. For now, we're casting booleans but
+                   #              are not yet handling integers and floats.
+                   case v
+                   when 'true'
+                     true
+                   when 'false'
+                     false
+                   else
+                     v
+                   end
+                 }
                  .to_json
 
     where('"licenses"."metadata" @> ?', query)

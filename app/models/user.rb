@@ -43,6 +43,16 @@ class User < ApplicationRecord
 
   scope :search_metadata, -> (terms) {
     query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
+                 .transform_values { |v|
+                   case v
+                   when 'true'
+                     true
+                   when 'false'
+                     false
+                   else
+                     v
+                   end
+                 }
                  .to_json
 
     where('"users"."metadata" @> ?', query)
