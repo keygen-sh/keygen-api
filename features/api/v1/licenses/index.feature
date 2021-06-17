@@ -380,7 +380,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses?metadata[tos]=1"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the JSON response should be an array with 1 "licenses"
 
   Scenario: Admin retrieves licenses filtered by an float metadata value
     Given I am an admin of account "test1"
@@ -399,9 +399,9 @@ Feature: List license
       { "metadata": { "score": 0.9 } }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses?metadata[score]=1.0"
+    When I send a GET request to "/accounts/test1/licenses?metadata[score]=0.9"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "licenses"
+    And the JSON response should be an array with 1 "licenses"
 
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
