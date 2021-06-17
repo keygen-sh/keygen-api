@@ -34,11 +34,11 @@ module Api::V1::Releases::Relationships
 
       attached = release.constraints.create!(constraints_data)
 
-      BroadcastEventService.new(
+      BroadcastEventService.call(
         event: 'release.constraints.attached',
         account: current_account,
         resource: attached
-      ).execute
+      )
 
       render jsonapi: attached
     end
@@ -71,11 +71,11 @@ module Api::V1::Releases::Relationships
 
       detached = release.constraints.delete(release_constraints)
 
-      BroadcastEventService.new(
+      BroadcastEventService.call(
         event: 'release.constraints.detached',
         account: current_account,
         resource: detached
-      ).execute
+      )
     end
 
     private
