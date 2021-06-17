@@ -18,6 +18,10 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.first_payment_succeeded account: account
   end
 
+  def prompt_for_testimonial
+    PlaintextMailer.prompt_for_testimonial account: account
+  end
+
   def prompt_for_review
     PlaintextMailer.prompt_for_review account: account
   end

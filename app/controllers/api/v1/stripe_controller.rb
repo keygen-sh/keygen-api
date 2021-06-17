@@ -104,11 +104,17 @@ module Api::V1
         case successful_payment_count
         when 1
           PlaintextMailer.first_payment_succeeded(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
-        when 3, 6, 12
+        when 3,
+             6,
+             12
           if account.last_prompt_for_review_sent_at.nil?
             account.touch :last_prompt_for_review_sent_at
 
-            PlaintextMailer.prompt_for_review(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+            if rand(0..1).zero?
+              PlaintextMailer.prompt_for_testimonial(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+            else
+              PlaintextMailer.prompt_for_review(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+            end
           end
         end
 
