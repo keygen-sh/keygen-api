@@ -19,7 +19,8 @@ class BroadcastEventService < BaseService
     # for the async event creation worker
     begin
       options = {}
-      options.merge! meta: meta.transform_keys { |k| k.to_s.camelize(:lower) } unless meta.nil?
+      options.merge!(meta: meta.transform_keys { |k| k.to_s.camelize(:lower) }) unless
+        meta.nil?
 
       payload = Keygen::JSONAPI::Renderer.new(context: :webhook)
                                          .render(resource, options)
