@@ -58,13 +58,13 @@ module Api::V1::Releases::Relationships
       if release_constraints.size != entitlement_ids.size
         release_entitlement_ids = release_constraints.pluck(:entitlement_id)
         invalid_entitlement_ids = entitlement_ids - release_entitlement_ids
-        invalid_entitlement_id = invalid_entitlement_ids.first
-        invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
+        invalid_entitlement_id  = invalid_entitlement_ids.first
+        invalid_entitlement_idx = entitlement_ids.find_index(invalid_entitlement_id)
 
         return render_unprocessable_entity(
           detail: "constraint entitlement '#{invalid_entitlement_id}' relationship not found",
           source: {
-            pointer: "/data/#{invalid_idx}/relationships/entitlement"
+            pointer: "/data/#{invalid_entitlement_idx}/relationships/entitlement"
           }
         )
       end
