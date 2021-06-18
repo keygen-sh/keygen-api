@@ -112,10 +112,21 @@ class Release < ApplicationRecord
   }
 
   scope :for_channel, -> channel {
-    case channel
-    when ReleaseChannel,
-         UUID_REGEX
-      where(channel: channel)
+    key =
+      case channel
+      when UUID_REGEX
+        # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
+        #             also show releases for stable, rc and beta channels.
+        account.release_channels.select(:key)
+                                .find_by(id: channel)
+                                .try(:key)
+      when ReleaseChannel
+        channel.key
+      else
+        channel.to_s
+      end
+
+    case key
     when 'stable'
       self.stable
     when 'rc'
