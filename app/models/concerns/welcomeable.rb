@@ -9,6 +9,6 @@ module Welcomeable
 
   def send_welcome_email
     PlaintextMailer.prompt_for_first_impression(account: self)
-                   .deliver_later(wait: rand(0..5).days)
+                   .deliver_later(wait: rand(2..5).days)
   end
 end
