@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :release_channel do
-    name { "Stable" }
+    name { key.capitalize }
     key { "stable" }
 
     account nil
