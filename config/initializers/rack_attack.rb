@@ -88,7 +88,7 @@ Rack::Attack.throttled_response = -> (env) {
     [{
       errors: [{
         title: "Throttle limit reached",
-        detail: "Throttle limit has been reached for your IP address. Please see https://keygen.sh/docs/api#rate-limiting for more info."
+        detail: "Throttle limit has been reached for your IP address. Please see https://keygen.sh/docs/api/#rate-limiting for more info."
       }]
     }.to_json]
   ]
@@ -108,7 +108,7 @@ Rack::Attack.blocklisted_response = -> (env) {
     [{
       errors: [{
         title: "Forbidden",
-        detail: "Your IP address has been temporarily blacklisted due to abusive behavior. Please see https://keygen.sh/docs/api#rate-limiting for more info."
+        detail: "Your IP address has been temporarily blacklisted due to abusive behavior. Please see https://keygen.sh/docs/api/#rate-limiting for more info."
       }]
     }.to_json]
   ]

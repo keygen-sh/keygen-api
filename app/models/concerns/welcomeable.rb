@@ -8,6 +8,7 @@ module Welcomeable
   end
 
   def send_welcome_email
-    AccountMailer.welcome(account: self).deliver_later(wait: 15.minutes)
+    PlaintextMailer.prompt_for_first_impression(account: self)
+                   .deliver_later(wait: rand(0..5).days)
   end
 end
