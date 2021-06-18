@@ -151,7 +151,7 @@ class PlaintextMailer < ApplicationMailer
 
         What do you think the most valuable features are so far?
 
-        Also, please let me know if there is anything you are looking for but can’t find or if you are experiencing any technical issues.
+        Also, please let me know if there's anything you're looking for but can’t find or if you're experiencing any technical issues.
 
         --
         Zeke, Founder <https://keygen.sh>
