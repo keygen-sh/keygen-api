@@ -381,9 +381,239 @@ describe ReleaseUpdateService do
     end
   end
 
-  # TODO(ezekg) alpha
+  context 'when there is an update for the alpha channel' do
+    let(:platform) { create(:release_platform, key: 'macos', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'dmg', account: account) }
 
-  # TODO(ezekg) dev
+    let!(:stable_channel) { create(:release_channel, key: 'stable', account: account) }
+    let!(:rc_channel) { create(:release_channel, key: 'rc', account: account) }
+    let!(:beta_channel) { create(:release_channel, key: 'beta', account: account) }
+    let!(:alpha_channel) { create(:release_channel, key: 'alpha', account: account) }
+    let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
+
+    let!(:current_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: stable_channel,
+        version: '2.13.37',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: alpha_channel,
+        version: '3.0.0-alpha.1',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should not return an update when update channel is stable' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: platform,
+        filetype: filetype,
+        version: '2.13.37',
+        channel: stable_channel,
+      )
+
+      expect(updater.current_version).to eq '2.13.37'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should not return an update when update channel is rc' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: platform,
+        filetype: filetype,
+        version: '2.13.37',
+        channel: rc_channel,
+      )
+
+      expect(updater.current_version).to eq '2.13.37'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should not return an update when update channel is beta' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: platform,
+        filetype: filetype,
+        version: '2.13.37',
+        channel: beta_channel,
+      )
+
+      expect(updater.current_version).to eq '2.13.37'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should return an update when update channel is alpha' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: platform,
+        filetype: filetype,
+        version: '2.13.37',
+        channel: alpha_channel,
+      )
+
+      expect(updater.current_version).to eq '2.13.37'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq '3.0.0-alpha.1'
+      expect(updater.next_release).to eq next_release
+    end
+
+    it 'should not return an update when update channel is dev' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: platform,
+        filetype: filetype,
+        version: '2.13.37',
+        channel: dev_channel,
+      )
+
+      expect(updater.current_version).to eq '2.13.37'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+  end
+
+  context 'when there is an update for the dev channel' do
+    let(:platform) { create(:release_platform, key: 'macos', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'dmg', account: account) }
+
+    let!(:stable_channel) { create(:release_channel, key: 'stable', account: account) }
+    let!(:rc_channel) { create(:release_channel, key: 'rc', account: account) }
+    let!(:beta_channel) { create(:release_channel, key: 'beta', account: account) }
+    let!(:alpha_channel) { create(:release_channel, key: 'alpha', account: account) }
+    let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
+
+    let!(:current_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: stable_channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: dev_channel,
+        version: '1.1.0-dev.93+build.1624032445',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should not return an update when update channel is stable' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product.id,
+        platform: platform.id,
+        filetype: filetype.id,
+        version: '1.0.0',
+        channel: stable_channel.id,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should not return an update when update channel is rc' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product.id,
+        platform: platform.id,
+        filetype: filetype.id,
+        version: '1.0.0',
+        channel: rc_channel.id,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should not return an update when update channel is beta' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product.id,
+        platform: platform.id,
+        filetype: filetype.id,
+        version: '1.0.0',
+        channel: beta_channel.id,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should not return an update when update channel is alpha' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product.id,
+        platform: platform.id,
+        filetype: filetype.id,
+        version: '1.0.0',
+        channel: alpha_channel.id,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+
+    it 'should return an update when update channel is dev' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product.id,
+        platform: platform.id,
+        filetype: filetype.id,
+        version: '1.0.0',
+        channel: dev_channel.id,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq '1.1.0-dev.93+build.1624032445'
+      expect(updater.next_release).to eq next_release
+    end
+  end
 
   context 'when there is an update available for another platform' do
   end
