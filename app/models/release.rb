@@ -117,9 +117,10 @@ class Release < ApplicationRecord
       when UUID_REGEX
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show releases for stable, rc and beta channels.
-        account.release_channels.select(:key)
-                                .find_by(id: channel)
-                                .try(:key)
+        joins(:channel).select('release_channels.key')
+                       .where(channel: channel)
+                       .first
+                       .try(:key)
       when ReleaseChannel
         channel.key
       else
