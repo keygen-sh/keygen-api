@@ -138,4 +138,26 @@ class PlaintextMailer < ApplicationMailer
       TXT
     )
   end
+
+  def prompt_for_first_impression(account:)
+    admin = account.admins.last
+
+    mail(
+      content_type: "text/plain",
+      to: admin.email,
+      subject: "What is your first impression?",
+      body: <<~TXT
+        I know you're still early in your licensing journey, but I'd love to hear your first impression while your thoughts are fresh.
+
+        What do you think the most valuable features are so far?
+
+        Also, please let me know if there is anything you are looking for but can’t find or if you are experiencing any technical issues.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. You can bookmark this link to quickly log into your account: https://app.keygen.sh/login?account=#{account.id}
+      TXT
+    )
+  end
 end

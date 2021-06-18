@@ -26,6 +26,10 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.prompt_for_review account: account
   end
 
+  def prompt_for_first_impression
+    PlaintextMailer.prompt_for_first_impression account: account
+  end
+
   private
 
   def account
