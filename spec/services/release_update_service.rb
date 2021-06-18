@@ -615,6 +615,102 @@ describe ReleaseUpdateService do
     end
   end
 
+  context 'when the current version has been yanked' do
+    let(:platform) { create(:release_platform, key: 'linux', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'tar.gz', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
+
+    let!(:current_release) {
+      create(
+        :release,
+        yanked_at: Time.current,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '2.0.0+build.1624035574',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should return the current version that is yanked' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'linux',
+        filetype: 'tar.gz',
+        version: '1.0.0',
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq '2.0.0+build.1624035574'
+      expect(updater.next_release).to eq next_release
+    end
+  end
+
+  context 'when the next version has been yanked' do
+    let(:platform) { create(:release_platform, key: 'win32', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'exe', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
+
+    let!(:current_release) {
+      create(
+        :release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(
+        :release,
+        yanked_at: Time.current,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '2.0.0+build.1624035574',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should not return the next version that is yanked' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'win32',
+        filetype: 'exe',
+        version: '1.0.0',
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
+  end
+
   context 'when there is an update available for another platform' do
   end
 
