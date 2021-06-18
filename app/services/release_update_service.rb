@@ -39,7 +39,7 @@ class ReleaseUpdateService < BaseService
   end
 
   def call
-    current_version = current_semver.to_s
+    current_version = current_semver&.to_s
     current_release =
       if current_version.present?
         available_releases.find_by(version: current_version)
@@ -47,7 +47,7 @@ class ReleaseUpdateService < BaseService
         nil
       end
 
-    next_version = next_semver.to_s
+    next_version = next_semver&.to_s
     next_release =
       if next_version.present?
         available_updates.find_by(version: next_version)
