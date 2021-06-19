@@ -16,6 +16,8 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       expose: %w[
         keygen-accept-signature
         keygen-signature
+        keygen-date
+        keygen-digest
         keygen-account-id
         keygen-bearer-id
         keygen-token-id
@@ -26,6 +28,8 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
         x-ratelimit-reset
         x-request-id
         x-signature
+        date
+        digest
       ]
   end
 end
