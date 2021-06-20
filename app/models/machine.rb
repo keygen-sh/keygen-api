@@ -93,13 +93,14 @@ class Machine < ApplicationRecord
   }
 
   scope :search_metadata, -> (terms) {
+    # FIXME(ezekg) Duplicated code for licenses, users, and machines.
     # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
     #              to search for the original string values and type cast, since
     #              HTTP querystring parameters are strings.
     #
     #              Example we need to be able to search for:
     #
-    #                { metadata: { internalId: "1624214616", otherId: 1 } }
+    #                { metadata: { external_id: "1624214616", internal_id: 1 } }
     #
     terms.reduce(self) do |scope, (key, value)|
       search_key       = key.to_s.underscore.parameterize(separator: '_')
@@ -110,6 +111,8 @@ class Machine < ApplicationRecord
           { search_key => true }
         when 'false'
           { search_key => false }
+        when 'null'
+          { search_key => nil }
         when /^\d+$/
           { search_key => value.to_i }
         when /^\d+\.\d+$/
