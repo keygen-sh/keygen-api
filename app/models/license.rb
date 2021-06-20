@@ -95,25 +95,36 @@ class License < ApplicationRecord
   }
 
   scope :search_metadata, -> (terms) {
-    query = terms.transform_keys { |k| k.to_s.underscore.parameterize(separator: '_') }
-                 .transform_values { |v|
-                   # FIXME(ezekg) Need to figure out a better way to do this
-                   case v
-                   when 'true'
-                     true
-                   when 'false'
-                     false
-                   when /^\d+$/
-                     v.to_i
-                   when /^\d+\.\d+$/
-                     v.to_f
-                   else
-                     v
-                   end
-                 }
-                 .to_json
+    # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
+    #              to search for the original string values and type cast, since
+    #              HTTP querystring parameters are strings.
+    #
+    #              Example we need to be able to search for:
+    #
+    #                { metadata: { internalId: "1624214616", otherId: 1 } }
+    #
+    terms.reduce(self) do |scope, (key, value)|
+      search_key       = key.to_s.underscore.parameterize(separator: '_')
+      before_type_cast = { search_key => value }
+      after_type_cast  =
+        case value
+        when 'true'
+          { search_key => true }
+        when 'false'
+          { search_key => false }
+        when /^\d+$/
+          { search_key => value.to_i }
+        when /^\d+\.\d+$/
+          { search_key => value.to_f }
+        else
+          { search_key => value }
+        end
 
-    where('"licenses"."metadata" @> ?', query)
+      scope.where('"licenses"."metadata" @> ?', before_type_cast.to_json)
+        .or(
+          scope.where('"licenses"."metadata" @> ?', after_type_cast.to_json)
+        )
+    end
   }
 
   scope :search_user, -> (term) {

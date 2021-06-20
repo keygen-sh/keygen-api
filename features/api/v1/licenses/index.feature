@@ -403,6 +403,27 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 1 "licenses"
 
+  Scenario: Admin retrieves licenses filtered by a numeric string metadata value
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "internalId": "1624214637", "tenantId": 1 } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "internalId": "1624214637", "tenantId": 2 } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "internalId": "1624214637", "tenantId": 3 } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[internalId]=1624214637&metadata[tenantId]=2"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"
