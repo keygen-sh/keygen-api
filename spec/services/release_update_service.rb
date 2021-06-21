@@ -974,18 +974,4 @@ describe ReleaseUpdateService do
       expect(updater.next_release).to eq next_major_release
     end
   end
-
-  context 'when the release has entitlement constraints' do
-    context 'when the current bearer is an admin' do
-    end
-
-    context 'when the current bearer is a product' do
-    end
-
-    context 'when the current bearer is a user' do
-    end
-
-    context 'when the current bearer is a license' do
-    end
-  end
 end
