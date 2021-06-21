@@ -23,8 +23,22 @@ describe ReleaseUpdateService do
     DatabaseCleaner.clean
   end
 
-  context 'when there are no products' do
-    it 'should not return an update when product is nil' do
+  context 'when invalid parameters are supplied to the service' do
+    it 'should raise an error when account is nil' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: nil,
+          product: product,
+          platform: 'win32',
+          filetype: 'exe',
+          version: '1.0.0',
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidAccountError
+    end
+
+    it 'should raise an error when product is nil' do
       updater = -> {
         ReleaseUpdateService.call(
           account: account,
@@ -38,6 +52,80 @@ describe ReleaseUpdateService do
       expect { updater.call }.to raise_error ReleaseUpdateService::InvalidProductError
     end
 
+    it 'should raise an error when platform is nil' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account,
+          product: account,
+          platform: nil,
+          filetype: 'exe',
+          version: '1.0.0',
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidPlatformError
+    end
+
+    it 'should raise an error when filetype is nil' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account,
+          product: account,
+          platform: 'win32',
+          filetype: nil,
+          version: '1.0.0',
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidFiletypeError
+    end
+
+    it 'should raise an error when version is nil' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account,
+          product: account,
+          platform: 'win32',
+          filetype: 'exe',
+          version: nil,
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidVersionError
+    end
+
+    it 'should raise an error when channel is nil' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account,
+          product: account,
+          platform: 'win32',
+          filetype: 'exe',
+          version: '1.0.0',
+          channel: nil,
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidChannelError
+    end
+
+    it 'should raise an error when constraint is not a valid semver' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account,
+          product: account,
+          platform: 'win32',
+          filetype: 'exe',
+          version: '1.0.0',
+          constraint: 'v8.0.2.1'
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidConstraintError
+    end
+  end
+
+  context 'when there are no products' do
     it 'should not return an update when product does not exist' do
       updater = ReleaseUpdateService.call(
         account: account,
