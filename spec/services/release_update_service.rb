@@ -711,43 +711,268 @@ describe ReleaseUpdateService do
     end
   end
 
+  context 'when the release versions contain build tags' do
+    let(:platform) { create(:release_platform, key: 'macos', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'dmg', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
+
+    let!(:current_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.0+build.1624288707',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.1+build.1624288716',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should return an update result with a nil current release when version is not exact' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'macos',
+        filetype: 'dmg',
+        version: '1.0.0',
+        channel: channel,
+      )
+
+      expect(updater.current_version).to eq '1.0.0'
+      expect(updater.current_release).to be_nil
+      expect(updater.next_version).to eq next_release.version
+      expect(updater.next_release).to eq next_release
+      expect(updater.next_release.semver.build).to eq 'build.1624288716'
+    end
+
+    it 'should return an update result with the current release when the version is exact' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'macos',
+        filetype: 'dmg',
+        version: '1.0.0+build.1624288707',
+        channel: channel,
+      )
+
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.current_release.semver.build).to eq 'build.1624288707'
+      expect(updater.next_version).to eq next_release.version
+      expect(updater.next_release).to eq next_release
+      expect(updater.next_release.semver.build).to eq 'build.1624288716'
+    end
+  end
+
   context 'when there is an update available for another platform' do
+    let(:macos_platform) { create(:release_platform, key: 'macos', account: account) }
+    let(:win32_platform) { create(:release_platform, key: 'win32', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'tar.gz', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
+
+    let!(:current_release) {
+      create(:release,
+        platform: macos_platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(:release,
+        platform: win32_platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '2.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should not return an update for the other platform' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'macos',
+        filetype: 'tar.gz',
+        version: '1.0.0',
+        channel: channel,
+      )
+
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
   end
 
-  context 'when there is no update available for another platform' do
+  context 'when there is an update available for another filetype' do
+    let(:platform) { create(:release_platform, key: 'win32', account: account) }
+    let(:exe_filetype) { create(:release_filetype, key: 'exe', account: account) }
+    let(:msi_filetype) { create(:release_filetype, key: 'msi', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
+
+    let!(:current_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{exe_filetype.key}",
+        filetype: exe_filetype,
+        channel: channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    let!(:next_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{msi_filetype.key}",
+        filetype: msi_filetype,
+        channel: channel,
+        version: '2.0.0',
+        account: account,
+        product: product,
+      )
+    }
+
+    it 'should not return an update for the other filetype' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'win32',
+        filetype: 'exe',
+        version: '1.0.0',
+        channel: channel,
+      )
+
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to be_nil
+      expect(updater.next_release).to be_nil
+    end
   end
 
-  context 'when there is an update available for the filetype' do
-  end
+  context 'when the request supplies a version constraint' do
+    let(:platform) { create(:release_platform, key: 'win32', account: account) }
+    let(:filetype) { create(:release_filetype, key: 'exe', account: account) }
+    let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
-  context 'when there is no update available for the filetype' do
-  end
+    let!(:current_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.0',
+        account: account,
+        product: product,
+      )
+    }
 
-  context 'when there is an update available for a different filetype' do
-  end
+    let!(:next_patch_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.0.83+build.1624289491',
+        account: account,
+        product: product,
+      )
+    }
 
-  context 'when there is no update available for a different filetype' do
-  end
+    let!(:next_minor_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '1.5.0',
+        account: account,
+        product: product,
+      )
+    }
 
-  context 'when there is an update for the stable channel' do
-  end
+    let!(:next_major_release) {
+      create(:release,
+        platform: platform,
+        filename: "#{SecureRandom.hex}.#{filetype.key}",
+        filetype: filetype,
+        channel: channel,
+        version: '2.0.0',
+        account: account,
+        product: product,
+      )
+    }
 
-  context 'when there is an update for the rc channel' do
-  end
+    it 'should return a patch update when version is constrained to 1.0.0' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'win32',
+        filetype: 'exe',
+        version: '1.0.0',
+        channel: channel,
+        constraint: '1.0.0',
+      )
 
-  context 'when there is an update for the beta channel' do
-  end
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq next_patch_release.version
+      expect(updater.next_release).to eq next_patch_release
+    end
 
-  context 'when there is an update for the alpha channel' do
-  end
+    it 'should return a patch update when version is constrained to 1.0' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'win32',
+        filetype: 'exe',
+        version: '1.0.0',
+        channel: channel,
+        constraint: '1.0',
+      )
 
-  context 'when there is an update for the dev channel' do
-  end
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq next_minor_release.version
+      expect(updater.next_release).to eq next_minor_release
+    end
 
-  context 'when there is a new update that was yanked' do
-  end
+    it 'should return major update when version is constrained to 2.0' do
+      updater = ReleaseUpdateService.call(
+        account: account,
+        product: product,
+        platform: 'win32',
+        filetype: 'exe',
+        version: '1.0.0',
+        channel: channel,
+        constraint: '2.0',
+      )
 
-  context 'when the request has version constraints' do
+      expect(updater.current_version).to eq current_release.version
+      expect(updater.current_release).to eq current_release
+      expect(updater.next_version).to eq next_major_release.version
+      expect(updater.next_release).to eq next_major_release
+    end
   end
 
   context 'when the release has entitlement constraints' do
