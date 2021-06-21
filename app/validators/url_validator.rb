@@ -5,6 +5,10 @@ class UrlValidator < ActiveModel::EachValidator
     dist.keygen.sh
     app.keygen.sh
     api.keygen.sh
+    dashboard.keygen.sh
+    portal.keygen.sh
+    status.keygen.sh
+    stats.keygen.sh
     keygen.sh
     localhost
   ].freeze
