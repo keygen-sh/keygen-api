@@ -1042,7 +1042,7 @@ describe ReleaseUpdateService do
       expect(updater.next_release).to eq next_patch_release
     end
 
-    it 'should return a patch update when version is constrained to 1.0' do
+    it 'should return a minor update when version is constrained to 1.0' do
       updater = ReleaseUpdateService.call(
         account: account,
         product: product,
