@@ -12,7 +12,7 @@ class ReleaseUpdateService < BaseService
 
   def initialize(account:, product:, platform:, filetype:, version:, constraint: nil, channel: 'stable')
     raise InvalidAccountError.new('account must be present') unless
-      account.present?
+      account.present? && account.instance_of?(Account)
 
     raise InvalidProductError.new('product must be present') unless
       product.present?
