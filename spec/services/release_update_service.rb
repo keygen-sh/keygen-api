@@ -38,6 +38,20 @@ describe ReleaseUpdateService do
       expect { updater.call }.to raise_error ReleaseUpdateService::InvalidAccountError
     end
 
+    it 'should raise an error when account is not a model' do
+      updater = -> {
+        ReleaseUpdateService.call(
+          account: account.id,
+          product: product,
+          platform: 'win32',
+          filetype: 'exe',
+          version: '1.0.0',
+        )
+      }
+
+      expect { updater.call }.to raise_error ReleaseUpdateService::InvalidAccountError
+    end
+
     it 'should raise an error when product is nil' do
       updater = -> {
         ReleaseUpdateService.call(
