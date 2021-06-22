@@ -100,6 +100,7 @@ Feature: List releases
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=stable"
     Then the response status should be "200"
@@ -122,10 +123,79 @@ Feature: List releases
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "releases"
+
+  Scenario: Admin retrieves all rc releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?channel=rc"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "releases"
+
+  Scenario: Admin retrieves all alpha releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?channel=alpha"
+    Then the response status should be "200"
+    And the JSON response should be an array with 8 "releases"
+
+  Scenario: Admin retrieves all dev releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?channel=dev"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "release"
 
   Scenario: Admin retrieves all v1.0.0 releases for their account
     Given I am an admin of account "test1"
