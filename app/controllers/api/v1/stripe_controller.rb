@@ -87,9 +87,9 @@ module Api::V1
           account.touch(:last_trial_will_end_sent_at)
 
           if billing.card.nil?
-            PlaintextMailer.trial_ending_soon_without_payment_method(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+            PlaintextMailer.trial_ending_soon_without_payment_method(account: account).deliver_later
           else
-            PlaintextMailer.trial_ending_soon_with_payment_method(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+            PlaintextMailer.trial_ending_soon_with_payment_method(account: account).deliver_later
           end
         end
       when "invoice.payment_succeeded"
@@ -103,7 +103,7 @@ module Api::V1
 
         case successful_payment_count
         when 1
-          PlaintextMailer.first_payment_succeeded(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+          PlaintextMailer.first_payment_succeeded(account: account).deliver_later
         when 3,
              6,
              12
@@ -111,9 +111,9 @@ module Api::V1
             account.touch :last_prompt_for_review_sent_at
 
             if rand(0..1).zero?
-              PlaintextMailer.prompt_for_testimonial(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+              PlaintextMailer.prompt_for_testimonial(account: account).deliver_later
             else
-              PlaintextMailer.prompt_for_review(account: account).deliver_later(wait_until: Date.tomorrow.beginning_of_day)
+              PlaintextMailer.prompt_for_review(account: account).deliver_later
             end
           end
         end
