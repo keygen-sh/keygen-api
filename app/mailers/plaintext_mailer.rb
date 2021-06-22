@@ -97,9 +97,9 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
 
-        Do you have a couple minutes today to give us a quick testimonial? As a thank you, we'll give you a $50 gift card (or a $60 account credit).
+        Do you have a couple minutes today to give us a quick testimonial? As a thank you, we'll send you a $25 Amazon gift card (or a $50 account credit).
 
-        You can leave a testimonial here: https://testimonial.to/keygen (you can do video or text)
+        You can leave a testimonial here: https://testimonial.to/keygen (you can do video or text, whatever you're most comfortable with!)
 
         We're a bootstrapped company, and these testimonials help us out a lot. You can reply to this email directly with any feedback.
 
@@ -123,7 +123,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         Hope things are going well. I wanted to reach out and thank you again for your continued business. I'm glad Keygen has been able to provide value to your company, and hopefully we've made licensing your software a bit easier.
 
-        Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $25 gift card (or a $50 account credit).
+        Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $25 Amazon gift card (or a $50 account credit).
 
         You can leave a review here: https://reviews.capterra.com/new/168916?utm_campaign=vendor_request_paid
 
