@@ -12,7 +12,9 @@ class WebhookWorker
 
   sidekiq_options queue: :webhooks, retry: 15, lock: :until_executed, dead: false
   sidekiq_retry_in do |count|
-    (count ** 4) + (10.minutes.to_i * rand(1..10))
+    jitter = 10.minutes.to_i * rand(1..10)
+
+    (count ** 4) + jitter
   end
 
   def perform(account_id, event_id, endpoint_id, payload)

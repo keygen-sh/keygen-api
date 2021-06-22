@@ -30,7 +30,7 @@ class RequestLimitsReportWorker
           account.touch(:last_low_activity_lifeline_sent_at)
 
           # Random delay between 1 and n minutes
-          delay = (1..42).to_a.sample.send(:minutes)
+          delay = rand(1..42).minutes
 
           PlaintextMailer.low_activity_lifeline(account: account).deliver_later(wait: delay)
         end
