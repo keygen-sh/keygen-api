@@ -155,6 +155,21 @@ class Release < ApplicationRecord
 
   scope :with_version, -> version { where(version: version) }
 
+  delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
+    to: :channel
+
+  def filetype_id=(id)
+    self.release_platform_id = id
+  end
+
+  def platform_id=(id)
+    self.release_filetype_id = id
+  end
+
+  def channel_id=(id)
+    self.release_channel_id = id
+  end
+
   def platform_id
     release_platform_id
   end
@@ -175,30 +190,6 @@ class Release < ApplicationRecord
     @semver ||= Semverse::Version.new(version)
   rescue Semverse::InvalidVersionFormat
     nil
-  end
-
-  def stable?
-    channel.key == 'stable'
-  end
-
-  def pre_release?
-    !stable?
-  end
-
-  def rc?
-    channel.key == 'rc'
-  end
-
-  def beta?
-    channel.key == 'beta'
-  end
-
-  def alpha?
-    channel.key == 'alpha'
-  end
-
-  def dev?
-    channel.key == 'dev'
   end
 
   private

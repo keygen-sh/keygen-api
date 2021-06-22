@@ -81,6 +81,47 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
+Given /^the current account has (\d+) "([^\"]*)" with the following:$/ do |count, resource, body|
+  parse_placeholders! body
+
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+
+  count.to_i.times do
+    create resource.singularize.underscore, **attrs, account: @account
+  end
+end
+
+Given /^the current account has the following "product" rows:$/ do |rows|
+  products = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+
+  products.each do |product|
+    create(:product,
+      account: @account,
+      **product,
+    )
+  end
+end
+
+Given /^the current account has the following "release" rows:$/ do |rows|
+  releases = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+
+  releases.each do |release|
+    platform = release.delete(:platform)
+    filetype = release.delete(:filetype)
+    channel = release.delete(:channel)
+    product = release.delete(:product)
+
+    create(:release,
+      platform_attributes: { key: platform },
+      filetype_attributes: { key: filetype },
+      channel_attributes: { key: channel },
+      account_id: @account.id,
+      product_id: product,
+      **release,
+    )
+  end
+end
+
 Given /^the current account has (\d+) "([^\"]*)" for(?: an)? existing "([^\"]*)"$/ do |count, resource, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).all.sample
