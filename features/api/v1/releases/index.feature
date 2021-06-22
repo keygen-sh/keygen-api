@@ -215,3 +215,112 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
     And the JSON response should be an array with 2 "releases"
+
+  Scenario: Admin retrieves all tar.gz releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App.1.0.0.exe         | exe      | win32    | stable   |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Admin retrieves all exe releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App.1.0.0.exe         | exe      | win32    | stable   |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?filetype=exe"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Admin retrieves all dmg releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?filetype=dmg"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Admin retrieves all macos releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?platform=macos"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Admin retrieves all win32 releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?platform=win32"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+
+  Scenario: Admin retrieves all linux releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | ID                                   | Name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | Product                              | Version       | Filename                   | Filetype | Platform | Channel  |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?platform=linux"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
