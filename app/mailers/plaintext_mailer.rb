@@ -99,7 +99,7 @@ class PlaintextMailer < ApplicationMailer
 
         Do you have a couple minutes today to give us a quick testimonial? As a thank you, we'll send you a $25 Amazon gift card (or a $50 account credit).
 
-        You can leave a testimonial here: https://testimonial.to/keygen (you can do video or text, whatever you're most comfortable with!)
+        You can leave a testimonial here: https://keygen.sh/testimonial/ (you can do video or text, and it can be a personal testimonial or on behalf of the company)
 
         We're a bootstrapped company, and these testimonials help us out a lot. You can reply to this email directly with any feedback.
 
@@ -125,7 +125,7 @@ class PlaintextMailer < ApplicationMailer
 
         Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $25 Amazon gift card (or a $50 account credit).
 
-        You can leave a review here: https://reviews.capterra.com/new/168916?utm_campaign=vendor_request_paid
+        You can leave a review here: https://keygen.sh/review/ (it can be a personal review or on behalf of the company)
 
         We're a bootstrapped company, and these reviews help us out a lot. You can reply to this email directly with any feedback.
 
