@@ -82,7 +82,7 @@ Feature: Machine user relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/user"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the user for a machine they own
     Given the current account is "test1"
@@ -119,7 +119,29 @@ Feature: Machine user relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/user"
+    Then the response status should be "404"
+
+  Scenario: License attempst to retrieve their user
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
+    And the current account has 2 "machines" for the first "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "403"
+
+  Scenario: License attempts to retrieve the user for a different license
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
+    And the current account has 2 "machines" for the second "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$1/user"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the user for a machine of another account
     Given I am an admin of account "test2"
