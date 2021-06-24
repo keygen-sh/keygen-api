@@ -54,7 +54,7 @@ module Api::V1::Accounts::Relationships
           )
         else
           render_unprocessable_entity(
-            detail: "failed to update #{@account.billing.state} plan because of a billing error",
+            detail: "failed to update #{@account.billing.state} plan because of a billing issue (check payment method)",
             source: { pointer: "/data/relationships/billing" }
           )
         end
