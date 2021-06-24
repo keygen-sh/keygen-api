@@ -362,3 +362,49 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?yanked=true"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
+
+  Scenario: Product retrieves all public releases
+    Given the current account is "test1"
+    And the current account has 3 "releases"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current product has 1 "release"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: User retrieves all public releases
+    Given the current account is "test1"
+    And the current account has 2 "releases"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+
+  Scenario: License retrieves all public releases
+    Given the current account is "test1"
+    And the current account has 4 "releases"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "releases"
+
+  Scenario: Anonymous retrieves all public releases
+    Given the current account is "test1"
+    And the current account has 6 "releases"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "401"
+
+  Scenario: Admin attempts to retrieve releases for another account
+    Given I am an admin of account "test2"
+    But the current account is "test1"
+    And the account "test1" has 2 "releases"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
