@@ -186,7 +186,7 @@ class Account < ApplicationRecord
   def paid_tier?
     return false if billing.nil?
 
-    return billing.active? && billing.card.present? &&
+    return (billing.active? || billing.card.present?) &&
            plan.paid?
   end
 
