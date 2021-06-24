@@ -186,6 +186,26 @@ class Release < ApplicationRecord
     "blobs/#{account_id}/#{id}/#{filename}"
   end
 
+  def blob_cache_key
+    "blobs:#{account_id}:#{id}:#{CACHE_KEY_VERSION}"
+  end
+
+  def blob=(s3_object)
+    if s3_object.present?
+      Rails.cache.write(blob_cache_key, s3_object.version_id, expires_in: 1.day)
+    else
+      Rails.cache.delete(blob_cache_key)
+    end
+  end
+
+  def blob?
+    Rails.cache.exist?(blob_cache_key)
+  end
+
+  def blob
+    Rails.cache.fetch(blob_cache_key)
+  end
+
   def semver
     @semver ||= Semverse::Version.new(version)
   rescue Semverse::InvalidVersionFormat
