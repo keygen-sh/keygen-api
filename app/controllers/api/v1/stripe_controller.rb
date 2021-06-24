@@ -101,20 +101,17 @@ module Api::V1
         successful_payment_count = billing.receipts.paid.count + 1
         account = billing.account
 
-        case successful_payment_count
-        when 1
+        if successful_payment_count == 1
           PlaintextMailer.first_payment_succeeded(account: account).deliver_later
-        when 3,
-             6,
-             12
-          if account.last_prompt_for_review_sent_at.nil?
-            account.touch :last_prompt_for_review_sent_at
+        end
 
-            if rand(0..1).zero?
-              PlaintextMailer.prompt_for_testimonial(account: account).deliver_later
-            else
-              PlaintextMailer.prompt_for_review(account: account).deliver_later
-            end
+        if successful_payment_count >= 3 && account.last_prompt_for_review_sent_at.nil?
+          account.touch :last_prompt_for_review_sent_at
+
+          if rand(0..1).zero?
+            PlaintextMailer.prompt_for_testimonial(account: account).deliver_later
+          else
+            PlaintextMailer.prompt_for_review(account: account).deliver_later
           end
         end
 
