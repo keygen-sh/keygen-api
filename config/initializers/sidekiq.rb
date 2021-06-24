@@ -36,7 +36,13 @@ Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session
 
 # Configure Sidekiq client
 Sidekiq.configure_client do |config|
-  config.redis = { size: 5, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
+  config.redis = {
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
+    size: 5,
+    pool_timeout: 5,
+    connect_timeout: 5,
+    network_timeout: 5,
+  }
 
   config.client_middleware do |chain|
     chain.add SidekiqUniqueJobs::Middleware::Client
@@ -46,7 +52,13 @@ end
 
 # Configure Sidekiq server
 Sidekiq.configure_server do |config|
-  config.redis = { size: 25, pool_timeout: 5, connect_timeout: 5, network_timeout: 5 }
+  config.redis = {
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
+    size: 25,
+    pool_timeout: 5,
+    connect_timeout: 5,
+    network_timeout: 5,
+  }
 
   schedule_file = Rails.root.join 'config', 'schedule.yml'
 
