@@ -3,7 +3,7 @@ Feature: Delete release
 
   Background:
     Given the following "accounts" exist:
-      | Name    | Slug  |
+      | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
@@ -78,23 +78,43 @@ Feature: Delete release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product deletes a release for a different product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "releases" for the second "product"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/releases/$2"
+    Then the response status should be "404"
+    And the current account should have 3 "releases"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License attempts to delete a release for their product
     Given the current account is "test1"
-    And the current account has 1 "license"
-    And I am a license of account "test1"
     And the current account has 2 "webhook-endpoints"
-    And the current account has 3 "releases"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for an existing "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And I am a license of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/releases/$2"
     Then the response status should be "403"
 
   Scenario: User attempts to delete a release for their product
     Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
     And the current account has 1 "user"
+    And the current account has 4 "releases" for an existing "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
     And I am a user of account "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 3 "releases"
     And I use an authentication token
+    And the current user has 1 "license"
     When I send a DELETE request to "/accounts/test1/releases/$2"
     Then the response status should be "403"
 

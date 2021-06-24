@@ -78,7 +78,9 @@ module Api::V1
     attr_reader :release
 
     def set_release
-      @release = current_account.releases.find params[:id]
+      scoped_releases = policy_scope(current_account.releases)
+
+      @release = scoped_releases.find(params[:id])
 
       Keygen::Store::Request.store[:current_resource] = release
     end

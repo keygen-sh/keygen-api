@@ -3,7 +3,7 @@ Feature: Create release
 
   Background:
     Given the following "accounts" exist:
-      | Name    | Slug  |
+      | name    | slug  |
       | Test 1  | test1 |
       | Test 2  | test2 |
     And I send and accept JSON
