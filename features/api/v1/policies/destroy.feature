@@ -77,3 +77,62 @@ Feature: Delete policy
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Product deletes one of their policies
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies" for the first "product"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "policies"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product deletes a policy for a different product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And I am a product of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies" for the second "product"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "403"
+    And the current account should have 3 "policies"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to delete a policy for their product
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+
+  Scenario: User attempts to delete a policy for their product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a DELETE request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+
+  Scenario: Anonymous attempts to delete a policy
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies"
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "401"
