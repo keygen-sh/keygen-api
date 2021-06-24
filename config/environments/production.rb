@@ -29,7 +29,7 @@ Rails.application.configure do
     reconnect_attempts: ENV.fetch('REDIS_RECONNECT_ATTEMPTS') { 5 }.to_i,
     reconnect_delay: ENV.fetch('REDIS_RECONNECT_DELAY') { 1 }.to_f,
     reconnect_delay_max: ENV.fetch('REDIS_RECONNECT_DELAY_MAX') { 1 }.to_f,
-    driver: :hiredis,
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
     error_handler: -> (method:, returning:, exception:) {
       Keygen.logger.exception exception
     },

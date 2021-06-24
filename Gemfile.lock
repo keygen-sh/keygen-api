@@ -172,7 +172,6 @@ GEM
       actionpack (>= 4.1)
       activesupport (>= 4.1)
     hashdiff (1.0.1)
-    hiredis (0.6.3)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
@@ -439,7 +438,6 @@ DEPENDENCIES
   faker (~> 2.14.0)
   haml-rails
   has_scope
-  hiredis
   httparty
   json (~> 2.3.0)
   jsonapi-rails (= 0.3.1)
