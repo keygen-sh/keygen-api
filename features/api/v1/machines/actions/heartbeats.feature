@@ -235,7 +235,7 @@ Feature: License heartbeat actions
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -310,7 +310,7 @@ Feature: License heartbeat actions
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -387,7 +387,7 @@ Feature: License heartbeat actions
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -464,7 +464,7 @@ Feature: License heartbeat actions
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
