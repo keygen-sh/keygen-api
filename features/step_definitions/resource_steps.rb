@@ -131,7 +131,7 @@ Given /^the current account has (\d+) "([^\"]*)" for(?: an)? existing "([^\"]*)"
   end
 end
 
-Given /^the current account has (\d+) "([^\"]*)" associated to the (\w+) "([^\"]*)"$/ do |count, resource, index, association|
+Given /^the current account has (\d+) "([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
     association_name = association.singularize.underscore.to_sym
