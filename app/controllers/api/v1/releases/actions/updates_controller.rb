@@ -78,8 +78,13 @@ module Api::V1::Releases::Actions
         authorize updater.next_release, :download?
 
         # Assert object exists before redirecting to S3
-        s3  = Aws::S3::Client.new
-        obj = s3.head_object(bucket: 'keygen-dist', key: updater.next_release.s3_object_key)
+        if !updater.next_release.blob?
+          s3  = Aws::S3::Client.new
+          obj = s3.head_object(bucket: 'keygen-dist', key: updater.next_release.s3_object_key)
+
+          # Cache it for next time
+          updater.next_release.blob = obj
+        end
 
         # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
         # NOTE(ezekg) Check obj.replication_status for EU
