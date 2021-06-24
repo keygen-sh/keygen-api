@@ -13,7 +13,6 @@ gem 'rack-cors'
 
 # Redis for caching and background jobs
 gem 'redis'
-gem 'hiredis'
 
 # JSON API serializers
 gem 'json', '~> 2.3.0'
