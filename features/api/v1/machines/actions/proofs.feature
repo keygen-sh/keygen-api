@@ -178,4 +178,4 @@ Feature: Machine proof actions
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
