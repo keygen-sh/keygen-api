@@ -9,11 +9,7 @@ FactoryGirl.define do
     after :build do |constraint, evaluator|
       constraint.account     ||= evaluator.account.presence || create(:account)
       constraint.entitlement ||=
-        if !evaluator.entitlement.present?
-          create(:entitlement, account: constraint.account)
-        else
-          evaluator.entitlement
-        end
+        evaluator.entitlement.presence || create(:entitlement, account: constraint.account)
     end
   end
 end
