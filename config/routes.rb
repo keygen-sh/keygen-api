@@ -196,12 +196,12 @@ Rails.application.routes.draw do
           end
           member do
             scope "actions", module: "releases/actions" do
-              get "check-for-update", to: "updates#check_for_update_by_id"
+              get "upgrade", to: "upgrades#check_for_upgrade_by_id"
             end
           end
           collection do
             scope "actions", module: "releases/actions" do
-              get "check-for-update", to: "updates#check_for_update_by_query"
+              get "upgrade", to: "upgrades#check_for_upgrade_by_query"
             end
           end
         end

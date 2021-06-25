@@ -18,8 +18,8 @@ class ReleaseSerializer < BaseSerializer
   attribute :downloads do
     @object.download_count
   end
-  attribute :updates do
-    @object.update_count
+  attribute :upgrades do
+    @object.upgrade_count
   end
   attribute :version
   attribute :semver do
