@@ -499,6 +499,93 @@ Feature: Release blob relationship
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "404"
 
-  # TODO(ezekg) Blob upload links
+  # Blob upload links
+  Scenario: Admin uploads a blob for a release (not uploaded)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is not uploaded
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "307"
+    And the JSON response should be a "release-upload-link"
+
+  Scenario: Admin uploads a blob for a release (already uploaded)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is uploaded
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "307"
+    And the JSON response should be a "release-upload-link"
+
+  Scenario: Product uploads a blob for a release of their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has a blob that is not uploaded
+    Given I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "307"
+    And the JSON response should be a "release-upload-link"
+
+  Scenario: Product uploads a blob for a release of a different product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "releases" for the second "product"
+    And the first "release" has a blob that is not uploaded
+    Given I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "404"
+
+  Scenario: License uploads a blob for a release of their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has a blob that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "403"
+
+  Scenario: License uploads a blob for a release of a different product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has a blob that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "404"
+
+  Scenario: User uploads a blob for a release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has a blob that is uploaded
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "403"
+
+  Scenario: User uploads a blob for a release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "release"
+    And the first "release" has a blob that is uploaded
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "404"
 
   # TODO(ezekg) Deletions
