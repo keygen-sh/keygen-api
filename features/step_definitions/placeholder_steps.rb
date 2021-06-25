@@ -32,6 +32,7 @@ PLACEHOLDERS = %w[
   release_download_link
   release_update_link
   release_upload_link
+  constraint
   current
   crypt
   date
@@ -164,6 +165,8 @@ def parse_path_placeholders!(str)
       else
         if @account && resource.singularize != 'account'
           case resource.underscore
+          when "constraints"
+            @account.release_entitlement_constraints.send(:[], index.to_i).id
           when "request-logs"
             @account.request_logs.send(:[], index.to_i).id
           when "billing"

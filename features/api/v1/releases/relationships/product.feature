@@ -48,7 +48,7 @@ Feature: Release product relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the product for a release
     Given the current account is "test1"
@@ -57,7 +57,7 @@ Feature: Release product relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the product for a release of another account
     Given I am an admin of account "test2"
