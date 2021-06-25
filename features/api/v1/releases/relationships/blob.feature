@@ -197,7 +197,7 @@ Feature: Release blob relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
-     And the first "license" has the following attributes:
+    And the first "license" has the following attributes:
       """
       { "expiry": "$time.2.minutes.ago" }
       """
