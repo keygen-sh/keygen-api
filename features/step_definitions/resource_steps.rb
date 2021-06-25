@@ -439,7 +439,7 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
-Given /^the (\w+) "release" has a blob that is (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
+Given /^(?:the )?(\w+) "releases?" (?:has a|have) blobs? that (?:is|are) (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
   res = case named_scenario
         when 'uploaded'
           []
