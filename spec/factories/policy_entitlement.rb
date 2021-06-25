@@ -7,18 +7,9 @@ FactoryGirl.define do
     policy
 
     after :build do |policy_entitlement, evaluator|
-      account = evaluator.account.presence || create(:account)
-      entitlement =
-        if evaluator.entitlement.present?
-          evaluator.entitlement
-        else
-          create :entitlement, account: account
-        end
-
-      policy_entitlement.assign_attributes(
-        account: account,
-        entitlement: entitlement
-      )
+      policy_entitlement.account     ||= evaluator.account.presence || create(:account)
+      policy_entitlement.entitlement ||=
+        evaluator.entitlement.presence || create(:entitlement, account: policy_entitlement.account)
     end
   end
 end

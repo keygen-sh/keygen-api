@@ -7,18 +7,9 @@ FactoryGirl.define do
     license
 
     after :build do |license_entitlement, evaluator|
-      account = evaluator.account.presence || create(:account)
-      entitlement =
-        if evaluator.entitlement.present?
-          evaluator.entitlement
-        else
-          create :entitlement, account: account
-        end
-
-      license_entitlement.assign_attributes(
-        account: account,
-        entitlement: entitlement
-      )
+      license_entitlement.account     ||= evaluator.account.presence || create(:account)
+      license_entitlement.entitlement ||=
+        evaluator.entitlement.presence || create(:entitlement, account: license_entitlement.account)
     end
   end
 end

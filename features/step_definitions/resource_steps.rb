@@ -439,6 +439,23 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
+Given /^the (\w+) "release" has a blob that is (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
+  res = case named_scenario
+        when 'uploaded'
+          []
+        when 'not uploaded'
+          ['NotFound']
+        when 'timing out'
+          [Timeout::Error]
+        end
+
+  Aws.config[:s3] = {
+    stub_responses: {
+      head_object: res,
+    }
+  }
+end
+
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   parse_placeholders! body
 
