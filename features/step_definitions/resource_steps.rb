@@ -451,6 +451,7 @@ Given /^the (\w+) "release" has a blob that is (uploaded|not uploaded|timing out
 
   Aws.config[:s3] = {
     stub_responses: {
+      delete_object: [],
       head_object: res,
     }
   }
@@ -589,4 +590,11 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   model = @account.licenses.all[index]
 
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
+end
+
+Given /^the (\w+) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
+  release  = @account.releases.send(named_index)
+  expected = named_scenario == 'be'
+
+  expect(release.yanked_at.present?).to be expected
 end
