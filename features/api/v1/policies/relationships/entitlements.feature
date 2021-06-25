@@ -326,6 +326,8 @@ Feature: Policy entitlements relationship
       }
       """
     Then the response status should be "204"
+    And the current account should have 0 "policy-entitlements"
+    And the current account should have 3 "entitlements"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
