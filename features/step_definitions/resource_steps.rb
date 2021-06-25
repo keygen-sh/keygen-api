@@ -91,34 +91,35 @@ Given /^the current account has (\d+) "([^\"]*)" with the following:$/ do |count
   end
 end
 
-Given /^the current account has the following "product" rows:$/ do |rows|
-  products = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, rows|
+  hashes  = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+  factory = resource.singularize.underscore.to_sym
 
-  products.each do |product|
-    create(:product,
-      account: @account,
-      **product,
-    )
-  end
-end
+  hashes.each do |hash|
+    # FIXME(ezekg) Treating releases a bit differently for convenience
+    case factory
+    when :release
+      codes = hash.delete(:entitlements)&.split(/,\s*/)
+      if codes.present? && codes.any?
+        entitlements = codes.map { |code| { entitlement: @account.entitlements.find_by!(code: code) } }
 
-Given /^the current account has the following "release" rows:$/ do |rows|
-  releases = rows.hashes.map { |h| h.transform_keys { |k| k.underscore.to_sym } }
+        hash[:constraints_attributes] = entitlements
+      end
 
-  releases.each do |release|
-    platform = release.delete(:platform)
-    filetype = release.delete(:filetype)
-    channel = release.delete(:channel)
-    product = release.delete(:product)
+      hash[:platform_attributes] = { key: hash.delete(:platform) }
+      hash[:filetype_attributes] = { key: hash.delete(:filetype) }
+      hash[:channel_attributes]  = { key: hash.delete(:channel) }
 
-    create(:release,
-      platform_attributes: { key: platform },
-      filetype_attributes: { key: filetype },
-      channel_attributes: { key: channel },
-      account_id: @account.id,
-      product_id: product,
-      **release,
-    )
+      create(:release,
+        account: @account,
+        **hash,
+      )
+    else
+      create(factory,
+        account: @account,
+        **hash,
+      )
+    end
   end
 end
 

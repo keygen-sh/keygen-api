@@ -850,3 +850,464 @@ Feature: Release upgrade actions
         "next": "2.0.0"
       }
       """
+
+  # Entitlements
+  Scenario: License retrieves an upgrade for a product release (has v2 entitlement)
+    Given the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code     |
+      | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | APP_V1   |
+      | ac1f0d43-383a-4cbf-8d42-91e7820f4c61 | APP_V2   |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  | entitlements |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2        | Test-App-1.0.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3        | Test-App-1.0.3.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1        | Test-App-1.1.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2        | Test-App-1.1.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0        | Test-App-1.4.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "8cdf47c8-9cdc-44c9-a752-1e137355ecaf",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "ac1f0d43-383a-4cbf-8d42-91e7820f4c61",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "2.0.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (missing v2 entitlement)
+    Given the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code     |
+      | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | APP_V1   |
+      | ac1f0d43-383a-4cbf-8d42-91e7820f4c61 | APP_V2   |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  | entitlements |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2        | Test-App-1.0.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3        | Test-App-1.0.3.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1        | Test-App-1.1.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2        | Test-App-1.1.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0        | Test-App-1.4.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "8cdf47c8-9cdc-44c9-a752-1e137355ecaf",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "204"
+
+  Scenario: License retrieves an upgrade for a product release (missing v2 entitlement, constrained to v1)
+    Given the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code     |
+      | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | APP_V1   |
+      | ac1f0d43-383a-4cbf-8d42-91e7820f4c61 | APP_V2   |
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  | entitlements |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2        | Test-App-1.0.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3        | Test-App-1.0.3.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1        | Test-App-1.1.1.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2        | Test-App-1.1.2.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0        | Test-App-1.4.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "8cdf47c8-9cdc-44c9-a752-1e137355ecaf",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.7.0"
+      }
+      """
+
+  # Pre-releases
+  Scenario: License retrieves an upgrade for a product release (stable channel)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version                    | filename                   | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653627 | Test-App-1624653627.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653693 | Test-App-1624653693.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653702 | Test-App-1624653702.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653708 | Test-App-1624653708.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653716 | Test-App-1624653716.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1              | Test-App-2.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.2              | Test-App-2.0.0-alpha.2.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1               | Test-App-2.0.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.2               | Test-App-2.0.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.3               | Test-App-2.0.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-rc.1                 | Test-App-2.0.0-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0                      | Test-App-2.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653735 | Test-App-1624653735.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653760 | Test-App-1624653760.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-rc.1                 | Test-App-2.0.1-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1                      | Test-App-2.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-dev+build.1624653771 | Test-App-1624653771.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-alpha.1              | Test-App-2.0.2-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.6.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.6.0",
+        "next": "2.0.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (rc channel)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version                    | filename                   | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653627 | Test-App-1624653627.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653693 | Test-App-1624653693.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653702 | Test-App-1624653702.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653708 | Test-App-1624653708.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653716 | Test-App-1624653716.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1              | Test-App-2.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.2              | Test-App-2.0.0-alpha.2.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1               | Test-App-2.0.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.2               | Test-App-2.0.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.3               | Test-App-2.0.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-rc.1                 | Test-App-2.0.0-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0                      | Test-App-2.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653735 | Test-App-1624653735.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653760 | Test-App-1624653760.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-rc.1                 | Test-App-2.0.1-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1                      | Test-App-2.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-dev+build.1624653771 | Test-App-1624653771.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-alpha.1              | Test-App-2.0.2-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-dev%2bbuild.0&channel=rc&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-dev+build.0",
+        "next": "2.0.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (beta channel)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version                    | filename                   | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653627 | Test-App-1624653627.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653693 | Test-App-1624653693.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653702 | Test-App-1624653702.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653708 | Test-App-1624653708.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653716 | Test-App-1624653716.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1              | Test-App-2.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.2              | Test-App-2.0.0-alpha.2.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1               | Test-App-2.0.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.2               | Test-App-2.0.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.3               | Test-App-2.0.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-rc.1                 | Test-App-2.0.0-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0                      | Test-App-2.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653735 | Test-App-1624653735.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653760 | Test-App-1624653760.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-rc.1                 | Test-App-2.0.1-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1                      | Test-App-2.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-dev+build.1624653771 | Test-App-1624653771.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-alpha.1              | Test-App-2.0.2-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=2.0.0&channel=beta&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "2.0.0",
+        "next": "2.0.2-beta.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (alpha channel)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version                    | filename                   | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653627 | Test-App-1624653627.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653693 | Test-App-1624653693.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653702 | Test-App-1624653702.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653708 | Test-App-1624653708.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653716 | Test-App-1624653716.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1              | Test-App-2.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.2              | Test-App-2.0.0-alpha.2.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1               | Test-App-2.0.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.2               | Test-App-2.0.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.3               | Test-App-2.0.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-rc.1                 | Test-App-2.0.0-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0                      | Test-App-2.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653735 | Test-App-1624653735.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653760 | Test-App-1624653760.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-rc.1                 | Test-App-2.0.1-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1                      | Test-App-2.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-dev+build.1624653771 | Test-App-1624653771.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-alpha.1              | Test-App-2.0.2-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-alpha.1&channel=alpha&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-alpha.1",
+        "next": "2.1.0-beta.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (dev channel)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version                    | filename                   | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653627 | Test-App-1624653627.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653693 | Test-App-1624653693.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653702 | Test-App-1624653702.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653708 | Test-App-1624653708.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624653716 | Test-App-1624653716.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1              | Test-App-2.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.2              | Test-App-2.0.0-alpha.2.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1               | Test-App-2.0.0-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.2               | Test-App-2.0.0-beta.2.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.3               | Test-App-2.0.0-beta.3.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-rc.1                 | Test-App-2.0.0-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0                      | Test-App-2.0.0.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653735 | Test-App-1624653735.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-dev+build.1624653760 | Test-App-1624653760.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1-rc.1                 | Test-App-2.0.1-rc.1.dmg    | dmg      | darwin   | rc       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1                      | Test-App-2.0.1.dmg         | dmg      | darwin   | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-dev+build.1624653771 | Test-App-1624653771.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-alpha.1              | Test-App-2.0.2-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
+    And all "releases" have blobs that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.7.0-dev%2bbuild.1624653614&channel=dev&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.7.0-dev+build.1624653614",
+        "next": "2.1.0-dev+build.1624654615"
+      }
+      """
