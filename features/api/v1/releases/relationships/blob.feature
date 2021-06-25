@@ -208,6 +208,27 @@ Feature: Release blob relationship
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "403"
 
+  Scenario: License retrieves the blob for a release of their product (expired after release)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "$time.3.months.ago" }
+      """
+    And the first "release" has a blob that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "303"
+    And the JSON response should be a "release-download-link"
+
   Scenario: License retrieves the blob for a release of their product (suspended)
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -403,6 +424,29 @@ Feature: Release blob relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "403"
+
+  Scenario: User retrieves a release blob with a license for it (expired after release)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.days.ago" }
+      """
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "$time.1.months.ago" }
+      """
+    And the first "release" has a blob that is uploaded
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "303"
+    And the JSON response should be a "release-download-link"
 
   Scenario: User retrieves a release blob with a license for it (suspended)
     Given the current account is "test1"
