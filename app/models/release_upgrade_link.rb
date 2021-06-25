@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-class ReleaseUpdateLink < ApplicationRecord
+class ReleaseUpgradeLink < ApplicationRecord
   include Limitable
   include Pageable
 
   belongs_to :account
   belongs_to :release,
-    counter_cache: :update_count,
-    inverse_of: :update_links
+    counter_cache: :upgrade_count,
+    inverse_of: :upgrade_links
 
   validates :account,
     presence: { message: 'must exist' }

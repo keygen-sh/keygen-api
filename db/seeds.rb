@@ -64,7 +64,7 @@ EVENT_TYPES = %w[
   release.updated
   release.deleted
   release.downloaded
-  release.update-downloaded
+  release.upgraded
   release.uploaded
   release.yanked
   *

@@ -68,7 +68,7 @@ class Metric < ApplicationRecord
     release.updated
     release.deleted
     release.downloaded
-    release.update-downloaded
+    release.upgraded
     release.uploaded
     release.yanked
   ].freeze
