@@ -31,7 +31,7 @@ Feature: Release blob relationship
       { "ttl": 60 }
       """
 
-   Scenario: Admin retrieves the blob for a release with a custom TTL
+   Scenario: Admin retrieves the blob for a release (1 hour TTL)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
@@ -42,6 +42,44 @@ Feature: Release blob relationship
     And the JSON response should be a "release-download-link" with the following attributes:
       """
       { "ttl": 3600 }
+      """
+
+  Scenario: Admin retrieves the blob for a release (10 second TTL)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is uploaded
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/blob?ttl=10"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be greater than or equal to 60 (1 minute)",
+        "source": {
+          "parameter": "ttl"
+        }
+      }
+      """
+
+  Scenario: Admin retrieves the blob for a release (2 week TTL)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is uploaded
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/blob?ttl=1209600"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 604800 (1 week)",
+        "source": {
+          "parameter": "ttl"
+        }
+      }
       """
 
   Scenario: Admin retrieves the blob for a release that has not been uploaded
@@ -93,7 +131,24 @@ Feature: Release blob relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "303"
-    And the JSON response should be a "release-download-link"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 60 }
+      """
+
+  Scenario: Product retrieves the blob for a release of their product (1 week TTL)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has a blob that is uploaded
+    Given I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/blob?ttl=604800"
+    Then the response status should be "303"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 604800 }
+      """
 
   Scenario: Product retrieves the blob for a release of a different product
     Given the current account is "test1"
@@ -116,7 +171,26 @@ Feature: Release blob relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "303"
-    And the JSON response should be a "release-download-link"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 60 }
+      """
+
+  Scenario: License retrieves the blob for a release of their product (1 day TTL)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has a blob that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/blob?ttl=86400"
+    Then the response status should be "303"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 60 }
+      """
 
   Scenario: License retrieves the blob for a release of their product (expired)
     Given the current account is "test1"
@@ -289,6 +363,28 @@ Feature: Release blob relationship
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "303"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 60 }
+      """
+
+  Scenario: User retrieves a release blob with a license for it (2 minute TTL)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has a blob that is uploaded
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/blob?ttl=120"
+    Then the response status should be "303"
+    And the JSON response should be a "release-download-link" with the following attributes:
+      """
+      { "ttl": 60 }
+      """
 
   Scenario: User retrieves a release blob with a license for it (expired)
     Given the current account is "test1"

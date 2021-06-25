@@ -98,7 +98,9 @@ module Api::V1::Releases::Relationships
 
     typed_query do
       on :show do
-        query :ttl, type: :integer, coerce: true, optional: true
+        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+          query :ttl, type: :integer, coerce: true, optional: true
+        end
       end
     end
   end
