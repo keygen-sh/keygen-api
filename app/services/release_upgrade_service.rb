@@ -86,7 +86,7 @@ class ReleaseUpgradeService < BaseService
 
   def upgrade_versions
     @upgrade_versions ||= available_upgrades.limit(10_000)
-                                           .pluck(:version)
+                                            .pluck(:version)
   end
 
   def current_semver
