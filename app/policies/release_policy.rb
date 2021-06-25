@@ -43,7 +43,7 @@ class ReleasePolicy < ApplicationPolicy
         # Assert current bearer is a user of the product that has a non-expired/suspended
         # license or that the bearer is itself a license for the product that is valid,
         # and then assert that the license satifies all entitlement constraints.
-        (bearer.has_role?(:user) && has_valid_license(bearer)) ||
+        (bearer.has_role?(:user) && has_valid_license?(bearer)) ||
         (bearer.has_role?(:license) && valid_license?(bearer))
       )
   end
@@ -93,12 +93,16 @@ class ReleasePolicy < ApplicationPolicy
   private
 
   def has_valid_license?(user)
-    user.licenses.for_product(resource.product).any? { |l| valid_license?(l) }
+    licenses = user.licenses.preload(:product, :policy).for_product(resource.product)
+
+    licenses.any? { |l| valid_license?(l) }
   end
 
   def valid_license?(license)
-    within_expiry_window?(license) && has_entitlements?(license) &&
-      resource.product == license.product
+    resource.product == license.product &&
+      !license.suspended? &&
+      within_expiry_window?(license) &&
+      has_entitlements?(license)
   end
 
   def within_expiry_window?(license)
