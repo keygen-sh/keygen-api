@@ -721,4 +721,132 @@ Feature: Release upgrade actions
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
-  # TODO(ezekg) Upgrade by query
+  # Upgrade by query
+  Scenario: Admin retrieves an upgrade for a product release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2        | Test-App-1.0.2.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3        | Test-App-1.0.3.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1        | Test-App-1.1.1.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2        | Test-App-1.1.2.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0        | Test-App-1.4.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.1.1&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.1.1",
+        "next": "1.7.0"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a product release (unknown platform)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=win32&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "204"
+
+  Scenario: Admin retrieves an upgrade for a product release (unknown filetype)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "204"
+
+  Scenario: Admin retrieves an upgrade for a product release (unknown product)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=macos&filetype=zip&product=4f1c06e0-a4b2-4e3e-8a19-f2ce7f2f6e62"
+    Then the response status should be "204"
+
+  Scenario: Admin retrieves an upgrade for a product release (constrained to v1.x)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.zip        | zip      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a product release (constrained to v2.x)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 3.0.0        | Test-App-3.0.0.zip        | zip      | macos    | stable   |
+    And all "releases" have blobs that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "2.0.0"
+      }
+      """
