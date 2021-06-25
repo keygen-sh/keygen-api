@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class ReleaseUpdateLinkSerializer < BaseSerializer
-  type 'release-update-links'
+class ReleaseUpgradeLinkSerializer < BaseSerializer
+  type 'release-upgrade-links'
 
   attribute :url
   attribute :ttl

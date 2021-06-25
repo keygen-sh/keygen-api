@@ -30,7 +30,7 @@ PLACEHOLDERS = %w[
   release_channels
   release_entitlement_constraint
   release_download_link
-  release_update_link
+  release_upgrade_link
   release_upload_link
   constraint
   current

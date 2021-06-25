@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReleaseUpdateService < BaseService
+class ReleaseUpgradeService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidProductError < StandardError; end
   class InvalidPlatformError < StandardError; end
@@ -50,7 +50,7 @@ class ReleaseUpdateService < BaseService
     next_version = next_semver&.to_s
     next_release =
       if next_version.present?
-        available_updates.find_by(version: next_version)
+        available_upgrades.find_by(version: next_version)
       else
         nil
       end
@@ -79,14 +79,14 @@ class ReleaseUpdateService < BaseService
                                             .for_filetype(filetype)
   end
 
-  def available_updates
-    @available_updates ||= available_releases.for_channel(channel)
-                                             .unyanked
+  def available_upgrades
+    @available_upgrades ||= available_releases.for_channel(channel)
+                                              .unyanked
   end
 
-  def update_versions
-    @update_versions ||= available_updates.limit(10_000)
-                                          .pluck(:version)
+  def upgrade_versions
+    @upgrade_versions ||= available_upgrades.limit(10_000)
+                                           .pluck(:version)
   end
 
   def current_semver
@@ -96,8 +96,8 @@ class ReleaseUpdateService < BaseService
   end
 
   def next_semver
-    semvers = update_versions.map { |v| Semverse::Version.new(v) }
-                             .reject { |v| v <= current_semver }
+    semvers = upgrade_versions.map { |v| Semverse::Version.new(v) }
+                              .reject { |v| v <= current_semver }
 
     if constraint.present?
       prerelease =
@@ -134,7 +134,7 @@ class ReleaseUpdateService < BaseService
   rescue Semverse::InvalidConstraintFormat
     raise InvalidConstraintError.new 'version constraint must be valid: x, x.y, x.y.z'
   rescue Semverse::NoSolutionError => e
-    Keygen.logger.warn "[release_update_service] No solution found: current=#{current_semver} constraint=#{constraint} rule=(#{rule}) versions=(#{semvers.join(', ')})"
+    Keygen.logger.warn "[release_upgrade_service] No solution found: current=#{current_semver} constraint=#{constraint} rule=(#{rule}) versions=(#{semvers.join(', ')})"
 
     nil
   end

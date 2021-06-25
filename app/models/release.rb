@@ -39,8 +39,8 @@ class Release < ApplicationRecord
     class_name: 'ReleaseDownloadLink',
     inverse_of: :release,
     dependent: :delete_all
-  has_many :update_links,
-    class_name: 'ReleaseUpdateLink',
+  has_many :upgrade_links,
+    class_name: 'ReleaseUpgradeLink',
     inverse_of: :release,
     dependent: :delete_all
   has_many :upload_links,
