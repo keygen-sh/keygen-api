@@ -63,7 +63,9 @@ module Api::V1::Releases::Actions
     attr_reader :release
 
     def set_release
-      @release = current_account.releases.find(params[:id])
+      scoped_releases = policy_scope(current_account.releases)
+
+      @release = scoped_releases.find(params[:id])
 
       Keygen::Store::Request.store[:current_resource] = release
     end
@@ -116,8 +118,9 @@ module Api::V1::Releases::Actions
 
         render status: :no_content
       end
-    rescue Aws::S3::Errors::NotFound
-      Keygen.logger.warn "[releases.check_for_upgrade] No blob found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version}"
+    rescue Aws::S3::Errors::NotFound,
+           Timeout::Error => e
+      Keygen.logger.warn "[releases.check_for_upgrade] No blob found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
 
       # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
       #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
