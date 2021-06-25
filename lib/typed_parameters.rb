@@ -370,7 +370,7 @@ class TypedParameters
         parameters.inject(HashWithIndifferentAccess.new) do |params, (_, data)|
           case data
           when Array
-            data.map { |d| transformer.call(params, d) }
+            data.map { |d| transformer.call(params.dup, d) }
           when Hash
             transformer.call(params, data)
           end
@@ -431,8 +431,6 @@ class TypedParameters
 
             deserialize_jsonapi_data(d)
           }.compact.reduce(:merge) || {}
-
-          puts dt: :hash, id: id, attrs: attrs, rels: rels
 
           assoc_key   = "#{type}_attributes"
           assoc_attrs = {}.merge(id, attrs, rels)

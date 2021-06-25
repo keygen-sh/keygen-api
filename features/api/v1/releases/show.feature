@@ -109,7 +109,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
-  Scenario: License retrieves a release without an association to it
+  Scenario: License retrieves a release of a different product
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "release"
@@ -118,7 +118,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: License retrieves a release with an association to it
+  Scenario: License retrieves a release of their product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
