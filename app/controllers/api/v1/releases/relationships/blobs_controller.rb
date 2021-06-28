@@ -41,8 +41,8 @@ module Api::V1::Releases::Relationships
 
       render jsonapi: link, status: :see_other, location: link.url
     rescue Aws::S3::Errors::NotFound,
-           Timeout::Error
-      Keygen.logger.warn "[releases.blob.download] No blob found: account=#{current_account.id} release=#{release.id} version=#{release.version}"
+           Timeout::Error => e
+      Keygen.logger.warn "[releases.blob.download] No blob found: account=#{current_account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
       render_not_found detail: 'does not exist or is unavailable',
         source: { pointer: '/data/relationships/blob' },
