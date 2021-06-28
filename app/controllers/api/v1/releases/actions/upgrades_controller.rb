@@ -19,17 +19,17 @@ module Api::V1::Releases::Actions
 
       check_for_upgrade(**kwargs)
     rescue ReleaseUpgradeService::InvalidProductError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_PRODUCT, source: { parameter: :product }
+      render_bad_request detail: e.message, code: :UPGRADE_PRODUCT_INVALID, source: { parameter: :product }
     rescue ReleaseUpgradeService::InvalidPlatformError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_PLATFORM, source: { parameter: :platform }
+      render_bad_request detail: e.message, code: :UPGRADE_PLATFORM_INVALID, source: { parameter: :platform }
     rescue ReleaseUpgradeService::InvalidFiletypeError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_FILETYPE, source: { parameter: :filetype }
+      render_bad_request detail: e.message, code: :UPGRADE_FILETYPE_INVALID, source: { parameter: :filetype }
     rescue ReleaseUpgradeService::InvalidVersionError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_VERSION, source: { parameter: :version }
+      render_bad_request detail: e.message, code: :UPGRADE_VERSION_INVALID, source: { parameter: :version }
     rescue ReleaseUpgradeService::InvalidConstraintError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_CONSTRAINT, source: { parameter: :constraint }
+      render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
     rescue ReleaseUpgradeService::InvalidChannelError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_CHANNEL, source: { parameter: :channel }
+      render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
     rescue Pundit::NotAuthorizedError
       render status: :no_content
     end
@@ -46,9 +46,9 @@ module Api::V1::Releases::Actions
 
       check_for_upgrade(**kwargs)
     rescue ReleaseUpgradeService::InvalidConstraintError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_CONSTRAINT, source: { parameter: :constraint }
+      render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
     rescue ReleaseUpgradeService::InvalidChannelError => e
-      render_bad_request detail: e.message, code: :INVALID_UPGRADE_CHANNEL, source: { parameter: :channel }
+      render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
     rescue ReleaseUpgradeService::InvalidProductError,
            ReleaseUpgradeService::InvalidPlatformError,
            ReleaseUpgradeService::InvalidFiletypeError,
