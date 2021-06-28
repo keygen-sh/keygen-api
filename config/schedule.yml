@@ -14,6 +14,14 @@ prune_expired_tokens:
   cron: "0 2 * * *" # Every day at 2am (8pm CST)
   class: "PruneExpiredTokensWorker"
 
+prune_release_download_links:
+  cron: "15 2 * * *" # Every day at 2:14am (8pm CST)
+  class: "PruneReleaseDownloadLinksWorker"
+
+prune_release_upgrade_links:
+  cron: "30 2 * * *" # Every day at 2:30am (8pm CST)
+  class: "PruneReleaseUpgradeLinksWorker"
+
 prune_request_logs:
   cron: "0 3 * * *" # Every day at 3am (9pm CST)
   class: "PruneRequestLogsWorker"

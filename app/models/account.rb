@@ -28,6 +28,9 @@ class Account < ApplicationRecord
   has_many :release_filetypes
   has_many :release_channels
   has_many :release_entitlement_constraints
+  has_many :release_download_links
+  has_many :release_upgrade_links
+  has_many :release_upload_links
   has_one :billing
 
   accepts_nested_attributes_for :users, limit: 10
