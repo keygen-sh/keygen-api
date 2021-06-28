@@ -3,9 +3,9 @@
 module Api::V1::Products::Relationships
   class ReleasesController < Api::V1::BaseController
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
-    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
+    has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:version) { |c, s, v| s.with_version(v) }
 
     before_action :scope_to_current_account!
