@@ -14,7 +14,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      releases = apply_scopes(product.releases.preload(:platform, :filetype, :channel))
+      releases = policy_scope apply_scopes(product.releases.preload(:platform, :filetype, :channel))
       authorize releases
 
       render jsonapi: releases
