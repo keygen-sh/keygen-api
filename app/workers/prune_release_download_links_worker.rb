@@ -10,7 +10,6 @@ class PruneReleaseDownloadLinksWorker
                       .group('accounts.id')
                       .having('count(release_download_links.id) > 0')
 
-
     Keygen.logger.info "[workers.prune-release-download-links] Starting: accounts=#{accounts.count}"
 
     accounts.find_each do |account|
