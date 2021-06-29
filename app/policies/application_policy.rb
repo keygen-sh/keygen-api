@@ -102,13 +102,13 @@ class ApplicationPolicy
       when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
         scope
       when scope.respond_to?(:for_bearer) && bearer.has_role?(:product, :user, :license)
-        scope.for_bearer bearer.id
+        scope.for_bearer(bearer.class.name, bearer.id)
       when scope.respond_to?(:for_product) && bearer.has_role?(:product)
-        scope.for_product bearer.id
+        scope.for_product(bearer.id)
       when scope.respond_to?(:for_user) && bearer.has_role?(:user)
-        scope.for_user bearer.id
+        scope.for_user(bearer.id)
       when scope.respond_to?(:for_license) && bearer.has_role?(:license)
-        scope.for_license bearer.id
+        scope.for_license(bearer.id)
       else
         scope.none
       end
