@@ -10,7 +10,6 @@ class PruneWebhookEventsWorker
                       .group('accounts.id')
                       .having('count(webhook_events.id) > 0')
 
-
     Keygen.logger.info "[workers.prune-webhook-events] Starting: accounts=#{accounts.count}"
 
     accounts.find_each do |account|
