@@ -28,6 +28,10 @@ class Product < ApplicationRecord
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
+  def second_factor_supported?
+    false
+  end
+
   private
 
   def set_role

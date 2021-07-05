@@ -61,6 +61,26 @@ module Api::V1
     def destroy
       authorize @product
 
+      if current_bearer.second_factor_supported? && current_bearer.second_factor_enabled?
+        otp = product_meta[:otp]
+        if otp.nil?
+          render_unauthorized detail: 'second factor is required', code: 'OTP_REQUIRED', source: { pointer: '/meta/otp' } and return
+        end
+
+        if !current_bearer.verify_second_factor(otp)
+          render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+        end
+      else
+        name = product_meta[:confirmation]
+        if name.nil?
+          render_unauthorized detail: 'confirmation is required', code: 'CONFIRMATION_REQUIRED', source: { pointer: '/meta/confirmation' } and return
+        end
+
+        if name != @product.name
+          render_unauthorized detail: 'confirmation must match', code: 'CONFIRMATION_INVALID', source: { pointer: '/meta/confirmation' } and return
+        end
+      end
+
       BroadcastEventService.call(
         event: "product.deleted",
         account: current_account,
@@ -107,6 +127,13 @@ module Api::V1
               items type: :string
             end
           end
+        end
+      end
+
+      on :destroy do
+        param :meta, type: :hash, optional: true do
+          param :confirmation, type: :string, optional: true
+          param :otp, type: :string, optional: true
         end
       end
     end

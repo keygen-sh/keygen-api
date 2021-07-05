@@ -70,6 +70,9 @@ When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, bod
   parse_placeholders! body
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
+
+  # Wait for all async deletion workers to finish
+  DestroyModelWorker.drain
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|

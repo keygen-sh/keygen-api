@@ -257,6 +257,10 @@ class License < ApplicationRecord
     save
   end
 
+  def second_factor_supported?
+    false
+  end
+
   private
 
   attr_accessor :seed_key

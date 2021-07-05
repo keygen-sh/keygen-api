@@ -122,6 +122,10 @@ class User < ApplicationRecord
     }
   end
 
+  def second_factor_supported?
+    true
+  end
+
   def second_factor_enabled?
     return false if second_factors.enabled.empty?
 

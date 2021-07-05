@@ -17,13 +17,153 @@ Feature: Delete product
     When I send a DELETE request to "/accounts/test1/products/$0"
     Then the response status should be "403"
 
-  Scenario: Admin deletes one of their products
+  Scenario: Admin deletes one of their products (2FA disabled, without confirmation)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "products"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$2"
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "confirmation is required",
+        "code": "CONFIRMATION_REQUIRED",
+        "source": {
+          "pointer": "/meta/confirmation"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their products (2FA disabled, with invalid confirmation)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "products"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/products/$2" with the following:
+      """
+      {
+        "meta": {
+          "confirmation": "Invalid Name"
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "confirmation must match",
+        "code": "CONFIRMATION_INVALID",
+        "source": {
+          "pointer": "/meta/confirmation"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their products (2FA disabled, with valid confirmation)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "products"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/products/$2" with the following:
+      """
+      {
+        "meta": {
+          "confirmation": "$products[2].name"
+        }
+      }
+      """
+    Then the response status should be "204"
+    And the current account should have 2 "products"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their products (2FA enabled, without OTP)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "products"
+    And I use an authentication token
+    And I have 2FA enabled
+    When I send a DELETE request to "/accounts/test1/products/$2"
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "second factor is required",
+        "code": "OTP_REQUIRED",
+        "source": {
+          "pointer": "/meta/otp"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their products (2FA enabled, with invalid OTP)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "products"
+    And I use an authentication token
+    And I have 2FA enabled
+    When I send a DELETE request to "/accounts/test1/products/$2" with the following:
+      """
+      {
+        "meta": {
+          "otp": "000000"
+        }
+      }
+      """
+    Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "second factor must be valid",
+        "code": "OTP_INVALID",
+        "source": {
+          "pointer": "/meta/otp"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin deletes one of their products (2FA enabled, with valid OTP)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "products"
+    And I use an authentication token
+    And I have 2FA enabled
+    When I send a DELETE request to "/accounts/test1/products/$2" with the following:
+      """
+      {
+        "meta": {
+          "otp": "$otp"
+        }
+      }
+      """
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
@@ -51,7 +191,14 @@ Feature: Delete product
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "products"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/products/$2"
+    When I send a DELETE request to "/accounts/test1/products/$1" with the following:
+      """
+      {
+        "meta": {
+          "confirmation": "$products[1].name"
+        }
+      }
+      """
     Then the response status should be "204"
     And the current account should have 2 "products"
     And sidekiq should have 1 "webhook" job
