@@ -116,7 +116,7 @@ module Keygen
 
         # This could be a Rack::BodyProxy or an array of JSON responses (see below middlewares)
         begin
-          res_body =
+          body =
             if res.respond_to?(:body)
               res.body
             else
@@ -127,7 +127,18 @@ module Keygen
         end
 
         begin
-          res_sig = headers['X-Signature'] || headers['Keygen-Signature']
+          sig = headers['X-Signature'] || headers['Keygen-Signature']
+        rescue => e
+          Keygen.logger.exception(e)
+        end
+
+        begin
+          user_agent =
+            if req.user_agent.valid_encoding?
+              req.user_agent.encode('ascii', invalid: :replace, undef: :replace)
+            else
+              nil
+            end
         rescue => e
           Keygen.logger.exception(e)
         end
@@ -141,16 +152,16 @@ module Keygen
             resource_id: resource&.id,
             request_time: http_date || Time.current,
             request_id: req.request_id,
-            body: filtered_req_body,
-            url: req.original_fullpath,
+            user_agent: user_agent,
+            ip: req.remote_ip,
             method: req.method,
-            ip: req.headers['cf-connecting-ip'] || req.remote_ip,
-            user_agent: req.user_agent,
+            url: req.original_fullpath,
+            body: filtered_req_body,
           },
           {
-            body: res_body,
-            signature: res_sig,
+            signature: sig,
             status: status,
+            body: body,
           }
         )
 
