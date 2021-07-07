@@ -5,7 +5,11 @@ class LicensePolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product, :user)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      (bearer.has_role?(:product) &&
+        resource.all? { |r| r.policy.product_id == bearer.id }) ||
+      (bearer.has_role?(:user) &&
+        resource.all? { |r| r.user_id == bearer.id })
   end
 
   def show?
