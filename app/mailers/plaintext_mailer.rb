@@ -156,7 +156,7 @@ class PlaintextMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. You can bookmark this link to quickly log into your account: https://app.keygen.sh/login?account=#{account.id}
+        p.s. You can bookmark this link to quickly log into your account: https://app.keygen.sh/login?account=#{account.slug}
       TXT
     )
   end
