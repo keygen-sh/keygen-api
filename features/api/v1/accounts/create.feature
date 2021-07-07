@@ -992,6 +992,41 @@ Feature: Create account
     Then the response status should be "400"
     And the JSON response should be an array of 1 errors
 
+  Scenario: Anonymous creates an account without an admin role (role param should be noop)
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Fathom",
+            "slug": "fathom"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "pjrvs@fathem.example",
+                    "password": "pr1vat3",
+                    "role": "user"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
   Scenario: Anonymous attempts to create a duplicate account with an invalid plan
     Given there exists an account "test1"
     When I send a POST request to "/accounts" with the following:
