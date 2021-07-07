@@ -992,7 +992,7 @@ Feature: Create account
     Then the response status should be "400"
     And the JSON response should be an array of 1 errors
 
-  Scenario: Anonymous creates an account without an admin role (role param should be noop)
+  Scenario: Anonymous creates an account without an admin role (role param should be a noop)
     When I send a POST request to "/accounts" with the following:
       """
       {
@@ -1014,7 +1014,7 @@ Feature: Create account
                 {
                   "type": "user",
                   "attributes": {
-                    "email": "pjrvs@fathem.example",
+                    "email": "pjrvs@fathom.example",
                     "password": "pr1vat3",
                     "role": "user"
                   }
