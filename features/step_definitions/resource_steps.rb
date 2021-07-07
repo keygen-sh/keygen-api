@@ -593,6 +593,16 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
 end
 
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
+  parse_placeholders!(body)
+
+  account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+  model   = account.send(model_name.pluralize).send(index_in_words)
+  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+
+  expect(model.attributes).to include attrs
+end
+
 Given /^the (\w+) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
   release  = @account.releases.send(named_index)
   expected = named_scenario == 'be'
