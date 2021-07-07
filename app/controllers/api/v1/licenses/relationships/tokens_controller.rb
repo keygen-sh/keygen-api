@@ -40,7 +40,7 @@ module Api::V1::Licenses::Relationships
       authorize @license, :list_tokens?
 
       # FIXME(ezekg) Skipping the policy scope here so that products can see
-      #              tokens which belong to licenses they own. Current behavior
+      #              tokens that belong to licenses they own. Current behavior
       #              is that non-admin bearers can only see their own tokens.
       #              The scoping is happening within the main app policy.
       @tokens = apply_scopes(@license.tokens)

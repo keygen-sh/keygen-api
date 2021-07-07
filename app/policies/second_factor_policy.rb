@@ -5,7 +5,9 @@ class SecondFactorPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :user)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      (bearer.has_role?(:user) &&
+        resource.all? { |r| r.user_id == bearer.id })
   end
 
   def show?

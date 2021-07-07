@@ -5,7 +5,9 @@ class PolicyPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      (bearer.has_role?(:product) &&
+        resource.all? { |r| r.product_id == bearer.id })
   end
 
   def show?
