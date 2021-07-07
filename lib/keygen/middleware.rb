@@ -134,7 +134,7 @@ module Keygen
 
         begin
           user_agent =
-            if req.user_agent.valid_encoding?
+            if req.user_agent.present? && req.user_agent.valid_encoding?
               req.user_agent.encode('ascii', invalid: :replace, undef: :replace)
             else
               nil
