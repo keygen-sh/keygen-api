@@ -19,6 +19,8 @@ class Product < ApplicationRecord
   has_many :users, -> { select('"users".*, "users"."id", "users"."created_at"').distinct('"users"."id"').reorder(Arel.sql('"users"."created_at" ASC')) }, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :releases, inverse_of: :product
+  has_many :release_platforms, through: :releases, source: :platform
+  has_many :release_channels, through: :releases, source: :channel
   has_one :role, as: :resource, dependent: :destroy
 
   after_create :set_role
