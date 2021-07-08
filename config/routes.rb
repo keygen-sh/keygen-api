@@ -206,6 +206,9 @@ Rails.application.routes.draw do
           end
         end
 
+        resources "platforms", only: [:index, :show]
+        resources "channels", only: [:index, :show]
+
         resources "entitlements"
 
         resources "webhook_endpoints", path: "webhook-endpoints"
