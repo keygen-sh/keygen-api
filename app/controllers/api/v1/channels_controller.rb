@@ -25,7 +25,9 @@ module Api::V1
     attr_reader :channel
 
     def set_channel
-      @channel = current_account.release_channels.find params[:id]
+      scoped_channels = policy_scope(current_account.release_channels)
+
+      @channel = scoped_channels.find params[:id]
     end
   end
 end
