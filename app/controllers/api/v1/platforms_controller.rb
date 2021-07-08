@@ -25,7 +25,9 @@ module Api::V1
     attr_reader :platform
 
     def set_platform
-      @platform = current_account.release_platforms.find params[:id]
+      scoped_platforms = policy_scope(current_account.release_platforms)
+
+      @platform = scoped_platforms.find params[:id]
     end
   end
 end
