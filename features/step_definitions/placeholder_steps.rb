@@ -25,9 +25,12 @@ PLACEHOLDERS = %w[
   policy_entitlement
   license_entitlement
   release
-  release_platforms
-  release_filetypes
-  release_channels
+  release_platform
+  platform
+  release_filetype
+  filetype
+  release_channel
+  channel
   release_entitlement_constraint
   release_download_link
   release_upgrade_link
@@ -167,6 +170,12 @@ def parse_path_placeholders!(str)
           case resource.underscore
           when "constraints"
             @account.release_entitlement_constraints.send(:[], index.to_i).id
+          when "platforms"
+            @account.release_platforms.send(:[], index.to_i).id
+          when "channels"
+            @account.release_channels.send(:[], index.to_i).id
+          when "filetypes"
+            @account.release_filetypes.send(:[], index.to_i).id
           when "request-logs"
             @account.request_logs.send(:[], index.to_i).id
           when "billing"
