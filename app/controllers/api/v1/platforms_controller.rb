@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+module Api::V1
+  class PlatformsController < Api::V1::BaseController
+    before_action :scope_to_current_account!
+    before_action :require_active_subscription!
+    before_action :authenticate_with_token!
+    before_action :set_platform, only: [:show]
+
+    def index
+      platforms = policy_scope apply_scopes(current_account.release_platforms)
+      authorize platforms
+
+      render jsonapi: platforms
+    end
+
+    def show
+      authorize platform
+
+      render jsonapi: platform
+    end
+
+    private
+
+    attr_reader :platform
+
+    def set_platform
+      @platform = current_account.release_platforms.find params[:id]
+    end
+  end
+end
