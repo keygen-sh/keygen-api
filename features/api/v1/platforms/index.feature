@@ -17,7 +17,7 @@ Feature: List release platforms
     When I send a GET request to "/accounts/test1/platforms"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves the platforms for a product
+  Scenario: Admin retrieves their release platforms (all have associated releases)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -38,11 +38,32 @@ Feature: List release platforms
     Then the response status should be "200"
     And the JSON response should be an array with 3 "platforms"
 
-  Scenario: Product retrieves the platforms for a product
+  Scenario: Admin retrieves their release platforms (some have associated  releases)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | stable   |
+    And the current account has the following "release-platform" rows:
+      | id                                   | name    | key     |
+      | 1663f35c-f682-45f7-a7e3-757759dc7d0c | Android | android |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/platforms"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "platforms"
+
+  Scenario: Product retrieves their release platforms
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
     And the current account has the following "release" rows:
       | product_id                           | version                    | filename                        | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.zip      | zip      | darwin   | alpha    |
@@ -66,6 +87,7 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-macOS-1624654615.zip   | zip      | darwin   | dev      |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-Windows-1624654615.zip | zip      | win32    | dev      |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-Linux-1624654615.zip   | zip      | linux    | dev      |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0                      | Test-App-Android.apk            | apk      | android  | stable   |
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/platforms"

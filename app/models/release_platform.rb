@@ -33,4 +33,6 @@ class ReleasePlatform < ApplicationRecord
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: id }).distinct
   }
+
+  scope :with_releases, -> { joins(:releases).distinct }
 end
