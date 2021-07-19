@@ -73,7 +73,7 @@ class ApplicationController < ActionController::API
     end
   }
 
-  rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden }
+  rescue_from Pundit::NotAuthorizedError, with: -> (err) { render_forbidden(detail: 'You do not have permission to complete the request (resource does not belong to the token bearer)') }
   rescue_from Pundit::NotDefinedError, with: -> (err) { render_not_found }
 
   attr_accessor :current_account
