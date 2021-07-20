@@ -76,6 +76,8 @@ module Api::V1::Releases::Actions
         **kwargs,
       )
 
+      Keygen.logger.debug "[releases.check_for_upgrade] Upgrade: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version}"
+
       if upgrade.next_release.present?
         authorize upgrade.next_release, :download?
 
