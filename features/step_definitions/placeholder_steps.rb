@@ -112,9 +112,12 @@ def parse_placeholders!(str)
       else
         model =
           if @account && resource.singularize != 'account'
-            @account.send(resource.underscore)
-              .all
-              .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            case resource.singularize
+            when 'constraint'
+              @account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            else
+              @account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            end
           else
             resource.singularize
               .underscore

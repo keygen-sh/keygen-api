@@ -46,30 +46,26 @@ module Api::V1::Releases::Relationships
     def detach
       authorize release, :detach_constraints?
 
-      entitlement_ids = constraint_params
-        .map { |e| e[:entitlement_id] }
-        .compact
-        .uniq
-
-      release_constraints = release.constraints.where(entitlement_id: entitlement_ids)
+      constraint_ids = constraint_params.collect { |e| e[:id] }.compact
+      constraints = release.constraints.where(id: constraint_ids)
 
       # Ensure all entitlement constraints exist. Deleting non-existent constraints would be
       # a noop, but responding with a 2xx status code is a confusing DX.
-      if release_constraints.size != entitlement_ids.size
-        release_entitlement_ids = release_constraints.pluck(:entitlement_id)
-        invalid_entitlement_ids = entitlement_ids - release_entitlement_ids
-        invalid_entitlement_id  = invalid_entitlement_ids.first
-        invalid_entitlement_idx = entitlement_ids.find_index(invalid_entitlement_id)
+      if constraints.size != constraint_ids.size
+        existing_constraint_ids = constraints.pluck(:id)
+        invalid_constraint_ids = constraint_ids - existing_constraint_ids
+        invalid_constraint_id = invalid_constraint_ids.first
+        invalid_idx = constraint_ids.find_index(invalid_constraint_id)
 
         return render_unprocessable_entity(
-          detail: "constraint entitlement '#{invalid_entitlement_id}' relationship not found",
+          detail: "constraint '#{invalid_constraint_id}' relationship not found",
           source: {
-            pointer: "/data/#{invalid_entitlement_idx}/relationships/entitlement"
+            pointer: "/data/#{invalid_idx}"
           }
         )
       end
 
-      detached = release.constraints.delete(release_constraints)
+      detached = release.constraints.delete(constraints)
 
       BroadcastEventService.call(
         event: 'release.constraints.detached',
@@ -114,14 +110,7 @@ module Api::V1::Releases::Relationships
         param :data, type: :array do
           items type: :hash do
             param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
-            param :relationships, type: :hash do
-              param :entitlement, type: :hash do
-                param :data, type: :hash do
-                  param :type, type: :string, inclusion: %w[entitlement entitlements]
-                  param :id, type: :string
-                end
-              end
-            end
+            param :id, type: :string
           end
         end
       end

@@ -464,30 +464,9 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          },
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[1]" }
-              }
-            }
-          },
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[2]" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[1]" },
+          { "type": "constraint", "id": "$constraints[2]" }
         ]
       }
       """
@@ -498,7 +477,7 @@ Feature: Release constraints relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to detach constraints from a release with an invalid entitlement ID
+  Scenario: Admin attempts to detach constraints from a release with an invalid constraint ID
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -509,30 +488,9 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          },
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[1]" }
-              }
-            }
-          },
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "f40913d3-a786-407f-8dd6-94664b95ade8" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[1]" },
+          { "type": "constraint", "id": "f40913d3-a786-407f-8dd6-94664b95ade8" }
         ]
       }
       """
@@ -541,9 +499,9 @@ Feature: Release constraints relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "constraint entitlement 'f40913d3-a786-407f-8dd6-94664b95ade8' relationship not found",
+        "detail": "constraint 'f40913d3-a786-407f-8dd6-94664b95ade8' relationship not found",
         "source": {
-          "pointer": "/data/2/relationships/entitlement"
+          "pointer": "/data/2"
         }
       }
       """
@@ -564,14 +522,7 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" }
         ]
       }
       """
@@ -592,26 +543,14 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          },
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[2]" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" },
+          { "type": "constraint", "id": "$constraints[2]" }
         ]
       }
       """
     Then the response status should be "204"
+    And the current account should have 2 "release-entitlement-constraints"
+    And the current account should have 4 "entitlements"
     And sidekiq should have 3 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -632,14 +571,7 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" }
         ]
       }
       """
@@ -661,14 +593,7 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          {
-            "type": "constraint",
-            "relationships": {
-              "entitlement": {
-                "data": { "type": "entitlement", "id": "$entitlements[0]" }
-              }
-            }
-          }
+          { "type": "constraint", "id": "$constraints[0]" }
         ]
       }
       """
@@ -693,7 +618,7 @@ Feature: Release constraints relationship
       """
       {
         "data": [
-          { "type": "entitlements", "id": "$entitlements[0]" }
+          { "type": "constraint", "id": "$constraints[0]" }
         ]
       }
       """
