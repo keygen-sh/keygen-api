@@ -206,6 +206,10 @@ class Release < ApplicationRecord
     Rails.cache.fetch(blob_cache_key)
   end
 
+  def yanked?
+    yanked_at.present?
+  end
+
   def semver
     @semver ||= Semverse::Version.new(version)
   rescue Semverse::InvalidVersionFormat
