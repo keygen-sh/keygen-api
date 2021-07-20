@@ -28,6 +28,8 @@ module Api::V1
       scoped_channels = policy_scope(current_account.release_channels)
 
       @channel = scoped_channels.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = channel
     end
   end
 end
