@@ -67,6 +67,8 @@ EVENT_TYPES = %w[
   release.upgraded
   release.uploaded
   release.yanked
+  release.constraints.attached
+  release.constraints.detached
   *
 ].freeze
 

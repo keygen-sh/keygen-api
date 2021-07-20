@@ -71,6 +71,8 @@ class Metric < ApplicationRecord
     release.upgraded
     release.uploaded
     release.yanked
+    release.constraints.attached
+    release.constraints.detached
   ].freeze
 
   belongs_to :account
