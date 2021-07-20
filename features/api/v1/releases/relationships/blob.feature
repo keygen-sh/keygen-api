@@ -102,25 +102,18 @@ Feature: Release blob relationship
       }
       """
 
-  Scenario: Admin retrieves the blob for a release that has not been uploaded
+  Scenario: Admin retrieves the blob for a release that has been yanked
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has a blob that is timing out
+    And the first "release" has a blob that is not uploaded
+    And the first "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/blob"
-    Then the response status should be "404"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Not found",
-        "detail": "does not exist or is unavailable",
-        "source": {
-          "pointer": "/data/relationships/blob"
-        },
-        "code": "RELEASE_BLOB_UNAVAILABLE"
-      }
-      """
+    Then the response status should be "403"
 
   Scenario: Product retrieves the blob for a release of their product
     Given the current account is "test1"
@@ -660,6 +653,19 @@ Feature: Release blob relationship
     Then the response status should be "307"
     And the JSON response should be a "release-upload-link"
 
+  Scenario: Admin uploads a blob for a release that has been yanked
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is uploaded
+    And the first "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "403"
+
   Scenario: Product uploads a blob for a release of their product
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -748,6 +754,19 @@ Feature: Release blob relationship
     When I send a DELETE request to "/accounts/test1/releases/$0/blob"
     Then the response status should be "204"
     And the first "release" should be yanked
+
+  Scenario: Admin yanks a blob for a release (yanked)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has a blob that is not uploaded
+    And the first "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/releases/$0/blob"
+    Then the response status should be "403"
 
   Scenario: Product yanks a blob for a release of their product
     Given the current account is "test1"
