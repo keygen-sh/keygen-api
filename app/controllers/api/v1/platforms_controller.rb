@@ -28,6 +28,8 @@ module Api::V1
       scoped_platforms = policy_scope(current_account.release_platforms)
 
       @platform = scoped_platforms.find params[:id]
+
+      Keygen::Store::Request.store[:current_resource] = plaftorm
     end
   end
 end
