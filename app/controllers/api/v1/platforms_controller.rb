@@ -29,7 +29,7 @@ module Api::V1
 
       @platform = scoped_platforms.find params[:id]
 
-      Keygen::Store::Request.store[:current_resource] = plaftorm
+      Keygen::Store::Request.store[:current_resource] = platform
     end
   end
 end
