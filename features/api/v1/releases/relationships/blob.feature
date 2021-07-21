@@ -113,7 +113,17 @@ Feature: Release blob relationship
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/blob"
-    Then the response status should be "403"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "is yanked",
+        "source": {
+          "pointer": "/data/attributes/yanked"
+        }
+      }
+      """
 
   Scenario: Product retrieves the blob for a release of their product
     Given the current account is "test1"
@@ -664,7 +674,17 @@ Feature: Release blob relationship
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/releases/$0/blob"
-    Then the response status should be "403"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "is yanked",
+        "source": {
+          "pointer": "/data/attributes/yanked"
+        }
+      }
+      """
 
   Scenario: Product uploads a blob for a release of their product
     Given the current account is "test1"
@@ -766,7 +786,17 @@ Feature: Release blob relationship
       """
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/releases/$0/blob"
-    Then the response status should be "403"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "is yanked",
+        "source": {
+          "pointer": "/data/attributes/yanked"
+        }
+      }
+      """
 
   Scenario: Product yanks a blob for a release of their product
     Given the current account is "test1"

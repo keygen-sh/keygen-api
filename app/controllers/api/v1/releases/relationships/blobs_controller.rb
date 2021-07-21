@@ -18,6 +18,9 @@ module Api::V1::Releases::Relationships
         render_bad_request detail: 'must be less than or equal to 604800 (1 week)', source: { parameter: :ttl } and return
       end
 
+      return render_unprocessable_entity detail: 'is yanked', source: { pointer: '/data/attributes/yanked' } if
+        release.yanked?
+
       # Assert object exists before redirecting to S3
       if !release.blob?
         s3  = Aws::S3::Client.new
@@ -52,6 +55,9 @@ module Api::V1::Releases::Relationships
     def create
       authorize release, :upload?
 
+      return render_unprocessable_entity detail: 'is yanked', source: { pointer: '/data/attributes/yanked' } if
+        release.yanked?
+
       signer = Aws::S3::Presigner.new
       ttl    = 60.seconds.to_i
       url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
@@ -68,6 +74,9 @@ module Api::V1::Releases::Relationships
 
     def destroy
       authorize release, :yank?
+
+      return render_unprocessable_entity detail: 'is yanked', source: { pointer: '/data/attributes/yanked' } if
+        release.yanked?
 
       s3 = Aws::S3::Client.new
       s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
