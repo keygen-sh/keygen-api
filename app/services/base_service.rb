@@ -5,7 +5,7 @@ class BaseService
     raise NotImplementedError, '#call must be implemented by the service'
   end
 
-  def self.call(**kwargs)
-    new(**kwargs).call
+  def self.call(...)
+    new(...).call
   end
 end
