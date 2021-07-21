@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 ruby '2.7.4'
 
-gem 'rails', '~> 6.1.3.2'
+gem 'rails', '~> 6.1.4'
 gem 'pg'
 gem 'puma', '~> 5.3.1'
 gem 'bcrypt', '~> 3.1.7'
