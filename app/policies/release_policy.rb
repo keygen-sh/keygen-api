@@ -37,9 +37,6 @@ class ReleasePolicy < ApplicationPolicy
   def download?
     assert_account_scoped!
 
-    return false if
-      resource.yanked?
-
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
@@ -54,18 +51,12 @@ class ReleasePolicy < ApplicationPolicy
   def upload?
     assert_account_scoped!
 
-    return false if
-      resource.yanked?
-
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
   end
 
   def yank?
     assert_account_scoped!
-
-    return false if
-      resource.yanked?
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
