@@ -31,6 +31,7 @@ class Account < ApplicationRecord
   has_many :release_download_links
   has_many :release_upgrade_links
   has_many :release_upload_links
+  has_many :release_artifacts
   has_one :billing
 
   accepts_nested_attributes_for :users, limit: 10

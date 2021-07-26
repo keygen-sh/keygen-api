@@ -174,6 +174,7 @@ Rails.application.routes.draw do
             resources "machines", only: [:index, :show]
             resources "tokens", only: [:index, :show]
             resources "users", only: [:index, :show]
+            resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
             resources "platforms", only: [:index, :show]
             resources "releases", only: [:index, :show]
             resources "channels", only: [:index, :show]
@@ -191,7 +192,7 @@ Rails.application.routes.draw do
                 delete "/", to: "constraints#detach", as: "detach"
               end
             end
-            resource "blob", only: [:show, :destroy] do
+            resource "artifact", constraints: { id: /.*/ }, only: [:show, :destroy] do
               put :create
             end
             resource "product", only: [:show]
@@ -208,6 +209,7 @@ Rails.application.routes.draw do
           end
         end
 
+        resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
         resources "platforms", only: [:index, :show]
         resources "channels", only: [:index, :show]
 

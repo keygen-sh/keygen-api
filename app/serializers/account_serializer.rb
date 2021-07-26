@@ -59,6 +59,11 @@ class AccountSerializer < BaseSerializer
       @url_helpers.v1_account_releases_path @object
     end
   end
+  relationship :artifacts do
+    link :related do
+      @url_helpers.v1_account_artifacts_path @object
+    end
+  end
   relationship :policies do
     link :related do
       @url_helpers.v1_account_policies_path @object

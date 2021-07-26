@@ -40,15 +40,12 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link" with the following attributes:
-      """
-      { "ttl": 60 }
-      """
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -65,13 +62,13 @@ Feature: Release upgrade actions
     And the current account has the following "release" rows:
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
-  Scenario: Admin retrieves an upgrade for a product release (no blob available)
+  Scenario: Admin retrieves an upgrade for a product release (no artifact available)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     |
@@ -80,13 +77,13 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-    And the all "releases" have blobs that are not uploaded
+    And the all "releases" have artifacts that are not uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
-  Scenario: Admin retrieves an upgrade for a product release (blob timing out)
+  Scenario: Admin retrieves an upgrade for a product release (artifact timing out)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     |
@@ -95,7 +92,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-    And the all "releases" have blobs that are timing out
+    And the all "releases" have artifacts that are timing out
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
@@ -114,15 +111,12 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link" with the following attributes:
-      """
-      { "ttl": 60 }
-      """
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -140,7 +134,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 0.1.0        | Test-App-0.1.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.exe        | exe      | win32    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$1/actions/upgrade"
@@ -156,7 +150,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-B-1.0.0.exe      | exe      | win32    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-B-2.0.0.exe      | exe      | win32    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
@@ -176,17 +170,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link" with the following attributes:
-      """
-      { "ttl": 60 }
-      """
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -208,7 +199,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
@@ -233,7 +224,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
@@ -258,7 +249,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -275,7 +266,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "entitlement"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -304,7 +295,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -322,7 +313,7 @@ Feature: Release upgrade actions
       | product_id                           | version       | filename                   | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | Test-App-1.0.0-alpha.1.dmg | dmg      | macos    | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 2 "entitlements"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -365,7 +356,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade?channel=alpha"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -383,7 +374,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 2 "entitlements"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -429,7 +420,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 2 "release-entitlement-constraints" for the first "release"
@@ -453,7 +444,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
@@ -462,10 +453,7 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade?channel=beta"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link" with the following attributes:
-      """
-      { "ttl": 60 }
-      """
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -484,7 +472,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
@@ -507,7 +495,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.exe        | exe      | win32    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.exe        | exe      | win32    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
@@ -530,7 +518,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.tar.gz     | tar.gz   | linux    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.2.0.tar.gz     | tar.gz   | linux    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -549,7 +537,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "entitlement"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -580,7 +568,7 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -598,7 +586,7 @@ Feature: Release upgrade actions
       | product_id                           | version       | filename                   | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | Test-App-1.0.0-alpha.1.dmg | dmg      | macos    | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 2 "entitlements"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -643,7 +631,7 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -661,7 +649,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 2 "entitlements"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -709,7 +697,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 2 "release-entitlement-constraints" for the first "release"
@@ -742,12 +730,12 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.1.1&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -765,7 +753,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=win32&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
@@ -780,7 +768,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
@@ -795,7 +783,7 @@ Feature: Release upgrade actions
       | product_id                           | version      | filename                  | filetype | platform | channel  |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&platform=macos&filetype=zip&product=4f1c06e0-a4b2-4e3e-8a19-f2ce7f2f6e62"
@@ -812,12 +800,12 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -837,12 +825,12 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 3.0.0        | Test-App-3.0.0.zip        | zip      | macos    | stable   |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=zip&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -878,7 +866,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "license-entitlement" with the following:
@@ -899,7 +887,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=2.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -934,7 +922,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "license-entitlement" with the following:
@@ -975,7 +963,7 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   | APP_V1       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   | APP_V2       |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   | APP_V2       |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "license-entitlement" with the following:
@@ -989,7 +977,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&constraint=1.0&platform=macos&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -1045,14 +1033,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.6.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -1108,14 +1096,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-dev%2bbuild.0&channel=rc&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -1170,14 +1158,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.2-beta.1               | Test-App-2.0.2-beta.1.dmg  | dmg      | darwin   | beta     |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=2.0.0&channel=beta&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -1233,14 +1221,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0-alpha.1&channel=alpha&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {
@@ -1296,14 +1284,14 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.3-alpha.1              | Test-App-2.0.3-alpha.1.dmg | dmg      | darwin   | alpha    |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-dev+build.1624654615 | Test-App-1624654615.dmg    | dmg      | darwin   | dev      |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.1.0-beta.1               | Test-App-2.1.0-beta.1.dmg  | dmg      | darwin   | beta     |
-    And all "releases" have blobs that are uploaded
+    And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.7.0-dev%2bbuild.1624653614&channel=dev&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be a "release-upgrade-link"
+    And the JSON response should be an "artifact"
     And the JSON response should contain meta which includes the following:
       """
       {

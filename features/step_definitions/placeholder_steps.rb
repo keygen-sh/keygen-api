@@ -35,6 +35,8 @@ PLACEHOLDERS = %w[
   release_download_link
   release_upgrade_link
   release_upload_link
+  release_artifact
+  artifact
   constraint
   current
   crypt
@@ -179,6 +181,8 @@ def parse_path_placeholders!(str)
             @account.release_channels.send(:[], index.to_i).id
           when "filetypes"
             @account.release_filetypes.send(:[], index.to_i).id
+          when "artifacts"
+            @account.release_artifacts.send(:[], index.to_i).id
           when "request-logs"
             @account.request_logs.send(:[], index.to_i).id
           when "billing"
