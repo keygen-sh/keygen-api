@@ -1,5 +1,5 @@
 @api/v1
-Feature: List release platforms
+Feature: List release artifacts
 
   Background:
     Given the following "accounts" exist:
@@ -14,10 +14,10 @@ Feature: List release platforms
     And the current account is "test1"
     And the current account has 1 "product"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves their release platforms (all have associated releases)
+  Scenario: Admin retrieves their release artifacts (all releases have artifacts)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -32,13 +32,14 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | stable   |
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the JSON response should be an array with 7 "artifacts"
 
-  Scenario: Admin retrieves their release platforms (some have associated releases)
+  Scenario: Admin retrieves their release artifacts (some releases have artifacts)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -49,16 +50,15 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip        | zip      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | stable   |
-    And the current account has the following "release-platform" rows:
-      | id                                   | name    | key     |
-      | 1663f35c-f682-45f7-a7e3-757759dc7d0c | Android | android |
+    And the first "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is uploaded
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the JSON response should be an array with 2 "artifacts"
 
-  Scenario: Product retrieves their release platforms
+  Scenario: Product retrieves their release artifacts
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -71,30 +71,31 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.zip              | zip      | darwin   | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.zip              | zip      | darwin   | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1                      | Test-App-1.1.1.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2                      | Test-App-1.1.2.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0                      | Test-App-1.2.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0                      | Test-App-1.3.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.zip       | zip      | darwin   | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.zip       | zip      | darwin   | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.zip       | zip      | darwin   | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0                      | Test-App-1.4.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0                      | Test-App-1.5.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0                      | Test-App-1.6.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0-dev+build.1624653614 | Test-App-1624653614.zip         | zip      | darwin   | dev      |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0                      | Test-App-1.7.0.zip              | zip      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-macOS-1624654615.zip   | zip      | darwin   | dev      |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-Windows-1624654615.zip | zip      | win32    | dev      |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-dev+build.1624654615 | Test-App-Linux-1624654615.zip   | zip      | linux    | dev      |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.1.0                      | Test-App-1.1.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.1.1                      | Test-App-1.1.1.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.1.2                      | Test-App-1.1.2.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.2.0                      | Test-App-1.2.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.3.0                      | Test-App-1.3.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.4.0-beta.1               | Test-App-1.4.0-beta.1.zip       | zip      | darwin   | beta     |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.4.0-beta.2               | Test-App-1.4.0-beta.2.zip       | zip      | darwin   | beta     |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.4.0-beta.3               | Test-App-1.4.0-beta.3.zip       | zip      | darwin   | beta     |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.4.0                      | Test-App-1.4.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.5.0                      | Test-App-1.5.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.6.0                      | Test-App-1.6.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.7.0-dev+build.1624653614 | Test-App-1624653614.zip         | zip      | darwin   | dev      |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.7.0                      | Test-App-1.7.0.zip              | zip      | darwin   | stable   |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0-dev+build.1624654615 | Test-App-macOS-1624654615.zip   | zip      | darwin   | dev      |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0-dev+build.1624654615 | Test-App-Windows-1624654615.zip | zip      | win32    | dev      |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0-dev+build.1624654615 | Test-App-Linux-1624654615.zip   | zip      | linux    | dev      |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0                      | Test-App-Android.apk            | apk      | android  | stable   |
+    And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "platforms"
+    And the JSON response should be an array with 5 "artifacts"
 
-  Scenario: Product retrieves the platforms of another product
+  Scenario: Product retrieves the artifacts of another product
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -105,63 +106,68 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
+    And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: User attempts to retrieve the platforms for a product (licensed)
+  Scenario: User attempts to retrieve the artifacts for a product (licensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
+    And the current account has 2 "releases" for an existing "product"
+    And all "releases" have artifacts that are uploaded
     And I am a user of account "test1"
     And the current user has 1 "license"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "platform"
+    And the JSON response should be an array of 2 "artifacts"
 
-  Scenario: User attempts to retrieve the platforms for a product (unlicensed)
+  Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
+    And all "releases" have artifacts that are uploaded
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: License attempts to retrieve the platforms for their product
+  Scenario: License attempts to retrieve the artifacts for their product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
+    And all "releases" have artifacts that are uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 1 "platform"
+    And the JSON response should be an array of 3 "artifacts"
 
-  Scenario: License attempts to retrieve the platforms for a different product
+  Scenario: License attempts to retrieve the artifacts for a different product
    Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "releases" for the first "product"
+    And all "releases" have artifacts that are uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 0 "platforms"
+    And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: Admin attempts to retrieve the platforms for a product of another account
+  Scenario: Admin attempts to retrieve the artifacts for a product of another account
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -171,7 +177,8 @@ Feature: List release platforms
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
+    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test2"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/platforms"
+    When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "401"

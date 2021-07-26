@@ -81,22 +81,8 @@ module Api::V1::Releases::Actions
       if upgrade.next_release.present?
         authorize upgrade.next_release, :download?
 
-        # Assert object exists before redirecting to S3
-        if !upgrade.next_release.blob?
-          s3  = Aws::S3::Client.new
-          obj = s3.head_object(bucket: 'keygen-dist', key: upgrade.next_release.s3_object_key)
-
-          # Cache it for next time
-          upgrade.next_release.blob = obj
-        end
-
-        # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
-        # NOTE(ezekg) Check obj.replication_status for EU
-        signer = Aws::S3::Presigner.new
-        ttl    = 60.seconds.to_i
-        url    = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: upgrade.next_release.s3_object_key, expires_in: ttl)
-        link   = upgrade.next_release.upgrade_links.create!(account: current_account, url: url, ttl: ttl)
-        meta   = {
+        download = ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, upgrade: true)
+        meta     = {
           current: upgrade.current_version,
           next: upgrade.next_version,
         }
@@ -108,7 +94,7 @@ module Api::V1::Releases::Actions
           meta: meta,
         )
 
-        render jsonapi: link, meta: meta, status: :see_other, location: link.url
+        render jsonapi: download.artifact, meta: meta, status: :see_other, location: download.redirect_url
       else
         if upgrade.current_release.present?
           authorize upgrade.current_release, :download?
@@ -120,9 +106,8 @@ module Api::V1::Releases::Actions
 
         render status: :no_content
       end
-    rescue Aws::S3::Errors::NotFound,
-           Timeout::Error => e
-      Keygen.logger.warn "[releases.check_for_upgrade] No blob found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
+    rescue ReleaseDownloadService::InvalidArtifactError => e
+      Keygen.logger.warn "[releases.check_for_upgrade] No artifact found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
 
       # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
       #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
