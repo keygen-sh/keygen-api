@@ -192,7 +192,7 @@ Rails.application.routes.draw do
                 delete "/", to: "constraints#detach", as: "detach"
               end
             end
-            resource "artifact", constraints: { id: /.*/ }, only: [:show, :destroy] do
+            resource "artifact", only: [:show, :destroy] do
               put :create
             end
             resource "product", only: [:show]
