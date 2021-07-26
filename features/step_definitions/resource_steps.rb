@@ -440,7 +440,7 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
-Given /^(?:the )?(\w+) "releases?" (?:has a|have) blobs? that (?:is|are) (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
+Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
   res = case named_scenario
         when 'uploaded'
           []
@@ -456,6 +456,18 @@ Given /^(?:the )?(\w+) "releases?" (?:has a|have) blobs? that (?:is|are) (upload
       head_object: res,
     }
   }
+
+  if named_index == 'all'
+    releases = @account.releases.all
+
+    releases.each do |release|
+      release.create_artifact!(key: release.filename, account: release.account, product: release.product)
+    end
+  else
+    release = @account.releases.send(named_index)
+
+    release.create_artifact!(key: release.filename, account: release.account, product: release.product)
+  end
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|

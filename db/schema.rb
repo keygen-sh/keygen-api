@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_25_161816) do
+ActiveRecord::Schema.define(version: 2021_07_26_131850) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -272,6 +272,19 @@ ActiveRecord::Schema.define(version: 2021_06_25_161816) do
     t.index ["billing_id", "created_at"], name: "index_receipts_on_billing_id_and_created_at"
     t.index ["created_at"], name: "index_receipts_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_receipts_on_id_and_created_at", unique: true
+  end
+
+  create_table "release_artifacts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "product_id", null: false
+    t.uuid "release_id", null: false
+    t.string "key", null: false
+    t.string "etag"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id", "product_id", "release_id"], name: "releases_artifacts_acct_prod_rel_idx", unique: true
+    t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
+    t.index ["key", "product_id", "account_id"], name: "index_release_artifacts_on_key_and_product_id_and_account_id", unique: true
   end
 
   create_table "release_channels", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

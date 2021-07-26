@@ -47,6 +47,10 @@ class Release < ApplicationRecord
     class_name: 'ReleaseUploadLink',
     inverse_of: :release,
     dependent: :delete_all
+  has_one :artifact,
+    class_name: 'ReleaseArtifact',
+    inverse_of: :release,
+    dependent: :delete
 
   accepts_nested_attributes_for :constraints, limit: 20
   accepts_nested_attributes_for :platform
@@ -154,6 +158,7 @@ class Release < ApplicationRecord
   scope :yanked, -> { where.not(yanked_at: nil) }
 
   scope :with_version, -> version { where(version: version) }
+  scope :with_artifact, -> { joins(:artifact) }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
@@ -183,27 +188,7 @@ class Release < ApplicationRecord
   end
 
   def s3_object_key
-    "blobs/#{account_id}/#{id}/#{filename}"
-  end
-
-  def blob_cache_key
-    "blobs:#{account_id}:#{id}:#{CACHE_KEY_VERSION}"
-  end
-
-  def blob=(s3_object)
-    if s3_object.present?
-      Rails.cache.write(blob_cache_key, s3_object.version_id, expires_in: 1.day)
-    else
-      Rails.cache.delete(blob_cache_key)
-    end
-  end
-
-  def blob?
-    Rails.cache.exist?(blob_cache_key)
-  end
-
-  def blob
-    Rails.cache.fetch(blob_cache_key)
+    "artifacts/#{account_id}/#{id}/#{filename}"
   end
 
   def yanked?

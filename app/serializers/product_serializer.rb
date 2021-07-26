@@ -64,6 +64,11 @@ class ProductSerializer < BaseSerializer
       @url_helpers.v1_account_product_releases_path @object.account_id, @object
     end
   end
+  relationship :artifacts do
+    link :related do
+      @url_helpers.v1_account_product_artifacts_path @object.account_id, @object
+    end
+  end
 
   link :self do
     @url_helpers.v1_account_product_path @object.account_id, @object

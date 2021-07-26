@@ -70,7 +70,7 @@ Feature: Show release platform
   Scenario: Product retrieves a platform for their product
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "release"
+    And the current account has 1 "release" for an existing "product"
     And I am a product of account "test1"
     And I use an authentication token
     And the current product has 1 "release"
