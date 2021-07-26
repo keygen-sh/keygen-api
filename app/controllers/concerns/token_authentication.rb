@@ -52,7 +52,7 @@ module TokenAuthentication
   end
 
   def request_http_token_authentication(realm = "Keygen", message = nil)
-    headers["WWW-Authenticate"] = %(Token realm="#{realm.gsub(/"/, "")}")
+    headers["WWW-Authenticate"] = %(Bearer realm="#{realm.gsub(/"/, "")}")
 
     case
     when current_token_value.nil?
