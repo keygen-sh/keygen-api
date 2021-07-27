@@ -91,7 +91,7 @@ module Keygen
 
         begin
           filtered_req_params = req.filtered_parameters.slice(:meta, :data)
-          filtered_req_body =
+          filtered_req_body   =
             if filtered_req_params.present?
               params = filtered_req_params.deep_transform_keys! { |k| k.to_s.camelize :lower }
 
@@ -99,6 +99,13 @@ module Keygen
             else
               nil
             end
+        rescue => e
+          Keygen.logger.exception(e)
+        end
+
+        begin
+          filtered_req_path = req.filtered_path ||
+                              req.original_fullpath
         rescue => e
           Keygen.logger.exception(e)
         end
@@ -155,7 +162,7 @@ module Keygen
             user_agent: user_agent,
             ip: req.remote_ip,
             method: req.method,
-            url: req.original_fullpath,
+            url: filtered_req_path,
             body: filtered_req_body,
           },
           {
