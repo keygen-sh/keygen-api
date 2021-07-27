@@ -15,7 +15,9 @@ Rails.application.configure do
     res = controller.response
     query_params =
       if req.query_string.present?
-        "{#{req.query_string}}"
+        filtered_qs = req.send(:filtered_query_string) # private
+
+        "{#{filtered_qs}}"
       else
         nil
       end

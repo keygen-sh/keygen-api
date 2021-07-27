@@ -9,26 +9,47 @@ module TokenAuthentication
   def authenticate_with_token!
     @current_bearer =
       case
+      when has_bearer_credentials?
+        authenticate_or_request_with_http_token(&method(:http_token_authenticator))
       when has_basic_credentials?
         authenticate_or_request_with_http_basic(&method(:http_basic_authenticator))
       else
-        authenticate_or_request_with_http_token(&method(:http_token_authenticator))
+        authenticate_or_request_with_query_token(&method(:query_token_authenticator))
       end
   end
 
   def authenticate_with_token
     @current_bearer =
       case
+      when has_bearer_credentials?
+        authenticate_with_http_token(&method(:http_token_authenticator))
       when has_basic_credentials?
         authenticate_with_http_basic(&method(:http_basic_authenticator))
       else
-        authenticate_with_http_token(&method(:http_token_authenticator))
+        authenticate_with_query_token(&method(:query_token_authenticator))
       end
   end
 
   private
 
   attr_accessor :current_http_token
+
+  def authenticate_or_request_with_query_token(&auth_procedure)
+    authenticate_with_query_token(&auth_procedure) || request_http_token_authentication
+  end
+
+  def authenticate_with_query_token(&auth_procedure)
+    query_token = request.query_parameters[:token]
+
+    auth_procedure.call(query_token)
+  end
+
+  def query_token_authenticator(query_token)
+    return if
+      current_account.nil? || query_token.blank?
+
+    http_token_authenticator(query_token)
+  end
 
   def http_basic_authenticator(username = nil, password = nil)
     return if
@@ -94,7 +115,23 @@ module TokenAuthentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
   end
 
+  def has_bearer_credentials?
+    authentication_scheme == 'bearer'
+  end
+
   def has_basic_credentials?
-    ActionController::HttpAuthentication::Basic.has_basic_credentials?(request)
+    authentication_scheme == 'basic'
+  end
+
+  def authentication_scheme
+    return nil unless
+      request.authorization.present?
+
+    auth_parts  = request.authorization.to_s.split(' ', 2)
+    auth_scheme = auth_parts.first
+    return nil if
+      auth_scheme.nil?
+
+    auth_scheme.downcase
   end
 end
