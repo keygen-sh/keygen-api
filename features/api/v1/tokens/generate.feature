@@ -301,6 +301,15 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "401"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "Credentials must be valid",
+        "code": "CREDENTIALS_INVALID"
+      }
+      """
 
   Scenario: User attempts to generate a new token without authentication
     Given the current account is "test1"

@@ -81,7 +81,8 @@ Feature: Regenerate authentication token
       """
       {
         "title": "Unauthorized",
-        "detail": "must be a valid token"
+        "detail": "You must be authenticated to complete the request",
+        "code": "TOKEN_INVALID"
       }
       """
 

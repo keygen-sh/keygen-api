@@ -7,7 +7,7 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: [:index]
-    before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :revoke]
+    before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :regenerate_current, :revoke]
     before_action :set_token, only: [:show, :regenerate, :revoke]
 
     # GET /tokens
@@ -55,54 +55,41 @@ module Api::V1
             bearer: user,
             **kwargs
           )
+
           if token.valid?
             BroadcastEventService.call(
-              event: "token.generated",
+              event: 'token.generated',
               account: current_account,
               resource: token
             )
 
-            render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token) and return
+            render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
           else
             render_unprocessable_resource token
           end
+
+          return
         end
       end
 
-      render_unauthorized detail: "credentials must be valid"
+      render_unauthorized detail: 'Credentials must be valid', code: 'CREDENTIALS_INVALID'
     rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
       render_bad_request
     end
 
     # PUT /tokens
     def regenerate_current
-      skip_authorization
+      authorize current_token, :regenerate?
 
-      authenticate_with_http_token do |token, options|
-        tok = TokenAuthenticationService.call(
-          account: current_account,
-          token: token
-        )
+      current_token.regenerate!
 
-        next if tok.nil?
+      BroadcastEventService.call(
+        event: 'token.regenerated',
+        account: current_account,
+        resource: current_token,
+      )
 
-        if tok.expired?
-          render_unauthorized detail: "is expired", source: {
-            pointer: "/data/relationships/token" } and return
-        end
-
-        tok.regenerate!
-
-        BroadcastEventService.call(
-          event: "token.regenerated",
-          account: current_account,
-          resource: tok
-        )
-
-        render jsonapi: tok and return
-      end
-
-      render_unauthorized detail: "must be a valid token"
+      render jsonapi: current_token
     end
 
     # PUT /tokens/1
