@@ -2995,7 +2995,7 @@ Feature: Create license
       """
       {
         "title": "Unauthorized",
-        "detail": "Token format is invalid (make sure the token begins with a proper prefix e.g. 'prod-XXX' or 'acti-XXX', and that it's not a token UUID)",
+        "detail": "Token format is invalid (make sure the token begins with a proper prefix e.g. 'admin-XXX', 'prod-XXX' or 'activ-XXX', and that it's not a token's UUID identifier)",
         "code": "TOKEN_FORMAT_INVALID"
       }
       """

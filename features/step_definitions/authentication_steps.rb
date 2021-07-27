@@ -96,7 +96,16 @@ Given /^I use an authentication token$/ do
   # make sure we're backwards compatible.
   @token.regenerate! version: TOKEN_VERSIONS.sample
 
-  header "Authorization", "Bearer #{@token.raw}"
+  # Use a mix between basic and bearer auth schemes
+  if rand(0..1).zero?
+    http_token = @token.raw
+
+    header "Authorization", "Bearer #{http_token}"
+  else
+    http_basic = Base64.strict_encode64("#{@token.raw}:")
+
+    header "Authorization", "Basic #{http_basic}"
+  end
 end
 
 Given /^I use an expired authentication token$/ do
