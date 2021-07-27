@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_26_131850) do
+ActiveRecord::Schema.define(version: 2021_07_27_191029) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -282,6 +282,8 @@ ActiveRecord::Schema.define(version: 2021_07_26_131850) do
     t.string "etag"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "content_length"
+    t.string "content_type"
     t.index ["account_id", "product_id", "release_id"], name: "releases_artifacts_acct_prod_rel_idx", unique: true
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["key", "product_id", "account_id"], name: "index_release_artifacts_on_key_and_product_id_and_account_id", unique: true

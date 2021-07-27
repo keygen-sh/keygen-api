@@ -41,7 +41,11 @@ class ReleaseDownloadService < BaseService
       s3  = Aws::S3::Client.new
       obj = s3.head_object(bucket: 'keygen-dist', key: release.s3_object_key)
 
-      artifact.update!(etag: obj.etag)
+      artifact.update!(
+        content_length: obj.content_length,
+        content_type: obj.content_type,
+        etag: obj.etag.delete('"'),
+      )
     end
 
     # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
