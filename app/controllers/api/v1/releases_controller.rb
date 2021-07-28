@@ -53,7 +53,7 @@ module Api::V1
 
       # When upserting the release, we want to replace its ID on conflict so that
       # artifacts and entitlement constraints are not carried over (so less of
-      # an "upsert" and more of a "replace on conflict").
+      # an "upsert" and more of an atomic "replace on conflict").
       release.transaction do
         if release.persisted?
           # FIXME(ezekg) Replacing ID orphans artifacts and entitlement constraints
