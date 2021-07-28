@@ -11,7 +11,7 @@ module Api::V1
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :require_paid_subscription!, only: %i[create update destroy]
+    before_action :require_paid_subscription!, only: %i[create upsert update destroy]
     before_action :authenticate_with_token!
     before_action :set_release, only: %i[show update destroy]
 
@@ -40,6 +40,34 @@ module Api::V1
         )
 
         render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
+      else
+        render_unprocessable_resource release
+      end
+    end
+
+    def upsert
+      conditions = release_params.slice(:product_id, :filename)
+      release    = current_account.releases.find_or_initialize_by(conditions)
+      authorize release
+
+      if release.update(release_params.merge(id: SecureRandom.uuid))
+        if release.previously_new_record?
+          BroadcastEventService.call(
+            event: 'release.created',
+            account: current_account,
+            resource: release,
+          )
+
+          render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
+        else
+          BroadcastEventService.call(
+            event: 'release.replaced',
+            account: current_account,
+            resource: release,
+          )
+
+          render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
+        end
       else
         render_unprocessable_resource release
       end
@@ -133,13 +161,43 @@ module Api::V1
         end
       end
 
+      on :upsert do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[release releases]
+          param :attributes, type: :hash do
+            param :name, type: :string, optional: true, allow_nil: true
+            param :filename, type: :string
+            param :filesize, type: :integer, optional: true, allow_nil: true
+            param :filetype, type: :string, transform: -> (k, v) {
+              [:filetype_attributes, { key: v.downcase }]
+            }
+            param :platform, type: :string, transform: -> (k, v) {
+              [:platform_attributes, { key: v.downcase }]
+            }
+            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
+              [:channel_attributes, { key: v.downcase }]
+            }
+            param :version, type: :string
+            param :metadata, type: :hash, optional: true
+          end
+          param :relationships, type: :hash do
+            param :product, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[product products]
+                param :id, type: :string
+              end
+            end
+          end
+        end
+      end
+
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[release releases]
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
-            param :name, type: :string, optional: true
-            param :filesize, type: :integer, optional: true
+            param :name, type: :string, optional: true, allow_nil: true
+            param :filesize, type: :integer, optional: true, allow_nil: true
             param :metadata, type: :hash, optional: true
           end
         end
