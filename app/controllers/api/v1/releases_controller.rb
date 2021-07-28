@@ -46,30 +46,41 @@ module Api::V1
     end
 
     def upsert
+      # NOTE(ezekg) Upserts use unique index: account_id, product_id, filename
       conditions = release_params.slice(:product_id, :filename)
       release    = current_account.releases.find_or_initialize_by(conditions)
       authorize release
 
-      if release.update(release_params.merge(id: SecureRandom.uuid))
-        if release.previously_new_record?
-          BroadcastEventService.call(
-            event: 'release.created',
-            account: current_account,
-            resource: release,
-          )
+      # When upserting the release, we want to replace its ID on conflict so that
+      # artifacts and entitlement constraints are not carried over (so less of
+      # an "upsert" and more of a "replace on conflict").
+      release.transaction do
+        if release.persisted?
+          # FIXME(ezekg) Replacing ID orphans artifacts and entitlement constraints
+          release.id = SecureRandom.uuid
 
-          render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
-        else
-          BroadcastEventService.call(
-            event: 'release.replaced',
-            account: current_account,
-            resource: release,
-          )
-
-          render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
+          release.save!(validate: false)
         end
+
+        release.update!(release_params)
+      end
+
+      if release.previously_new_record?
+        BroadcastEventService.call(
+          event: 'release.created',
+          account: current_account,
+          resource: release,
+        )
+
+        render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
       else
-        render_unprocessable_resource release
+        BroadcastEventService.call(
+          event: 'release.replaced',
+          account: current_account,
+          resource: release,
+        )
+
+        render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
       end
     end
 
@@ -185,6 +196,21 @@ module Api::V1
               param :data, type: :hash do
                 param :type, type: :string, inclusion: %w[product products]
                 param :id, type: :string
+              end
+            end
+            param :constraints, type: :hash, optional: true do
+              param :data, type: :array do
+                items type: :hash do
+                  param :type, type: :string, inclusion: %w[constraint constraints]
+                  param :relationships, type: :hash do
+                    param :entitlement, type: :hash do
+                      param :data, type: :hash do
+                        param :type, type: :string, inclusion: %w[entitlement entitlements]
+                        param :id, type: :string
+                      end
+                    end
+                  end
+                end
               end
             end
           end

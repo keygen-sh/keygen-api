@@ -196,7 +196,7 @@ class Release < ApplicationRecord
   end
 
   def semver
-    @semver ||= Semverse::Version.new(version)
+    Semverse::Version.new(version)
   rescue Semverse::InvalidVersionFormat
     nil
   end
