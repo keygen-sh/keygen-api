@@ -185,6 +185,9 @@ Rails.application.routes.draw do
         end
 
         resources "releases" do
+          collection do
+            put "/", to: "releases#upsert", as: "upsert"
+          end
           scope module: "releases/relationships" do
             resources "constraints", only: [:index, :show] do
               collection do

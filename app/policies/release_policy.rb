@@ -20,6 +20,13 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def upsert?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
   def update?
     assert_account_scoped!
 
