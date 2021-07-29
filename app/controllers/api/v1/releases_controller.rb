@@ -51,36 +51,26 @@ module Api::V1
       release    = current_account.releases.find_or_initialize_by(conditions)
       authorize release
 
-      # When upserting the release, we want to replace its ID on conflict so that
-      # artifacts and entitlement constraints are not carried over (so less of
-      # an "upsert" and more of an atomic "replace on conflict").
-      release.transaction do
-        if release.persisted?
-          # FIXME(ezekg) Replacing ID orphans artifacts and entitlement constraints
-          release.id = SecureRandom.uuid
+      if release.update(release_params)
+        if release.previously_new_record?
+          BroadcastEventService.call(
+            event: 'release.created',
+            account: current_account,
+            resource: release,
+          )
 
-          release.save!(validate: false)
+          render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
+        else
+          BroadcastEventService.call(
+            event: 'release.replaced',
+            account: current_account,
+            resource: release,
+          )
+
+          render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
         end
-
-        release.update!(release_params)
-      end
-
-      if release.previously_new_record?
-        BroadcastEventService.call(
-          event: 'release.created',
-          account: current_account,
-          resource: release,
-        )
-
-        render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
       else
-        BroadcastEventService.call(
-          event: 'release.replaced',
-          account: current_account,
-          resource: release,
-        )
-
-        render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
+        render_unprocessable_resource(release)
       end
     end
 

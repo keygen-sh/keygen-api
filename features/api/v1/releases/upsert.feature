@@ -1610,7 +1610,7 @@ Feature: Upsert release
       """
     Then the response status should be "200"
     And the JSON response should be a "release"
-    And the current account should have 2 "release-entitlement-constraints"
+    And the current account should have 1 "release-entitlement-constraint"
     And the current account should have 3 "entitlements"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
