@@ -62,7 +62,7 @@ module Api::V1
           render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
         else
           BroadcastEventService.call(
-            event: 'release.replaced',
+            event: 'release.updated',
             account: current_account,
             resource: release,
           )

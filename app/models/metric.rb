@@ -65,7 +65,6 @@ class Metric < ApplicationRecord
     entitlement.updated
     entitlement.deleted
     release.created
-    release.replaced
     release.updated
     release.deleted
     release.downloaded
