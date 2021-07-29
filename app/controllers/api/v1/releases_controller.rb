@@ -67,7 +67,7 @@ module Api::V1
             resource: release,
           )
 
-          render jsonapi: release, status: :ok, location: v1_account_release_url(release.account_id, release)
+          render jsonapi: release, status: :ok
         end
       else
         render_unprocessable_resource(release)
