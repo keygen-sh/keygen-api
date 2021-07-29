@@ -52,7 +52,7 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete
 
-  accepts_nested_attributes_for :constraints, limit: 20
+  accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
@@ -245,5 +245,12 @@ class Release < ApplicationRecord
         errors.import(err, attribute: "constraints[#{i}].#{err.attribute}")
       end
     end
+  end
+
+  def reject_duplicate_associated_records_for_constraints(attrs)
+    return if
+      new_record?
+
+    constraints.exists?(attrs)
   end
 end
