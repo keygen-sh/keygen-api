@@ -210,8 +210,8 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_filetype
-    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") unless
-      filename.ends_with?(".#{filetype.key}")
+    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") if
+      filename.include?('.') && !filename.ends_with?(".#{filetype.key}")
 
     self.filetype = account.release_filetypes.find_or_create_by(key: filetype.key)
   rescue ActiveRecord::RecordNotUnique
