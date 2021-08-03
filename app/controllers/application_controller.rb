@@ -109,7 +109,7 @@ class ApplicationController < ActionController::API
   def render_unauthorized(opts = {})
     skip_authorization
 
-    self.headers["WWW-Authenticate"] = %(Token realm="Keygen")
+    self.headers["WWW-Authenticate"] = %(Bearer realm="keygen")
     render json: {
       meta: { id: request.request_id },
       errors: [{
