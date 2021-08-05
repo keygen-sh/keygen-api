@@ -60,7 +60,7 @@ ip_limit_proc = lambda do |rack_req|
   end
 end
 
-Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(150), period: 30.seconds }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(60), period: 30.seconds }, &ip_limit_proc)
 Rack::Attack.throttle("req/ip/burst/2m", { limit: req_limit_proc.call(600), period: 2.minutes }, &ip_limit_proc)
 Rack::Attack.throttle("req/ip/burst/5m", { limit: req_limit_proc.call(1_500), period: 5.minutes }, &ip_limit_proc)
 Rack::Attack.throttle("req/ip/burst/10m", { limit: req_limit_proc.call(3_000), period: 10.minutes }, &ip_limit_proc)
