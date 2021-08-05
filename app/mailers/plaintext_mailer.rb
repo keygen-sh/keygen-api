@@ -125,9 +125,9 @@ class PlaintextMailer < ApplicationMailer
 
         You can leave a review here: https://keygen.sh/write-a-review/ (it can be a personal review or on behalf of the company.)
 
-        If that's too much to ask -- a short tweet tagging @keygen_sh also works!
+        If that's too much to ask, a short tweet tagging @keygen_sh would also be awesome! We'll give it a retweet.
 
-        We're a bootstrapped company, and this helps us out a lot. You can reply to this email directly with any feedback!
+        We're a bootstrapped company, and this would help us out a lot. You can reply to this email directly with any feedback!
 
         Thanks again!
 
