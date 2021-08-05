@@ -37,8 +37,6 @@ class PlaintextMailer < ApplicationMailer
 
         --
         Zeke, Founder <https://keygen.sh>
-
-        p.s. I know COVID has affected many businesses, so please let me know if there's anything I can do to help. :)
       TXT
     )
   end
@@ -99,9 +97,9 @@ class PlaintextMailer < ApplicationMailer
 
         Do you have a couple minutes today to give us a quick testimonial? As a thank you, we'll send you a $25 Amazon gift card (or a $50 account credit).
 
-        You can leave a testimonial here: https://keygen.sh/record-a-testimonial/ (you can do video or text, and it can be a personal testimonial or on behalf of the company)
+        You can leave a testimonial here: https://keygen.sh/record-a-testimonial/ (you can do video or text, and it can be a personal testimonial or on behalf of the company.)
 
-        We're a bootstrapped company, and these testimonials help us out a lot. You can reply to this email directly with any feedback.
+        We're a bootstrapped company, and these testimonials help us out a lot. You can reply to this email directly with any feedback!
 
         Thanks again!
 
@@ -125,9 +123,11 @@ class PlaintextMailer < ApplicationMailer
 
         Do you have a few minutes today to give us a quick review on Capterra so more companies can find us? As a thank you, all verified reviews will receive a $25 Amazon gift card (or a $50 account credit).
 
-        You can leave a review here: https://keygen.sh/write-a-review/ (it can be a personal review or on behalf of the company)
+        You can leave a review here: https://keygen.sh/write-a-review/ (it can be a personal review or on behalf of the company.)
 
-        We're a bootstrapped company, and these reviews help us out a lot. You can reply to this email directly with any feedback.
+        If that's too much to ask -- a short tweet tagging @keygen_sh also works!
+
+        We're a bootstrapped company, and this helps us out a lot. You can reply to this email directly with any feedback!
 
         Thanks again!
 
