@@ -149,7 +149,7 @@ class PlaintextMailer < ApplicationMailer
       body: <<~TXT
         I know you're still early in your licensing journey, but I'd love to hear your first impression while your thoughts are fresh.
 
-        What do you think the most valuable features are so far?
+        What do you think the most valuable features are so far? Is there anything missing?
 
         Also, please let me know if there's anything you're looking for but can’t find or if you're experiencing any technical issues.
 
