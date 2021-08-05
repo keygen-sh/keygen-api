@@ -12,7 +12,10 @@ module Billings
       c = Billings::Subscription.retrieve(subscription)
       c.delete(at_period_end: at_period_end)
     rescue Billings::Error => e
-      Keygen.logger.exception(e)
+      error_code = e.json_body.dig(:error, :code) rescue nil
+
+      Keygen.logger.exception(e) unless
+        error_code == 'resource_missing'
 
       nil
     end
