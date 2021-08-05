@@ -240,6 +240,9 @@ module Stripe
     end
 
     def median_time_to_convert
+      return 0.0 if
+        days_to_convert.empty?
+
       sorted_times = days_to_convert.sort
       mid_idx = days_to_convert.size / 2
 
@@ -271,6 +274,9 @@ module Stripe
     end
 
     def median_time_on_free
+      return 0.0 if
+        days_on_free.empty?
+
       sorted_times = days_on_free.sort
       mid_idx = days_on_free.size / 2
 
@@ -470,42 +476,45 @@ module Stripe
     def invoices_for(resource)
       @invoices_for ||= {}
 
-      @invoices_for[resource.id] ||= to_struct(
-        JSON.parse(
-          cache.fetch("stripe:stats:invoices:#{resource.id}", raw: true, expires_in: 2.days) do
-            invoices =
-              case resource.object
-              when 'subscription'
-                Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
-              when 'customer'
-                Stripe::Invoice.list(customer: resource.id, limit: 100).auto_paging_each.to_a
-              else
-                []
-              end
+      memo_key = nil
+      invoices = []
 
-            invoices
-              &.sort_by { |i| i.created }
-              .to_json
-          end
-        )
-      )
+      case resource.object
+      when 'subscription'
+        memo_key = resource.customer.id
+
+        return @invoices_for[memo_key] if
+          @invoices_for.key?(memo_key)
+
+        # Don't waste resources fetching invoices when subscription
+        # is on the free tier
+        if resource.plan.product != FREE_TIER_PRODUCT_ID
+          invoices =
+            Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
+        end
+      when 'customer'
+        memo_key = resource.id
+
+        return @invoices_for[memo_key] if
+          @invoices_for.key?(memo_key)
+
+        invoices =
+          Stripe::Invoice.list(customer: resource.id, limit: 100).auto_paging_each.to_a
+      end
+
+      @invoices_for[memo_key] ||=
+        invoices.sort_by { |i| i.created }
     end
 
     def subscriptions
-      @subscriptions ||= to_struct(
-        JSON.parse(
-          cache.fetch('stripe:stats:subscriptions', raw: true, expires_in: 2.days) do
-            Stripe::Subscription.list(status: 'all', limit: 100, expand: ['data.customer', 'data.customer.default_source', 'data.customer.invoice_settings.default_payment_method'])
-              .auto_paging_each
-              .to_a
-              .filter { |s| !s.customer.deleted? }
-              .reject { |s| internal_email?(s.customer.email) }
-              .sort_by { |s| [s.customer.id, -s.created] }
-              .uniq { |s| s.customer.id }
-              .to_json
-          end
-        )
-      )
+      @subscriptions ||=
+        Stripe::Subscription.list(limit: 100, expand: ['data.customer', 'data.customer.default_source', 'data.customer.invoice_settings.default_payment_method'])
+          .auto_paging_each
+          .to_a
+          .filter { |s| !s.customer.deleted? }
+          .reject { |s| internal_email?(s.customer.email) }
+          .sort_by { |s| [s.customer.id, -s.created] }
+          .uniq { |s| s.customer.id }
     end
 
     def paid_subscriptions
@@ -553,7 +562,14 @@ module Stripe
     end
 
     def canceled_subscriptions
-      @canceled_subscriptions ||= subscriptions.filter { |s| s.status == 'canceled' }
+      @canceled_subscriptions ||=
+        Stripe::Subscription.list(status: 'ended', created: { gte: 3.months.ago.to_i }, limit: 100, expand: ['data.customer', 'data.customer.default_source', 'data.customer.invoice_settings.default_payment_method'])
+          .auto_paging_each
+          .to_a
+          .filter { |s| !s.customer.deleted? }
+          .reject { |s| internal_email?(s.customer.email) }
+          .sort_by { |s| [s.customer.id, -s.created] }
+          .uniq { |s| s.customer.id }
     end
 
     def churned_subscriptions
@@ -664,54 +680,37 @@ module Stripe
     end
 
     def active_paid_accounts
-      @active_paid_accounts ||= to_struct(
-        JSON.parse(
-          cache.fetch('stripe:stats:accounts:paid', raw: true, expires_in: 2.days) do
-            ::Account.paid.select(:id)
-              .joins(:request_logs)
-              .where('request_logs.created_at > ?', 90.days.ago)
-              .group('accounts.id')
-              .having('count(request_logs.id) > 0')
-              .to_a
-              .to_json
-          end
-        )
-      )
+      @active_paid_accounts ||=
+        ::Account.paid.select(:id)
+          .joins(:request_logs)
+          .where('request_logs.created_at > ?', 90.days.ago)
+          .group('accounts.id')
+          .having('count(request_logs.id) > 0')
+          .to_a
+          .to_json
     end
 
     def active_free_accounts
-      @active_free_accounts ||= to_struct(
-        JSON.parse(
-          cache.fetch('stripe:stats:accounts:free', raw: true, expires_in: 2.days) do
-            ::Account.free.select(:id)
-              .joins(:request_logs)
-              .where('request_logs.created_at > ?', 90.days.ago)
-              .group('accounts.id')
-              .having('count(request_logs.id) > 0')
-              .to_a
-              .to_json
-          end
-        )
-      )
+      @active_free_accounts ||=
+        ::Account.free.select(:id)
+          .joins(:request_logs)
+          .where('request_logs.created_at > ?', 90.days.ago)
+          .group('accounts.id')
+          .having('count(request_logs.id) > 0')
+          .to_a
+          .to_json
     end
 
     private
 
     attr_reader :cache
 
-    def to_struct(object)
-      case object
-      when Hash
-        OpenStruct.new(object.each_with_object({}) { |(k, v), h| h[k] = to_struct(v) })
-      when Array
-        object.map { |v| to_struct(v) }
-      else
-        object
-      end
-    end
-
     def quantile(values, percentile)
-      return values.first if values.size == 1
+      return 0.0 if
+        values.empty?
+
+      return values.first if
+        values.size == 1
 
       sorted = values.sort
       k = (percentile * (sorted.size - 1) + 1).floor - 1
@@ -801,11 +800,11 @@ namespace :stripe do
       s << "\e[34mUser Growth Rate:\e[0m\n"
       s << "\e[34m  - Overall: \e[32m#{report.user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
       s << "\e[34m  - Paid: \e[32m#{report.paid_user_growth_rate.to_s(:percentage, precision: 2)}\e[0m\n"
-      # s << "\e[34mForecasted Revenue:\e[0m\n"
-      # s << "\e[34m  - Next 4 Weeks: \e[32m#{report.forecasted_revenue_4w.to_s(:currency)}/mo\e[34m (with #{report.revenue_growth_rate.to_s(:percentage, precision: 2)} growth rate)\e[0m\n"
-      # s << "\e[34m  - 3 Months: \e[32m#{report.forecasted_revenue_3m.to_s(:currency)}/mo\e[0m\n"
-      # s << "\e[34m  - 6 Months: \e[32m#{report.forecasted_revenue_6m.to_s(:currency)}/mo\e[0m\n"
-      # s << "\e[34m  - 1 Year: \e[32m#{report.forecasted_revenue_1y.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34mForecasted Revenue:\e[0m\n"
+      s << "\e[34m  - Next 4 Weeks: \e[32m#{report.forecasted_revenue_4w.to_s(:currency)}/mo\e[34m (with #{report.revenue_growth_rate.to_s(:percentage, precision: 2)} growth rate)\e[0m\n"
+      s << "\e[34m  - 3 Months: \e[32m#{report.forecasted_revenue_3m.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34m  - 6 Months: \e[32m#{report.forecasted_revenue_6m.to_s(:currency)}/mo\e[0m\n"
+      s << "\e[34m  - 1 Year: \e[32m#{report.forecasted_revenue_1y.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Revenue Per-User: \e[32m#{report.average_revenue_per_user.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mAverage Lifetime Value: \e[32m#{report.average_life_time_value.to_s(:currency)}\e[0m\n"
       s << "\e[34mAverage Lifetime: \e[36m#{report.average_subscription_length_per_user.to_s(:rounded, precision: 2)} months\e[0m\n"
