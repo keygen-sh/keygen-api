@@ -58,6 +58,7 @@ module DefaultHeaders
     add_signature_headers
     add_whoami_headers
     add_version_header
+    add_powered_by_header
   end
 
   def add_content_security_policy_headers
@@ -103,5 +104,9 @@ module DefaultHeaders
 
   def add_version_header
     response.headers['Keygen-Version'] = '1.0'
+  end
+
+  def add_powered_by_header
+    response.headers['X-Powered-By'] = 'Ruby, Rails, and a lot of coffee. (And the occasional Islay.)'
   end
 end
