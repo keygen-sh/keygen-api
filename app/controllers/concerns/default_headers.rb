@@ -37,7 +37,10 @@ module DefaultHeaders
     if selected_content_types.empty?
       response.headers['Content-Type'] = accepted_content_types[:jsonapi]
 
-      render_bad_request(detail: "The content type of the request is not supported (check accept header)", code: 'ACCEPT_INVALID')
+      # Skip accept header enforcement for artifacts#show so that we play
+      # nicely with package managers such as pip
+      render_bad_request(detail: "The content type of the request is not supported (check accept header)", code: 'ACCEPT_INVALID') unless
+        artifact_route?
 
       return
     end
@@ -108,5 +111,13 @@ module DefaultHeaders
 
   def add_powered_by_header
     response.headers['X-Powered-By'] = 'Ruby, Rails, and a lot of coffee. (And the occasional Islay.)'
+  end
+
+  def artifact_route?
+    controller = params[:controller]
+    action     = params[:action]
+
+    controller == 'api/v1/artifacts' &&
+      action == 'show'
   end
 end
