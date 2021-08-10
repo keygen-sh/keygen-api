@@ -166,18 +166,23 @@ class Account < ApplicationRecord
   end
 
   def active_licensed_user_count
-    # Get count of userless licenses then add in grouped licensed user count
-    total_licensed_users, *licensed_users =
+    license_counts =
       self.licenses.active
         .reorder(Arel.sql('"licenses"."user_id" NULLS FIRST'))
         .group(Arel.sql('"licenses"."user_id"'))
         .count
-        .values
 
-    # We're counting a user with any amount of licenses as 1 licensed user
-    total_licensed_users += licensed_users.count unless total_licensed_users.nil?
+    # FIXME(ezekg) The nil key here is really weird, but that's what AR gives us for
+    #              unassigned licenses i.e. those without a user.
+    total_unassigned_licenses = license_counts[nil].to_i
 
-    total_licensed_users.to_i
+    # We're counting a user with any amount of licenses as 1 "licensed user."
+    total_assigned_licenses = license_counts.except(nil).count
+
+    total_licensed_users =
+      total_unassigned_licenses + total_assigned_licenses
+
+    total_licensed_users
   end
 
   def trialing_or_free_tier?
