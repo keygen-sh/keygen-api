@@ -38,8 +38,11 @@ req_limit_proc = lambda do |base_req_limit|
     return base_req_limit if token.blank?
 
     # Admins/products get to make additional RPS (indicates server-side)
-    if token.starts_with?('admi') || token.starts_with?('dev') || token.starts_with?('prod')
+    case
+    when token.starts_with?('admi')
       base_req_limit * 5
+    when token.starts_with?('prod')
+      base_req_limit * 3
     else
       base_req_limit
     end
