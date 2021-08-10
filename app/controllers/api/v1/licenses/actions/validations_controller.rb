@@ -25,7 +25,13 @@ module Api::V1::Licenses::Actions
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
 
-        @license.touch :last_validated_at unless request.headers['origin'] == 'https://app.keygen.sh'
+        @license.touch(:last_validated_at) unless
+          # Only touch if it's different. Large spikes in concurrent validation
+          # requests needlessly update this, causing slow queries due to locks.
+          @license.last_validated_at.to_i == Time.current.to_i ||
+          # Skip quick validations for dashboard since that's what we're using
+          # to check license validity.
+          request.headers['origin'] == 'https://app.keygen.sh'
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -63,7 +69,10 @@ module Api::V1::Licenses::Actions
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
 
-        @license.touch :last_validated_at
+        @license.touch(:last_validated_at) unless
+          # Only touch if it's different. Large spikes in concurrent validation
+          # requests needlessly update this, causing slow queries due to locks.
+          @license.last_validated_at.to_i == Time.current.to_i
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -110,7 +119,10 @@ module Api::V1::Licenses::Actions
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
 
-        @license.touch :last_validated_at
+        @license.touch(:last_validated_at) unless
+          # Only touch if it's different. Large spikes in concurrent validation
+          # requests needlessly update this, causing slow queries due to locks.
+          @license.last_validated_at.to_i == Time.current.to_i
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
