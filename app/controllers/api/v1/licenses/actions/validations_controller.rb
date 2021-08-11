@@ -12,7 +12,7 @@ module Api::V1::Licenses::Actions
     def quick_validate_by_id
       authorize @license
 
-      valid, detail, constant = LicenseValidationService.call(license: @license, scope: false)
+      valid, detail, constant = LicenseValidationService.call(license: @license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
         valid: valid,
@@ -24,14 +24,6 @@ module Api::V1::Licenses::Actions
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
-
-        @license.touch(:last_validated_at) unless
-          # Only touch if it's different. Large spikes in concurrent validation
-          # requests needlessly update this, causing slow queries due to locks.
-          @license.last_validated_at.to_i == Time.current.to_i ||
-          # Skip quick validations for dashboard since that's what we're using
-          # to check license validity.
-          request.headers['origin'] == 'https://app.keygen.sh'
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -68,11 +60,6 @@ module Api::V1::Licenses::Actions
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
-
-        @license.touch(:last_validated_at) unless
-          # Only touch if it's different. Large spikes in concurrent validation
-          # requests needlessly update this, causing slow queries due to locks.
-          @license.last_validated_at.to_i == Time.current.to_i
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -118,11 +105,6 @@ module Api::V1::Licenses::Actions
 
       if @license.present?
         Keygen::Store::Request.store[:current_resource] = @license
-
-        @license.touch(:last_validated_at) unless
-          # Only touch if it's different. Large spikes in concurrent validation
-          # requests needlessly update this, causing slow queries due to locks.
-          @license.last_validated_at.to_i == Time.current.to_i
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",

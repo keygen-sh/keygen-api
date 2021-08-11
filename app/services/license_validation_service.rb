@@ -2,13 +2,18 @@
 
 class LicenseValidationService < BaseService
 
-  def initialize(license:, scope: nil)
-    @license = license
-    @scope   = scope
+  def initialize(license:, scope: nil, skip_touch: false)
+    @license    = license
+    @scope      = scope
+    @skip_touch = skip_touch
   end
 
   def call
     return [false, "does not exist", :NOT_FOUND] if license.nil?
+
+    touch_last_validated_at unless
+      skip_touch?
+
     # Check if license is suspended
     return [false, "is suspended", :SUSPENDED] if license.suspended?
     # Check if license is expired (move along if it has no expiry)
@@ -100,4 +105,24 @@ class LicenseValidationService < BaseService
   private
 
   attr_reader :license, :scope
+
+  def skip_touch?
+    @skip_touch
+  end
+
+  def touch_last_validated_at
+    return if
+      skip_touch?
+
+    # We're going to attempt to update the license's last validated timestamp,
+    # but if there's a concurrent update then we'll skip.
+    license.with_lock 'FOR UPDATE NOWAIT' do
+      license.last_validated_at = Time.current
+      license.save!
+    end
+  rescue ActiveRecord::LockWaitTimeout
+    # noop
+  rescue => e
+    Keygen.logger.exception(e)
+  end
 end
