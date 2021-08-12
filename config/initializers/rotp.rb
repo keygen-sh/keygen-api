@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # FIXME(ezekg) Monkey patch ROTP to support `image` param.
 #              See: https://github.com/mdp/rotp/pull/90
 module ROTP
