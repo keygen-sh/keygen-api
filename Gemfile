@@ -44,7 +44,7 @@ gem 'pg_search'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
 gem 'sidekiq-status'
-gem 'sidekiq-cron'
+gem 'sidekiq-cron', '~> 1.2'
 gem 'sidekiq-throttled'
 gem 'sidekiq-cronitor', '~> 2.0'
 
