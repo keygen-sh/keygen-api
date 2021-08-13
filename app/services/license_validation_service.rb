@@ -116,11 +116,12 @@ class LicenseValidationService < BaseService
 
     # We're going to attempt to update the license's last validated timestamp,
     # but if there's a concurrent update then we'll skip.
-    license.with_lock 'FOR UPDATE NOWAIT' do
+    license.with_lock 'FOR UPDATE SKIP LOCKED' do
       license.last_validated_at = Time.current
       license.save!
     end
-  rescue ActiveRecord::LockWaitTimeout
+  rescue ActiveRecord::LockWaitTimeout, # For NOWAIT lock wait timeout error
+         ActiveRecord::RecordNotFound   # SKIP LOCKED raises not found
     # noop
   rescue => e
     Keygen.logger.exception(e)
