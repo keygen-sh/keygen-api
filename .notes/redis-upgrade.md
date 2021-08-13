@@ -12,6 +12,12 @@ heroku config:get REDIS_URL
 heroku addons:create heroku-redis:premium-5 --fork {{PREV_REDIS_URL}
 ```
 
+Wait until ready:
+
+```
+heroku addons:info {{NEXT_REDIS_NAME}}
+```
+
 Promote Redis:
 
 ```
