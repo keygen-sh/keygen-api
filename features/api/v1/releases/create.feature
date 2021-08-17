@@ -371,7 +371,7 @@ Feature: Create release
           "attributes": {
             "name": null,
             "filename": "Product-3.0.0-dev.9+build.93214.tar.gz",
-            "filetype": "tar.gz",
+            "filetype": ".tar.gz",
             "version": "3.0.0-dev.9+build.93214",
             "platform": "linux",
             "channel": "dev",
