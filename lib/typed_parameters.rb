@@ -186,17 +186,21 @@ class TypedParameters
     end
 
     def param(key, type:, optional: false, coerce: false, allow_blank: true, allow_nil: false, allow_non_scalars: false, inclusion: [], transform: nil, source: :pointer, &block)
-      return if optional && !context.params.key?(key.to_s)
+      real_params =
+        if context.params.is_a?(ActionController::Parameters)
+          context.params.to_unsafe_h.with_indifferent_access
+        else
+          context.params.with_indifferent_access
+        end
 
-      real_type = VALID_TYPES.fetch type.to_sym, nil
-      value = if context.params.is_a? ActionController::Parameters
-                context.params.to_unsafe_h[key]
-              else
-                context.params[key]
-              end
+      return if
+        optional && !real_params.key?(key)
+
+      real_type = VALID_TYPES.fetch(type.to_sym, nil)
+      value     = real_params[key]
 
       if value.nil? && optional && !allow_nil
-        [key.to_s, key.to_s.camelize(:lower)].map { |k| context.params.delete k }
+        [key.to_s, key.to_s.camelize(:lower)].map { |k| context.params.delete(k) }
         return
       end
 
