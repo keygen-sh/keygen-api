@@ -67,6 +67,7 @@ class PlaintextMailer < ApplicationMailer
       %(Is there anything we can do better?),
       %(What's one thing we could improve?),
       %(How did you hear about us?),
+      %(Where did you find us?),
       %(Has Keygen helped you meet your licensing goals?),
     ]
 
