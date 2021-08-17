@@ -746,6 +746,52 @@ Feature: Create release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a release with an invalid channel
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Bad Version: Prefix",
+            "filename": "Product.zip",
+            "version": "1.2.34",
+            "platform": "win32",
+            "filetype": "zip",
+            "channel": "latest"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: stable, rc, beta, alpha, dev (received latest)",
+        "source": {
+          "pointer": "/data/attributes/channel"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a release with entitlement constraints that belong to another account
     Given the account "test2" has 2 "entitlements"
     And the first "entitlement" of account "test2" has the following attributes:
