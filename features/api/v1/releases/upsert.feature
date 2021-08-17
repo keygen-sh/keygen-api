@@ -1514,7 +1514,7 @@ Feature: Upsert release
           "attributes": {
             "name": "Product Version 2",
             "filename": "latest-mac.yml",
-            "filetype": "yml",
+            "filetype": ".yml",
             "version": "2.0.0",
             "platform": "darwin",
             "channel": "stable"
@@ -1548,6 +1548,52 @@ Feature: Upsert release
     And the current account should have 3 "entitlements"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with an invalid channel
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Product Version 2",
+            "filename": "latest-mac.yml",
+            "filetype": "yml",
+            "version": "2.0.0",
+            "platform": "darwin",
+            "channel": "latest"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: stable, rc, beta, alpha, dev (received latest)",
+        "source": {
+          "pointer": "/data/attributes/channel"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin upserts a release with entitlement constraints (update, entitlement conflict)
