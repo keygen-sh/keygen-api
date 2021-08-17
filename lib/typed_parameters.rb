@@ -145,10 +145,12 @@ class TypedParameters
       keys = segment.keys - params.keys
       unpermitted = keys.map { |k| k.to_s.camelize :lower }.join ", "
 
-      Keygen.logger.error("[typed_parameters] Unpermitted parameters: request_id=#{context.request.request_id} unpermitted=(#{unpermitted})")
-      Keygen.logger.error(segment: segment, segment_keys: segment.keys, params_keys: params.keys)
+      if keys.any?
+        Keygen.logger.error("[typed_parameters] Unpermitted parameters: request_id=#{context.request.request_id} unpermitted=(#{unpermitted})")
+        Keygen.logger.error(segment: segment, segment_keys: segment.keys, params_keys: params.keys)
 
-      raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted}" if keys.any?
+        raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted}"
+      end
     end
 
     def transform!
