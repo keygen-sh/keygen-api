@@ -91,6 +91,34 @@ Feature: Update release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin remvoes the filesize of release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "filesize": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "filesize": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attempts to change the version of a release
     Given I am an admin of account "test1"
     And the current account is "test1"
