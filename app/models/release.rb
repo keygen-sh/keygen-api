@@ -204,18 +204,100 @@ class Release < ApplicationRecord
   private
 
   def validate_associated_records_for_platform
-    self.platform = account.release_platforms.find_or_create_by(key: platform.key)
-  rescue ActiveRecord::RecordNotUnique
-    retry
+    return if
+      platform.nil?
+
+    # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
+    #              our current transaction by using DB exceptions
+    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id: account.id, key: platform.key }]
+      WITH ins AS (
+        INSERT INTO "release_platforms"
+          (
+            "account_id",
+            "key",
+            "created_at",
+            "updated_at"
+          )
+        VALUES
+          (
+            :account_id,
+            :key,
+            current_timestamp(6),
+            current_timestamp(6)
+          )
+        ON CONFLICT ("account_id", "key")
+          DO NOTHING
+        RETURNING
+          *
+      )
+      SELECT
+        *
+      FROM
+        ins
+
+      UNION
+
+      SELECT
+        *
+      FROM
+        "release_platforms"
+      WHERE
+        "release_platforms"."account_id" = :account_id AND
+        "release_platforms"."key"        = :key
+    SQL
+
+    self.platform = rows.first
   end
 
   def validate_associated_records_for_filetype
+    return if
+      filetype.nil?
+
+    filetype.key.delete_prefix!('.')
+
     errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") if
       filename.include?('.') && !filename.ends_with?(".#{filetype.key}")
 
-    self.filetype = account.release_filetypes.find_or_create_by(key: filetype.key)
-  rescue ActiveRecord::RecordNotUnique
-    retry
+    # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
+    #              our current transaction by using DB exceptions
+    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id: account.id, key: filetype.key }]
+      WITH ins AS (
+        INSERT INTO "release_filetypes"
+          (
+            "account_id",
+            "key",
+            "created_at",
+            "updated_at"
+          )
+        VALUES
+          (
+            :account_id,
+            :key,
+            current_timestamp(6),
+            current_timestamp(6)
+          )
+        ON CONFLICT ("account_id", "key")
+          DO NOTHING
+        RETURNING
+          *
+      )
+      SELECT
+        *
+      FROM
+        ins
+
+      UNION
+
+      SELECT
+        *
+      FROM
+        "release_filetypes"
+      WHERE
+        "release_filetypes"."account_id" = :account_id AND
+        "release_filetypes"."key"        = :key
+    SQL
+
+    self.filetype = rows.first
   end
 
   def validate_associated_records_for_channel
@@ -228,12 +310,52 @@ class Release < ApplicationRecord
         semver&.pre_release.present?
     end
 
-    self.channel = account.release_channels.find_or_create_by(key: channel.key)
-  rescue ActiveRecord::RecordNotUnique
-    retry
+    # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
+    #              our current transaction by using DB exceptions
+    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id: account.id, key: channel.key }]
+      WITH ins AS (
+        INSERT INTO "release_channels"
+          (
+            "account_id",
+            "key",
+            "created_at",
+            "updated_at"
+          )
+        VALUES
+          (
+            :account_id,
+            :key,
+            current_timestamp(6),
+            current_timestamp(6)
+          )
+        ON CONFLICT ("account_id", "key")
+          DO NOTHING
+        RETURNING
+          *
+      )
+      SELECT
+        *
+      FROM
+        ins
+
+      UNION
+
+      SELECT
+        *
+      FROM
+        "release_channels"
+      WHERE
+        "release_channels"."account_id" = :account_id AND
+        "release_channels"."key"        = :key
+    SQL
+
+    self.channel = rows.first
   end
 
   def validate_associated_records_for_constraints
+    return if
+      constraints.nil? || constraints.empty?
+
     constraints.each_with_index do |constraint, i|
       constraint.account = account if
         constraint.account.nil?
