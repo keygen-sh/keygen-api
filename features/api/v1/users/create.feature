@@ -16,7 +16,7 @@ Feature: Create user
     When I send a POST request to "/accounts/test1/users"
     Then the response status should be "403"
 
-  Scenario: Anonymous creates a user for an account
+  Scenario: Anonymous creates a user for an account (without role)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the first "webhook-endpoint" has the following attributes:
@@ -47,6 +47,38 @@ Feature: Create user
     And the current account should have 2 "users"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous creates a user for an account (with role)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      {
+        "subscriptions": ["user.created", "user.updated"]
+      }
+      """
+    And the current account has 1 "user"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "email": "superman@keygen.sh",
+            "password": "lois",
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous creates a user with no name
@@ -592,6 +624,121 @@ Feature: Create user
             "email": "thor@keygen.sh",
             "password": "mjolnir",
             "role": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a developer role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "developer"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a sales agent role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "sales-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a support agent role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "support-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a license role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "license"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a product role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir",
+            "role": "product"
           }
         }
       }
