@@ -147,7 +147,7 @@ class TypedParameters
 
       if keys.any?
         Keygen.logger.error("[typed_parameters] Unpermitted parameters: request_id=#{context.request.request_id} unpermitted=(#{unpermitted})")
-        Keygen.logger.error(segment: segment, segment_keys: segment.keys, params_keys: params.keys)
+        Keygen.logger.error(segment_keys: segment.keys, params_keys: params.keys)
 
         raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted}"
       end
