@@ -48,29 +48,40 @@ module Api::V1
     def upsert
       # NOTE(ezekg) Upserts use unique index: account_id, product_id, filename
       conditions = release_params.slice(:product_id, :filename)
-      release    = current_account.releases.find_or_initialize_by(conditions)
-      authorize release
 
-      if release.update(release_params)
-        if release.previously_new_record?
-          BroadcastEventService.call(
-            event: 'release.created',
-            account: current_account,
-            resource: release,
-          )
+      # Attempt to avoid race conditions for concurrent upserts
+      attempt = 0
 
-          render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
-        else
-          BroadcastEventService.call(
-            event: 'release.replaced',
-            account: current_account,
-            resource: release,
-          )
+      begin
+        release = current_account.releases.find_or_initialize_by(conditions)
+        authorize release
 
-          render jsonapi: release, status: :ok
-        end
+        release.update!(release_params)
+      rescue ActiveRecord::RecordNotUnique,
+             ActiveRecord::RecordInvalid => e
+        raise e if attempt > 3
+
+        attempt += 1
+
+        retry
+      end
+
+      if release.previously_new_record?
+        BroadcastEventService.call(
+          event: 'release.created',
+          account: current_account,
+          resource: release,
+        )
+
+        render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
       else
-        render_unprocessable_resource(release)
+        BroadcastEventService.call(
+          event: 'release.replaced',
+          account: current_account,
+          resource: release,
+        )
+
+        render jsonapi: release, status: :ok
       end
     end
 
