@@ -49,19 +49,16 @@ module Api::V1
       # NOTE(ezekg) Upserts use unique index: account_id, product_id, filename
       conditions = release_params.slice(:product_id, :filename)
 
-      # Attempt to avoid race conditions for concurrent upserts
-      attempt = 0
-
+      # Attempt to avoid race conditions for concurrent upserts by retrying once
       begin
-        release = current_account.releases.find_or_initialize_by(conditions)
+        retries ||= 0
+        release   = current_account.releases.find_or_initialize_by(conditions)
         authorize release
 
         release.update!(release_params)
       rescue ActiveRecord::RecordNotUnique,
-             ActiveRecord::RecordInvalid => e
-        raise e if attempt > 3
-
-        attempt += 1
+             ActiveRecord::RecordInvalid
+        raise if (retries += 1) > 1
 
         retry
       end
