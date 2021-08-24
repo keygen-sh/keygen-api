@@ -143,11 +143,15 @@ class TypedParameters
       # Get the difference of current param segment and schema's params
       segment ||= context.params
       keys = segment.keys - params.keys
-      unpermitted = keys.map { |k| k.to_s.camelize :lower }.join ", "
 
       if keys.any?
+        unpermitted = keys.map { |k| to_pointer(k) }.join ", "
+
         Keygen.logger.error("[typed_parameters] Unpermitted parameters: request_id=#{context.request.request_id} unpermitted=(#{unpermitted})")
-        Keygen.logger.error(segment_keys: segment.keys, params_keys: params.keys)
+        Keygen.logger.error(
+          segment_keys: segment.keys.map { |k| to_pointer(k) },
+          params_keys: params.keys.map { |k| to_pointer(k) },
+        )
 
         raise UnpermittedParametersError, "Unpermitted parameters: #{unpermitted}"
       end
@@ -176,6 +180,12 @@ class TypedParameters
     private
 
     attr_reader :context, :config, :stack, :children, :transforms
+
+    def to_pointer(key)
+      parts = [*stack, key.to_s.camelize(:lower)]
+
+      "/#{parts.join('/')}"
+    end
 
     def options(opts)
       config.merge! opts

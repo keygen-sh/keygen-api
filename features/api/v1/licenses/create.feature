@@ -2195,7 +2195,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: protected"
+        "detail": "Unpermitted parameters: /data/attributes/protected"
       }
       """
     And the current account should have 0 "licenses"
@@ -2241,7 +2241,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: protected"
+        "detail": "Unpermitted parameters: /data/attributes/protected"
       }
       """
     And the current account should have 0 "licenses"
@@ -2285,7 +2285,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: id"
+        "detail": "Unpermitted parameters: /data/id"
       }
       """
     And the current account should have 0 "licenses"
@@ -2331,7 +2331,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: suspended"
+        "detail": "Unpermitted parameters: /data/attributes/suspended"
       }
       """
     And the current account should have 0 "licenses"
@@ -2377,7 +2377,7 @@ Feature: Create license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: expiry"
+        "detail": "Unpermitted parameters: /data/attributes/expiry"
       }
       """
     And the current account should have 0 "licenses"

@@ -321,7 +321,7 @@ Feature: Update license
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: key"
+        "detail": "Unpermitted parameters: /data/attributes/key"
       }
       """
     And sidekiq should have 0 "webhook" job

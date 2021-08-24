@@ -142,7 +142,7 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: version"
+        "detail": "Unpermitted parameters: /data/attributes/version"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -172,7 +172,7 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: filename"
+        "detail": "Unpermitted parameters: /data/attributes/filename"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -202,7 +202,7 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: filetype"
+        "detail": "Unpermitted parameters: /data/attributes/filetype"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -232,7 +232,7 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: platform"
+        "detail": "Unpermitted parameters: /data/attributes/platform"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -262,7 +262,7 @@ Feature: Update release
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: channel"
+        "detail": "Unpermitted parameters: /data/attributes/channel"
       }
       """
     And sidekiq should have 0 "webhook" jobs
