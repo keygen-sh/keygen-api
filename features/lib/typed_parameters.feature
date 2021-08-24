@@ -126,7 +126,7 @@ Feature: Typed parameters
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: unpermittedParam"
+        "detail": "Unpermitted parameters: /data/attributes/unpermittedParam"
       }
       """
 

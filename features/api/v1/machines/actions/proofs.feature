@@ -112,7 +112,7 @@ Feature: Machine proof actions
       """
       {
         "title": "Bad request",
-        "detail": "Unpermitted parameters: meta"
+        "detail": "Unpermitted parameters: /meta"
       }
       """
 
