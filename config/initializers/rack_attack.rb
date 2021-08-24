@@ -37,12 +37,17 @@ req_limit_proc = lambda do |base_req_limit|
     token = auth.remove('Bearer ')
     return base_req_limit if token.blank?
 
-    # Admins/products get to make additional RPS (indicates server-side)
+    # Certain roles get to make additional RPS (e.g. admin/prod indicates server-side)
     case
-    when token.starts_with?('admi')
+    when token.starts_with?('admin-'),
+         token.starts_with?('admi-'),
+         token.starts_with?('dev-')
       base_req_limit * 5
-    when token.starts_with?('prod')
+    when token.starts_with?('prod-')
       base_req_limit * 3
+    when token.starts_with?('activ-'),
+         token.starts_with?('user-')
+      base_req_limit * 2
     else
       base_req_limit
     end
