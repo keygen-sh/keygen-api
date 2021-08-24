@@ -30,12 +30,24 @@ end
 
 req_limit_proc = lambda do |base_req_limit|
   lambda do |rack_req|
-    req = ActionDispatch::Request.new rack_req.env
+    req  = ActionDispatch::Request.new rack_req.env
     auth = req.headers.fetch('authorization') { '' }
-    return base_req_limit if auth.blank?
 
-    token = auth.remove('Bearer ')
-    return base_req_limit if token.blank?
+    return base_req_limit if
+      auth.blank?
+
+    token =
+      case
+      when auth.starts_with?('Basic ')
+        Base64.decode64(auth.remove('Basic ')).split(':').first
+      when auth.starts_with?('Bearer ')
+        auth.remove('Bearer ')
+      else
+        nil
+      end
+
+    return base_req_limit if
+      token.blank?
 
     # Certain roles get to make additional RPS (e.g. admin/prod indicates server-side)
     case
@@ -51,6 +63,10 @@ req_limit_proc = lambda do |base_req_limit|
     else
       base_req_limit
     end
+  rescue => e
+    Keygen.logger.exception(e)
+
+    base_req_limit
   end
 end
 
