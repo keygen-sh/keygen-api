@@ -3200,7 +3200,7 @@ Feature: Create license
     And the current account should have 0 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to create a license while on a paid tier with card but has exceeded their max licensed user limit
     Given I am an admin of account "test1"

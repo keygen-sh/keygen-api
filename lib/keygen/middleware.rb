@@ -74,19 +74,23 @@ module Keygen
         status, headers, res = @app.call env
 
         is_ignored_origin = IGNORED_ORIGINS.include?(req.headers['origin'])
-        return [status, headers, res] if is_ignored_origin
+        return [status, headers, res] if
+          is_ignored_origin
 
-        account = Keygen::Store::Request.store[:current_account]
-        account_id = account&.id || req.params[:account_id] || req.params[:id]
-
-        route = Rails.application.routes.recognize_path req.url, method: req.method
+        account    = Keygen::Store::Request.store[:current_account]
+        route      = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
-        action = route[:action]
+        action     = route[:action]
+        account_id = account.try(:id) ||
+          route[:account_id] ||
+          req.params[:account_id] ||
+          req.params[:id]
 
         is_ignored_resource = account_id.nil? || controller.nil? || IGNORED_RESOURCES.any? { |r| controller.include?(r) }
-        return [status, headers, res] if is_ignored_resource
+        return [status, headers, res] if
+          is_ignored_resource
 
-        resource = Keygen::Store::Request.store[:current_resource]
+        resource  = Keygen::Store::Request.store[:current_resource]
         requestor = Keygen::Store::Request.store[:current_bearer]
 
         begin
