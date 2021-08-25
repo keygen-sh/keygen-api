@@ -127,7 +127,7 @@ Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
   dec   = Base64.decode64(auth.remove('Basic '))
   email = dec.split(':').first
   next unless
-    email.include?('@')
+    email.present? && email.include?('@')
 
   hash = Digest::SHA2.hexdigest(email.to_s.downcase)
 
