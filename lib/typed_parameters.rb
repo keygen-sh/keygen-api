@@ -30,7 +30,6 @@ class TypedParameters
     true_class: TrueClass,
     false_class: FalseClass,
     boolean: Boolean,
-    symbol: Symbol,
     string: String,
     hash: Hash,
     array: Array,
@@ -50,7 +49,6 @@ class TypedParameters
     float: lambda { |v| v.to_f },
     decimal: lambda { |v| v.to_d },
     boolean: lambda { |v| TRUTHY_VALUES.include?(v) },
-    symbol: lambda { |v| v.to_sym },
     string: lambda { |v| v.to_s },
     datetime: lambda { |v| v.to_datetime },
     date: lambda { |v| v.to_date },
@@ -211,6 +209,7 @@ class TypedParameters
       keys      = stack.dup << key.to_s.camelize(:lower)
 
       if value.nil? && optional && !allow_nil
+        # Delete the keys to avoid unneccessary unpermitted param errors
         context.params.delete(key.to_sym)
         context.params.delete(key.to_s)
 
