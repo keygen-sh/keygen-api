@@ -290,6 +290,49 @@ Feature: Release constraints relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to attach constraints to a release with an invalid parameter
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "entitlements"
+    And the current account has 1 "release"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[0]" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[1]", "bad": "param" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/1/relationships/entitlement/data/bad"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin attempts to attach an constraint to a release for another account
     Given I am an admin of account "test2"
     And the current account is "test1"
