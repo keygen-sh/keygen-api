@@ -129,6 +129,8 @@ module Keygen
             else
               res.first
             end
+
+          filtered_res_body = filter_response_body(body)
         rescue => e
           Keygen.logger.exception(e)
         end
@@ -168,7 +170,7 @@ module Keygen
           {
             signature: sig,
             status: status,
-            body: body,
+            body: filtered_res_body,
           }
         )
 
@@ -177,6 +179,27 @@ module Keygen
         Keygen.logger.exception(e)
 
         raise e
+      end
+
+      private
+
+      def filter_response_body(body)
+        return if
+          body.nil?
+
+        params =
+          if body.present? && body.is_a?(String)
+            JSON.parse(body.to_s)
+          else
+            body
+          end
+
+        filterer = ActiveSupport::ParameterFilter.new(%i[password token])
+        filtered = filterer.filter(params)
+
+        filtered.to_json
+      rescue => e
+        Keygen.logger.exception(e)
       end
     end
 
