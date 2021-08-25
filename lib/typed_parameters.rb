@@ -208,13 +208,14 @@ class TypedParameters
 
       real_type = VALID_TYPES.fetch(type.to_sym, nil)
       value     = real_params[key]
+      keys      = stack.dup << key.to_s.camelize(:lower)
 
       if value.nil? && optional && !allow_nil
-        [key.to_s, key.to_s.camelize(:lower)].map { |k| context.params.delete(k) }
+        context.params.delete(key.to_sym)
+        context.params.delete(key.to_s)
+
         return
       end
-
-      keys = stack.dup << key.to_s.camelize(:lower)
 
       if coerce && value
         if COERCABLE_TYPES.key?(type.to_sym)
@@ -241,7 +242,8 @@ class TypedParameters
         raise InvalidParameterError.new(type: source, param: keys.join("/")), "cannot be blank"
       end
 
-      transforms.merge! key => transform if transform.present?
+      transforms.merge! key => transform if
+        transform.present?
 
       if value.nil? && allow_nil
         params.merge! key => value
