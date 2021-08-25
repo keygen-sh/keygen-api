@@ -224,7 +224,7 @@ class TypedParameters
             raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced"
           end
         else
-          raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced (expected one of #{COERCABLE_TYPES.keys.join ", "})"
+          raise InvalidParameterError.new(type: source, param: keys.join("/")), "cannot not be coerced"
         end
       end
 
