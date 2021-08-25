@@ -9,7 +9,7 @@ class RequestLogWorker
 
   def perform(account_id, req, res)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-      Account.find_by(id: account_id)
+      FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
     end
 
     # Skip request logs for non-existent accounts
