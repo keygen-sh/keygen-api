@@ -131,7 +131,7 @@ Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
       ''
     end
 
-  hash = Digest::SHA2.hexdigest(email.to_s)
+  hash = Digest::SHA2.hexdigest(email.to_s.downcase)
 
   "#{account}/#{ip}/#{hash}"
 rescue => e
@@ -160,7 +160,7 @@ Rack::Attack.throttle("req/ip/rstpwd", limit: 5, period: 1.minute) do |rack_req|
   next unless
     email.present?
 
-  hash = Digest::SHA2.hexdigest(email.to_s)
+  hash = Digest::SHA2.hexdigest(email.to_s.downcase)
 
   "#{account}/#{ip}/#{hash}"
 rescue => e
@@ -192,7 +192,7 @@ Rack::Attack.throttle("req/ip/mutpwd", limit: 5, period: 1.minute) do |rack_req|
   next unless
     user.present?
 
-  hash = Digest::SHA2.hexdigest(user.to_s)
+  hash = Digest::SHA2.hexdigest(user.to_s.downcase)
 
   "#{account}/#{ip}/#{hash}"
 rescue => e
@@ -221,7 +221,7 @@ Rack::Attack.throttle("req/ip/mfa", limit: 5, period: 1.minute) do |rack_req|
   next unless
     user.present?
 
-  hash = Digest::SHA2.hexdigest(user.to_s)
+  hash = Digest::SHA2.hexdigest(user.to_s.downcase)
 
   "#{account}/#{ip}/#{hash}"
 rescue => e
