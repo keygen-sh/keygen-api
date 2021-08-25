@@ -7,25 +7,37 @@ WHITELISTED_DOMAINS = %w[
 
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
-  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   "127.0.0.1" == ip || "::1" == ip unless Rails.env.development?
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
 end
 
 Rack::Attack.safelist("req/allow/internal") do |rack_req|
-  req = ActionDispatch::Request.new rack_req.env
+  req    = ActionDispatch::Request.new rack_req.env
   origin = URI.parse(req.headers['origin']) rescue nil
 
   WHITELISTED_DOMAINS.include?(req.host) || (
     !origin.nil? && WHITELISTED_DOMAINS.include?(origin.host)
   )
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
 end
 
 Rack::Attack.blocklist("req/block/ip") do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
-  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   !Rack::Attack.cache.read("req/block/ip:#{ip}").nil?
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
 end
 
 req_limit_proc = lambda do |base_req_limit|
@@ -71,7 +83,7 @@ end
 
 ip_limit_proc = lambda do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
-  ip = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
   account = matches[1] unless matches.nil?
@@ -81,22 +93,152 @@ ip_limit_proc = lambda do |rack_req|
   else
     ip
   end
+rescue => e
+  Keygen.logger.exception(e)
+
+  nil
 end
 
-Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(60), period: 30.seconds }, &ip_limit_proc)
-Rack::Attack.throttle("req/ip/burst/2m", { limit: req_limit_proc.call(600), period: 2.minutes }, &ip_limit_proc)
-Rack::Attack.throttle("req/ip/burst/5m", { limit: req_limit_proc.call(1_500), period: 5.minutes }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/30s", { limit: req_limit_proc.call(60),    period: 30.seconds }, &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/2m",  { limit: req_limit_proc.call(600),   period: 2.minutes },  &ip_limit_proc)
+Rack::Attack.throttle("req/ip/burst/5m",  { limit: req_limit_proc.call(1_500), period: 5.minutes },  &ip_limit_proc)
 Rack::Attack.throttle("req/ip/burst/10m", { limit: req_limit_proc.call(3_000), period: 10.minutes }, &ip_limit_proc)
+
+# Rate limit token creation (i.e. authentication)
+Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
+  next unless
+    rack_req.post? && rack_req.path.ends_with?('/tokens')
+
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\//)
+  next if
+    matches.nil?
+
+  account = matches[1]
+  next unless
+    account.present?
+
+  auth = req.headers.fetch('authorization')
+  next unless
+    auth.present?
+
+  email =
+    if auth.starts_with?('Basic ')
+      Base64.decode64(auth.remove('Basic ')).split(':').first
+    else
+      ''
+    end
+
+  hash = Digest::SHA2.hexdigest(email.to_s)
+
+  "#{account}/#{ip}/#{hash}"
+rescue => e
+  Keygen.logger.exception(e)
+
+  nil
+end
+
+# Rate limit password reset requests
+Rack::Attack.throttle("req/ip/rstpwd", limit: 5, period: 1.minute) do |rack_req|
+  next unless
+    rack_req.post? && rack_req.path.ends_with?('/passwords')
+
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\//)
+  next if
+    matches.nil?
+
+  account = matches[1]
+  next unless
+    account.present?
+
+  email = req.params.dig(:meta, :email)
+  next unless
+    email.present?
+
+  hash = Digest::SHA2.hexdigest(email.to_s)
+
+  "#{account}/#{ip}/#{hash}"
+rescue => e
+  Keygen.logger.exception(e)
+
+  nil
+end
+
+# Rate limit password mutations (i.e. update password, reset password)
+Rack::Attack.throttle("req/ip/mutpwd", limit: 5, period: 1.minute) do |rack_req|
+  next unless
+    rack_req.post? && (
+      rack_req.path.ends_with?('/update-password') ||
+      rack_req.path.ends_with?('/reset-password')
+    )
+
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\/users\/([^\/]+)\//)
+  next if
+    matches.nil?
+
+  account = matches[1]
+  next unless
+    account.present?
+
+  user = matches[2]
+  next unless
+    user.present?
+
+  hash = Digest::SHA2.hexdigest(user.to_s)
+
+  "#{account}/#{ip}/#{hash}"
+rescue => e
+  Keygen.logger.exception(e)
+
+  nil
+end
+
+# Rate limit MFA mutations (i.e. second factors, etc.)
+Rack::Attack.throttle("req/ip/mfa", limit: 5, period: 1.minute) do |rack_req|
+  next unless
+    rack_req.post? && rack_req.path.ends_with?('/second-factors')
+
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\/users\/([^\/]+)\//)
+  next if
+    matches.nil?
+
+  account = matches[1]
+  next unless
+    account.present?
+
+  user = matches[2]
+  next unless
+    user.present?
+
+  hash = Digest::SHA2.hexdigest(user.to_s)
+
+  "#{account}/#{ip}/#{hash}"
+rescue => e
+  Keygen.logger.exception(e)
+
+  nil
+end
 
 Rack::Attack.throttled_response = -> (env) {
   match_data = env["rack.attack.match_data"] || {}
-  match_key = env['rack.attack.matched'] || ''
+  match_key  = env['rack.attack.matched'] || ''
 
   window = match_key.split('/').last
-  count = match_data[:count].to_i
+  count  = match_data[:count].to_i
   period = match_data[:period].to_i
-  limit = match_data[:limit].to_i
-  now = Time.current
+  limit  = match_data[:limit].to_i
+  now    = Time.current
 
   [
     429,
