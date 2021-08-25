@@ -102,7 +102,7 @@ describe TypedParameters do
       expect(params.call).to_not include "key" => nil
     end
 
-    context  "should allow requests that contain optional null values with varied key casing" do
+    context  "should allow requests that contain optional null values with varied input key casing" do
       it "pascal casing" do
         params = lambda {
           ctx = request PascalKey: nil
@@ -115,31 +115,31 @@ describe TypedParameters do
         }
         expect(&params).to_not raise_error { |err|
           expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/PascalKey"
+          expect(err.source).to include pointer: "/pascalKey"
         }
         expect(params.call).to be_empty
       end
 
       it "snake casing" do
         params = lambda {
-          ctx = request pascal_key: nil
+          ctx = request snake_key: nil
 
           TypedParameters.build ctx do
             on :create do
-              param :pascal_key, type: :string, optional: true
+              param :snake_key, type: :string, optional: true
             end
           end
         }
         expect(&params).to_not raise_error { |err|
           expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/PascalKey"
+          expect(err.source).to include pointer: "/snakeKey"
         }
         expect(params.call).to be_empty
       end
 
       it "camel casing" do
         params = lambda {
-          ctx = request camel_key: nil
+          ctx = request camelKey: nil
 
           TypedParameters.build ctx do
             on :create do
@@ -149,7 +149,7 @@ describe TypedParameters do
         }
         expect(&params).to_not raise_error { |err|
           expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/camel_key"
+          expect(err.source).to include pointer: "/camelKey"
         }
         expect(params.call).to be_empty
       end
@@ -166,7 +166,7 @@ describe TypedParameters do
         }
         expect(&params).to_not raise_error { |err|
           expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/meme_key"
+          expect(err.source).to include pointer: "/memeKey"
         }
         expect(params.call).to be_empty
       end
