@@ -7,7 +7,7 @@ require 'typed_parameters'
 describe TypedParameters do
 
   # Quick and dirty mock controller context for a request
-  def request(params, action = :create)
+  def request(params = {}, action = :create)
     OpenStruct.new(
       action_name: action,
       params: params,
@@ -99,6 +99,94 @@ describe TypedParameters do
         expect(err).to be_a TypedParameters::InvalidParameterError
         expect(err.source).to include pointer: "/key"
       }
+      expect(params.call).to_not include "key" => nil
+    end
+
+    context  "should allow requests that contain optional null values with varied key casing" do
+      it "pascal casing" do
+        params = lambda {
+          ctx = request PascalKey: nil
+
+          TypedParameters.build ctx do
+            on :create do
+              param :pascal_key, type: :string, optional: true
+            end
+          end
+        }
+        expect(&params).to_not raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to include pointer: "/PascalKey"
+        }
+        expect(params.call).to be_empty
+      end
+
+      it "snake casing" do
+        params = lambda {
+          ctx = request pascal_key: nil
+
+          TypedParameters.build ctx do
+            on :create do
+              param :pascal_key, type: :string, optional: true
+            end
+          end
+        }
+        expect(&params).to_not raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to include pointer: "/PascalKey"
+        }
+        expect(params.call).to be_empty
+      end
+
+      it "camel casing" do
+        params = lambda {
+          ctx = request camel_key: nil
+
+          TypedParameters.build ctx do
+            on :create do
+              param :camel_key, type: :string, optional: true
+            end
+          end
+        }
+        expect(&params).to_not raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to include pointer: "/camel_key"
+        }
+        expect(params.call).to be_empty
+      end
+
+      it "meme casing" do
+        params = lambda {
+          ctx = request mEmEkEy: nil
+
+          TypedParameters.build ctx do
+            on :create do
+              param :meme_key, type: :string, optional: true
+            end
+          end
+        }
+        expect(&params).to_not raise_error { |err|
+          expect(err).to be_a TypedParameters::InvalidParameterError
+          expect(err.source).to include pointer: "/meme_key"
+        }
+        expect(params.call).to be_empty
+      end
+    end
+
+    it "should allow requests that omit optional values" do
+      params = lambda {
+        ctx = request
+
+        TypedParameters.build ctx do
+          on :create do
+            param :key, type: :string, optional: true
+          end
+        end
+      }
+      expect(&params).to_not raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.source).to include pointer: "/key"
+      }
+      expect(params.call).to_not include "key" => nil
     end
 
     it "should allow requests that contain allowed nil values" do
