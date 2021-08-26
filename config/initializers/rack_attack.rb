@@ -250,8 +250,9 @@ Rack::Attack.throttled_response = -> (env) {
     },
     [{
       errors: [{
-        title: "Throttle limit reached",
-        detail: "Throttle limit has been reached for your IP address. Please see https://keygen.sh/docs/api/#rate-limiting for more info."
+        title: "Too many requests",
+        detail: "Throttle limit has been reached for your IP address. Please slow down. See https://keygen.sh/docs/api/#rate-limiting for more info.",
+        code: "TOO_MANY_REQUESTS",
       }]
     }.to_json]
   ]
