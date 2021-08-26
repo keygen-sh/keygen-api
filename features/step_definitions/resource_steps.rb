@@ -351,12 +351,19 @@ Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/
 
   resources = @account.send(resource.pluralize.underscore).all
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
-  slice = resources[(start_index.to_i - 1)..(end_index.to_i - 1)]
+  slice =
+    if start_index.to_i.zero?
+      # Arrays start at zero...
+      resources[start_index.to_i..end_index.to_i]
+    else
+      # Oh no, he's retarded...
+      resources[(start_index.to_i - 1)..(end_index.to_i - 1)]
+    end
 
   slice.each { |r| r.update(attrs) }
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
   parse_placeholders! body
   numbers = {
     "first"   => 0,
@@ -367,7 +374,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
     "sixth"   => 5,
     "seventh" => 6,
     "eigth"   => 7,
-    "ninth"   => 8
+    "ninth"   => 8,
+    "last"    => -1,
   }
 
   model = if resource.singularize == "plan"
