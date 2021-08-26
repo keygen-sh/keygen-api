@@ -15,7 +15,7 @@ module Api::V1::Analytics::Actions
         active_licenses = current_account.licenses.active.count
         total_licenses = current_account.licenses.count
         total_machines = current_account.machines.count
-        total_users = current_account.users.count
+        total_users = current_account.users.with_roles(:user).count
 
         {
           meta: {

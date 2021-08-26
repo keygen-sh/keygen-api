@@ -349,77 +349,63 @@ end
 Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
   parse_placeholders! body
 
-  resources = @account.send(resource.pluralize.underscore).all
-  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
-  slice =
-    if start_index.to_i.zero?
-      # Arrays start at zero...
-      resources[start_index.to_i..end_index.to_i]
+  start_idx = start_index.to_i
+  end_idx   = end_index.to_i
+  resources = @account.send(resource.pluralize.underscore).limit(start_idx + end_index)
+  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
+  slice     =
+    if start_idx.zero?
+      # Arrays start at zero!
+      resources[start_idx..end_idx]
     else
       # Oh no, he's retarded...
-      resources[(start_index.to_i - 1)..(end_index.to_i - 1)]
+      resources[(start_idx - 1)..(end_idx - 1)]
     end
 
   slice.each { |r| r.update(attrs) }
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |i, resource, body|
+Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, body|
   parse_placeholders! body
-  numbers = {
-    "first"   => 0,
-    "second"  => 1,
-    "third"   => 2,
-    "fourth"  => 3,
-    "fifth"   => 4,
-    "sixth"   => 5,
-    "seventh" => 6,
-    "eigth"   => 7,
-    "ninth"   => 8,
-    "last"    => -1,
-  }
 
-  model = if resource.singularize == "plan"
-            Plan.all
-          else
-            @account.send(resource.pluralize.underscore).all
-          end
+  idx       = index.to_i
+  resources = @account.send(resource.pluralize.underscore).limit(idx + 1)
+  attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
+  resource  = resources[idx]
 
-  m = model.send(:[], numbers[i])
-
-  m.assign_attributes(
-    JSON.parse(body).deep_transform_keys! &:underscore
-  )
-
-  m.save validate: false
+  resource.update(attrs)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |i, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |named_idx, resource, body|
   parse_placeholders! body
-  numbers = {
-    "first"   => 0,
-    "second"  => 1,
-    "third"   => 2,
-    "fourth"  => 3,
-    "fifth"   => 4,
-    "sixth"   => 5,
-    "seventh" => 6,
-    "eigth"   => 7,
-    "ninth"   => 8
-  }
 
-  model = if resource.singularize == "plan"
-            Plan.all
-          else
-            @account.send(resource.pluralize.underscore).all
-          end
+  attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
+  model =
+    if resource.singularize == "plan"
+      Plan.send(named_idx)
+    else
+      @account.send(resource.pluralize.underscore).send(named_idx)
+    end
 
-  m = model.send(:[], numbers[i])
+  model.assign_attributes(attrs)
 
-  m.assign_attributes(
-    metadata: JSON.parse(body).deep_transform_keys!(&:underscore)
-  )
+  model.save validate: false
+end
 
-  m.save validate: false
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
+  parse_placeholders! body
+
+  metadata = JSON.parse(body).deep_transform_keys!(&:underscore)
+  model    =
+    if resource.singularize == "plan"
+      Plan.send(named_idx)
+    else
+      @account.send(resource.pluralize.underscore).send(named_idx)
+    end
+
+  model.assign_attributes(metadata: metadata)
+
+  model.save validate: false
 end
 
 Given /^the (first|second|third|fourth|fifth) "license" has the following policy entitlements:$/ do |named_index, body|
