@@ -20,6 +20,7 @@ class RequestLogWorker
       requestor_id: req['requestor_id'],
       resource_type: req['resource_type'],
       resource_id: req['resource_id'],
+      created_date: req['request_time'],
       created_at: req['request_time'],
       updated_at: req['request_time'],
       response_signature: res['signature'],
