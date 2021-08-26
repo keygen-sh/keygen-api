@@ -5,7 +5,6 @@ class Key < ApplicationRecord
   include Pageable
   include Searchable
 
-  EXCLUDED_KEYS = %w[actions action].freeze
   SEARCH_ATTRIBUTES = %i[id key].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name],

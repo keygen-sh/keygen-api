@@ -23,11 +23,17 @@ Feature: Analytic counts
     And the current account has 50 "users"
     And the current account has 50 userless "licenses"
     And the current account has 30 "machines" for existing "licenses"
-    # Adjust created timestamps so that some licenses are old
-    And "licenses" 0-25 have the following attributes:
+    # Adjust associations so that some users own multiple liceness
+    And "licenses" 0-10 have the following attributes:
       """
       {
-        "createdAt": "$time.1.year.ago"
+        "userId": "$users[2]"
+      }
+      """
+    And "license" 42 has the following attributes:
+      """
+      {
+        "userId": "$users[42]"
       }
       """
     # Adjust validation timestamps so that some old licenses are still active
@@ -37,35 +43,29 @@ Feature: Analytic counts
         "lastValidatedAt": "$time.1.day.ago"
       }
       """
-    # Adjust associations so that some users own multiple liceness
-    And "licenses" 0-10 have the following attributes:
+    # Adjust created timestamps so that some licenses are old
+    And "licenses" 0-25 have the following attributes:
       """
       {
-        "userId": "$users[2]"
-      }
-      """
-    And the last "license" has the following attributes:
-      """
-      {
-        "userId": "$users[42]"
+        "createdAt": "$time.1.year.ago"
       }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/analytics/actions/count"
     Then the response status should be "200"
     # 50 users + 50 active unassigned licenses = 50 ALU
-    # 50 ALU - 25 inactive unassigned licenses = 25 ALU
-    # 25 ALU + 20 active unassigned licenses = 45 ACU
+    # 50 ALU - 25 inactive/old unassigned licenses = 25 ALU
+    # 25 ALU + 20 active/old unassigned licenses = 45 ACU
     # 45 ALU - 10 licenses assigned to user #2 = 36 ALU
-    # 45 ALU - 1 license assigned to user #42 = 35 ALU
+    # 36 ALU - 1 license assigned to user #42 = 36 ALU
     And the JSON response should contain meta with the following:
       """
       {
-        "activeLicensedUsers": 35,
+        "activeLicensedUsers": 36,
         "activeLicenses": 45,
         "totalLicenses": 50,
         "totalMachines": 30,
-        "totalUsers": 51
+        "totalUsers": 50
       }
       """
     And sidekiq should have 0 "request-log" jobs
