@@ -55,6 +55,8 @@ module Api::V1::Analytics::Actions
             )
           GROUP BY
             "request_logs"."resource_id"
+          HAVING
+            count("request_logs"."id") > 1
           ORDER BY
             count DESC
           LIMIT
@@ -97,6 +99,8 @@ module Api::V1::Analytics::Actions
           GROUP BY
             "request_logs"."method",
             "request_logs"."url"
+          HAVING
+            count("request_logs"."id") > 1
           ORDER BY
             count DESC
           LIMIT
@@ -136,6 +140,8 @@ module Api::V1::Analytics::Actions
             )
           GROUP BY
             "request_logs"."ip"
+          HAVING
+            count("request_logs"."id") > 1
           ORDER BY
             count DESC
           LIMIT
