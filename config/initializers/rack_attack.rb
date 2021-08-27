@@ -120,7 +120,7 @@ Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
   next unless
     account.present?
 
-  auth = req.headers.fetch('authorization')
+  auth = req.headers.fetch('authorization') { '' }
   next unless
     auth.present? && auth.starts_with?('Basic ')
 
