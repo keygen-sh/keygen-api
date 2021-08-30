@@ -186,7 +186,7 @@ class ApplicationController < ActionController::API
       meta: { id: request.request_id },
       errors: [{
         title: "Internal server error",
-        detail: "Looks like something went wrong!"
+        detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
       }.merge(opts)]
     }, status: :internal_server_error
   end

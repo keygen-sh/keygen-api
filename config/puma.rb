@@ -31,6 +31,9 @@ wait_for_less_busy_worker ENV.fetch("RAILS_WAIT_FOR_LESS_BUSY_WORKERS") { 0.005 
 # https://github.com/puma/puma/blob/de632261ac45d7dd85230c83f6af6dd720f1cbd9/5.0-Upgrade.md#better-memory-usage
 nakayoshi_fork
 
+# Ensure our backlog is drained
+drain_on_shutdown
+
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
 # before forking the application. This takes advantage of Copy On Write
@@ -39,12 +42,38 @@ nakayoshi_fork
 # block.
 preload_app!
 
-# The code in the `on_worker_boot` will be called if you are using
-# clustered mode by specifying a number of `workers`. After each worker
-# process is booted this block will be run, if you are using `preload_app!`
-# option you will want to use this block to reconnect to any threads
-# or connections that may have been created at application boot, Ruby
-# cannot share connections between processes.
+# Add some logging to understand what Puma is doing
 on_worker_boot do
-  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+  Keygen.logger.info("[puma] [#{Process.pid}] worker boot event")
+end
+
+on_worker_shutdown do
+  Keygen.logger.info("[puma] [#{Process.pid}] worker shutdown event")
+end
+
+on_refork do
+  Keygen.logger.info("[puma] [#{Process.pid}] refork event")
+end
+
+on_restart do
+  Keygen.logger.info("[puma] [#{Process.pid}] restart event")
+end
+
+# Handle low level exceptions from Puma
+lowlevel_error_handler do |e|
+  Keygen.logger.error("[puma] [#{Process.pid}] lowlevel error")
+  Keygen.logger.exception(e)
+
+  [
+    500,
+    {
+      "Content-Type" => "application/vnd.api+json"
+    },
+    [{
+      errors: [{
+        title: "Internal server error",
+        detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
+      }]
+    }.to_json]
+  ]
 end
