@@ -48,23 +48,25 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
-      @user.assign_attributes(user_params)
+      # NOTE(ezekg) Wrapping in a transaction to cover any possible database side-effects
+      #             of the attrs assignment, e.g. setting the IDs of an association.
+      user.transaction do
+        user.assign_attributes(user_params)
 
-      # NOTE(ezekg) We're authorizing after assigning attrs to catch any unpermitted
-      #             role changes, signaling privilege escalation.
-      authorize @user
+        # NOTE(ezekg) We're authorizing after assigning attrs to catch any unpermitted
+        #             role changes, i.e. privilege escalation.
+        authorize user
 
-      if @user.save
-        BroadcastEventService.call(
-          event: "user.updated",
-          account: current_account,
-          resource: @user
-        )
-
-        render jsonapi: @user
-      else
-        render_unprocessable_resource @user
+        user.save!
       end
+
+      BroadcastEventService.call(
+        event: 'user.updated',
+        account: current_account,
+        resource: user,
+      )
+
+      render jsonapi: user
     end
 
     # DELETE /users/1
@@ -85,6 +87,8 @@ module Api::V1
     end
 
     private
+
+    attr_reader :user
 
     def set_user
       @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id].downcase, aliases: :email)
