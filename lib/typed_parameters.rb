@@ -131,7 +131,7 @@ class TypedParameters
         when :string
           :string
         else
-          Keygen.logger.error("[typed_parameters] Unknown type: request_id=#{context.request.request_id} type=#{type_sym}")
+          Keygen.logger.error("[typed_parameters] Unknown type: request_id=#{context.request.request_id} type=#{t_sym}")
 
           :null
         end
