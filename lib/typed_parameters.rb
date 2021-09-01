@@ -38,8 +38,12 @@ class TypedParameters
     time: Time
   }
 
-  SCALAR_TYPES = VALID_TYPES.slice(
-    *(VALID_TYPES.keys - [:hash, :array, :datetime, :date, :time])
+  SCALAR_TYPES = VALID_TYPES.except(
+    :hash,
+    :array,
+    :datetime,
+    :date,
+    :time,
   )
 
   COERCABLE_TYPES = {
@@ -102,14 +106,35 @@ class TypedParameters
       end
     end
 
-    def self.class_type(c)
-      t = c.name.demodulize.underscore.to_sym rescue nil
+    def self.class_type(klass)
+      t = klass.name.demodulize.underscore rescue nil
 
-      # Rename hash => object for easier debugging (since most languages call a hash type an "object" or "dictionary")
-      t = :object if t == :hash || t == :hash_with_indifferent_access
+      t.to_s
+    end
 
-      # Rename nil => null
-      t = :null if t == :nil_class
+    def self.human_type(klass)
+      t_sym = klass.name.demodulize.underscore.to_sym
+      t     =
+        case t_sym
+        when :hash, :hash_with_indifferent_access
+          :object
+        when :array
+          :array
+        when :nil_class
+          :null
+        when :true_class, :false_class
+          :boolean
+        when :integer
+          :integer
+        when :float
+          :float
+        when :string
+          :string
+        else
+          Keygen.logger.error("[typed_parameters] Unknown type: request_id=#{context.request.request_id} type=#{type_sym}")
+
+          :null
+        end
 
       t.to_s
     end
@@ -219,7 +244,7 @@ class TypedParameters
         case key.to_sym
         when :meta,
              :data
-          raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
+          raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.human_type(value.class)} expected #{Helper.human_type(real_type)})"
         else
           return
         end
@@ -239,11 +264,11 @@ class TypedParameters
 
       case
       when real_type.nil?
-        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type is invalid (expected one of #{VALID_TYPES.keys.join ", "})"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type is invalid"
       when value.nil? && !optional && !allow_nil
         raise InvalidParameterError.new(type: source, param: keys.join("/")), "is missing"
       when !value.nil? && !Helper.compare_types(value.class, real_type)
-        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.human_type(value.class)} expected #{Helper.human_type(real_type)})"
       when !value.nil? && !inclusion.empty? && !inclusion.include?(value)
         raise InvalidParameterError.new(type: source, param: keys.join("/")), "must be one of: #{inclusion.join ", "} (received #{value})"
       when value.blank? && !allow_blank
@@ -306,7 +331,7 @@ class TypedParameters
           if index = value.index { |v| !Helper.compare_types(v.class, arr_type) }
             keys << index
 
-            raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (expected array of #{Helper.class_type(arr_type).pluralize})"
+            raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (expected array of #{Helper.human_type(arr_type).pluralize})"
           end
 
           # TODO: Handle array type here as well
