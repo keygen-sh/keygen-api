@@ -335,6 +335,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "developers"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to a sales agent role
@@ -359,6 +360,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "sales-agent"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to a support agent role
@@ -383,6 +385,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "support-agent"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to a product role
@@ -407,6 +410,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "products"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to a license role
@@ -431,6 +435,7 @@ Feature: Update user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "licenses"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to an unknown role

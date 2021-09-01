@@ -515,17 +515,19 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
 end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
-  user  = @account.admins.first
-  token = TokenGeneratorService.call(
-    account: @account,
-    bearer: user
-  )
-
   case resource
+  when /^administrators?$/
+    expect(@account.users.administrators.count).to eq count.to_i
   when /^admins?$/
     expect(@account.users.admins.count).to eq count.to_i
+  when /^developers?$/
+    expect(@account.users.with_role(:developer).count).to eq count.to_i
+  when /^sales-agents?$/
+    expect(@account.users.with_role(:sales_agent).count).to eq count.to_i
+  when /^support-agents?$/
+    expect(@account.users.with_role(:support_agent).count).to eq count.to_i
   when /^users?$/
-    expect(@account.users.with_roles(:user).count).to eq count.to_i
+    expect(@account.users.with_role(:user).count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
@@ -534,17 +536,19 @@ end
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, resource|
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
 
-  user  = account.admins.first
-  token = TokenGeneratorService.call(
-    account: account,
-    bearer: user
-  )
-
   case resource
+  when /^administrators?$/
+    expect(account.users.administrators.count).to eq count.to_i
   when /^admins?$/
     expect(account.users.admins.count).to eq count.to_i
+  when /^developers?$/
+    expect(account.users.with_role(:developer).count).to eq count.to_i
+  when /^sales-agents?$/
+    expect(account.users.with_role(:sales_agent).count).to eq count.to_i
+  when /^support-agents?$/
+    expect(account.users.with_role(:support_agent).count).to eq count.to_i
   when /^users?$/
-    expect(account.users.with_roles(:user).count).to eq count.to_i
+    expect(account.users.with_role(:user).count).to eq count.to_i
   else
     expect(account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
