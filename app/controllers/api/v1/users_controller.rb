@@ -48,9 +48,13 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
+      @user.assign_attributes(user_params)
+
+      # NOTE(ezekg) We're authorizing after assigning attrs to catch any unpermitted
+      #             role changes, signaling privilege escalation.
       authorize @user
 
-      if @user.update(user_params)
+      if @user.save
         BroadcastEventService.call(
           event: "user.updated",
           account: current_account,
