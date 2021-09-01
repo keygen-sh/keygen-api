@@ -108,6 +108,9 @@ class TypedParameters
       # Rename hash => object for easier debugging (since most languages call a hash type an "object" or "dictionary")
       t = :object if t == :hash || t == :hash_with_indifferent_access
 
+      # Rename nil => null
+      t = :null if t == :nil_class
+
       t.to_s
     end
   end
@@ -210,10 +213,16 @@ class TypedParameters
 
       if value.nil? && optional && !allow_nil
         # Delete the keys to avoid unneccessary unpermitted param errors
-        context.params.delete(key.to_sym)
-        context.params.delete(key.to_s)
+        context.params.delete(key)
 
-        return
+        # Special case where nil is not allowed for top-level keys
+        case key.to_sym
+        when :meta,
+             :data
+          raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.class_type(value.class)} expected #{Helper.class_type(real_type)})"
+        else
+          return
+        end
       end
 
       if coerce && value
