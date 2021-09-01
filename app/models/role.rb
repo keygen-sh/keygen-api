@@ -18,6 +18,10 @@ class Role < ApplicationRecord
   belongs_to :resource,
     polymorphic: true
 
+  # NOTE(ezekg) Sanity check
+  validates :resource_type,
+    inclusion: { in: [User.name, Product.name, License.name] }
+
   validates :name,
     inclusion: { in: USER_ROLES, message: 'must be a valid user role' },
     if: -> { resource.is_a?(User) }
