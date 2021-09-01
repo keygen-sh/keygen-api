@@ -58,7 +58,6 @@ Feature: Create user
         "subscriptions": ["user.created", "user.updated"]
       }
       """
-    And the current account has 1 "user"
     When I send a POST request to "/accounts/test1/users" with the following:
       """
       {
@@ -84,7 +83,7 @@ Feature: Create user
       }
       """
     And the response should contain a valid signature header for "test1"
-    And the current account should have 1 "user"
+    And the current account should have 0 "users"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
