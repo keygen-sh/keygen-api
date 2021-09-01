@@ -36,6 +36,15 @@ Feature: Delete user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Developer attempts to delete an admin
+    Given the current account is "test1"
+    And the current account has 1 "developer"
+    And the current account has 3 "admins"
+    And I am a developer of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3"
+    Then the response status should be "403"
+
   Scenario: Developer deletes one of their users
     Given the current account is "test1"
     And the current account has 1 "developer"

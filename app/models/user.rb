@@ -81,10 +81,12 @@ class User < ApplicationRecord
 
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :with_roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
+  scope :with_role, -> (role) { joins(:role).where(roles: { name: role.to_s.underscore }) }
   scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:license).where licenses: id }
   scope :for_user, -> (id) { where id: id }
-  scope :admins, -> { with_roles :admin }
+  scope :administrators, -> { with_roles(:admin, :developer, :sales_agent, :support_agent) }
+  scope :admins, -> { with_role(:admin) }
   scope :active, -> (status = true) {
     sub_query = License.where('"licenses"."user_id" = "users"."id"').select(1).arel.exists
 

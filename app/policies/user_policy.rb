@@ -17,9 +17,7 @@ class UserPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
-
-    return false if resource.has_role?(:admin) &&
-                    !bearer&.has_role?(:admin)
+    assert_role_ok!
 
     (bearer.present? && bearer.has_role?(:admin, :developer, :product)) ||
       !account.protected?
@@ -27,9 +25,7 @@ class UserPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
-
-    return false if resource.has_role?(:admin) &&
-                    !bearer.has_role?(:admin)
+    assert_role_ok!
 
     bearer.has_role?(:admin, :developer, :sales_agent, :product) ||
       resource == bearer
@@ -37,6 +33,7 @@ class UserPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_role_ok!
 
     bearer.has_role?(:admin, :developer)
   end
@@ -58,5 +55,21 @@ class UserPolicy < ApplicationPolicy
     assert_account_scoped!
 
     resource == bearer
+  end
+
+  private
+
+  def assert_role_ok!
+    return if
+      resource.role.nil?
+
+    # Assert that privilege escalation is not occurring (sanity check)
+    raise Pundit::NotAuthorizedError, reason: 'bearer is escalating privileges for the resource' if
+      (bearer.role.changed? || resource.role.changed?) &&
+      bearer.role < resource.role
+
+    # Assert bearer can perform this action on the resource
+    raise Pundit::NotAuthorizedError, reason: 'bearer lacks privileges to the resource' if
+      bearer.role < resource.role
   end
 end
