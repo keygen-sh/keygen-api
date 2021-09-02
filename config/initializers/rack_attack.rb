@@ -6,10 +6,12 @@ WHITELISTED_DOMAINS = %w[
 ]
 
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
+  next unless Rails.env.development?
+
   req = ActionDispatch::Request.new rack_req.env
   ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
-  "127.0.0.1" == ip || "::1" == ip unless Rails.env.development?
+  "127.0.0.1" == ip || "::1" == ip
 rescue => e
   Keygen.logger.exception(e)
 
@@ -20,9 +22,19 @@ Rack::Attack.safelist("req/allow/internal") do |rack_req|
   req    = ActionDispatch::Request.new rack_req.env
   origin = URI.parse(req.headers['origin']) rescue nil
 
-  WHITELISTED_DOMAINS.include?(req.host) || (
-    !origin.nil? && WHITELISTED_DOMAINS.include?(origin.host)
-  )
+  WHITELISTED_DOMAINS.include?(req.host) ||
+    (!origin.nil? && WHITELISTED_DOMAINS.include?(origin.host))
+rescue => e
+  Keygen.logger.exception(e)
+
+  false
+end
+
+Rack::Attack.safelist("req/allow/ip") do |rack_req|
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+
+  Rack::Attack.cache.read("req/allow/ip:#{ip}").present?
 rescue => e
   Keygen.logger.exception(e)
 
@@ -33,7 +45,7 @@ Rack::Attack.blocklist("req/block/ip") do |rack_req|
   req = ActionDispatch::Request.new rack_req.env
   ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
-  !Rack::Attack.cache.read("req/block/ip:#{ip}").nil?
+  Rack::Attack.cache.read("req/block/ip:#{ip}").present?
 rescue => e
   Keygen.logger.exception(e)
 
