@@ -61,7 +61,7 @@ end
 
 # Handle low level exceptions from Puma
 lowlevel_error_handler do |e|
-  Keygen.logger.error("[puma] [#{Process.pid}] lowlevel error")
+  Keygen.logger.error("[puma] [#{Process.pid}] lowlevel error: #{e.message}")
   Keygen.logger.exception(e)
 
   [
