@@ -11,7 +11,7 @@ Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
 # camel case to snake case
 ActionDispatch::Request.parameter_parsers[:json]    =
 ActionDispatch::Request.parameter_parsers[:jsonapi] = -> raw_post {
-  data = ActiveSupport::JSON.decode(raw_post)
+  data = ActiveSupport::JSON.decode(raw_post) || {}
 
   data.deep_transform_keys! { |k| k.to_s.underscore.parameterize(separator: '_') }
 
