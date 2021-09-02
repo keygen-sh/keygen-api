@@ -95,10 +95,7 @@ describe TypedParameters do
           end
         end
       }
-      expect(&params).to_not raise_error { |err|
-        expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.source).to include pointer: "/key"
-      }
+      expect(&params).to_not raise_error
       expect(params.call).to_not include "key" => nil
     end
 
@@ -113,10 +110,7 @@ describe TypedParameters do
             end
           end
         }
-        expect(&params).to_not raise_error { |err|
-          expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/pascalKey"
-        }
+        expect(&params).to_not raise_error
         expect(params.call).to be_empty
       end
 
@@ -130,10 +124,7 @@ describe TypedParameters do
             end
           end
         }
-        expect(&params).to_not raise_error { |err|
-          expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/snakeKey"
-        }
+        expect(&params).to_not raise_error
         expect(params.call).to be_empty
       end
 
@@ -147,10 +138,7 @@ describe TypedParameters do
             end
           end
         }
-        expect(&params).to_not raise_error { |err|
-          expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/camelKey"
-        }
+        expect(&params).to_not raise_error
         expect(params.call).to be_empty
       end
 
@@ -164,10 +152,7 @@ describe TypedParameters do
             end
           end
         }
-        expect(&params).to_not raise_error { |err|
-          expect(err).to be_a TypedParameters::InvalidParameterError
-          expect(err.source).to include pointer: "/memeKey"
-        }
+        expect(&params).to_not raise_error
         expect(params.call).to be_empty
       end
     end
@@ -182,10 +167,7 @@ describe TypedParameters do
           end
         end
       }
-      expect(&params).to_not raise_error { |err|
-        expect(err).to be_a TypedParameters::InvalidParameterError
-        expect(err.source).to include pointer: "/key"
-      }
+      expect(&params).to_not raise_error
       expect(params.call).to_not include "key" => nil
     end
 
@@ -504,6 +486,26 @@ describe TypedParameters do
         end
       }
       expect(&params).to raise_error TypedParameters::UnpermittedParametersError
+    end
+
+    it "should disallow requests that contain a top-level optional hash that is nil" do
+      params = lambda {
+        ctx = request data: nil
+
+        TypedParameters.build ctx do
+          options strict: true
+
+          on :create do
+            param :data, type: :hash, optional: true do
+              param :type, type: :string
+            end
+          end
+        end
+      }
+      expect(&params).to raise_error { |err|
+        expect(err).to be_a TypedParameters::InvalidParameterError
+        expect(err.source).to include pointer: "/data"
+      }
     end
   end
 

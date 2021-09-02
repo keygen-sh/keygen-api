@@ -240,14 +240,11 @@ class TypedParameters
         # Delete the keys to avoid unneccessary unpermitted param errors
         context.params.delete(key)
 
-        # Special case where nil is not allowed for top-level keys
-        case key.to_sym
-        when :meta,
-             :data
-          raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.human_type(value.class)} expected #{Helper.human_type(real_type)})"
-        else
-          return
-        end
+        # Special case where nil is not allowed for top-level hash keys, e.g. data, meta, etc.
+        raise InvalidParameterError.new(type: source, param: keys.join("/")), "type mismatch (received #{Helper.human_type(value.class)} expected #{Helper.human_type(real_type)})" if
+          keys.size == 1 && type == :hash
+
+        return
       end
 
       if coerce && value
