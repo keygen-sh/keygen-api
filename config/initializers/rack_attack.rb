@@ -212,7 +212,7 @@ rescue => e
 end
 
 # Rate limit MFA mutations (i.e. second factors, etc.)
-Rack::Attack.throttle("req/ip/mfa", limit: 5, period: 1.minute) do |rack_req|
+Rack::Attack.throttle("req/ip/mutmfa", limit: 5, period: 1.minute) do |rack_req|
   next unless
     (rack_req.post? && rack_req.path.ends_with?('/second-factors')) ||
     (rack_req.delete? && rack_req.path.include?('/second-factors/')) ||
@@ -247,11 +247,12 @@ Rack::Attack.throttled_response = -> (env) {
   match_data = env["rack.attack.match_data"] || {}
   match_key  = env['rack.attack.matched'] || ''
 
-  window = match_key.split('/').last
-  count  = match_data[:count].to_i
-  period = match_data[:period].to_i
-  limit  = match_data[:limit].to_i
-  now    = Time.current
+  window      = match_key.split('/').last
+  count       = match_data[:count].to_i
+  period      = match_data[:period].to_i
+  limit       = match_data[:limit].to_i
+  now         = match_data[:epoch_time].to_i
+  retry_after = period - (now % period)
 
   [
     429,
@@ -261,7 +262,8 @@ Rack::Attack.throttled_response = -> (env) {
       "X-RateLimit-Count" => count.to_s,
       "X-RateLimit-Limit" => limit.to_s,
       "X-RateLimit-Remaining" => "0",
-      "X-RateLimit-Reset" => (now + (period - now.to_i % period)).to_i.to_s
+      "X-RateLimit-Reset" => (now + (period - now.to_i % period)).to_i.to_s,
+      "Retry-After" => retry_after.to_s,
     },
     [{
       errors: [{

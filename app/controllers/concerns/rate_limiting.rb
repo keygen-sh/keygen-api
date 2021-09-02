@@ -19,16 +19,16 @@ module RateLimiting
 
     window = key.split('/').last
     period = data[:period].to_i
-    count = data[:count].to_i
-    limit = data[:limit].to_i
-    now = Time.current
+    count  = data[:count].to_i
+    limit  = data[:limit].to_i
+    now    = data[:epoch_time].to_i
 
     {
       window: window,
       count: count,
       limit: limit,
       remaining: [0, limit - count].max,
-      reset: (now + (period - now.to_i % period)).to_i,
+      reset: (now + (period - now % period)).to_i,
     }
   rescue => e
     Keygen.logger.exception e
