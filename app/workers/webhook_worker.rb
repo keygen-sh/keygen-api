@@ -145,7 +145,13 @@ class WebhookWorker
     )
   end
 
-  class FailedRequestError < StandardError; end
+  class FailedRequestError < StandardError
+    # Silence backtrace for failed webhooks (not needed, too noisy)
+    def backtrace
+      nil
+    end
+  end
+
   class Request
     include HTTParty
   end

@@ -5,7 +5,7 @@ module Keygen
     def self.exception(e, context: nil)
       Rails.logger.error context if context.present?
       Rails.logger.error e.message
-      Rails.logger.error e.backtrace.join("\n")
+      Rails.logger.error e.backtrace&.join("\n")
     end
 
     def self.error(msg)
