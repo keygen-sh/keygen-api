@@ -214,7 +214,10 @@ end
 # Rate limit MFA mutations (i.e. second factors, etc.)
 Rack::Attack.throttle("req/ip/mfa", limit: 5, period: 1.minute) do |rack_req|
   next unless
-    rack_req.post? && rack_req.path.ends_with?('/second-factors')
+    (rack_req.post? && rack_req.path.ends_with?('/second-factors')) ||
+    (rack_req.delete? && rack_req.path.include?('/second-factors/')) ||
+    (rack_req.patch? && rack_req.path.include?('/second-factors/')) ||
+    (rack_req.put? && rack_req.path.include?('/second-factors/'))
 
   req = ActionDispatch::Request.new(rack_req.env)
   ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
