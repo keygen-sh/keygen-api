@@ -116,7 +116,8 @@ Feature: Show user
       """
       {
         "title": "Not found",
-        "detail": "The requested user 'invalid' was not found"
+        "detail": "The requested user 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

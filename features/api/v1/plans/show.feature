@@ -29,7 +29,8 @@ Feature: Show plan
       """
       {
         "title": "Not found",
-        "detail": "The requested plan 'invalid' was not found"
+        "detail": "The requested plan 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
     And sidekiq should have 0 "request-log" jobs

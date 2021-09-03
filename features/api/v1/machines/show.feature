@@ -156,7 +156,8 @@ Feature: Show machine
       """
       {
         "title": "Not found",
-        "detail": "The requested machine 'invalid' was not found"
+        "detail": "The requested machine 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 
@@ -184,7 +185,8 @@ Feature: Show machine
       """
       {
         "title": "Not found",
-        "detail": "The requested machine '95a4a5dc-fd79-4108-ba73-c3610ccfcab1' was not found"
+        "detail": "The requested machine '95a4a5dc-fd79-4108-ba73-c3610ccfcab1' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

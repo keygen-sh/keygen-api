@@ -63,7 +63,8 @@ Feature: Show release platform
       """
       {
         "title": "Not found",
-        "detail": "The requested release platform 'invalid' was not found"
+        "detail": "The requested release platform 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

@@ -63,7 +63,8 @@ Feature: Show release
       """
       {
         "title": "Not found",
-        "detail": "The requested release 'invalid' was not found"
+        "detail": "The requested release 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

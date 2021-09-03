@@ -63,7 +63,8 @@ Feature: Show policy
       """
       {
         "title": "Not found",
-        "detail": "The requested policy 'invalid' was not found"
+        "detail": "The requested policy 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

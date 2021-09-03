@@ -88,7 +88,8 @@ Feature: Release artifact relationship
       """
       {
         "title": "Not found",
-        "detail": "artifact does not exist or is unavailable (ensure it has been uploaded)"
+        "detail": "artifact does not exist or is unavailable (ensure it has been uploaded)",
+        "code": "NOT_FOUND"
       }
       """
 

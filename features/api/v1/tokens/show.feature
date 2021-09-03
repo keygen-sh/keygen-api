@@ -34,7 +34,8 @@ Feature: Show authentication token
       """
       {
         "title": "Not found",
-        "detail": "The requested token 'invalid' was not found"
+        "detail": "The requested token 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

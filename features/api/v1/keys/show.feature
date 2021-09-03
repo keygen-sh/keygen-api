@@ -38,7 +38,8 @@ Feature: Show key
       """
       {
         "title": "Not found",
-        "detail": "The requested key 'invalid' was not found"
+        "detail": "The requested key 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
     And sidekiq should have 1 "request-log" job

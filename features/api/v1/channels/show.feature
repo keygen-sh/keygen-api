@@ -63,7 +63,8 @@ Feature: Show release channel
       """
       {
         "title": "Not found",
-        "detail": "The requested release channel 'invalid' was not found"
+        "detail": "The requested release channel 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 
