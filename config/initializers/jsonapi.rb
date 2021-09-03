@@ -12,8 +12,7 @@ Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
 ActionDispatch::Request.parameter_parsers[:json]    =
 ActionDispatch::Request.parameter_parsers[:jsonapi] = -> raw_post {
   data = ActiveSupport::JSON.decode(raw_post)
-
-  raise JSON::ParserError, 'expected top-level object' unless
+  data = { data: data } unless
     data.is_a?(Hash)
 
   data.deep_transform_keys! { |k| k.to_s.underscore.parameterize(separator: '_') }
