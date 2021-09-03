@@ -129,7 +129,7 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists",
+        "detail": "already exists for 'darwin' platform with 'dmg' filetype on 'stable' channel",
         "code": "VERSION_TAKEN",
         "source": {
           "pointer": "/data/attributes/version"
