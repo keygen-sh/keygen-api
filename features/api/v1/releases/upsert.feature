@@ -546,7 +546,7 @@ Feature: Upsert release
           "attributes": {
             "name": "macOS Manfiest",
             "filename": "latest-mac.yml",
-            "filetype": "yml",
+            "filetype": ".yml",
             "platform": "darwin",
             "channel": "stable",
             "version": "1.0.0"
@@ -568,7 +568,7 @@ Feature: Upsert release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists",
+        "detail": "already exists for 'darwin' platform with 'yml' filetype on 'stable' channel",
         "source": {
           "pointer": "/data/attributes/version"
         },

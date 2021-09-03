@@ -75,7 +75,18 @@ class Release < ApplicationRecord
   validates :version,
     presence: true,
     semver: true,
-    uniqueness: { message: 'already exists', scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id] }
+    uniqueness: {
+      # This error scenario is one of our most confusing, so we're giving as
+      # much context as possible to the end-user.
+      scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id],
+      message: -> release, * {
+        filetype = release.filetype&.key
+        platform = release.platform&.key
+        channel  = release.channel&.key
+
+        "already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel"
+      }
+    }
   validates :filename,
     presence: true,
     uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
