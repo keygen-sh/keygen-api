@@ -82,7 +82,8 @@ Feature: Show account
       """
       {
         "title": "Not found",
-        "detail": "The requested account 'invalid' was not found"
+        "detail": "The requested account 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

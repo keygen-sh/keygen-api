@@ -38,7 +38,8 @@ Feature: Show metric
       """
       {
         "title": "Not found",
-        "detail": "The requested metric 'invalid' was not found"
+        "detail": "The requested metric 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
     And sidekiq should have 0 "request-log" jobs

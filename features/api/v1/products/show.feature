@@ -66,7 +66,8 @@ Feature: Show product
       """
       {
         "title": "Not found",
-        "detail": "The requested product 'invalid' was not found"
+        "detail": "The requested product 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

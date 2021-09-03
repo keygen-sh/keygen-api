@@ -216,7 +216,8 @@ Feature: Product artifacts relationship
       """
       {
         "title": "Not found",
-        "detail": "The requested release artifact 'invalid' was not found"
+        "detail": "The requested release artifact 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

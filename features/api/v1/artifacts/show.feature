@@ -68,7 +68,8 @@ Feature: Show release artifact
       """
       {
         "title": "Not found",
-        "detail": "The requested release artifact 'invalid' was not found"
+        "detail": "The requested release artifact 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

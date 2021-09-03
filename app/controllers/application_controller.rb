@@ -141,7 +141,8 @@ class ApplicationController < ActionController::API
       meta: { id: request.request_id },
       errors: [{
         title: "Not found",
-        detail: "The requested resource was not found"
+        detail: "The requested resource was not found",
+        code: "NOT_FOUND",
       }.merge(opts)]
     }, status: :not_found
   end

@@ -263,7 +263,8 @@ Feature: Show license
       """
       {
         "title": "Not found",
-        "detail": "The requested license 'invalid' was not found"
+        "detail": "The requested license 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 
@@ -292,7 +293,8 @@ Feature: Show license
       """
       {
         "title": "Not found",
-        "detail": "The requested license 'a-license-key' was not found"
+        "detail": "The requested license 'a-license-key' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

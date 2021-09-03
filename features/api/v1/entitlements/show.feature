@@ -66,7 +66,8 @@ Feature: Show entitlement
       """
       {
         "title": "Not found",
-        "detail": "The requested entitlement 'invalid' was not found"
+        "detail": "The requested entitlement 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

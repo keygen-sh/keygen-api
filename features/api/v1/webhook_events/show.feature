@@ -37,7 +37,8 @@ Feature: Show webhook event
       """
       {
         "title": "Not found",
-        "detail": "The requested webhook event 'invalid' was not found"
+        "detail": "The requested webhook event 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

@@ -37,7 +37,8 @@ Feature: Show webhook endpoint
       """
       {
         "title": "Not found",
-        "detail": "The requested webhook endpoint 'invalid' was not found"
+        "detail": "The requested webhook endpoint 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 

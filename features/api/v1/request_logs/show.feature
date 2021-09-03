@@ -36,7 +36,8 @@ Feature: Show request logs
       """
       {
         "title": "Not found",
-        "detail": "The requested request log 'invalid' was not found"
+        "detail": "The requested request log 'invalid' was not found",
+        "code": "NOT_FOUND"
       }
       """
 
