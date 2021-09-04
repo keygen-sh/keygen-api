@@ -140,6 +140,58 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a duplicate release (by version, with malicious platform)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                   | filetype | platform       | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Product-1.0.0.dmg.blockmap | blockmap | %{injection}   | stable   |
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Duplicate Release",
+            "filename": "Product-1.0.0.zip.blockmap",
+            "filetype": ".blockmap",
+            "platform": "%{injection}",
+            "channel": "stable",
+            "version": "1.0.0"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "already exists for '{injection}' platform with 'blockmap' filetype on 'stable' channel",
+        "code": "VERSION_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/version"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate release (by filename)
     Given I am an admin of account "test1"
     And the current account is "test1"
