@@ -79,12 +79,14 @@ class Release < ApplicationRecord
       # This error scenario is one of our most confusing, so we're giving as
       # much context as possible to the end-user.
       scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id],
-      message: -> release, * {
+      message: proc { |release|
         filetype = release.filetype&.key
         platform = release.platform&.key
         channel  = release.channel&.key
 
-        "already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel"
+        # We're going to remove % chars since Rails treats these special,
+        # e.g. %{value}.
+        "already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel".remove('%')
       }
     }
   validates :filename,
