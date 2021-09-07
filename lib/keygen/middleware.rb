@@ -387,9 +387,13 @@ module Keygen
       end
 
       def call(env)
-        if env['CONTENT_TYPE'] == 'application/x-www-form-urlencoded'
-          env['CONTENT_TYPE'] = 'application/json'
-        end
+        content_type = env['CONTENT_TYPE'] || ''
+
+        # Default to JSON content-type header for typical HTML content types
+        env['CONTENT_TYPE'] = 'application/json' if
+          content_type.include?('application/x-www-form-urlencoded') ||
+          content_type.include?('text/plain') ||
+          content_type.empty?
 
         @app.call env
       end
