@@ -71,9 +71,16 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
   end
 
-  validates :key, length: { minimum: 1, maximum: 100.kilobytes }, uniqueness: { case_sensitive: true, scope: :account_id }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { key.nil? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
+
+  # Key is immutable so we only need to assert on create
+  validates :key,
+    exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
+    uniqueness: { case_sensitive: true, scope: :account_id },
+    length: { minimum: 1, maximum: 100.kilobytes },
+    unless: -> { key.nil? },
+    on: :create
 
   # FIXME(ezekg) Hack to override pg_search with more performant queries
   # TODO(ezekg) Rip out pg_search completely
