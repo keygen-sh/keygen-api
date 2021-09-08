@@ -103,6 +103,9 @@ module Api::V1
               param :protected, type: :boolean, optional: true
               param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
               param :suspended, type: :boolean, optional: true
+              param :max_machines, type: :integer, optional: true
+              param :max_cores, type: :integer, optional: true
+              param :max_uses, type: :integer, optional: true
             end
             param :metadata, type: :hash, optional: true
           end
@@ -134,6 +137,9 @@ module Api::V1
               param :protected, type: :boolean, optional: true
               param :suspended, type: :boolean, optional: true
               param :metadata, type: :hash, optional: true
+              param :max_machines, type: :integer, optional: true
+              param :max_cores, type: :integer, optional: true
+              param :max_uses, type: :integer, optional: true
             end
           end
         end

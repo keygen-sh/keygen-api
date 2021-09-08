@@ -65,10 +65,10 @@ class License < ApplicationRecord
 
   validate on: :update do |license|
     next unless license.uses_changed?
-    next if license&.uses.nil? || license.policy&.max_uses.nil?
-    next if license.uses <= license.policy.max_uses
+    next if license.uses.nil? || license.max_uses.nil?
+    next if license.uses <= license.max_uses
 
-    license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.policy.max_uses})"
+    license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.max_uses})"
   end
 
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
@@ -81,6 +81,47 @@ class License < ApplicationRecord
     length: { minimum: 1, maximum: 100.kilobytes },
     unless: -> { key.nil? },
     on: :create
+
+  validates :max_machines,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_blank: true,
+    allow_nil: true,
+    if: -> {
+      attributes['max_machines'].present?
+    }
+
+  validates :max_machines,
+    numericality: { greater_than_or_equal_to: 1, message: 'must be greater than or equal to 1 for floating policy' },
+    allow_blank: true,
+    allow_nil: true,
+    if: -> {
+      attributes['max_machines'].present? &&
+        floating?
+    }
+
+  validates :max_machines, numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
+    allow_blank: true,
+    allow_nil: true,
+    if: -> {
+      attributes['max_machines'].present? &&
+        node_locked?
+    }
+
+  validates :max_cores,
+    numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
+    allow_blank: true,
+    allow_nil: true,
+    if: -> {
+      attributes['max_cores'].present?
+    }
+
+  validates :max_uses,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_blank: true,
+    allow_nil: true,
+    if: -> {
+      attributes['max_uses'].present?
+    }
 
   # FIXME(ezekg) Hack to override pg_search with more performant queries
   # TODO(ezekg) Rip out pg_search completely
@@ -184,15 +225,11 @@ class License < ApplicationRecord
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
 
-  delegate :requires_check_in?, to: :policy
-  delegate :check_in_interval, to: :policy
-  delegate :check_in_interval_count, to: :policy
-  delegate :duration, to: :policy
-  delegate :encrypted?, to: :policy
-  delegate :legacy_encrypted?, to: :policy
-  delegate :scheme?, to: :policy
-  delegate :scheme, to: :policy
-  delegate :pool?, to: :policy
+  delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
+    :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,
+    :strict?, :concurrent?, :pool?, :node_locked?, :floating?,
+    to: :policy,
+    allow_nil: true
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
@@ -202,6 +239,18 @@ class License < ApplicationRecord
         .or(
           entl.where(license_entitlements: { license_id: id })
         )
+  end
+
+  def max_machines
+    attributes['max_machines'] || policy&.max_machines
+  end
+
+  def max_cores
+    attributes['max_cores'] || policy&.max_cores
+  end
+
+  def max_uses
+    attributes['max_uses'] || policy&.max_uses
   end
 
   def protected?

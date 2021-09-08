@@ -49,24 +49,24 @@ class Machine < ApplicationRecord
     machines_count = machine.license.machines_count || 0
     next if machines_count == 0
 
-    next unless (machines_count >= machine.policy.max_machines rescue false)
+    next unless (machines_count >= machine.license.max_machines rescue false)
 
-    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.policy.max_machines || 1})"
+    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.license.max_machines || 1})"
   end
 
   # Disallow machine core overages for non-concurrent licenses
   validate on: [:create, :update] do |machine|
     next if machine.policy.nil? || machine.license.nil?
-    next if machine.policy.max_cores.nil? ||
+    next if machine.license.max_cores.nil? ||
             machine.policy.concurrent?
 
     prev_core_count = machine.license.machines.where.not(id: machine.id).sum(:cores) || 0
     next_core_count = prev_core_count + machine.cores.to_i
     next if next_core_count == 0
 
-    next unless (next_core_count > machine.policy.max_cores rescue false)
+    next unless (next_core_count > machine.license.max_cores rescue false)
 
-    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.policy.max_cores || 1})"
+    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.license.max_cores || 1})"
   end
 
   # Fingerprint uniqueness on create
