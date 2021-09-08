@@ -42,7 +42,7 @@ class LicenseValidationService < BaseService
         when license.policy.floating? && license.machines_count == 0
           return [false, "machine is not activated (has no associated machines)", :NO_MACHINES]
         else
-          return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
+          return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
         end
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
