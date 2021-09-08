@@ -1582,7 +1582,7 @@ Feature: License validation actions
       """
       {
         "valid": false,
-        "detail": "fingerprint scope does not match any associated machines",
+        "detail": "fingerprint is not activated (does not match any associated machines)",
         "constant": "FINGERPRINT_SCOPE_MISMATCH",
         "scope": {
           "fingerprint": "$machines[1].fingerprint"
@@ -1631,7 +1631,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "constant": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -1675,7 +1675,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "constant": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3059,7 +3059,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has no associated machine", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "constant": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3103,7 +3103,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has no associated machines", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "constant": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3201,7 +3201,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match any associated machines", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3516,7 +3516,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match enough associated machines", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3568,7 +3568,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match enough associated machines", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3675,7 +3675,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match all associated machines", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match all associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3889,7 +3889,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope does not match any associated machines", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
