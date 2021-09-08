@@ -44,6 +44,111 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin updates a floating license's max machines (was present)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "floating": true }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxMachines": 10
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxMachines "10"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes a floating license's max machines (was present)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxMachines": 5,
+        "floating": true
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxMachines": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxMachines "5"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a floating license's max machines (was nil)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "floating": true }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxMachines": null }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxMachines": 5
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxMachines "5"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Developer updates a license expiry
     Given the current account is "test1"
     And the current account has 1 "developer"
