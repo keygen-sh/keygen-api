@@ -84,7 +84,6 @@ class License < ApplicationRecord
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
-    allow_blank: true,
     allow_nil: true,
     if: -> {
       attributes['max_machines'].present?
@@ -92,7 +91,6 @@ class License < ApplicationRecord
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 1, message: 'must be greater than or equal to 1 for floating policy' },
-    allow_blank: true,
     allow_nil: true,
     if: -> {
       attributes['max_machines'].present? &&
@@ -100,7 +98,6 @@ class License < ApplicationRecord
     }
 
   validates :max_machines, numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
-    allow_blank: true,
     allow_nil: true,
     if: -> {
       attributes['max_machines'].present? &&
@@ -109,7 +106,6 @@ class License < ApplicationRecord
 
   validates :max_cores,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
-    allow_blank: true,
     allow_nil: true,
     if: -> {
       attributes['max_cores'].present?
@@ -117,7 +113,6 @@ class License < ApplicationRecord
 
   validates :max_uses,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
-    allow_blank: true,
     allow_nil: true,
     if: -> {
       attributes['max_uses'].present?
