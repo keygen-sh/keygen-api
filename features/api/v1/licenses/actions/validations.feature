@@ -999,6 +999,48 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict floating license that has too many machines (max machines has diverged)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "maxMachines": 5,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now",
+        "maxMachines": 10
+      }
+      """
+    And the current account has 6 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many machines
     Given I am an admin of account "test1"
     And the current account is "test1"
