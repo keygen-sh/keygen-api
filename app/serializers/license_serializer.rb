@@ -16,28 +16,28 @@ class LicenseSerializer < BaseSerializer
   attribute :suspended
   attribute :scheme
   attribute :encrypted do
-    @object.policy.encrypted?
+    @object.encrypted?
   end
   attribute :strict do
-    @object.policy.strict?
+    @object.strict?
   end
   attribute :floating do
-    @object.policy.floating?
+    @object.floating?
   end
   attribute :concurrent do
-    @object.policy.concurrent?
+    @object.concurrent?
   end
   attribute :protected do
     @object.protected?
   end
   attribute :max_machines do
-    @object.policy.max_machines
+    @object.max_machines
   end
   attribute :max_cores do
-    @object.policy.max_cores
+    @object.max_cores
   end
   attribute :max_uses do
-    @object.policy.max_uses
+    @object.max_uses
   end
   attribute :require_check_in do
     @object.requires_check_in?
