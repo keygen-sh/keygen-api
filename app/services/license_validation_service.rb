@@ -38,9 +38,9 @@ class LicenseValidationService < BaseService
       if scope.present? && scope.key?(:machine)
         case
         when !license.policy.floating? && license.machines_count == 0
-          return [false, "fingerprint is not activated (has no associated machine)", :NO_MACHINE]
+          return [false, "machine is not activated (has no associated machine)", :NO_MACHINE]
         when license.policy.floating? && license.machines_count == 0
-          return [false, "fingerprint is not activated (has no associated machines)", :NO_MACHINES]
+          return [false, "machine is not activated (has no associated machines)", :NO_MACHINES]
         else
           return [false, "machine scope does not match", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
         end
