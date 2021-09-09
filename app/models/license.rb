@@ -97,7 +97,8 @@ class License < ApplicationRecord
         floating?
     }
 
-  validates :max_machines, numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
+  validates :max_machines,
+    numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
     allow_nil: true,
     if: -> {
       attributes['max_machines'].present? &&
