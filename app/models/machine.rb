@@ -53,7 +53,7 @@ class Machine < ApplicationRecord
       machines_count == 0
 
     next unless
-      (machines_count >= machine.license.max_machines rescue false)
+      machines_count >= machine.license.max_machines
 
     machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.license.max_machines})"
   end
@@ -71,7 +71,7 @@ class Machine < ApplicationRecord
       next_core_count == 0
 
     next unless
-      (next_core_count > machine.license.max_cores rescue false)
+      next_core_count > machine.license.max_cores
 
     machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.license.max_cores})"
   end
