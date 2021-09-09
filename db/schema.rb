@@ -127,9 +127,9 @@ ActiveRecord::Schema.define(version: 2021_09_08_172755) do
     t.integer "machines_count", default: 0
     t.datetime "last_validated_at"
     t.integer "machines_core_count"
-    t.integer "max_machines"
-    t.integer "max_cores"
-    t.integer "max_uses"
+    t.integer "max_machines_override"
+    t.integer "max_cores_override"
+    t.integer "max_uses_override"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
