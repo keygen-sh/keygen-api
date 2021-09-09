@@ -44,7 +44,7 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a floating license's max machines (was present)
+  Scenario: Admin overrides a floating license's max machines
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoints"
@@ -78,7 +78,7 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin removes a floating license's max machines (was present)
+  Scenario: Admin removes a floating license's max machine override
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoints"
@@ -115,7 +115,7 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a floating license's max machines (was nil)
+  Scenario: Admin overrides a floating license's max machines
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoints"
@@ -144,6 +144,148 @@ Feature: Update license
       """
     Then the response status should be "200"
     And the JSON response should be a "license" with the maxMachines "5"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin overrides a floating license's max cores
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "floating": true }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxCores": 8 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxCores": 32
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxCores "32"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes a floating license's max cores override
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxCores": 4,
+        "floating": true
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxCores": 8 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxCores": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxCores "4"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin overrides a floating license's max uses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "floating": true }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxUses": 100 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxUses": 500
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxUses "500"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes a floating license's max uses override
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxUses": 100,
+        "floating": true
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxUses": 250 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "maxUses": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the maxUses "100"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
