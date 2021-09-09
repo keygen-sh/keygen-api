@@ -43,30 +43,37 @@ class Machine < ApplicationRecord
 
   # Disallow machine overages when the policy is not set to concurrent
   validate on: :create do |machine|
-    next if machine.policy.nil? || machine.license.nil?
-    next if machine.policy.concurrent?
+    next if machine.license.nil?
+    next if
+      machine.license.max_machines.nil? ||
+      machine.license.concurrent?
 
     machines_count = machine.license.machines_count || 0
-    next if machines_count == 0
+    next if
+      machines_count == 0
 
-    next unless (machines_count >= machine.license.max_machines rescue false)
+    next unless
+      (machines_count >= machine.license.max_machines rescue false)
 
-    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.license.max_machines || 1})"
+    machine.errors.add :base, :limit_exceeded, message: "machine count has exceeded maximum allowed by current policy (#{machine.license.max_machines})"
   end
 
   # Disallow machine core overages for non-concurrent licenses
   validate on: [:create, :update] do |machine|
-    next if machine.policy.nil? || machine.license.nil?
-    next if machine.license.max_cores.nil? ||
-            machine.policy.concurrent?
+    next if machine.license.nil?
+    next if
+      machine.license.max_cores.nil? ||
+      machine.license.concurrent?
 
     prev_core_count = machine.license.machines.where.not(id: machine.id).sum(:cores) || 0
     next_core_count = prev_core_count + machine.cores.to_i
-    next if next_core_count == 0
+    next if
+      next_core_count == 0
 
-    next unless (next_core_count > machine.license.max_cores rescue false)
+    next unless
+      (next_core_count > machine.license.max_cores rescue false)
 
-    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.license.max_cores || 1})"
+    machine.errors.add :base, :core_limit_exceeded, message: "machine core count has exceeded maximum allowed by current policy (#{machine.license.max_cores})"
   end
 
   # Fingerprint uniqueness on create
@@ -251,7 +258,7 @@ class Machine < ApplicationRecord
   def update_machines_core_count_on_update
     return if policy.nil? || license.nil?
 
-    # Skip unless cores have chagned
+    # Skip unless cores have changed
     return unless saved_change_to_cores?
 
     core_count = license.machines.sum(:cores) || 0
