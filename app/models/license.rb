@@ -225,6 +225,10 @@ class License < ApplicationRecord
         )
   end
 
+  def max_machines=(value)
+    self.max_machines_override = value
+  end
+
   def max_machines
     return max_machines_override if
       max_machines_override?
@@ -232,11 +236,19 @@ class License < ApplicationRecord
     policy&.max_machines
   end
 
+  def max_cores=(value)
+    self.max_cores_override = value
+  end
+
   def max_cores
     return max_cores_override if
       max_cores_override?
 
     policy&.max_cores
+  end
+
+  def max_uses=(value)
+    self.max_uses_override = value
   end
 
   def max_uses
