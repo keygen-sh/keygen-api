@@ -85,39 +85,27 @@ class License < ApplicationRecord
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> {
-      attributes['max_machines'].present?
-    }
+    if: -> { max_machines_override? }
 
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 1, message: 'must be greater than or equal to 1 for floating policy' },
     allow_nil: true,
-    if: -> {
-      attributes['max_machines'].present? &&
-        floating?
-    }
+    if: -> { max_machines_override? && floating? }
 
   validates :max_machines,
     numericality: { equal_to: 1, message: 'must be equal to 1 for non-floating policy' },
     allow_nil: true,
-    if: -> {
-      attributes['max_machines'].present? &&
-        node_locked?
-    }
+    if: -> { max_machines_override? && node_locked? }
 
   validates :max_cores,
     numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> {
-      attributes['max_cores'].present?
-    }
+    if: -> { max_cores_override? }
 
   validates :max_uses,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
-    if: -> {
-      attributes['max_uses'].present?
-    }
+    if: -> { max_uses_override? }
 
   # FIXME(ezekg) Hack to override pg_search with more performant queries
   # TODO(ezekg) Rip out pg_search completely
@@ -238,15 +226,24 @@ class License < ApplicationRecord
   end
 
   def max_machines
-    attributes['max_machines'] || policy&.max_machines
+    return max_machines_override if
+      max_machines_override?
+
+    policy&.max_machines
   end
 
   def max_cores
-    attributes['max_cores'] || policy&.max_cores
+    return max_cores_override if
+      max_cores_override?
+
+    policy&.max_cores
   end
 
   def max_uses
-    attributes['max_uses'] || policy&.max_uses
+    return max_uses_override if
+      max_uses_override?
+
+    policy&.max_uses
   end
 
   def protected?
