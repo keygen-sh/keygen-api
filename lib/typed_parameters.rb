@@ -122,13 +122,13 @@ class TypedParameters
           :array
         when :nil_class
           :null
-        when :true_class, :false_class
+        when :true_class, :false_class, :boolean
           :boolean
         when :integer
           :integer
         when :float
           :float
-        when :string
+        when :string, :symbol
           :string
         else
           Keygen.logger.error("[typed_parameters] Unknown type: type=#{t_sym}")
