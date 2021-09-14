@@ -476,6 +476,7 @@ Feature: Create license
           "type": "licenses",
           "attributes": {
             "metadata": {
+              "key": ["value"],
               "object": {
                 "key": { "k": "v" }
               },

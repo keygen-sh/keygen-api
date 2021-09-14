@@ -296,7 +296,7 @@ class TypedParameters
               value.each do |k, v|
                 next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
-                keys << k.to_s.camelize(:lower)
+                parts = [*keys, k.to_s.camelize(:lower)]
 
                 # FIXME(ezekg) This is very, very dirty…
                 case v
@@ -304,13 +304,13 @@ class TypedParameters
                   v.each do |k, v|
                     next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
-                    raise InvalidParameterError.new(type: source, param: (keys << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
+                    raise InvalidParameterError.new(type: source, param: (parts << k.to_s.camelize(:lower)).join("/")), "unpermitted type (expected nested object of scalar types)"
                   end
                 when Array
                   v.each_with_index do |v, i|
                     next if SCALAR_TYPES[Helper.class_type(v.class).to_sym].present?
 
-                    raise InvalidParameterError.new(type: source, param: (keys << i).join("/")), "unpermitted type (expected nested array of scalar types)"
+                    raise InvalidParameterError.new(type: source, param: (parts << i).join("/")), "unpermitted type (expected nested array of scalar types)"
                   end
                 end
               end
