@@ -108,8 +108,12 @@ module Keygen
         end
 
         begin
-          filtered_req_path = req.filtered_path ||
-                              req.original_fullpath
+          filtered_req_path =
+            if status.to_i < 500
+              req.filtered_path || req.original_fullpath
+            else
+              req.original_fullpath
+            end
         rescue => e
           Keygen.logger.exception(e)
         end
