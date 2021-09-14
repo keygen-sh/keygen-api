@@ -207,6 +207,10 @@ class Account < ApplicationRecord
     users.admins
   end
 
+  def technical_contacts
+    users.with_roles(:admin, :developer)
+  end
+
   private
 
   def set_founding_users_roles!
