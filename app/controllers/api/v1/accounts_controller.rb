@@ -82,7 +82,7 @@ module Api::V1
                     param :password, type: :string
                     param :first_name, type: :string, optional: true
                     param :last_name, type: :string, optional: true
-                    param :metadata, type: :hash, optional: true
+                    param :metadata, type: :hash, allow_non_scalars: true, optional: true
                     param :role, type: :string, optional: true, transform: -> (k, v) { [] }
                   end
                 end

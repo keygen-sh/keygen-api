@@ -597,13 +597,91 @@ Feature: Update user
           "type": "users",
           "attributes": {
             "metadata": {
-              "nested": { "meta": "data" }
+              "object": { "key": "value" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following "metadata":
+      """
+      {
+        "object": { "key": "value" }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a users metadata with a nested hash of non-scalar values (hash)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "object": {
+                "object": { "key": "value" }
+              }
             }
           }
         }
       }
       """
     Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted type (expected nested object of scalar types)",
+        "source": {
+          "pointer": "/data/attributes/metadata/object/object"
+        }
+      }
+      """
+
+  Scenario: Admin updates a users metadata with a nested hash of non-scalar values (array)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "metadata": {
+              "array": [
+                "foo",
+                "bar",
+                { "key": "value" },
+                "baz"
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted type (expected nested array of scalar types)",
+        "source": {
+          "pointer": "/data/attributes/metadata/array/2"
+        }
+      }
+      """
 
   Scenario: Admin updates a users metadata with 64 keys
     Given I am an admin of account "test1"
