@@ -148,7 +148,7 @@ module Api::V1
               [:channel_attributes, { key: v.downcase }]
             }
             param :version, type: :string
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
           param :relationships, type: :hash do
             param :product, type: :hash do
@@ -193,7 +193,7 @@ module Api::V1
               [:channel_attributes, { key: v.downcase }]
             }
             param :version, type: :string
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
           param :relationships, type: :hash do
             param :product, type: :hash do
@@ -228,7 +228,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
             param :filesize, type: :integer, optional: true, allow_nil: true
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
       end

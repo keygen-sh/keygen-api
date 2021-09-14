@@ -107,7 +107,7 @@ module Api::V1
             param :last_name, type: :string, optional: true
             param :email, type: :string
             param :password, type: :string
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_bearer&.has_role?(:admin)
               param :role, type: :string, inclusion: %w[user admin developer sales-agent support-agent], optional: true, transform: -> (k, v) {
                 [:role_attributes, { name: v.underscore }]
@@ -129,7 +129,7 @@ module Api::V1
               param :password, type: :string, optional: true
             end
             if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
-              param :metadata, type: :hash, optional: true
+              param :metadata, type: :hash, allow_non_scalars: true, optional: true
             end
             if current_bearer&.has_role?(:admin)
               param :role, type: :string, inclusion: %w[user admin developer sales-agent support-agent], optional: true, transform: -> (k, v) {

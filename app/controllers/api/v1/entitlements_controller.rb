@@ -82,7 +82,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string
             param :code, type: :string
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
       end
@@ -94,7 +94,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :code, type: :string, optional: true
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
       end

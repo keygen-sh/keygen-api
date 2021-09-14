@@ -107,7 +107,7 @@ module Api::V1
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true
             end
-            param :metadata, type: :hash, optional: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
           param :relationships, type: :hash do
             param :policy, type: :hash do
@@ -136,7 +136,7 @@ module Api::V1
               param :expiry, type: :datetime, optional: true, coerce: true, allow_nil: true
               param :protected, type: :boolean, optional: true
               param :suspended, type: :boolean, optional: true
-              param :metadata, type: :hash, optional: true
+              param :metadata, type: :hash, allow_non_scalars: true, optional: true
               param :max_machines, type: :integer, optional: true, allow_nil: true
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true

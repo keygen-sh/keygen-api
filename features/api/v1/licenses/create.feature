@@ -405,6 +405,108 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license with complex metadata
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "metadata": {
+              "object": {
+                "key": "value"
+              },
+              "array": [
+                "foo",
+                "bar",
+                "baz",
+                "qux"
+              ]
+            }
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "license" with the following "metadata":
+      """
+      {
+        "object": {
+          "key": "value"
+        },
+        "array": [
+          "foo",
+          "bar",
+          "baz",
+          "qux"
+        ]
+      }
+      """
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license with invalid metadata
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "metadata": {
+              "object": {
+                "key": { "k": "v" }
+              },
+              "array": [
+                [1, 2, 3]
+              ]
+            }
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "unpermitted type (expected nested object of scalar types)",
+        "source": {
+          "pointer": "/data/attributes/metadata/object/key"
+        }
+      }
+      """
+
   Scenario: Admin creates a license with metadata for their account and the keys should be transformed to camelcase
     Given I am an admin of account "test1"
     And the current account is "test1"
