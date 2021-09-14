@@ -133,7 +133,7 @@ class TypedParameters
         else
           Keygen.logger.error("[typed_parameters] Unknown type: type=#{t_sym}")
 
-          :null
+          :undefined
         end
 
       t.to_s
