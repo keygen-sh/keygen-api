@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserMailer < ApplicationMailer
-  default from: "Keygen Support <support@keygen.sh>"
+  default from: "Keygen <noreply@keygen.sh>"
   layout "user_mailer"
 
   def password_reset(user:, token:)
