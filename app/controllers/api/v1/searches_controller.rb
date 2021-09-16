@@ -19,7 +19,7 @@ module Api::V1
 
         search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
         search_rels  = model::SEARCH_RELATIONSHIPS
-        res          = current_account.send(type.underscore.pluralize)
+        res          = model.where(account: current_account)
 
         # Special cases for certain models
         case
