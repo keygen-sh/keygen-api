@@ -80,9 +80,10 @@ module Api::V1
           end
         end
 
-        @search = policy_scope apply_scopes(res)
+        search_results = policy_scope apply_scopes(res)
+        authorize search_results, :index?
 
-        render jsonapi: @search
+        render jsonapi: search_results
       else
         render_bad_request(
           detail: "unsupported search type '#{type.camelize(:lower)}'",
