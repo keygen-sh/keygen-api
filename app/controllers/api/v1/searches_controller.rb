@@ -11,16 +11,15 @@ module Api::V1
 
     # POST /search
     def search
-      query, type = search_params[:meta].fetch_values 'query', 'type'
-      model = type.underscore.classify.constantize rescue nil
+      query, type  = search_meta.fetch_values('query', 'type')
+      model        = type.underscore.classify.safe_constantize
 
-      if model.respond_to?(:search) && current_account.respond_to?(type.underscore.pluralize)
+      if model.present? && model.respond_to?(:search) && current_account.respond_to?(type.underscore.pluralize) && current_account.associated_to?(type.underscore.pluralize)
         authorize model
 
         search_attrs = model::SEARCH_ATTRIBUTES.map { |a| a.is_a?(Hash) ? a.keys.first : a }
-        search_rels = model::SEARCH_RELATIONSHIPS
-
-        res = current_account.send type.underscore.pluralize
+        search_rels  = model::SEARCH_RELATIONSHIPS
+        res          = current_account.send(type.underscore.pluralize)
 
         # Special cases for certain models
         case
@@ -77,7 +76,7 @@ module Api::V1
             # Truncate attr search terms to speed up search queries
             term = term[0...128] if search_attrs.include?(attribute.to_sym)
 
-            res = res.send "search_#{attribute}", term
+            res  = res.send "search_#{attribute}", term
           end
         end
 
@@ -100,7 +99,24 @@ module Api::V1
       on :search do
         param :meta, type: :hash do
           param :type, type: :string
-          param :query, type: :hash, allow_non_scalars: true
+          param :query, type: :hash, allow_non_scalars: true do
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
+
+            # FIXME(ezekg) Wildcard to be able to support the nested metadata
+            #              query above (when searching arrays and objects)
+            controller.params.fetch('query', {}).except('metadata').each do |(key, value)|
+              case value
+              when TrueClass, FalseClass
+                param key.to_sym, type: :boolean, optional: true
+              when Integer
+                param key.to_sym, type: :integer, optional: true
+              when Float
+                param key.to_sym, type: :float, optional: true
+              else
+                param key.to_sym, type: :string, optional: true
+              end
+            end
+          end
         end
       end
     end

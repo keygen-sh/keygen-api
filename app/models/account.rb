@@ -211,6 +211,16 @@ class Account < ApplicationRecord
     users.with_roles(:admin, :developer)
   end
 
+  def self.associated_to?(association)
+    associations = self.reflect_on_all_associations(:has_many)
+
+    associations.any? { |r| r.name == association.to_sym }
+  end
+
+  def associated_to?(association)
+    self.class.associated_to?(association)
+  end
+
   private
 
   def set_founding_users_roles!

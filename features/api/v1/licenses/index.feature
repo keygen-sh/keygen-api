@@ -445,6 +445,90 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
 
+  Scenario: Admin retrieves licenses filtered by an object metadata value (integers)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "ryzen-3700x", "cores": 16 } } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "intel-i9", "cores": 16 } } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "ryzen-threadripper", "cores": 64 } } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[hardware][cores]=64"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by an object metadata value (strings)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "ryzen-3700x", "cores": 16 } } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "intel-i9", "cores": 16 } } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "hardware": { "cpu": "ryzen-threadripper", "cores": 64 } } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[hardware][cpu]=ryzen-threadripper"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves licenses filtered by an array metadata value (integers)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "ids": [1, 2, 3] } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "ids": [4, 5, 6] } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "ids": [2] } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[ids][]=2"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by an array metadata value (strings)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "metadata": { "ids": ["1", "2", "3"] } }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "metadata": { "ids": ["4", "5", "6"] } }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "metadata": { "ids": ["2"] } }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?metadata[ids][]=2"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"
