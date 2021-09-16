@@ -604,7 +604,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "search query for 'metadata' must be a hash of key-value search terms",
+        "detail": "type mismatch (received array expected object)",
         "source": {
           "pointer": "/meta/query/metadata"
         }
@@ -702,6 +702,135 @@ Feature: Search
       """
     Then the response status should be "200"
     And the JSON response should be an array with 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by license type on a metadata object attribute (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following metadata:
+      """
+      {
+        "object": {
+          "foo": "bar",
+          "baz": "qux"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "license",
+          "query": {
+            "metadata": {
+              "object": {
+                "foo": "bar",
+                "baz": "qux"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by license type on a metadata object attribute (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following metadata:
+      """
+      {
+        "object": {
+          "foo": "bar",
+          "baz": "qux"
+        }
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "license",
+          "query": {
+            "metadata": {
+              "object": { "baz": "qux" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by license type on a metadata array attribute (full)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following metadata:
+      """
+      {
+        "array": [1, 2, 3]
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "license",
+          "query": {
+            "metadata": {
+              "array": [1, 2, 3]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by license type on a metadata array attribute (partial)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "licenses"
+    And the first "license" has the following metadata:
+      """
+      {
+        "array": [1, 2, 3]
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "license",
+          "query": {
+            "metadata": {
+              "array": [2]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
