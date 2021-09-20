@@ -117,7 +117,7 @@ module DefaultHeaders
     controller = params[:controller]
     action     = params[:action]
 
-    controller == 'api/v1/artifacts' &&
+    controller.ends_with?('/artifacts') &&
       action == 'show'
   end
 end

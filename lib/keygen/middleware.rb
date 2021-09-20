@@ -393,10 +393,17 @@ module Keygen
       def call(env)
         content_type = env['CONTENT_TYPE'] || ''
 
-        # Default to JSON content-type header for typical HTML content types
-        env['CONTENT_TYPE'] = 'application/json' if
-          content_type.include?('text/plain') ||
-          content_type.empty?
+        if content_type.empty?
+          req          = ActionDispatch::Request.new(env)
+          route        = Rails.application.routes.recognize_path(req.url, method: req.method)
+          controller   = route[:controller]
+          action       = route[:action]
+
+          # Default to JSON content-type header for non-artifact endpoints
+          env['CONTENT_TYPE'] = 'application/json' unless
+            controller.ends_with?('/artifacts') &&
+            action == 'create'
+        end
 
         @app.call env
       end
