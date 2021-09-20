@@ -393,6 +393,10 @@ module Keygen
       def call(env)
         content_type = env['CONTENT_TYPE'] || ''
 
+        # Whenever an API request is sent without a content-type header, some clients,
+        # such as `fetch()` or curl, use these headers by default. We're going to try
+        # to parse the request as JSON and error later, instead of rejecting the request
+        # off the bat. In theory, this would slightly improve onboarding DX.
         if content_type.empty? || content_type.include?('text/plain') || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
           begin
             req        = ActionDispatch::Request.new(env)
