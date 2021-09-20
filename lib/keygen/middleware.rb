@@ -393,7 +393,7 @@ module Keygen
       def call(env)
         content_type = env['CONTENT_TYPE'] || ''
 
-        if content_type.empty?
+        if content_type.empty? || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
           begin
             req        = ActionDispatch::Request.new(env)
             route      = Rails.application.routes.recognize_path(req.url, method: req.method)
