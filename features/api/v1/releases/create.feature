@@ -86,6 +86,67 @@ Feature: Create release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a new release for their account (non-lowercase filetype)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "filename": "Product-1.0.0.AppImage",
+            "filetype": ".AppImage",
+            "filesize": 209715200,
+            "platform": "linux",
+            "channel": "stable",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Launch Release",
+        "filename": "Product-1.0.0.AppImage",
+        "filetype": "appimage",
+        "filesize": 209715200,
+        "platform": "linux",
+        "channel": "stable",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate release (by version)
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -269,7 +269,7 @@ class Release < ApplicationRecord
     filetype.key.delete_prefix!('.')
 
     errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") if
-      filename.include?('.') && !filename.ends_with?(".#{filetype.key}")
+      filename.include?('.') && !filename.downcase.ends_with?(".#{filetype.key}")
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
