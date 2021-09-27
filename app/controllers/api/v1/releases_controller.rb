@@ -16,7 +16,7 @@ module Api::V1
     before_action :set_release, only: %i[show update destroy]
 
     def index
-      releases = policy_scope apply_scopes(current_account.releases.preload(:platform, :filetype, :channel))
+      releases = policy_scope apply_scopes(current_account.releases.preload(:artifact, :platform, :filetype, :channel))
       authorize releases
 
       render jsonapi: releases
