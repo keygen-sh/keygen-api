@@ -26,4 +26,8 @@ class Plan < ApplicationRecord
   def paid?
     !free?
   end
+
+  def ent?
+    name.starts_with?('Ent')
+  end
 end

@@ -199,6 +199,12 @@ class Account < ApplicationRecord
            plan.paid?
   end
 
+  def ent_tier?
+    return false if billing.nil?
+
+    return plan.ent?
+  end
+
   def protected?
     protected
   end

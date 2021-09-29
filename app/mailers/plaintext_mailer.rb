@@ -60,6 +60,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def first_payment_succeeded(account:)
+    return if
+      account.ent_tier?
+
     admin = account.admins.last
     call_to_actions = [
       %(If I could ask one question -- how did you hear about Keygen?),
@@ -87,6 +90,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def prompt_for_testimonial(account:)
+    return if
+      account.ent_tier?
+
     admin = account.admins.last
 
     mail(
@@ -113,6 +119,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def prompt_for_review(account:)
+    return if
+      account.ent_tier?
+
     admin = account.admins.last
 
     mail(
