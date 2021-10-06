@@ -587,6 +587,143 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 2 "licenses"
 
+  Scenario: Admin retrieves licenses filtered by user ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?user=$users[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by user email
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And the second "user" has the following attributes:
+      """
+      { "email": "zeke@keygen.example" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "email": "luca@keygen.example" }
+      """
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": null }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?user=luca@keygen.example"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves licenses filtered by policy ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "policies"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "policyId": "$policies[2]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?policy=$policies[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by product ID
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 2 "policies"
+    And the first "policies" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the second "policies" has the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?product=$products[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"

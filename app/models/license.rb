@@ -186,6 +186,59 @@ class License < ApplicationRecord
                 )
   }
 
+  scope :search_product, -> (term) {
+    product_identifier = term.to_s
+    return none if
+      product_identifier.empty?
+
+    return joins(:policy).where(policy: { product_id: product_identifier }) if
+      UUID_REGEX.match?(product_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', policies.product_id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(policy: :product)
+      .where('products.name ILIKE ?', "%#{product_identifier}%")
+      .or(
+        joins(:policy).where(tsv_query.squish, product_identifier)
+      )
+  }
+
+  scope :search_policy, -> (term) {
+    policy_identifier = term.to_s
+    return none if
+      policy_identifier.empty?
+
+    return where(policy_id: policy_identifier) if
+      UUID_REGEX.match?(policy_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', policy_id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
+                  .or(
+                    joins(:policy).where(tsv_query.squish, policy_identifier)
+                  )
+  }
+
   scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :unassigned, -> (status = true) {
@@ -211,7 +264,13 @@ class License < ApplicationRecord
   }
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :for_policy, -> (id) { where policy: id }
-  scope :for_user, -> (id) { where user: id }
+  scope :for_user, -> id {
+    if UUID_REGEX.match?(id)
+      where(user: id)
+    else
+      search_user(id)
+    end
+  }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
