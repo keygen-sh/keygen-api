@@ -264,11 +264,12 @@ class License < ApplicationRecord
   }
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :for_policy, -> (id) { where policy: id }
-  scope :for_user, -> id {
-    if UUID_REGEX.match?(id)
-      where(user: id)
+  scope :for_user, -> user {
+    case user
+    when User
+      where(user_id: user.id)
     else
-      search_user(id)
+      search_user(user)
     end
   }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
