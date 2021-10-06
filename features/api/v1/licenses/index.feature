@@ -235,6 +235,64 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
 
+  Scenario: Admin retrieves all expiring licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 6 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.hour.ago" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": "$time.4.days.from_now" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "$time.1.hour.from_now" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.from_now" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "$time.10.minutes.from_now" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expiring=1"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves all non-expiring licenses
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 8 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.hour.ago" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "$time.4.days.from_now" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "$time.1.day.from_now" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "$time.10.minutes.from_now" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expiring=0"
+    Then the response status should be "200"
+    And the JSON response should be an array with 6 "licenses"
+
   Scenario: Admin retrieves all unassigned licenses
     Given I am an admin of account "test1"
     And the current account is "test1"
