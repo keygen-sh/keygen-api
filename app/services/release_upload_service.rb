@@ -22,8 +22,8 @@ class ReleaseUploadService < BaseService
 
   def call
     signer   = Aws::S3::Presigner.new
-    ttl      = 60.seconds.to_i
-    url      = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+    ttl      = 60.seconds
+    url      = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl.to_i)
     link     = release.upload_links.create!(account: account, url: url, ttl: ttl)
     artifact = ReleaseArtifact.find_or_create_by!(
       account: account,
