@@ -22,10 +22,10 @@ class ReleaseDownloadService < BaseService
       release.yanked?
 
     raise InvalidTTLError.new('must be greater than or equal to 60 (1 minute)') if
-      ttl.present? && ttl < 1.minute.to_i
+      ttl.present? && ttl < 1.minute
 
     raise InvalidTTLError.new('must be less than or equal to 604800 (1 week)') if
-      ttl.present? && ttl > 1.week.to_i
+      ttl.present? && ttl > 1.week
 
     @account  = account
     @release  = release
@@ -51,7 +51,7 @@ class ReleaseDownloadService < BaseService
     # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
     # NOTE(ezekg) Check obj.replication_status for EU
     signer   = Aws::S3::Presigner.new
-    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl)
+    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl&.to_i)
     link     =
       if upgrade?
         release.upgrade_links.create!(account: account, url: url, ttl: ttl)
