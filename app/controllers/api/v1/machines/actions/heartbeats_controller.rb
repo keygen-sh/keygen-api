@@ -29,7 +29,7 @@ module Api::V1::Machines::Actions
       authorize @machine
 
       if @machine.heartbeat_dead?
-        render_unprocessable_entity(detail: "is dead", source: { pointer: "/data/attributes/heartbeatStatus" }) and return
+        render_unprocessable_entity(detail: "is dead", code: "MACHINE_HEARTBEAT_DEAD", source: { pointer: "/data/attributes/heartbeatStatus" }) and return
       end
 
       if !@machine.update(last_heartbeat_at: Time.current)
