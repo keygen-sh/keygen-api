@@ -45,7 +45,7 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_requestor_type, -> (term) {
-    requestor_type = type.to_s.underscore.singularize.classify
+    requestor_type = term.to_s.underscore.singularize.classify
     return none if
       requestor_type.empty?
 
