@@ -29,6 +29,11 @@ class Policy < ApplicationRecord
     MATCH_ALL
   ].freeze
 
+  EXPIRATION_STRATEGIES = %w[
+    RESTRICT_ACCESS
+    REVOKE_ACCESS
+  ].freeze
+
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name]
@@ -49,6 +54,7 @@ class Policy < ApplicationRecord
 
   before_create -> { self.fingerprint_uniqueness_strategy = 'UNIQUE_PER_LICENSE' }, if: -> { fingerprint_uniqueness_strategy.nil? }
   before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
+  before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -74,6 +80,7 @@ class Policy < ApplicationRecord
   validates :scheme, inclusion: { in: CRYPTO_SCHEMES, message: "unsupported encryption scheme" }, if: :scheme?
   validates :fingerprint_uniqueness_strategy, inclusion: { in: FINGERPRINT_UNIQUENESS_STRATEGIES, message: "unsupported fingerprint uniqueness strategy" }, allow_nil: true
   validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
+  validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -157,6 +164,18 @@ class Policy < ApplicationRecord
 
   def fingerprint_match_all?
     fingerprint_matching_strategy == 'MATCH_ALL'
+  end
+
+  def restrict_access?
+    expiration_strategy == 'RESTRICT_ACCESS'
+  end
+
+  def revoke_access?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      expiration_strategy.nil?
+
+    expiration_strategy == 'REVOKE_ACCESS'
   end
 
   def pop!

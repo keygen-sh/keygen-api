@@ -279,6 +279,7 @@ class License < ApplicationRecord
   delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
     :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,
     :strict?, :concurrent?, :pool?, :node_locked?, :floating?,
+    :revoke_access?, :restrict_access?,
     to: :policy,
     allow_nil: true
 

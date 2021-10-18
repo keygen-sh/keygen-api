@@ -187,10 +187,14 @@ Feature: Release artifact relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
 
-  Scenario: License retrieves the artifact for a release of their product (expired after release)
+  Scenario: License retrieves the artifact for a release of their product (expired after release, restrict access)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
     And the current account has 1 "license" for an existing "policy"
     And the first "license" has the following attributes:
       """
@@ -207,6 +211,30 @@ Feature: Release artifact relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
+
+  Scenario: License retrieves the artifact for a release of their product (expired after release, revoke access)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS" }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "$time.3.months.ago" }
+      """
+    And the first "release" has an artifact that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (suspended)
     Given the current account is "test1"
