@@ -186,7 +186,7 @@ Feature: Release upgrade actions
       }
       """
 
-  Scenario: License retrieves an upgrade for a release of their product (expired)
+  Scenario: License retrieves an upgrade for a release of their product (expired, but access restricted)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     |
@@ -201,10 +201,43 @@ Feature: Release upgrade actions
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
     And the current account has 1 "license" for the first "policy"
     And the first "license" has the following attributes:
       """
       { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$2/actions/upgrade"
+    Then the response status should be "204"
+
+  Scenario: License retrieves an upgrade for a release of their product (expired, but access revoked)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.zip        | zip      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | Test-App-2.0.0-beta.1.zip | zip      | macos    | beta     |
+    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.6.months.ago" }
       """
     And I am a license of account "test1"
     And I use an authentication token

@@ -16,8 +16,12 @@ class LicenseValidationService < BaseService
 
     # Check if license is suspended
     return [false, "is suspended", :SUSPENDED] if license.suspended?
-    # Check if license is expired (move along if it has no expiry)
-    return [false, "is expired", :EXPIRED] if license.expired?
+
+    # When revoking access, check if license is expired (move along if it has no expiry)
+    return [false, "is expired", :EXPIRED] if
+      license.revoke_access? &&
+      license.expired?
+
     # Check if license is overdue for check in
     return [false, "is overdue for check in", :OVERDUE] if license.check_in_overdue?
     # Scope validations (quick validation skips this by setting explicitly to false)
@@ -86,8 +90,17 @@ class LicenseValidationService < BaseService
         return [false, "is missing one or more required entitlements", :ENTITLEMENTS_MISSING] if license.entitlements.where(code: entitlements).count != entitlements.size
       end
     end
-    # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict)
-    return [true, "is valid", :VALID] if !license.policy.strict?
+
+    # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).
+    if !license.policy.strict?
+      # When restricting access, check if license is expired after checking machine requirements.
+      return [false, "is expired", :EXPIRED] if
+        license.restrict_access? &&
+        license.expired?
+
+      return [true, "is valid", :VALID]
+    end
+
     # Check if license policy allows floating and if not, should have single activation
     return [false, "must have exactly 1 associated machine", :NO_MACHINE] if !license.policy.floating? && license.machines_count == 0
     # When not floating, license's machine count should not surpass 1
@@ -98,6 +111,12 @@ class LicenseValidationService < BaseService
     return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.floating? && !license.max_machines.nil? && license.machines_count > license.max_machines
     # Check if license has exceeded its CPU core limit
     return [false, "has too many associated machine cores", :TOO_MANY_CORES] if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
+
+    # When restricting access, check if license is expired after checking machine requirements.
+    return [false, "is expired", :EXPIRED] if
+        license.restrict_access? &&
+        license.expired?
+
     # All good
     return [true, "is valid", :VALID]
   end

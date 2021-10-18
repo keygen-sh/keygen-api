@@ -113,7 +113,14 @@ class ReleasePolicy < ApplicationPolicy
   end
 
   def within_expiry_window?(license)
-    license.expiry.nil? || resource.created_at < license.expiry
+    return true if
+      license.expiry.nil?
+
+    return false if
+      license.revoke_access? &&
+      license.expired?
+
+    resource.created_at < license.expiry
   end
 
   def has_entitlements?(license)
