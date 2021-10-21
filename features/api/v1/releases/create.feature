@@ -99,6 +99,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Launch Release",
+            "description": "Our first release",
             "filename": "Product-1.0.0.AppImage",
             "filetype": ".AppImage",
             "filesize": 209715200,
@@ -125,6 +126,7 @@ Feature: Create release
       """
       {
         "name": "Launch Release",
+        "description": "Our first release",
         "filename": "Product-1.0.0.AppImage",
         "filetype": "appimage",
         "filesize": 209715200,
@@ -320,6 +322,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
+            "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "filename": "Product-1.0.0-rc.99.zip",
             "filetype": "zip",
             "filesize": 1342177280,
@@ -343,6 +346,9 @@ Feature: Create release
       """
       {
         "name": null,
+        "description": null,
+        "signature": null,
+        "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "filename": "Product-1.0.0-rc.99.zip",
         "filetype": "zip",
         "filesize": 1342177280,
@@ -375,6 +381,9 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
+            "description": null,
+            "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+            "checksum": null,
             "filename": "Product-1.0.0-alpha.1.exe",
             "filetype": "exe",
             "platform": "win32",
@@ -397,6 +406,9 @@ Feature: Create release
       """
       {
         "name": "Alpha Release",
+        "description": null,
+        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+        "checksum": null,
         "filename": "Product-1.0.0-alpha.1.exe",
         "filetype": "exe",
         "filesize": null,
