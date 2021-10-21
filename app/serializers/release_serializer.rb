@@ -4,6 +4,9 @@ class ReleaseSerializer < BaseSerializer
   type :releases
 
   attribute :name
+  attribute :description
+  attribute :signature
+  attribute :checksum
   attribute :filename
   attribute :filetype do
     @object.filetype.key

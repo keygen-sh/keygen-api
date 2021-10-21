@@ -589,7 +589,8 @@ Feature: Upsert release
     And the first "release" has the following attributes:
       """
       {
-        "filename": "latest-mac.yml"
+        "filename": "latest-mac.yml",
+        "description": "a note"
       }
       """
     And I use an authentication token
@@ -600,6 +601,9 @@ Feature: Upsert release
           "type": "releases",
           "attributes": {
             "name": "Duplicate Manifest",
+            "description": null,
+            "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+            "checksum": null,
             "filename": "latest-mac.yml",
             "filetype": "yml",
             "platform": "darwin",
@@ -622,6 +626,9 @@ Feature: Upsert release
       """
       {
         "name": "Duplicate Manifest",
+        "description": null,
+        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+        "checksum": null,
         "filename": "latest-mac.yml",
         "filetype": "yml",
         "platform": "darwin",
