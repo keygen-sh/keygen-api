@@ -140,6 +140,7 @@ Rails.application.routes.draw do
               post "increment-usage", to: "uses#increment"
               post "decrement-usage", to: "uses#decrement"
               post "reset-usage", to: "uses#reset"
+              get "checkout", to: "checkouts#checkout"
             end
           end
           collection do
