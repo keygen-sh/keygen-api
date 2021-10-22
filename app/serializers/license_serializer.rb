@@ -12,6 +12,7 @@ class LicenseSerializer < BaseSerializer
     end
   end
   attribute :expiry
+  attribute :status
   attribute :uses
   attribute :suspended
   attribute :scheme

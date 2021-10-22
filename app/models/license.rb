@@ -240,6 +240,7 @@ class License < ApplicationRecord
   }
 
   scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
+  scope :inactive, -> (start_date = 90.days.ago) { where 'created_at < :start_date AND last_validated_at < :start_date', start_date: start_date }
   scope :suspended, -> (status = true) { where suspended: ActiveRecord::Type::Boolean.new.cast(status) }
   scope :unassigned, -> (status = true) {
     if ActiveRecord::Type::Boolean.new.cast(status)
@@ -263,6 +264,22 @@ class License < ApplicationRecord
     end
   }
   scope :with_metadata, -> (meta) { search_metadata meta }
+  scope :with_status, -> status {
+    case status.to_s.upcase
+    when 'SUSPENDED'
+      self.suspended
+    when 'EXPIRED'
+      self.expired
+    when 'EXPIRING'
+      self.expiring
+    when 'INACTIVE'
+      self.inactive
+    when 'ACTIVE'
+      self.active
+    else
+      self.none
+    end
+  }
   scope :for_policy, -> (id) { where policy: id }
   scope :for_user, -> user {
     case user
@@ -291,6 +308,21 @@ class License < ApplicationRecord
         .or(
           entl.where(license_entitlements: { license_id: id })
         )
+  end
+
+  def status
+    case
+    when suspended?
+      :SUSPENDED
+    when expired?
+      :EXPIRED
+    when expiring?
+      :EXPIRING
+    when inactive?
+      :INACTIVE
+    else
+      :ACTIVE
+    end
   end
 
   def max_machines=(value)
@@ -342,8 +374,19 @@ class License < ApplicationRecord
     expiry < Time.current
   end
 
+  def expiring?
+    return false if
+      expiry.nil?
+
+    expiry > Time.current && expiry < 3.days.from_now
+  end
+
   def active?(t = 90.days.ago)
     (created_at >= t || last_validated_at >= t) rescue false
+  end
+
+  def inactive?
+    !active?
   end
 
   def check_in_overdue?

@@ -7,6 +7,7 @@ module Api::V1
     has_scope(:policy) { |c, s, v| s.for_policy(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
+    has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope :suspended
     has_scope :expiring
     has_scope :expired
