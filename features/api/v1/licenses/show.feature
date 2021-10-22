@@ -354,6 +354,127 @@ Feature: Show license
     When I send a GET request to "/accounts/test1/licenses/$0"
     Then the response status should be "200"
 
+  Scenario: Admin attempts to retrieves an active license for their account (new license)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "createdAt": "$time.3.days.ago" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an inactive license for their account (inactive license, unused)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": null,
+        "createdAt": "$time.91.days.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "INACTIVE" }
+      """
+
+   Scenario: Admin attempts to retrieves an active license for their account (old license, recently used)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.1.day.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "ACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an inactive license for their account (old license, unused)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.1.year.ago"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "INACTIVE" }
+      """
+
+  Scenario: Admin attempts to retrieves an expired license for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.91.days.ago" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "EXPIRED" }
+      """
+
+  Scenario: Admin attempts to retrieves an expiring license for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.days.from_now" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "EXPIRING" }
+      """
+
+  Scenario: Admin attempts to retrieves a suspended license for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "status": "SUSPENDED" }
+      """
+
   Scenario: Product retrieves a license for their product
     Given the current account is "test1"
     And the current account has 1 "product"
