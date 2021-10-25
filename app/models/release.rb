@@ -114,7 +114,7 @@ class Release < ApplicationRecord
          UUID_REGEX
       where(platform: platform)
     else
-      joins(:platform).where(platform: { key: platform.to_s })
+      joins(:platform).where(platform: { key: platform })
     end
   }
 
@@ -124,7 +124,7 @@ class Release < ApplicationRecord
          UUID_REGEX
       where(filetype: filetype)
     else
-      joins(:filetype).where(filetype: { key: filetype.to_s })
+      joins(:filetype).where(filetype: { key: filetype })
     end
   }
 
@@ -141,7 +141,7 @@ class Release < ApplicationRecord
       when ReleaseChannel
         channel.key
       else
-        channel.to_s
+        channel
       end
 
     case key

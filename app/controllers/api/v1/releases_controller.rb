@@ -19,7 +19,15 @@ module Api::V1
       releases = policy_scope apply_scopes(current_account.releases.preload(:artifact, :platform, :filetype, :channel))
       authorize releases
 
-      render jsonapi: releases
+      case
+      when sparkle?
+        headers['content-disposition'] = ''
+        headers['content-type']        = ''
+
+        render xml: GenerateAppcastService.call(account: current_account, releases: releases)
+      else
+        render jsonapi: releases
+      end
     end
 
     def show

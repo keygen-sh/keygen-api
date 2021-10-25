@@ -139,6 +139,8 @@ module Keygen
             end
 
           filtered_res_body = filter_response_body(body)
+        rescue JSON::ParserError
+          # noop
         rescue => e
           Keygen.logger.exception(e)
         end
