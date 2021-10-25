@@ -62,7 +62,6 @@ end
 # Handle low level exceptions from Puma
 lowlevel_error_handler do |e|
   Keygen.logger.warn("[puma] [#{Process.pid}] lowlevel error: #{e.message}")
-  Keygen.logger.warn(e.message)
   Keygen.logger.warn(e.backtrace&.join("\n"))
 
   [
