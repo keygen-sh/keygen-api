@@ -724,6 +724,389 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 4 "licenses"
 
+  Scenario: Admin retrieves licenses filtered by status (active)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    # New, active
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    # Inactive, expiring
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    # Old, active, expiring
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    # Old, active, suspended
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    # Old, inactive
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=ACTIVE"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by status (active, lowercase)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=active"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by status (inactive)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=INACTIVE"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "licenses"
+
+  Scenario: Admin retrieves licenses filtered by status (expiring)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=EXPIRING"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves licenses filtered by status (expired)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=EXPIRED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves licenses filtered by status (suspended)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=SUSPENDED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
+  Scenario: Admin retrieves licenses filtered by status (invalid)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.1.minute.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.month.from_now",
+        "suspended": false
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": null,
+        "expiry": "$time.1.day.from_now",
+        "suspended": false
+      }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.91.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.2.days.ago",
+        "suspended": false
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.4.days.ago",
+        "lastValidatedAt": "$time.1.day.ago",
+        "expiry": "$time.1.year.from_now",
+        "suspended": true
+      }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      {
+        "createdAt": "$time.2.years.ago",
+        "lastValidatedAt": "$time.1.year.ago",
+        "expiry": null,
+        "suspended": false
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=INVALID"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "licenses"
+
   Scenario: Product retrieves all licenses for their product
     Given the current account is "test1"
     And the current account has 1 "product"
