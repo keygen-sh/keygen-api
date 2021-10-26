@@ -3,6 +3,9 @@
 require 'ox'
 
 class GenerateAppcastService < BaseService
+  SUPPORTED_FILETYPES = %i[zip dmg pkg mpkg tar.gz tar.bz2].freeze
+  SUPPORTED_PLATFORMS = %i[macos windows].freeze
+
   include Rails.application.routes.url_helpers
 
   def initialize(account:, product:, releases:)
@@ -73,8 +76,8 @@ class GenerateAppcastService < BaseService
   attr_reader :account, :product, :releases
 
   def available_releases
-    releases.for_filetype(%i[zip dmg pkg mpkg tar.gz tar.bz2])
-            .for_platform(%i[macos windows])
+    releases.for_filetype(SUPPORTED_FILETYPES)
+            .for_platform(SUPPORTED_PLATFORMS)
             .for_product(product)
             .with_artifact
             .limit(100)
