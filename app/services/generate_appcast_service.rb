@@ -39,7 +39,7 @@ class GenerateAppcastService < BaseService
           builder.element(:link) { builder.text(product.url.to_s) }
           builder.element(:pubDate) { builder.text(release.created_at.httpdate) }
 
-          builder.element('sparkle:version') { builder.text(release.version.to_s) }
+          builder.element('sparkle:version') { builder.text(release.version) }
           builder.element('sparkle:channel') { builder.text(channel.key) } if
             release.pre_release?
 
