@@ -2,7 +2,7 @@
 
 class ReleasePlatform < ApplicationRecord
   WIN_KEYS = %w[windows win win32 dos msdos]
-  MAC_KEYS = %w[darwin mac macos]
+  MAC_KEYS = %w[darwin osx mac macos]
   NIX_KEYS = %w[linux]
 
   include Limitable
