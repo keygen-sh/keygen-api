@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ox'
 
 class GenerateAppcastService < BaseService
@@ -32,17 +34,22 @@ class GenerateAppcastService < BaseService
         builder.element(:item) do
           builder.element(:title) { builder.text(release.name.to_s) }
           builder.element(:link) { builder.text(product.url.to_s) }
-          builder.element(:'sparkle:version') { builder.text(release.version.to_s) }
-          builder.element(:'sparkle:channel') { builder.text(channel.key) } if release.pre_release?
-          # TODO(ezekg) Add support for serializing:
-          #               - sparkle:minimumAutoupdateVersion
-          #               - sparkle:minimumSystemVersion
-          #               - sparkle:informationalUpdate
-          #               - sparkle:criticalUpdate
-          #               - sparkle:shortVersionString
-          #               - sparkle:releaseNotesLink
-          builder.element(:description) { builder.cdata(release.description.to_s) } if release.description?
           builder.element(:pubDate) { builder.text(release.created_at.httpdate) }
+
+          builder.element('sparkle:version') { builder.text(release.version.to_s) }
+          builder.element('sparkle:channel') { builder.text(channel.key) } if
+            release.pre_release?
+
+          release.metadata&.each do |key, value|
+            next unless
+              key.starts_with?('sparkle:')
+
+            builder.element(key) { builder.text(value) }
+          end
+
+          builder.element(:description) { builder.cdata(release.description.to_s) } if
+            release.description?
+
           builder.element(:enclosure, {
             url: v1_account_product_artifact_path(account, product, artifact.key),
             'sparkle:edSignature': release.signature&.to_s,
