@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class ReleasePlatform < ApplicationRecord
+  WIN_KEYS = %w[windows win win32 dos msdos]
+  MAC_KEYS = %w[darwin mac macos]
+  NIX_KEYS = %w[linux]
+
   include Limitable
   include Pageable
 
@@ -35,4 +39,16 @@ class ReleasePlatform < ApplicationRecord
   }
 
   scope :with_releases, -> { joins(:releases).distinct }
+
+  def mac?
+    MAC_KEYS.include?(key)
+  end
+
+  def win?
+    WIN_KEYS.include?(key)
+  end
+
+  def nix?
+    NIX_KEYS.include?(key)
+  end
 end

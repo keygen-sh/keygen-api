@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def show
-      releases = policy_scope apply_scopes(product.releases.preload(:artifact, :channel))
+      releases = policy_scope apply_scopes(product.releases.preload(:artifact, :channel, :platform))
       authorize releases
 
       headers['Content-Disposition'] = 'attachment; filename="appcast.xml"'

@@ -26,6 +26,7 @@ class GenerateAppcastService < BaseService
 
       available_releases.find_each do |release|
         artifact = release.artifact
+        platform = release.platform
         channel  = release.channel
 
         builder.element(:item) do
@@ -42,14 +43,13 @@ class GenerateAppcastService < BaseService
           #               - sparkle:releaseNotesLink
           builder.element(:description) { builder.cdata(release.description.to_s) } if release.description?
           builder.element(:pubDate) { builder.text(release.created_at.httpdate) }
-          builder.element(:enclosure,
+          builder.element(:enclosure, {
             url: v1_account_product_artifact_path(account, product, artifact.key),
-            'sparkle:edSignature': release.signature.to_s,
-            # TODO(ezekg) Add support for windows and linux?
-            # 'sparkle:os': 'windows',
+            'sparkle:edSignature': release.signature&.to_s,
+            'sparkle:os': platform.mac? ? nil : platform.key,
             length: release.filesize.to_s,
             type: 'application/octet-stream',
-          )
+          }.compact)
         end
 
         builder.pop
