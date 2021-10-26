@@ -308,26 +308,5 @@ class ApplicationController < ActionController::API
     render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
   end
 
-  def electron?
-    return false if
-      request.user_agent.nil?
-
-    request.user_agent.include?(' Electron/')
-  end
-
-  def sparkle?
-    return false if
-      request.user_agent.nil?
-
-    request.user_agent.include?(' Sparkle/')
-  end
-
-  def squirrel?
-    return false if
-      request.user_agent.nil?
-
-    request.user_agent.include?(' Squirrel/')
-  end
-
   class AuthorizationContext < OpenStruct; end
 end
