@@ -46,7 +46,7 @@ class GenerateAppcastService < BaseService
           builder.element(:enclosure, {
             url: v1_account_product_artifact_path(account, product, artifact.key),
             'sparkle:edSignature': release.signature&.to_s,
-            'sparkle:os': platform.mac? ? nil : platform.key,
+            'sparkle:os': platform.key,
             length: release.filesize.to_s,
             type: 'application/octet-stream',
           }.compact)
@@ -67,6 +67,7 @@ class GenerateAppcastService < BaseService
 
   def available_releases
     releases.for_filetype(%i[zip dmg tar.gz tar.bz2])
+            .for_platform(%i[macos windows])
             .for_product(product)
             .with_artifact
             .limit(100)
