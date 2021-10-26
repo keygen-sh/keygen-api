@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePlatform < ApplicationRecord
-  WIN_KEYS = %w[windows win win32 dos msdos]
+  WIN_KEYS = %w[windows win win32 win64 dos msdos]
   MAC_KEYS = %w[darwin osx mac macos]
 
   include Limitable
