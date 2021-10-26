@@ -36,6 +36,8 @@ class GenerateAppcastService < BaseService
           # TODO(ezekg) Add support for serializing:
           #               - sparkle:minimumAutoupdateVersion
           #               - sparkle:minimumSystemVersion
+          #               - sparkle:informationalUpdate
+          #               - sparkle:criticalUpdate
           #               - sparkle:shortVersionString
           #               - sparkle:releaseNotesLink
           builder.element(:description) { builder.cdata(release.description.to_s) } if release.description?
