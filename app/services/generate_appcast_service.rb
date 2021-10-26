@@ -46,8 +46,12 @@ class GenerateAppcastService < BaseService
             type: 'application/octet-stream',
           )
         end
+
+        builder.pop
       end
     end
+
+    builder.close
 
     builder.to_s
   end
