@@ -20,6 +20,9 @@ gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 
+# XML serializers
+gem 'ox'
+
 # Billing and subscriptions
 gem 'stripe'
 

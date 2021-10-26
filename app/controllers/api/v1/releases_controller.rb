@@ -21,9 +21,12 @@ module Api::V1
 
       case
       when sparkle?
-        headers['content-disposition'] = ''
-        headers['content-type']        = ''
+        headers['Content-Disposition'] = 'attachment; filename="appcast.xml"'
+        headers['Content-Type']        = 'application/xml'
 
+        # FIXME(ezekg) This needs to be scoped to a particular product, in the
+        #              case where a user has licenses for multiple products.
+        #              Probably better to move this to /products/<id>/appcast?
         render xml: GenerateAppcastService.call(account: current_account, releases: releases)
       else
         render jsonapi: releases

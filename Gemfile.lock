@@ -261,6 +261,7 @@ GEM
     numerizer (0.1.1)
     oj (3.7.12)
     openssl (2.1.2)
+    ox (2.14.5)
     parallel (1.19.2)
     parallel_tests (3.3.0)
       parallel
@@ -468,6 +469,7 @@ DEPENDENCIES
   lograge
   oj
   openssl
+  ox
   parallel_tests (~> 3.3)
   pg
   pg_search
