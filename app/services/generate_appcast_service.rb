@@ -45,6 +45,8 @@ class GenerateAppcastService < BaseService
           builder.element(:enclosure,
             url: v1_account_product_artifact_path(account, product, artifact.key),
             'sparkle:edSignature': release.signature.to_s,
+            # TODO(ezekg) Add support for windows and linux?
+            # 'sparkle:os': 'windows',
             length: release.filesize.to_s,
             type: 'application/octet-stream',
           )
