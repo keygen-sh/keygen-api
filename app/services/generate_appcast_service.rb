@@ -34,6 +34,7 @@ class GenerateAppcastService < BaseService
           builder.element(:'sparkle:version') { builder.text(release.version.to_s) }
           builder.element(:'sparkle:channel') { builder.text(channel.key) } if release.pre_release?
           # TODO(ezekg) Add support for serializing:
+          #               - sparkle:minimumAutoupdateVersion
           #               - sparkle:minimumSystemVersion
           #               - sparkle:shortVersionString
           #               - sparkle:releaseNotesLink
