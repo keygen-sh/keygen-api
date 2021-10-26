@@ -62,7 +62,7 @@ class GenerateAppcastService < BaseService
   attr_reader :account, :product, :releases
 
   def available_releases
-    releases.for_filetype(%i[zip tar.gz tar.bz2])
+    releases.for_filetype(%i[zip dmg tar.gz tar.bz2])
             .for_product(product)
             .with_artifact
             .limit(100)
