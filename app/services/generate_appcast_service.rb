@@ -47,7 +47,11 @@ class GenerateAppcastService < BaseService
             next unless
               key.starts_with?('sparkle:')
 
-            builder.element(key) { builder.text(value) }
+            next if
+              value.is_a?(Array) ||
+              value.is_a?(Hash)
+
+            builder.element(key) { builder.text(value.to_s) }
           end
 
           builder.element(:description) { builder.cdata(release.description.to_s) } if
