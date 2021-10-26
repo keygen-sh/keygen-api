@@ -208,6 +208,8 @@ module Keygen
         filtered = filterer.filter(params)
 
         filtered.to_json
+      rescue JSON::ParserError
+        body
       rescue => e
         Keygen.logger.exception(e)
       end
