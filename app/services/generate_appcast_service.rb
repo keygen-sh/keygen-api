@@ -3,8 +3,9 @@ require 'ox'
 class GenerateAppcastService < BaseService
   include Rails.application.routes.url_helpers
 
-  def initialize(account:, releases:)
+  def initialize(account:, product:, releases:)
     @account  = account
+    @product  = product
     @releases = releases
   end
 
@@ -20,18 +21,18 @@ class GenerateAppcastService < BaseService
 
     builder.element(:channel) do
       builder.element(:title) { builder.text("Releases for #{account.name}") }
-      builder.element(:description) { builder.text('Most recent changes with links to upgrades.') }
+      builder.element(:description) { builder.text("Most recent changes for #{product.name} with links to upgrades.") }
       builder.element(:language) { builder.text('en') }
 
       available_releases.find_each do |release|
-        product  = release.product
         artifact = release.artifact
+        channel  = release.channel
 
         builder.element(:item) do
           builder.element(:title) { builder.text(release.name.to_s) }
           builder.element(:link) { builder.text(product.url.to_s) }
           builder.element(:'sparkle:version') { builder.text(release.version.to_s) }
-          builder.element(:'sparkle:channel') { builder.text(release.channel.key) } if release.pre_release?
+          builder.element(:'sparkle:channel') { builder.text(channel.key) } if release.pre_release?
           # TODO(ezekg) Add support for serializing:
           #               - sparkle:minimumSystemVersion
           #               - sparkle:releaseNotesLink
@@ -52,11 +53,11 @@ class GenerateAppcastService < BaseService
 
   private
 
-  attr_reader :account, :releases
+  attr_reader :account, :product, :releases
 
   def available_releases
-    releases.preload(:product)
-            .for_filetype([:zip, :pkg, :dmg])
+    releases.for_filetype([:zip, :pkg, :dmg])
+            .for_product(product)
             .with_artifact
             .limit(100)
   end

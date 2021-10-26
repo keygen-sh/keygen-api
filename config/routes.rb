@@ -178,6 +178,7 @@ Rails.application.routes.draw do
             resources "platforms", only: [:index, :show]
             resources "releases", only: [:index, :show]
             resources "channels", only: [:index, :show]
+            resource "appcast", only: [:show]
             member do
               post "tokens", to: "tokens#generate"
             end
