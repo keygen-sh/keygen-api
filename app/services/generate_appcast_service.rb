@@ -66,7 +66,7 @@ class GenerateAppcastService < BaseService
             url: v1_account_product_artifact_url(account, product, artifact.key, protocol: 'https', host: host),
             'sparkle:edSignature': release.signature&.to_s,
             'sparkle:os': platform.key,
-            length: release.filesize.to_s,
+            length: release.filesize&.to_s || '0',
             type: 'application/octet-stream',
           }.compact)
         end
