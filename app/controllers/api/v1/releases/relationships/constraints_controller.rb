@@ -74,6 +74,34 @@ module Api::V1::Releases::Relationships
       )
     end
 
+    def replace
+      authorize release, :replace_constraints?
+
+      constraints_data = constraint_params
+        .uniq { |constraint| constraint[:entitlement_id] }
+        .map { |constraint|
+          constraint.merge(account_id: current_account.id)
+        }
+
+      # We're wrapping in a transaction so that we don't clear the release's
+      # constraints if an error occurs during create!
+      replaced = []
+
+      release.transaction do
+        release.constraints = [] # Clear constraints
+
+        replaced = release.constraints.create!(constraints_data)
+      end
+
+      BroadcastEventService.call(
+        event: 'release.constraints.replaced',
+        account: current_account,
+        resource: replaced,
+      )
+
+      render jsonapi: replaced
+    end
+
     private
 
     attr_reader :release
@@ -111,6 +139,22 @@ module Api::V1::Releases::Relationships
           items type: :hash do
             param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
             param :id, type: :string
+          end
+        end
+      end
+
+      on :replace do
+        param :data, type: :array do
+          items type: :hash do
+            param :type, type: :string, inclusion: %w[constraint constraints], transform: -> (k, v) { [] }
+            param :relationships, type: :hash do
+              param :entitlement, type: :hash do
+                param :data, type: :hash do
+                  param :type, type: :string, inclusion: %w[entitlement entitlements]
+                  param :id, type: :string
+                end
+              end
+            end
           end
         end
       end

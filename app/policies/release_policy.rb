@@ -97,6 +97,13 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def replace_constraints?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
   private
 
   def has_valid_license?(user)

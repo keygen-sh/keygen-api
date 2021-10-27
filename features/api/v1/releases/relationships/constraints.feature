@@ -669,3 +669,140 @@ Feature: Release constraints relationship
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin replaces constraints for a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "entitlements"
+    And the current account has 1 "release"
+    And the current account has 1 "release-entitlement-constraints" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[1]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "constraint"
+    And the current account should have 1 "release-entitlement-constraint"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin replaces constraints for a release (overwriting constraints that already exist)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "entitlements"
+    And the current account has 1 "release"
+    And the current account has 1 "release-entitlement-constraints" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[0]" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[1]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array of 2 "constraints"
+    And the current account should have 2 "release-entitlement-constraints"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin replaces constraints for a release (does not overwrite on error)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "entitlements"
+    And the current account has 1 "release"
+    And the current account has 1 "release-entitlement-constraints" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases/$0/constraints" with the following:
+      """
+      {
+        "data": [
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "f40913d3-a786-407f-8dd6-94664b95ade8" }
+              }
+            }
+          },
+          {
+            "type": "constraint",
+            "relationships": {
+              "entitlement": {
+                "data": { "type": "entitlement", "id": "$entitlements[1]" }
+              }
+            }
+          }
+        ]
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "source": {
+          "pointer": "/data/relationships/entitlement"
+        },
+        "code": "ENTITLEMENT_BLANK"
+      }
+      """
+    And the current account should have 1 "release-entitlement-constraint"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job

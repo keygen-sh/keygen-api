@@ -193,6 +193,7 @@ Rails.application.routes.draw do
               collection do
                 post "/", to: "constraints#attach", as: "attach"
                 delete "/", to: "constraints#detach", as: "detach"
+                put "/", to: "constraints#replace", as: "replace"
               end
             end
             resource "artifact", only: [:show, :destroy] do
