@@ -347,25 +347,33 @@ module Stripe
 
     def days_to_convert
       @days_to_convert ||= paid_subscriptions
-        .map do |s|
+        .map { |s|
           customer = s.customer
           invoices = invoices_for(customer)
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
           payment_method = payment_method_for(customer)
           next if first_paid_invoice.nil? && payment_method.nil?
 
-          conversion_at =
+          created_at   = s.created
+          converted_at =
             first_paid_invoice&.status_transitions&.paid_at ||
             payment_method.created
-          next if conversion_at.nil?
 
-          (Time.at(conversion_at) - Time.at(customer.created)) / 1.day
-        end.compact
+          next if
+            converted_at.nil?
+
+          [created_at, converted_at]
+        }
+        .compact
+        .sort_by { |tuple| tuple.second }
+        .map { |tuple|
+          (Time.at(tuple.second) - Time.at(tuple.first)) / 1.day
+        }
     end
 
     def days_on_free
       @days_on_free ||= paid_subscriptions
-        .map do |s|
+        .map { |s|
           customer = s.customer
           invoices = invoices_for(customer)
           next unless invoices.any? { |i|
@@ -376,18 +384,26 @@ module Stripe
           payment_method = payment_method_for(customer)
           next if first_paid_invoice.nil? && payment_method.nil?
 
-          conversion_at =
+          created_at   = s.created
+          converted_at =
             first_paid_invoice&.status_transitions&.paid_at ||
             payment_method.created
-          next if conversion_at.nil?
 
-          (Time.at(conversion_at) - Time.at(customer.created)) / 1.day
-        end.compact
+          next if
+            converted_at.nil?
+
+          [created_at, converted_at]
+        }
+        .compact
+        .sort_by { |tuple| tuple.second }
+        .map { |tuple|
+          (Time.at(tuple.second) - Time.at(tuple.first)) / 1.day
+        }
     end
 
     def latest_converted_free_user
       @latest_converted_free_user ||= paid_subscriptions
-        .map do |s|
+        .map { |s|
           customer = s.customer
           invoices = invoices_for(customer)
           next unless invoices.any? { |i|
@@ -398,21 +414,43 @@ module Stripe
           payment_method = payment_method_for(customer)
           next if first_paid_invoice.nil? && payment_method.nil?
 
-          customer
-        end.compact.last
+          converted_at =
+            first_paid_invoice&.status_transitions&.paid_at ||
+            payment_method.created
+
+          next if
+            converted_at.nil?
+
+          { customer: customer, converted_at: converted_at }
+        }
+        .compact
+        .sort_by { |h| h[:converted_at] }
+        .map { |h| h[:customer] }
+        .last
     end
 
     def latest_converted_user
       @latest_converted_user ||= paid_subscriptions
-        .map do |s|
+        .map { |s|
           customer = s.customer
           invoices = invoices_for(customer)
           first_paid_invoice = invoices.find { |i| i.amount_paid > 0 }
           payment_method = payment_method_for(customer)
           next if first_paid_invoice.nil? && payment_method.nil?
 
-          customer
-        end.compact.last
+          converted_at =
+            first_paid_invoice&.status_transitions&.paid_at ||
+            payment_method.created
+
+          next if
+            converted_at.nil?
+
+          { customer: customer, converted_at: converted_at }
+        }
+        .compact
+        .sort_by { |h| h[:converted_at] }
+        .map { |h| h[:customer] }
+        .last
     end
 
     def revenue_per_user
@@ -540,12 +578,12 @@ module Stripe
         payment_method = payment_method_for(customer)
         next if first_paid_invoice.nil? && payment_method.nil?
 
-        conversion_at =
+        converted_at =
           first_paid_invoice&.status_transitions&.paid_at ||
           payment_method.created
-        next if conversion_at.nil?
+        next if converted_at.nil?
 
-        conversion_at >= START_DATE
+        converted_at >= START_DATE
       end
     end
 
