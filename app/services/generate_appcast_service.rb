@@ -4,7 +4,7 @@ require 'ox'
 
 class GenerateAppcastService < BaseService
   SUPPORTED_FILETYPES = %i[zip dmg pkg mpkg tar.gz tar.bz2].freeze
-  SUPPORTED_PLATFORMS = %i[macos windows].freeze
+  SUPPORTED_PLATFORMS = %i[macos windows windows-x86 windows-x64].freeze
 
   include Rails.application.routes.url_helpers
 
@@ -17,6 +17,7 @@ class GenerateAppcastService < BaseService
   def call
     builder = Ox::Builder.new
 
+    # NOTE(ezekg) See: https://github.com/vslavik/winsparkle/wiki/Appcast-Feeds
     builder.instruct(:xml, version: '1.0', encoding: 'UTF-8')
     builder.element(:rss,
       version: '2.0',
