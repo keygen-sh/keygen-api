@@ -27,9 +27,15 @@ class GenerateAppcastService < BaseService
     )
 
     builder.element(:channel) do
-      builder.element(:title) { builder.text("Releases for #{account.name}") }
-      builder.element(:description) { builder.text("Most recent changes for #{product.name} with links to upgrades.") }
       builder.element(:language) { builder.text('en') }
+      builder.element(:title) { builder.text("Releases for #{product.name}") }
+      builder.element(:description) {
+        if product.name?
+          builder.text("Most recent changes for #{product.name} with links to upgrades.")
+        else
+          builder.text('Most recent changes with links to upgrades.')
+        end
+      }
 
       available_releases.find_each do |release|
         artifact = release.artifact
