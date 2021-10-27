@@ -53,6 +53,7 @@ class GenerateAppcastService < BaseService
               value.is_a?(Array) ||
               value.is_a?(Hash)
 
+            # Clean up the tag name since ox doesn't sanitize 100%
             tag = key.delete_prefix('sparkle:')
                      .gsub(/[^a-z0-9]/i, '')
 
