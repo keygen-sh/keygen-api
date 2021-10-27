@@ -8,10 +8,11 @@ class GenerateAppcastService < BaseService
 
   include Rails.application.routes.url_helpers
 
-  def initialize(account:, product:, releases:)
+  def initialize(account:, product:, releases:, host: 'api.keygen.sh')
     @account  = account
     @product  = product
     @releases = releases
+    @host     = host
   end
 
   def call
@@ -59,7 +60,7 @@ class GenerateAppcastService < BaseService
             release.description?
 
           builder.element(:enclosure, {
-            url: v1_account_product_artifact_path(account, product, artifact.key),
+            url: v1_account_product_artifact_url(account, product, artifact.key, protocol: 'https', host: host),
             'sparkle:edSignature': release.signature&.to_s,
             'sparkle:os': platform.key,
             length: release.filesize.to_s,
@@ -78,7 +79,7 @@ class GenerateAppcastService < BaseService
 
   private
 
-  attr_reader :account, :product, :releases
+  attr_reader :account, :product, :releases, :host
 
   def available_releases
     releases.for_filetype(SUPPORTED_FILETYPES)
