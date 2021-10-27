@@ -53,7 +53,10 @@ class GenerateAppcastService < BaseService
               value.is_a?(Array) ||
               value.is_a?(Hash)
 
-            builder.element(key) { builder.text(value.to_s) }
+            tag = key.delete_prefix('sparkle:')
+                     .gsub(/[^a-z0-9]/i, '')
+
+            builder.element("sparkle:#{tag}") { builder.text(value.to_s) }
           end
 
           builder.element(:description) { builder.cdata(release.description.to_s) } if
