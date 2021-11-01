@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_21_145410) do
+ActiveRecord::Schema.define(version: 2021_11_01_211819) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -377,7 +377,7 @@ ActiveRecord::Schema.define(version: 2021_10_21_145410) do
     t.string "name"
     t.string "version"
     t.string "filename"
-    t.integer "filesize"
+    t.bigint "filesize"
     t.bigint "download_count", default: 0
     t.jsonb "metadata"
     t.datetime "yanked_at"
