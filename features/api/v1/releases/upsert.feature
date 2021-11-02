@@ -568,7 +568,7 @@ Feature: Upsert release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists for 'darwin' platform with 'yml' filetype on 'stable' channel",
+        "detail": "version already exists for 'darwin' platform with 'yml' filetype on 'stable' channel",
         "source": {
           "pointer": "/data/attributes/version"
         },

@@ -192,7 +192,7 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists for 'darwin' platform with 'dmg' filetype on 'stable' channel",
+        "detail": "version already exists for 'darwin' platform with 'dmg' filetype on 'stable' channel",
         "code": "VERSION_TAKEN",
         "source": {
           "pointer": "/data/attributes/version"
@@ -244,7 +244,7 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "already exists for '{injection}' platform with 'blockmap' filetype on 'stable' channel",
+        "detail": "version already exists for '{injection}' platform with 'blockmap' filetype on 'stable' channel",
         "code": "VERSION_TAKEN",
         "source": {
           "pointer": "/data/attributes/version"
