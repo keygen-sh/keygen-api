@@ -86,7 +86,7 @@ class Release < ApplicationRecord
 
         # We're going to remove % chars since Rails treats these special,
         # e.g. %{value}.
-        "already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel".remove('%')
+        "version already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel".remove('%')
       }
     }
   validates :filename,
