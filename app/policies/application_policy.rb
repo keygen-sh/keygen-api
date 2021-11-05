@@ -98,6 +98,8 @@ class ApplicationPolicy
     end
 
     def resolve
+      return scope.none if bearer.nil?
+
       case
       when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
         scope

@@ -170,6 +170,10 @@ class Release < ApplicationRecord
   scope :unyanked, -> { where(yanked_at: nil) }
   scope :yanked, -> { where.not(yanked_at: nil) }
 
+  scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
+  scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
+
   scope :with_version, -> version { where(version: version) }
   scope :with_artifact, -> { joins(:artifact) }
 

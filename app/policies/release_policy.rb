@@ -44,6 +44,9 @@ class ReleasePolicy < ApplicationPolicy
   def download?
     assert_account_scoped!
 
+    return resource.product.open_distribution? if
+      bearer.nil?
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
@@ -125,5 +128,13 @@ class ReleasePolicy < ApplicationPolicy
 
   def has_entitlements?(license)
     (resource.entitlements & license.entitlements).size == resource.entitlements.size
+  end
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      return scope.open if bearer.nil?
+
+      super
+    end
   end
 end
