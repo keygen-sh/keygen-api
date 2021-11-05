@@ -264,6 +264,7 @@ ActiveRecord::Schema.define(version: 2021_11_05_145230) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "products_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_products_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_products_on_created_at", order: :desc
+    t.index ["distribution_strategy"], name: "index_products_on_distribution_strategy"
     t.index ["id", "created_at", "account_id"], name: "index_products_on_id_and_created_at_and_account_id", unique: true
   end
 
