@@ -101,20 +101,23 @@ class Release < ApplicationRecord
   }
 
   scope :for_user, -> user {
-    joins(:users, :product).where(
-      product: { distribution_strategy: ['LICENSED', nil] },
-      users: { id: user },
-    )
+    joins(:users, :product)
+      .where(
+        product: { distribution_strategy: ['LICENSED', nil] },
+        users: { id: user },
+      )
       .union(
         joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
       )
   }
 
   scope :for_license, -> license {
-    joins(:licenses, :product).where(
-      product: { distribution_strategy: ['LICENSED', nil] },
-      licenses: { id: license },
-    )
+    # Should we be applying a LIMIT to these UNION'd queries?
+    joins(:licenses, :product)
+      .where(
+        product: { distribution_strategy: ['LICENSED', nil] },
+        licenses: { id: license },
+      )
       .union(
         joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
       )
