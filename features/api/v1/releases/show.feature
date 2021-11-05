@@ -130,11 +130,361 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
-  Scenario: Anonymous retrieves a release
+  # Licensed distribution strategy
+  Scenario: Anonymous retrieves a LICENSED release
     Given the current account is "test1"
-    And the current account has 1 "release"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
+
+  Scenario: License retrieves a LICENSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves a LICENSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves a LICENSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retrieves a LICENSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retrieves a LICENSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retrieves a LICENSED release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retrieves a LICENSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  # Open distribution strategy
+  Scenario: Anonymous retrieves an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Anonymous retrieves an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: License retrieves an OPEN release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: License retrieves an OPEN release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves an OPEN release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves an OPEN release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retrieves an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retrieves an OPEN release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retrieves an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  # Closed distribution strategy
+  Scenario: Anonymous retrieves a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves a CLOSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves a CLOSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retrieves a CLOSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retrieves a CLOSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retrieves a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retrieves a CLOSED release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retrieves a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
 
   Scenario: Admin attempts to retrieve a release for another account
     Given I am an admin of account "test2"
