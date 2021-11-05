@@ -233,6 +233,33 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 8 "artifacts"
 
+  Scenario: License attempts to retrieve all accessible releases (filtered)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the third "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the current account has 7 "releases" for the third "product"
+    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts?product=$products[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "artifacts"
+
   Scenario: User attempts to retrieve all accessible releases
     Given the current account is "test1"
     And the current account has 3 "products"
@@ -261,3 +288,32 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
     And the JSON response should be an array with 8 "artifacts"
+
+  Scenario: User attempts to retrieve all accessible releases (filtered)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the third "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 5 "releases" for the second "product"
+    And the current account has 7 "releases" for the third "product"
+    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts?product=$products[0]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
