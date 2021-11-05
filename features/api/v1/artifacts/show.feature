@@ -193,12 +193,386 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/dir/Test-App.1.0.0.zip"
     Then the response status should be "404"
 
-  Scenario: Anonymous retrieves an artifact
+  # Licensed distribution strategy
+  Scenario: Anonymous retreives an artifact for a LICENSED release
     Given the current account is "test1"
-    And the current account has 1 "release"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
     And the first "release" has an artifact that is uploaded
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a LICENSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a LICENSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: User retreives an artifact for a LICENSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a LICENSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Product retreives an artifact for a LICENSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Product retreives an artifact for a LICENSED release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives an artifact for a LICENSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  # Open distribution strategy
+  Scenario: Anonymous retreives an artifact for an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Anonymous retreives an artifact for an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: License retreives an artifact for an OPEN release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: License retreives an artifact for an OPEN release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: User retreives an artifact for an OPEN release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: User retreives an artifact for an OPEN release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Product retreives an artifact for an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Product retreives an artifact for an OPEN release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives an artifact for an OPEN release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  # Closed distribution strategy
+  Scenario: Anonymous retreives an artifact for a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a CLOSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a CLOSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a CLOSED release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a CLOSED release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives an artifact for a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: Product retreives an artifact for a CLOSED release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the second "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the second "product"
+    And the first "release" has an artifact that is uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives an artifact for a CLOSED release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
 
   Scenario: Admin attempts to retrieve an artifact for another account
     Given I am an admin of account "test2"
