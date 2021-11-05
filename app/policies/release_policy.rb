@@ -137,7 +137,7 @@ class ReleasePolicy < ApplicationPolicy
       @scope =
         case
         when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          scope
+          scope.open.or(scope.licensed).or(scope.closed)
         when bearer.has_role?(:license, :user)
           scope.open.or(scope.licensed)
         else
