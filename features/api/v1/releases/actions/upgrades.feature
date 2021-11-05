@@ -1340,13 +1340,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
@@ -1369,13 +1368,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -1400,13 +1398,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
@@ -1418,13 +1415,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
@@ -1450,13 +1446,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  | entitlements |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
+      | product_id                           | version | filename           | filetype | platform | channel | entitlements |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
@@ -1474,13 +1469,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  | entitlements |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   | TEST_ENTL    |
+      | product_id                           | version | filename           | filetype | platform | channel | entitlements |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
@@ -1510,13 +1504,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -1541,13 +1534,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
@@ -1567,13 +1559,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
@@ -1584,13 +1575,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
@@ -1605,13 +1595,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
@@ -1628,13 +1617,12 @@ Feature: Release upgrade actions
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And I am an admin of account "test1"
     And I use an authentication token
@@ -1649,19 +1637,18 @@ Feature: Release upgrade actions
       }
       """
 
-  Scenario: Product retrieves an upgrade for a product release (CLOSED distribution strategy)
+  Scenario: Product retrieves an upgrade for their release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name     | distributionStrategy |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
     And the current account has the following "release" rows:
-      | product_id                           | version                    | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1              | Test-App-1.0.0-alpha.1.dmg | dmg      | darwin   | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0                      | Test-App-1.0.0.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1                      | Test-App-1.0.1.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2                      | Test-App-1.0.2.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3                      | Test-App-1.0.3.dmg         | dmg      | darwin   | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0                      | Test-App-1.1.0.dmg         | dmg      | darwin   | stable   |
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
     And all "releases" have artifacts that are uploaded
     And I am a product of account "test1"
     And I use an authentication token
@@ -1676,3 +1663,23 @@ Feature: Release upgrade actions
         "next": "1.1.0"
       }
       """
+
+  Scenario: Product retrieves an upgrade for another product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distributionStrategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED               |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED               |
+    And the current account has the following "release" rows:
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
+    And all "releases" have artifacts that are uploaded
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "204"
