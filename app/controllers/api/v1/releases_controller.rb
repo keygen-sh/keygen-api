@@ -17,7 +17,10 @@ module Api::V1
     before_action :set_release, only: %i[show update destroy]
 
     def index
-      releases = policy_scope apply_scopes(current_account.releases.preload(:artifact, :platform, :filetype, :channel))
+      # We're applying scopes and preloading after the policy scope because
+      # our policy scope may include a UNION, and scopes/preloading need to
+      # be applied after the UNION query has been performed.
+      releases = apply_scopes(policy_scope(current_account.releases)).preload(:artifact, :platform, :filetype, :channel)
       authorize releases
 
       render jsonapi: releases
