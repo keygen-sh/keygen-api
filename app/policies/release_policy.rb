@@ -44,7 +44,14 @@ class ReleasePolicy < ApplicationPolicy
   def download?
     assert_account_scoped!
 
-    return resource.product.open_distribution? if
+    # We don't need to authenticate if product is open distribution, as long as the
+    # release doesn't have any entitlement constraints.
+    return true if
+      resource.product.open_distribution? &&
+      resource.constraints.none?
+
+    # Otherwise, we required authentication.
+    return false if
       bearer.nil?
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
