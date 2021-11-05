@@ -39,6 +39,75 @@ Feature: Create product
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a product with a LICENSED distribution strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "distributionStrategy": "LICENSED"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "product" with the distributionStrategy "LICENSED"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a product with a OPEN distribution strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "distributionStrategy": "OPEN"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "product" with the distributionStrategy "OPEN"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a product with a CLOSED distribution strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/products" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "name": "Cool App",
+            "distributionStrategy": "CLOSED"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "product" with the distributionStrategy "CLOSED"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a product with an invalid URL for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
