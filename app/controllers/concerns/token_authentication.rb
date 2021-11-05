@@ -79,6 +79,10 @@ module TokenAuthentication
       token: http_token
     )
 
+    # If a token was provided but was not found, fail early.
+    raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID') if
+      http_token.present? && current_token.nil?
+
     current_bearer = current_token&.bearer
 
     if (current_bearer.present? && current_bearer.account_id != current_account.id) ||
@@ -95,7 +99,7 @@ module TokenAuthentication
       render_unauthorized code: 'TOKEN_EXPIRED', detail: 'Token is expired' and return
     end
 
-    current_token&.bearer
+    current_bearer
   end
 
   def request_http_token_authentication(realm = 'keygen', message = nil)
