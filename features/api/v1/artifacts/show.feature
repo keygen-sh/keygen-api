@@ -198,7 +198,7 @@ Feature: Show release artifact
     And the current account has 1 "release"
     And the first "release" has an artifact that is uploaded
     When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "401"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve an artifact for another account
     Given I am an admin of account "test2"
