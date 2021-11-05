@@ -50,7 +50,7 @@ class ReleasePolicy < ApplicationPolicy
       resource.product.open_distribution? &&
       resource.constraints.none?
 
-    # Otherwise, we required authentication.
+    # Otherwise, we require authentication.
     return false if
       bearer.nil?
 
