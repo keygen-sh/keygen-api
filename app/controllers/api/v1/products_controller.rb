@@ -86,6 +86,7 @@ module Api::V1
           param :type, type: :string, inclusion: %w[product products]
           param :attributes, type: :hash do
             param :name, type: :string
+            param :distribution_strategy, type: :string, optional: true
             param :url, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             param :platforms, type: :array, optional: true, allow_nil: true do
@@ -101,6 +102,7 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
+            param :distribution_strategy, type: :string, optional: true, allow_nil: true
             param :url, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             param :platforms, type: :array, optional: true, allow_nil: true do
