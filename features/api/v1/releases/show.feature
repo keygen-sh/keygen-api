@@ -134,7 +134,7 @@ Feature: Show release
     Given the current account is "test1"
     And the current account has 1 "release"
     When I send a GET request to "/accounts/test1/releases/$0"
-    Then the response status should be "401"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve a release for another account
     Given I am an admin of account "test2"

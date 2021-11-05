@@ -406,7 +406,8 @@ Feature: List releases
     Given the current account is "test1"
     And the current account has 6 "releases"
     When I send a GET request to "/accounts/test1/releases"
-    Then the response status should be "401"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
 
   Scenario: Admin attempts to retrieve releases for another account
     Given I am an admin of account "test2"
