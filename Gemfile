@@ -38,7 +38,8 @@ gem 'rotp'
 gem 'has_scope'
 gem 'kaminari', '~> 1.2.0'
 
-# Search
+# Postgres extensions
+gem 'active_record_union'
 gem 'pg_search'
 
 # Background jobs
