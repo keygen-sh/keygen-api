@@ -9,6 +9,12 @@ class Product < ApplicationRecord
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {}.freeze
 
+  DISTRIBUTION_STRATEGIES = %w[
+    LICENSED
+    OPEN
+    CLOSED
+  ]
+
   search attributes: SEARCH_ATTRIBUTES
 
   belongs_to :account
@@ -26,10 +32,29 @@ class Product < ApplicationRecord
 
   after_create :set_role
 
+  before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
+
   validates :account, presence: { message: "must exist" }
   validates :name, presence: true
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+  validates :distribution_strategy, inclusion: { in: DISTRIBUTION_STRATEGIES, message: "unsupported distribution strategy" }, allow_nil: true
+
+  def licensed_distribution?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      distribution_strategy.nil?
+
+    distribution_strategy == 'LICENSED'
+  end
+
+  def open_distribution?
+    distribution_strategy == 'OPEN'
+  end
+
+  def closed_distribution?
+    distribution_strategy == 'CLOSED'
+  end
 
   private
 

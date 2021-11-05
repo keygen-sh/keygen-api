@@ -32,4 +32,8 @@ class ReleaseArtifact < ApplicationRecord
   scope :for_license, -> license {
     joins(:licenses).where(licenses: { id: license })
   }
+
+  scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
+  scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 end
