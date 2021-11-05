@@ -67,7 +67,7 @@ class ReleaseDownloadService < BaseService
          Timeout::Error => e
     Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
-    raise InvalidArtifactError.new('artifact does not exist or is unavailable (ensure it has been uploaded)')
+    raise InvalidArtifactError.new('artifact is unavailable (ensure it has been fully uploaded)')
   end
 
   private
