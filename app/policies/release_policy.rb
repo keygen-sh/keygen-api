@@ -134,6 +134,16 @@ class ReleasePolicy < ApplicationPolicy
     def resolve
       return scope.open if bearer.nil?
 
+      @scope =
+        case
+        when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+          scope
+        when bearer.has_role?(:license, :user)
+          scope.open.or(scope.licensed)
+        else
+          scope.none
+        end
+
       super
     end
   end
