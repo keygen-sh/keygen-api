@@ -2,6 +2,8 @@
 
 module Api::V1
   class ArtifactsController < Api::V1::BaseController
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
