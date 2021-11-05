@@ -18,11 +18,5 @@ class ReleaseArtifactPolicy < ApplicationPolicy
     release_policy.download?
   end
 
-  class Scope < ApplicationPolicy::Scope
-    def resolve
-      return scope.open if bearer.nil?
-
-      super
-    end
-  end
+  class Scope < ReleasePolicy::Scope; end
 end
