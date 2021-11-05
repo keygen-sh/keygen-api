@@ -27,12 +27,16 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :for_user, -> user {
     joins(:users).where(users: { id: user })
-      .union(self.open)
+      .union(
+        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+      )
   }
 
   scope :for_license, -> license {
     joins(:licenses).where(licenses: { id: license })
-      .union(self.open)
+      .union(
+        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+      )
   }
 
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
