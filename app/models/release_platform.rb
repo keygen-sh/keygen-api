@@ -54,5 +54,5 @@ class ReleasePlatform < ApplicationRecord
   scope :open, -> { joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct }
   scope :closed, -> { joins(:products).where(products: { distribution_strategy: 'CLOSED' }).distinct }
 
-  scope :with_releases, -> { joins(:releases).distinct }
+  scope :with_releases, -> { joins(products: %i[releases]).distinct }
 end
