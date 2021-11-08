@@ -151,9 +151,8 @@ Feature: Show release
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "license"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -167,9 +166,8 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -277,9 +275,8 @@ Feature: Show release
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "license"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -293,9 +290,8 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
@@ -392,9 +388,8 @@ Feature: Show release
       """
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "license"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
@@ -408,9 +403,8 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And I am a user of account "test1"
+    And I am a license of account "test1"
     And I use an authentication token
-    And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
