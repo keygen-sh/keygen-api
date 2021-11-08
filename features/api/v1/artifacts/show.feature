@@ -237,6 +237,26 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
+  Scenario: License retreives an artifact for an LICENSED release with an expired license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "403"
+
   Scenario: User retreives an artifact for a LICENSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -365,6 +385,26 @@ Feature: Show release artifact
     And the first "release" has an artifact that is uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "303"
+
+  Scenario: License retreives an artifact for an OPEN release with an expired license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
