@@ -32,7 +32,8 @@ class ReleaseArtifact < ApplicationRecord
         users: { id: user },
       )
       .union(
-        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+        joins(:product)
+          .where(product: { distribution_strategy: 'OPEN' })
       )
   }
 
@@ -43,7 +44,8 @@ class ReleaseArtifact < ApplicationRecord
         licenses: { id: license },
       )
       .union(
-        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+        joins(:product)
+          .where(product: { distribution_strategy: 'OPEN' })
       )
   }
 
