@@ -1460,7 +1460,7 @@ Feature: Release upgrade actions
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
 
-  Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy, missing entitlement)
+  Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy, has entitlement)
     Given the current account is "test1"
     And the current account has the following "entitlement" rows:
       | id                                   | code      |
