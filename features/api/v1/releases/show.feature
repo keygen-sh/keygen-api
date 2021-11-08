@@ -171,6 +171,25 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
+  Scenario: License retrieves an LICENSED release with an expired license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
   Scenario: User retrieves a LICENSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -255,17 +274,6 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
-  Scenario: Anonymous retrieves an OPEN release
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the first "product" has the following attributes:
-      """
-      { "distributionStrategy": "OPEN" }
-      """
-    And the current account has 1 "release" for the first "product"
-    When I send a GET request to "/accounts/test1/releases/$0"
-    Then the response status should be "200"
-
   Scenario: License retrieves an OPEN release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -290,6 +298,25 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: License retrieves an OPEN release with an expired license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
