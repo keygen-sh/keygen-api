@@ -107,7 +107,8 @@ class Release < ApplicationRecord
         users: { id: user },
       )
       .union(
-        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+        joins(:product)
+          .where(product: { distribution_strategy: 'OPEN' })
       )
   }
 
@@ -119,7 +120,8 @@ class Release < ApplicationRecord
         licenses: { id: license },
       )
       .union(
-        joins(:product).rewhere(product: { distribution_strategy: 'OPEN' })
+        joins(:product)
+          .where(product: { distribution_strategy: 'OPEN' })
       )
   }
 
