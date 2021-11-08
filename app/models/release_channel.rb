@@ -27,17 +27,27 @@ class ReleaseChannel < ApplicationRecord
     joins(:products).where(products: { id: id }).distinct
   }
 
-  scope :for_user, -> id {
-    joins(:users).where(users: { id: id }).distinct
+  scope :for_user, -> user {
+    joins(products: %i[users])
+      .where(
+        products: { distribution_strategy: ['LICENSED', nil] },
+        users: { id: user },
+      )
+      .distinct
       .union(
-        joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct
+        self.open
       )
   }
 
-  scope :for_license, -> id {
-    joins(:licenses).where(licenses: { id: id }).distinct
+  scope :for_license, -> license {
+    joins(products: %i[licenses])
+      .where(
+        products: { distribution_strategy: ['LICENSED', nil] },
+        licenses: { id: license },
+      )
+      .distinct
       .union(
-        joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct
+        self.open
       )
   }
 
