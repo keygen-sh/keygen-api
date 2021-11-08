@@ -347,18 +347,6 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Anonymous retreives an artifact for an OPEN release
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the first "product" has the following attributes:
-      """
-      { "distributionStrategy": "OPEN" }
-      """
-    And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    When I send a GET request to "/accounts/test1/artifacts/$0"
-    Then the response status should be "303"
-
   Scenario: License retreives an artifact for an OPEN release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
