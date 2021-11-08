@@ -1337,8 +1337,8 @@ Feature: Release upgrade actions
   Scenario: License retrieves an upgrade for a product release (LICENSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED              |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1365,8 +1365,8 @@ Feature: Release upgrade actions
   Scenario: User retrieves an upgrade for a product release (LICENSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED              |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1395,8 +1395,8 @@ Feature: Release upgrade actions
   Scenario: Anonymous retrieves an upgrade for a product release (LICENSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED             |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | LICENSED              |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1412,8 +1412,8 @@ Feature: Release upgrade actions
   Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1443,8 +1443,8 @@ Feature: Release upgrade actions
       | id                                   | code      |
       | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | TEST_ENTL |
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel | entitlements |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
@@ -1466,8 +1466,8 @@ Feature: Release upgrade actions
       | id                                   | code      |
       | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | TEST_ENTL |
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel | entitlements |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  | TEST_ENTL    |
@@ -1501,8 +1501,8 @@ Feature: Release upgrade actions
   Scenario: User retrieves an upgrade for a product release (OPEN distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1531,8 +1531,8 @@ Feature: Release upgrade actions
   Scenario: Anonymous retrieves an upgrade for a product release (OPEN distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                 |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1556,8 +1556,8 @@ Feature: Release upgrade actions
   Scenario: Anonymous retrieves an upgrade for a product release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1572,8 +1572,8 @@ Feature: Release upgrade actions
   Scenario: License retrieves an upgrade for a product release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1592,8 +1592,8 @@ Feature: Release upgrade actions
   Scenario: User retrieves an upgrade for a product release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1614,8 +1614,8 @@ Feature: Release upgrade actions
   Scenario: Admin retrieves an upgrade for a product release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1640,8 +1640,8 @@ Feature: Release upgrade actions
   Scenario: Product retrieves an upgrade for their release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distributionStrategy |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED               |
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
@@ -1667,9 +1667,9 @@ Feature: Release upgrade actions
   Scenario: Product retrieves an upgrade for another product release (CLOSED distribution strategy)
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name       | distributionStrategy |
-      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED               |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED               |
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED                |
     And the current account has the following "release" rows:
       | product_id                           | version | filename           | filetype | platform | channel |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
