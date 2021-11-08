@@ -134,7 +134,7 @@ Feature: Show release channel
     Given the current account is "test1"
     And the current account has 1 "release"
     When I send a GET request to "/accounts/test1/channels/$0"
-    Then the response status should be "401"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve a channel for another account
     Given I am an admin of account "test2"
@@ -144,3 +144,36 @@ Feature: Show release channel
     When I send a GET request to "/accounts/test1/channels/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: Anonymous attempts to retrieves a channel for an account (LICENSED distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels/$0"
+    Then the response status should be "404"
+
+  Scenario: Anonymous attempts to retrieves a channel for an account (OPEN distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels/$0"
+    Then the response status should be "200"
+
+  Scenario: Anonymous attempts to retrieves a channel for an account (CLOSED distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels/$0"
+    Then the response status should be "404"

@@ -171,3 +171,39 @@ Feature: List release channels
     And I use an authentication token
     When I send a GET request to "/accounts/test1/channels"
     Then the response status should be "401"
+
+  Scenario: Anonymous attempts to retrieve the channels for an account (LICENSED distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels"
+    Then the response status should be "200"
+    And the JSON response should be an array of 0 "channels"
+
+  Scenario: Anonymous attempts to retrieve the channels for an account (OPEN distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "OPEN" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "channel"
+
+  Scenario: Anonymous attempts to retrieve the channels for an account (CLOSED distribution strategy)
+   Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "CLOSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    When I send a GET request to "/accounts/test1/channels"
+    Then the response status should be "200"
+    And the JSON response should be an array of 0 "channels"

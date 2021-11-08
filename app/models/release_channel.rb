@@ -29,11 +29,21 @@ class ReleaseChannel < ApplicationRecord
 
   scope :for_user, -> id {
     joins(:users).where(users: { id: id }).distinct
+      .union(
+        joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct
+      )
   }
 
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: id }).distinct
+      .union(
+        joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct
+      )
   }
+
+  scope :licensed, -> { joins(:products).where(products: { distribution_strategy: ['LICENSED', nil] }).distinct }
+  scope :open, -> { joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct }
+  scope :closed, -> { joins(:products).where(products: { distribution_strategy: 'CLOSED' }).distinct }
 
   def stable?
     key == 'stable'
