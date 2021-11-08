@@ -12,4 +12,6 @@ class ReleaseChannelPolicy < ApplicationPolicy
 
     true
   end
+
+  class Scope < ReleasePolicy::Scope; end
 end
