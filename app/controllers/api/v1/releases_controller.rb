@@ -154,7 +154,6 @@ module Api::V1
             }
             param :version, type: :string
             param :description, type: :string, optional: true
-            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true
             param :signature, type: :string, optional: true
             param :checksum, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
@@ -203,7 +202,6 @@ module Api::V1
             }
             param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true
-            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
             param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
@@ -242,7 +240,6 @@ module Api::V1
             param :name, type: :string, optional: true, allow_nil: true
             param :filesize, type: :integer, optional: true, allow_nil: true
             param :description, type: :string, optional: true, allow_nil: true
-            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
             param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true

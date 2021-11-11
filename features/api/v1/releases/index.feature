@@ -432,18 +432,9 @@ Feature: List releases
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the second "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the third "release" has the following attributes:
-      """
-      { "status": "DRAFT" }
-      """
+    And the first "release" has an artifact that is nil
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -460,21 +451,11 @@ Feature: List releases
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the second "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the third "release" has the following attributes:
-      """
-      { "status": "DRAFT" }
-      """
+    And the first "release" has an artifact that is nil
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
-    And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=PUBLISHED"
@@ -491,19 +472,13 @@ Feature: List releases
     And the current account has 3 "releases" for the first "product"
     And the first "release" has the following attributes:
       """
-      { "status": "YANKED" }
-      """
-    And the second "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the third "release" has the following attributes:
-      """
-      { "status": "DRAFT" }
+      { "yankedAt": "$time.now" }
       """
     And the current account has 1 "policy" for the first "product"
+    And the first "release" has an artifact that is nil
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is uploaded
     And the current account has 1 "license" for the first "policy"
-    And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=YANKED"

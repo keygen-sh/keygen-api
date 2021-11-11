@@ -26,6 +26,40 @@ Feature: Show release
     Then the response status should be "200"
     And the JSON response should be a "release"
 
+  Scenario: Admin retrieves a draft release for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is nil
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the status "DRAFT"
+
+  Scenario: Admin retrieves a published release for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the status "PUBLISHED"
+
+  Scenario: Admin retrieves a yanked release for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
+    And the first "release" has an artifact that is nil
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the status "YANKED"
+
   Scenario: Developer retrieves a release for their account
     Given the current account is "test1"
     And the current account has 1 "developer"

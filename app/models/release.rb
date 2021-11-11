@@ -4,12 +4,6 @@ class Release < ApplicationRecord
   include Limitable
   include Pageable
 
-  STATUSES = %w[
-    DRAFT
-    PUBLISHED
-    YANKED
-  ]
-
   belongs_to :account,
     inverse_of: :releases
   belongs_to :product,
@@ -63,8 +57,6 @@ class Release < ApplicationRecord
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
 
-  before_create -> { self.status = 'PUBLISHED' }, if: -> { status.nil? }
-
   validates :account,
     presence: { message: 'must exist' }
   validates :product,
@@ -103,10 +95,6 @@ class Release < ApplicationRecord
   validates :filesize,
     allow_blank: true,
     numericality: { greater_than_or_equal_to: 0 }
-
-  validates :status,
-    inclusion: { in: STATUSES, message: "unsupported status" },
-    allow_nil: true
 
   scope :for_product, -> product {
     where(product: product)
@@ -202,9 +190,20 @@ class Release < ApplicationRecord
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_version, -> version { where(version: version) }
-  scope :with_status, -> status { where(status: status) }
   scope :with_artifact, -> { joins(:artifact) }
   scope :without_artifact, -> { where.missing(:artifact) }
+  scope :with_status, -> status {
+    case status.to_s.upcase
+    when 'YANKED'
+      self.yanked
+    when 'DRAFT'
+      self.without_artifact
+    when 'PUBLISHED'
+      self.with_artifact
+    else
+      self.none
+    end
+  }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
@@ -239,6 +238,17 @@ class Release < ApplicationRecord
 
   def yanked?
     yanked_at.present?
+  end
+
+  def status
+    case
+    when yanked?
+      :YANKED
+    when artifact.nil?
+      :DRAFT
+    else
+      :PUBLISHED
+    end
   end
 
   def semver
