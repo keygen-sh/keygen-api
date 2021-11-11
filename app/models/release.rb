@@ -4,6 +4,12 @@ class Release < ApplicationRecord
   include Limitable
   include Pageable
 
+  STATUSES = %w[
+    DRAFT
+    PUBLISHED
+    YANKED
+  ]
+
   belongs_to :account,
     inverse_of: :releases
   belongs_to :product,
@@ -57,6 +63,8 @@ class Release < ApplicationRecord
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
 
+  before_create -> { self.status = 'PUBLISHED' }, if: -> { status.nil? }
+
   validates :account,
     presence: { message: 'must exist' }
   validates :product,
@@ -96,6 +104,10 @@ class Release < ApplicationRecord
     allow_blank: true,
     numericality: { greater_than_or_equal_to: 0 }
 
+  validates :status,
+    inclusion: { in: STATUSES, message: "unsupported status" },
+    allow_nil: true
+
   scope :for_product, -> product {
     where(product: product)
   }
@@ -107,8 +119,7 @@ class Release < ApplicationRecord
         users: { id: user },
       )
       .union(
-        joins(:product)
-          .where(product: { distribution_strategy: 'OPEN' })
+        self.open
       )
   }
 
@@ -120,8 +131,7 @@ class Release < ApplicationRecord
         licenses: { id: license },
       )
       .union(
-        joins(:product)
-          .where(product: { distribution_strategy: 'OPEN' })
+        self.open
       )
   }
 
@@ -192,7 +202,9 @@ class Release < ApplicationRecord
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_version, -> version { where(version: version) }
+  scope :with_status, -> status { where(status: status) }
   scope :with_artifact, -> { joins(:artifact) }
+  scope :without_artifact, -> { where.missing(:artifact) }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
