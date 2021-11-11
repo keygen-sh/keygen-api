@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_11_195235) do
+ActiveRecord::Schema.define(version: 2021_11_05_145230) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -390,7 +390,6 @@ ActiveRecord::Schema.define(version: 2021_11_11_195235) do
     t.text "description"
     t.string "signature"
     t.string "checksum"
-    t.string "status"
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
     t.index ["account_id", "product_id", "release_platform_id", "release_channel_id", "release_filetype_id", "version"], name: "releases_acct_prod_plat_chan_type_ver_idx", unique: true

@@ -23,10 +23,7 @@ class ReleaseYankService < BaseService
     s3 = Aws::S3::Client.new
     s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
 
-    release.update(
-      yanked_at: Time.current,
-      status: 'YANKED',
-    )
+    release.touch(:yanked_at)
 
     artifact = release.artifact
     artifact.destroy unless

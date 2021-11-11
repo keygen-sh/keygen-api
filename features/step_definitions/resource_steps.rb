@@ -434,7 +434,7 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
-Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out)$/ do |named_index, named_scenario|
+Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out|nil)$/ do |named_index, named_scenario|
   res = case named_scenario
         when 'uploaded'
           []
@@ -442,6 +442,8 @@ Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (
           ['NotFound']
         when 'timing out'
           [Timeout::Error]
+        when 'nil'
+          next # bail without doing anything
         end
 
   Aws.config[:s3] = {
