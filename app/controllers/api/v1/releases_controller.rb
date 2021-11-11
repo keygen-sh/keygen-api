@@ -8,6 +8,7 @@ module Api::V1
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:version) { |c, s, v| s.with_version(v) }
+    has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -153,6 +154,7 @@ module Api::V1
             }
             param :version, type: :string
             param :description, type: :string, optional: true
+            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true
             param :signature, type: :string, optional: true
             param :checksum, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
@@ -201,6 +203,7 @@ module Api::V1
             }
             param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true
+            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
             param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
@@ -239,6 +242,7 @@ module Api::V1
             param :name, type: :string, optional: true, allow_nil: true
             param :filesize, type: :integer, optional: true, allow_nil: true
             param :description, type: :string, optional: true, allow_nil: true
+            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
             param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true

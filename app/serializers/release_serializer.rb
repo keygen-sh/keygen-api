@@ -24,6 +24,7 @@ class ReleaseSerializer < BaseSerializer
   attribute :upgrades do
     @object.upgrade_count
   end
+  attribute :status
   attribute :version
   attribute :semver do
     semver = @object.semver
