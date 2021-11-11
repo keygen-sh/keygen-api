@@ -69,6 +69,7 @@ Feature: Create release
         "filesize": 209715200,
         "platform": "darwin",
         "channel": "stable",
+        "status": "PUBLISHED",
         "version": "1.0.0",
         "semver": {
           "major": 1,
@@ -84,6 +85,120 @@ Feature: Create release
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a draft release for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Product 2",
+        "filename": "Product-2.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "status": "DRAFT",
+            "version": "2.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Product 2",
+        "filename": "Product-2.0.0.dmg",
+        "filetype": "dmg",
+        "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "status": "DRAFT",
+        "version": "2.0.0",
+        "semver": {
+          "major": 2,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a yanked release for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "filename": "Product-1.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "status": "YANKED",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: DRAFT, PUBLISHED (received YANKED)",
+        "source": {
+          "pointer": "/data/attributes/status"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (non-lowercase filetype)

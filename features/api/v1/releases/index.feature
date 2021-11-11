@@ -424,6 +424,92 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 5 "releases"
 
+  Scenario: License attempts to retrieve all draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?status=DRAFT"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "release"
+
+  Scenario: License attempts to retrieve all published releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "release" has an artifact that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?status=PUBLISHED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+
+  Scenario: License attempts to retrieve all yanked releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has the following attributes:
+      """
+      { "status": "YANKED" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "release" has an artifact that is uploaded
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?status=YANKED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "release"
+
   Scenario: License attempts to retrieve all accessible releases
     Given the current account is "test1"
     And the current account has 3 "products"
