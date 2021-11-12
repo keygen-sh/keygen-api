@@ -433,7 +433,11 @@ Feature: List releases
       """
     And the current account has 3 "releases" for the first "product"
     And the first "release" has an artifact that is nil
-    And the second "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is nil
+    And the second "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
     And the third "release" has an artifact that is uploaded
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"

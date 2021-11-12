@@ -197,9 +197,9 @@ class Release < ApplicationRecord
     when 'YANKED'
       self.yanked
     when 'DRAFT'
-      self.without_artifact
+      self.unyanked.without_artifact
     when 'PUBLISHED'
-      self.with_artifact
+      self.unyanked.with_artifact
     else
       self.none
     end
