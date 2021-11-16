@@ -424,7 +424,7 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 5 "releases"
 
-  Scenario: License attempts to retrieve all draft releases
+  Scenario: License attempts to retrieve all unpublished releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the first "product" has the following attributes:
@@ -444,6 +444,29 @@ Feature: List releases
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=NOT_PUBLISHED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "release"
+
+  Scenario: License attempts to retrieve all draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has an artifact that is nil
+    And the second "release" has an artifact that is nil
+    And the second "release" has the following attributes:
+      """
+      { "yankedAt": "$time.now" }
+      """
+    And the third "release" has an artifact that is uploaded
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?status=DRAFT"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 
