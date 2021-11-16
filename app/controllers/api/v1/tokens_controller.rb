@@ -72,7 +72,7 @@ module Api::V1
         return render_unauthorized detail: 'Credentials must be valid', code: 'CREDENTIALS_INVALID'
       end
 
-      render_unauthorized detail: 'Credentials must be provided', code: 'CREDENTIALS_MISSING'
+      render_unauthorized detail: 'An email and password is required', code: 'CREDENTIALS_REQUIRED'
     rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
       render_bad_request
     end
