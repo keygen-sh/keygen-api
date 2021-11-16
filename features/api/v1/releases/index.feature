@@ -443,7 +443,7 @@ Feature: List releases
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?status=DRAFT"
+    When I send a GET request to "/accounts/test1/releases?status=NOT_PUBLISHED"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 

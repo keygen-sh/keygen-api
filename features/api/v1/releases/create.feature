@@ -69,7 +69,7 @@ Feature: Create release
         "filesize": 209715200,
         "platform": "darwin",
         "channel": "stable",
-        "status": "DRAFT",
+        "status": "NOT_PUBLISHED",
         "version": "1.0.0",
         "semver": {
           "major": 1,
