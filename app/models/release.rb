@@ -196,7 +196,8 @@ class Release < ApplicationRecord
     case status.to_s.upcase
     when 'YANKED'
       self.yanked
-    when 'NOT_PUBLISHED'
+    when 'NOT_PUBLISHED',
+         'DRAFT'
       self.unyanked.without_artifact
     when 'PUBLISHED'
       self.unyanked.with_artifact
