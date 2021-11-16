@@ -196,7 +196,7 @@ class Release < ApplicationRecord
     case status.to_s.upcase
     when 'YANKED'
       self.yanked
-    when 'DRAFT'
+    when 'NOT_PUBLISHED'
       self.unyanked.without_artifact
     when 'PUBLISHED'
       self.unyanked.with_artifact
@@ -245,7 +245,7 @@ class Release < ApplicationRecord
     when yanked?
       :YANKED
     when artifact.nil?
-      :DRAFT
+      :NOT_PUBLISHED
     else
       :PUBLISHED
     end

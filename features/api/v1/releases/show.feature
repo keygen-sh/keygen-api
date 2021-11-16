@@ -34,7 +34,7 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release" with the status "DRAFT"
+    And the JSON response should be a "release" with the status "NOT_PUBLISHED"
 
   Scenario: Admin retrieves a published release for their account
     Given I am an admin of account "test1"
