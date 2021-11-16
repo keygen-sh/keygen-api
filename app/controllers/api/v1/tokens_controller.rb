@@ -35,11 +35,11 @@ module Api::V1
         if user&.second_factor_enabled?
           otp = token_meta[:otp]
           if otp.nil?
-            render_unauthorized detail: 'second factor is required', code: 'OTP_REQUIRED', source: { pointer: '/meta/otp' } and return
+            return render_unauthorized detail: 'second factor is required', code: 'OTP_REQUIRED', source: { pointer: '/meta/otp' }
           end
 
           if !user.verify_second_factor(otp)
-            render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
+            return render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' }
           end
         end
 
