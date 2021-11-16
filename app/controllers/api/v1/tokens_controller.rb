@@ -63,16 +63,16 @@ module Api::V1
               resource: token
             )
 
-            render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
+            return render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
           else
-            render_unprocessable_resource token
+            return render_unprocessable_resource token
           end
-
-          return
         end
+
+        return render_unauthorized detail: 'Credentials must be valid', code: 'CREDENTIALS_INVALID'
       end
 
-      render_unauthorized detail: 'Credentials must be valid', code: 'CREDENTIALS_INVALID'
+      render_unauthorized detail: 'Credentials must be provided', code: 'CREDENTIALS_MISSING'
     rescue ArgumentError # Catch null bytes (Postgres throws an argument error)
       render_bad_request
     end
