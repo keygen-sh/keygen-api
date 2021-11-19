@@ -197,11 +197,11 @@ module Keygen
       private
 
       def filter_response_body(body)
-        return if
-          body.nil?
+        return unless
+          body.present?
 
         params =
-          if body.present? && body.is_a?(String)
+          if body.is_a?(String)
             JSON.parse(body.to_s)
           else
             body
