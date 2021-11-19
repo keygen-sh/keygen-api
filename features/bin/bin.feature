@@ -12,7 +12,7 @@ Feature: Short bin URLs
     Then the response status should be "307"
     Then the response should contain the following headers:
       """
-      { "Location": "/v1/accounts/keygen/artifacts/cli%2Finstall.sh" }
+      { "Location": "https://api.keygen.sh/v1/accounts/keygen/artifacts/cli%2Finstall.sh" }
       """
 
   Scenario: Subdomain 'get' should redirect to an artifact
@@ -20,5 +20,5 @@ Feature: Short bin URLs
     Then the response status should be "307"
     Then the response should contain the following headers:
       """
-      { "Location": "/v1/accounts/keygen/artifacts/cli%2Finstall.sh" }
+      { "Location": "https://api.keygen.sh/v1/accounts/keygen/artifacts/cli%2Finstall.sh" }
       """

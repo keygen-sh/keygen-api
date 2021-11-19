@@ -5,7 +5,8 @@ module Bin
     def show
       skip_authorization
 
-      render status: :temporary_redirect, location: v1_account_artifact_path(account, artifact)
+      render location: v1_account_artifact_url(account, artifact, protocol: 'https', host: 'api.keygen.sh'),
+             status: :temporary_redirect
     end
 
     private
