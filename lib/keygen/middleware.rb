@@ -52,6 +52,7 @@ module Keygen
 
     class RequestLogger
       IGNORED_ORIGINS ||= %w[https://app.keygen.sh https://dist.keygen.sh].freeze
+      IGNORED_HOSTS ||= %w[get.keygen.sh bin.keygen.sh].freeze
       IGNORED_RESOURCES ||= %w[
         webhook_endpoints
         webhook_events
@@ -76,6 +77,10 @@ module Keygen
         is_ignored_origin = IGNORED_ORIGINS.include?(req.headers['origin'])
         return [status, headers, res] if
           is_ignored_origin
+
+        is_ignored_host = IGNORED_HOSTS.include?(req.host)
+        return [status, headers, res] if
+          is_ignored_host
 
         account    = Keygen::Store::Request.store[:current_account]
         route      = Rails.application.routes.recognize_path req.url, method: req.method
