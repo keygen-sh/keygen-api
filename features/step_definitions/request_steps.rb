@@ -16,7 +16,11 @@ end
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
 
-  get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  if !path.starts_with?('//')
+    get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
+  else
+    get path
+  end
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
