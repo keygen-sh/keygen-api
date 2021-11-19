@@ -266,8 +266,9 @@ Rails.application.routes.draw do
   end
 
   scope module: "bin", **bin_constraints do
-    get ":account_id/:artifact_id", to: "bin#show",
-      constraints: { account_id: /[^\/]*/, artifact_id: /.*/ }
+    get ":account_id/:artifact_id",
+      constraints: { account_id: /[^\/]*/, artifact_id: /.*/ },
+      to: "bin#show"
   end
 
   %w[500 503].each do |code|
