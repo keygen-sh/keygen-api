@@ -4,7 +4,13 @@ require 'sidekiq/web'
 require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
-  constraints =
+  bin_constraints =
+    if !Rails.env.development?
+      { constraints: { subdomain: %w[bin get], format: "jsonapi" } }
+    else
+      { constraints: { format: "jsonapi" } }
+    end
+  api_constraints =
     if !Rails.env.development?
       { constraints: { subdomain: "api", format: "jsonapi" } }
     else
@@ -27,7 +33,7 @@ Rails.application.routes.draw do
     }
   end
 
-  scope module: "api", **constraints do
+  scope module: "api", **api_constraints do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
 
@@ -257,6 +263,11 @@ Rails.application.routes.draw do
         post "search", to: "searches#search"
       end
     end
+  end
+
+  scope module: "bin", **bin_constraints do
+    get ":account_id/:artifact_id", to: "bin#show",
+      constraints: { account_id: /[^\/]*/, artifact_id: /.*/ }
   end
 
   %w[500 503].each do |code|
