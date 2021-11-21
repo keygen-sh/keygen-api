@@ -15,19 +15,20 @@ heroku addons:create heroku-redis:premium-5 --fork {{PREV_REDIS_URL}
 Wait until ready:
 
 ```
-heroku addons:info {{NEXT_REDIS_NAME}}
+heroku addons:info HEROKU_REDIS_ONYX
+heroku redis:info
 ```
 
 Promote Redis:
 
 ```
-heroku redis:promote {{NEXT_REDIS_NAME}}
+heroku redis:promote HEROKU_REDIS_ONYX
 ```
 
 Update key eviction policy:
 
 ```
-heroku redis:maxmemory {{NEXT_REDIS_NAME}} --policy volatile-lru
+heroku redis:maxmemory HEROKU_REDIS_ONYX --policy volatile-lru
 ```
 
 Confirm database is correct:
@@ -36,11 +37,13 @@ Confirm database is correct:
 heroku redis:info
 ```
 
-Scale up dynos and disable maintenance mode:
+Disable preboot, scale up dynos and disable maintenance mode:
 
 ```
-heroku ps:scale web=1 worker=2
+heroku features:disable preboot
+heroku ps:scale web=2 worker=2
 heroku maintenance:off
+heroku features:enable preboot
 ```
 
 Deprovisioning the prev Redis:
