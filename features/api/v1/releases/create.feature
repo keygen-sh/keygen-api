@@ -16,20 +16,11 @@ Feature: Create release
     When I send a POST request to "/accounts/test1/releases"
     Then the response status should be "403"
 
-  Scenario: Endpoint should be inaccessible when account is on free tier
-    Given the account "test1" is on a free tier
-    And the account "test1" is subscribed
-    And I am an admin of account "test1"
-    And the current account is "test1"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases"
-    Then the response status should be "403"
-
   Scenario: Admin creates a new release for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases" with the following:
       """
@@ -85,6 +76,125 @@ Feature: Create release
       """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a new release for their account (free tier, limit not reached)
+    Given the account "test1" is on a free tier
+    And the account "test1" is subscribed
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 3 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "filename": "Product-1.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Launch Release",
+        "filename": "Product-1.0.0.dmg",
+        "filetype": "dmg",
+        "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "status": "NOT_PUBLISHED",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a new release for their account (free tier, limit reached)
+    Given the account "test1" is on a free tier
+    And the account "test1" is subscribed
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 10 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "filename": "Product-1.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "Your tier's release limit of 10 has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing.",
+        "source": {
+          "pointer": "/data/relationships/account"
+        },
+        "code": "ACCOUNT_RELEASE_LIMIT_EXCEEDED"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (non-lowercase filetype)

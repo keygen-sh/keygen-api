@@ -57,6 +57,8 @@ class Release < ApplicationRecord
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :channel
 
+  before_create :enforce_release_limit_on_account!
+
   validates :account,
     presence: { message: 'must exist' }
   validates :product,
@@ -431,5 +433,23 @@ class Release < ApplicationRecord
       new_record?
 
     constraints.exists?(attrs)
+  end
+
+  def enforce_release_limit_on_account!
+    return unless account.trialing_or_free_tier?
+
+    release_count = account.releases.count
+
+    # TODO(ezekg) Add max_releases to plans
+    release_limit = 10
+
+    return if release_count.nil? ||
+              release_limit.nil?
+
+    if release_count >= release_limit
+      errors.add :account, :release_limit_exceeded, message: "Your tier's release limit of #{release_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
+
+      throw :abort
+    end
   end
 end
