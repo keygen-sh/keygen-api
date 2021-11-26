@@ -17,16 +17,6 @@ Feature: Update release
     When I send a PATCH request to "/accounts/test1/releases/$0"
     Then the response status should be "403"
 
-  Scenario: Endpoint should be inaccessible when account is on free tier
-    Given the account "test1" is on a free tier
-    And the account "test1" is subscribed
-    And I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "release"
-    And I use an authentication token
-    When I send a PATCH request to "/accounts/test1/releases/$0"
-    Then the response status should be "403"
-
   Scenario: Admin updates a release for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
