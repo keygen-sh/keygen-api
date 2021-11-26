@@ -20,6 +20,7 @@ Feature: Create release
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
+    And the current account has 14 "releases"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases" with the following:
