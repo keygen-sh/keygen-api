@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_05_145230) do
+ActiveRecord::Schema.define(version: 2021_11_26_232314) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -479,6 +479,7 @@ ActiveRecord::Schema.define(version: 2021_11_05_145230) do
     t.uuid "account_id"
     t.string "first_name"
     t.string "last_name"
+    t.datetime "unsubscribed_from_stdout_at"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist

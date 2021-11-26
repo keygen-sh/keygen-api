@@ -4,12 +4,6 @@ require 'sidekiq/web'
 require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
-  bin_constraints =
-    if !Rails.env.development?
-      { constraints: { subdomain: %w[bin get], format: "jsonapi" } }
-    else
-      { constraints: { format: "jsonapi" } }
-    end
   api_constraints =
     if !Rails.env.development?
       { constraints: { subdomain: "api", format: "jsonapi" } }
@@ -265,13 +259,13 @@ Rails.application.routes.draw do
     end
   end
 
-  scope module: "bin", **bin_constraints do
-    get ":account_id",
-      constraints: { account_id: /[^\/]*/ },
-      to: "artifacts#index"
-    get ":account_id/:id",
-      constraints: { account_id: /[^\/]*/, id: /.*/ },
-      to: "artifacts#show"
+  scope module: "bin", constraints: { subdomain: %w[bin get], format: "jsonapi" } do
+    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index"
+    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show"
+  end
+
+  scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
+    get "unsub/:email", to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
   end
 
   %w[500 503].each do |code|
