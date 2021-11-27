@@ -4,33 +4,22 @@ class NewsletterMailer < ApplicationMailer
   default from: 'Zeke at Keygen <zeke@keygen.sh>'
 
   def november_2021
-    active_accounts = Account.select(:id)
-                             .joins(:billing, :request_logs)
-                             .where(billings: { state: %i[subscribed trialing pending] })
-                             .where('request_logs.created_at > ?', 90.days.ago)
-                             .group('accounts.id')
-                             .having('count(request_logs.id) > 0')
-
-    active_admins = User.where(account_id: active_accounts, unsubscribed_from_stdout_at: nil)
-                        .with_roles(:admin, :developer)
-                        .uniq(&:email)
-
-    active_admins.map do |admin|
+    active_contacts.map do |contact|
       unsubscribe_link = stdout_unsubscribe_url(
-        Base64.urlsafe_encode64(admin.email),
+        Base64.urlsafe_encode64(contact.email),
         protocol: 'https',
         host: 'stdout.keygen.sh',
       )
 
-      greeting = if admin.first_name?
-                   "Hey, #{admin.first_name}"
+      greeting = if contact.first_name?
+                   "Hey, #{contact.first_name}"
                  else
                    "Hey"
                  end
 
       mail(
         content_type: 'text/plain',
-        email: admin.email,
+        email: contact.email,
         subject: "Trying something new",
         body: <<~TXT
           #{greeting} -- long time no update! Zeke here, founder of Keygen.
@@ -113,5 +102,16 @@ class NewsletterMailer < ApplicationMailer
         TXT
       )
     end
+  end
+
+  private
+
+  def active_contacts
+    active_accounts = Account.active.select(:id)
+
+    User.where(account_id: active_accounts, stdout_unsubscribed_at: nil)
+        .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
+        .with_roles(:admin, :developer)
+        .uniq(&:email)
   end
 end
