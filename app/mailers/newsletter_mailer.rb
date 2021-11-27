@@ -103,6 +103,8 @@ class NewsletterMailer < ApplicationMailer
 
           Thank you so much for your support!
 
+          Until next time,
+
           --
           Zeke, Founder <https://keygen.sh>
 
