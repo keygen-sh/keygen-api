@@ -22,17 +22,23 @@ class NewsletterMailer < ApplicationMailer
         host: 'stdout.keygen.sh',
       )
 
+      greeting = if admin.first_name?
+                   "Hey, #{admin.first_name}"
+                 else
+                   "Hey"
+                 end
+
       mail(
         content_type: 'text/plain',
         email: admin.email,
-        subject: "November in review -- what's new in Keygen",
+        subject: "Trying something new",
         body: <<~TXT
-          Hey -- long time no talk! Zeke here, founder of Keygen.
+          #{greeting} -- long time no update! Zeke here, founder of Keygen.
 
-          I'm going to be trying something new -- a bi-weekly/monthly newsletter covering "what's new" in Keygen.
-          It was recently brought to my attention that I don't do a good job of surfacing new updates to Keygen
-          customers, so I hope that this changes that. If you don't want to receive marketing emails like this,
-          you can opt-out by following this link (#{unsubscribe_link}).
+          I'm going to be trying something new -- a monthly-ish newsletter covering "what's new" in Keygen. It
+          was recently brought to my attention that I don't do a good job of surfacing new updates to Keygen
+          customers, so I hope this changes that. If you don't want to receive marketing emails like this,
+          you can opt-out anytime by following this link: #{unsubscribe_link}
 
           To kick things off, let's talk software distribution --
 
@@ -43,10 +49,21 @@ class NewsletterMailer < ApplicationMailer
           licensing API. This has been a huge goal of mine, really, since I first wrote the prototype for the
           old distribution API in Go. The new API is now available at api.keygen.sh.
 
-          We've deprecated our older distribution API, dist.keygen.sh. It will continue to be available, but
-          we recommend using our new API for all new product development.
+          Some cool features of Dist v2:
 
-          Link: https://keygen.sh/docs/api/releases/
+            - You can add entitlement constraints to releases, ensuring that only users that possess a license
+              with those entitlements can access the release. E.g. a popular use case is locking a license to
+              a specific major version of a product until they purchase an upgrade. This can be accomplished
+              using entitlement constraints, with a V1 and V2 entitlement, respectively.
+            - You can set a product's "distribution strategy", allowing you to either distribute your product
+              OPENly to anybody, no license required, or only to LICENSED users (the default). This really
+              opens up doors for Keygen to support a wider variety of business models, such as freemium
+              distribution as well as open source.
+
+          We've deprecated our older distribution API, dist.keygen.sh. It'll continue to be available, but we
+          recommend using our new API for all new product development.
+
+          Docs: https://keygen.sh/docs/api/releases/
 
           ## Go SDK
 
@@ -54,10 +71,10 @@ class NewsletterMailer < ApplicationMailer
           rolled out our first SDK, for Go. With it, you can add license validation, activation, and automatic
           upgrades to any Go application.
 
-          We're currently working on other SDKs as well, for Node, Swift, and C#. Let us know if you have any
-          specific requests for an SDK! We're going to be focusing on these a lot next year.
+          We're currently working on other SDKs as well, for Node, Swift, and C#. Up next will be a macOS SDK,
+          written in Swift. Let me know if you have any specific requests for an SDK!
 
-          Link: https://github.com/keygen-sh/keygen-go
+          Source: https://github.com/keygen-sh/keygen-go
 
           Next up, let's talk command line --
 
@@ -68,6 +85,14 @@ class NewsletterMailer < ApplicationMailer
           using the CLI, and it utilizes our Go SDK for automatic upgrades, all backed by Keygen's new
           distribution API (it's dogfooding all the way down!)
 
+          To install the CLI, you can run this quick install script:
+
+            curl -sSL https://get.keygen.sh/keygen/cli/install.sh | sh
+
+          The install script will auto-detect your platform and install the approriate binary. You can, of
+          course, install manually by visiting the docs, linked below.
+
+          Source: https://github.com/keygen-sh/keygen-cli
           Docs: https://keygen.sh/docs/cli/
 
           --
