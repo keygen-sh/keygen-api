@@ -56,6 +56,13 @@ class Account < ApplicationRecord
     errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
   end
 
+  scope :active, -> (t = 90.days.ago) {
+    joins(:billing, :request_logs)
+      .where(billings: { state: %i[subscribed trialing pending] })
+      .where('request_logs.created_at > ?', t)
+      .group('accounts.id')
+      .having('count(request_logs.id) > 0')
+  }
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
   scope :with_plan, -> (id) { where plan: id }

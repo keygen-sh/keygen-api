@@ -8,7 +8,7 @@ module Stdout
       user = User.where(email: dec)
 
       # Unsubscribe all users with this email across all accounts
-      user.update!(unsubscribed_from_stdout_at: Time.current)
+      user.update!(stdout_unsubscribed_at: Time.current)
     rescue => e
       Keygen.logger.warn "[stdout] Unsubscribe failed: id=#{params[:id]} err=#{e.message}"
     ensure
