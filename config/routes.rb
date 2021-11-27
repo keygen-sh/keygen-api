@@ -260,8 +260,8 @@ Rails.application.routes.draw do
   end
 
   scope module: "bin", constraints: { subdomain: %w[bin get], format: "jsonapi" } do
-    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index"
-    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show"
+    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
+    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
   end
 
   scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
