@@ -38,7 +38,7 @@ class NewsletterMailer < ApplicationMailer
           licensing API. This has been a huge goal of mine, really, since I first wrote the prototype for the
           old distribution API in Go. The new API is now available at api.keygen.sh.
 
-          Some cool features of Dist v2:
+          Some of the rad features for Dist v2:
 
             - You can add entitlement constraints to releases, ensuring that only users that possess a license
               with those entitlements can access the release. E.g. a popular use case is locking a license to
