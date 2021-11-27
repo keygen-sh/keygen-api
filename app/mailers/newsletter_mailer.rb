@@ -5,17 +5,16 @@ class NewsletterMailer < ApplicationMailer
 
   def november_2021
     active_contacts.map do |contact|
-      unsubscribe_link = stdout_unsubscribe_url(
-        Base64.urlsafe_encode64(contact.email),
-        protocol: 'https',
-        host: 'stdout.keygen.sh',
-      )
+      enc_email = encrypt(contact.email, account: contact.account)
+      next if
+        enc_email.nil?
 
-      greeting = if contact.first_name?
-                   "Hey, #{contact.first_name}"
-                 else
-                   "Hey"
-                 end
+      unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+      greeting   = if contact.first_name?
+                     "Hey, #{contact.first_name}"
+                   else
+                     "Hey"
+                   end
 
       mail(
         content_type: 'text/plain',
@@ -27,7 +26,11 @@ class NewsletterMailer < ApplicationMailer
           I'm going to be trying something new -- a monthly-ish newsletter covering "what's new" in Keygen. It
           was recently brought to my attention that I don't do a good job of surfacing new updates to Keygen
           customers, so I hope this changes that. If you don't want to receive marketing emails like this,
-          you can opt-out anytime by following this link: #{unsubscribe_link}
+          you can opt-out anytime by following this link:
+
+            #{unsub_link}
+
+          --
 
           To kick things off, let's talk software distribution --
 
@@ -101,8 +104,10 @@ class NewsletterMailer < ApplicationMailer
           --
           Zeke, Founder <https://keygen.sh>
 
-          (You're receiving this email because you signed up for a Keygen account. If you don't find this
-          email useful, you can unsubscribe here: #{unsubscribe_link})
+          (You're receiving this email because you or your team signed up for a Keygen account. If you don't
+          find this email useful, you can unsubscribe below.)
+
+          Unsubscribe: #{unsub_link}
         TXT
       )
     end
@@ -117,5 +122,30 @@ class NewsletterMailer < ApplicationMailer
         .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
         .with_roles(:admin, :developer)
         .uniq(&:email)
+  end
+
+  def encrypt(plaintext, account:)
+    cipher = OpenSSL::Cipher.new('aes-256-gcm')
+    cipher.encrypt
+
+    auth_data = account.id
+    key       = account.secret_key[0..31]
+    iv        = cipher.random_iv
+
+    cipher.auth_data = auth_data
+    cipher.key       = key
+    cipher.iv        = iv
+
+    ciphertext =
+      cipher.update(plaintext) + cipher.final
+
+    enc =
+      Base64.urlsafe_encode64(ciphertext + iv + auth_data)
+
+    enc
+  rescue => e
+    Keygen.logger.warn "[newsletter] Encrypt failed: err=#{e.message}"
+
+    nil
   end
 end
