@@ -20,7 +20,7 @@ class NewsletterMailer < ApplicationMailer
       mail(
         content_type: 'text/plain',
         email: contact.email,
-        subject: "Trying something new",
+        subject: "November in review -- trying something different",
         body: <<~TXT
           #{greeting} -- long time no update! Zeke here, founder of Keygen.
 
@@ -74,7 +74,11 @@ class NewsletterMailer < ApplicationMailer
           using the CLI, and it utilizes our Go SDK for automatic upgrades, all backed by Keygen's new
           distribution API (it's dogfooding all the way down!)
 
-          To install the CLI, you can run this quick install script:
+          The Keygen CLI is to integrate into your normal build and release workflow, complete with support
+          for CI/CD environments. Securely sign releases using an Ed25519 private key. (You can generate a
+          private signing key with the CLI's genkey command.)
+
+          To install the CLI and try it out, run this "quick install" script:
 
             curl -sSL https://get.keygen.sh/keygen/cli/install.sh | sh
 
