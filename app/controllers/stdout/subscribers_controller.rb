@@ -10,7 +10,7 @@ module Stdout
       # Unsubscribe all users with this email across all accounts
       user.update!(stdout_unsubscribed_at: Time.current)
     rescue => e
-      Keygen.logger.warn "[stdout] Unsubscribe failed: id=#{params[:id]} err=#{e.message}"
+      Keygen.logger.warn "[stdout] Unsubscribe failed: err=#{e.message}"
     ensure
       render plain: "You've been unsubscribed"
     end
