@@ -91,8 +91,8 @@ class StdoutMailer < ApplicationMailer
         distribution API (it's dogfooding all the way down!)
 
         The Keygen CLI is easy to integrate into your normal build and release workflow, complete with support
-        for CI/CD environments. Securely sign releases using an Ed25519 private key. (You can generate a
-        private signing key with the CLI's genkey command.)
+        for CI/CD environments. Securely sign releases using an Ed25519 private key, and verify upgrades
+        using a public key. (You can generate a key pair with the CLI's genkey command.)
 
         To install the CLI and try it out, run this "quick install" script:
 
