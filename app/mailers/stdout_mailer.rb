@@ -92,7 +92,7 @@ class StdoutMailer < ApplicationMailer
 
         The Keygen CLI is easy to integrate into your normal build and release workflow, complete with support
         for CI/CD environments. Securely sign releases using an Ed25519 private key, and verify upgrades
-        using a public key. (You can generate a key pair with the CLI's genkey command.)
+        using a public key. You can generate a key pair with the CLI's genkey command.
 
         To install the CLI and try it out, run this "quick install" script:
 
@@ -108,7 +108,7 @@ class StdoutMailer < ApplicationMailer
 
         We've teamed up with the electron-builder maintainers to craft a super slick integration, allowing
         you to easily provide automatic upgrades, served by the new distribution API, with only a few lines
-        of code. Publishing releases is just as easy -- electron-builder does all the work.
+        of code. (Publishing releases is just as easy -- electron-builder does all the work.)
 
             const { autoUpdater } = require('electron-updater')
 
@@ -120,8 +120,8 @@ class StdoutMailer < ApplicationMailer
             autoUpdater.checkForUpdatesAndNotify()
 
         I'm super stoked about this one. It's something I've been wanting to do since I first created Keygen,
-        at a time where licensing APIs weren't even a thing. I hope this makes licensing an Electron app
-        just a little bit easier.
+        at a time where licensing APIs weren't even a thing. I hope this makes licensing and distributing
+        an Electron app just a little bit easier!
 
         Source: https://github.com/electron-userland/electron-builder
         Docs: https://keygen.sh/docs/api/auto-updates/#auto-updates-electron
