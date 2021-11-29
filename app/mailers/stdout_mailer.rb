@@ -20,7 +20,7 @@ class StdoutMailer < ApplicationMailer
 
     mail(
       content_type: 'text/plain',
-      email: subscriber.email,
+      to: subscriber.email,
       subject: 'November in review -- trying something different',
       body: <<~TXT
         #{greeting} -- long time no update! Zeke here, founder of Keygen.
