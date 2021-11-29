@@ -39,7 +39,6 @@ class User < ApplicationRecord
 
   scope :stdout_subscribers, -> {
     User.where(account: Account.active, stdout_unsubscribed_at: nil)
-        .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
         .with_roles(:admin, :developer)
         .reorder(:email, :created_at)
         .distinct(:email)
