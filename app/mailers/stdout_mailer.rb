@@ -128,9 +128,9 @@ class StdoutMailer < ApplicationMailer
 
         --
 
-        Well, that's it for this first newsletter. Let me know if you have any feedback for me. We're going
-        to make 2022 a great year -- complete with a brand new, much needed, UI overhaul (including a
-        highly-requested *customer-facing* portal!)
+        Well, that's it for this first issue of Stdout. Let me know if you have any feedback for me. We're
+        going to make 2022 a great year -- complete with a brand new, much needed, UI overhaul (including
+        a highly-requested *customer-facing* portal!)
 
         Thank you so much for your support!
 
