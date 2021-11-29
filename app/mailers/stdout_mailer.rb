@@ -139,7 +139,7 @@ class StdoutMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        Unsubscribe: #{unsub_link}
+        p.s. If you know anyone, we have a pretty cool affiliate program: https://keygen.sh/affiliates/ :)
       TXT
     )
   end
