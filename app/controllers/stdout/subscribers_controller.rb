@@ -5,12 +5,15 @@ module Stdout
     def unsubscribe
       skip_authorization
 
-      enc  = params.fetch(:enc)
-      dec  = decrypt(enc)
-      user = User.where(email: dec)
+      ciphertext = params.fetch(:ciphertext)
+      email      = decrypt(ciphertext)
+      return if
+        email.nil?
+
+      user = User.where(email: email, stdout_unsubscribed_at: nil)
 
       # Unsubscribe all users with this email across all accounts
-      user.update!(stdout_unsubscribed_at: Time.current)
+      user.update_all(stdout_unsubscribed_at: Time.current)
     rescue => e
       Keygen.logger.warn "[stdout] Unsubscribe failed: err=#{e.message}"
     ensure
@@ -19,7 +22,19 @@ module Stdout
 
     private
 
-    def decrypt
+    def decrypt(ciphertext)
+      crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
+      dec   = crypt.decrypt_and_verify(ciphertext.gsub('.', '--'))
+
+      dec
+    rescue => e
+      Keygen.logger.warn "[stdout.decrypt] Decrypt failed: err=#{e.message}"
+
+      nil
+    end
+
+    def secret_key
+      Rails.application.secrets.secret_key_stdout
     end
   end
 end
