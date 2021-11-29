@@ -9,12 +9,12 @@ namespace :stdout do
                         .select(:id, :email, :first_name)
                         .to_a
 
-      Keygen.logger.info "Sending zeroth issue to all Stdout subscribers (#{subscribers.size})"
+      Keygen.logger.info "Sending zeroth issue to #{subscribers.size} Stdout subscribers"
 
       subscribers.each do |subscriber|
         subscriber.touch(:stdout_last_sent_at)
 
-        Keygen.logger.info "Sending issue #0 to #{subscriber}"
+        Keygen.logger.info "Sending issue #0 to #{subscriber.email}"
 
         StdoutMailer.issue_zero(subscriber: subscriber)
                     .deliver_later(
