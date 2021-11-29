@@ -17,6 +17,8 @@ module Stdout
     rescue => e
       Keygen.logger.error "[stdout] Unsubscribe failed: err=#{e.message}"
     ensure
+      response.headers['Content-Type'] = 'text/plain'
+
       render plain: "You've been unsubscribed"
     end
 
