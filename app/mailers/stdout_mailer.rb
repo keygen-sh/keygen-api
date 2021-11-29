@@ -161,6 +161,6 @@ class StdoutMailer < ApplicationMailer
   end
 
   def secret_key
-    Rails.application.secrets.secret_key_stdout
+    Rails.application.secrets.stdout_secret_key
   end
 end
