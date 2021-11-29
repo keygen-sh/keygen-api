@@ -24,9 +24,11 @@ module Stdout
 
     def decrypt(ciphertext)
       crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
-      dec   = crypt.decrypt_and_verify(ciphertext.gsub('.', '--'))
+      enc   = ciphertext.split('.')
+                        .map { |s| Base64.strict_encode64(Base64.urlsafe_decode64(s)) }
+                        .join('--')
 
-      dec
+      crypt.decrypt_and_verify(enc)
     rescue => e
       Keygen.logger.warn "[stdout.decrypt] Decrypt failed: err=#{e.message}"
 
