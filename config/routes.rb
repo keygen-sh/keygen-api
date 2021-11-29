@@ -265,7 +265,7 @@ Rails.application.routes.draw do
   end
 
   scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
-    get "unsub/:enc", constraints: { enc: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
+    get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
   end
 
   %w[500 503].each do |code|
