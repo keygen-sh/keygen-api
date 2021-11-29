@@ -30,8 +30,8 @@ class StdoutMailer < ApplicationMailer
 
         I'm gonna be trying something new -- a periodic email update covering "what's new" in Keygen. It
         was recently brought to my attention that I don't do a good job of surfacing new updates to Keygen
-        customers, so I hope this changes that. If you don't want to receive marketing emails like this,
-        you can opt-out anytime by following this link:
+        customers, so I hope this changes that. If you don't want to receive emails like this, you can
+        opt-out anytime by following this link:
 
           #{unsub_link}
 
