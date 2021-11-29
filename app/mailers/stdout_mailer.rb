@@ -155,7 +155,7 @@ class StdoutMailer < ApplicationMailer
 
     enc
   rescue => e
-    Keygen.logger.warn "[stdout.encrypt] Encrypt failed: err=#{e.message}"
+    Keygen.logger.error "[stdout.encrypt] Encrypt failed: err=#{e.message}"
 
     nil
   end
