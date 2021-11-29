@@ -5,6 +5,7 @@ Rails.application.configure do
   config.hosts << 'api.keygen.sh'
   config.hosts << 'get.keygen.sh'
   config.hosts << 'bin.keygen.sh'
+  config.hosts << 'stdout.keygen.sh'
 
   # Disables security vulnerability
   config.assets.compile = false
