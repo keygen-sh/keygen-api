@@ -5,7 +5,8 @@ namespace :stdout do
   namespace :send do
     task zero: [:environment] do
       subscribers = User.stdout_subscribers
-                        .select(:email, :first_name)
+                        .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
+                        .select(:id, :email, :first_name)
                         .to_a
 
       Keygen.logger.info "Sending zeroth issue to all Stdout subscribers (#{subscribers.size})"
@@ -19,6 +20,11 @@ namespace :stdout do
                       in: rand(1.minute..3.hours),
                     )
       end
+
+      User.where(id: subscribers.map(&:id))
+          .update_all(
+            stdout_last_sent_at: Time.current,
+          )
 
       Keygen.logger.info "Done"
     end
