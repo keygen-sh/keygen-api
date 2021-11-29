@@ -37,6 +37,14 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
+  scope :stdout_subscribers, -> {
+    User.where(account: Account.active, stdout_unsubscribed_at: nil)
+        .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
+        .with_roles(:admin, :developer)
+        .reorder(:email, :created_at)
+        .distinct(:email)
+  }
+
   # FIXME(ezekg) Hack to override pg_search with more performant query
   # TODO(ezekg) Rip out pg_search
   scope :search_email, -> (term) {
