@@ -13,13 +13,13 @@ class StdoutMailer < ApplicationMailer
       greeting   = if contact.first_name?
                      "Hey, #{contact.first_name}"
                    else
-                     "Hey"
+                     'Hey'
                    end
 
       mail(
         content_type: 'text/plain',
         email: contact.email,
-        subject: "November in review -- trying something different",
+        subject: 'November in review -- trying something different',
         body: <<~TXT
           #{greeting} -- long time no update! Zeke here, founder of Keygen.
 
@@ -122,13 +122,17 @@ class StdoutMailer < ApplicationMailer
 
   private
 
-  def active_contacts
-    active_accounts = Account.active.select(:id)
+  def active_accounts
+    @active_accounts ||= Account.active.select(:id)
+  end
 
-    User.where(account_id: active_accounts, stdout_unsubscribed_at: nil)
+  def active_contacts
+    @active_contacts ||= User.select(:email, :first_name)
+        .where(account: active_accounts, stdout_unsubscribed_at: nil)
         .where('stdout_last_sent_at is null or stdout_last_sent_at < ?', 7.days.ago)
         .with_roles(:admin, :developer)
-        .uniq(&:email)
+        .reorder(:email)
+        .distinct(:email)
   end
 
   def encrypt(plaintext)
