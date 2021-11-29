@@ -5,7 +5,7 @@ class StdoutMailer < ApplicationMailer
 
   def issue_one
     active_contacts.map do |contact|
-      enc_email = encrypt(contact.email, account: contact.account)
+      enc_email = encrypt(contact.email)
       next if
         enc_email.nil?
 
@@ -127,26 +127,19 @@ class StdoutMailer < ApplicationMailer
         .uniq(&:email)
   end
 
-  def encrypt(plaintext, account:)
-    cipher = OpenSSL::Cipher.new('aes-256-gcm')
-    cipher.encrypt
-
-    iv        = cipher.random_iv
-    auth_data = account.id
-
-    cipher.key       = account.secret_key[0..31]
-    cipher.auth_data = auth_data
-
-    ciphertext =
-      cipher.update(plaintext) + cipher.final
-
-    enc =
-      Base64.urlsafe_encode64(ciphertext + iv + auth_data)
+  def encrypt(plaintext)
+    crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
+    enc   = crypt.encrypt_and_sign(plaintext)
+                 .gsub('--', '.')
 
     enc
   rescue => e
     Keygen.logger.warn "[stdout.encrypt] Encrypt failed: err=#{e.message}"
 
     nil
+  end
+
+  def secret_key
+    Rails.application.secrets.secret_key_stdout
   end
 end
