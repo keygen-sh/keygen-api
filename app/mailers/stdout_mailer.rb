@@ -130,7 +130,9 @@ class StdoutMailer < ApplicationMailer
   def encrypt(plaintext)
     crypt = ActiveSupport::MessageEncryptor.new(secret_key, serializer: JSON)
     enc   = crypt.encrypt_and_sign(plaintext)
-                 .gsub('--', '.')
+                 .split('--')
+                 .map { |s| Base64.urlsafe_encode64(Base64.strict_decode64(s), padding: false) }
+                 .join('.')
 
     enc
   rescue => e
