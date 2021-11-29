@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class NewsletterMailer < ApplicationMailer
+class StdoutMailer < ApplicationMailer
   default from: 'Zeke at Keygen <zeke@keygen.sh>'
 
-  def november_2021
+  def issue_one
     active_contacts.map do |contact|
       enc_email = encrypt(contact.email, account: contact.account)
       next if
@@ -51,6 +51,9 @@ class NewsletterMailer < ApplicationMailer
               OPENly to anybody, no license required, or only to LICENSED users (the default). This really
               opens up doors for Keygen to support a wider variety of business models, such as freemium
               distribution as well as open source.
+            - Since the new distribution API is fully integrated into our licensing API, scoping releases
+              per-license and per-user is now possible. When authenticated as a licensee, they only see
+              the product releases they have a license for.
 
           We've deprecated our older distribution API, dist.keygen.sh. It'll continue to be available, but we
           recommend using our new API for all new product development.
@@ -72,12 +75,12 @@ class NewsletterMailer < ApplicationMailer
 
           ## Keygen CLI
 
-          We just recently rolled out the beta of our new Keygen CLI. You can use it to sign and publish new
+          We just recently rolled out the beta for our new Keygen CLI. You can use it to sign and publish new
           software releases to the new aforementioned distribution API. Keygen's CLI itself is published
           using the CLI, and it utilizes our Go SDK for automatic upgrades, all backed by Keygen's new
           distribution API (it's dogfooding all the way down!)
 
-          The Keygen CLI is to integrate into your normal build and release workflow, complete with support
+          The Keygen CLI is easy to integrate into your normal build and release workflow, complete with support
           for CI/CD environments. Securely sign releases using an Ed25519 private key. (You can generate a
           private signing key with the CLI's genkey command.)
 
@@ -99,7 +102,7 @@ class NewsletterMailer < ApplicationMailer
 
           Thank you so much for your support!
 
-          Until next time,
+          Until next time.
 
           --
           Zeke, Founder <https://keygen.sh>
@@ -128,13 +131,11 @@ class NewsletterMailer < ApplicationMailer
     cipher = OpenSSL::Cipher.new('aes-256-gcm')
     cipher.encrypt
 
-    auth_data = account.id
-    key       = account.secret_key[0..31]
     iv        = cipher.random_iv
+    auth_data = account.id
 
+    cipher.key       = account.secret_key[0..31]
     cipher.auth_data = auth_data
-    cipher.key       = key
-    cipher.iv        = iv
 
     ciphertext =
       cipher.update(plaintext) + cipher.final
@@ -144,7 +145,7 @@ class NewsletterMailer < ApplicationMailer
 
     enc
   rescue => e
-    Keygen.logger.warn "[newsletter] Encrypt failed: err=#{e.message}"
+    Keygen.logger.warn "[stdout.encrypt] Encrypt failed: err=#{e.message}"
 
     nil
   end
