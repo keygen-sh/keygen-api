@@ -3,7 +3,7 @@
 class StdoutMailer < ApplicationMailer
   default from: 'Zeke at Keygen <zeke@keygen.sh>'
 
-  def issue_one(subscriber:)
+  def issue_zero(subscriber:)
     return if
       subscriber.stdout_unsubscribed_at?
 
@@ -37,18 +37,18 @@ class StdoutMailer < ApplicationMailer
 
         --
 
-        A lot has happened in 2021, so this first issue of "Stdout" (what I'll be calling this) may be a
-        little bit lengthier than future issues. There are a lot of other, smaller, changes that have
+        A lot has happened in 2021, so this zeroth issue of "Stdout" (what I'll be calling this) may be
+        a little bit lengthier than future issues. There are a lot of other, smaller, changes that have
         happened, but for those you can check out Keygen's changelog.
 
         To kick things off, let's talk software distribution --
 
         ## Keygen Dist v2
 
-        A few months back, we rolled out a brand new version of our distribution API. We made the decision to
-        build a better version from the ground up -- one that is fully integrated into our flagship software
-        licensing API. This has been a huge goal of mine, really, since I first wrote the prototype for the
-        old distribution API in Go. The new API is now available at api.keygen.sh.
+        A few months back, we rolled out a brand new version of our distribution API. We made the decision
+        to build a better version from the ground up -- one that is fully integrated into our flagship
+        software licensing API. This has been a huge goal of mine, really, since I first wrote the Go
+        prototype for the first distribution API.
 
         Some of the rad features for Dist v2:
 
@@ -56,16 +56,20 @@ class StdoutMailer < ApplicationMailer
             with those entitlements can access the release. E.g. a popular use case is locking a license to
             a specific major version of a product until they purchase an upgrade. This can be accomplished
             using entitlement constraints, with a V1 and V2 entitlement, respectively.
+
           - You can set a product's "distribution strategy", allowing you to either distribute your product
             releases OPENly to anybody, no license required, or only to LICENSED users (the default). This
             really opens up doors for Keygen to support a wider variety of business models, such as freemium
             distribution as well as open source (like our CLI, which I'll touch on in a sec).
+
           - Since the new distribution API is fully integrated into our licensing API, scoping releases
             per-license and per-user is now possible. When authenticated as a licensee, they only see
             the product releases they have a license for.
 
         We've deprecated our older distribution API, dist.keygen.sh. It'll continue to be available, but we
         recommend using our new API for all new product development.
+
+        The new API is now available at api.keygen.sh.
 
         Docs: https://keygen.sh/docs/api/releases/
 
@@ -139,7 +143,7 @@ class StdoutMailer < ApplicationMailer
         --
         Zeke, Founder <https://keygen.sh>
 
-        p.s. If you know anyone, we have a pretty cool affiliate program: https://keygen.sh/affiliates/ :)
+        p.s. If you know anyone, we have a new affiliate program: https://keygen.sh/affiliates/ :)
       TXT
     )
   end
