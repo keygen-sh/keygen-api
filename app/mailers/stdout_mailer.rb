@@ -23,7 +23,10 @@ class StdoutMailer < ApplicationMailer
         body: <<~TXT
           #{greeting} -- long time no update! Zeke here, founder of Keygen.
 
-          I'm going to be trying something new -- a monthly-ish newsletter covering "what's new" in Keygen. It
+          (You're receiving this email because you or your team signed up for a Keygen account. If you don't
+          find this email useful, you can unsubscribe below.)
+
+          I'm gonna be trying something new -- a periodic email update covering "what's new" in Keygen. It
           was recently brought to my attention that I don't do a good job of surfacing new updates to Keygen
           customers, so I hope this changes that. If you don't want to receive marketing emails like this,
           you can opt-out anytime by following this link:
@@ -31,6 +34,10 @@ class StdoutMailer < ApplicationMailer
             #{unsub_link}
 
           --
+
+          A lot has happened in 2021, so this first issue of "Stdout" (what I'll be calling this) may be a
+          little bit lengthier than future issues. There are a lot of other, smaller, changes that have
+          happened, but for those you can check out Keygen's changelog.
 
           To kick things off, let's talk software distribution --
 
@@ -64,7 +71,7 @@ class StdoutMailer < ApplicationMailer
 
           With the launch of our new distribution API, I really wanted to start focusing on SDKs. We recently
           rolled out our first SDK, for Go. With it, you can add license validation, activation, and automatic
-          upgrades to any Go application.
+          upgrades to any Go application. It's super slick.
 
           We're currently working on other SDKs as well, for Node, Swift, and C#. Up next will be a macOS SDK,
           written in Swift. Let me know if you have any specific requests for an SDK!
@@ -106,9 +113,6 @@ class StdoutMailer < ApplicationMailer
 
           --
           Zeke, Founder <https://keygen.sh>
-
-          (You're receiving this email because you or your team signed up for a Keygen account. If you don't
-          find this email useful, you can unsubscribe below.)
 
           Unsubscribe: #{unsub_link}
         TXT
