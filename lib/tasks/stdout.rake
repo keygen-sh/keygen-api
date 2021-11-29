@@ -4,7 +4,9 @@ desc 'send a stdout issue'
 namespace :stdout do
   namespace :send do
     task zero: [:environment] do
-      subscribers = User.stdout_subscribers.to_a
+      subscribers = User.stdout_subscribers
+                        .select(:email, :first_name)
+                        .to_a
 
       Keygen.logger.info "Sending zeroth issue to all Stdout subscribers (#{subscribers.size})"
 
