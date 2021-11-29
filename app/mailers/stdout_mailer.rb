@@ -57,9 +57,9 @@ class StdoutMailer < ApplicationMailer
             a specific major version of a product until they purchase an upgrade. This can be accomplished
             using entitlement constraints, with a V1 and V2 entitlement, respectively.
           - You can set a product's "distribution strategy", allowing you to either distribute your product
-            OPENly to anybody, no license required, or only to LICENSED users (the default). This really
-            opens up doors for Keygen to support a wider variety of business models, such as freemium
-            distribution as well as open source.
+            releases OPENly to anybody, no license required, or only to LICENSED users (the default). This
+            really opens up doors for Keygen to support a wider variety of business models, such as freemium
+            distribution as well as open source (like our CLI, which I'll touch on in a sec).
           - Since the new distribution API is fully integrated into our licensing API, scoping releases
             per-license and per-user is now possible. When authenticated as a licensee, they only see
             the product releases they have a license for.
