@@ -69,28 +69,6 @@ class StdoutMailer < ApplicationMailer
 
         Docs: https://keygen.sh/docs/api/releases/
 
-        ## Electron Builder
-
-        We've teamed up with the electron-builder maintainers to craft a super slick integration, allowing
-        you to easily provide automatic upgrades, served by the new distribution API, with only a few lines
-        of code. Publishing releases is just as easy -- electron-builder does all the work.
-
-            const { autoUpdater } = require('electron-updater')
-
-            // Pass in an API token that belongs to the licensee (i.e. a user or
-            // activation token)
-            autoUpdater.addAuthHeader(`Bearer ${token}`)
-
-            // Check for updates
-            autoUpdater.checkForUpdatesAndNotify()
-
-        I'm super stoked about this one. It's something I've been wanting to do since I first created Keygen,
-        at a time where licensing APIs weren't even a thing. I hope this makes licensing an Electron app
-        just a little bit easier.
-
-        Source: https://github.com/electron-userland/electron-builder
-        Docs: https://keygen.sh/docs/api/auto-updates/#auto-updates-electron
-
         ## Go SDK
 
         With the launch of our new distribution API, I really wanted to start focusing on SDKs. We recently
@@ -125,6 +103,28 @@ class StdoutMailer < ApplicationMailer
 
         Source: https://github.com/keygen-sh/keygen-cli
         Docs: https://keygen.sh/docs/cli/
+
+        ## Electron Builder
+
+        We've teamed up with the electron-builder maintainers to craft a super slick integration, allowing
+        you to easily provide automatic upgrades, served by the new distribution API, with only a few lines
+        of code. Publishing releases is just as easy -- electron-builder does all the work.
+
+            const { autoUpdater } = require('electron-updater')
+
+            // Pass in an API token that belongs to the licensee (i.e. a user or
+            // activation token)
+            autoUpdater.addAuthHeader(`Bearer ${token}`)
+
+            // Check for updates
+            autoUpdater.checkForUpdatesAndNotify()
+
+        I'm super stoked about this one. It's something I've been wanting to do since I first created Keygen,
+        at a time where licensing APIs weren't even a thing. I hope this makes licensing an Electron app
+        just a little bit easier.
+
+        Source: https://github.com/electron-userland/electron-builder
+        Docs: https://keygen.sh/docs/api/auto-updates/#auto-updates-electron
 
         --
 
