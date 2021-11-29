@@ -12,6 +12,8 @@ namespace :stdout do
       Keygen.logger.info "Sending zeroth issue to all Stdout subscribers (#{subscribers.size})"
 
       subscribers.each do |subscriber|
+        subscriber.touch(:stdout_last_sent_at)
+
         Keygen.logger.info "Sending issue #0 to #{subscriber}"
 
         StdoutMailer.issue_zero(subscriber: subscriber)
@@ -19,12 +21,9 @@ namespace :stdout do
                       # Fan out deliveries
                       in: rand(1.minute..3.hours),
                     )
-      end
 
-      User.where(id: subscribers.map(&:id))
-          .update_all(
-            stdout_last_sent_at: Time.current,
-          )
+        sleep 0.1
+      end
 
       Keygen.logger.info "Done"
     end
