@@ -391,7 +391,7 @@ module Keygen
     end
 
     class DefaultContentType
-      def initialize app
+      def initialize(app)
         @app = app
       end
 
@@ -403,22 +403,29 @@ module Keygen
         # to parse the request as JSON and error later, instead of rejecting the request
         # off the bat. In theory, this would slightly improve onboarding DX.
         if content_type.empty? || content_type.include?('text/plain') || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
-          begin
-            req        = ActionDispatch::Request.new(env)
-            route      = Rails.application.routes.recognize_path(req.url, method: req.method)
-            controller = route[:controller]
-            action     = route[:action]
+          req = ActionDispatch::Request.new(env)
 
-            # Default to JSON content-type header for non-artifact endpoints
-            env['CONTENT_TYPE'] = 'application/json' unless
-              controller.ends_with?('/artifacts') &&
-              action == 'create'
-          rescue => e
-            Keygen.logger.exception(e)
-          end
+          # Emails are likely multipart/form-data, and we don't want to modify the
+          # content-type header since we don't really care.
+          return if
+            req.host == 'stdin.keygen.sh'
+
+          route      = Rails.application.routes.recognize_path(req.url, method: req.method)
+          controller = route[:controller]
+          action     = route[:action]
+
+          # Artifacts may be sent to our API, and then redirected out to S3, so we
+          # want to ensure that we respect the content-type header.
+          return if
+            controller.ends_with?('/artifacts') &&
+            action == 'create'
+
+          env['CONTENT_TYPE'] = 'application/json'
         end
-
-        @app.call env
+      rescue => e
+        Keygen.logger.exception(e)
+      ensure
+        return @app.call(env)
       end
     end
   end
