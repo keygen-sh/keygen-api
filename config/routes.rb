@@ -264,8 +264,12 @@ Rails.application.routes.draw do
     get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
   end
 
-  scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
+  scope module: "stdout", constraints: { subdomain: %w[stdout] } do
     get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
+  end
+
+  scope module: "stdin", constraints: { subdomain: %w[stdin] } do
+    post '/', to: "sendgrid#process", as: "stdin_sendgrid"
   end
 
   %w[500 503].each do |code|

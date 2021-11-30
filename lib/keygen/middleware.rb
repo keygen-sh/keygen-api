@@ -408,14 +408,14 @@ module Keygen
           # Emails are likely multipart/form-data, and we don't want to modify the
           # content-type header since we don't really care.
           return if
-            req.host == 'stdin.keygen.sh'
+            req.subdomain == 'stdin'
 
           route      = Rails.application.routes.recognize_path(req.url, method: req.method)
           controller = route[:controller]
           action     = route[:action]
 
-          # Artifacts may be sent to our API, and then redirected out to S3, so we
-          # want to ensure that we respect the content-type header.
+          # Artifact blobs may be sent to our API, and then redirected out to S3,
+          # so we want to ensure that we respect the content-type header.
           return if
             controller.ends_with?('/artifacts') &&
             action == 'create'
