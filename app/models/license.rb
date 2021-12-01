@@ -195,7 +195,7 @@ class License < ApplicationRecord
       UUID_REGEX.match?(product_identifier)
 
     tsv_query = <<~SQL
-      to_tsvector('simple', policies.product_id::text)
+      to_tsvector('simple', products.id::text)
       @@
       to_tsquery(
         'simple',
@@ -209,7 +209,7 @@ class License < ApplicationRecord
     joins(policy: :product)
       .where('products.name ILIKE ?', "%#{product_identifier}%")
       .or(
-        joins(:policy).where(tsv_query.squish, product_identifier)
+        joins(policy: :product).where(tsv_query.squish, product_identifier)
       )
   }
 
