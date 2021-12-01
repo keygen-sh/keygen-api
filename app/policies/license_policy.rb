@@ -100,6 +100,7 @@ class LicensePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource == bearer
   end
+  alias :validate? :validate_by_id?
 
   def validate_by_key?
     assert_account_scoped!
