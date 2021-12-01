@@ -14,7 +14,7 @@ module Stdin
 
     def receive_webhook
       case action_name
-      when 'validate'
+      when :validate
         license = FindByAliasService.call(scope: current_account.licenses, identifier: sendgrid_params[:id], aliases: :key)
         # authorize license, :validate?
 
@@ -27,21 +27,21 @@ module Stdin
           resource: license,
           meta: meta
         )
-      when 'activate'
+      when :activate
         machine = current_account.machines.new(sendgrid_params)
         # authorize machine, :activate?
 
         machine.save!
 
         BroadcastEventService.call(event: 'machine.created', account: current_account, resource: machine)
-      when 'deactivate'
+      when :deactivate
         machine = FindByAliasService.call(scope: current_account.machines, identifier: sendgrid_params[:id], aliases: :fingerprint)
         # authorize machine, :deactivate?
 
         machine.destroy!
 
         BroadcastEventService.call(event: 'machine.deleted', account: current_account, resource: machine)
-      when 'ping'
+      when :ping
         machine = FindByAliasService.call(scope: current_account.machines, identifier: sendgrid_params[:id], aliases: :fingerprint)
         # authorize machine, :ping?
 
@@ -74,17 +74,28 @@ module Stdin
     attr_reader :license
 
     def set_current_account
-      account_id = mail.to.first.split('@').first.split('+').first
+      account_id = mail.to.first.split('@')
+                          .first.split('+')
+                          .first
 
       @current_account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
     end
 
     def set_action_name
-      @action_name = mail.to.first.split('@').first.split('+').second
+      @action_name = mail.to.first.split('@')
+                            .first.split('+')
+                            .second
+                            .to_sym
     end
 
     def set_params
-      @params = JSON.parse(mail.body.decoded)
+      body = if !mail.content_type.start_with?('text/plain')
+               body = mail.parts.find { |p| p.content_type.start_with?('text/plain') }
+             else
+               body = mail.body
+             end
+
+      @params = JSON.parse(body.decoded.squish)
     end
 
     def mail
