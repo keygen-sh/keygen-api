@@ -2,16 +2,16 @@
 
 module Stdin
   class SendgridController < ApplicationController
-    def process
+    def receive_webhook
       skip_authorization
 
-      render json: envelope
+      render json: { from: mail.from, to: mail.to }
     end
 
     private
 
-    def envelope
-      JSON.parse(params.fetch(:envelope))
+    def mail
+      @mail ||= Mail.new(params.fetch(:email))
     end
   end
 end

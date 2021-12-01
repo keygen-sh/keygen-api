@@ -269,7 +269,7 @@ Rails.application.routes.draw do
   end
 
   scope module: "stdin", constraints: { subdomain: %w[stdin] } do
-    post '/', to: "sendgrid#process", as: "stdin_sendgrid"
+    post '/', to: "sendgrid#receive_webhook", as: "stdin_sendgrid"
   end
 
   %w[500 503].each do |code|
