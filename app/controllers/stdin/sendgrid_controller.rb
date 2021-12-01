@@ -2,37 +2,60 @@
 
 module Stdin
   class SendgridController < ApplicationController
+    include TypedParameters::ControllerMethods
+
+    before_action :set_current_account
+    before_action :set_action_name
+    before_action :set_params
+
+    # NOTE(ezekg) These are both for typed params compat
+    attr_accessor :action_name,
+                  :params
+
     def receive_webhook
-      fingerprint, token = from_address.split('@').first.split('+')
-      license_id, action = to_address.split('@').first.split('+')
-
-      puts message_id: message_id,
-           to: to_address,
-           from: from_address,
-           license_id: license_id,
-           action: action,
-           fingerprint: fingerprint,
-           token: token,
-           body: body
-
-      license = FindByAliasService.call(scope: License, identifier: license_id, aliases: :key)
-
-      @current_account = license.account
-
-      if token.present?
-        @current_token  = TokenAuthenticationService.call(account: current_account, token: token)
-        @current_bearer = current_token.bearer
-      end
-
-      case action
+      case action_name
       when 'validate'
-        validate!(license, fingerprint)
+        license = FindByAliasService.call(scope: current_account.licenses, identifier: sendgrid_params[:id], aliases: :key)
+        # authorize license, :validate?
+
+        ok, msg, code = LicenseValidationService.call(license: license, scope: sendgrid_meta[:scope])
+        meta = { ts: Time.current, valid: ok, detail: msg, constant: code }
+
+        BroadcastEventService.call(
+          event: ok ? 'license.validation.succeeded' : 'license.validation.failed',
+          account: current_account,
+          resource: license,
+          meta: meta
+        )
       when 'activate'
-        activate!(license, fingerprint)
+        machine = current_account.machines.new(sendgrid_params)
+        # authorize machine, :activate?
+
+        machine.save!
+
+        BroadcastEventService.call(event: 'machine.created', account: current_account, resource: machine)
       when 'deactivate'
-        deactivate!(license, fingerprint)
+        machine = FindByAliasService.call(scope: current_account.machines, identifier: sendgrid_params[:id], aliases: :fingerprint)
+        # authorize machine, :deactivate?
+
+        machine.destroy!
+
+        BroadcastEventService.call(event: 'machine.deleted', account: current_account, resource: machine)
       when 'ping'
-        ping!(license, fingerprint)
+        machine = FindByAliasService.call(scope: current_account.machines, identifier: sendgrid_params[:id], aliases: :fingerprint)
+        # authorize machine, :ping?
+
+        return if
+          machine.heartbeat_dead?
+
+        machine.update!(last_heartbeat_at: Time.current)
+
+        BroadcastEventService.call(event: 'machine.heartbeat.ping', account: current_account, resource: machine)
+
+        MachineHeartbeatWorker.perform_in(
+          machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
+          machine.id,
+        )
       end
     rescue ActiveRecord::RecordNotFound,
            ActiveRecord::RecordInvalid,
@@ -48,83 +71,86 @@ module Stdin
 
     private
 
-    def validate!(license, fingerprint)
-      # authorize license, :validate?
+    attr_reader :license
 
-      ok, msg, code = LicenseValidationService.call(license: license, scope: { fingerprint: fingerprint })
-      meta = { ts: Time.current, valid: ok, detail: msg, constant: code }
+    def set_current_account
+      account_id = mail.to.first.split('@').first.split('+').first
 
-      BroadcastEventService.call(
-        event: ok ? 'license.validation.succeeded' : 'license.validation.failed',
-        account: current_account,
-        resource: license,
-        meta: meta
-      )
+      @current_account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
     end
 
-    def activate!(license, fingerprint)
-      machine = license.machines.new(account: current_account, license: license, fingerprint: fingerprint)
-      # authorize machine, :activate?
-
-      machine.save!
-
-      BroadcastEventService.call(event: 'machine.created', account: current_account, resource: machine)
+    def set_action_name
+      @action_name = mail.to.first.split('@').first.split('+').second
     end
 
-    def deactivate!(license, fingerprint)
-      machine = FindByAliasService.call(scope: license.machines, identifier: fingerprint, aliases: :fingerprint)
-      # authorize machine, :deactivate?
-
-      machine.destroy!
-
-      BroadcastEventService.call(event: 'machine.deleted', account: current_account, resource: machine)
-    end
-
-    def ping!(license, fingerprint)
-      machine = FindByAliasService.call(scope: license.machines, identifier: fingerprint, aliases: :fingerprint)
-      # authorize machine, :ping?
-
-      return if
-        machine.heartbeat_dead?
-
-      machine.update!(last_heartbeat_at: Time.current)
-
-      BroadcastEventService.call(event: 'machine.heartbeat.ping', account: current_account, resource: machine)
-
-      MachineHeartbeatWorker.perform_in(
-        machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
-        machine.id,
-      )
+    def set_params
+      @params = JSON.parse(mail.body.decoded)
     end
 
     def mail
-      @mail ||= Mail.new(params['email'])
+      @mail ||= Mail.new(request.params['email'])
     end
 
-    def message_id
-      mail.message_id
-    end
+    typed_parameters format: :jsonapi do
+      options strict: false
 
-    def from_address
-      mail.from.first
-    end
+      on :validate do
+        param :meta, type: :hash, optional: true do
+          param :scope, type: :hash, optional: true do
+            param :product, type: :string, optional: true
+            param :policy, type: :string, optional: true
+            param :machine, type: :string, optional: true
+            param :fingerprint, type: :string, optional: true
+            param :fingerprints, type: :array, optional: true do
+              items type: :string
+            end
+            param :entitlements, type: :array, optional: true do
+              items type: :string
+            end
+          end
+        end
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[license licenses]
+          param :id, type: :string
+        end
+      end
 
-    def to_address
-      mail.to.first
-    end
+      on :activate do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[machine machines]
+          param :attributes, type: :hash do
+            param :fingerprint, type: :string
+            param :name, type: :string, optional: true, allow_nil: true
+            param :ip, type: :string, optional: true, allow_nil: true
+            param :hostname, type: :string, optional: true, allow_nil: true
+            param :platform, type: :string, optional: true, allow_nil: true
+            param :cores, type: :integer, optional: true, allow_nil: true
+            param :metadata, type: :hash, allow_non_scalars: true, optional: true
+          end
+          param :relationships, type: :hash do
+            param :license, type: :hash do
+              param :data, type: :hash do
+                param :type, type: :string, inclusion: %w[license licenses]
+                param :id, type: :string
+              end
+            end
+          end
+        end
+      end
 
-    def ip_address
-      params['sender_ip']
-    end
+      on :deactivate do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[machine machines]
+          param :id, type: :string
+        end
+      end
 
-    def plaintext_body
-      mail.body.decoded
-    end
-
-    def body
-      JSON.parse(plaintext_body.squish)
-    rescue
-      nil
+      on :ping do
+        param :data, type: :hash do
+          param :type, type: :string, inclusion: %w[machine machines]
+          param :id, type: :string
+        end
+      end
     end
   end
 end
