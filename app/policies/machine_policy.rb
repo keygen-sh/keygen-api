@@ -31,6 +31,7 @@ class MachinePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource.license == bearer
   end
+  alias :activate? :create?
 
   def update?
     assert_account_scoped!
@@ -48,6 +49,7 @@ class MachinePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource.license == bearer
   end
+  alias :deactivate? :destroy?
 
   def ping_heartbeat?
     assert_account_scoped!
@@ -57,6 +59,7 @@ class MachinePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource.license == bearer
   end
+  alias :ping? :ping_heartbeat?
 
   def reset_heartbeat?
     assert_account_scoped!
