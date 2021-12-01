@@ -8,28 +8,34 @@ module Api::V1
     # POST /passwords
     def reset_password
       skip_authorization
-      return unless @user
 
-      token = @user.generate_password_reset_token
+      return unless
+        user.present?
+
+      token = user.generate_password_reset_token
 
       BroadcastEventService.call(
-        event: "user.password-reset",
+        event: 'user.password-reset',
         account: current_account,
-        resource: @user,
+        resource: user,
         meta: {
           password_reset_token: token
         }
       )
 
-      if password_params[:meta][:deliver] != false # nil or true = send email
-        @user.send_password_reset_email token: token
+      if password_meta[:deliver] != false # nil or true = send email
+        user.send_password_reset_email(token: token)
       end
     end
 
     private
 
+    attr_reader :user
+
     def set_user
-      @user = current_account.users.find_by_email password_params[:meta][:email]
+      email = password_meta[:email].downcase
+
+      @user = current_account.users.find_by(email: email)
     end
 
     typed_parameters do
