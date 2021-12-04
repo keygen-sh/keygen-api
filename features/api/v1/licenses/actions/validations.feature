@@ -2388,6 +2388,10 @@ Feature: License validation actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
     And the current account has 1 "license" using "RSA_2048_PKCS1_SIGN_V2"
+    And the first "license" has the following metadata:
+      """
+      { "customerName": "Procter & Gamble" }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "200"
