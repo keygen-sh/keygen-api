@@ -8,7 +8,7 @@ class ReleaseDownloadService < BaseService
   class InvalidTTLError < StandardError; end
   class DownloadResult < OpenStruct; end
 
-  def initialize(account:, release:, ttl: 60, upgrade: false)
+  def initialize(account:, release:, ttl: 1.hour, upgrade: false)
     raise InvalidAccountError.new('account must be present') unless
       account.present?
 
