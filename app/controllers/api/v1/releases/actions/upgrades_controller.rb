@@ -81,7 +81,7 @@ module Api::V1::Releases::Actions
       if upgrade.next_release.present?
         authorize upgrade.next_release, :download?
 
-        download = ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, ttl: 10.minutes, upgrade: true)
+        download = ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, ttl: 1.hour, upgrade: true)
         meta     = {
           current: upgrade.current_version,
           next: upgrade.next_version,
