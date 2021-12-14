@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_27_135950) do
+ActiveRecord::Schema.define(version: 2021_12_14_215330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -374,7 +374,7 @@ ActiveRecord::Schema.define(version: 2021_11_27_135950) do
   create_table "releases", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "product_id", null: false
-    t.uuid "release_platform_id", null: false
+    t.uuid "release_platform_id"
     t.uuid "release_channel_id", null: false
     t.string "name"
     t.string "version"
@@ -386,7 +386,7 @@ ActiveRecord::Schema.define(version: 2021_11_27_135950) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "upgrade_count", default: 0
-    t.uuid "release_filetype_id", null: false
+    t.uuid "release_filetype_id"
     t.text "description"
     t.string "signature"
     t.string "checksum"

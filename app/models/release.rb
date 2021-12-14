@@ -16,12 +16,14 @@ class Release < ApplicationRecord
     class_name: 'ReleasePlatform',
     foreign_key: :release_platform_id,
     inverse_of: :releases,
-    autosave: true
+    autosave: true,
+    optional: true
   belongs_to :filetype,
     class_name: 'ReleaseFiletype',
     foreign_key: :release_filetype_id,
     inverse_of: :releases,
-    autosave: true
+    autosave: true,
+    optional: true
   belongs_to :channel,
     class_name: 'ReleaseChannel',
     foreign_key: :release_channel_id,
@@ -66,10 +68,12 @@ class Release < ApplicationRecord
     scope: { by: :account_id }
   validates :filetype,
     presence: { message: 'must exist' },
-    scope: { by: :account_id }
+    scope: { by: :account_id },
+    unless: -> { filetype.nil? }
   validates :platform,
     presence: { message: 'must exist' },
-    scope: { by: :account_id }
+    scope: { by: :account_id },
+    unless: -> { platform.nil? }
   validates :channel,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
@@ -263,8 +267,12 @@ class Release < ApplicationRecord
   private
 
   def validate_associated_records_for_platform
-    return if
-      platform.nil?
+    return unless
+      platform.present?
+
+    # Clear platform if the key is empty e.g. "" or nil
+    return self.platform = nil unless
+      platform.key?
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
@@ -309,8 +317,12 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_filetype
-    return if
-      filetype.nil?
+    return unless
+      filetype.present?
+
+    # Clear filetype if the key is empty e.g. "" or nil
+    return self.filetype = nil unless
+      filetype.key?
 
     filetype.key.delete_prefix!('.')
 
@@ -360,6 +372,9 @@ class Release < ApplicationRecord
   end
 
   def validate_associated_records_for_channel
+    return unless
+      channel.present?
+
     case
     when pre_release?
       errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.z-#{channel.key}.n got #{semver})") if

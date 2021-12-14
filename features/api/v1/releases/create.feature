@@ -1115,3 +1115,206 @@ Feature: Create release
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a release with a null filetype
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Spec",
+            "filename": "gems/specs.4.8",
+            "filetype": null,
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Spec",
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And the current account should have 0 "release-platforms"
+    And the current account should have 0 "release-filetypes"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a release with a null platform
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Latest",
+            "filename": "gems/latest_specs.4.8.gz",
+            "filetype": "gz",
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Latest",
+        "filename": "gems/latest_specs.4.8.gz",
+        "filetype": "gz",
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And the current account should have 0 "release-platforms"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a duplicate release with a null platform
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/latest_specs.4.8.gz",
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Latest",
+            "filename": "gems/latest_specs.4.8.gz",
+            "filetype": "gz",
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "already exists",
+        "code": "FILENAME_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/filename"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a duplicate release with a null filetype
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Spec",
+            "filename": "gems/specs.4.8",
+            "filetype": null,
+            "version": "1.0.0",
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "already exists",
+        "code": "FILENAME_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/filename"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
