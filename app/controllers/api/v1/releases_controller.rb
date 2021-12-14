@@ -142,14 +142,14 @@ module Api::V1
             param :name, type: :string, optional: true
             param :filename, type: :string
             param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, transform: -> (k, v) {
-              [:filetype_attributes, { key: v.downcase }]
+            param :filetype, type: :string, optional: true, transform: -> (k, v) {
+              [:filetype_attributes, { key: v.downcase.presence }]
             }
-            param :platform, type: :string, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase }]
+            param :platform, type: :string, optional: true, transform: -> (k, v) {
+              [:platform_attributes, { key: v.downcase.presence }]
             }
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
-              [:channel_attributes, { key: v.downcase }]
+              [:channel_attributes, { key: v.downcase.presence }]
             }
             param :version, type: :string
             param :description, type: :string, optional: true
@@ -190,14 +190,14 @@ module Api::V1
             param :name, type: :string, optional: true, allow_nil: true
             param :filename, type: :string
             param :filesize, type: :integer, optional: true, allow_nil: true
-            param :filetype, type: :string, transform: -> (k, v) {
-              [:filetype_attributes, { key: v.downcase }]
+            param :filetype, type: :string, optional: true, transform: -> (k, v) {
+              [:filetype_attributes, { key: v.downcase.presence }]
             }
-            param :platform, type: :string, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase }]
+            param :platform, type: :string, optional: true, transform: -> (k, v) {
+              [:platform_attributes, { key: v.downcase.presence }]
             }
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
-              [:channel_attributes, { key: v.downcase }]
+              [:channel_attributes, { key: v.downcase.presence }]
             }
             param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true
