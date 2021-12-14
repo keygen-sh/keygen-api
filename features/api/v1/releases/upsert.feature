@@ -1746,3 +1746,324 @@ Feature: Upsert release
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with a null platform
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/latest_specs.4.8.gz",
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Latest Spec",
+            "filename": "gems/latest_specs.4.8.gz",
+            "filetype": "gz",
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Latest Spec",
+        "filename": "gems/latest_specs.4.8.gz",
+        "filetype": "gz",
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with an empty platform (coalesce to null)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/latest_specs.4.8.gz",
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Latest Spec",
+            "filename": "gems/latest_specs.4.8.gz",
+            "filetype": "gz",
+            "version": "1.0.0",
+            "platform": "",
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Latest Spec",
+        "filename": "gems/latest_specs.4.8.gz",
+        "filetype": "gz",
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with a null filetype
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Spec",
+            "filename": "gems/specs.4.8",
+            "filetype": null,
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Spec",
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with an empty filetype (coalesce to null)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "platform": null
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Spec",
+            "filename": "gems/specs.4.8",
+            "filetype": "",
+            "version": "1.0.0",
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Spec",
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with a null channel
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/hello.gem"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem: Hello",
+            "filename": "gems/hello.gem",
+            "filetype": "gem",
+            "version": "1.0.0",
+            "platform": null,
+            "channel": null
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "pointer": "/data/attributes/channel"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin upserts a release with an empty channel (coalesce to null)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/hello.gem"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem: Hello",
+            "filename": "gems/hello.gem",
+            "filetype": "gem",
+            "version": "1.0.0",
+            "platform": null,
+            "channel": ""
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: stable, rc, beta, alpha, dev (received )",
+        "source": {
+          "pointer": "/data/attributes/channel"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job

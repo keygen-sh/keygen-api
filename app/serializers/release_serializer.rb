@@ -9,14 +9,14 @@ class ReleaseSerializer < BaseSerializer
   attribute :checksum
   attribute :filename
   attribute :filetype do
-    @object.filetype.key
+    @object.filetype&.key
   end
   attribute :filesize
   attribute :platform do
-    @object.platform.key
+    @object.platform&.key
   end
   attribute :channel do
-    @object.channel.key
+    @object.channel&.key
   end
   attribute :downloads do
     @object.download_count
