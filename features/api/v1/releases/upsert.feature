@@ -571,6 +571,64 @@ Feature: Upsert release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin upserts a duplicate release (by version, with null platform and filetype)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "release"
+    And the first "release" has the following attributes:
+      """
+      {
+        "filename": "gems/latest_specs.4.8",
+        "productId": "$products[0]",
+        "platform": null,
+        "filetype": null,
+        "version": "1.0.0"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "release",
+          "attributes": {
+            "name": "Rubygem Manifest: Pre Spec",
+            "filename": "gems/prerelease_specs.4.8",
+            "filetype": null,
+            "version": "1.0.0",
+            "platform": null,
+            "channel": "stable"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "product",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Rubygem Manifest: Pre Spec",
+        "filename": "gems/prerelease_specs.4.8",
+        "filetype": null,
+        "version": "1.0.0",
+        "platform": null,
+        "channel": "stable"
+      }
+      """
+    And the current account should have 2 "releases"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin upserts a duplicate release (by filename)
     Given I am an admin of account "test1"
     And the current account is "test1"

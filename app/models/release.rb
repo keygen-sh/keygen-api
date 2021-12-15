@@ -86,13 +86,21 @@ class Release < ApplicationRecord
       # much context as possible to the end-user.
       scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id],
       message: proc { |release|
-        filetype = release.filetype&.key
-        platform = release.platform&.key
-        channel  = release.channel&.key
+        filetype = release.filetype.key
+        platform = release.platform.key
+        channel  = release.channel.key
 
         # We're going to remove % chars since Rails treats these special,
         # e.g. %{value}.
         "version already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel".remove('%')
+      },
+      # We only want to assert this validation if the filetype and platform
+      # are present, since the unique index doesn't include nulls, and we
+      # want to allow duplicates when these attrs are nil.
+      if: -> {
+        filetype&.key.present? &&
+        platform&.key.present? &&
+        channel&.key.present?
       }
     }
   validates :filename,
