@@ -34,9 +34,8 @@ class License < ApplicationRecord
   on_event 'license.validation.failed',
     -> l { puts('='*80 + "\nVALIDATION FAILED FOR LICENSE #{l.id}!\n" + '='*80) }
 
-  on_event 'license.validation.*',
-    -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) },
-    if: :first_validation?
+  on_first_event 'license.validation.*',
+    -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) }
 
   on_event 'machine.created',
     -> l { puts('='*80 + "\nMACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
