@@ -32,7 +32,7 @@ module Api::V1::Machines::Actions
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
-      Keygen::Store::Request.store[:current_resource] = @machine
+      Current.resource = @machine
     end
 
     typed_parameters do

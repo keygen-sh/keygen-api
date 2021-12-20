@@ -92,8 +92,8 @@ module TokenAuthentication
       raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
     end
 
-    Keygen::Store::Request.store[:current_token]  = current_token
-    Keygen::Store::Request.store[:current_bearer] = current_bearer
+    Current.bearer = current_bearer
+    Current.token  = current_token
 
     if current_token&.expired?
       render_unauthorized code: 'TOKEN_EXPIRED', detail: 'Token is expired' and return

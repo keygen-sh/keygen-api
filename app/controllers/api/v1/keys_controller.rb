@@ -78,7 +78,7 @@ module Api::V1
     def set_key
       @key = current_account.keys.find params[:id]
 
-      Keygen::Store::Request.store[:current_resource] = @key
+      Current.resource = @key
     end
 
     typed_parameters format: :jsonapi do

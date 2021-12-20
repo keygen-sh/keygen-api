@@ -86,7 +86,7 @@ module Api::V1
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
-      Keygen::Store::Request.store[:current_resource] = @license
+      Current.resource = @license
     end
 
     typed_parameters format: :jsonapi do

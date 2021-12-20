@@ -85,7 +85,7 @@ module Api::V1::Licenses::Actions
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
-      Keygen::Store::Request.store[:current_resource] = @license
+      Current.resource = @license
     end
 
     def increment_param
