@@ -15,6 +15,20 @@ class BroadcastEventService < BaseService
       Keygen.logger.exception(e)
     end
 
+    begin
+      BroadcastEventWorker.perform_async(
+        event: event,
+        account_id: Current.account.id,
+        resource_type: resource.class.name,
+        resource_id: resource.id,
+        request_id: Current.request_id,
+        idempotency_key: SecureRandom.hex,
+        metadata: meta,
+      )
+    rescue => e
+      Keygen.logger.exception(e)
+    end
+
     # Append meta to options for resource payload and serialize
     # for the async event creation worker
     begin

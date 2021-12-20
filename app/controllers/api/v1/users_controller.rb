@@ -93,7 +93,7 @@ module Api::V1
     def set_user
       @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id].downcase, aliases: :email)
 
-      Keygen::Store::Request.store[:current_resource] = @user
+      Current.resource = @user
     end
 
     typed_parameters format: :jsonapi do

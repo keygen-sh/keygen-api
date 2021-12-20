@@ -33,7 +33,7 @@ module Api::V1::Users::Relationships
       @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
       authorize @user, :show?
 
-      Keygen::Store::Request.store[:current_resource] = @user
+      Current.resource = @user
     end
   end
 end

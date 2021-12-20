@@ -29,7 +29,7 @@ module Api::V1
 
       @channel = scoped_channels.find params[:id]
 
-      Keygen::Store::Request.store[:current_resource] = channel
+      Current.resource = channel
     end
   end
 end

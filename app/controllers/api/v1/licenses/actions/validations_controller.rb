@@ -23,7 +23,7 @@ module Api::V1::Licenses::Actions
       Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
       if @license.present?
-        Keygen::Store::Request.store[:current_resource] = @license
+        Current.resource = @license
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -59,7 +59,7 @@ module Api::V1::Licenses::Actions
       Keygen.logger.info "[license.validate] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
-        Keygen::Store::Request.store[:current_resource] = @license
+        Current.resource = @license
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
@@ -104,7 +104,7 @@ module Api::V1::Licenses::Actions
       Keygen.logger.info "[license.validate-key] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if @license.present?
-        Keygen::Store::Request.store[:current_resource] = @license
+        Current.resource = @license
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",

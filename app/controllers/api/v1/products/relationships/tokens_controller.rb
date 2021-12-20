@@ -51,7 +51,7 @@ module Api::V1::Products::Relationships
     def set_product
       @product = current_account.products.find params[:product_id] || params[:id]
 
-      Keygen::Store::Request.store[:current_resource] = @product
+      Current.resource = @product
     end
   end
 end

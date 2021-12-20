@@ -20,7 +20,7 @@ module CurrentAccountScope
           FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
         end
 
-        Keygen::Store::Request.store[:current_account] = account
+        Current.account  = account
 
         @current_account = account
       end
