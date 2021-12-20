@@ -15,6 +15,7 @@ class BroadcastEventWorker
   def perform_with_kwargs(event:, account_id:, resource_type:, resource_id:, request_id: nil, idempotency_key: nil, metadata: nil)
     event_type = fetch_event_type_by_event(event)
 
+    # TODO(ezekg) Event notifications should be atomic. Use a lock here?
     e = Event.create!(
       idempotency_key: idempotency_key,
       event_type_id: event_type.id,
@@ -25,7 +26,7 @@ class BroadcastEventWorker
       metadata: metadata,
     )
 
-    PropagateEventWorker.perform_async(e.id)
+    EventNotificationWorker.perform_async(e.id)
   end
 
   def fetch_event_type_by_event(event)

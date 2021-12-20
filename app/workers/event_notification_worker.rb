@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PropagateEventWorker
+class EventNotificationWorker
   include Sidekiq::Worker
 
   sidekiq_options queue: :events,
