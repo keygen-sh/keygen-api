@@ -84,7 +84,7 @@ module Api::V1::Releases::Relationships
       @release = scoped_releases.find(params[:release_id])
       authorize release, :show?
 
-      Keygen::Store::Request.store[:current_resource] = release
+      Current.resource = release
     end
 
     typed_parameters format: :jsonapi do

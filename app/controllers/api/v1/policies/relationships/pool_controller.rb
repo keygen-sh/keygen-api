@@ -50,7 +50,7 @@ module Api::V1::Policies::Relationships
           source: { pointer: "/data/attributes/usePool" } and return
       end
 
-      Keygen::Store::Request.store[:current_resource] = @policy
+      Current.resource = @policy
     end
   end
 end

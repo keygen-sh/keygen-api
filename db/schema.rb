@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_14_215330) do
+ActiveRecord::Schema.define(version: 2021_12_20_155108) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -81,6 +81,23 @@ ActiveRecord::Schema.define(version: 2021_12_14_215330) do
     t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
+  create_table "events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "event_type_id", null: false
+    t.string "resource_type", null: false
+    t.uuid "resource_id", null: false
+    t.uuid "request_log_id", null: false
+    t.string "idempotency_key"
+    t.jsonb "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_events_on_account_id"
+    t.index ["event_type_id"], name: "index_events_on_event_type_id"
+    t.index ["idempotency_key"], name: "index_events_on_idempotency_key", unique: true
+    t.index ["request_log_id"], name: "index_events_on_request_log_id"
+    t.index ["resource_type", "resource_id"], name: "index_events_on_resource"
+  end
+
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "key"
     t.datetime "created_at", null: false
@@ -130,6 +147,9 @@ ActiveRecord::Schema.define(version: 2021_12_14_215330) do
     t.integer "max_machines_override"
     t.integer "max_cores_override"
     t.integer "max_uses_override"
+    t.datetime "last_used_at"
+    t.datetime "last_activated_at"
+    t.datetime "last_download_at"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -230,6 +250,7 @@ ActiveRecord::Schema.define(version: 2021_12_14_215330) do
     t.string "fingerprint_matching_strategy"
     t.integer "max_cores"
     t.string "expiration_strategy"
+    t.string "expiration_basis"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

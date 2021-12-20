@@ -21,7 +21,7 @@ module Api::V1::Policies::Relationships
       @policy = current_account.policies.find params[:policy_id]
       authorize @policy, :show?
 
-      Keygen::Store::Request.store[:current_resource] = @policy
+      Current.resource = @policy
     end
   end
 end

@@ -52,7 +52,7 @@ module Api::V1
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :key)
 
-      Keygen::Store::Request.store[:current_resource] = artifact
+      Current.resource = artifact
     end
 
     typed_query do

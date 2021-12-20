@@ -21,7 +21,7 @@ module Api::V1::Keys::Relationships
       @key = current_account.keys.find params[:key_id]
       authorize @key, :show?
 
-      Keygen::Store::Request.store[:current_resource] = @key
+      Current.resource = @key
     end
   end
 end

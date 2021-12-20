@@ -23,7 +23,7 @@ module Api::V1::Releases::Relationships
 
       @release = scoped_releases.find(params[:release_id])
 
-      Keygen::Store::Request.store[:current_resource] = release
+      Current.resource = release
     end
   end
 end

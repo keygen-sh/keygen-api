@@ -6,6 +6,7 @@ class License < ApplicationRecord
   include Pageable
   include Roleable
   include Searchable
+  include Eventable
 
   SEARCH_ATTRIBUTES = %i[id key name metadata].freeze
   SEARCH_RELATIONSHIPS = {
@@ -23,8 +24,25 @@ class License < ApplicationRecord
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
+  has_many :events, as: :resource
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
+
+  on_event 'license.validation.succeeded',
+    -> l { puts('='*80 + "\nVALIDATION SUCCEEDED FOR LICENSE #{l.id}!\n" + '='*80) }
+
+  on_event 'license.validation.failed',
+    -> l { puts('='*80 + "\nVALIDATION FAILED FOR LICENSE #{l.id}!\n" + '='*80) }
+
+  on_event 'license.validation.*',
+    -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) },
+    if: :first_validation?
+
+  on_event 'machine.created',
+    -> l { puts('='*80 + "\nMACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
+
+  on_event '*.created',
+    -> l { puts('='*80 + "\nMODEL CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
 
   # Used for legacy encrypted licenses
   attr_reader :raw

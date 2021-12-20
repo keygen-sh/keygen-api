@@ -67,7 +67,7 @@ module Api::V1::Releases::Actions
 
       @release = scoped_releases.find(params[:id])
 
-      Keygen::Store::Request.store[:current_resource] = release
+      Current.resource = release
     end
 
     def check_for_upgrade(**kwargs)

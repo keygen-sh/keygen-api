@@ -1,26 +1,9 @@
 # frozen_string_literal: true
 
 require_relative "./logger"
-require_relative './store'
 
 module Keygen
   module Middleware
-    class RequestStore
-      def initialize(app)
-        @app = app
-      end
-
-      def call(env)
-        Keygen::Store::Request.initialize!
-
-        status, headers, res = @app.call env
-
-        Keygen::Store::Request.clear!
-
-        [status, headers, res]
-      end
-    end
-
     class RequestCountLogger
       IGNORED_ORIGINS ||= %w[https://app.keygen.sh https://dist.keygen.sh].freeze
 
@@ -37,7 +20,7 @@ module Keygen
         end
 
         begin
-          account = Keygen::Store::Request.store[:current_account]
+          account = Current.account
           account_id = account&.id || req.params[:account_id] || req.params[:id]
           if account_id.present?
             Rails.cache.increment Account.daily_request_count_cache_key(account_id), 1, expires_in: 1.day
@@ -82,7 +65,7 @@ module Keygen
         return [status, headers, res] if
           is_ignored_host
 
-        account    = Keygen::Store::Request.store[:current_account]
+        account    = Current.account
         route      = Rails.application.routes.recognize_path req.url, method: req.method
         controller = route[:controller]
         action     = route[:action]
@@ -95,8 +78,8 @@ module Keygen
         return [status, headers, res] if
           is_ignored_resource
 
-        resource  = Keygen::Store::Request.store[:current_resource]
-        requestor = Keygen::Store::Request.store[:current_bearer]
+        resource  = Current.resource
+        requestor = Current.bearer
 
         begin
           filtered_req_params = req.filtered_parameters.slice(:meta, :data)

@@ -21,7 +21,7 @@ module Api::V1::Licenses::Relationships
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
       authorize @license, :show?
 
-      Keygen::Store::Request.store[:current_resource] = @license
+      Current.resource = @license
     end
   end
 end

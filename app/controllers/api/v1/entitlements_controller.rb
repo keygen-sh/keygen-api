@@ -70,7 +70,7 @@ module Api::V1
     def set_entitlement
       @entitlement = current_account.entitlements.find(params[:id])
 
-      Keygen::Store::Request.store[:current_resource] = @entitlement
+      Current.resource = @entitlement
     end
 
     typed_parameters format: :jsonapi do

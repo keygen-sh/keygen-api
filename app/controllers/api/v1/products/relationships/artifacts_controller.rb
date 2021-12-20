@@ -47,7 +47,7 @@ module Api::V1::Products::Relationships
       @product = current_account.products.find params[:product_id]
       authorize product, :show?
 
-      Keygen::Store::Request.store[:current_resource] = product
+      Current.resource = product
     end
 
     typed_query do

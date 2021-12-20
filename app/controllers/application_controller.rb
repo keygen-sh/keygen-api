@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
   include Pundit
