@@ -4,6 +4,8 @@
 module Eventable
   extend ActiveSupport::Concern
 
+  class AssociationTooDeepError < StandardError; end
+
   EVENTABLE_WILDCARD_SENTINEL = SecureRandom.hex(4)
   EVENTABLE_CALLBACK_PREFIX   = '__eventable_'
   EVENTABLE_REDIS_PREFIX      = 'eventable:'
@@ -49,8 +51,16 @@ module Eventable
         model_callbacks_defined?(key)
 
       if reflection = reflect_on_association(kwargs.delete(:through))
+        raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
+          reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
+
+        puts relfection: reflection.through_reflection
+
         klass = reflection.klass
         cb    = -> do
+          next unless
+            reflection.inverse_of.present?
+
           inverse = send(reflection.inverse_of.name)
 
           inverse.notify!(event: event)
@@ -69,7 +79,7 @@ module Eventable
     def after_first_event(event, callback, **kwargs)
       kwargs = kwargs.merge if: -> {
         redis = Rails.cache.redis
-        key   = EVENTABLE_REDIS_PREFIX + Digest::SHA2.hexdigest("#{id}:#{event}")
+        key   = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
         nonce = Time.current.to_i
 
         redis.with do |conn|

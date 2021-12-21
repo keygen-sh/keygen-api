@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_secure_password
 
   belongs_to :account
+  has_one :role, as: :resource, dependent: :destroy
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :products, -> { select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').reorder(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
@@ -24,7 +25,8 @@ class User < ApplicationRecord
   has_many :policy_entitlements, through: :licenses
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
-  has_one :role, as: :resource, dependent: :destroy
+  has_many :releases, -> u { for_user(u.id) },
+    through: :products
 
   accepts_nested_attributes_for :role, update_only: true
 
