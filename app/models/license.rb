@@ -20,29 +20,29 @@ class License < ApplicationRecord
   belongs_to :account
   belongs_to :user
   belongs_to :policy
+  has_one :product, through: :policy
+  has_one :role, as: :resource, dependent: :destroy
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
-  has_many :events, as: :resource
-  has_one :product, through: :policy
-  has_one :role, as: :resource, dependent: :destroy
-
-  on_event 'license.validation.succeeded',
-    -> l { puts('='*80 + "\nVALIDATION SUCCEEDED FOR LICENSE #{l.id}!\n" + '='*80) }
-
-  on_event 'license.validation.failed',
-    -> l { puts('='*80 + "\nVALIDATION FAILED FOR LICENSE #{l.id}!\n" + '='*80) }
+  has_many :events,
+    as: :resource
+  has_many :releases, -> l { for_license(l.id) },
+    through: :product
 
   on_first_event 'license.validation.*',
     -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) }
+
+  on_first_event 'license.usage.incremented',
+    -> l { puts('='*80 + "\nFIRST USE FOR LICENSE #{l.id}!\n" + '='*80) }
 
   on_first_event 'machine.created',
     -> l { puts('='*80 + "\nFIRST MACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) },
     through: :machines
 
-  on_event '*.created',
-    -> l { puts('='*80 + "\nMODEL CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
+  on_first_event 'release.downloaded',
+    -> l { puts('='*80 + "\nFIRST RELEASE DOWNLOAD FOR LICENSE #{l.id}!\n" + '='*80) }
 
   # Used for legacy encrypted licenses
   attr_reader :raw

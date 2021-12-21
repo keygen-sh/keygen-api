@@ -4,19 +4,21 @@ class EventNotificationWorker
   include Sidekiq::Worker
 
   sidekiq_options queue: :events,
-                  lock: :until_executed,
-                  retry: 0,
-                  dead: false
+                  lock: :until_executed
 
   def perform(event_id)
-    event    = Event.find(event_id)
-    resource = event.resource
+    event      = Event.find(event_id)
+    event_type = event.event_type
+    requestor  = event.request_log.requestor
+    resource   = event.resource
 
-    return unless
-      resource < Eventable
+    requestor.notify!(event: event_type.event) unless
+      requestor.class < Eventable
 
-    resource.notify!(
-      event: event.event_type.event
-    )
+    return if
+      resource == requestor
+
+    resource.notify!(event: event_type.event) unless
+      resource.class < Eventable
   end
 end
