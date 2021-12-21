@@ -31,17 +31,20 @@ class License < ApplicationRecord
   has_many :releases, -> l { for_license(l.id) },
     through: :product
 
-  on_first_event 'license.validation.*',
-    -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) }
+  on_atomic_event 'license.validation.*',
+    -> l { update(expiry: Time.current + policy.duration.to_i) },
+    unless: :expiry?
 
-  on_first_event 'license.usage.incremented',
-    -> l { puts('='*80 + "\nFIRST USE FOR LICENSE #{l.id}!\n" + '='*80) }
+  on_atomic_event 'license.usage.incremented',
+    -> l { update(last_used_at: Time.current) },
+    if: -> { last_used_at.nil? }
 
-  on_first_event 'machine.created',
+  on_atomic_event 'machine.created',
     -> l { puts('='*80 + "\nFIRST MACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) },
-    through: :machines
+    through: :machines,
+    unless: -> { machines_count > 1 }
 
-  on_first_event 'release.downloaded',
+  on_atomic_event 'release.downloaded',
     -> l { puts('='*80 + "\nFIRST RELEASE DOWNLOAD FOR LICENSE #{l.id}!\n" + '='*80) }
 
   # Used for legacy encrypted licenses
