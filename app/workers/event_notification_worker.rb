@@ -13,7 +13,7 @@ class EventNotificationWorker
     resource = event.resource
 
     return unless
-      resource.class.include?(Eventable)
+      resource < Eventable
 
     resource.notify!(
       event: event.event_type.event
