@@ -8,8 +8,8 @@ module Eventable
 
   EVENTABLE_WILDCARD_SENTINEL = SecureRandom.hex(4)
   EVENTABLE_CALLBACK_PREFIX   = '__eventable_'
-  EVENTABLE_REDIS_PREFIX      = 'eventable:'
-  EVENTABLE_REDIS_TTL         = 1.year.to_i
+  EVENTABLE_REDIS_PREFIX      = 'eventable:lock:'
+  EVENTABLE_REDIS_TTL         = 60.seconds
 
   included do
     extend ActiveModel::Callbacks
@@ -19,6 +19,11 @@ module Eventable
       matches = matching_callbacks(key)
 
       matches.map { |k| run_callbacks(k) }
+
+      redis = Rails.cache.redis
+      lock  = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
+
+      redis.with { |c| c.del(lock) }
     end
 
     private
@@ -44,17 +49,15 @@ module Eventable
   end
 
   module ClassMethods
-    def after_event(event, callback, **kwargs)
+    def on_event(event, callback, **kwargs)
       key = to_eventable_key(event)
 
-      define_model_callbacks(key, only: :after) unless
+      define_model_callbacks(key, only: :before) unless
         model_callbacks_defined?(key)
 
       if reflection = reflect_on_association(kwargs.delete(:through))
         raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
           reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
-
-        puts relfection: reflection.through_reflection
 
         klass = reflection.klass
         cb    = -> do
@@ -69,27 +72,29 @@ module Eventable
         klass.include(Eventable) unless
           klass < Eventable
 
-        klass.after_event(event, cb, **kwargs)
+        klass.on_event(event, cb, **kwargs)
       end
 
-      set_callback(key, :after, callback, **kwargs)
+      set_callback(key, :before, callback, **kwargs)
     end
-    alias_method :on_event, :after_event
 
-    def after_first_event(event, callback, **kwargs)
-      kwargs = kwargs.merge if: -> {
+    def on_atomic_event(event, callback, **kwargs)
+      acquire_lock = -> {
         redis = Rails.cache.redis
-        key   = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
-        nonce = Time.current.to_i
+        lock  = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
+        nonce = "#{Process.pid}:#{Time.current.to_f}"
 
-        redis.with do |conn|
-          conn.set(key, nonce, nx: true, px: EVENTABLE_REDIS_TTL)
-        end
+        redis.with { |c| c.set(lock, nonce, nx: true, px: EVENTABLE_REDIS_TTL) }
       }
 
-      after_event(event, callback, **kwargs)
+      # Since we're using :if to acquire our lock below, we're going to
+      # append our locking proc to any :if params.
+      kwargs.merge!(
+        if: Array(kwargs.delete(:if)).push(acquire_lock)
+      )
+
+      on_event(event, callback, **kwargs)
     end
-    alias_method :on_first_event, :after_first_event
 
     def to_eventable_key(event)
       key = EVENTABLE_CALLBACK_PREFIX +
