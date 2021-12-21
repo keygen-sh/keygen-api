@@ -37,8 +37,9 @@ class License < ApplicationRecord
   on_first_event 'license.validation.*',
     -> l { puts('='*80 + "\nFIRST VALIDATION FOR LICENSE #{l.id}!\n" + '='*80) }
 
-  on_event 'machine.created',
-    -> l { puts('='*80 + "\nMACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
+  on_first_event 'machine.created',
+    -> l { puts('='*80 + "\nFIRST MACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) },
+    through: :machines
 
   on_event '*.created',
     -> l { puts('='*80 + "\nMODEL CREATED FOR LICENSE #{l.id}!\n" + '='*80) }
