@@ -7,6 +7,7 @@ module Eventable
   EVENTABLE_WILDCARD_SENTINEL = SecureRandom.hex(4)
   EVENTABLE_CALLBACK_PREFIX   = '__eventable_'
   EVENTABLE_REDIS_PREFIX      = 'eventable:'
+  EVENTABLE_REDIS_TTL         = 1.year.to_i
 
   included do
     extend ActiveModel::Callbacks
@@ -47,16 +48,33 @@ module Eventable
       define_model_callbacks(key, only: :after) unless
         model_callbacks_defined?(key)
 
+      if reflection = reflect_on_association(kwargs.delete(:through))
+        klass = reflection.klass
+        cb    = -> do
+          inverse = send(reflection.inverse_of.name)
+
+          inverse.notify!(event: event)
+        end
+
+        klass.include(Eventable) unless
+          klass < Eventable
+
+        klass.after_event(event, cb, **kwargs)
+      end
+
       set_callback(key, :after, callback, **kwargs)
     end
     alias_method :on_event, :after_event
 
     def after_first_event(event, callback, **kwargs)
       kwargs = kwargs.merge if: -> {
-        key = EVENTABLE_REDIS_PREFIX + Digest::SHA2.hexdigest("#{id}:#{event}")
+        redis = Rails.cache.redis
+        key   = EVENTABLE_REDIS_PREFIX + Digest::SHA2.hexdigest("#{id}:#{event}")
+        nonce = Time.current.to_i
 
-        # TODO(ezekg) Use redis to create a lock system?
-        puts key
+        redis.with do |conn|
+          conn.set(key, nonce, nx: true, px: EVENTABLE_REDIS_TTL)
+        end
       }
 
       after_event(event, callback, **kwargs)
