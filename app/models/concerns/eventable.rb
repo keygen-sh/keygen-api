@@ -121,28 +121,24 @@ module Eventable
       acquire_lock = proc do
         redis = Rails.cache.redis
         key   = lock_key_for_event(event)
-        nonce = "#{Process.pid}:#{Time.current.to_f}"
-        ok    = false
+        time  = Time.current.to_f
+        nonce = "#{Process.pid}:#{time}"
 
-        Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
-          loop do
-            ok = redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
+        loop do
+          break true if
+            redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
 
-            raise LockNotAcquiredError, 'failed to acquire lock' if
-              raise_on_lock_error &&
-              !wait_on_lock_error &&
-              !ok
+          delta_time = Time.current.to_f - time
+          timed_out  = delta_time > EVENTABLE_LOCK_TIMEOUT
 
-            break if
-              !wait_on_lock_error ||
-              ok
+          if raise_on_lock_error
+            raise LockNotAcquiredError, 'failed to acquire lock' unless wait_on_lock_error
+            raise LockTimeoutError, 'lock timeout' if timed_out
+          else
+            break false unless wait_on_lock_error
+            break false if timed_out
           end
         end
-
-        ok
-      rescue Timeout::Error
-        raise LockTimeoutError, 'lock timeout' if
-          raise_on_lock_error
       end
 
       # Since we're using :if to acquire our lock below, we're going to
