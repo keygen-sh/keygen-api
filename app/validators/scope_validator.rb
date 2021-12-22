@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 class ScopeValidator < ActiveModel::EachValidator
-  def validate_each(parent, name, child)
+  def validate_each(record, association_name, association_record)
     return if
-      child.nil?
+      association_record.nil?
 
     key = options.fetch(:by).to_s
 
-    # Assert that parent scope matches child scope (i.e. account_id)
-    parent.errors.add(name, :blank, message: 'must exist') unless
-      parent.attributes[key] == child.attributes[key]
+    raise ArgumentError, ':by cannot be blank' if
+      key.empty?
+
+    # Assert that record scope matches association scope (i.e. self.account_id == assoc.account_id)
+    record.errors.add(association_name, :blank, message: 'must exist') unless
+      record.attributes[key] == association_record.attributes[key]
   end
 end
