@@ -26,7 +26,7 @@ module Eventable
         idem_key = idem_key_for_idempotency_key(idempotency_key)
 
         return true unless
-          redis.with { |c| c.set(idem_key, 1, nx: true, px: EVENTABLE_IDEMPOTENCY_TTL) }
+          redis.with { |c| c.set(idem_key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
       end
 
       # Run the callbacks
@@ -108,7 +108,7 @@ module Eventable
         key   = lock_key_for_event(event)
         nonce = "#{Process.pid}:#{Time.current.to_f}"
 
-        redis.with { |c| c.set(key, nonce, nx: true, px: EVENTABLE_LOCK_TTL) }
+        redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
       }
 
       # Since we're using :if to acquire our lock below, we're going to
