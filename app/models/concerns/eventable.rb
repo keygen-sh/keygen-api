@@ -5,8 +5,9 @@ module Eventable
   extend ActiveSupport::Concern
 
   class AssociationTooDeepError < StandardError; end
+  class LockNotAcquiredError < StandardError; end
 
-  EVENTABLE_WILDCARD_SENTINEL  = SecureRandom.hex(4)
+  EVENTABLE_WILDCARD_SENTINEL  = '9f3bc5d9'
   EVENTABLE_CALLBACK_PREFIX    = '__eventable_'
   EVENTABLE_LOCK_PREFIX        = 'eventable:lock:'
   EVENTABLE_LOCK_TTL           = 60.seconds
@@ -18,26 +19,38 @@ module Eventable
 
     def notify!(event:, idempotency_key: nil)
       callback_key = self.class.callback_key_for_event(event)
-      matches      = matching_callbacks(callback_key)
+      callbacks    = matching_callbacks(callback_key)
       redis        = Rails.cache.redis
 
       # Skip if an :idempotency_key was provided and has already been processed
       if idempotency_key.present?
         idem_key = idem_key_for_idempotency_key(idempotency_key)
 
-        return true unless
+        return unless
           redis.with { |c| c.set(idem_key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
       end
 
       # Run the callbacks
-      ok = matches.map { |k| run_callbacks(k) }.all?
+      callbacks.map do |key|
+        if ok = run_callbacks(key)
+          event    = key.to_s.delete_prefix(EVENTABLE_CALLBACK_PREFIX)
+          lock_key = lock_key_for_event(event)
 
-      # Release the lock
-      lock_key = lock_key_for_event(event)
+          # Release the lock
+          redis.with { |c| c.del(lock_key) }
 
-      redis.with { |c| c.del(lock_key) }
+          ok
+        end
+      end
+    rescue
+      if idempotency_key.present?
+        idem_key = idem_key_for_idempotency_key(idempotency_key)
 
-      ok
+        # Release the idempotency lock on failure?
+        redis.with { |c| c.del(idem_key) }
+      end
+
+      raise
     end
 
     private
@@ -62,7 +75,7 @@ module Eventable
     end
 
     def lock_key_for_event(event)
-      EVENTABLE_LOCK_PREFIX + "#{self.id}:#{event}"
+      EVENTABLE_LOCK_PREFIX + "#{self.id}:#{self.class.parameterized_callback_key(event)}"
     end
 
     def idem_key_for_idempotency_key(key)
@@ -71,13 +84,13 @@ module Eventable
   end
 
   module ClassMethods
-    def on_event(event, callback, **kwargs)
+    def on_event(event, callback, through: nil, **kwargs)
       callback_key = callback_key_for_event(event)
 
       define_model_callbacks(callback_key, only: :before) unless
-        respond_to?(:"after_#{callback_key}")
+        respond_to?(:"before_#{callback_key}")
 
-      if reflection = reflect_on_association(kwargs.delete(:through))
+      if reflection = reflect_on_association(through)
         raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
           reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
@@ -102,13 +115,18 @@ module Eventable
       set_callback(callback_key, :before, callback, **kwargs)
     end
 
-    def on_atomic_event(event, callback, **kwargs)
+    def on_atomic_event(event, callback, raise_on_lock_error: false, **kwargs)
       acquire_lock = -> {
         redis = Rails.cache.redis
         key   = lock_key_for_event(event)
         nonce = "#{Process.pid}:#{Time.current.to_f}"
 
-        redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
+        ok = redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
+
+        raise LockNotAcquiredError, 'lock was not acquired' if
+          raise_on_lock_error && !ok
+
+        ok
       }
 
       # Since we're using :if to acquire our lock below, we're going to
@@ -121,12 +139,15 @@ module Eventable
     end
 
     def callback_key_for_event(event)
-      key = EVENTABLE_CALLBACK_PREFIX +
-        event.to_s.sub('*', EVENTABLE_WILDCARD_SENTINEL)
-                  .underscore
-                  .parameterize(separator: '_')
+      key = EVENTABLE_CALLBACK_PREFIX + parameterized_callback_key(event)
 
       key.to_sym
+    end
+
+    def parameterized_callback_key(event)
+      event.to_s.sub('*', EVENTABLE_WILDCARD_SENTINEL)
+                .underscore
+                .parameterize(separator: '_')
     end
   end
 end

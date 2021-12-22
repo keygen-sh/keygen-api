@@ -31,8 +31,17 @@ class License < ApplicationRecord
   has_many :releases, -> l { for_license(l.id) },
     through: :product
 
+  on_atomic_event 'license.validation.succeeded',
+    -> l { puts 'LICENSE VALIDATION SUCCEEDED!' },
+    raise_on_lock_error: true
+
+  on_atomic_event 'license.validation.failed',
+    -> l { puts 'LICENSE VALIDATION FAILED!' },
+    raise_on_lock_error: true
+
   on_atomic_event 'license.validation.*',
     -> l { update(expiry: Time.current + policy.duration.to_i) },
+    raise_on_lock_error: true,
     unless: :expiry?
 
   on_atomic_event 'license.usage.incremented',
