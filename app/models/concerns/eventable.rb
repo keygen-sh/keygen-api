@@ -6,24 +6,38 @@ module Eventable
 
   class AssociationTooDeepError < StandardError; end
 
-  EVENTABLE_WILDCARD_SENTINEL = SecureRandom.hex(4)
-  EVENTABLE_CALLBACK_PREFIX   = '__eventable_'
-  EVENTABLE_LOCK_PREFIX       = 'eventable:lock:'
-  EVENTABLE_LOCK_TTL          = 60.seconds
+  EVENTABLE_WILDCARD_SENTINEL  = SecureRandom.hex(4)
+  EVENTABLE_CALLBACK_PREFIX    = '__eventable_'
+  EVENTABLE_LOCK_PREFIX        = 'eventable:lock:'
+  EVENTABLE_LOCK_TTL           = 60.seconds
+  EVENTABLE_IDEMPOTENCY_PREFIX = 'eventable:idem:'
+  EVENTABLE_IDEMPOTENCY_TTL    = 24.hours
 
   included do
     extend ActiveModel::Callbacks
 
-    def notify!(event:)
+    def notify!(event:, idempotency_key: nil)
       callback_key = self.class.callback_key_for_event(event)
       matches      = matching_callbacks(callback_key)
+      redis        = Rails.cache.redis
 
-      matches.map { |k| run_callbacks(k) }
+      # Skip if an :idempotency_key was provided and has already been processed
+      if idempotency_key.present?
+        idem_key = idem_key_for_idempotency_key(idempotency_key)
 
-      redis = Rails.cache.redis
-      key   = lock_key_for_event(event)
+        return true unless
+          redis.with { |c| c.set(idem_key, 1, nx: true, px: EVENTABLE_IDEMPOTENCY_TTL) }
+      end
 
-      redis.with { |c| c.del(key) }
+      # Run the callbacks
+      ok = matches.map { |k| run_callbacks(k) }.all?
+
+      # Release the lock
+      lock_key = lock_key_for_event(event)
+
+      redis.with { |c| c.del(lock_key) }
+
+      ok
     end
 
     private
@@ -49,6 +63,10 @@ module Eventable
 
     def lock_key_for_event(event)
       EVENTABLE_LOCK_PREFIX + "#{self.id}:#{event}"
+    end
+
+    def idem_key_for_idempotency_key(key)
+      EVENTABLE_IDEMPOTENCY_PREFIX + "#{self.id}:#{key}"
     end
   end
 
