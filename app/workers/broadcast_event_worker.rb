@@ -3,8 +3,8 @@
 class BroadcastEventWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :events,
-                  lock: :until_executed
+  sidekiq_options lock: :until_executed,
+                  queue: :events
 
   def perform(kwargs)
     perform_with_kwargs(**kwargs.to_h.symbolize_keys)
@@ -12,28 +12,38 @@ class BroadcastEventWorker
 
   private
 
-  def perform_with_kwargs(event:, account_id:, resource_type:, resource_id:, request_id: nil, idempotency_key: nil, metadata: nil)
-    event_type = fetch_event_type_by_event(event)
-
-    # TODO(ezekg) Event notifications should be atomic. Use a lock here?
-    e = Event.create!(
+  def perform_with_kwargs(
+    event_name:,
+    account_id:,
+    resource_type:,
+    resource_id:,
+    created_by_type:,
+    created_by_id:,
+    request_id: nil,
+    idempotency_key: nil,
+    metadata: nil
+  )
+    event_type = fetch_event_type_by_event(event_name)
+    event      = Event.create!(
       idempotency_key: idempotency_key,
       event_type_id: event_type.id,
       account_id: account_id,
       resource_type: resource_type,
       resource_id: resource_id,
+      created_by_type: created_by_type,
+      created_by_id: created_by_id,
       request_log_id: request_id,
       metadata: metadata,
     )
 
-    EventNotificationWorker.perform_async(e.id)
+    EventNotificationWorker.perform_async(event.id)
   end
 
-  def fetch_event_type_by_event(event)
-    cache_key = EventType.cache_key(event)
+  def fetch_event_type_by_event(event_name)
+    cache_key = EventType.cache_key(event_name)
 
     cache.fetch(cache_key, skip_nil: true, expires_in: 1.day) do
-      EventType.find_or_create_by!(event: event)
+      EventType.find_or_create_by!(event: event_name)
     end
   end
 
