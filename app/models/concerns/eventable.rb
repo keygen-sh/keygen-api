@@ -15,32 +15,32 @@ module Eventable
     extend ActiveModel::Callbacks
 
     def notify!(event:)
-      key     = self.class.to_eventable_key(event)
-      matches = matching_callbacks(key)
+      callback_key = self.class.to_event_callback_key(event)
+      matches      = matching_callbacks(callback_key)
 
       matches.map { |k| run_callbacks(k) }
 
       redis = Rails.cache.redis
-      lock  = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
+      key   = self.class.to_event_lock_key(id, event)
 
-      redis.with { |c| c.del(lock) }
+      redis.with { |c| c.del(key) }
     end
 
     private
 
-    def matching_callbacks(key)
-      callbacks = __callbacks.select do |k, v|
+    def matching_callbacks(pattern)
+      callbacks = __callbacks.select do |key|
         case
-        when k.starts_with?(EVENTABLE_CALLBACK_PREFIX + EVENTABLE_WILDCARD_SENTINEL)
-          suffix = k.to_s.remove(EVENTABLE_CALLBACK_PREFIX + EVENTABLE_WILDCARD_SENTINEL)
+        when key.starts_with?(EVENTABLE_CALLBACK_PREFIX + EVENTABLE_WILDCARD_SENTINEL)
+          suffix = key.to_s.remove(EVENTABLE_CALLBACK_PREFIX + EVENTABLE_WILDCARD_SENTINEL)
 
-          key.ends_with?(suffix)
-        when k.ends_with?(EVENTABLE_WILDCARD_SENTINEL)
-          prefix = k.to_s.remove(EVENTABLE_WILDCARD_SENTINEL)
+          pattern.ends_with?(suffix)
+        when key.ends_with?(EVENTABLE_WILDCARD_SENTINEL)
+          prefix = key.to_s.remove(EVENTABLE_WILDCARD_SENTINEL)
 
-          key.starts_with?(prefix)
+          pattern.starts_with?(prefix)
         else
-          key == k
+          pattern == key
         end
       end
 
@@ -50,10 +50,10 @@ module Eventable
 
   module ClassMethods
     def on_event(event, callback, **kwargs)
-      key = to_eventable_key(event)
+      callback_key = to_event_callback_key(event)
 
-      define_model_callbacks(key, only: :before) unless
-        model_callbacks_defined?(key)
+      define_model_callbacks(callback_key, only: :before) unless
+        respond_to?(:"after_#{callback_key}")
 
       if reflection = reflect_on_association(kwargs.delete(:through))
         raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
@@ -75,16 +75,16 @@ module Eventable
         klass.on_event(event, cb, **kwargs)
       end
 
-      set_callback(key, :before, callback, **kwargs)
+      set_callback(callback_key, :before, callback, **kwargs)
     end
 
     def on_atomic_event(event, callback, **kwargs)
       acquire_lock = -> {
         redis = Rails.cache.redis
-        lock  = EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
+        key   = self.class.to_event_lock_key(id, event)
         nonce = "#{Process.pid}:#{Time.current.to_f}"
 
-        redis.with { |c| c.set(lock, nonce, nx: true, px: EVENTABLE_REDIS_TTL) }
+        redis.with { |c| c.set(key, nonce, nx: true, px: EVENTABLE_REDIS_TTL) }
       }
 
       # Since we're using :if to acquire our lock below, we're going to
@@ -96,7 +96,7 @@ module Eventable
       on_event(event, callback, **kwargs)
     end
 
-    def to_eventable_key(event)
+    def to_event_callback_key(event)
       key = EVENTABLE_CALLBACK_PREFIX +
         event.to_s.sub('*', EVENTABLE_WILDCARD_SENTINEL)
                   .underscore
@@ -105,10 +105,8 @@ module Eventable
       key.to_sym
     end
 
-    private
-
-    def model_callbacks_defined?(key)
-      respond_to?(:"after_#{key}")
+    def to_event_lock_key(id, event)
+      EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
     end
   end
 end
