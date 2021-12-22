@@ -9,14 +9,13 @@ class EventNotificationWorker
   def perform(event_id)
     event      = Event.find(event_id)
     event_type = event.event_type
-    resource   = event.resource
     created_by = event.created_by
+    resource   = event.resource
 
-    resource.notify!(event: event_type.event) unless
+    created_by.notify!(event: event_type.event, idempotency_key: event.idempotency_key) unless
+      created_by.class < Eventable
+
+    resource.notify!(event: event_type.event, idempotency_key: event.idempotency_key) unless
       resource.class < Eventable
-
-    created_by.notify!(event: event_type.event) unless
-      created_by.class < Eventable &&
-      created_by != resource
   end
 end
