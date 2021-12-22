@@ -6,10 +6,12 @@ module Eventable
 
   class AssociationTooDeepError < StandardError; end
   class LockNotAcquiredError < StandardError; end
+  class LockTimeoutError < StandardError; end
 
   EVENTABLE_WILDCARD_SENTINEL  = '9f3bc5d9'
   EVENTABLE_CALLBACK_PREFIX    = '__eventable_'
   EVENTABLE_LOCK_PREFIX        = 'eventable:lock:'
+  EVENTABLE_LOCK_TIMEOUT       = 30.seconds
   EVENTABLE_LOCK_TTL           = 60.seconds
   EVENTABLE_IDEMPOTENCY_PREFIX = 'eventable:idem:'
   EVENTABLE_IDEMPOTENCY_TTL    = 24.hours
@@ -31,7 +33,7 @@ module Eventable
       end
 
       # Run the callbacks
-      callbacks.map do |key|
+      statuses = callbacks.map do |key|
         if ok = run_callbacks(key)
           event    = key.to_s.delete_prefix(EVENTABLE_CALLBACK_PREFIX)
           lock_key = lock_key_for_event(event)
@@ -43,10 +45,10 @@ module Eventable
         end
       end
     rescue
-      if idempotency_key.present?
+      if statuses&.none? && idempotency_key.present?
         idem_key = idem_key_for_idempotency_key(idempotency_key)
 
-        # Release the idempotency lock on failure?
+        # Release the idempotency lock on complete failure
         redis.with { |c| c.del(idem_key) }
       end
 
@@ -115,19 +117,33 @@ module Eventable
       set_callback(callback_key, :before, callback, **kwargs)
     end
 
-    def on_atomic_event(event, callback, raise_on_lock_error: false, **kwargs)
-      acquire_lock = -> {
+    def on_atomic_event(event, callback, wait_on_lock_error: false, raise_on_lock_error: false, **kwargs)
+      acquire_lock = proc do
         redis = Rails.cache.redis
         key   = lock_key_for_event(event)
         nonce = "#{Process.pid}:#{Time.current.to_f}"
+        ok    = false
 
-        ok = redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
+        Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
+          loop do
+            ok = redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
 
-        raise LockNotAcquiredError, 'lock was not acquired' if
-          raise_on_lock_error && !ok
+            raise LockNotAcquiredError, 'failed to acquire lock' if
+              raise_on_lock_error &&
+              !wait_on_lock_error &&
+              !ok
+
+            break if
+              !wait_on_lock_error ||
+              ok
+          end
+        end
 
         ok
-      }
+      rescue Timeout::Error
+        raise LockTimeoutError, 'lock timeout' if
+          raise_on_lock_error
+      end
 
       # Since we're using :if to acquire our lock below, we're going to
       # append our locking proc to any :if params.
