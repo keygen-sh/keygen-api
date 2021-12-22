@@ -17,10 +17,12 @@ class BroadcastEventService < BaseService
 
     begin
       BroadcastEventWorker.perform_async(
-        event: event,
+        event_name: event,
         account_id: Current.account.id,
         resource_type: resource.class.name,
         resource_id: resource.id,
+        created_by_type: Current.bearer.class.name,
+        created_by_id: Current.bearer.id,
         request_id: Current.request_id,
         idempotency_key: SecureRandom.hex,
         metadata: meta,
