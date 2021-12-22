@@ -8,20 +8,20 @@ module Eventable
 
   EVENTABLE_WILDCARD_SENTINEL = SecureRandom.hex(4)
   EVENTABLE_CALLBACK_PREFIX   = '__eventable_'
-  EVENTABLE_REDIS_PREFIX      = 'eventable:lock:'
-  EVENTABLE_REDIS_TTL         = 60.seconds
+  EVENTABLE_LOCK_PREFIX       = 'eventable:lock:'
+  EVENTABLE_LOCK_TTL          = 60.seconds
 
   included do
     extend ActiveModel::Callbacks
 
     def notify!(event:)
-      callback_key = self.class.to_event_callback_key(event)
+      callback_key = self.class.callback_key_for_event(event)
       matches      = matching_callbacks(callback_key)
 
       matches.map { |k| run_callbacks(k) }
 
       redis = Rails.cache.redis
-      key   = self.class.to_event_lock_key(id, event)
+      key   = lock_key_for_event(event)
 
       redis.with { |c| c.del(key) }
     end
@@ -46,11 +46,15 @@ module Eventable
 
       callbacks.keys
     end
+
+    def lock_key_for_event(event)
+      EVENTABLE_LOCK_PREFIX + "#{self.id}:#{event}"
+    end
   end
 
   module ClassMethods
     def on_event(event, callback, **kwargs)
-      callback_key = to_event_callback_key(event)
+      callback_key = callback_key_for_event(event)
 
       define_model_callbacks(callback_key, only: :before) unless
         respond_to?(:"after_#{callback_key}")
@@ -59,6 +63,8 @@ module Eventable
         raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
           reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
+        # Wire up the association to listen for the target event and notify
+        # the parent (making the association Eventable if not already)
         klass = reflection.klass
         cb    = -> do
           next unless
@@ -81,10 +87,10 @@ module Eventable
     def on_atomic_event(event, callback, **kwargs)
       acquire_lock = -> {
         redis = Rails.cache.redis
-        key   = self.class.to_event_lock_key(id, event)
+        key   = lock_key_for_event(event)
         nonce = "#{Process.pid}:#{Time.current.to_f}"
 
-        redis.with { |c| c.set(key, nonce, nx: true, px: EVENTABLE_REDIS_TTL) }
+        redis.with { |c| c.set(key, nonce, nx: true, px: EVENTABLE_LOCK_TTL) }
       }
 
       # Since we're using :if to acquire our lock below, we're going to
@@ -96,17 +102,13 @@ module Eventable
       on_event(event, callback, **kwargs)
     end
 
-    def to_event_callback_key(event)
+    def callback_key_for_event(event)
       key = EVENTABLE_CALLBACK_PREFIX +
         event.to_s.sub('*', EVENTABLE_WILDCARD_SENTINEL)
                   .underscore
                   .parameterize(separator: '_')
 
       key.to_sym
-    end
-
-    def to_event_lock_key(id, event)
-      EVENTABLE_REDIS_PREFIX + "#{id}:#{event}"
     end
   end
 end
