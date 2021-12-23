@@ -35,7 +35,7 @@ module Eventable
       # Skip if an :idempotency_key was provided and has already been processed
       if idempotency_key.present?
         return unless
-          acquire_idem_for_event!(event)
+          acquire_idempotency_lock!(idempotency_key)
       end
 
       # Run the callbacks
@@ -43,12 +43,12 @@ module Eventable
         run_callbacks(key) do
           e = key.to_s.delete_prefix(EVENTABLE_CALLBACK_PREFIX)
 
-          release_lock_for_event!(e)
+          release_event_lock!(e)
         end
       end
     rescue
       # Release the idempotency lock on complete failure
-      release_idem_for_event!(event) if
+      release_idempotency_lock!(idempotency_key) if
         idempotency_key.present? &&
         statuses&.none?
 
@@ -84,11 +84,11 @@ module Eventable
       callbacks
     end
 
-    def lock_key_for_event(event)
+    def event_lock_key(event)
       EVENTABLE_LOCK_PREFIX + "#{self.id}:#{self.class.parameterized_callback_key(event)}"
     end
 
-    def idem_key_for_idempotency_key(key)
+    def idempotency_lock_key(key)
       EVENTABLE_IDEMPOTENCY_PREFIX + "#{self.id}:#{key}"
     end
 
@@ -106,9 +106,9 @@ module Eventable
         redis.with { |c| c.script(:load, EVENTABLE_LOCK_CMDs[cmd]) }
     end
 
-    def acquire_lock_for_event!(event, wait_on_lock_error:, raise_on_lock_error:)
+    def acquire_event_lock!(event, wait_on_lock_error:, raise_on_lock_error:)
       redis = Rails.cache.redis
-      key   = lock_key_for_event(event)
+      key   = event_lock_key(event)
 
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
@@ -135,25 +135,25 @@ module Eventable
         raise_on_lock_error
     end
 
-    def release_lock_for_event!(event)
+    def release_event_lock!(event)
       redis = Rails.cache.redis
       sha   = load_lua_cmd(:getdel)
-      key   = lock_key_for_event(event)
+      key   = event_lock_key(event)
       val   = lock_key_value(key)
 
       redis.with { |c| !c.evalsha(sha, keys: [key], argv: [val]).zero? }
     end
 
-    def acquire_idem_for_event!(event)
+    def acquire_idempotency_lock!(idempotency_key)
       redis = Rails.cache.redis
-      key   = idem_key_for_idempotency_key(idempotency_key)
+      key   = idempotency_lock_key(idempotency_key)
 
       redis.with { |c| c.set(key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
     end
 
-    def release_idem_for_event!(event)
+    def release_idempotency_lock!(idempotency_key)
       redis = Rails.cache.redis
-      key   = idem_key_for_idempotency_key(idempotency_key)
+      key   = idempotency_lock_key(idempotency_key)
 
       redis.with { |c| !c.del(key).zero? }
     end
@@ -197,7 +197,7 @@ module Eventable
       kwargs.merge!(
         if: Array(kwargs.delete(:if))
               .push(Proc.new {
-                acquire_lock_for_event!(event,
+                acquire_event_lock!(event,
                   wait_on_lock_error: wait_on_lock_error,
                   raise_on_lock_error: raise_on_lock_error
                 )
