@@ -42,7 +42,7 @@ class License < ApplicationRecord
   on_atomic_event 'license.validation.*',
     -> { with_lock('FOR UPDATE SKIP LOCKED') { update(expiry: Time.current + policy.duration.to_i) } rescue nil },
     raise_on_lock_error: true,
-    wait_on_lock_error: true,
+    wait_on_lock: true,
     unless: :expiry?
 
   on_atomic_event 'license.usage.incremented',
