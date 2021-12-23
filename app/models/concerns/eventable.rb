@@ -8,13 +8,22 @@ module Eventable
   class LockNotAcquiredError < StandardError; end
   class LockTimeoutError < StandardError; end
 
-  EVENTABLE_WILDCARD_SENTINEL  = '9f3bc5d9'
+  EVENTABLE_WILDCARD_SENTINEL  = '9f3bc5d9' # Predetermined value since we're distributed
   EVENTABLE_CALLBACK_PREFIX    = '__eventable_'
+  EVENTABLE_IDEMPOTENCY_PREFIX = 'eventable:idem:'
+  EVENTABLE_IDEMPOTENCY_TTL    = 24.hours
   EVENTABLE_LOCK_PREFIX        = 'eventable:lock:'
   EVENTABLE_LOCK_TIMEOUT       = 30.seconds
   EVENTABLE_LOCK_TTL           = 60.seconds
-  EVENTABLE_IDEMPOTENCY_PREFIX = 'eventable:idem:'
-  EVENTABLE_IDEMPOTENCY_TTL    = 24.hours
+  EVENTABLE_LOCK_CMDs          = {
+    release_lock: <<~LUA
+      if redis.call('get', KEYS[1]) == ARGV[1] then
+        return redis.call('del', KEYS[1])
+      else
+        return 0
+      end
+    LUA
+  }
 
   included do
     extend ActiveModel::Callbacks
@@ -22,40 +31,35 @@ module Eventable
     def notify!(event:, idempotency_key: nil)
       callback_key = self.class.callback_key_for_event(event)
       callbacks    = matching_callbacks(callback_key)
-      redis        = Rails.cache.redis
 
       # Skip if an :idempotency_key was provided and has already been processed
       if idempotency_key.present?
-        idem_key = idem_key_for_idempotency_key(idempotency_key)
-
         return unless
-          redis.with { |c| c.set(idem_key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
+          acquire_idem_for_event!(event)
       end
 
       # Run the callbacks
-      statuses = callbacks.map do |key|
-        if ok = run_callbacks(key)
-          event    = key.to_s.delete_prefix(EVENTABLE_CALLBACK_PREFIX)
-          lock_key = lock_key_for_event(event)
+      statuses = callbacks.map do |(key)|
+        run_callbacks(key) do
+          e = key.to_s.delete_prefix(EVENTABLE_CALLBACK_PREFIX)
 
-          # Release the lock
-          redis.with { |c| c.del(lock_key) }
-
-          ok
+          release_lock_for_event!(e)
         end
       end
     rescue
-      if statuses&.none? && idempotency_key.present?
-        idem_key = idem_key_for_idempotency_key(idempotency_key)
-
-        # Release the idempotency lock on complete failure
-        redis.with { |c| c.del(idem_key) }
-      end
+      # Release the idempotency lock on complete failure
+      release_idem_for_event!(event) if
+        idempotency_key.present? &&
+        statuses&.none?
 
       raise
     end
 
     private
+
+    class_attribute :__eventable_lock_ids,
+      instance_writer: false,
+      default: {}
 
     def matching_callbacks(pattern)
       callbacks = __callbacks.select do |key|
@@ -73,15 +77,71 @@ module Eventable
         end
       end
 
-      callbacks.keys
+      callbacks
     end
 
-    def lock_key_for_event(event)
+    def get_lock_key_for_event(event)
       EVENTABLE_LOCK_PREFIX + "#{self.id}:#{self.class.parameterized_callback_key(event)}"
     end
 
-    def idem_key_for_idempotency_key(key)
+    def get_idem_key_for_idempotency_key(key)
       EVENTABLE_IDEMPOTENCY_PREFIX + "#{self.id}:#{key}"
+    end
+
+    def acquire_lock_for_event!(event, wait_on_lock_error:, raise_on_lock_error:)
+      redis = Rails.cache.redis
+      key   = get_lock_key_for_event(event)
+
+      Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
+        loop do
+          val = SecureRandom.hex(8)
+          if redis.with { |c| c.set(key, val, nx: true, ex: EVENTABLE_LOCK_TTL) }
+            __eventable_lock_ids[key] = val
+
+            return true
+          end
+
+          if raise_on_lock_error
+            raise LockNotAcquiredError, 'failed to acquire lock' unless
+              wait_on_lock_error
+          end
+
+          return false unless
+            wait_on_lock_error
+
+          sleep rand(0.1..1.0)
+        end
+      end
+    rescue Timeout::Error
+      raise LockTimeoutError, 'lock timeout' if
+        raise_on_lock_error
+    end
+
+    def release_lock_for_event!(event)
+      redis = Rails.cache.redis
+      lua   = EVENTABLE_LOCK_CMDs[:release_lock]
+      key   = get_lock_key_for_event(event)
+      val   = get_lock_id(key)
+
+      redis.with { |c| !c.eval(lua, keys: [key], argv: [val]).zero? }
+    end
+
+    def get_lock_id(key)
+      __eventable_lock_ids[key]
+    end
+
+    def acquire_idem_for_event!(event)
+      redis = Rails.cache.redis
+      key   = get_idem_key_for_idempotency_key(idempotency_key)
+
+      redis.with { |c| c.set(key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
+    end
+
+    def release_idem_for_event!(event)
+      redis = Rails.cache.redis
+      key   = get_idem_key_for_idempotency_key(idempotency_key)
+
+      redis.with { |c| !c.del(key).zero? }
     end
   end
 
@@ -118,33 +178,16 @@ module Eventable
     end
 
     def on_atomic_event(event, callback, wait_on_lock_error: false, raise_on_lock_error: false, **kwargs)
-      acquire_lock = proc do
-        redis = Rails.cache.redis
-        key   = lock_key_for_event(event)
-        time  = Time.current.to_f
-        nonce = "#{Process.pid}:#{time}"
-
-        loop do
-          break true if
-            redis.with { |c| c.set(key, nonce, nx: true, ex: EVENTABLE_LOCK_TTL) }
-
-          delta_time = Time.current.to_f - time
-          timed_out  = delta_time > EVENTABLE_LOCK_TIMEOUT
-
-          if raise_on_lock_error
-            raise LockNotAcquiredError, 'failed to acquire lock' unless wait_on_lock_error
-            raise LockTimeoutError, 'lock timeout' if timed_out
-          else
-            break false unless wait_on_lock_error
-            break false if timed_out
-          end
-        end
-      end
-
       # Since we're using :if to acquire our lock below, we're going to
       # append our locking proc to any :if params.
       kwargs.merge!(
-        if: Array(kwargs.delete(:if)).push(acquire_lock)
+        if: Array(kwargs.delete(:if))
+              .push(Proc.new {
+                acquire_lock_for_event!(event,
+                  wait_on_lock_error: wait_on_lock_error,
+                  raise_on_lock_error: raise_on_lock_error
+                )
+              })
       )
 
       on_event(event, callback, **kwargs)
