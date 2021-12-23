@@ -102,8 +102,9 @@ module Eventable
       return __eventuable_lua_shas[cmd] if
         __eventuable_lua_shas.key?(cmd)
 
-      __eventuable_lua_shas[cmd] =
-        redis.with { |c| c.script(:load, EVENTABLE_LOCK_CMDs[cmd]) }
+      __eventuable_lua_shas[cmd] = redis.with { |c| c.script(:load, EVENTABLE_LOCK_CMDs[cmd]) }
+
+      __eventuable_lua_shas[cmd]
     end
 
     def acquire_event_lock!(event, wait_on_lock_error:, raise_on_lock_error:)

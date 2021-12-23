@@ -40,13 +40,13 @@ class License < ApplicationRecord
   #   raise_on_lock_error: true
 
   on_atomic_event 'license.validation.*',
-    -> l { with_lock('FOR UPDATE SKIP LOCKED') { update(expiry: Time.current + l.policy.duration.to_i) } rescue nil },
+    -> { with_lock('FOR UPDATE SKIP LOCKED') { update(expiry: Time.current + policy.duration.to_i) } rescue nil },
     raise_on_lock_error: true,
     wait_on_lock_error: true,
     unless: :expiry?
 
   on_atomic_event 'license.usage.incremented',
-    -> l { with_lock('FOR UPDATE SKIP LOCKED') { update(last_used_at: Time.current) } rescue nil },
+    -> { with_lock('FOR UPDATE SKIP LOCKED') { update(last_used_at: Time.current) } rescue nil },
     if: -> { last_used_at.nil? }
 
   on_atomic_event 'machine.created',
