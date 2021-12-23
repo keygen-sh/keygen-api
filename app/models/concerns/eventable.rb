@@ -15,15 +15,7 @@ module Eventable
   EVENTABLE_LOCK_PREFIX        = 'eventable:lock:'
   EVENTABLE_LOCK_TIMEOUT       = 30.seconds
   EVENTABLE_LOCK_TTL           = 60.seconds
-  EVENTABLE_LOCK_CMDs          = {
-    getdel: <<~LUA
-      if redis.call('get', KEYS[1]) == ARGV[1] then
-        return redis.call('del', KEYS[1])
-      else
-        return 0
-      end
-    LUA
-  }
+  EVENTABLE_LUA_SHASUMS        = {}
 
   included do
     extend ActiveModel::Callbacks
@@ -61,10 +53,6 @@ module Eventable
       instance_writer: false,
       default: {}
 
-    class_attribute :__eventuable_lua_shas,
-      instance_writer: false,
-      default: {}
-
     def matching_callbacks(pattern)
       callbacks = __callbacks.select do |key|
         case
@@ -96,24 +84,13 @@ module Eventable
       __eventable_lock_values[key]
     end
 
-    def load_lua_cmd(cmd)
-      redis = Rails.cache.redis
-
-      return __eventuable_lua_shas[cmd] if
-        __eventuable_lua_shas.key?(cmd)
-
-      __eventuable_lua_shas[cmd] = redis.with { |c| c.script(:load, EVENTABLE_LOCK_CMDs[cmd]) }
-
-      __eventuable_lua_shas[cmd]
-    end
-
     def acquire_event_lock!(event, wait_on_lock_error:, raise_on_lock_error:)
       redis = Rails.cache.redis
       key   = event_lock_key(event)
 
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
-          val = SecureRandom.hex(8)
+          val = SecureRandom.hex
           if redis.with { |c| c.set(key, val, nx: true, ex: EVENTABLE_LOCK_TTL) }
             __eventable_lock_values[key] = val
 
@@ -138,11 +115,22 @@ module Eventable
 
     def release_event_lock!(event)
       redis = Rails.cache.redis
-      sha   = load_lua_cmd(:getdel)
       key   = event_lock_key(event)
       val   = lock_key_value(key)
 
-      redis.with { |c| !c.evalsha(sha, keys: [key], argv: [val]).zero? }
+      # Redlock algorithm (see https://redis.io/topics/distlock)
+      cmd = <<~LUA
+        if redis.call('get', KEYS[1]) == ARGV[1] then
+          return redis.call('del', KEYS[1])
+        else
+          return 0
+        end
+      LUA
+
+      shasum =
+        (EVENTABLE_LUA_SHASUMS[:delif] ||= redis.with { |c| c.script(:load, cmd) })
+
+      redis.with { |c| !c.evalsha(shasum, keys: [key], argv: [val]).zero? }
     end
 
     def acquire_idempotency_lock!(idempotency_key)
