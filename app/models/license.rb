@@ -40,7 +40,7 @@ class License < ApplicationRecord
   #   raise_on_lock_error: true
 
   on_atomic_event 'license.validation.*',
-    -> l { License.where(id: l.id, expiry: nil).update(expiry: Time.current + l.policy.duration.to_i) },
+    -> l { License.where(id: l.id, expiry: nil).limit(1).update(expiry: Time.current + l.policy.duration.to_i) },
     raise_on_lock_error: true,
     wait_on_lock_error: true,
     unless: :expiry?
