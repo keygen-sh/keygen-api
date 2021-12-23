@@ -49,7 +49,7 @@ module Eventable
 
     private
 
-    class_attribute :__eventable_lock_values,
+    class_attribute :__eventable_lock_checksums,
       instance_writer: false,
       default: {}
 
@@ -80,8 +80,8 @@ module Eventable
       EVENTABLE_IDEMPOTENCY_PREFIX + "#{self.id}:#{key}"
     end
 
-    def lock_key_value(key)
-      __eventable_lock_values[key]
+    def current_lock_checksum(key)
+      __eventable_lock_checksums[key]
     end
 
     def acquire_event_lock!(event, wait_on_lock_error:, raise_on_lock_error:)
@@ -90,9 +90,9 @@ module Eventable
 
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
-          val = SecureRandom.hex
-          if redis.with { |c| c.set(key, val, nx: true, ex: EVENTABLE_LOCK_TTL) }
-            __eventable_lock_values[key] = val
+          checksum = SecureRandom.hex
+          if redis.with { |c| c.set(key, checksum, nx: true, ex: EVENTABLE_LOCK_TTL) }
+            __eventable_lock_checksums[key] = checksum
 
             return true
           end
@@ -109,14 +109,19 @@ module Eventable
         end
       end
     rescue Timeout::Error
+      # Always release the lock for the current checksum, since Timeout
+      # could (although unlikely), raise after we obtain a lock but before
+      # we exit the method. This makes sure the lock is released.
+      release_event_lock!(key, checksum: checksum)
+
       raise LockTimeoutError, 'lock timeout' if
         raise_on_lock_error
     end
 
-    def release_event_lock!(event)
-      redis = Rails.cache.redis
-      key   = event_lock_key(event)
-      val   = lock_key_value(key)
+    def release_event_lock!(event, checksum: nil)
+      redis      = Rails.cache.redis
+      key        = event_lock_key(event)
+      checksum ||= current_lock_checksum(key)
 
       # Redlock algorithm (see https://redis.io/topics/distlock)
       cmd = <<~LUA
@@ -130,7 +135,7 @@ module Eventable
       shasum =
         (EVENTABLE_LUA_SHASUMS[:delif] ||= redis.with { |c| c.script(:load, cmd) })
 
-      redis.with { |c| !c.evalsha(shasum, keys: [key], argv: [val]).zero? }
+      redis.with { |c| !c.evalsha(shasum, keys: [key], argv: [checksum]).zero? }
     end
 
     def acquire_idempotency_lock!(idempotency_key)
