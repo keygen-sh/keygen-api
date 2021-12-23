@@ -4,7 +4,7 @@
 module Eventable
   extend ActiveSupport::Concern
 
-  class AssociationTooDeepError < StandardError; end
+  class BadAssociationError < StandardError; end
   class LockNotAcquiredError < StandardError; end
   class LockTimeoutError < StandardError; end
 
@@ -167,16 +167,16 @@ module Eventable
         respond_to?(:"before_#{callback_key}")
 
       if reflection = reflect_on_association(through)
-        raise AssociationTooDeepError, 'association is too deep (only immediate associations are allowed for :through)' if
+        raise BadAssociationError, ':through association is too deep (only immediate associations are allowed)' if
           reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
+
+        raise BadAssociationError, ':through association does not have an inverse association' unless
+          reflection.inverse_of.present?
 
         # Wire up the association to listen for the target event and notify
         # the parent (making the association Eventable if not already)
         klass = reflection.klass
         cb    = -> do
-          next unless
-            reflection.inverse_of.present?
-
           inverse = send(reflection.inverse_of.name)
 
           inverse.notify!(event: event)
