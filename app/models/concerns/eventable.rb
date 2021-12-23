@@ -84,7 +84,7 @@ module Eventable
       __eventable_lock_checksums[key]
     end
 
-    def acquire_event_lock!(event, wait_on_lock_error:, raise_on_lock_error:)
+    def acquire_event_lock!(event, raise_on_lock_error:, wait_on_lock:)
       redis = Rails.cache.redis
       key   = event_lock_key(event)
 
@@ -99,11 +99,11 @@ module Eventable
 
           if raise_on_lock_error
             raise LockNotAcquiredError, 'failed to acquire lock' unless
-              wait_on_lock_error
+              wait_on_lock
           end
 
           return false unless
-            wait_on_lock_error
+            wait_on_lock
 
           sleep rand(0.1..1.0)
         end
@@ -185,15 +185,15 @@ module Eventable
       set_callback(callback_key, :before, callback, **kwargs)
     end
 
-    def on_atomic_event(event, callback, wait_on_lock_error: false, raise_on_lock_error: false, **kwargs)
+    def on_atomic_event(event, callback, raise_on_lock_error: false, wait_on_lock: false, **kwargs)
       # Since we're using :if to acquire our lock below, we're going to
       # append our locking proc to any :if params.
       kwargs.merge!(
         if: Array(kwargs.delete(:if))
               .push(Proc.new {
                 acquire_event_lock!(event,
-                  wait_on_lock_error: wait_on_lock_error,
                   raise_on_lock_error: raise_on_lock_error
+                  wait_on_lock: wait_on_lock,
                 )
               })
       )
