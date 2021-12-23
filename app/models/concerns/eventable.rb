@@ -57,7 +57,11 @@ module Eventable
 
     private
 
-    class_attribute :__eventable_lock_ids,
+    class_attribute :__eventable_lock_values,
+      instance_writer: false,
+      default: {}
+
+    class_attribute :__eventuable_lua_shas,
       instance_writer: false,
       default: {}
 
@@ -80,23 +84,37 @@ module Eventable
       callbacks
     end
 
-    def get_lock_key_for_event(event)
+    def lock_key_for_event(event)
       EVENTABLE_LOCK_PREFIX + "#{self.id}:#{self.class.parameterized_callback_key(event)}"
     end
 
-    def get_idem_key_for_idempotency_key(key)
+    def idem_key_for_idempotency_key(key)
       EVENTABLE_IDEMPOTENCY_PREFIX + "#{self.id}:#{key}"
+    end
+
+    def lock_key_value(key)
+      __eventable_lock_values[key]
+    end
+
+    def load_lua_cmd(cmd)
+      redis = Rails.cache.redis
+
+      return __eventuable_lua_shas[cmd] if
+        __eventuable_lua_shas.key?(cmd)
+
+      __eventuable_lua_shas[cmd] =
+        redis.with { |c| c.script(:load, EVENTABLE_LOCK_CMDs[cmd]) }
     end
 
     def acquire_lock_for_event!(event, wait_on_lock_error:, raise_on_lock_error:)
       redis = Rails.cache.redis
-      key   = get_lock_key_for_event(event)
+      key   = lock_key_for_event(event)
 
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
           val = SecureRandom.hex(8)
           if redis.with { |c| c.set(key, val, nx: true, ex: EVENTABLE_LOCK_TTL) }
-            __eventable_lock_ids[key] = val
+            __eventable_lock_values[key] = val
 
             return true
           end
@@ -119,27 +137,23 @@ module Eventable
 
     def release_lock_for_event!(event)
       redis = Rails.cache.redis
-      lua   = EVENTABLE_LOCK_CMDs[:release_lock]
-      key   = get_lock_key_for_event(event)
-      val   = get_lock_id(key)
+      sha   = load_lua_cmd(:release_lock)
+      key   = lock_key_for_event(event)
+      val   = lock_key_value(key)
 
-      redis.with { |c| !c.eval(lua, keys: [key], argv: [val]).zero? }
-    end
-
-    def get_lock_id(key)
-      __eventable_lock_ids[key]
+      redis.with { |c| !c.evalsha(sha, keys: [key], argv: [val]).zero? }
     end
 
     def acquire_idem_for_event!(event)
       redis = Rails.cache.redis
-      key   = get_idem_key_for_idempotency_key(idempotency_key)
+      key   = idem_key_for_idempotency_key(idempotency_key)
 
       redis.with { |c| c.set(key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
     end
 
     def release_idem_for_event!(event)
       redis = Rails.cache.redis
-      key   = get_idem_key_for_idempotency_key(idempotency_key)
+      key   = idem_key_for_idempotency_key(idempotency_key)
 
       redis.with { |c| !c.del(key).zero? }
     end
