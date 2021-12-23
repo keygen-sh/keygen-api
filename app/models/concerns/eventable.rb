@@ -16,7 +16,7 @@ module Eventable
   EVENTABLE_LOCK_TIMEOUT       = 30.seconds
   EVENTABLE_LOCK_TTL           = 60.seconds
   EVENTABLE_LOCK_CMDs          = {
-    release_lock: <<~LUA
+    getdel: <<~LUA
       if redis.call('get', KEYS[1]) == ARGV[1] then
         return redis.call('del', KEYS[1])
       else
@@ -137,7 +137,7 @@ module Eventable
 
     def release_lock_for_event!(event)
       redis = Rails.cache.redis
-      sha   = load_lua_cmd(:release_lock)
+      sha   = load_lua_cmd(:getdel)
       key   = lock_key_for_event(event)
       val   = lock_key_value(key)
 
