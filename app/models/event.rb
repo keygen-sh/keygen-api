@@ -5,7 +5,7 @@ class Event < ApplicationRecord
   belongs_to :event_type
   belongs_to :resource,
     polymorphic: true
-  belongs_to :created_by,
+  belongs_to :initiator,
     polymorphic: true
   belongs_to :request_log,
     optional: true
