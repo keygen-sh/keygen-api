@@ -9,13 +9,19 @@ class EventNotificationWorker
   def perform(event_id)
     event      = Event.find(event_id)
     event_type = event.event_type
-    created_by = event.created_by
+    initiator  = event.initiator
     resource   = event.resource
 
-    created_by.notify!(event: event_type.event, idempotency_key: event.idempotency_key) unless
-      created_by.class < Eventable
+    if initiator.present?
+      initiator.notify!(event: event_type.event, idempotency_key: event.idempotency_key) if
+        initiator.class < Eventable
 
-    resource.notify!(event: event_type.event, idempotency_key: event.idempotency_key) unless
+      # No use in attempting to resend the same idempotent event
+      return if
+        initiator == resource
+    end
+
+    resource.notify!(event: event_type.event, idempotency_key: event.idempotency_key) if
       resource.class < Eventable
   end
 end
