@@ -31,30 +31,30 @@ class License < ApplicationRecord
   has_many :releases, -> l { for_license(l.id) },
     through: :product
 
-  # on_atomic_event 'license.validation.succeeded',
+  # on_mutually_exclusive_event 'license.validation.succeeded',
   #   -> l { puts 'LICENSE VALIDATION SUCCEEDED!' },
   #   raise_on_lock_error: true
 
-  # on_atomic_event 'license.validation.failed',
+  # on_mutually_exclusive_event 'license.validation.failed',
   #   -> l { puts 'LICENSE VALIDATION FAILED!' },
   #   raise_on_lock_error: true
 
-  on_atomic_event 'license.validation.*',
+  on_mutually_exclusive_event 'license.validation.*',
     -> { with_lock('FOR UPDATE SKIP LOCKED') { update(expiry: Time.current + policy.duration.to_i) } rescue nil },
     raise_on_lock_error: true,
     wait_on_lock: true,
     unless: :expiry?
 
-  on_atomic_event 'license.usage.incremented',
+  on_mutually_exclusive_event 'license.usage.incremented',
     -> { with_lock('FOR UPDATE SKIP LOCKED') { update(last_used_at: Time.current) } rescue nil },
     if: -> { last_used_at.nil? }
 
-  on_atomic_event 'machine.created',
+  on_mutually_exclusive_event 'machine.created',
     -> l { puts('='*80 + "\nFIRST MACHINE CREATED FOR LICENSE #{l.id}!\n" + '='*80) },
     through: :machines,
     unless: -> { machines_count > 1 }
 
-  on_atomic_event 'release.downloaded',
+  on_mutually_exclusive_event 'release.downloaded',
     -> l { puts('='*80 + "\nFIRST RELEASE DOWNLOAD FOR LICENSE #{l.id}!\n" + '='*80) }
 
   # Used for legacy encrypted licenses
