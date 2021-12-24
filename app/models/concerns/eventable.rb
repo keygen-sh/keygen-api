@@ -192,7 +192,7 @@ module Eventable
         if: Array(kwargs.delete(:if))
               .push(Proc.new {
                 acquire_event_lock!(event,
-                  raise_on_lock_error: raise_on_lock_error
+                  raise_on_lock_error: raise_on_lock_error,
                   wait_on_lock: wait_on_lock,
                 )
               })
