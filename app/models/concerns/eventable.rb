@@ -20,7 +20,7 @@ module Eventable
   included do
     extend ActiveModel::Callbacks
 
-    def notify!(event:, idempotency_key: nil)
+    def notify_of_event!(event:, idempotency_key: nil)
       callback_key = self.class.callback_key_for_event(event)
       callbacks    = matching_callbacks(callback_key)
 
@@ -45,6 +45,13 @@ module Eventable
         statuses&.none?
 
       raise
+    end
+
+    def listens_to?(event)
+      callback_key = self.class.callback_key_for_event(event)
+      callbacks    = matching_callbacks(callback_key)
+
+      callbacks.any?
     end
 
     private
@@ -173,7 +180,7 @@ module Eventable
         cb    = -> do
           inverse = send(reflection.inverse_of.name)
 
-          inverse.notify!(event: event)
+          inverse.notify_of_event!(event: event)
         end
 
         klass.include(Eventable) unless
