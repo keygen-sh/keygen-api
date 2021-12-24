@@ -13,15 +13,17 @@ class EventNotificationWorker
     resource   = event.resource
 
     if initiator.present?
-      initiator.notify!(event: event_type.event, idempotency_key: event.idempotency_key) if
-        initiator.class < Eventable
+      initiator.notify_of_event!(event: event_type.event, idempotency_key: event.idempotency_key) if
+        initiator.class < Eventable &&
+        initiator.listens_to?(event)
 
       # No use in attempting to resend the same idempotent event
       return if
         initiator == resource
     end
 
-    resource.notify!(event: event_type.event, idempotency_key: event.idempotency_key) if
-      resource.class < Eventable
+    resource.notify_of_event!(event: event_type.event, idempotency_key: event.idempotency_key) if
+      resource.class < Eventable &&
+      initiator.listens_to?(event)
   end
 end
