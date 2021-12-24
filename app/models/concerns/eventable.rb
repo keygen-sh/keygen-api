@@ -192,7 +192,7 @@ module Eventable
       set_callback(callback_key, :before, callback, **kwargs)
     end
 
-    def on_atomic_event(event, callback, raise_on_lock_error: false, wait_on_lock: false, **kwargs)
+    def on_mutually_exclusive_event(event, callback, raise_on_lock_error: false, wait_on_lock: false, **kwargs)
       # Since we're using :if to acquire our lock below, we're going to
       # append our locking proc to any :if params.
       kwargs.merge!(
