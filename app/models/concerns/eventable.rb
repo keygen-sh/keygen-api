@@ -20,7 +20,7 @@ module Eventable
   included do
     extend ActiveModel::Callbacks
 
-    def notify_of_event!(event:, idempotency_key: nil)
+    def notify_of_event!(event, idempotency_key: nil)
       callback_key = self.class.callback_key_for_event(event)
       callbacks    = matching_callbacks(callback_key)
 
@@ -92,8 +92,9 @@ module Eventable
     end
 
     def acquire_event_lock!(event, raise_on_lock_error:, wait_on_lock:)
-      redis = Rails.cache.redis
-      key   = event_lock_key(event)
+      redis    = Rails.cache.redis
+      key      = event_lock_key(event)
+      checksum = nil
 
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
@@ -119,7 +120,8 @@ module Eventable
       # Always release the lock for the current checksum, since Timeout
       # could (although unlikely), raise after we obtain a lock but before
       # we exit the method. This makes sure the lock is released.
-      release_event_lock!(key, checksum: checksum)
+      release_event_lock!(key, checksum: checksum) unless
+        checksum.nil?
 
       raise LockTimeoutError, 'lock timeout' if
         raise_on_lock_error
@@ -167,7 +169,12 @@ module Eventable
       define_model_callbacks(callback_key, only: :before) unless
         respond_to?(:"before_#{callback_key}")
 
-      if reflection = reflect_on_association(through)
+      if through.present? && respond_to?(:reflect_on_association)
+        reflection = reflect_on_association(through)
+
+        raise BadAssociationError, ':through is not a valid association' unless
+          reflection.present?
+
         raise BadAssociationError, ':through association is too deep (only immediate associations are allowed)' if
           reflection.is_a?(ActiveRecord::Reflection::ThroughReflection)
 
@@ -180,7 +187,7 @@ module Eventable
         cb    = -> do
           inverse = send(reflection.inverse_of.name)
 
-          inverse.notify_of_event!(event: event)
+          inverse.notify_of_event!(event)
         end
 
         klass.include(Eventable) unless
