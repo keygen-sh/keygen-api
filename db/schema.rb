@@ -150,9 +150,6 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.integer "max_machines_override"
     t.integer "max_cores_override"
     t.integer "max_uses_override"
-    t.datetime "last_used_at"
-    t.datetime "last_activated_at"
-    t.datetime "last_download_at"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -253,7 +250,6 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.string "fingerprint_matching_strategy"
     t.integer "max_cores"
     t.string "expiration_strategy"
-    t.string "expiration_basis"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
