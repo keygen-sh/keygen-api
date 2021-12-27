@@ -86,8 +86,8 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.uuid "event_type_id", null: false
     t.string "resource_type", null: false
     t.uuid "resource_id", null: false
-    t.string "initiator_type"
-    t.uuid "initiator_id"
+    t.string "whodunnit_type"
+    t.uuid "whodunnit_id"
     t.uuid "request_log_id"
     t.string "idempotency_key"
     t.jsonb "metadata"
@@ -96,9 +96,9 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.index ["account_id"], name: "index_events_on_account_id"
     t.index ["event_type_id"], name: "index_events_on_event_type_id"
     t.index ["idempotency_key"], name: "index_events_on_idempotency_key", unique: true
-    t.index ["initiator_type", "initiator_id"], name: "index_events_on_initiator"
     t.index ["request_log_id"], name: "index_events_on_request_log_id"
     t.index ["resource_type", "resource_id"], name: "index_events_on_resource"
+    t.index ["whodunnit_type", "whodunnit_id"], name: "index_events_on_whodunnit"
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

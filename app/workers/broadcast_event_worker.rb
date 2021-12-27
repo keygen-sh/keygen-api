@@ -17,8 +17,8 @@ class BroadcastEventWorker
     account_id:,
     resource_type:,
     resource_id:,
-    initiator_type:,
-    initiator_id:,
+    whodunnit_type:,
+    whodunnit_id:,
     request_id: nil,
     idempotency_key: nil,
     metadata: nil
@@ -30,8 +30,8 @@ class BroadcastEventWorker
       account_id: account_id,
       resource_type: resource_type,
       resource_id: resource_id,
-      initiator_type: initiator_type,
-      initiator_id: initiator_id,
+      whodunnit_type: whodunnit_type,
+      whodunnit_id: whodunnit_id,
       request_log_id: request_id,
       metadata: metadata,
     )
