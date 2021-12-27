@@ -217,6 +217,7 @@ module Eventable
     def parameterized_callback_key(event)
       event.to_s.sub('*', EVENTABLE_WILDCARD_SENTINEL)
                 .underscore
+                .encode
                 .parameterize(separator: '_')
     end
   end
