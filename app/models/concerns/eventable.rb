@@ -203,8 +203,8 @@ module Eventable
     # on a record cannot be called concurrently, regardless of how many processess/threads. However,
     # it does not guaranteee that only 1 call can occur. More than one invocation may occur, e.g.
     # after the first lock is released, a second lock is acquired in another thread which was called
-    # around the same time as the first (meaning :if/:unless guards returned true). The likihood
-    # of this scenario occuring increases if you use :wait_on_lock.
+    # around the same time as the first (meaning :if/:unless guards returned true). The likelihood
+    # of this scenario occurring increases if you use :wait_on_lock.
     #
     # If you're wanting to invoke a given callback at most one time, then special care should be used
     # inside the callback. In addition to using :if/:unless to check if the callback should be called,
