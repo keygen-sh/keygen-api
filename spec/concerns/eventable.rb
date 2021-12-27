@@ -1,13 +1,10 @@
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, {
-  except: ['event_types']
-}
 
 describe Eventable do
+  before { Rails.cache.clear }
+  after { Rails.cache.clear }
+
   let(:eventable) do
     klass = Struct.new(:id) do
       include ActiveModel::Model
@@ -21,8 +18,13 @@ describe Eventable do
         raise_on_lock_error: true,
         wait_on_lock: true
 
-      on_locked_event 'test.exclusive-event.raise', :callback,
+      on_locked_event 'test.exclusive-event.raise', -> { sleep 5.seconds },
         raise_on_lock_error: true
+
+      # TODO(ezekg) Add ability to set :lock_wait_timeout
+      on_locked_event 'test.exclusive-event.timeout', -> { sleep Eventable::EVENTABLE_LOCK_TIMEOUT + 1.second },
+        raise_on_lock_error: true,
+        wait_on_lock: true
 
       on_locked_event 'test.exclusive-event.wait', :callback,
         wait_on_lock: true
@@ -42,8 +44,6 @@ describe Eventable do
 
       def callback
         @has_been_called_once = true
-
-        sleep 0.1
       end
     end
 
@@ -108,14 +108,26 @@ describe Eventable do
       threads.map(&:join)
     end
 
-    skip 'should raise when an event is locked' do
-      expect(eventable).to receive(:callback).once
-
+    it 'should raise when an event is locked' do
       threads = []
+      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to_not raise_error }
+      threads << Thread.new do
+        sleep 1.second
 
-      # FIXME(ezekg) How do I reliably test this?
-      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to_not raise_error Eventable::LockNotAcquiredError }
-      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to raise_error Eventable::LockNotAcquiredError }
+        expect { eventable.notify_of_event!('test.exclusive-event.raise') }.to raise_error Eventable::LockNotAcquiredError
+      end
+
+      threads.map(&:join)
+    end
+
+    it 'should raise on event lock timeout' do
+      threads = []
+      threads << Thread.new { expect { eventable.notify_of_event!('test.exclusive-event.timeout') }.to_not raise_error }
+      threads << Thread.new do
+        sleep 1.second
+
+        expect { eventable.notify_of_event!('test.exclusive-event.timeout') }.to raise_error Eventable::LockTimeoutError
+      end
 
       threads.map(&:join)
     end
