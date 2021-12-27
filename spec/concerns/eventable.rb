@@ -15,19 +15,19 @@ describe Eventable do
 
       attr_accessor :has_been_called_once
 
-      on_mutually_exclusive_event 'test.exclusive-event', :callback
+      on_locked_event 'test.exclusive-event', :callback
 
-      on_mutually_exclusive_event 'test.exclusive-event.wait-and-raise', :callback,
+      on_locked_event 'test.exclusive-event.wait-and-raise', :callback,
         raise_on_lock_error: true,
         wait_on_lock: true
 
-      on_mutually_exclusive_event 'test.exclusive-event.raise', :callback,
+      on_locked_event 'test.exclusive-event.raise', :callback,
         raise_on_lock_error: true
 
-      on_mutually_exclusive_event 'test.exclusive-event.wait', :callback,
+      on_locked_event 'test.exclusive-event.wait', :callback,
         wait_on_lock: true
 
-      on_mutually_exclusive_event 'test.exclusive-event.once', :callback,
+      on_locked_event 'test.exclusive-event.once', :callback,
         unless: :has_been_called_once?
 
       on_event 'test.event',    :callback
