@@ -16,6 +16,19 @@ class BroadcastEventService < BaseService
     end
 
     begin
+      # FIXME(ezekg) Should pass in the entire JSONAPI :document and require the caller
+      #              to also specify :metadata for the broadcasted event? This would let
+      #              us keep any event data separate from the webhook payload.
+      metadata =
+        case event
+        when /\release\.(downloaded|upgraded)/
+          { prev: meta[:current], next: meta[:next] }
+        when /license\.validation/
+          { code: meta[:constant ] }
+        else
+          nil
+        end
+
       BroadcastEventWorker.perform_async(
         event_name: event,
         account_id: Current.account.id,
@@ -25,7 +38,7 @@ class BroadcastEventService < BaseService
         whodunnit_id: Current.bearer&.id,
         request_id: Current.request_id,
         idempotency_key: SecureRandom.hex,
-        metadata: meta,
+        metadata: metadata,
       )
     rescue => e
       Keygen.logger.exception(e)
