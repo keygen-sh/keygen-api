@@ -98,7 +98,7 @@ module Eventable
       Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
         loop do
           checksum = SecureRandom.hex
-          if redis.with { |c| c.set(key, checksum, nx: true, ex: EVENTABLE_LOCK_TTL) }
+          if redis.with { _1.set(key, checksum, nx: true, ex: EVENTABLE_LOCK_TTL) }
             __eventable_lock_checksums[key] = checksum
 
             return true
@@ -140,23 +140,23 @@ module Eventable
       LUA
 
       shasum =
-        (EVENTABLE_LUA_SHASUMS[:delif] ||= redis.with { |c| c.script(:load, cmd) })
+        (EVENTABLE_LUA_SHASUMS[:delif] ||= redis.with { _1.script(:load, cmd) })
 
-      redis.with { |c| !c.evalsha(shasum, keys: [key], argv: [checksum]).zero? }
+      redis.with { !_1.evalsha(shasum, keys: [key], argv: [checksum]).zero? }
     end
 
     def acquire_idempotency_lock!(idempotency_key)
       redis = Rails.cache.redis
       key   = idempotency_lock_key(idempotency_key)
 
-      redis.with { |c| c.set(key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
+      redis.with { _1.set(key, 1, nx: true, ex: EVENTABLE_IDEMPOTENCY_TTL) }
     end
 
     def release_idempotency_lock!(idempotency_key)
       redis = Rails.cache.redis
       key   = idempotency_lock_key(idempotency_key)
 
-      redis.with { |c| !c.del(key).zero? }
+      redis.with { !_1.del(key).zero? }
     end
   end
 
