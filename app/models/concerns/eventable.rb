@@ -91,12 +91,12 @@ module Eventable
       __eventable_lock_checksums[key]
     end
 
-    def acquire_event_lock!(event, raise_on_lock_error:, wait_on_lock:)
+    def acquire_event_lock!(event, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
       redis    = Rails.cache.redis
       key      = event_lock_key(event)
       checksum = nil
 
-      Timeout.timeout(EVENTABLE_LOCK_TIMEOUT) do
+      Timeout.timeout(lock_wait_timeout) do
         loop do
           checksum = SecureRandom.hex
           if redis.with { _1.set(key, checksum, nx: true, ex: EVENTABLE_LOCK_TTL) }
@@ -213,7 +213,7 @@ module Eventable
     #
     # The locking algorithm used is Redlock (https://redis.io/topics/distlock).
     #
-    def on_locked_event(event, callback, raise_on_lock_error: false, wait_on_lock: false, **kwargs)
+    def on_exclusive_event(event, callback, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: EVENTABLE_LOCK_TIMEOUT, **kwargs)
       # Since we're using :if to acquire our lock below, we're going to
       # append our locking proc to any :if params.
       kwargs.merge!(
@@ -221,6 +221,7 @@ module Eventable
               .push(Proc.new {
                 acquire_event_lock!(event,
                   raise_on_lock_error: raise_on_lock_error,
+                  lock_wait_timeout: lock_wait_timeout,
                   wait_on_lock: wait_on_lock,
                 )
               })
