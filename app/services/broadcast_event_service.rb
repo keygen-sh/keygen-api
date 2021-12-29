@@ -21,11 +21,11 @@ class BroadcastEventService < BaseService
       #              us keep any event data separate from the webhook payload.
       metadata =
         case event
-        when /\release\.(downloaded|upgraded)/
+        when /^release\.upgraded$/
           { prev: meta[:current], next: meta[:next] }
-        when /license\.validation/
+        when /^license\.validation\./
           { code: meta[:constant ] }
-        when /\.update/
+        when /\.updated$/
           { diff: resource.previous_changes }
         else
           nil
