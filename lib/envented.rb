@@ -127,7 +127,7 @@ module Envented
   end
 
   class ExclusiveCallback < Callback
-    def initialize(callback, on: event, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, **kwargs)
+    def initialize(callback, on: event, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, auto_release_lock: true, **kwargs)
       super(callback, **kwargs)
 
       @on                  = on
@@ -135,6 +135,7 @@ module Envented
       @raise_on_lock_error = raise_on_lock_error
       @wait_on_lock        = wait_on_lock
       @lock_wait_timeout   = lock_wait_timeout
+      @auto_release_lock   = auto_release_lock
     end
 
     def call(...)
@@ -152,7 +153,8 @@ module Envented
 
       super(...)
 
-      RedLock.release!(lock_id, checksum: checksum)
+      RedLock.release!(lock_id, checksum: checksum) if
+        @auto_release_lock
     end
 
     private
