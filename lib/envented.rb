@@ -90,23 +90,21 @@ module Envented
     def initialize(callback, if: nil, unless: nil)
       @callback = CallbackMethod.build(callback)
 
-      # FIXME(ezekg) I want to validate keyword args but :if/:unless are reserved words
-      kwargs = {
-        unless: binding.local_variable_get(:unless),
-        if: binding.local_variable_get(:if),
-      }.compact
+      unless_value = binding.local_variable_get(:unless)
+      if_value     = binding.local_variable_get(:if)
 
       raise ArgumentError, 'cannot provide both :if and :unless' if
-        kwargs.key?(:if) && kwargs.key?(:unless)
+        unless_value.present? &&
+        if_value.present?
 
       @guard =
         case
-        when kwargs.key?(:unless)
+        when unless_value.present?
           # We're inverting :unless so that we only have to worry about one type
           # of guard clause result, :if, instead of the 2 types.
-          CallbackMethod.build(kwargs[:unless]).invert
-        when kwargs.key?(:if)
-          CallbackMethod.build(kwargs[:if])
+          CallbackMethod.build(unless_value).invert
+        when if_value.present?
+          CallbackMethod.build(if_value)
         end
     end
 
