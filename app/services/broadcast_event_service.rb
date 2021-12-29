@@ -25,6 +25,8 @@ class BroadcastEventService < BaseService
           { prev: meta[:current], next: meta[:next] }
         when /license\.validation/
           { code: meta[:constant ] }
+        when /\.update/
+          { diff: resource.previous_changes }
         else
           nil
         end
