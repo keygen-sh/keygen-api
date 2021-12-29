@@ -4,7 +4,7 @@ module Envented
   class BadAssociationError < StandardError; end
   class LockNotAcquiredError < StandardError; end
   class LockTimeoutError < StandardError; end
-  class ContextMissingError < StandardError; end
+  class CallbackNotBoundError < StandardError; end
 
   WILDCARD_SYMBOL    = '*'
   IDEMPOTENCY_PREFIX = 'envented:idem:'
@@ -88,7 +88,8 @@ module Envented
 
   class Callback
     def initialize(callback, if: nil, unless: nil)
-      @callback = CallbackMethod.build(callback)
+      @binding  = BindingBox.wrap(nil)
+      @callback = CallbackMethod.build(callback, binding: @binding)
 
       unless_value = binding.local_variable_get(:unless)
       if_value     = binding.local_variable_get(:if)
@@ -102,26 +103,26 @@ module Envented
         when unless_value.present?
           # We're inverting :unless so that we only have to worry about one type
           # of guard clause result, :if, instead of the 2 types.
-          CallbackMethod.build(unless_value).invert
+          CallbackMethod.build(unless_value, binding: @binding).invert
         when if_value.present?
-          CallbackMethod.build(if_value)
+          CallbackMethod.build(if_value, binding: @binding)
         end
     end
 
-    def bind(context)
-      @context = context
+    def bind(binding)
+      @binding.replace(binding)
 
       self
     end
 
     def call
-      raise ContextMissingError, 'no context is bound' if
-        @context.nil?
+      raise CallbackNotBoundError, 'callback must have a binding' unless
+        @binding.present?
 
       return false if
-        @guard.present? && !@guard.bind(@context).call
+        @guard.present? && !@guard.bind(@binding).call
 
-      @callback.bind(@context).call
+      @callback.bind(@binding).call
     end
   end
 
@@ -137,8 +138,8 @@ module Envented
     end
 
     def call(...)
-      raise ContextMissingError, 'no context is bound' if
-        @context.nil?
+      raise CallbackNotBoundError, 'callback must have a binding' if
+        @binding.nil?
 
       checksum = RedLock.acquire!(lock_id,
         raise_on_lock_error: @raise_on_lock_error,
@@ -157,17 +158,17 @@ module Envented
     private
 
     def lock_id
-      [@context.send(@lock_id_method), @on].join(':')
+      [@binding.unwrap.send(@lock_id_method), @on].join(':')
     end
   end
 
   class CallbackMethod
-    def self.build(method)
+    def self.build(method, binding: nil)
       case method
       when Symbol
-        SymbolMethod.new(method)
+        SymbolMethod.new(method, binding: binding)
       when Proc
-        ProcMethod.new(method)
+        ProcMethod.new(method, binding: binding)
       else
         raise ArgumentError, 'must be a symbol or proc'
       end
@@ -175,83 +176,112 @@ module Envented
   end
 
   class SymbolMethod
-    def initialize(method)
+    def initialize(method, binding: nil)
       raise ArgumentError, 'method must be a symbol' unless
         method.is_a?(Symbol)
 
-      @method = method
+      @method  = method
+      @binding = BindingBox.wrap(binding)
     end
 
+    # Invert result using fancy-pants "arrow" function composition. XD
+    #
+    # This will invert the proc without calling it.
+    #
     def invert
-      # Invert result using fancy-pants proc "arrow" composition XD
-      ProcMethod.new(to_proc >>-> { !_1 })
+      ProcMethod.new(to_proc >>-> { !_1 }, binding: @binding)
     end
 
-    def bind(context)
-      @context = context
+    def bind(binding)
+      @binding.replace(binding)
 
       self
     end
 
     def call
-      raise ContextMissingError, 'no context is bound' if
-        @context.nil?
+      raise CallbackNotBoundError, 'callback must have a binding' unless
+        @binding.present?
 
-      to_proc.call(@context)
+      to_proc.call
     end
 
     private
 
     def to_proc
-      Proc.new do |ctx|
-        method = @method
+      _method = @method
 
-        # FIXME(ezekg) Checking method(:).arity doesn't seem to work...
-        ctx.instance_exec do |ctx|
-          send(method, ctx)
-        rescue ArgumentError
-          send(method)
-        end
-      end
+      Proc.new { @binding.unwrap.instance_exec { send(_method) } }
     end
   end
 
   class ProcMethod
-    def initialize(method)
+    def initialize(method, binding: nil)
       raise ArgumentError, 'method must be a proc' unless
         method.is_a?(Proc)
 
-      @method = method
+      @method  = method
+      @binding = BindingBox.wrap(binding)
     end
 
     def invert
-      @method >>= -> { !_1 }
+      @method = @method >>-> { !_1 }
 
       self
     end
 
-    def bind(context)
-      @context = context
+    def bind(binding)
+      @binding.replace(binding)
 
       self
     end
 
     def call
-      raise ContextMissingError, 'no context is bound' if
-        @context.nil?
+      raise CallbackNotBoundError, 'callback must have a binding' unless
+        @binding.present?
 
-      to_proc.call(@context)
+      to_proc.call
     end
 
     private
 
     def to_proc
-      # FIXME(ezekg) I can't get block.arity to work properly...
-      Proc.new do |ctx|
-        ctx.instance_exec(@context, &@method)
-      rescue ArgumentError
-        ctx.instance_exec(&@method)
+      Proc.new { @binding.unwrap.instance_exec(&@method) }
+    end
+  end
+
+  # Wrap our bindings so that they can be passed down the transformation call
+  # chain, e.g. an inverted SymbolMethod gets turned into a ProcMethod but
+  # it needs to keep the previous binding. So we box it up into an object
+  # reference instead of a nullable record passed by value.
+  #
+  class BindingBox
+    def self.wrap(value)
+      return value if
+        value.class <= BindingBox
+
+      new(value)
+    end
+
+    def unwrap
+      @value
+    end
+
+    def replace(v)
+      if v.class <= BindingBox
+        @value = v.unwrap
+      else
+        @value = v
       end
+    end
+
+    def present?
+      @value.present?
+    end
+
+    private
+
+    def initialize(value)
+      @value = value
     end
   end
 

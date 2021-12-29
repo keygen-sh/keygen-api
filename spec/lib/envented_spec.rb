@@ -133,10 +133,8 @@ describe Envented do
     eventable.notify_of_event!('test.callback.proc')
   end
 
-  it 'should invoke a proc callback with an arity of 1' do
-    expect(eventable).to receive(:callback_with_args)
-
-    eventable.notify_of_event!('test.callback.proc-args')
+  it 'should raise an error when proc callback has incorrect arity' do
+    expect { eventable.notify_of_event!('test.callback.proc-args') }.to raise_error ArgumentError
   end
 
   it 'should invoke a symbol callback with an arity of 0' do
@@ -145,10 +143,8 @@ describe Envented do
     eventable.notify_of_event!('test.callback.symbol')
   end
 
-  it 'should invoke a symbol callback with an arity of 1' do
-    expect(eventable).to receive(:callback_with_args)
-
-    eventable.notify_of_event!('test.callback.symbol-args')
+  it 'should raise an error when symbol callback has incorrect arity' do
+    expect { eventable.notify_of_event!('test.callback.symbol-args') }.to raise_error ArgumentError
   end
 
   it 'should invoke callbacks on a wildcard suffix event' do
@@ -180,102 +176,70 @@ describe Envented do
   end
 
   context 'when using an :if guard clause' do
-    it 'should invoke callbacks when :if is a proc/0 that returns true' do
+    it 'should invoke callbacks when :if is a proc that returns true' do
       expect(eventable).to receive(:callback)
 
       eventable.notify_of_event!('test.if-proc.true')
     end
 
-    it 'should not invoke callbacks when :if is a proc/0 that returns false' do
+    it 'should not invoke callbacks when :if is a proc that returns false' do
       expect(eventable).to_not receive(:callback)
 
       eventable.notify_of_event!('test.if-proc.false')
     end
 
-    it 'should invoke callbacks when :if is a proc/1 that returns true' do
-      expect(eventable).to receive(:callback)
-
-      eventable.notify_of_event!('test.if-proc-args.true')
+    it 'should raise an error when :if proc has incorrect arity' do
+      expect { eventable.notify_of_event!('test.if-proc-args.true') }.to raise_error ArgumentError
     end
 
-    it 'should not invoke callbacks when :if is a proc/1 that returns false' do
-      expect(eventable).to_not receive(:callback)
-
-      eventable.notify_of_event!('test.if-proc-args.false')
-    end
-
-    it 'should invoke callbacks when :if is a method/0 symbol that returns true' do
+    it 'should invoke callbacks when :if is a method symbol that returns true' do
       expect(eventable).to receive(:callback)
 
       eventable.notify_of_event!('test.if-symbol.true')
     end
 
-    it 'should not invoke callbacks when :if is a method/0 symbol that returns false' do
+    it 'should not invoke callbacks when :if is a method symbol that returns false' do
       expect(eventable).to_not receive(:callback)
 
       eventable.notify_of_event!('test.if-symbol.false')
     end
 
-    it 'should invoke callbacks when :if is a method/1 symbol that returns true' do
-      expect(eventable).to receive(:callback)
-
-      eventable.notify_of_event!('test.if-symbol-args.true')
-    end
-
-    it 'should not invoke callbacks when :if is a method/1 symbol that returns false' do
-      expect(eventable).to_not receive(:callback)
-
-      eventable.notify_of_event!('test.if-symbol-args.false')
+    it 'should raise an error when :if method symbol has incorrect arity' do
+      expect { eventable.notify_of_event!('test.if-symbol-args.true') }.to raise_error ArgumentError
     end
   end
 
   context 'when using an :unless guard clause' do
-    it 'should not invoke callbacks when :unless is a proc/0 that returns true' do
+    it 'should not invoke callbacks when :unless is a proc that returns true' do
       expect(eventable).to_not receive(:callback)
 
       eventable.notify_of_event!('test.unless-proc.true')
     end
 
-    it 'should invoke callbacks when :unless is a proc/0 that returns false' do
+    it 'should invoke callbacks when :unless is a proc that returns false' do
       expect(eventable).to receive(:callback)
 
       eventable.notify_of_event!('test.unless-proc.false')
     end
 
-    it 'should not invoke callbacks when :unless is a proc/1 that returns true' do
-      expect(eventable).to_not receive(:callback)
-
-      eventable.notify_of_event!('test.unless-proc-args.true')
+    it 'should raise an error when :unless proc has incorrect arity' do
+      expect { eventable.notify_of_event!('test.unless-proc-args.true') }.to raise_error ArgumentError
     end
 
-    it 'should invoke callbacks when :unless is a proc/1 that returns false' do
-      expect(eventable).to receive(:callback)
-
-      eventable.notify_of_event!('test.unless-proc-args.false')
-    end
-
-    it 'should not invoke callbacks when :unless is a method/0 symbol that returns true' do
+    it 'should not invoke callbacks when :unless is a method symbol that returns true' do
       expect(eventable).to_not receive(:callback)
 
       eventable.notify_of_event!('test.unless-symbol.true')
     end
 
-    it 'should invoke callbacks when :unless is a method/0 symbol that returns false' do
+    it 'should invoke callbacks when :unless is a method symbol that returns false' do
       expect(eventable).to receive(:callback)
 
       eventable.notify_of_event!('test.unless-symbol.false')
     end
 
-    it 'should not invoke callbacks when :unless is a method/1 symbol that returns true' do
-      expect(eventable).to_not receive(:callback)
-
-      eventable.notify_of_event!('test.unless-symbol-args.true')
-    end
-
-    it 'should invoke callbacks when :unless is a method/1 symbol that returns false' do
-      expect(eventable).to receive(:callback)
-
-      eventable.notify_of_event!('test.unless-symbol-args.false')
+    it 'should raise an error when :unless method symbol has incorrect arity' do
+      expect { eventable.notify_of_event!('test.unless-symbol-args.true') }.to raise_error ArgumentError
     end
   end
 
