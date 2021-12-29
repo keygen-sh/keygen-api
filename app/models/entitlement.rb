@@ -3,6 +3,12 @@
 class Entitlement < ApplicationRecord
   include Limitable
   include Pageable
+  include Searchable
+
+  SEARCH_ATTRIBUTES    = %i[id name code].freeze
+  SEARCH_RELATIONSHIPS = {}.freeze
+
+  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
