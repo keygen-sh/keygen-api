@@ -224,14 +224,14 @@ module Envented
       @method = method
     end
 
-    def bind(context)
-      @context = context
+    def invert
+      @method >>= -> { !_1 }
 
       self
     end
 
-    def invert
-      @method >>= -> { !_1 }
+    def bind(context)
+      @context = context
 
       self
     end
