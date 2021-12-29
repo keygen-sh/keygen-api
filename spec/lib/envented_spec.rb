@@ -43,6 +43,14 @@ describe Envented do
       on_exclusive_event 'test.exclusive-event.once', :callback_once,
         unless: :has_been_called?
 
+      on_exclusive_event 'test.exclusive-event.auto-release-enabled', :callback,
+        raise_on_lock_error: true,
+        auto_release_lock: true
+
+      on_exclusive_event 'test.exclusive-event.auto-release-disabled', :callback,
+        raise_on_lock_error: true,
+        auto_release_lock: false
+
       on_event 'test.event',    :callback
       on_event 'test.suffix.*', :callback
       on_event '*.test.prefix', :callback
@@ -240,6 +248,18 @@ describe Envented do
 
     it 'should raise an error when :unless method symbol has incorrect arity' do
       expect { eventable.notify_of_event!('test.unless-symbol-args.true') }.to raise_error ArgumentError
+    end
+  end
+
+  context 'when using :auto_release_lock' do
+    it 'should automatically release the lock when true' do
+      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
+      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-enabled') }.to_not raise_error
+    end
+
+    it 'should not automatically release the lock when false' do
+      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-disabled') }.to_not raise_error
+      expect { eventable.notify_of_event!('test.exclusive-event.auto-release-disabled') }.to raise_error Envented::LockNotAcquiredError
     end
   end
 
