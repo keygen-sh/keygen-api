@@ -79,7 +79,7 @@ module Envented
       # The locking algorithm used is Redlock (https://redis.io/topics/distlock).
       #
       def on_exclusive_event(event, callback, **kwargs)
-        exclusive_callback = ExclusiveCallback.new(event, callback, **kwargs)
+        exclusive_callback = ExclusiveCallback.new(callback, on: event, **kwargs)
 
         on_event(event, exclusive_callback, **kwargs)
       end
@@ -126,10 +126,10 @@ module Envented
   end
 
   class ExclusiveCallback < Callback
-    def initialize(event, callback, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, **kwargs)
+    def initialize(callback, on: event, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, **kwargs)
       super(callback, **kwargs)
 
-      @event               = event
+      @on                  = on
       @lock_id_method      = lock_id_method
       @raise_on_lock_error = raise_on_lock_error
       @wait_on_lock        = wait_on_lock
@@ -140,9 +140,7 @@ module Envented
       raise ContextMissingError, 'no context is bound' if
         @context.nil?
 
-      checksum = RedLock.acquire!(
-        @event,
-        id: @context.send(@lock_id_method),
+      checksum = RedLock.acquire!(lock_id,
         raise_on_lock_error: @raise_on_lock_error,
         wait_on_lock: @wait_on_lock,
         lock_wait_timeout: @lock_wait_timeout,
@@ -153,11 +151,13 @@ module Envented
 
       super(...)
 
-      RedLock.release!(
-        @event,
-        id: @context.send(@lock_id_method),
-        checksum: checksum,
-      )
+      RedLock.release!(lock_id, checksum: checksum)
+    end
+
+    private
+
+    def lock_id
+      [@context.send(@lock_id_method), @on].join(':')
     end
   end
 
@@ -289,8 +289,8 @@ module Envented
 
   # See: https://redis.io/topics/distlock
   class RedLock
-    def self.acquire!(event, id:, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
-      key      = Envented::LOCK_PREFIX + "#{id}:#{event}"
+    def self.acquire!(id, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
+      key      = Envented::LOCK_PREFIX + id
       checksum = nil
 
       Timeout.timeout(lock_wait_timeout) do
@@ -315,15 +315,15 @@ module Envented
       # Always attempt to release the lock for the current checksum on error,
       # since Timeout could, although unlikely, raise after we obtain a lock
       # but before we exit the method. This ensures the lock is released.
-      release!(event, id: id, checksum: checksum) unless
+      release!(id, checksum: checksum) unless
         checksum.nil?
 
       raise LockTimeoutError, 'lock timeout' if
         raise_on_lock_error
     end
 
-    def self.release!(event, id:, checksum:)
-      key = Envented::LOCK_PREFIX + "#{id}:#{event}"
+    def self.release!(id, checksum:)
+      key = Envented::LOCK_PREFIX + id
       cmd = <<~LUA
         if redis.call('get', KEYS[1]) == ARGV[1] then
           return redis.call('del', KEYS[1])
