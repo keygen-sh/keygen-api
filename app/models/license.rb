@@ -6,7 +6,6 @@ class License < ApplicationRecord
   include Pageable
   include Roleable
   include Searchable
-  include Eventable
 
   SEARCH_ATTRIBUTES = %i[id key name metadata].freeze
   SEARCH_RELATIONSHIPS = {
