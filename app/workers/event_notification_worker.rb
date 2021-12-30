@@ -6,14 +6,14 @@ class EventNotificationWorker
   sidekiq_options queue: :events,
                   lock: :until_executed
 
-  def perform(event_id)
-    event      = Event.find(event_id)
-    event_type = event.event_type
-    whodunnit  = event.whodunnit
-    resource   = event.resource
+  def perform(event_log_id)
+    event_log  = EventLog.find(event_log_id)
+    event_type = event_log.event_type
+    whodunnit  = event_log.whodunnit
+    resource   = event_log.resource
 
     if whodunnit.present?
-      whodunnit.notify_of_event!(event_type.event, idempotency_key: event.idempotency_key) if
+      whodunnit.notify_of_event!(event_type.event, idempotency_key: event_log.idempotency_key) if
         resource.respond_to?(:notify_of_event!)
 
       # No use in attempting to resend the same idempotent event
@@ -21,7 +21,7 @@ class EventNotificationWorker
         whodunnit == resource
     end
 
-    resource.notify_of_event!(event_type.event, idempotency_key: event.idempotency_key) if
+    resource.notify_of_event!(event_type.event, idempotency_key: event_log.idempotency_key) if
       resource.respond_to?(:notify_of_event!)
   end
 end
