@@ -6,9 +6,6 @@ require 'spec_helper'
 require_dependency Rails.root.join "lib", "envented"
 
 describe Envented do
-  before { Rails.cache.clear }
-  after { Rails.cache.clear }
-
   let(:eventable) do
     klass = Class.new do
       include Envented::Callbacks
