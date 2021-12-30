@@ -180,6 +180,18 @@ describe Envented do
     eventable.notify_of_event!('test.event', idempotency_key: SecureRandom.hex)
   end
 
+  it 'should invoke callback for all events' do
+    expect(eventable).to receive(:callback).exactly(32).times
+
+    threads = []
+
+    32.times do
+      threads << Thread.new { eventable.notify_of_event!('test.event') }
+    end
+
+    threads.map(&:join)
+  end
+
   context 'when using an :if guard clause' do
     it 'should invoke callbacks when :if is a proc that returns true' do
       expect(eventable).to receive(:callback)
