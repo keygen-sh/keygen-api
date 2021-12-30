@@ -26,7 +26,7 @@ class License < ApplicationRecord
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
-  has_many :events,
+  has_many :event_logs,
     as: :resource
   has_many :releases, -> l { for_license(l.id) },
     through: :product

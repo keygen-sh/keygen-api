@@ -33,7 +33,7 @@ class BroadcastEventService < BaseService
         end
 
       BroadcastEventWorker.perform_async(
-        event_name: event,
+        event: event,
         account_id: Current.account.id,
         resource_type: resource.class.name,
         resource_id: resource.id,
