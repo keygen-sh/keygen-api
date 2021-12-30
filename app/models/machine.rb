@@ -4,6 +4,7 @@ class Machine < ApplicationRecord
   include Limitable
   include Pageable
   include Searchable
+  include Diffable
 
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes

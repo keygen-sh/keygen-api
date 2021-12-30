@@ -4,6 +4,7 @@ class Entitlement < ApplicationRecord
   include Limitable
   include Pageable
   include Searchable
+  include Diffable
 
   SEARCH_ATTRIBUTES    = %i[id name code].freeze
   SEARCH_RELATIONSHIPS = {}.freeze

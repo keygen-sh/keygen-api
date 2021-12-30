@@ -26,7 +26,8 @@ class BroadcastEventService < BaseService
         when /^license\.validation\./
           { code: meta[:constant ] }
         when /\.updated$/
-          { diff: resource.previous_changes }
+          { diff: resource.to_diff } if
+            resource.class < Diffable
         else
           nil
         end
