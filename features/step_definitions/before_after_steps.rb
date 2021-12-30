@@ -17,7 +17,7 @@ Before do
   ActionMailer::Base.deliveries.clear
   Sidekiq::Worker.clear_all
   StripeHelper.start
-  Rails.cache.clear
+  Rails.cache.clear(namespace: "test_#{ENV['TEST_ENV_NUMBER']}")
 
   stub_account_keygens
   stub_cache
@@ -53,12 +53,7 @@ After do |scenario|
     )
   end
 
-  # Clear redis cache keys
-  begin
-    Rails.cache.clear
-  rescue => e
-    log '[REDIS]', e
-  end
+  Rails.cache.clear(namespace: "test_#{ENV['TEST_ENV_NUMBER']}")
 
   @account = nil
   @token = nil
