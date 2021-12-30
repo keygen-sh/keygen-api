@@ -37,7 +37,11 @@ describe Envented do
       on_exclusive_event 'test.exclusive-event.wait', :callback,
         wait_on_lock: true
 
-      on_exclusive_event 'test.exclusive-event.once', :callback_once,
+      on_exclusive_event 'test.exclusive-event.once-without-auto-release', :callback_once,
+        auto_release_lock: false,
+        unless: :has_been_called?
+
+      on_exclusive_event 'test.exclusive-event.once-with-auto-release', :callback_once,
         unless: :has_been_called?
 
       on_exclusive_event 'test.exclusive-event.auto-release-enabled', :callback,
@@ -321,14 +325,29 @@ describe Envented do
       threads.map(&:join)
     end
 
-    it 'should notify for an event once' do
+    it 'should notify once for a low volume concurrent event with an auto-released lock' do
       expect(eventable).to receive(:callback).once
 
       threads = []
 
-      # FIXME(ezekg) This should probably be physical core count?
+      # FIXME(ezekg) Using 4 here is a "magic number" based on CPU core
+      #              count. We're only trying to test concurrent lock
+      #              access, and guard behavior, ensuring contested
+      #              access is thrown out.
       4.times do |i|
-        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.once') }
+        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.once-with-auto-release') }
+      end
+
+      threads.map(&:join)
+    end
+
+    it 'should notify once for a high volume concurrent event without an auto-released lock' do
+      expect(eventable).to receive(:callback).once
+
+      threads = []
+
+      64.times do |i|
+        threads << Thread.new { eventable.notify_of_event!('test.exclusive-event.once-without-auto-release') }
       end
 
       threads.map(&:join)
