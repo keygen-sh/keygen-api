@@ -14,12 +14,9 @@ describe MachineHeartbeatWorker do
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
     Sidekiq::Testing.fake!
-    Sidekiq.redis &:flushdb
   end
 
   after do
-    Sidekiq.redis &:flushdb
-    Sidekiq::Worker.clear_all
     DatabaseCleaner.clean
   end
 
