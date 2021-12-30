@@ -4,6 +4,7 @@ class Key < ApplicationRecord
   include Limitable
   include Pageable
   include Searchable
+  include Diffable
 
   SEARCH_ATTRIBUTES = %i[id key].freeze
   SEARCH_RELATIONSHIPS = {
