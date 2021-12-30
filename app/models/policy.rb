@@ -4,6 +4,7 @@ class Policy < ApplicationRecord
   include Limitable
   include Pageable
   include Searchable
+  include Diffable
 
   CRYPTO_SCHEMES = %w[
     LEGACY_ENCRYPT

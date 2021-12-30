@@ -5,6 +5,7 @@ class Product < ApplicationRecord
   include Pageable
   include Roleable
   include Searchable
+  include Diffable
 
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {}.freeze

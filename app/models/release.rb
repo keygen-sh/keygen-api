@@ -3,6 +3,7 @@
 class Release < ApplicationRecord
   include Limitable
   include Pageable
+  include Diffable
 
   belongs_to :account,
     inverse_of: :releases

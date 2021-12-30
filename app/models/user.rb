@@ -8,6 +8,7 @@ class User < ApplicationRecord
   include Pageable
   include Roleable
   include Searchable
+  include Diffable
 
   SEARCH_ATTRIBUTES = [:id, :email, :first_name, :last_name, :metadata, { full_name: [:first_name, :last_name] }].freeze
   SEARCH_RELATIONSHIPS = { role: %i[name] }.freeze
