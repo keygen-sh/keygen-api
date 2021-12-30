@@ -13,7 +13,7 @@ class BroadcastEventWorker
   private
 
   def perform_with_kwargs(
-    event_name:,
+    event:,
     account_id:,
     resource_type:,
     resource_id:,
@@ -23,8 +23,8 @@ class BroadcastEventWorker
     idempotency_key: nil,
     metadata: nil
   )
-    event_type = fetch_event_type_by_event(event_name)
-    event      = Event.create!(
+    event_type = fetch_event_type_by_event(event)
+    event_log  = EventLog.create!(
       idempotency_key: idempotency_key,
       event_type_id: event_type.id,
       account_id: account_id,
@@ -36,14 +36,14 @@ class BroadcastEventWorker
       metadata: metadata,
     )
 
-    EventNotificationWorker.perform_async(event.id)
+    EventNotificationWorker.perform_async(event_log.id)
   end
 
-  def fetch_event_type_by_event(event_name)
-    cache_key = EventType.cache_key(event_name)
+  def fetch_event_type_by_event(event)
+    cache_key = EventType.cache_key(event)
 
     cache.fetch(cache_key, skip_nil: true, expires_in: 1.day) do
-      EventType.find_or_create_by!(event: event_name)
+      EventType.find_or_create_by!(event: event)
     end
   end
 

@@ -74,14 +74,7 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.index ["code"], name: "index_entitlements_on_code"
   end
 
-  create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "event"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["event"], name: "index_event_types_on_event", unique: true
-  end
-
-  create_table "events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+  create_table "event_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "event_type_id", null: false
     t.string "resource_type", null: false
@@ -93,12 +86,19 @@ ActiveRecord::Schema.define(version: 2021_12_20_155108) do
     t.jsonb "metadata"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["account_id"], name: "index_events_on_account_id"
-    t.index ["event_type_id"], name: "index_events_on_event_type_id"
-    t.index ["idempotency_key"], name: "index_events_on_idempotency_key", unique: true
-    t.index ["request_log_id"], name: "index_events_on_request_log_id"
-    t.index ["resource_type", "resource_id"], name: "index_events_on_resource"
-    t.index ["whodunnit_type", "whodunnit_id"], name: "index_events_on_whodunnit"
+    t.index ["account_id"], name: "index_event_logs_on_account_id"
+    t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
+    t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
+    t.index ["request_log_id"], name: "index_event_logs_on_request_log_id"
+    t.index ["resource_type", "resource_id"], name: "index_event_logs_on_resource"
+    t.index ["whodunnit_type", "whodunnit_id"], name: "index_event_logs_on_whodunnit"
+  end
+
+  create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "event"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
