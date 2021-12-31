@@ -35,6 +35,14 @@ class Policy < ApplicationRecord
     REVOKE_ACCESS
   ].freeze
 
+  EXPIRATION_BASES = %w[
+    FROM_CREATION
+    FROM_FIRST_VALIDATION
+    FROM_FIRST_ACTIVATION
+    FROM_FIRST_DOWNLOAD
+    FROM_FIRST_USE
+  ].freeze
+
   SEARCH_ATTRIBUTES = %i[id name metadata].freeze
   SEARCH_RELATIONSHIPS = {
     product: %i[id name]
@@ -58,6 +66,7 @@ class Policy < ApplicationRecord
   before_create -> { self.fingerprint_uniqueness_strategy = 'UNIQUE_PER_LICENSE' }, if: -> { fingerprint_uniqueness_strategy.nil? }
   before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
+  before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -84,6 +93,7 @@ class Policy < ApplicationRecord
   validates :fingerprint_uniqueness_strategy, inclusion: { in: FINGERPRINT_UNIQUENESS_STRATEGIES, message: "unsupported fingerprint uniqueness strategy" }, allow_nil: true
   validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
+  validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -179,6 +189,30 @@ class Policy < ApplicationRecord
       expiration_strategy.nil?
 
     expiration_strategy == 'REVOKE_ACCESS'
+  end
+
+  def expire_from_creation?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      expiration_basis.nil?
+
+    expiration_basis == 'FROM_CREATION'
+  end
+
+  def expire_from_first_validation?
+    expiration_basis == 'FROM_FIRST_VALIDATION'
+  end
+
+  def expire_from_first_activation?
+    expiration_basis == 'FROM_FIRST_ACTIVATION'
+  end
+
+  def expire_from_first_use?
+    expiration_basis == 'FROM_FIRST_USE'
+  end
+
+  def expire_from_first_download?
+    expiration_basis == 'FROM_FIRST_DOWNLOAD'
   end
 
   def pop!
