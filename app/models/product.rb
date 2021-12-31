@@ -19,6 +19,7 @@ class Product < ApplicationRecord
   search attributes: SEARCH_ATTRIBUTES
 
   belongs_to :account
+  has_one :role, as: :resource, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
@@ -29,7 +30,8 @@ class Product < ApplicationRecord
   has_many :release_platforms, through: :releases, source: :platform
   has_many :release_channels, through: :releases, source: :channel
   has_many :release_artifacts, inverse_of: :product
-  has_one :role, as: :resource, dependent: :destroy
+  has_many :event_logs,
+    as: :resource
 
   after_create :set_role
 

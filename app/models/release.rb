@@ -54,6 +54,8 @@ class Release < ApplicationRecord
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
     dependent: :delete
+  has_many :event_logs,
+    as: :resource
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
   accepts_nested_attributes_for :platform

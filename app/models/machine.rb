@@ -24,6 +24,8 @@ class Machine < ApplicationRecord
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
+  has_many :event_logs,
+    as: :resource
 
   # Update license's total core count on machine create, update and destroy
   after_create :update_machines_core_count_on_create

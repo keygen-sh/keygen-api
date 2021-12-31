@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :releases, -> u { for_user(u.id) },
     through: :products
+  has_many :event_logs,
+    as: :resource
 
   accepts_nested_attributes_for :role, update_only: true
 
