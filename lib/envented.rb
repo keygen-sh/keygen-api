@@ -334,7 +334,7 @@ module Envented
           end
 
           if raise_on_lock_error
-            raise LockNotAcquiredError, 'failed to lock lock' unless
+            raise LockNotAcquiredError, 'failed to acquire lock' unless
               wait_on_lock
           end
 
