@@ -17,6 +17,8 @@ class Entitlement < ApplicationRecord
   has_many :release_entitlement_constraints,
     inverse_of: :entitlement,
     dependent: :delete_all
+  has_many :event_logs,
+    as: :resource
 
   validates :account, presence: { message: 'must exist' }
 
