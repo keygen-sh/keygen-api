@@ -22,16 +22,8 @@ module Api::V1::Licenses::Actions
 
       Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
-      if @license.present?
-        Current.resource = @license
-
-        BroadcastEventService.call(
-          event: valid ? "license.validation.succeeded" : "license.validation.failed",
-          account: current_account,
-          resource: @license,
-          meta: meta
-        )
-      end
+      Current.resource = @license if
+        @license.present?
 
       render jsonapi: @license, meta: meta
     end
