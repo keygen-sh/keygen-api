@@ -211,9 +211,10 @@ module Envented
     private
 
     def to_proc
-      _method = @method
+      _binding = @binding
+      _method  = @method
 
-      Proc.new { @binding.unwrap.instance_exec { send(_method) } }
+      Proc.new { _binding.unwrap.instance_exec { send(_method) } }
     end
   end
 
@@ -248,7 +249,10 @@ module Envented
     private
 
     def to_proc
-      Proc.new { @binding.unwrap.instance_exec(&@method) }
+      _binding = @binding
+      _method  = @method
+
+      Proc.new { _binding.unwrap.instance_exec(&_method) }
     end
   end
 
