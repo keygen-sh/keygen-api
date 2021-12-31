@@ -84,8 +84,8 @@ Feature: License validation actions
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a check-in license that is overdue
@@ -126,7 +126,7 @@ Feature: License validation actions
       { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that is valid
@@ -171,8 +171,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a suspended license
@@ -218,8 +218,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "is suspended", "constant": "SUSPENDED" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict floating license that has too many machines
@@ -266,7 +266,7 @@ Feature: License validation actions
       { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machines
@@ -305,8 +305,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too many machines
@@ -345,8 +345,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a non-strict license that has too many machine cores
@@ -388,8 +388,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has too many machine cores
@@ -431,8 +431,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "has too many associated machine cores", "constant": "TOO_MANY_CORES" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license that has not been used
@@ -463,8 +463,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict floating license that has not been used
@@ -496,8 +496,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "must have at least 1 associated machine", "constant": "NO_MACHINES" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a strict license that has not been used
@@ -529,8 +529,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "must have exactly 1 associated machine", "constant": "NO_MACHINE" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (restrict strategy)
@@ -565,8 +565,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin quick validates a license by key that is expired (revoke strategy)
@@ -601,8 +601,8 @@ Feature: License validation actions
       """
       { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a floating license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -636,8 +636,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin validates a node-locked license scoped to a mismatched machine fingerprint, but the license has no machines
@@ -671,8 +671,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" jobs
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a product scope
@@ -705,8 +705,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a policy scope
@@ -739,8 +739,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a machine scope
@@ -773,8 +773,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: An admin quick validates a valid license that requires a fingerprint scope
@@ -807,8 +807,8 @@ Feature: License validation actions
       """
       { "valid": true, "detail": "is valid", "constant": "VALID" }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   # License validation
