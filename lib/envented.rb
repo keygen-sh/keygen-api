@@ -161,7 +161,7 @@ module Envented
     private
 
     def lock_id
-      [@binding.unwrap.send(@lock_id_method), @on].join(':')
+      @lock_id ||= [@binding.unwrap.send(@lock_id_method), @on].join(':')
     end
   end
 
