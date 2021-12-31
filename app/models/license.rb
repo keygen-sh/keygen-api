@@ -38,7 +38,7 @@ class License < ApplicationRecord
   before_create :enforce_license_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { policy.present? && requires_check_in? }
-  before_create :set_expiry_from_creation, if: -> { expiry.nil? && policy.present? }
+  before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
   after_create :set_role
@@ -501,7 +501,7 @@ class License < ApplicationRecord
     self.last_check_in_at = Time.current
   end
 
-  def set_expiry_from_creation
+  def set_expiry_on_creation
     return unless
       expire_from_creation? &&
       duration.present? &&
