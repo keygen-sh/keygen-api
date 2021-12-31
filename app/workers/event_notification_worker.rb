@@ -3,8 +3,8 @@
 class EventNotificationWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :events,
-                  lock: :until_executed
+  sidekiq_options lock: :until_executed,
+                  queue: :logs
 
   def perform(event_log_id)
     event_log  = EventLog.find(event_log_id)
