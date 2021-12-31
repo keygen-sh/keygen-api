@@ -35,13 +35,13 @@ module Envented
         # Skip if an :idempotency_key was provided and has already been processed
         if idempotency_key.present?
           return unless
-            IdempotencyLock.acquire(idempotency_key)
+            IdempotencyLock.lock(idempotency_key)
         end
 
         statuses = callbacks.map { |_, c| c.bind(self).call }
       rescue
         # Release the idempotency lock on complete failure
-        IdempotencyLock.release(idempotency_key) if
+        IdempotencyLock.unlock(idempotency_key) if
           idempotency_key.present? &&
           statuses&.none?
 
@@ -142,19 +142,20 @@ module Envented
       raise CallbackNotBoundError, 'callback must have a binding' if
         @binding.nil?
 
-      checksum = RedLock.acquire!(lock_id,
+      token = RedLock.lock!(lock_id,
         raise_on_lock_error: @raise_on_lock_error,
         wait_on_lock: @wait_on_lock,
         lock_wait_timeout: @lock_wait_timeout,
       )
 
       return false if
-        checksum.nil?
+        token.nil?
 
       super(...)
-
-      RedLock.release!(lock_id, checksum: checksum) if
-        @auto_release_lock
+    ensure
+      RedLock.unlock!(lock_id, token: token) if
+        @auto_release_lock &&
+        token.present?
     end
 
     private
@@ -288,24 +289,24 @@ module Envented
   end
 
   class IdempotencyLock
-    def self.acquire!(key)
+    def self.lock!(key)
       redis { _1.set(Envented::IDEMPOTENCY_PREFIX + key, 1, nx: true, ex: Envented::IDEMPOTENCY_TTL) }
     end
 
-    def self.acquire(...)
-      acquire!(...)
+    def self.lock(...)
+      lock!(...)
     rescue => e
       Keygen.logger.warn(e)
 
       false
     end
 
-    def self.release!(key)
+    def self.unlock!(key)
       redis { !_1.del(Envented::IDEMPOTENCY_PREFIX + key).zero? }
     end
 
-    def self.release(...)
-      release!(...)
+    def self.unlock(...)
+      unlock!(...)
     rescue => e
       Keygen.logger.warn(e)
 
@@ -321,19 +322,19 @@ module Envented
 
   # See: https://redis.io/topics/distlock
   class RedLock
-    def self.acquire!(id, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
+    def self.lock!(id, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
       key      = Envented::LOCK_PREFIX + id
-      checksum = nil
+      token = nil
 
       Timeout.timeout(lock_wait_timeout) do
         loop do
-          checksum = SecureRandom.hex
-          if redis { _1.set(key, checksum, nx: true, ex: Envented::LOCK_TTL) }
-            return checksum
+          token = SecureRandom.hex
+          if redis { _1.set(key, token, nx: true, ex: Envented::LOCK_TTL) }
+            return token
           end
 
           if raise_on_lock_error
-            raise LockNotAcquiredError, 'failed to acquire lock' unless
+            raise LockNotAcquiredError, 'failed to lock lock' unless
               wait_on_lock
           end
 
@@ -344,17 +345,17 @@ module Envented
         end
       end
     rescue Timeout::Error
-      # Always attempt to release the lock for the current checksum on error,
+      # Always attempt to release the lock for the current token on error,
       # since Timeout could, although unlikely, raise after we obtain a lock
       # but before we exit the method. This ensures the lock is released.
-      release!(id, checksum: checksum) unless
-        checksum.nil?
+      unlock!(id, token: token) unless
+        token.nil?
 
       raise LockTimeoutError, 'lock timeout' if
         raise_on_lock_error
     end
 
-    def self.release!(id, checksum:)
+    def self.unlock!(id, token:)
       key = Envented::LOCK_PREFIX + id
       cmd = <<~LUA
         if redis.call('get', KEYS[1]) == ARGV[1] then
@@ -365,9 +366,9 @@ module Envented
       LUA
 
       shasum =
-        (Envented::LUA_SHASUMS[:delif] ||= redis { _1.script(:load, cmd) })
+        (Envented::LUA_SHASUMS[:unlock] ||= redis { _1.script(:load, cmd) })
 
-      redis { !_1.evalsha(shasum, keys: [key], argv: [checksum]).zero? }
+      redis { !_1.evalsha(shasum, keys: [key], argv: [token]).zero? }
     end
 
     private
