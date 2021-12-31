@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class License < ApplicationRecord
+  include Envented::Callbacks
   include Limitable
   include Tokenable
   include Pageable
@@ -37,10 +38,26 @@ class License < ApplicationRecord
   before_create :enforce_license_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
   before_create :set_first_check_in, if: -> { policy.present? && requires_check_in? }
-  before_create :set_expiry, if: -> { expiry.nil? && policy.present? }
+  before_create :set_expiry_from_creation, if: -> { expiry.nil? && policy.present? }
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
   after_create :set_role
+
+  on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation,
+    auto_release_lock: false,
+    unless: :expiry?
+
+  on_exclusive_event 'machine.created', :set_expiry_on_first_activation,
+    auto_release_lock: false,
+    unless: :expiry?
+
+  on_exclusive_event 'license.usage.incremented', :set_expiry_on_first_use,
+    auto_release_lock: false,
+    unless: :expiry?
+
+  on_exclusive_event 'release.downloaded', :set_expiry_on_first_download,
+    auto_release_lock: false,
+    unless: :expiry?
 
   validates :account, presence: { message: "must exist" }
   validates :policy,
@@ -307,6 +324,11 @@ class License < ApplicationRecord
     :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,
     :strict?, :concurrent?, :pool?, :node_locked?, :floating?,
     :revoke_access?, :restrict_access?,
+    :expire_from_creation?,
+    :expire_from_first_validation?,
+    :expire_from_first_activation?,
+    :expire_from_first_use?,
+    :expire_from_first_download?,
     to: :policy,
     allow_nil: true
 
@@ -479,12 +501,49 @@ class License < ApplicationRecord
     self.last_check_in_at = Time.current
   end
 
-  def set_expiry
-    if policy.duration.nil?
-      self.expiry = nil
-    else
-      self.expiry = Time.current + ActiveSupport::Duration.build(policy.duration)
-    end
+  def set_expiry_from_creation
+    return unless
+      expire_from_creation? &&
+      duration.present? &&
+      expiry.nil?
+
+    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+  end
+
+  def set_expiry_on_first_validation
+    return unless
+      expire_from_first_validation? &&
+      duration.present? &&
+      expiry.nil?
+
+    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+  end
+
+  def set_expiry_on_first_activation
+    return unless
+      expire_from_first_activation? &&
+      duration.present? &&
+      expiry.nil?
+
+    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+  end
+
+  def set_expiry_on_first_use
+    return unless
+      expire_from_first_use? &&
+      duration.present? &&
+      expiry.nil?
+
+    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+  end
+
+  def set_expiry_on_first_download
+    return unless
+      expire_from_first_download? &&
+      duration.present? &&
+      expiry.nil?
+
+    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
   end
 
   def autogenerate_key
