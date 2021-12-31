@@ -4,7 +4,7 @@ class BroadcastEventWorker
   include Sidekiq::Worker
 
   sidekiq_options lock: :until_executed,
-                  queue: :events
+                  queue: :logs
 
   def perform(kwargs)
     perform_with_kwargs(**kwargs.to_h.symbolize_keys)
