@@ -17,6 +17,8 @@ class Key < ApplicationRecord
   belongs_to :account
   belongs_to :policy
   has_one :product, through: :policy
+  has_many :event_logs,
+    as: :resource
 
   validates :account, presence: { message: "must exist" }
   validates :policy,

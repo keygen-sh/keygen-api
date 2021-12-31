@@ -8,6 +8,7 @@ class Account < ApplicationRecord
   include Billable
 
   belongs_to :plan
+  has_one :billing
   has_many :webhook_endpoints
   has_many :webhook_events
   has_many :request_logs
@@ -32,7 +33,7 @@ class Account < ApplicationRecord
   has_many :release_upgrade_links
   has_many :release_upload_links
   has_many :release_artifacts
-  has_one :billing
+  has_many :event_logs
 
   accepts_nested_attributes_for :users, limit: 10
 
