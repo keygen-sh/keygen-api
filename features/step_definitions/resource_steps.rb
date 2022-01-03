@@ -606,9 +606,6 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
-  CreateEventLogWorker.drain
-  EventNotificationWorker.drain
-
   license  = @account.licenses.send(index_in_words)
   duration = duration_count.to_i.send(duration_interval)
 
@@ -616,18 +613,12 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should not have an expiry$/ do |index_in_words|
-  CreateEventLogWorker.drain
-  EventNotificationWorker.drain
-
   license = @account.licenses.send(index_in_words)
 
   expect(license.expiry).to be nil
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have the expiry "([^"]+)"$/ do |index_in_words, expected_expiry|
-  CreateEventLogWorker.drain
-  EventNotificationWorker.drain
-
   license = @account.licenses.send(index_in_words)
 
   expect(license.expiry).to eq expected_expiry

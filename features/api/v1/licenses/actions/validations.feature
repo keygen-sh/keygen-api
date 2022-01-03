@@ -4978,6 +4978,8 @@ Feature: License validation actions
         }
       }
       """
+    Then sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
   Scenario: Anonymous validates a license key with a validation expiration basis (set)
@@ -5006,4 +5008,6 @@ Feature: License validation actions
         }
       }
       """
+    Then sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"

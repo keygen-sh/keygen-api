@@ -883,6 +883,8 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
   Scenario: License increments its usage count with a usage expiration basis (set)
@@ -907,4 +909,6 @@ Feature: License usage actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"

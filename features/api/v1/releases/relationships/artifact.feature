@@ -1264,6 +1264,8 @@ Feature: Release artifact relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
   Scenario: License downloads an artifact with a download expiration basis (set)
@@ -1291,4 +1293,6 @@ Feature: Release artifact relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
