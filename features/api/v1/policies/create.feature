@@ -87,6 +87,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_LICENSE"
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ANY"
     And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
+    And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
@@ -158,6 +159,7 @@ Feature: Create policy
             "name": "Actionsack Map Pack",
             "fingerprintMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
+            "expirationBasis": "FROM_FIRST_VALIDATION",
             "maxUses": 5
           },
           "relationships": {
@@ -175,6 +177,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the name "Actionsack Map Pack"
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ALL"
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
+    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
     And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent
@@ -425,6 +428,49 @@ Feature: Create policy
         "code": "EXPIRATION_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/expirationStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid expiration basis
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Bad Expiration Basis",
+            "expirationBasis": "FROM_FIRST_READ"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported expiration basis",
+        "code": "EXPIRATION_BASIS_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/expirationBasis"
         }
       }
       """
