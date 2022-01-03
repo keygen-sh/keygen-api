@@ -4950,3 +4950,32 @@ Feature: License validation actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
+
+  # Expiration basis
+  Scenario: Anonymous validates a license key with a validation expiration basis
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_VALIDATION",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    And the first "license" should have a 1 year expiry
