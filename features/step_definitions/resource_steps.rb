@@ -608,8 +608,9 @@ end
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
   license  = @account.licenses.send(index_in_words)
   duration = duration_count.to_i.send(duration_interval)
+  expiry   = duration.from_now
 
-  expect(license.expiry).to be_within(30.seconds).of(Time.current + duration)
+  expect(license.expiry).to be_within(30.seconds).of(expiry)
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should not have an expiry$/ do |index_in_words|
@@ -618,10 +619,10 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(license.expiry).to be nil
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have the expiry "([^"]+)"$/ do |index_in_words, expected_expiry|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have the expiry "([^"]+)"$/ do |index_in_words, expiry|
   license = @account.licenses.send(index_in_words)
 
-  expect(license.expiry).to eq expected_expiry
+  expect(license.expiry).to eq expiry
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
