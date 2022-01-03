@@ -605,6 +605,25 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
 end
 
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
+  CreateEventLogWorker.drain
+  EventNotificationWorker.drain
+
+  license  = @account.licenses.send(index_in_words)
+  duration = duration_count.to_i.send(duration_interval)
+
+  expect(license.expiry).to be_within(30.seconds).of(Time.current + duration)
+end
+
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should not have an expiry$/ do |index_in_words|
+  CreateEventLogWorker.drain
+  EventNotificationWorker.drain
+
+  license = @account.licenses.send(index_in_words)
+
+  expect(license.expiry).to be nil
+end
+
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   parse_placeholders!(body)
 
