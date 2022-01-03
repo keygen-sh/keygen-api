@@ -2,13 +2,15 @@
 
 World Rack::Test::Methods
 
-Then /^sidekiq should have (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
+Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ do |expected_count, worker_name, queued_at|
   worker_name =
     case worker_name
     when "metric"
       "record_metric_worker" # We renamed this worker
     when "request-log"
       "request_log_worker"
+    when "event-log"
+      "event_log_worker"
     when "heartbeat"
       "machine_heartbeat_worker"
     else
@@ -31,6 +33,10 @@ Then /^sidekiq should have (\d+) "([^\"]*)" jobs?(?: queued in ([.\d]+ \w+))?$/ 
   case worker_name
   when "initialize_billing_worker"
     InitializeBillingWorker.drain
+  when "event_notification_worker"
+    EventNotificationWorker.drain
+  when "event_log_worker"
+    EventLogWorker.drain
   end
 
   # Future queueing

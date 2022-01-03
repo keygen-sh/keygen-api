@@ -2231,6 +2231,8 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
   Scenario: License activates a machine with an activation expiration basis (set)
@@ -2274,4 +2276,6 @@ Feature: Create machine
       }
       """
     Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
