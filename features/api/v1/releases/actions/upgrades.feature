@@ -1718,6 +1718,8 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
   Scenario: License upgrades a release with a download expiration basis (set)
@@ -1753,4 +1755,6 @@ Feature: Release upgrade actions
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"

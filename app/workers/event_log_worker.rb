@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateEventLogWorker
+class EventLogWorker
   include Sidekiq::Worker
 
   sidekiq_options lock: :until_executed,
