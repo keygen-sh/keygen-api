@@ -1237,3 +1237,58 @@ Feature: Release artifact relationship
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
     And the first "release" should not be yanked
+
+  # Expiration basis
+  Scenario: License downloads an artifact with a download expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "303"
+    And the first "license" should have a 1 year expiry
+
+  Scenario: License downloads an artifact with a download expiration basis (set)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2042-01-03T14:18:02.743Z"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "303"
+    And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
