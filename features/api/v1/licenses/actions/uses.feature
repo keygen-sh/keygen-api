@@ -859,3 +859,29 @@ Feature: License usage actions
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
+
+  # Expiration basis
+  Scenario: License increments its usage count with a validation expiration basis
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_USE",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null,
+        "uses": 4
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
+    Then the response status should be "200"
+    And the first "license" should have a 1 year expiry
