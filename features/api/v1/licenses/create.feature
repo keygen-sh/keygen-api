@@ -3895,3 +3895,97 @@ Feature: Create license
   #   And sidekiq should have 0 "webhook" jobs
   #   And sidekiq should have 0 "metric" jobs
   #   And sidekiq should have 1 "request-log" job
+
+  # Expiration basis
+  Scenario: Admin creates a license with a creation expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_CREATION",
+        "duration": $time.1.year
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should have a 1 year expiry
+
+  Scenario: Admin creates a license with a validation expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_VALIDATION",
+        "duration": $time.1.year
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should not have an expiry
+
+  Scenario: Admin creates a license with a creation expiration basis (set)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_CREATION",
+        "duration": $time.1.year
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "expiry": "2022-01-03T14:18:02.743Z"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
