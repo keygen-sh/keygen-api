@@ -44,11 +44,12 @@ class License < ApplicationRecord
   after_create :set_role
 
   on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
+    # NOTE(ezekg) No auto-release for high volume events to rate limit
     auto_release_lock: false,
     unless: :expiry?
 
   on_exclusive_event 'machine.created', :set_expiry_on_first_activation!,
-    auto_release_lock: false,
+    auto_release_lock: true,
     unless: :expiry?
 
   on_exclusive_event 'license.usage.incremented', :set_expiry_on_first_use!,
@@ -56,11 +57,11 @@ class License < ApplicationRecord
     unless: :expiry?
 
   on_exclusive_event 'release.downloaded', :set_expiry_on_first_download!,
-    auto_release_lock: false,
+    auto_release_lock: true,
     unless: :expiry?
 
   on_exclusive_event 'release.upgraded', :set_expiry_on_first_download!,
-    auto_release_lock: false,
+    auto_release_lock: true,
     unless: :expiry?
 
   validates :account, presence: { message: "must exist" }

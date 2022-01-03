@@ -2235,6 +2235,50 @@ Feature: Create machine
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  Scenario: Product activates a machine with an activation expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_ACTIVATION",
+        "duration": $time.1.month
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" jobs
+    And the first "license" should have a 1 month expiry
+
   Scenario: License activates a machine with a validation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policies"
