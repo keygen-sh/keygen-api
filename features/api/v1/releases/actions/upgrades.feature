@@ -1683,3 +1683,74 @@ Feature: Release upgrade actions
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.2&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "204"
+
+  # Expiration basis
+  Scenario: License upgrades a release with a download expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App A |
+    And the current account has the following "release" rows:
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
+    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the first "license" should have a 1 year expiry
+
+  Scenario: License upgrades a release with a download expiration basis (set)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App A |
+    And the current account has the following "release" rows:
+      | product_id                           | version | filename           | filetype | platform | channel |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | Test-App-1.0.0.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | Test-App-1.0.1.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | Test-App-1.0.2.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | Test-App-1.0.3.dmg | dmg      | darwin   | stable  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | Test-App-1.1.0.dmg | dmg      | darwin   | stable  |
+    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2042-01-03T14:18:02.743Z"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"

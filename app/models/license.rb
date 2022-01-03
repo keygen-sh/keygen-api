@@ -59,6 +59,10 @@ class License < ApplicationRecord
     auto_release_lock: false,
     unless: :expiry?
 
+  on_exclusive_event 'release.upgraded', :set_expiry_on_first_download!,
+    auto_release_lock: false,
+    unless: :expiry?
+
   validates :account, presence: { message: "must exist" }
   validates :policy,
     presence: { message: "must exist" },
