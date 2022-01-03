@@ -32,7 +32,7 @@ class BroadcastEventService < BaseService
           nil
         end
 
-      BroadcastEventWorker.perform_async(
+      CreateEventLogWorker.perform_async(
         event: event,
         account_id: Current.account.id,
         resource_type: resource.class.name,
