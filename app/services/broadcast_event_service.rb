@@ -34,7 +34,7 @@ class BroadcastEventService < BaseService
 
       EventLogWorker.perform_async(
         event: event,
-        account_id: Current.account.id,
+        account_id: account.id,
         resource_type: resource.class.name,
         resource_id: resource.id,
         whodunnit_type: Current.bearer&.class&.name,
