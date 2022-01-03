@@ -43,19 +43,19 @@ class License < ApplicationRecord
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
   after_create :set_role
 
-  on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation,
+  on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
     auto_release_lock: false,
     unless: :expiry?
 
-  on_exclusive_event 'machine.created', :set_expiry_on_first_activation,
+  on_exclusive_event 'machine.created', :set_expiry_on_first_activation!,
     auto_release_lock: false,
     unless: :expiry?
 
-  on_exclusive_event 'license.usage.incremented', :set_expiry_on_first_use,
+  on_exclusive_event 'license.usage.incremented', :set_expiry_on_first_use!,
     auto_release_lock: false,
     unless: :expiry?
 
-  on_exclusive_event 'release.downloaded', :set_expiry_on_first_download,
+  on_exclusive_event 'release.downloaded', :set_expiry_on_first_download!,
     auto_release_lock: false,
     unless: :expiry?
 
@@ -510,40 +510,40 @@ class License < ApplicationRecord
     self.expiry = Time.current + ActiveSupport::Duration.build(duration)
   end
 
-  def set_expiry_on_first_validation
+  def set_expiry_on_first_validation!
     return unless
       expire_from_first_validation? &&
       duration.present? &&
       expiry.nil?
 
-    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
   end
 
-  def set_expiry_on_first_activation
+  def set_expiry_on_first_activation!
     return unless
       expire_from_first_activation? &&
       duration.present? &&
       expiry.nil?
 
-    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
   end
 
-  def set_expiry_on_first_use
+  def set_expiry_on_first_use!
     return unless
       expire_from_first_use? &&
       duration.present? &&
       expiry.nil?
 
-    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
   end
 
-  def set_expiry_on_first_download
+  def set_expiry_on_first_download!
     return unless
       expire_from_first_download? &&
       duration.present? &&
       expiry.nil?
 
-    self.expiry = Time.current + ActiveSupport::Duration.build(duration)
+    update!(expiry: Time.current + ActiveSupport::Duration.build(duration))
   end
 
   def autogenerate_key
