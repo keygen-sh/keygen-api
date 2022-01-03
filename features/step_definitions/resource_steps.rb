@@ -624,6 +624,15 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(license.expiry).to be nil
 end
 
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have the expiry "([^"]+)"$/ do |index_in_words, expected_expiry|
+  CreateEventLogWorker.drain
+  EventNotificationWorker.drain
+
+  license = @account.licenses.send(index_in_words)
+
+  expect(license.expiry).to eq expected_expiry
+end
+
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   parse_placeholders!(body)
 
