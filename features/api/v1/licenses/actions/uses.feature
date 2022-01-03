@@ -861,7 +861,7 @@ Feature: License usage actions
     And sidekiq should have 1 "request-log" job
 
   # Expiration basis
-  Scenario: License increments its usage count with a validation expiration basis
+  Scenario: License increments its usage count with a usage expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
@@ -876,8 +876,7 @@ Feature: License usage actions
       """
       {
         "policyId": "$policies[0]",
-        "expiry": null,
-        "uses": 4
+        "expiry": null
       }
       """
     And I am a license of account "test1"
@@ -885,3 +884,27 @@ Feature: License usage actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
     Then the response status should be "200"
     And the first "license" should have a 1 year expiry
+
+  Scenario: License increments its usage count with a usage expiration basis (set)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_USE",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2022-01-03T14:18:02.743Z"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/increment-usage"
+    Then the response status should be "200"
+    And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
