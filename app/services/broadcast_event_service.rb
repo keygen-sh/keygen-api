@@ -28,15 +28,17 @@ class BroadcastEventService < BaseService
         when /\.updated$/
           { diff: resource.to_diff } if
             resource.class < Diffable
+        when /\.entitlements\.(de|at)tached$/
+          { codes: resource.map(&:code) }
         else
           nil
         end
 
       EventLogWorker.perform_async(
         event: event,
-        account_id: account.id,
-        resource_type: resource.class.name,
-        resource_id: resource.id,
+        account_id: Current.account&.id || account.id,
+        resource_type: Current.resource&.class&.name || resource.class.name,
+        resource_id: Current.resource&.id || resource.id,
         whodunnit_type: Current.bearer&.class&.name,
         whodunnit_id: Current.bearer&.id,
         request_id: Current.request_id,
