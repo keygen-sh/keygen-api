@@ -21,4 +21,8 @@ class LicenseEntitlement < ApplicationRecord
   validate on: :create do
     errors.add :entitlement, :conflict, message: 'already exists (entitlement is attached through policy)' if policy.policy_entitlements.exists?(entitlement_id: entitlement_id)
   end
+
+  delegate :code,
+    to: :entitlement,
+    allow_nil: true
 end

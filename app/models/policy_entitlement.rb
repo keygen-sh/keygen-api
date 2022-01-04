@@ -16,4 +16,8 @@ class PolicyEntitlement < ApplicationRecord
     uniqueness: { message: 'already exists', scope: [:account_id, :policy_id, :entitlement_id] },
     presence: { message: 'must exist' },
     scope: { by: :account_id }
+
+  delegate :code,
+    to: :entitlement,
+    allow_nil: true
 end
