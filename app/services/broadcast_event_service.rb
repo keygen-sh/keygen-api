@@ -29,7 +29,7 @@ class BroadcastEventService < BaseService
           { diff: resource.to_diff } if
             resource.class < Diffable
         when /\.entitlements\.(de|at)tached$/
-          { codes: resource.map(&:code) }
+          { ids: resource.map(&:entitlement_id) }
         else
           nil
         end
