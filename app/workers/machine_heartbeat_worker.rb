@@ -8,23 +8,26 @@ class MachineHeartbeatWorker
   sidekiq_options queue: :critical
 
   def perform(machine_id)
-    machine = Machine.find machine_id rescue nil
-    return unless machine&.requires_heartbeat?
+    machine = Machine.find(machine_id)
+    return unless
+      machine.requires_heartbeat?
 
     if machine.heartbeat_dead?
       BroadcastEventService.call(
-        event: "machine.heartbeat.dead",
+        event: 'machine.heartbeat.dead',
         account: machine.account,
-        resource: machine
+        resource: machine,
       )
 
       machine.destroy! if machine.policy.deactivate_dead_machines?
     else
       BroadcastEventService.call(
-        event: "machine.heartbeat.pong",
+        event: 'machine.heartbeat.pong',
         account: machine.account,
-        resource: machine
+        resource: machine,
       )
     end
+  rescue ActiveRecord::RecordNotFound
+    # NOTE(ezekg) Already deactivated
   end
 end

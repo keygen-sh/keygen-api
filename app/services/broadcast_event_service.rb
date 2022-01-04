@@ -24,7 +24,7 @@ class BroadcastEventService < BaseService
         when /^release\.upgraded$/
           { prev: meta[:current], next: meta[:next] }
         when /^license\.validation\./
-          { code: meta[:constant ] }
+          { code: meta[:constant] }
         when /\.updated$/
           { diff: resource.to_diff } if
             resource.class < Diffable
