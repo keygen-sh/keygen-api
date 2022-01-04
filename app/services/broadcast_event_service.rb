@@ -26,10 +26,9 @@ class BroadcastEventService < BaseService
         when /^license\.validation\./
           { code: meta[:constant] }
         when /\.updated$/
-          { diff: resource.to_diff } if
-            resource.class < Diffable
+          { diff: resource.to_diff } if resource.class < Diffable
         when /\.entitlements\.(de|at)tached$/
-          { ids: resource.map(&:entitlement_id) }
+          { codes: account.entitlements.where(id: resource.map(&:entitlement_id)).pluck(:code) }
         else
           nil
         end
