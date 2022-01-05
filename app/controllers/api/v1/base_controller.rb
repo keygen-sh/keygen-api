@@ -10,5 +10,9 @@ module Api::V1
     include TokenAuthentication
     include SharedScopes
     include Pagination
+
+    # NOTE(ezekg) Including these at the end so that they're run last
+    include RequestCounter
+    include RequestLogger
   end
 end

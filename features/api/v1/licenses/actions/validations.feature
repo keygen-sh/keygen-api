@@ -4949,7 +4949,7 @@ Feature: License validation actions
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 0 "request-log" jobs
 
   # Expiration basis
   Scenario: Anonymous validates a license key with a validation expiration basis (not set)
