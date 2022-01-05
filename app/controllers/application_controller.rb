@@ -6,85 +6,15 @@ class ApplicationController < ActionController::API
   include RateLimiting
   include Pundit
 
+  # NOTE(ezekg) Including these at the end so that they're run last
+  include RequestCounter
+  include RequestLogger
+
+  # NOTE(ezekg) We're using an around_action here so that our request
+  #             logger concern can log the resulting response body.
+  #             Otherwise, the logged response may be incorrect.
+  around_action :rescue_from_exceptions
   after_action :verify_authorized
-
-  rescue_from TypedParameters::UnpermittedParametersError, with: -> (err) { render_bad_request detail: err.message }
-  rescue_from TypedParameters::InvalidParameterError, with: -> (err) { render_bad_request detail: err.message, source: err.source }
-  rescue_from TypedParameters::InvalidRequestError, with: -> (err) { render_bad_request detail: err.message }
-  rescue_from Keygen::Error::InvalidScopeError, with: -> (err) { render_bad_request detail: err.message, source: err.source }
-  rescue_from Keygen::Error::UnauthorizedError, with: -> (err) { render_unauthorized code: err.code }
-  rescue_from Keygen::Error::BadRequestError, with: -> err { render_bad_request detail: err.message }
-  rescue_from Keygen::Error::NotFoundError, with: -> (err) {
-    if err.model.present? && err.id.present?
-      id = Array.wrap(err.id).first
-
-      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{id}' was not found"
-    else
-      render_not_found
-    end
-  }
-  rescue_from ActionController::UnpermittedParameters, with: -> (err) { render_bad_request detail: err.message }
-  rescue_from ActionController::ParameterMissing, with: -> (err) { render_bad_request detail: err.message }
-  rescue_from ActiveModel::RangeError, with: -> { render_bad_request detail: "integer is too large" }
-  rescue_from ActiveRecord::StatementInvalid, with: -> (err) {
-    # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
-    case err.cause
-    when PG::InvalidTextRepresentation
-      render_bad_request detail: 'The request could not be completed because it contains badly formatted data (check encoding)', code: 'ENCODING_INVALID'
-    when PG::CharacterNotInRepertoire
-      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
-    else
-      Keygen.logger.exception err
-
-      render_bad_request
-    end
-  }
-  rescue_from PG::Error, with: -> (err) {
-    case err.message
-    when /incomplete multibyte character/
-      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
-    else
-      Keygen.logger.exception err
-
-      render_internal_server_error
-    end
-  }
-  rescue_from ActiveRecord::RecordInvalid, with: -> (err) { render_unprocessable_resource err.record }
-  rescue_from ActiveRecord::RecordNotSaved, with: -> err { render_unprocessable_resource(err.record) }
-  rescue_from ActiveRecord::RecordNotUnique, with: -> { render_conflict } # Race condition on unique index
-  rescue_from ActiveRecord::RecordNotFound, with: -> (err) {
-    if err.model.present? && err.id.present?
-      id = Array.wrap(err.id).first
-
-      render_not_found detail: "The requested #{err.model.underscore.humanize.downcase} '#{id}' was not found"
-    else
-      render_not_found
-    end
-  }
-  rescue_from ArgumentError, with: -> (err) {
-    case err.message
-    when /invalid byte sequence in UTF-8/,
-         /incomplete multibyte character/
-      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
-    when /string contains null byte/
-      render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
-    else
-      Keygen.logger.exception err
-
-      render_internal_server_error
-    end
-  }
-
-  rescue_from Pundit::NotDefinedError, with: -> err { render_not_found }
-  rescue_from Pundit::NotAuthorizedError, with: -> err {
-    msg = if current_bearer.present?
-            'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'
-          else
-            'You do not have permission to complete the request (ensure a token is present and valid)'
-          end
-
-    render_forbidden(detail: msg)
-  }
 
   attr_accessor :current_account
   attr_accessor :current_bearer
@@ -313,6 +243,83 @@ class ApplicationController < ActionController::API
       end
 
     render json: { meta: { id: request.request_id }, errors: errors }, status: status_code
+  end
+
+  def rescue_from_exceptions
+    yield
+  rescue TypedParameters::UnpermittedParametersError,
+         TypedParameters::InvalidRequestError,
+         Keygen::Error::BadRequestError,
+         ActionController::UnpermittedParameters,
+         ActionController::ParameterMissing => e
+    render_bad_request detail: e.message
+  rescue TypedParameters::InvalidParameterError,
+         Keygen::Error::InvalidScopeError => e
+    render_bad_request detail: e.message, source: e.source
+  rescue Keygen::Error::UnauthorizedError => e
+    render_unauthorized code: e.code
+  rescue Keygen::Error::NotFoundError,
+         ActiveRecord::RecordNotFound => e
+    if e.model.present? && e.id.present?
+      resource = e.model.underscore.humanize.downcase
+      id       = Array.wrap(e.id).first
+
+      render_not_found detail: "The requested #{resource} '#{id}' was not found"
+    else
+      render_not_found
+    end
+  rescue ActiveModel::RangeError
+    render_bad_request detail: "integer is too large"
+  rescue ActiveRecord::StatementInvalid => e
+    # Bad encodings, Invalid UUIDs, non-base64'd creds, etc.
+    case e.cause
+    when PG::InvalidTextRepresentation
+      render_bad_request detail: 'The request could not be completed because it contains badly formatted data (check encoding)', code: 'ENCODING_INVALID'
+    when PG::CharacterNotInRepertoire
+      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
+    when PG::UniqueViolation
+      render_conflict
+    else
+      Keygen.logger.exception(e)
+
+      render_bad_request
+    end
+  rescue PG::Error => e
+    case e.message
+    when /incomplete multibyte character/
+      render_bad_request detail: 'The request could not be completed because it contains badly encoded data (check encoding)', code: 'ENCODING_INVALID'
+    else
+      Keygen.logger.exception(e)
+
+      render_internal_server_error
+    end
+  rescue ActiveRecord::RecordNotSaved,
+         ActiveRecord::RecordInvalid => e
+    render_unprocessable_resource e.record
+  rescue ActiveRecord::RecordNotUnique
+    render_conflict # Race condition on unique index
+  rescue ArgumentError => e
+    case e.message
+    when /invalid byte sequence in UTF-8/,
+          /incomplete multibyte character/
+      render_bad_request detail: 'The request could not be completed because it contains an invalid byte sequence (check encoding)', code: 'ENCODING_INVALID'
+    when /string contains null byte/
+      render_bad_request detail: 'The request could not be completed because it contains an unexpected null byte (check encoding)', code: 'ENCODING_INVALID'
+    else
+      Keygen.logger.exception(e)
+
+      render_internal_server_error
+    end
+  rescue Pundit::NotDefinedError => e
+    render_not_found
+  rescue Pundit::NotAuthorizedError
+    msg = if current_bearer.present?
+            'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'
+          else
+            'You do not have permission to complete the request (ensure a token is present and valid)'
+          end
+
+    render_forbidden detail: msg
   end
 
   class AuthorizationContext < OpenStruct; end

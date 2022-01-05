@@ -4,7 +4,7 @@ module RequestCounter
   REQUEST_COUNT_IGNORED_ORIGINS = %w[https://app.keygen.sh https://dist.keygen.sh].freeze
 
   included do
-    around_action :count_request!
+    prepend_around_action :count_request!
 
     private
 
@@ -12,10 +12,6 @@ module RequestCounter
       yield
     ensure
       increment_request_count
-    end
-
-    def request_count_cache_key
-      Current.account.daily_request_count_cache_key
     end
 
     def count_request?
@@ -30,6 +26,12 @@ module RequestCounter
         count_request?
 
       Rails.cache.increment(request_count_cache_key, 1, expires_in: 1.day)
+    rescue => e
+      Keygen.logger.exception(e)
+    end
+
+    def request_count_cache_key
+      Current.account.daily_request_count_cache_key
     end
   end
 end

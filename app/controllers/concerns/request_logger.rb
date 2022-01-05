@@ -18,7 +18,7 @@ module RequestLogger
   ].freeze
 
   included do
-    around_action :log_request!
+    prepend_around_action :log_request!
 
     private
 
@@ -29,6 +29,52 @@ module RequestLogger
       yield
     ensure
       queue_request_log_worker
+    end
+
+    def log_request?
+      return false if
+        REQUEST_LOG_IGNORED_ORIGINS.include?(request.headers['Origin'])
+
+      return false if
+        REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
+
+      route = Rails.application.routes.recognize_path(request.url, method: request.method)
+      return false unless
+        route.key?(:controller)
+
+      return false if
+        REQUEST_LOG_IGNORED_RESOURCES.any? { |r| r.in?(route[:controller]) }
+
+      Current.account.present?
+    end
+
+    def queue_request_log_worker
+      return unless
+        log_request?
+
+      RequestLogWorker.perform_async(
+        Current.account.id,
+        {
+          requestor_type: Current.bearer&.class&.name,
+          requestor_id: Current.bearer&.id,
+          resource_type: Current.resource&.class&.name,
+          resource_id: Current.resource&.id,
+          request_time: request_log_date,
+          request_id: Current.request_id,
+          user_agent: request_log_user_agent,
+          ip: request_log_ip,
+          method: request_log_method,
+          url: request_log_url,
+          body: request_log_request_body,
+        },
+        {
+          signature: request_log_signature,
+          status: request_log_status,
+          body: request_log_response_body,
+        }
+      )
+    rescue => e
+      Keygen.logger.exception(e)
     end
 
     def request_log_date
@@ -90,55 +136,11 @@ module RequestLogger
     end
 
     def request_log_status
-      response.code
+      response.response_code
     end
 
     def request_log_signature
       response.headers['X-Signature'] || response.headers['Keygen-Signature']
-    end
-
-    def log_request?
-      return false if
-        REQUEST_LOG_IGNORED_ORIGINS.include?(request.headers['Origin'])
-
-      return false if
-        REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
-
-      route = Rails.application.routes.recognize_path(request.url, method: request.method)
-      return false unless
-        route.key?(:controller)
-
-      return false if
-        REQUEST_LOG_IGNORED_RESOURCES.any? { |r| r.in?(route[:controller]) }
-
-      Current.account.present?
-    end
-
-    def queue_request_log_worker
-      return unless
-        log_request?
-
-      RequestLogWorker.perform_async(
-        Current.account.id,
-        {
-          requestor_type: Current.bearer&.class&.name,
-          requestor_id: Current.bearer&.id,
-          resource_type: Current.resource&.class&.name,
-          resource_id: Current.resource&.id,
-          request_time: request_log_date,
-          request_id: Current.request_id,
-          user_agent: request_log_user_agent,
-          ip: request_log_ip,
-          method: request_log_method,
-          url: request_log_url,
-          body: request_log_request_body,
-        },
-        {
-          signature: request_log_signature,
-          status: request_log_status,
-          body: request_log_response_body,
-        }
-      )
     end
   end
 end
