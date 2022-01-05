@@ -40,10 +40,6 @@ module Keygen
     config.middleware.delete Rack::Sendfile
     config.middleware.delete Rack::Runtime
 
-    # Log Rack request/response to datastores
-    config.middleware.insert_before 0, Keygen::Middleware::RequestCountLogger
-    config.middleware.insert_before 0, Keygen::Middleware::RequestLogger
-
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and
     #              emits this error at multiple layers in the stack, resulting
