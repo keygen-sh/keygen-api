@@ -4,9 +4,21 @@ module Keygen
   module Error
     class UnauthorizedError < StandardError
       attr_reader :code
+      attr_reader :detail
 
-      def initialize(code:)
-        @code = code
+      def initialize(code:, detail: nil)
+        @code   = code
+        @detail = detail
+      end
+    end
+
+    class ForbiddenError < StandardError
+      attr_reader :code
+      attr_reader :detail
+
+      def initialize(code:, detail: nil)
+        @code   = code
+        @detail = detail
       end
     end
 

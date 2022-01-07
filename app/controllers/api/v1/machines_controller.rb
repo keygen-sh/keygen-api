@@ -37,7 +37,7 @@ module Api::V1
       @machine = current_account.machines.new machine_params
       authorize @machine
 
-      if @machine.valid? && current_token.activation_token?
+      if @machine.valid? && current_token&.activation_token?
         begin
           lock = if current_token.max_activations?
                    'FOR UPDATE NOWAIT'
@@ -97,7 +97,7 @@ module Api::V1
     def destroy
       authorize @machine
 
-      if current_token.activation_token?
+      if current_token&.activation_token?
         begin
           lock = if current_token.max_deactivations?
                    'FOR UPDATE NOWAIT'
