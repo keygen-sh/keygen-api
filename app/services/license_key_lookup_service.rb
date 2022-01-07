@@ -3,7 +3,7 @@
 class LicenseKeyLookupService < BaseService
   ENCRYPTED_KEY_REGEX = /\A(.{#{UUID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
 
-  def initialize(account:, key:, legacy_encrypted:)
+  def initialize(account:, key:, legacy_encrypted: false)
     @account          = account
     @key              = key
     @legacy_encrypted = legacy_encrypted
