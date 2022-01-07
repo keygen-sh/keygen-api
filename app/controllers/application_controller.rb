@@ -257,7 +257,17 @@ class ApplicationController < ActionController::API
          Keygen::Error::InvalidScopeError => e
     render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnauthorizedError => e
-    render_unauthorized code: e.code
+    if e.detail.present?
+      render_unauthorized code: e.code, detail: e.detail
+    else
+      render_unauthorized code: e.code
+    end
+  rescue Keygen::Error::ForbiddenError => e
+    if e.detail.present?
+      render_forbidden code: e.code, detail: e.detail
+    else
+      render_forbidden code: e.code
+    end
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
     if e.model.present? && e.id.present?
