@@ -80,6 +80,7 @@ Rails.application.configure do
       end
 
     {
+      request_id: req.request_id,
       query_params: query_params || 'N/A',
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
