@@ -112,6 +112,12 @@ module TokenAuthentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
       current_token&.expired?
 
+    case
+    when current_bearer&.has_role?(:license)
+      raise Keygen::Error::ForbiddenError.new(code: 'TOKEN_NOT_ALLOWED', detail: 'Token authentication is not allowed by policy') unless
+        current_bearer.supports_token_auth?
+    end
+
     current_bearer
   end
 
@@ -145,7 +151,10 @@ module TokenAuthentication
     raise Keygen::Error::UnauthorizedError.new(code: 'LICENSE_EXPIRED', detail: 'License is expired') if
       current_license&.expired?
 
-    # TODO(ezekg) Assert that policy allows license key authentication
+    if current_license.present?
+      raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_NOT_ALLOWED', detail: 'License key authentication is not allowed by policy') unless
+        current_license.supports_key_auth?
+    end
 
     current_license
   end
