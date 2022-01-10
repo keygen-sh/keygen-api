@@ -13,8 +13,8 @@ module TokenAuthentication
         authenticate_or_request_with_http_token(&method(:http_token_authenticator))
       when has_basic_credentials?
         authenticate_or_request_with_http_basic(&method(:http_basic_authenticator))
-      when has_key_credentials?
-        authenticate_or_request_with_http_key(&method(:http_key_authenticator))
+      when has_license_credentials?
+        authenticate_or_request_with_http_license(&method(:http_license_authenticator))
       else
         authenticate_or_request_with_query_token(&method(:query_token_authenticator))
       end
@@ -27,8 +27,8 @@ module TokenAuthentication
         authenticate_with_http_token(&method(:http_token_authenticator))
       when has_basic_credentials?
         authenticate_with_http_basic(&method(:http_basic_authenticator))
-      when has_key_credentials?
-        authenticate_with_http_key(&method(:http_key_authenticator))
+      when has_license_credentials?
+        authenticate_with_http_license(&method(:http_license_authenticator))
       else
         authenticate_with_query_token(&method(:query_token_authenticator))
       end
@@ -48,11 +48,11 @@ module TokenAuthentication
     auth_procedure.call(query_token)
   end
 
-  def authenticate_or_request_with_http_key(&auth_procedure)
-    authenticate_with_http_key(&auth_procedure) || request_http_token_authentication
+  def authenticate_or_request_with_http_license(&auth_procedure)
+    authenticate_with_http_license(&auth_procedure) || request_http_token_authentication
   end
 
-  def authenticate_with_http_key(&auth_procedure)
+  def authenticate_with_http_license(&auth_procedure)
     license_key = request.authorization.to_s.split(' ').second
 
     auth_procedure.call(license_key)
@@ -115,7 +115,7 @@ module TokenAuthentication
     current_bearer
   end
 
-  def http_key_authenticator(license_key, options = nil)
+  def http_license_authenticator(license_key, options = nil)
     return nil if
       current_account.nil? || license_key.blank?
 
@@ -175,8 +175,8 @@ module TokenAuthentication
     authentication_scheme == 'basic'
   end
 
-  def has_key_credentials?
-    authentication_scheme == 'key'
+  def has_license_credentials?
+    authentication_scheme == 'license'
   end
 
   def authentication_scheme
