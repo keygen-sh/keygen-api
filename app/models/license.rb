@@ -332,6 +332,10 @@ class License < ApplicationRecord
     :expire_from_first_activation?,
     :expire_from_first_use?,
     :expire_from_first_download?,
+    :supports_token_auth?,
+    :supports_key_auth?,
+    :supports_mixed_auth?,
+    :supports_auth?,
     to: :policy,
     allow_nil: true
 

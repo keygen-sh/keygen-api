@@ -251,6 +251,7 @@ ActiveRecord::Schema.define(version: 2022_01_21_175339) do
     t.integer "max_cores"
     t.string "expiration_strategy"
     t.string "expiration_basis"
+    t.string "license_auth_strategy"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

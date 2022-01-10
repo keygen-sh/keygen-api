@@ -42,6 +42,13 @@ class Policy < ApplicationRecord
     FROM_FIRST_USE
   ].freeze
 
+  LICENSE_AUTH_STRATEGIES = %w[
+    TOKEN
+    KEY
+    MIXED
+    NONE
+  ].freeze
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -59,6 +66,7 @@ class Policy < ApplicationRecord
   before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
+  before_create -> { self.license_auth_strategy = 'TOKEN' }, if: -> { license_auth_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -86,6 +94,9 @@ class Policy < ApplicationRecord
   validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
+  validates :license_auth_strategy,
+    inclusion: { in: LICENSE_AUTH_STRATEGIES, message: "unsupported authentication strategy" },
+    allow_nil: true
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -283,6 +294,26 @@ class Policy < ApplicationRecord
 
   def expire_from_first_download?
     expiration_basis == 'FROM_FIRST_DOWNLOAD'
+  end
+
+  def supports_token_auth?
+    # NOTE(ezekg) Backwards compat
+    return true if
+     license_auth_strategy.nil?
+
+    license_auth_strategy == 'TOKEN' || supports_mixed_auth?
+  end
+
+  def supports_key_auth?
+    license_auth_strategy == 'KEY' || supports_mixed_auth?
+  end
+
+  def supports_mixed_auth?
+    license_auth_strategy == 'MIXED'
+  end
+
+  def supports_auth?
+    license_auth_strategy != 'NONE'
   end
 
   def pop!
