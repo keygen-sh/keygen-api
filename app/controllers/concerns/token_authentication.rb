@@ -80,7 +80,7 @@ module TokenAuthentication
     # who may be mistakenly using a UUID as a token, which is a common mistake.
     if http_token.present? && http_token =~ UUID_REGEX
       raise Keygen::Error::UnauthorizedError.new(
-        detail: "Token format is invalid (make sure the token begins with a proper prefix e.g. 'prod-XXX' or 'activ-XXX', and that it's not a token's UUID identifier)",
+        detail: "Token format is invalid (make sure that you're providing the token, not the token's UUID identifier)",
         code: 'TOKEN_FORMAT_INVALID',
       )
     end
