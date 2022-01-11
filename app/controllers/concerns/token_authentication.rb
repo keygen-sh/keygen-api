@@ -67,9 +67,16 @@ module TokenAuthentication
 
   def http_basic_authenticator(username = nil, password = nil)
     return nil if
-      current_account.nil? || username.blank? || password.present?
+      current_account.nil? || username.blank? && password.blank?
 
-    http_token_authenticator(username)
+    case username
+    when 'license'
+      http_license_authenticator(password)
+    when 'token'
+      http_token_authenticator(password)
+    else
+      http_token_authenticator(username)
+    end
   end
 
   def http_token_authenticator(http_token = nil, options = nil)
