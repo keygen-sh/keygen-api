@@ -493,7 +493,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Bad Auth Stratety",
+            "name": "Bad Auth Strategy",
             "licenseAuthStrategy": "API_KEY"
           },
           "relationships": {
