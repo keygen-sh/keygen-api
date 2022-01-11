@@ -161,7 +161,7 @@ Feature: Create policy
             "fingerprintMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_VALIDATION",
-            "licenseAuthStrategy": "LICENSE_KEY",
+            "licenseAuthStrategy": "KEY",
             "maxUses": 5
           },
           "relationships": {
@@ -180,7 +180,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ALL"
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
-    And the JSON response should be a "policy" with the licenseAuthStrategy "LICENSE_KEY"
+    And the JSON response should be a "policy" with the licenseAuthStrategy "KEY"
     And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent

@@ -160,7 +160,7 @@ module TokenAuthentication
 
     if current_license.present?
       raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_NOT_ALLOWED', detail: 'License key authentication is not allowed by policy') unless
-        current_license.supports_license_key_auth?
+        current_license.supports_key_auth?
     end
 
     current_license
