@@ -44,7 +44,7 @@ class Policy < ApplicationRecord
 
   LICENSE_AUTH_STRATEGIES = %w[
     TOKEN
-    LICENSE_KEY
+    KEY
     MIXED
     NONE
   ].freeze
@@ -304,8 +304,8 @@ class Policy < ApplicationRecord
     license_auth_strategy == 'TOKEN' || supports_mixed_auth?
   end
 
-  def supports_license_key_auth?
-    license_auth_strategy == 'LICENSE_KEY' || supports_mixed_auth?
+  def supports_key_auth?
+    license_auth_strategy == 'KEY' || supports_mixed_auth?
   end
 
   def supports_mixed_auth?
