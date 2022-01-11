@@ -2484,3 +2484,213 @@ Feature: Create machine
       }
       """
     And the current account should have 0 "machines"
+
+  # Authentication schemes
+  #
+  Scenario: License activates a machine with a token (auth strategy allowed)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "TOKEN" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: License activates a machine with a token (auth strategy not allowed)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "NONE" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "Token authentication is not allowed by policy",
+        "code": "TOKEN_NOT_ALLOWED"
+      }
+      """
+
+  Scenario: License activates a machine with their key (auth strategy allowed)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "LICENSE_KEY" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: License activates a machine with their key (auth strategy not allowed)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "TOKEN" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "License key authentication is not allowed by policy",
+        "code": "LICENSE_NOT_ALLOWED"
+      }
+      """
+
+  Scenario: License activates a machine with a token (mixed auth strategy)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "MIXED" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
+  Scenario: License activates a machine with their key (mixed auth strategy)
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "licenseAuthStrategy": "MIXED" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
