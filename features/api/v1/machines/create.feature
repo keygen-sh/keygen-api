@@ -2564,7 +2564,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "LICENSE_KEY" }
+      { "licenseAuthStrategy": "KEY" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
