@@ -75,6 +75,7 @@ module TokenAuthentication
     when 'token'
       http_token_authenticator(password)
     else
+      # NOTE(ezekg) For backwards compatibility
       http_token_authenticator(username)
     end
   end
