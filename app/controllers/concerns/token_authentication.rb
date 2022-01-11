@@ -53,7 +53,7 @@ module TokenAuthentication
   end
 
   def authenticate_with_http_license(&auth_procedure)
-    license_key = request.authorization.to_s.split(' ').second
+    license_key = request.authorization.to_s.split(' ', 2).second
 
     auth_procedure.call(license_key)
   end
@@ -160,7 +160,7 @@ module TokenAuthentication
 
     if current_license.present?
       raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_NOT_ALLOWED', detail: 'License key authentication is not allowed by policy') unless
-        current_license.supports_key_auth?
+        current_license.supports_license_key_auth?
     end
 
     current_license
