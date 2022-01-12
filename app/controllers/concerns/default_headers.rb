@@ -58,6 +58,7 @@ module DefaultHeaders
   ensure
     add_content_security_policy_headers
     add_rate_limiting_headers
+    add_cache_control_headers
     add_signature_headers
     add_whoami_headers
     add_version_header
@@ -79,6 +80,10 @@ module DefaultHeaders
       report-uri /-/csp-reports;
       report-to csp-reports;
     TXT
+  end
+
+  def add_cache_control_headers
+    response.headers['Cache-Control'] = 'private, no-cache, no-store'
   end
 
   def add_rate_limiting_headers
