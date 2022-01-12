@@ -217,6 +217,10 @@ class Account < ApplicationRecord
     protected
   end
 
+  def status
+    billing&.state&.upcase
+  end
+
   def admins
     users.admins
   end

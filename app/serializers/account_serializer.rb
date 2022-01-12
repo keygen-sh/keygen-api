@@ -5,6 +5,7 @@ class AccountSerializer < BaseSerializer
 
   attribute :name
   attribute :slug
+  attribute :status
   attribute :protected
   attribute :created do
     @object.created_at
