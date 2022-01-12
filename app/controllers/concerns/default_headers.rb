@@ -83,7 +83,7 @@ module DefaultHeaders
   end
 
   def add_cache_control_headers
-    response.headers['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
+    response.headers['Cache-Control'] = 'no-store, max-age=0'
   end
 
   def add_rate_limiting_headers
