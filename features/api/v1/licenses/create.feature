@@ -3147,7 +3147,7 @@ Feature: Create license
       """
       {
         "title": "Unauthorized",
-        "detail": "Token format is invalid (make sure that you're providing the token, not the token's UUID identifier)",
+        "detail": "Token format is invalid (make sure that you're providing a token value, not a token's UUID identifier)",
         "code": "TOKEN_FORMAT_INVALID"
       }
       """
