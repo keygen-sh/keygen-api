@@ -36,7 +36,25 @@ class Token < ApplicationRecord
     token.errors.add :deactivations, :limit_exceeded, message: "exceeds maximum allowed (#{token.max_deactivations})"
   end
 
-  scope :for_bearer, -> (type, id) { where(bearer_type: type, bearer_id: id) }
+  scope :for_bearer, -> type, id {
+    for_bearer_type(type).for_bearer_id(id)
+  }
+
+  scope :for_bearer_type, -> type {
+    bearer_type = type.to_s.underscore.singularize.classify
+    return none if
+      bearer_type.empty?
+
+    where(bearer_type: bearer_type)
+  }
+
+  scope :for_bearer_id, -> id {
+    bearer_id = id.to_s
+    return none if
+      bearer_id.empty?
+
+    where(bearer_id: bearer_id)
+  }
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.

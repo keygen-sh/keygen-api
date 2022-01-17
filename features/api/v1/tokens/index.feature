@@ -24,7 +24,18 @@ Feature: List authentication tokens
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"
+    # NOTE(ezekg) 1 admin token, 3 product tokens, 5 user tokens
     And the JSON response should be an array of 9 "tokens"
+
+  Scenario: Admin requests all tokens for a specific user
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And the current account has 3 "products"
+    And the current account has 5 "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[3]"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
 
   Scenario: Product requests their tokens while authenticated
     Given the current account is "test1"
