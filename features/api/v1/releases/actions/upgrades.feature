@@ -463,6 +463,57 @@ Feature: Release upgrade actions
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
     Then the response status should be "204"
 
+  # Upgrade by filename
+  Scenario: Admin retrieves an upgrade for a product release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2        | Test-App-1.0.2.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3        | Test-App-1.0.3.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1        | Test-App-1.1.1.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2        | Test-App-1.1.2.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | Test-App-1.2.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | Test-App-1.3.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0        | Test-App-1.4.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0        | Test-App-1.5.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0        | Test-App-1.6.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0        | Test-App-1.7.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0        | Test-App-2.0.0.dmg        | dmg      | macos    | stable   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1        | Test-App-2.0.1.dmg        | dmg      | macos    | stable   |
+    And all "releases" have artifacts that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/Test-App-1.0.3.dmg/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.3",
+        "next": "2.0.1"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a product release (no upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version      | filename                  | filetype | platform | channel  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
+    And all "releases" have artifacts that are uploaded
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/Test-App-1.0.0.dmg/actions/upgrade"
+    Then the response status should be "204"
+
   # Users
   Scenario: User retrieves an upgrade for a release of their product (upgrade available)
     Given the current account is "test1"
