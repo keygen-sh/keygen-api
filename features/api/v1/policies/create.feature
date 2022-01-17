@@ -88,7 +88,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ANY"
     And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
-    And the JSON response should be a "policy" with the licenseAuthStrategy "TOKEN"
+    And the JSON response should be a "policy" with the authenticationStrategy "TOKEN"
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
@@ -161,7 +161,7 @@ Feature: Create policy
             "fingerprintMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_VALIDATION",
-            "licenseAuthStrategy": "KEY",
+            "authenticationStrategy": "LICENSE",
             "maxUses": 5
           },
           "relationships": {
@@ -180,7 +180,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ALL"
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
-    And the JSON response should be a "policy" with the licenseAuthStrategy "KEY"
+    And the JSON response should be a "policy" with the authenticationStrategy "LICENSE"
     And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent
@@ -494,7 +494,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Bad Auth Strategy",
-            "licenseAuthStrategy": "API_KEY"
+            "authenticationStrategy": "API_KEY"
           },
           "relationships": {
             "product": {
@@ -514,9 +514,9 @@ Feature: Create policy
       {
         "title": "Unprocessable resource",
         "detail": "unsupported authentication strategy",
-        "code": "LICENSE_AUTH_STRATEGY_NOT_ALLOWED",
+        "code": "AUTHENTICATION_STRATEGY_NOT_ALLOWED",
         "source": {
-          "pointer": "/data/attributes/licenseAuthStrategy"
+          "pointer": "/data/attributes/authenticationStrategy"
         }
       }
       """
