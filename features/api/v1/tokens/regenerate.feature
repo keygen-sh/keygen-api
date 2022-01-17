@@ -64,7 +64,7 @@ Feature: Regenerate authentication token
       { "expiry": "$time.1.week.ago.iso" }
       """
     When I send a PUT request to "/accounts/test1/tokens"
-    Then the response status should be "401"
+    Then the response status should be "403"
 
   Scenario: User resets their current token with a bad reset token
     Given the current account is "test1"
