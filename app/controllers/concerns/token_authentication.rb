@@ -117,7 +117,7 @@ module TokenAuthentication
     Current.bearer = current_bearer
     Current.token  = current_token
 
-    raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
+    raise Keygen::Error::ForbiddenError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
       current_token&.expired?
 
     case
@@ -156,7 +156,7 @@ module TokenAuthentication
     raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_SUSPENDED', detail: 'License is suspended') if
       current_license&.suspended?
 
-    raise Keygen::Error::UnauthorizedError.new(code: 'LICENSE_EXPIRED', detail: 'License is expired') if
+    raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_EXPIRED', detail: 'License is expired') if
       current_license&.expired?
 
     if current_license.present?
