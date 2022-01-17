@@ -26,12 +26,40 @@ Feature: User password actions
       {
         "meta": {
           "oldPassword": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
+
+  Scenario: User updates their password (too short)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/actions/update-password" with the following:
+      """
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "pass"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "is too short (minimum is 8 characters)",
+          "source": {
+            "pointer": "/data/attributes/password"
+          },
+          "code": "PASSWORD_TOO_SHORT"
+        }
+      """
 
   Scenario: User updates their password by using their email
     Given the current account is "test1"
@@ -49,7 +77,7 @@ Feature: User password actions
       {
         "meta": {
           "oldPassword": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -65,7 +93,7 @@ Feature: User password actions
       """
       {
         "meta": {
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -81,7 +109,7 @@ Feature: User password actions
       {
         "meta": {
           "oldPassword": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -98,7 +126,7 @@ Feature: User password actions
       {
         "meta": {
           "oldPassword": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -114,7 +142,7 @@ Feature: User password actions
       {
         "meta": {
           "oldPassword": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -133,7 +161,7 @@ Feature: User password actions
       {
         "meta": {
           "passwordResetToken": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -157,12 +185,48 @@ Feature: User password actions
       {
         "meta": {
           "passwordResetToken": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
+
+  Scenario: User resets their password (too short)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And I am a user of account "test1"
+    And I have the following attributes:
+      """
+      {
+        "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS",
+        "passwordResetSentAt": "$time.23.hours.ago",
+        "email": "user@example.com"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
+      """
+      {
+        "meta": {
+          "passwordResetToken": "password",
+          "newPassword": "bad"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "is too short (minimum is 8 characters)",
+          "source": {
+            "pointer": "/data/attributes/password"
+          },
+          "code": "PASSWORD_TOO_SHORT"
+        }
+      """
 
   Scenario: User attempts to reset password with missing parameters
     Given the current account is "test1"
@@ -176,7 +240,7 @@ Feature: User password actions
       """
       {
         "meta": {
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """
@@ -195,7 +259,7 @@ Feature: User password actions
       {
         "meta": {
           "passwordResetToken": "password",
-          "newPassword": "pass"
+          "newPassword": "password2"
         }
       }
       """

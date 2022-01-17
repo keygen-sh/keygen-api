@@ -35,7 +35,7 @@ Feature: Create user
             "firstName": "Clark",
             "lastName": "Kent",
             "email": "superman@keygen.sh",
-            "password": "lois"
+            "password": "kent <3 lois"
           }
         }
       }
@@ -67,7 +67,7 @@ Feature: Create user
             "firstName": "Clark",
             "lastName": "Kent",
             "email": "superman@keygen.sh",
-            "password": "lois",
+            "password": "loislane",
             "role": "user"
           }
         }
@@ -88,6 +88,33 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous creates a user with a short password
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "invalid@keygen.example",
+            "password": "short"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "is too short (minimum is 8 characters)",
+          "source": {
+            "pointer": "/data/attributes/password"
+          },
+          "code": "PASSWORD_TOO_SHORT"
+        }
+      """
+
   Scenario: Anonymous creates a user with no name
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -105,7 +132,7 @@ Feature: Create user
           "type": "users",
           "attributes": {
             "email": "cap@keygen.sh",
-            "password": "america"
+            "password": "america!"
           }
         }
       }
@@ -137,7 +164,7 @@ Feature: Create user
             "firstName": "Clark",
             "lastName": "Kent",
             "email": "superman@keygen.sh",
-            "password": "lois"
+            "password": "superman+lois"
           }
         }
       }
@@ -179,7 +206,7 @@ Feature: Create user
             "firstName": "Clark",
             "lastName": "Kent",
             "email": 42,
-            "password": "lois"
+            "password": "superman+lois"
           }
         }
       }
@@ -199,7 +226,7 @@ Feature: Create user
             "firstName": "Clark",
             "lastName": "Kent",
             "email": "foo.com",
-            "password": "lois"
+            "password": "superman <3 lois"
           }
         }
       }
@@ -242,7 +269,7 @@ Feature: Create user
             "firstName": "Tony",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
+            "password": "!jarvis!"
           }
         }
       }
@@ -271,7 +298,7 @@ Feature: Create user
             "firstName": "Tony",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
+            "password": "!jarvis!"
           }
         }
       }
@@ -296,7 +323,7 @@ Feature: Create user
             "firstName": "Tony",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
+            "password": "((jarvis))"
           }
         }
       }
@@ -321,7 +348,7 @@ Feature: Create user
             "firstName": "Tony",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
+            "password": "secret123"
           }
         }
       }
@@ -346,7 +373,7 @@ Feature: Create user
           "type": "users",
           "attributes": {
             "email": "ironman@keygen.sh",
-            "password": "jarvis",
+            "password": "secret123",
             "role": "admin"
           }
         }
@@ -378,7 +405,7 @@ Feature: Create user
             "firstName": "Mr.",
             "lastName": "Robot",
             "email": "mr.robot@keygen.sh",
-            "password": "password",
+            "password": "l337h4x0r",
             "role": "developer"
           }
         }
@@ -410,7 +437,7 @@ Feature: Create user
             "firstName": "Jim",
             "lastName": "Halpert",
             "email": "jim@keygen.sh",
-            "password": "pam",
+            "password": "bears beets battlestar galactica",
             "role": "sales-agent"
           }
         }
@@ -442,7 +469,7 @@ Feature: Create user
             "firstName": "Pam",
             "lastName": "Beesly",
             "email": "beesly@keygen.sh",
-            "password": "jim",
+            "password": "jimjimjimjim",
             "role": "support-agent"
           }
         }
@@ -490,7 +517,7 @@ Feature: Create user
             "firstName": "Spiderman",
             "lastName": "Parker",
             "email": "spiderman@keygen.sh",
-            "password": "web",
+            "password": "i shoot webs",
             "role": "spider"
           }
         }
@@ -516,7 +543,7 @@ Feature: Create user
             "firstName": "Ironman",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis",
+            "password": "my suit's cool",
             "role": "admin"
           }
         }
@@ -552,7 +579,7 @@ Feature: Create user
             "firstName": "Ironman",
             "lastName": "Stark",
             "email": "ironman@keygen.sh",
-            "password": "jarvis"
+            "password": "jarvis!!"
           }
         }
       }
@@ -629,7 +656,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "*mjolnir*",
             "role": "admin"
           }
         }
@@ -660,7 +687,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "mjolnir?",
             "role": "developer"
           }
         }
@@ -691,7 +718,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "mjolnir--",
             "role": "sales-agent"
           }
         }
@@ -722,7 +749,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "mjolnir++",
             "role": "support-agent"
           }
         }
@@ -753,7 +780,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "hunter1",
             "role": "license"
           }
         }
@@ -784,7 +811,7 @@ Feature: Create user
             "firstName": "Thor",
             "lastName": "Thor",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "hunter1",
             "role": "product"
           }
         }
@@ -815,7 +842,7 @@ Feature: Create user
             "firstName": "Bad",
             "lastName": "Actor",
             "email": "hack@keygen.sh",
-            "password": "pwnd",
+            "password": "ugotpwnd",
             "RoLe": "admin"
           }
         }
@@ -846,7 +873,7 @@ Feature: Create user
             "firstName": "Bad",
             "lastName": "Actor",
             "email": "hack@keygen.sh",
-            "password": "pwnd",
+            "password": "ugotpwnd",
             "ROLE": "admin"
           }
         }
@@ -877,7 +904,7 @@ Feature: Create user
             "firstName": "String in CP1252 encoding: \xE4\xF6\xFC\xDF",
             "lastName": "Partly valid\xE4 UTF-8 encoding: äöüß",
             "email": "thor@keygen.sh",
-            "password": "mjolnir",
+            "password": "hunter1",
             "role": "admin"
           }
         }
