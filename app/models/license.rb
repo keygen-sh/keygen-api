@@ -109,6 +109,12 @@ class License < ApplicationRecord
     unless: -> { key.nil? },
     on: :create
 
+  # Non-crypted keys should be 8 character minimum
+  validates :key,
+    length: { minimum: 8, maximum: 100.kilobytes },
+    if: -> { key.present? && !scheme? },
+    on: :create
+
   validates :max_machines,
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,

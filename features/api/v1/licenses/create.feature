@@ -601,7 +601,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "a"
+            "key": "a-license-key"
           },
           "relationships": {
             "policy": {
@@ -615,7 +615,7 @@ Feature: Create license
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "license" with the key "a"
+    And the JSON response should be a "license" with the key "a-license-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -631,7 +631,7 @@ Feature: Create license
       """
       {
         "policyId": "$policies[0]",
-        "key": "a"
+        "key": "a-duplicate-key"
       }
       """
     And I use an authentication token
@@ -641,7 +641,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "a"
+            "key": "a-duplicate-key"
           },
           "relationships": {
             "policy": {
@@ -785,7 +785,7 @@ Feature: Create license
     And the first "license" of account "test2" has the following attributes:
       """
       {
-        "key": "a"
+        "key": "a-duplicate-key"
       }
       """
     And the current account has 1 "policy"
@@ -800,7 +800,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "a"
+            "key": "a-duplicate-key"
           },
           "relationships": {
             "policy": {
@@ -815,7 +815,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the JSON response should be a "license" with maxMachines "3"
-    And the JSON response should be a "license" with the key "a"
+    And the JSON response should be a "license" with the key "a-duplicate-key"
     And the current account should have 1 "license"
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -888,7 +888,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "a"
+            "key": "a-legacy-key"
           },
           "relationships": {
             "policy": {
@@ -2039,6 +2039,55 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license using scheme ED25519_SIGN with a short key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "short"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the signed key of "short" using "ED25519_SIGN"
+    And the JSON response should be a "license" with the scheme "ED25519_SIGN"
+    And the JSON response should be a "license" that is not encrypted
+    And the JSON response should be a "license" that is not strict
+    And the JSON response should be a "license" that is not floating
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license without a user
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2209,7 +2258,7 @@ Feature: Create license
       """
     Then the response status should be "422"
     And the current account should have 0 "licenses"
-    And the JSON response should be an array of 1 error
+    And the JSON response should be an array of 2 errors
     And the first error should have the following properties:
       """
       {
@@ -2219,6 +2268,17 @@ Feature: Create license
         "source": {
           "pointer": "/data/attributes/key"
         }
+      }
+      """
+    And the second error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "is too short (minimum is 8 characters)",
+        "source": {
+          "pointer": "/data/attributes/key"
+        },
+        "code": "KEY_TOO_SHORT"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -3989,3 +4049,37 @@ Feature: Create license
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
+
+  Scenario: Admin creates a license with a short key
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "short"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "is too short (minimum is 8 characters)",
+          "source": {
+            "pointer": "/data/attributes/key"
+          },
+          "code": "KEY_TOO_SHORT"
+        }
+      """

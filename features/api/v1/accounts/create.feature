@@ -30,7 +30,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "googling"
                   }
                 }
               ]
@@ -590,7 +590,7 @@ Feature: Create account
                   "type": "user",
                   "attributes": {
                     "email": "ace6b050-6dc0-4cb5-85e9-ad87f629255f@icloud.com",
-                    "password": "secret"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -632,7 +632,7 @@ Feature: Create account
                   "type": "user",
                   "attributes": {
                     "email": "-ace6b0506dc04cb585e9ad87f629255f-@icloud.com",
-                    "password": "secret"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -686,7 +686,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "hunter2!"
                   }
                 }
               ]
@@ -725,7 +725,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "password1"
                   }
                 },
                 {
@@ -734,7 +734,7 @@ Feature: Create account
                     "firstName": "Sergey",
                     "lastName": "Brin",
                     "email": "sbrin@keygen.sh",
-                    "password": "goog"
+                    "password": "password2"
                   }
                 },
                 {
@@ -743,7 +743,7 @@ Feature: Create account
                     "firstName": "Sundar",
                     "lastName": "Pichai",
                     "email": "spichai@keygen.sh",
-                    "password": "goog"
+                    "password": "password3"
                   }
                 }
               ]
@@ -784,7 +784,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "password1"
                   }
                 },
                 {
@@ -793,7 +793,7 @@ Feature: Create account
                     "firstName": "Sergey",
                     "lastName": "Brin",
                     "email": "sbrin@keygen.sh",
-                    "password": "goog"
+                    "password": "password2"
                   }
                 },
                 {
@@ -802,7 +802,7 @@ Feature: Create account
                     "firstName": "Sundar",
                     "lastName": "Pichai",
                     "email": "spichai@keygen.sh",
-                    "password": "goog"
+                    "password": "password3"
                   }
                 },
                 "invalidParameter"
@@ -839,7 +839,7 @@ Feature: Create account
                     "firstName": "Bad",
                     "lastName": "Actor",
                     "email": "hacker@keygen.sh",
-                    "password": "h4X0r$"
+                    "password": "h4X0r$!1"
                   }
                 }
               ]
@@ -880,7 +880,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "password"
                   }
                 }
               ]
@@ -927,7 +927,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage^keygen.sh",
-                    "password": "goog"
+                    "password": "password1"
                   }
                 },
                 {
@@ -936,7 +936,7 @@ Feature: Create account
                     "firstName": "Sergey",
                     "lastName": "Brin",
                     "email": "sbrin*keygen.sh",
-                    "password": "goog"
+                    "password": "password2"
                   }
                 }
               ]
@@ -1015,7 +1015,7 @@ Feature: Create account
                   "type": "user",
                   "attributes": {
                     "email": "pjrvs@fathom.example",
-                    "password": "pr1vat3",
+                    "password": "correct horse battery staple",
                     "role": "user"
                   }
                 }
@@ -1053,7 +1053,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -1090,7 +1090,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -1135,7 +1135,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -1180,7 +1180,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "lpage@keygen.sh",
-                    "password": "goog"
+                    "password": "secret123"
                   }
                 }
               ]
@@ -1227,7 +1227,7 @@ Feature: Create account
                     "firstName": "Larry",
                     "lastName": "Page",
                     "email": "missingatsymbol.keygen.sh",
-                    "password": "goog"
+                    "password": "secret123"
                   }
                 }
               ]
