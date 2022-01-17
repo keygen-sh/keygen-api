@@ -103,7 +103,7 @@ module Api::V1
             param :fingerprint_matching_strategy, type: :string, optional: true
             param :expiration_strategy, type: :string, optional: true
             param :expiration_basis, type: :string, optional: true
-            param :license_auth_strategy, type: :string, optional: true
+            param :authentication_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true
@@ -143,7 +143,7 @@ module Api::V1
             param :fingerprint_matching_strategy, type: :string, optional: true
             param :expiration_strategy, type: :string, optional: true
             param :expiration_basis, type: :string, optional: true
-            param :license_auth_strategy, type: :string, optional: true
+            param :authentication_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true

@@ -2492,7 +2492,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "TOKEN" }
+      { "authenticationStrategy": "TOKEN" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2524,7 +2524,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "KEY" }
+      { "authenticationStrategy": "LICENSE" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2564,7 +2564,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "KEY" }
+      { "authenticationStrategy": "LICENSE" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2596,7 +2596,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "TOKEN" }
+      { "authenticationStrategy": "TOKEN" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2636,7 +2636,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "MIXED" }
+      { "authenticationStrategy": "MIXED" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2668,7 +2668,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "MIXED" }
+      { "authenticationStrategy": "MIXED" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2700,7 +2700,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "NONE" }
+      { "authenticationStrategy": "NONE" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:
@@ -2740,7 +2740,7 @@ Feature: Create machine
     And the current account has 1 "policies"
     And the first "policy" has the following attributes:
       """
-      { "licenseAuthStrategy": "NONE" }
+      { "authenticationStrategy": "NONE" }
       """
     And the current account has 1 "license"
     And the first "license" has the following attributes:

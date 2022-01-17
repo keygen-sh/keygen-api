@@ -42,9 +42,9 @@ class Policy < ApplicationRecord
     FROM_FIRST_USE
   ].freeze
 
-  LICENSE_AUTH_STRATEGIES = %w[
+  AUTHENTICATION_STRATEGIES = %w[
     TOKEN
-    KEY
+    LICENSE
     MIXED
     NONE
   ].freeze
@@ -66,7 +66,7 @@ class Policy < ApplicationRecord
   before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
-  before_create -> { self.license_auth_strategy = 'TOKEN' }, if: -> { license_auth_strategy.nil? }
+  before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -94,8 +94,8 @@ class Policy < ApplicationRecord
   validates :fingerprint_matching_strategy, inclusion: { in: FINGERPRINT_MATCHING_STRATEGIES, message: "unsupported fingerprint matching strategy" }, allow_nil: true
   validates :expiration_strategy, inclusion: { in: EXPIRATION_STRATEGIES, message: "unsupported expiration strategy" }, allow_nil: true
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
-  validates :license_auth_strategy,
-    inclusion: { in: LICENSE_AUTH_STRATEGIES, message: "unsupported authentication strategy" },
+  validates :authentication_strategy,
+    inclusion: { in: AUTHENTICATION_STRATEGIES, message: "unsupported authentication strategy" },
     allow_nil: true
 
   validate do
@@ -299,21 +299,21 @@ class Policy < ApplicationRecord
   def supports_token_auth?
     # NOTE(ezekg) Backwards compat
     return true if
-      license_auth_strategy.nil?
+      authentication_strategy.nil?
 
-    license_auth_strategy == 'TOKEN' || supports_mixed_auth?
+    authentication_strategy == 'TOKEN' || supports_mixed_auth?
   end
 
   def supports_key_auth?
-    license_auth_strategy == 'KEY' || supports_mixed_auth?
+    authentication_strategy == 'LICENSE' || supports_mixed_auth?
   end
 
   def supports_mixed_auth?
-    license_auth_strategy == 'MIXED'
+    authentication_strategy == 'MIXED'
   end
 
   def supports_auth?
-    license_auth_strategy != 'NONE'
+    authentication_strategy != 'NONE'
   end
 
   def pop!
