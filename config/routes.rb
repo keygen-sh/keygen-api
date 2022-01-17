@@ -184,7 +184,7 @@ Rails.application.routes.draw do
           end
         end
 
-        resources "releases" do
+        resources "releases", constraints: { id: /.*/ } do
           collection do
             put "/", to: "releases#upsert", as: "upsert"
           end
