@@ -304,7 +304,7 @@ class Policy < ApplicationRecord
     authentication_strategy == 'TOKEN' || supports_mixed_auth?
   end
 
-  def supports_key_auth?
+  def supports_license_auth?
     authentication_strategy == 'LICENSE' || supports_mixed_auth?
   end
 
