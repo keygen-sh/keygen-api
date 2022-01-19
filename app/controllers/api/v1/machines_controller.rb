@@ -148,6 +148,7 @@ module Api::V1
       on :create do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[machine machines]
+          param :id, type: :string, optional: true
           param :attributes, type: :hash do
             param :fingerprint, type: :string
             param :name, type: :string, optional: true, allow_nil: true

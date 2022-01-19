@@ -80,7 +80,7 @@ class License < ApplicationRecord
       !UUID_REGEX.match?(id_before_type_cast)
 
     errors.add :id, :conflict, message: 'must not conflict with another license' if
-      account.licenses.exists?(id)
+      License.exists?(id)
   end
 
   validate on: :create, unless: -> { policy.nil? } do
