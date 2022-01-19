@@ -44,6 +44,14 @@ class Machine < ApplicationRecord
 
   validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
 
+  validate on: :create, if: -> { id_before_type_cast.present? } do
+    errors.add :id, :invalid, message: 'must be a valid UUID' if
+      !UUID_REGEX.match?(id_before_type_cast)
+
+    errors.add :id, :conflict, message: 'must not conflict with another machine' if
+      Machine.exists?(id)
+  end
+
   # Disallow machine fingerprints to match UUID of another machine
   validate on: :create do |machine|
     errors.add :fingerprint, :conflict, message: "must not conflict with another machine's identifier (UUID)" if account.machines.exists? fingerprint

@@ -2368,3 +2368,119 @@ Feature: Create machine
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
+
+  Scenario: License activates a machine with a pre-determined ID
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "00000000-2521-4033-9f4f-3675387016f7",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the id "00000000-2521-4033-9f4f-3675387016f7"
+    And the current account should have 1 "machine"
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+
+  Scenario: License activates a machine with a pre-determined ID (conflict)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      { "id": "00000000-2521-4033-9f4f-3675387016f7" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "00000000-2521-4033-9f4f-3675387016f7",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must not conflict with another machine",
+        "source": {
+          "pointer": "/data/id"
+        },
+        "code": "ID_CONFLICT"
+      }
+      """
+    And the current account should have 1 "machine"
+
+  Scenario: License activates a machine with a pre-determined ID (bad ID)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "1",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be a valid UUID",
+        "source": {
+          "pointer": "/data/id"
+        },
+        "code": "ID_INVALID"
+      }
+      """
+    And the current account should have 0 "machines"
