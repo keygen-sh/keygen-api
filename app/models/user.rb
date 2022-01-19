@@ -40,7 +40,7 @@ class User < ApplicationRecord
   before_save -> { self.email = email.downcase }
 
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
-  validates :password, length: { minimum: 8, maximum: 1.kilobyte }, if: -> { password.present? }
+  validates :password, length: { minimum: 6, maximum: 1.kilobyte }, if: -> { password.present? }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :stdout_subscribers, -> {
