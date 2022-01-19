@@ -53,7 +53,7 @@ Feature: User password actions
       """
       {
           "title": "Unprocessable resource",
-          "detail": "is too short (minimum is 8 characters)",
+          "detail": "is too short (minimum is 6 characters)",
           "source": {
             "pointer": "/data/attributes/password"
           },
@@ -220,7 +220,7 @@ Feature: User password actions
       """
       {
           "title": "Unprocessable resource",
-          "detail": "is too short (minimum is 8 characters)",
+          "detail": "is too short (minimum is 6 characters)",
           "source": {
             "pointer": "/data/attributes/password"
           },
