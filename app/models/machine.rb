@@ -173,10 +173,10 @@ class Machine < ApplicationRecord
       )
     SQL
 
-    joins(:license).where('licenses.key ILIKE ?', "%#{license_identifier}%")
-                .or(
-                  joins(:license).where(tsv_query.squish, license_identifier)
-                )
+    joins(:license).where('licenses.name ILIKE ?', "%#{license_identifier}%")
+                   .or(
+                     joins(:license).where(tsv_query.squish, license_identifier)
+                   )
   }
 
   scope :search_user, -> (term) {
