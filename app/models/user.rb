@@ -7,13 +7,7 @@ class User < ApplicationRecord
   include Limitable
   include Pageable
   include Roleable
-  include Searchable
   include Diffable
-
-  SEARCH_ATTRIBUTES = [:id, :email, :first_name, :last_name, :metadata, { full_name: [:first_name, :last_name] }].freeze
-  SEARCH_RELATIONSHIPS = { role: %i[name] }.freeze
-
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   has_secure_password
 
@@ -50,10 +44,22 @@ class User < ApplicationRecord
         .reorder(:email, :created_at)
   }
 
-  # FIXME(ezekg) Hack to override pg_search with more performant query
-  # TODO(ezekg) Rip out pg_search
   scope :search_email, -> (term) {
-    where('email ILIKE ?', "%#{term}%")
+    where('users.email ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_first_name, -> (term) {
+    where('users.first_name ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_last_name, -> (term) {
+    where('users.last_name ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_full_name, -> (term) {
+    first_name, last_name = term.to_s.split(' ', 2)
+
+    search_first_name(first_name).search_last_name(last_name)
   }
 
   scope :search_metadata, -> (terms) {
@@ -90,6 +96,32 @@ class User < ApplicationRecord
           scope.where('"users"."metadata" @> ?', after_type_cast.to_json)
         )
     end
+  }
+
+  scope :search_role, -> (term) {
+    role_identifier = term.to_s
+    return none if
+      role_identifier.empty?
+
+    return joins(:role).where(role: { id: role_identifier }) if
+      UUID_REGEX.match?(role_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', roles.id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
+                .or(
+                  joins(:role).where(tsv_query.squish, role_identifier)
+                )
   }
 
   scope :with_metadata, -> (meta) { search_metadata meta }

@@ -39,7 +39,6 @@ gem 'kaminari', '~> 1.2.0'
 
 # Postgres extensions
 gem 'active_record_union'
-gem 'pg_search'
 
 # Background jobs
 gem 'sidekiq'
