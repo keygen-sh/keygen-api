@@ -4,21 +4,10 @@ class Machine < ApplicationRecord
   include Envented::Callbacks
   include Limitable
   include Pageable
-  include Searchable
   include Diffable
 
   HEARTBEAT_DRIFT = 30.seconds
   HEARTBEAT_TTL = 10.minutes
-
-  SEARCH_ATTRIBUTES = %i[id fingerprint name metadata].freeze
-  SEARCH_RELATIONSHIPS = {
-    product: %i[id name],
-    policy: %i[id name],
-    license: %i[id key],
-    user: %i[id email]
-  }.freeze
-
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   belongs_to :license, counter_cache: true
@@ -109,8 +98,6 @@ class Machine < ApplicationRecord
   validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
-  # FIXME(ezekg) Hack to override pg_search with more performant query
-  # TODO(ezekg) Rip out pg_search
   scope :search_id, -> (term) {
     identifier = term.to_s
     return none if
@@ -119,15 +106,15 @@ class Machine < ApplicationRecord
     return where(id: identifier) if
       UUID_REGEX.match?(identifier)
 
-    where('id::text ILIKE ?', "%#{identifier}%")
+    where('machines.id::text ILIKE ?', "%#{identifier}%")
   }
 
   scope :search_fingerprint, -> (term) {
-    where('fingerprint ILIKE ?', "%#{term}%")
+    where('machines.fingerprint ILIKE ?', "%#{term}%")
   }
 
   scope :search_name, -> (term) {
-    where('name ILIKE ?', "%#{term}%")
+    where('machines.name ILIKE ?', "%#{term}%")
   }
 
   scope :search_metadata, -> (terms) {
@@ -159,11 +146,116 @@ class Machine < ApplicationRecord
           { search_key => value }
         end
 
-      scope.where('"machines"."metadata" @> ?', before_type_cast.to_json)
+      scope.where('machines.metadata @> ?', before_type_cast.to_json)
         .or(
-          scope.where('"machines"."metadata" @> ?', after_type_cast.to_json)
+          scope.where('machines.metadata @> ?', after_type_cast.to_json)
         )
     end
+  }
+
+  scope :search_license, -> (term) {
+    license_identifier = term.to_s
+    return none if
+      license_identifier.empty?
+
+    return joins(:license).where(license: { id: license_identifier }) if
+      UUID_REGEX.match?(license_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', licenses.id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:license).where('licenses.key ILIKE ?', "%#{license_identifier}%")
+                .or(
+                  joins(:license).where(tsv_query.squish, license_identifier)
+                )
+  }
+
+  scope :search_user, -> (term) {
+    user_identifier = term.to_s
+    return none if
+      user_identifier.empty?
+
+    return joins(:user).where(user: { id: user_identifier }) if
+      UUID_REGEX.match?(user_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', users.id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
+                .or(
+                  joins(:user).where(tsv_query.squish, user_identifier)
+                )
+  }
+
+  scope :search_product, -> (term) {
+    product_identifier = term.to_s
+    return none if
+      product_identifier.empty?
+
+    return joins(:policy).where(policy: { product_id: product_identifier }) if
+      UUID_REGEX.match?(product_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', products.id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(policy: :product)
+      .where('products.name ILIKE ?', "%#{product_identifier}%")
+      .or(
+        joins(policy: :product).where(tsv_query.squish, product_identifier)
+      )
+  }
+
+  scope :search_policy, -> (term) {
+    policy_identifier = term.to_s
+    return none if
+      policy_identifier.empty?
+
+    return where(policy_id: policy_identifier) if
+      UUID_REGEX.match?(policy_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', policy_id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
+                  .or(
+                    joins(:policy).where(tsv_query.squish, policy_identifier)
+                  )
   }
 
   scope :with_metadata, -> (meta) { search_metadata meta }

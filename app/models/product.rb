@@ -4,19 +4,13 @@ class Product < ApplicationRecord
   include Limitable
   include Pageable
   include Roleable
-  include Searchable
   include Diffable
-
-  SEARCH_ATTRIBUTES = %i[id name metadata].freeze
-  SEARCH_RELATIONSHIPS = {}.freeze
 
   DISTRIBUTION_STRATEGIES = %w[
     LICENSED
     OPEN
     CLOSED
   ]
-
-  search attributes: SEARCH_ATTRIBUTES
 
   belongs_to :account
   has_one :role, as: :resource, dependent: :destroy
@@ -42,6 +36,57 @@ class Product < ApplicationRecord
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :distribution_strategy, inclusion: { in: DISTRIBUTION_STRATEGIES, message: "unsupported distribution strategy" }, allow_nil: true
+
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_REGEX.match?(identifier)
+
+    where('products.id::text ILIKE ?', "%#{identifier}%")
+  }
+
+  scope :search_name, -> (term) {
+    where('products.name ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_metadata, -> (terms) {
+    # FIXME(ezekg) Duplicated code for licenses, users, and machines.
+    # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
+    #              to search for the original string values and type cast, since
+    #              HTTP querystring parameters are strings.
+    #
+    #              Example we need to be able to search for:
+    #
+    #                { metadata: { external_id: "1624214616", internal_id: 1 } }
+    #
+    terms.reduce(self) do |scope, (key, value)|
+      search_key       = key.to_s.underscore.parameterize(separator: '_')
+      before_type_cast = { search_key => value }
+      after_type_cast  =
+        case value
+        when 'true'
+          { search_key => true }
+        when 'false'
+          { search_key => false }
+        when 'null'
+          { search_key => nil }
+        when /^\d+$/
+          { search_key => value.to_i }
+        when /^\d+\.\d+$/
+          { search_key => value.to_f }
+        else
+          { search_key => value }
+        end
+
+      scope.where('policies.metadata @> ?', before_type_cast.to_json)
+        .or(
+          scope.where('policies.metadata @> ?', after_type_cast.to_json)
+        )
+    end
+  }
 
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat

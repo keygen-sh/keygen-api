@@ -6,17 +6,7 @@ class License < ApplicationRecord
   include Tokenable
   include Pageable
   include Roleable
-  include Searchable
   include Diffable
-
-  SEARCH_ATTRIBUTES = %i[id key name metadata].freeze
-  SEARCH_RELATIONSHIPS = {
-    product: %i[id name],
-    policy: %i[id name],
-    user: %i[id email]
-  }
-
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   belongs_to :user
@@ -140,8 +130,6 @@ class License < ApplicationRecord
     allow_nil: true,
     if: -> { max_uses_override? }
 
-  # FIXME(ezekg) Hack to override pg_search with more performant queries
-  # TODO(ezekg) Rip out pg_search completely
   scope :search_id, -> (term) {
     identifier = term.to_s
     return none if
@@ -150,11 +138,15 @@ class License < ApplicationRecord
     return where(id: identifier) if
       UUID_REGEX.match?(identifier)
 
-    where('id::text ILIKE ?', "%#{identifier}%")
+    where('licenses.id::text ILIKE ?', "%#{identifier}%")
   }
 
   scope :search_key, -> (term) {
-    where('key ILIKE ?', "%#{term}%")
+    where('licenses.key ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_name, -> (term) {
+    where('licenses.name ILIKE ?', "%#{term}%")
   }
 
   scope :search_metadata, -> (terms) {
@@ -186,9 +178,9 @@ class License < ApplicationRecord
           { search_key => value }
         end
 
-      scope.where('"licenses"."metadata" @> ?', before_type_cast.to_json)
+      scope.where('licenses.metadata @> ?', before_type_cast.to_json)
         .or(
-          scope.where('"licenses"."metadata" @> ?', after_type_cast.to_json)
+          scope.where('licenses.metadata @> ?', after_type_cast.to_json)
         )
     end
   }
