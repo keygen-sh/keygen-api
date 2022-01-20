@@ -158,7 +158,7 @@ class Machine < ApplicationRecord
     return none if
       license_identifier.empty?
 
-    return joins(:license).where(license: { id: license_identifier }) if
+    return where(license_id: license_identifier) if
       UUID_REGEX.match?(license_identifier)
 
     tsv_query = <<~SQL
