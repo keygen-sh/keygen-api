@@ -266,9 +266,6 @@ GEM
     parallel_tests (3.3.0)
       parallel
     pg (1.1.4)
-    pg_search (2.3.0)
-      activerecord (>= 4.2)
-      activesupport (>= 4.2)
     premailer (1.14.2)
       addressable
       css_parser (>= 1.6.0)
@@ -471,7 +468,6 @@ DEPENDENCIES
   openssl
   parallel_tests (~> 3.3)
   pg
-  pg_search
   premailer-rails
   puma (~> 5.5.1)
   pundit

@@ -3,13 +3,7 @@
 class Entitlement < ApplicationRecord
   include Limitable
   include Pageable
-  include Searchable
   include Diffable
-
-  SEARCH_ATTRIBUTES    = %i[id name code].freeze
-  SEARCH_RELATIONSHIPS = {}.freeze
-
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   has_many :license_entitlements, dependent: :delete_all
@@ -24,4 +18,23 @@ class Entitlement < ApplicationRecord
 
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
+
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_REGEX.match?(identifier)
+
+    where('entitlements.id::text ILIKE ?', "%#{identifier}%")
+  }
+
+  scope :search_code, -> (term) {
+    where('entitlements.code ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_name, -> (term) {
+    where('entitlements.name ILIKE ?', "%#{term}%")
+  }
 end

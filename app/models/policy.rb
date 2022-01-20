@@ -3,7 +3,6 @@
 class Policy < ApplicationRecord
   include Limitable
   include Pageable
-  include Searchable
   include Diffable
 
   CRYPTO_SCHEMES = %w[
@@ -42,13 +41,6 @@ class Policy < ApplicationRecord
     FROM_FIRST_DOWNLOAD
     FROM_FIRST_USE
   ].freeze
-
-  SEARCH_ATTRIBUTES = %i[id name metadata].freeze
-  SEARCH_RELATIONSHIPS = {
-    product: %i[id name]
-  }.freeze
-
-  search attributes: SEARCH_ATTRIBUTES, relationships: SEARCH_RELATIONSHIPS
 
   belongs_to :account
   belongs_to :product
@@ -100,6 +92,84 @@ class Policy < ApplicationRecord
     errors.add :scheme, :not_supported, message: "cannot use a scheme and use a pool" if pool? && scheme?
     errors.add :scheme, :invalid, message: "must be encrypted when using LEGACY_ENCRYPT scheme" if !encrypted? && legacy_scheme?
   end
+
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_REGEX.match?(identifier)
+
+    where('policies.id::text ILIKE ?', "%#{identifier}%")
+  }
+
+  scope :search_name, -> (term) {
+    where('policies.name ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_metadata, -> (terms) {
+    # FIXME(ezekg) Duplicated code for licenses, users, and machines.
+    # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
+    #              to search for the original string values and type cast, since
+    #              HTTP querystring parameters are strings.
+    #
+    #              Example we need to be able to search for:
+    #
+    #                { metadata: { external_id: "1624214616", internal_id: 1 } }
+    #
+    terms.reduce(self) do |scope, (key, value)|
+      search_key       = key.to_s.underscore.parameterize(separator: '_')
+      before_type_cast = { search_key => value }
+      after_type_cast  =
+        case value
+        when 'true'
+          { search_key => true }
+        when 'false'
+          { search_key => false }
+        when 'null'
+          { search_key => nil }
+        when /^\d+$/
+          { search_key => value.to_i }
+        when /^\d+\.\d+$/
+          { search_key => value.to_f }
+        else
+          { search_key => value }
+        end
+
+      scope.where('policies.metadata @> ?', before_type_cast.to_json)
+        .or(
+          scope.where('policies.metadata @> ?', after_type_cast.to_json)
+        )
+    end
+  }
+
+  scope :search_product, -> (term) {
+    product_identifier = term.to_s
+    return none if
+      product_identifier.empty?
+
+    return where(product_id: product_identifier) if
+      UUID_REGEX.match?(product_identifier)
+
+    tsv_query = <<~SQL
+      to_tsvector('simple', products.id::text)
+      @@
+      to_tsquery(
+        'simple',
+        ''' ' ||
+        ?     ||
+        ' ''' ||
+        ':*'
+      )
+    SQL
+
+    joins(:product)
+      .where('products.name ILIKE ?', "%#{product_identifier}%")
+      .or(
+        joins(:product).where(tsv_query.squish, product_identifier)
+      )
+  }
 
   scope :for_product, -> (id) { where product: id }
 

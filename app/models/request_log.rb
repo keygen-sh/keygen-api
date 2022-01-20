@@ -4,10 +4,6 @@ class RequestLog < ApplicationRecord
   include DateRangeable
   include Limitable
   include Pageable
-  include Searchable
-
-  SEARCH_ATTRIBUTES = [:request_id, :requestor_type, :requestor_id, :resource_type, :resource_id, :status, :method, :url, :ip].freeze
-  SEARCH_RELATIONSHIPS = {}.freeze
 
   belongs_to :account
   belongs_to :requestor, polymorphic: true
@@ -28,7 +24,6 @@ class RequestLog < ApplicationRecord
     where created_at: (date_start..date_end)
   }
 
-  # FIXME(ezekg) Rip out pg_search for other models and replace with scopes
   scope :search_request_id, -> (term) {
     request_id = term.to_s
     return none if
@@ -37,7 +32,7 @@ class RequestLog < ApplicationRecord
     return where(request_id: request_id) if
       UUID_REGEX.match?(request_id)
 
-    where('request_id::text ILIKE ?', "%#{request_id}%")
+    where('request_logs.request_id::text ILIKE ?', "%#{request_id}%")
   }
 
   scope :search_requestor, -> (type, id) {
@@ -60,7 +55,7 @@ class RequestLog < ApplicationRecord
     return where(requestor_id: requestor_id) if
       UUID_REGEX.match?(requestor_id)
 
-    where('requestor_id::text ILIKE ?', "%#{requestor_id}%")
+    where('request_logs.requestor_id::text ILIKE ?', "%#{requestor_id}%")
   }
 
   scope :search_resource, -> (type, id) {
@@ -83,7 +78,7 @@ class RequestLog < ApplicationRecord
     return where(resource_id: resource_id) if
       UUID_REGEX.match?(resource_id)
 
-    where('resource_id::text ILIKE ?', "%#{resource_id}%")
+    where('request_logs.resource_id::text ILIKE ?', "%#{resource_id}%")
   }
 
   scope :search_method, -> (term) {
@@ -95,10 +90,10 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_url, -> (term) {
-    where('url LIKE ?', "%#{term}%")
+    where('request_logs.url LIKE ?', "%#{term}%")
   }
 
   scope :search_ip, -> (term) {
-    where('ip ILIKE ?', "%#{term}%")
+    where('request_logs.ip ILIKE ?', "%#{term}%")
   }
 end

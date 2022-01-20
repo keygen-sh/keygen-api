@@ -21,13 +21,19 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 15 "users"
+    And the first 10 "users" have the following attributes:
+      """
+      { "lastName": "Doe" }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search" with the following:
       """
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "lastName": "doe"
+          }
         }
       }
       """
@@ -41,13 +47,19 @@ Feature: Search
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "users"
+    And the first 10 "users" have the following attributes:
+      """
+      { "lastName": "Doe" }
+      """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/search?page[size]=5&page[number]=1" with the following:
       """
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "lastName": "Doe"
+          }
         }
       }
       """
@@ -58,10 +70,10 @@ Feature: Search
       {
         "self": "/v1/accounts/test1/search?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/search?page[number]=2&page[size]=5",
-        "last": "/v1/accounts/test1/search?page[number]=3&page[size]=5",
+        "last": "/v1/accounts/test1/search?page[number]=2&page[size]=5",
         "meta": {
-          "pages": 3,
-          "count": 11
+          "pages": 2,
+          "count": 10
         }
       }
       """
@@ -165,7 +177,9 @@ Feature: Search
       {
         "meta": {
           "type": "accounts",
-          "query": {}
+          "query": {
+            "name": "test"
+          }
         }
       }
       """
@@ -174,7 +188,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "unsupported search type 'accounts'",
+        "detail": "search type 'accounts' is not supported",
         "source": {
           "pointer": "/meta/type"
         }
@@ -194,7 +208,9 @@ Feature: Search
       {
         "meta": {
           "type": "tokens",
-          "query": {}
+          "query": {
+            "token": "%"
+          }
         }
       }
       """
@@ -203,7 +219,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "unsupported search type 'tokens'",
+        "detail": "search type 'tokens' is not supported",
         "source": {
           "pointer": "/meta/type"
         }
@@ -232,7 +248,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "unsupported search type 'unknowns'",
+        "detail": "search type 'unknowns' is not supported",
         "source": {
           "pointer": "/meta/type"
         }
@@ -263,7 +279,7 @@ Feature: Search
       """
       {
         "title": "Bad request",
-        "detail": "unsupported search query 'foo' for resource type 'users'",
+        "detail": "search query 'foo' is not supported for resource type 'users'",
         "source": {
           "pointer": "/meta/query/foo"
         }
@@ -1720,6 +1736,35 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search with an empty query
+    Given the current account is "test1"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "query": {}
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "search query is required",
+        "source": {
+          "pointer": "/meta/query"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Product performs a search
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -1730,7 +1775,9 @@ Feature: Search
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "email": "test@keygen.example"
+          }
         }
       }
       """
@@ -1749,7 +1796,9 @@ Feature: Search
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "email": "test@keygen.example"
+          }
         }
       }
       """
@@ -1768,7 +1817,9 @@ Feature: Search
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "email": "test@keygen.example"
+          }
         }
       }
       """
@@ -1784,7 +1835,9 @@ Feature: Search
       {
         "meta": {
           "type": "users",
-          "query": {}
+          "query": {
+            "email": "test@keygen.example"
+          }
         }
       }
       """
