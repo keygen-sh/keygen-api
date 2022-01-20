@@ -81,9 +81,9 @@ class Product < ApplicationRecord
           { search_key => value }
         end
 
-      scope.where('policies.metadata @> ?', before_type_cast.to_json)
+      scope.where('products.metadata @> ?', before_type_cast.to_json)
         .or(
-          scope.where('policies.metadata @> ?', after_type_cast.to_json)
+          scope.where('products.metadata @> ?', after_type_cast.to_json)
         )
     end
   }
