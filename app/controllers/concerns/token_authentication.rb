@@ -185,7 +185,7 @@ module TokenAuthentication
   end
 
   def has_bearer_credentials?
-    authentication_scheme == 'bearer'
+    authentication_scheme == 'bearer' || authentication_scheme == 'token'
   end
 
   def has_basic_credentials?
