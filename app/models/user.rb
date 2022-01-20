@@ -62,6 +62,10 @@ class User < ApplicationRecord
     search_first_name(first_name).search_last_name(last_name)
   }
 
+  scope :search_name, -> (term) {
+    search_full_name(term)
+  }
+
   scope :search_metadata, -> (terms) {
     # FIXME(ezekg) Duplicated code for licenses, users, and machines.
     # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
