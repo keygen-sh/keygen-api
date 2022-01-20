@@ -5,8 +5,9 @@ module Api::V1
     class UnsupportedSearchTypeError < StandardError; end
     class EmptyQueryError < StandardError; end
 
-    MINIMUM_SEARCH_QUERY_SIZE = 3.freeze
-    SEARCHABLE_MODELS = [
+    SEARCH_MIN_QUERY_SIZE = 3.freeze
+    SEARCH_OPS            = %i[AND OR].freeze
+    SEARCH_MODELS         = [
       Entitlement.name,
       RequestLog.name,
       Product.name,
@@ -23,6 +24,7 @@ module Api::V1
     # POST /search
     def search
       query, type = search_meta.fetch_values('query', 'type')
+      op          = search_meta.fetch('op') { :AND }.to_sym
       model       = type.underscore.classify.safe_constantize
 
       raise UnsupportedSearchTypeError if
@@ -31,8 +33,11 @@ module Api::V1
       raise EmptyQueryError if
         query.empty?
 
+      raise UnsupportedSearchOperationError unless
+        SEARCH_OPS.include?(op)
+
       raise UnsupportedSearchTypeError unless
-        SEARCHABLE_MODELS.include?(model.name)
+        SEARCH_MODELS.include?(model.name)
 
       raise UnsupportedSearchTypeError unless
         current_account.associated_to?(type.underscore.pluralize)
@@ -70,26 +75,40 @@ module Api::V1
             )
           end
 
-          if value.any? { |k, v| v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE }
-            keypair = value.find { |k, v| v.is_a?(String) && v.size < MINIMUM_SEARCH_QUERY_SIZE }
+          if value.any? { |k, v| v.is_a?(String) && v.size < SEARCH_MIN_QUERY_SIZE }
+            keypair = value.find { |k, v| v.is_a?(String) && v.size < SEARCH_MIN_QUERY_SIZE }
             key     = keypair.first
 
             return render_bad_request(
-              detail: "search query for '#{key.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+              detail: "search query for '#{key.camelize(:lower)}' is too small (minimum #{SEARCH_MIN_QUERY_SIZE} characters)",
               source: { pointer: "/meta/query/metadata/#{key.camelize(:lower)}" }
             )
           end
 
-          res = res.search_metadata(value)
+          case op
+          when :AND
+            res = res.search_metadata(value)
+          when :OR
+            res = res.or(res.search_metadata(value))
+          else
+            res = res.none
+          end
         else
-          if value.is_a?(String) && value.size < MINIMUM_SEARCH_QUERY_SIZE
+          if value.is_a?(String) && value.size < SEARCH_MIN_QUERY_SIZE
             return render_bad_request(
-              detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{MINIMUM_SEARCH_QUERY_SIZE} characters)",
+              detail: "search query for '#{attribute.camelize(:lower)}' is too small (minimum #{SEARCH_MIN_QUERY_SIZE} characters)",
               source: { pointer: "/meta/query/#{attribute.camelize(:lower)}" }
             )
           end
 
-          res  = res.send("search_#{attribute}", value)
+          case op
+          when :AND
+            res = res.send("search_#{attribute}", value)
+          when :OR
+            res = res.or(res.send("search_#{attribute}", value))
+          else
+            res = res.none
+          end
         end
       end
 
@@ -111,6 +130,7 @@ module Api::V1
       on :search do
         param :meta, type: :hash do
           param :type, type: :string
+          param :op, type: :string, optional: true
           param :query, type: :hash, allow_non_scalars: true do
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
 

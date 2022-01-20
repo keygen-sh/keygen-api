@@ -17,7 +17,71 @@ Feature: Search
     When I send a POST request to "/accounts/test1/search"
     Then the response status should be "403"
 
-  Scenario: Admin performs a search by user type with an empty query
+  Scenario: Admin performs a search using the AND operator
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And "users" 1-5 have the following attributes:
+      """
+      { "firstName": "John", "lastName": "Doe" }
+      """
+    And "users" 6-10 have the following attributes:
+      """
+      { "firstName": "Jane", "lastName": "Doe" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "op": "AND",
+          "query": {
+            "firstName": "john",
+            "lastName": "doe"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search using the OR operator
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 10 "users"
+    And "users" 1-5 have the following attributes:
+      """
+      { "firstName": "John", "lastName": "Doe" }
+      """
+    And "users" 6-10 have the following attributes:
+      """
+      { "firstName": "Jane", "lastName": "Doe" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "users",
+          "op": "OR",
+          "query": {
+            "firstName": "john",
+            "lastName": "doe"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 10 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin performs a search by user type
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 15 "users"
@@ -43,7 +107,7 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin performs a search by user type with an empty query using pagination
+  Scenario: Admin performs a search by user type using pagination
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 10 "users"
