@@ -111,8 +111,23 @@ class Machine < ApplicationRecord
 
   # FIXME(ezekg) Hack to override pg_search with more performant query
   # TODO(ezekg) Rip out pg_search
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_REGEX.match?(identifier)
+
+    where('id::text ILIKE ?', "%#{identifier}%")
+  }
+
   scope :search_fingerprint, -> (term) {
     where('fingerprint ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_name, -> (term) {
+    where('name ILIKE ?', "%#{term}%")
   }
 
   scope :search_metadata, -> (terms) {
