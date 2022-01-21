@@ -16,22 +16,15 @@ class RequestLogWorker
 
     account.request_logs.insert!(
       id: req['request_id'],
-
       requestor_type: req['requestor_type'],
       requestor_id: req['requestor_id'],
-
       resource_type: req['resource_type'],
       resource_id: req['resource_id'],
-
       created_at: req['request_time'],
       updated_at: req['request_time'],
-
-      request_id: req['request_id'],
-      request_body: req['body'],
-
       response_signature: res['signature'],
       response_body: res['body'],
-
+      request_body: req['body'],
       url: req['url'],
       method: req['method'],
       ip: req['ip'],
