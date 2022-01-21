@@ -16,6 +16,9 @@ class WebhookEndpoint < ApplicationRecord
     allow_nil: true
 
   validate do
+    next if
+      subscriptions == %w[*]
+
     event_types = EventType.pluck(:event)
 
     if (subscriptions - event_types).any?
