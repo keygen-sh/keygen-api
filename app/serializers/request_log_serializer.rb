@@ -3,7 +3,6 @@
 class RequestLogSerializer < BaseSerializer
   type 'request-logs'
 
-  attribute :request_id
   attribute :url
   attribute :method
   attribute :status
