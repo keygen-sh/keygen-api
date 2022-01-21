@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_21_162853) do
+ActiveRecord::Schema.define(version: 2022_01_21_171234) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -422,7 +422,6 @@ ActiveRecord::Schema.define(version: 2022_01_21_162853) do
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
-    t.string "request_id"
     t.string "url"
     t.string "method"
     t.string "ip"
@@ -440,7 +439,6 @@ ActiveRecord::Schema.define(version: 2022_01_21_162853) do
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["ip", "account_id", "created_at"], name: "request_logs_top_ip_idx", where: "(ip IS NOT NULL)"
     t.index ["method", "url", "account_id", "created_at"], name: "request_logs_top_method_url_idx", where: "((method IS NOT NULL) AND (url IS NOT NULL))"
-    t.index ["request_id", "created_at"], name: "request_logs_request_id_created_idx", unique: true
     t.index ["requestor_id", "requestor_type", "account_id", "created_at"], name: "request_logs_top_requestor_idx", where: "((requestor_id IS NOT NULL) AND (requestor_type IS NOT NULL))"
     t.index ["resource_id", "resource_type", "account_id", "created_at"], name: "request_logs_top_resource_idx", where: "((resource_id IS NOT NULL) AND (resource_type IS NOT NULL))"
   end
