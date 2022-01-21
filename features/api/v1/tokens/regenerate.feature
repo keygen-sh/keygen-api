@@ -157,3 +157,20 @@ Feature: Regenerate authentication token
     When I send a PUT request to "/accounts/test1/tokens/$0"
     Then the response status should be "200"
     And the JSON response should be a "token" with a token
+
+  Scenario: License resets their current token while authenticating with a license key
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a PUT request to "/accounts/test1/tokens"
+    Then the response status should be "404"
