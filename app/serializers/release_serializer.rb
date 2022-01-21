@@ -18,12 +18,6 @@ class ReleaseSerializer < BaseSerializer
   attribute :channel do
     @object.channel&.key
   end
-  attribute :downloads do
-    @object.download_count
-  end
-  attribute :upgrades do
-    @object.upgrade_count
-  end
   attribute :status
   attribute :version
   attribute :semver do
