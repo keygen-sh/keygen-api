@@ -369,10 +369,14 @@ module Envented
         end
       LUA
 
-      shasum =
-        (Envented::LUA_SHASUMS[:unlock] ||= redis { _1.script(:load, cmd) })
+      shasum = (Envented::LUA_SHASUMS[:unlock] ||= Digest::SHA1.hexdigest(cmd))
+      res    = begin
+                 redis { _1.evalsha(shasum, keys: [key], argv: [token]) }
+               rescue Redis::CommandError
+                 redis { _1.eval(cmd, keys: [key], argv: [token]) }
+               end
 
-      redis { !_1.evalsha(shasum, keys: [key], argv: [token]).zero? }
+      !res.zero?
     end
 
     private
