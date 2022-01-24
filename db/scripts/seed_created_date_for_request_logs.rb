@@ -9,13 +9,20 @@ loop do
   batch += 1
   count = RequestLog.connection.update("
     UPDATE
-      request_logs
+      request_logs l
     SET
       created_date = created_at::date
     WHERE
-      created_date is null
-    LIMIT
-      #{BATCH_SIZE}
+      l.id IN (
+        SELECT
+          id
+        FROM
+          request_logs l2
+        WHERE
+          l2.created_date IS NULL
+        LIMIT
+          #{BATCH_SIZE}
+      )
   ")
 
   puts "[scripts.seed_created_date_for_request_logs] Updated #{count} request log rows (batch ##{batch})"
