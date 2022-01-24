@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_21_175339) do
+ActiveRecord::Schema.define(version: 2022_01_24_160526) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -436,7 +436,7 @@ ActiveRecord::Schema.define(version: 2022_01_21_175339) do
     t.text "response_signature"
     t.string "resource_type"
     t.uuid "resource_id"
-    t.date "created_date"
+    t.date "created_date", null: false
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["account_id", "created_date"], name: "index_request_logs_on_account_id_and_created_date"
   end
