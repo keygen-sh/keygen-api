@@ -25,6 +25,7 @@ Feature: Request log counts
     And the first 10 "request-logs" have the following attributes:
       """
       {
+        "createdDate": "$time.8.days.ago",
         "createdAt": "$time.8.days.ago"
       }
       """
