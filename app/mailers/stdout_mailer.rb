@@ -148,6 +148,73 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_one(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: 'January in review -- announcing license key authentication!',
+      body: <<~TXT
+        #{greeting} -- Zeke here with another quick update.
+
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't
+        find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        We heard you loud and clear! Activation tokens were not the most convenient authentication mechanism in the world. They had to be created after a license was created, which required multiple API requests, and figuring out which values to send to an end-user was kind of a headache. Should you send the license key? The activation token? Both? (Typically, the answer was both — which kind of sucked.)
+
+        Starting today, you can configure your policies to have a license key authentication strategy. Doing so will allow you to authenticate with our API using a license key. Simply adjust your policy's authentication strategy to LICENSE, and start passing a license key into any API request's Authorization header using a new License scheme:
+
+          Authorization: License C1B6DE-39A6E3-DE1529-8559A0-4AF593-V3
+
+        It's that simple! No activation token required!
+
+        Instead of figuring out which values to send to your end-users during fulfillment — all you have to do is send them a license key. No other values required! You can then perform any API request that you could do with an activation token, like activate a machine, download a release upgrade, or send a heartbeat ping.
+
+        You can, of course, continue to use activation tokens! Nothing has changed there. And pretty soon, you'll be able to adjust permissions on a per-token basis. So activation tokens will still have a place — where more fine-grained access control is needed. But for the majority of use cases, switching to license key authentication will likely simplify your integration and fulfillment, as well as your software's end-user experience, which we think is a win-win.
+
+        Note on backwards compatibility: for existing policies, and any new policies — nothing has changed. This is an opt-in feature only. Policies will default to using a TOKEN authentication strategy, which behaves exactly like it did before we introduced this new authentication scheme.
+
+        If you'd like to opt-in, switch your policy's authentication strategy to LICENSE. (You can even accept both types of authentication, using MIXED, which should help during migration.)
+
+        --
+
+        Aside: we're looking for users for our new Zapier integration! Zapier needs us to have a handful of live users before we're able to publish our integration publicly. To try it out, use this invite link:
+
+          https://zapier.com/developer/public-invite/153849/d64f8d33515a747e154f3ee74ad90440/
+
+        --
+
+        Well, that's it for the second issue of Stdout (well, first... if we count from zero). Let me know if you have any feedback for me -- would love to hear it.
+
+        There's a lot more cool stuff coming up that I'm excited to share.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. for more on API authentication, check out our updated docs: https://keygen.sh/docs/api/authentication/
+      TXT
+    )
+  end
+
   private
 
   def encrypt(plaintext)
