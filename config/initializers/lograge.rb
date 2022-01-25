@@ -11,6 +11,8 @@ Rails.application.configure do
     bearer_type = controller.current_bearer&.class&.name&.underscore
     bearer_id = controller.current_bearer&.id
     token_id = controller.current_token&.id
+    authn = controller.current_http_scheme
+    authz = controller.current_bearer&.role&.name
     req = controller.request
     res = controller.response
     query_params =
@@ -87,6 +89,8 @@ Rails.application.configure do
       bearer_type: bearer_type || 'N/A',
       bearer_id: bearer_id || 'N/A',
       token_id: token_id || 'N/A',
+      authn: authn,
+      authz: authz,
       ip: req.headers['cf-connecting-ip'] || req.remote_ip,
       user_agent: req.user_agent || 'N/A',
       origin: req.headers['origin'] || 'N/A',

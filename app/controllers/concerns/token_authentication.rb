@@ -6,6 +6,8 @@ module TokenAuthentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
+  attr_accessor :current_http_scheme
+
   def authenticate_with_token!
     @current_bearer =
       case
@@ -93,8 +95,9 @@ module TokenAuthentication
       )
     end
 
-    @current_http_token = http_token
-    @current_token      = TokenAuthenticationService.call(
+    @current_http_scheme = :token
+    @current_http_token  = http_token
+    @current_token       = TokenAuthenticationService.call(
       account: current_account,
       token: http_token
     )
@@ -133,8 +136,9 @@ module TokenAuthentication
     return nil if
       current_account.nil? || license_key.blank?
 
-    @current_http_token = license_key
-    @current_token      = nil
+    @current_http_scheme = :license
+    @current_http_token  = license_key
+    @current_token       = nil
 
     current_license = LicenseKeyLookupService.call(
       account: current_account,
