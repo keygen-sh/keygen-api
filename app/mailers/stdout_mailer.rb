@@ -195,9 +195,9 @@ class StdoutMailer < ApplicationMailer
 
         --
 
-        Aside: we're looking for users for our new Zapier integration! Zapier needs us to have a handful of live users before we're able to publish our integration publicly. To try it out, use this invite link:
+        Aside: we're looking for users for our new Zapier integration! Zapier needs us to have a handful of live users before we're able to publish our integration publicly. To try it out, use the invite link at the bottom of this page:
 
-          https://zapier.com/developer/public-invite/153849/d64f8d33515a747e154f3ee74ad90440/
+          https://keygen.sh/integrate/zapier/
 
         --
 
