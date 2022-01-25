@@ -6,8 +6,6 @@ module TokenAuthentication
   include ActionController::HttpAuthentication::Token::ControllerMethods
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
-  attr_accessor :current_http_scheme
-
   def authenticate_with_token!
     @current_bearer =
       case
@@ -37,8 +35,6 @@ module TokenAuthentication
   end
 
   private
-
-  attr_accessor :current_http_token
 
   def authenticate_or_request_with_query_token(&auth_procedure)
     authenticate_with_query_token(&auth_procedure) || request_http_token_authentication
