@@ -16,6 +16,8 @@ class ApplicationController < ActionController::API
   around_action :rescue_from_exceptions
   after_action :verify_authorized
 
+  attr_accessor :current_http_scheme
+  attr_accessor :current_http_token
   attr_accessor :current_account
   attr_accessor :current_bearer
   attr_accessor :current_token
