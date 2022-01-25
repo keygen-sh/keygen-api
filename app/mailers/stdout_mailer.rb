@@ -170,8 +170,7 @@ class StdoutMailer < ApplicationMailer
       body: <<~TXT
         #{greeting} -- Zeke here with another quick update.
 
-        (You're receiving this email because you or your team signed up for a Keygen account. If you don't
-        find this email useful, you can unsubscribe below.)
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
 
           #{unsub_link}
 
