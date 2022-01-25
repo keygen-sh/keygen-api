@@ -12,8 +12,10 @@ module Stripe
     FREE_TIER_PRODUCT_ID = 'prod_DvO2JQ0AtwO7Tp'
 
     def initialize(cache:)
-      Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY')
-      Stripe.api_version = '2016-07-06' # NOTE(ezekg) For `list(status: 'all')`` support
+      Stripe.api_key      = ENV.fetch('STRIPE_SECRET_KEY')
+      Stripe.api_version  = '2016-07-06' # NOTE(ezekg) For `list(status: 'all')`` support
+      Stripe.open_timeout = 120
+      Stripe.read_timeout = 120
 
       @cache = cache
     end
