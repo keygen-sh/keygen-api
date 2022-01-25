@@ -42,7 +42,7 @@ gem 'active_record_union'
 
 # Background jobs
 gem 'sidekiq'
-gem 'sidekiq-unique-jobs'
+gem 'sidekiq-unique-jobs', '~> 7.1'
 gem 'sidekiq-status'
 gem 'sidekiq-cron', '~> 1.2'
 gem 'sidekiq-throttled'

@@ -389,11 +389,11 @@ GEM
       concurrent-ruby
       redis-prescription
       sidekiq
-    sidekiq-unique-jobs (7.0.7)
+    sidekiq-unique-jobs (7.1.12)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
-      sidekiq (>= 5.0, < 7.0)
-      thor (>= 0.20, < 2.0)
+      sidekiq (>= 5.0, < 8.0)
+      thor (>= 0.20, < 3.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -489,7 +489,7 @@ DEPENDENCIES
   sidekiq-cronitor (~> 2.0)
   sidekiq-status
   sidekiq-throttled
-  sidekiq-unique-jobs
+  sidekiq-unique-jobs (~> 7.1)
   spring
   spring-watcher-listen (~> 2.0.0)
   sprockets (~> 3.0)
