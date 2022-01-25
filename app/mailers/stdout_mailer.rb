@@ -177,7 +177,7 @@ class StdoutMailer < ApplicationMailer
 
         --
 
-        We heard you loud and clear! Activation tokens were not the most convenient authentication mechanism in the world. They had to be created after a license was created, which required multiple API requests, and figuring out which values to send to an end-user was kind of a headache. Should you send the license key? The activation token? Both? (Typically, the answer was both — which kind of sucked.)
+        We heard you loud and clear! Activation tokens were not the most convenient authentication mechanism in the world. They had to be created after a license was created, which required multiple API requests, and figuring out which values to send to an end-user was kind of a headache. Should you send the license key? The activation token? Both? (Typically, the answer was both -- which kind of sucked.)
 
         Starting today, you can configure your policies to have a license key authentication strategy. Doing so will allow you to authenticate with our API using a license key. Simply adjust your policy's authentication strategy to LICENSE, and start passing a license key into any API request's Authorization header using a new License scheme:
 
