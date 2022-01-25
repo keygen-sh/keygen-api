@@ -9,14 +9,14 @@ namespace :stdout do
                         .select(:id, :email, :first_name)
                         .to_a
 
-      Keygen.logger.info "Sending zeroth issue to #{subscribers.size} Stdout subscribers"
+      Keygen.logger.info "Sending first issue to #{subscribers.size} Stdout subscribers"
 
       subscribers.each do |subscriber|
         subscriber.touch(:stdout_last_sent_at)
 
-        Keygen.logger.info "Sending issue #0 to #{subscriber.email}"
+        Keygen.logger.info "Sending issue #1 to #{subscriber.email}"
 
-        StdoutMailer.issue_zero(subscriber: subscriber)
+        StdoutMailer.issue_one(subscriber: subscriber)
                     .deliver_later(
                       # Fan out deliveries
                       in: rand(1.minute..3.hours),
