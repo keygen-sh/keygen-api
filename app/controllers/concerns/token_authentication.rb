@@ -153,13 +153,14 @@ module TokenAuthentication
      raise Keygen::Error::UnauthorizedError.new(code: 'LICENSE_INVALID')
     end
 
-    raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_SUSPENDED', detail: 'License is suspended') if
-      current_license&.suspended?
-
-    raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_EXPIRED', detail: 'License is expired') if
-      current_license&.expired?
-
     if current_license.present?
+      raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_SUSPENDED', detail: 'License is suspended') if
+        current_license.suspended?
+
+      raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_EXPIRED', detail: 'License is expired') if
+        current_license.revoke_access? &&
+        current_license.expired?
+
       raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_NOT_ALLOWED', detail: 'License key authentication is not allowed by policy') unless
         current_license.supports_license_auth?
     end
