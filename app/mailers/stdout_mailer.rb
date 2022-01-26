@@ -166,7 +166,7 @@ class StdoutMailer < ApplicationMailer
     mail(
       content_type: 'text/plain',
       to: subscriber.email,
-      subject: 'January in review -- announcing license key authentication!',
+      subject: "What's new in Keygen: license key authentication!",
       body: <<~TXT
         #{greeting} -- Zeke here with another quick update.
 
