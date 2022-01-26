@@ -116,13 +116,25 @@ Given /^I use an expired authentication token$/ do
   header "Authorization", "Bearer #{@token.raw}"
 end
 
-Given /^I authenticate with my license key$/ do
+Given /^I authenticate with my(?: license)? key$/ do
   if rand(0..1).zero?
     http_key = @bearer.key
 
     header "Authorization", "License #{http_key}"
   else
     http_basic = Base64.strict_encode64("license:#{@bearer.key}")
+
+    header "Authorization", "Basic #{http_basic}"
+  end
+end
+
+Given /^I authenticate with an invalid key$/ do
+  if rand(0..1).zero?
+    http_key = SecureRandom.hex
+
+    header "Authorization", "License #{http_key}"
+  else
+    http_basic = Base64.strict_encode64("license:#{SecureRandom.hex}")
 
     header "Authorization", "Basic #{http_basic}"
   end
