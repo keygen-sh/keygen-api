@@ -35,7 +35,7 @@ class BroadcastEventService < BaseService
 
       # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
       #             generated via a background job like MachineHeartbeatWorker.
-      EventLogWorker2.perform_async(
+      EventLogWorker.perform_async(
         event,
         Current.account&.id || account.id,
         Current.resource&.class&.name || resource.class.name,

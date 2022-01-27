@@ -52,7 +52,7 @@ module RequestLogger
       return unless
         log_request?
 
-      RequestLogWorker2.perform_async(
+      RequestLogWorker.perform_async(
         Current.account.id,
         Current.bearer&.class&.name,
         Current.bearer&.id,
