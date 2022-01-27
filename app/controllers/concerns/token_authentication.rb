@@ -116,7 +116,7 @@ module TokenAuthentication
     Current.bearer = current_bearer
     Current.token  = current_token
 
-    raise Keygen::Error::ForbiddenError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
+    raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
       current_token&.expired?
 
     case
