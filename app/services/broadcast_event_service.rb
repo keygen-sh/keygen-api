@@ -35,16 +35,16 @@ class BroadcastEventService < BaseService
 
       # NOTE(ezekg) These current attributes could be nil if e.g. the event is being
       #             generated via a background job like MachineHeartbeatWorker.
-      EventLogWorker.perform_async(
-        event: event,
-        account_id: Current.account&.id || account.id,
-        resource_type: Current.resource&.class&.name || resource.class.name,
-        resource_id: Current.resource&.id || resource.id,
-        whodunnit_type: Current.bearer&.class&.name,
-        whodunnit_id: Current.bearer&.id,
-        request_id: Current.request_id,
-        idempotency_key: SecureRandom.hex,
-        metadata: metadata,
+      EventLogWorker2.perform_async(
+        event,
+        Current.account&.id || account.id,
+        Current.resource&.class&.name || resource.class.name,
+        Current.resource&.id || resource.id,
+        Current.bearer&.class&.name,
+        Current.bearer&.id,
+        Current.request_id,
+        SecureRandom.hex,
+        metadata.to_json,
       )
     rescue => e
       Keygen.logger.exception(e)
