@@ -13,11 +13,11 @@ Feature: Token expiration
     And the current account is "test1"
     And I use an expired authentication token
     When I send a GET request to "/accounts/test1/me"
-    Then the response status should be "403"
+    Then the response status should be "401"
     And the first error should have the following properties:
       """
       {
-        "title": "Access denied",
+        "title": "Unauthorized",
         "detail": "Token is expired",
         "code": "TOKEN_EXPIRED"
       }
@@ -29,7 +29,7 @@ Feature: Token expiration
     And I am a user of account "test1"
     And I use an expired authentication token
     When I send a GET request to "/accounts/test1/me"
-    Then the response status should be "403"
+    Then the response status should be "401"
 
   Scenario: Product attempts to use an expired token
     Given the current account is "test1"
@@ -37,4 +37,4 @@ Feature: Token expiration
     And I am a product of account "test1"
     And I use an expired authentication token
     When I send a GET request to "/accounts/test1/me"
-    Then the response status should be "403"
+    Then the response status should be "401"
