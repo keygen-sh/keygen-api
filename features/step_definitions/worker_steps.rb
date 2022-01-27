@@ -8,9 +8,9 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     when "metric"
       "record_metric_worker" # We renamed this worker
     when "request-log"
-      "request_log_worker2"
+      "request_log_worker"
     when "event-log"
-      "event_log_worker2"
+      "event_log_worker"
     when "heartbeat"
       "machine_heartbeat_worker"
     else
@@ -35,8 +35,8 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
     InitializeBillingWorker.drain
   when "event_notification_worker"
     EventNotificationWorker.drain
-  when "event_log_worker2"
-    EventLogWorker2.drain
+  when "event_log_worker"
+    EventLogWorker.drain
   end
 
   # Future queueing

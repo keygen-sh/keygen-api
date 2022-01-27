@@ -6,22 +6,16 @@ class EventLogWorker
   sidekiq_options lock: :until_executed,
                   queue: :logs
 
-  def perform(kwargs)
-    perform_with_kwargs(**kwargs.to_h.symbolize_keys)
-  end
-
-  private
-
-  def perform_with_kwargs(
-    event:,
-    account_id:,
-    resource_type:,
-    resource_id:,
-    whodunnit_type:,
-    whodunnit_id:,
-    request_id: nil,
-    idempotency_key: nil,
-    metadata: nil
+  def perform(
+    event,
+    account_id,
+    resource_type,
+    resource_id,
+    whodunnit_type,
+    whodunnit_id,
+    request_id,
+    idempotency_key,
+    metadata
   )
     event_type = fetch_event_type_by_event(event)
     event_log  = EventLog.create!(
@@ -51,3 +45,7 @@ class EventLogWorker
     Rails.cache
   end
 end
+
+# FIXME(ezekg) From Sidekiq 6.4 migration. Remove once all
+#              EventLogWorker2 workers are cleared.
+EventLogWorker2 = EventLogWorker

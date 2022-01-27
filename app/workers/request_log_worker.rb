@@ -7,7 +7,23 @@ class RequestLogWorker
   sidekiq_throttle concurrency: { limit: 10 }
   sidekiq_options queue: :logs
 
-  def perform(account_id, req, res)
+  def perform(
+    account_id,
+    requestor_type,
+    requestor_id,
+    resource_type,
+    resource_id,
+    request_id,
+    request_time,
+    request_user_agent,
+    request_method,
+    request_url,
+    request_body,
+    request_ip,
+    response_signature,
+    response_body,
+    response_status
+  )
     account = fetch_account(account_id)
 
     # Skip request logs for non-existent accounts
@@ -15,21 +31,21 @@ class RequestLogWorker
       account.nil?
 
     account.request_logs.insert!(
-      id: req['request_id'],
-      requestor_type: req['requestor_type'],
-      requestor_id: req['requestor_id'],
-      resource_type: req['resource_type'],
-      resource_id: req['resource_id'],
-      created_at: req['request_time'],
-      updated_at: req['request_time'],
-      response_signature: res['signature'],
-      response_body: res['body'],
-      request_body: req['body'],
-      url: req['url'],
-      method: req['method'],
-      ip: req['ip'],
-      user_agent: req['user_agent'],
-      status: res['status']
+      id: request_id,
+      requestor_type: requestor_type,
+      requestor_id: requestor_id,
+      resource_type: resource_type,
+      resource_id: resource_id,
+      created_at: request_time,
+      updated_at: Time.current,
+      user_agent: request_user_agent,
+      method: request_method,
+      url: request_url,
+      request_body: request_body,
+      ip: request_ip,
+      response_signature: response_signature,
+      response_body: response_body,
+      status: response_status,
     )
   rescue PG::UniqueViolation
     # NOTE(ezekg) Don't log duplicates
@@ -47,3 +63,7 @@ class RequestLogWorker
     nil
   end
 end
+
+# FIXME(ezekg) From Sidekiq 6.4 migration. Remove once all
+#              RequestLogWorker2 workers are cleared.
+RequestLogWorker2 = RequestLogWorker
