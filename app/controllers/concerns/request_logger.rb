@@ -52,37 +52,35 @@ module RequestLogger
       return unless
         log_request?
 
-      RequestLogWorker.perform_async(
+      RequestLogWorker2.perform_async(
         Current.account.id,
-        {
-          requestor_type: Current.bearer&.class&.name,
-          requestor_id: Current.bearer&.id,
-          resource_type: Current.resource&.class&.name,
-          resource_id: Current.resource&.id,
-          request_time: request_log_date,
-          request_id: Current.request_id,
-          user_agent: request_log_user_agent,
-          ip: request_log_ip,
-          method: request_log_method,
-          url: request_log_url,
-          body: request_log_request_body,
-        },
-        {
-          signature: request_log_signature,
-          status: request_log_status,
-          body: request_log_response_body,
-        }
+        Current.bearer&.class&.name,
+        Current.bearer&.id,
+        Current.resource&.class&.name,
+        Current.resource&.id,
+        Current.request_id,
+        request_log_date,
+        request_log_user_agent,
+        request_log_method,
+        request_log_url,
+        request_log_request_body,
+        request_log_ip,
+        request_log_signature,
+        request_log_response_body,
+        request_log_status,
       )
     rescue => e
       Keygen.logger.exception(e)
     end
 
     def request_log_date
-      if response.headers.key?('Date')
-        Time.httpdate(response.headers['Date'])
-      else
-        Time.current
-      end
+      t = if response.headers.key?('Date')
+            Time.httpdate(response.headers['Date'])
+          else
+            Time.current
+          end
+
+      t.iso8601(6)
     end
 
     def request_log_user_agent

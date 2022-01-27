@@ -86,3 +86,7 @@ end
 
 # Configure Sidekiq throttled
 Sidekiq::Throttled.setup!
+
+# Enable strict args for development/test
+Sidekiq.strict_args! unless
+  Rails.env.production?
