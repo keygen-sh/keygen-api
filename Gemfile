@@ -41,7 +41,7 @@ gem 'kaminari', '~> 1.2.0'
 gem 'active_record_union'
 
 # Background jobs
-gem 'sidekiq'
+gem 'sidekiq', '~> 6.4'
 gem 'sidekiq-unique-jobs', '~> 7.1'
 gem 'sidekiq-status'
 gem 'sidekiq-cron', '~> 1.2'

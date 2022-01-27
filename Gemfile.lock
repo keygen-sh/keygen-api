@@ -324,7 +324,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.2.5)
+    redis (4.5.1)
     redis-prescription (1.0.0)
     regexp_parser (1.8.2)
     request_store (1.4.1)
@@ -372,7 +372,7 @@ GEM
     sendgrid-ruby (6.3.8)
       ruby_http_client (~> 3.4)
     sexp_processor (4.15.2)
-    sidekiq (6.2.1)
+    sidekiq (6.4.0)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -484,7 +484,7 @@ DEPENDENCIES
   semverse
   sendgrid-actionmailer
   sendgrid-ruby
-  sidekiq
+  sidekiq (~> 6.4)
   sidekiq-cron (~> 1.2)
   sidekiq-cronitor (~> 2.0)
   sidekiq-status
