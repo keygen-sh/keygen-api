@@ -63,7 +63,3 @@ class RequestLogWorker
     nil
   end
 end
-
-# FIXME(ezekg) From Sidekiq 6.4 migration. Remove once all
-#              RequestLogWorker2 workers are cleared.
-RequestLogWorker2 = RequestLogWorker
