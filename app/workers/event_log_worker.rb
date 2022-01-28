@@ -33,19 +33,13 @@ class EventLogWorker
     EventNotificationWorker.perform_async(event_log.id)
   end
 
+  private
+
   def fetch_event_type_by_event(event)
     cache_key = EventType.cache_key(event)
 
-    cache.fetch(cache_key, skip_nil: true, expires_in: 1.day) do
+    Rails.cache.fetch(cache_key, skip_nil: true, expires_in: 1.day) do
       EventType.find_or_create_by!(event: event)
     end
   end
-
-  def cache
-    Rails.cache
-  end
 end
-
-# FIXME(ezekg) From Sidekiq 6.4 migration. Remove once all
-#              EventLogWorker2 workers are cleared.
-EventLogWorker2 = EventLogWorker
