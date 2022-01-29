@@ -4982,6 +4982,40 @@ Feature: License validation actions
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have a 1 year expiry
 
+  Scenario: Product validates a license key with a validation expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_VALIDATION",
+        "productId": "$products[0]",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should have a 1 year expiry
+
   Scenario: Anonymous validates a license key with an activation expiration basis (not set)
     Given the current account is "test1"
     And the current account has 1 "policy"
