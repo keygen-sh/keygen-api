@@ -38,7 +38,7 @@ module Envented
             IdempotencyLock.lock(idempotency_key)
         end
 
-        statuses = callbacks.map { |_, c| c.bind(self).call }
+        statuses = callbacks.map { |_, c| c.call(self) }
       rescue
         # Release the idempotency lock on complete failure
         IdempotencyLock.unlock(idempotency_key) if
@@ -88,8 +88,7 @@ module Envented
 
   class Callback
     def initialize(callback, if: nil, unless: nil)
-      @binding  = BindingBox.wrap(nil)
-      @callback = CallbackMethod.build(callback, binding: @binding)
+      @callback = CallbackMethod.build(callback)
 
       unless_value = binding.local_variable_get(:unless)
       if_value     = binding.local_variable_get(:if)
@@ -101,28 +100,17 @@ module Envented
       @guard =
         case
         when unless_value.present?
-          # We're inverting :unless so that we only have to worry about one type
-          # of guard clause result, :if, instead of the 2 types.
-          CallbackMethod.build(unless_value, binding: @binding).invert
+          CallbackMethod.build(unless_value, invert: true)
         when if_value.present?
-          CallbackMethod.build(if_value, binding: @binding)
+          CallbackMethod.build(if_value)
         end
     end
 
-    def bind(binding)
-      @binding.replace(binding)
-
-      self
-    end
-
-    def call
-      raise CallbackNotBoundError, 'callback must have a binding' unless
-        @binding.present?
-
+    def call(ctx)
       return false if
-        @guard.present? && !@guard.bind(@binding).call
+        @guard.present? && !@guard.call(ctx)
 
-      @callback.bind(@binding).call
+      @callback.call(ctx)
     end
   end
 
@@ -138,11 +126,9 @@ module Envented
       @auto_release_lock   = auto_release_lock
     end
 
-    def call(...)
-      raise CallbackNotBoundError, 'callback must have a binding' if
-        @binding.nil?
-
-      token = RedLock.lock!(lock_id,
+    def call(ctx)
+      lock_id = [ctx.send(@lock_id_method), @on].join(':')
+      token   = RedLock.lock!(lock_id,
         raise_on_lock_error: @raise_on_lock_error,
         wait_on_lock: @wait_on_lock,
         lock_wait_timeout: @lock_wait_timeout,
@@ -151,27 +137,22 @@ module Envented
       return false if
         token.nil?
 
-      super(...)
+      super(ctx)
     ensure
       RedLock.unlock!(lock_id, token: token) if
         @auto_release_lock &&
+        lock_id.present? &&
         token.present?
-    end
-
-    private
-
-    def lock_id
-      @lock_id ||= [@binding.unwrap.send(@lock_id_method), @on].join(':')
     end
   end
 
   class CallbackMethod
-    def self.build(method, binding: nil)
+    def self.build(method, invert: false)
       case method
       when Symbol
-        SymbolMethod.new(method, binding: binding)
+        SymbolMethod.new(method, invert: invert)
       when Proc
-        ProcMethod.new(method, binding: binding)
+        ProcMethod.new(method, invert: invert)
       else
         raise ArgumentError, 'must be a symbol or proc'
       end
@@ -179,116 +160,54 @@ module Envented
   end
 
   class SymbolMethod
-    def initialize(method, binding: nil)
+    def initialize(method, invert: false)
       raise ArgumentError, 'method must be a symbol' unless
         method.is_a?(Symbol)
 
-      @method  = method
-      @binding = BindingBox.wrap(binding)
+      @invert = invert
+      @method = method
     end
 
-    # Invert result using fancy-pants "arrow" function composition. XD
-    #
-    # This will invert the proc without calling it.
-    #
-    def invert
-      ProcMethod.new(to_proc >>-> { !_1 }, binding: @binding)
-    end
+    def call(ctx)
+      _method = @method
 
-    def bind(binding)
-      @binding.replace(binding)
+      ok = ctx.instance_exec { send(_method) }
+      return !ok if
+        inverted?
 
-      self
-    end
-
-    def call
-      raise CallbackNotBoundError, 'callback must have a binding' unless
-        @binding.present?
-
-      to_proc.call
+      ok
     end
 
     private
 
-    def to_proc
-      _binding = @binding
-      _method  = @method
-
-      Proc.new { _binding.unwrap.instance_exec { send(_method) } }
+    def inverted?
+      @invert
     end
   end
 
   class ProcMethod
-    def initialize(method, binding: nil)
+    def initialize(method, invert: false)
       raise ArgumentError, 'method must be a proc' unless
         method.is_a?(Proc)
 
-      @method  = method
-      @binding = BindingBox.wrap(binding)
+      @invert = invert
+      @method = method
     end
 
-    def invert
-      @method = @method >>-> { !_1 }
+    def call(ctx)
+      _method = @method
 
-      self
-    end
+      ok = ctx.instance_exec(&_method)
+      return !ok if
+        inverted?
 
-    def bind(binding)
-      @binding.replace(binding)
-
-      self
-    end
-
-    def call
-      raise CallbackNotBoundError, 'callback must have a binding' unless
-        @binding.present?
-
-      to_proc.call
+      ok
     end
 
     private
 
-    def to_proc
-      _binding = @binding
-      _method  = @method
-
-      Proc.new { _binding.unwrap.instance_exec(&_method) }
-    end
-  end
-
-  # Wrap our bindings so that they can be passed down the transformation call
-  # chain, e.g. an inverted SymbolMethod gets turned into a ProcMethod but
-  # it needs to keep the previous binding. So we box it up into an object
-  # reference instead of a nullable record passed by value.
-  #
-  class BindingBox
-    def self.wrap(value)
-      return value if
-        value.class <= BindingBox
-
-      new(value)
-    end
-
-    def unwrap
-      @value
-    end
-
-    def replace(v)
-      if v.class <= BindingBox
-        @value = v.unwrap
-      else
-        @value = v
-      end
-    end
-
-    def present?
-      @value.present?
-    end
-
-    private
-
-    def initialize(value)
-      @value = value
+    def inverted?
+      @invert
     end
   end
 
@@ -327,7 +246,7 @@ module Envented
   # See: https://redis.io/topics/distlock
   class RedLock
     def self.lock!(id, raise_on_lock_error:, wait_on_lock:, lock_wait_timeout:)
-      key      = Envented::LOCK_PREFIX + id
+      key   = Envented::LOCK_PREFIX + id
       token = nil
 
       Timeout.timeout(lock_wait_timeout) do
