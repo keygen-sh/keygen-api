@@ -115,7 +115,7 @@ module Envented
   end
 
   class ExclusiveCallback < Callback
-    def initialize(callback, on: event, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, auto_release_lock: true, **kwargs)
+    def initialize(callback, on:, lock_id_method: :id, raise_on_lock_error: false, wait_on_lock: false, lock_wait_timeout: Envented::LOCK_WAIT_TIMEOUT, auto_release_lock: true, **kwargs)
       super(callback, **kwargs)
 
       @on                  = on
