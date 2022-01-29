@@ -169,9 +169,7 @@ module Envented
     end
 
     def call(ctx)
-      _method = @method
-
-      ok = ctx.instance_exec { send(_method) }
+      ok = ctx.send(@method)
       return !ok if
         inverted?
 
@@ -195,9 +193,7 @@ module Envented
     end
 
     def call(ctx)
-      _method = @method
-
-      ok = ctx.instance_exec(&_method)
+      ok = ctx.instance_exec(&@method)
       return !ok if
         inverted?
 
