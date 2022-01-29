@@ -13,7 +13,7 @@ class EventNotificationWorker
     resource   = event_log.resource
 
     if whodunnit.present?
-      whodunnit.notify_of_event!(event_type.event, idempotency_key: event_log.idempotency_key) if
+      whodunnit.notify_of_event!(event_type.event, idempotency_key: "#{whodunnit.id}:#{event_log.idempotency_key}") if
         whodunnit.respond_to?(:notify_of_event!)
 
       # No use in attempting to resend the same idempotent event
@@ -21,7 +21,7 @@ class EventNotificationWorker
         whodunnit == resource
     end
 
-    resource.notify_of_event!(event_type.event, idempotency_key: event_log.idempotency_key) if
+    resource.notify_of_event!(event_type.event, idempotency_key: "#{resource.id}:#{event_log.idempotency_key}") if
       resource.respond_to?(:notify_of_event!)
   end
 end
