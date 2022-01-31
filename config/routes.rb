@@ -20,12 +20,12 @@ Rails.application.routes.draw do
     }
   end
 
-  scope module: "bin", constraints: { subdomain: %w[bin get], format: "jsonapi" } do
+  scope module: "bin", constraints: { subdomain: %w[bin get], domain: %w[keygen.sh], format: "jsonapi" } do
     get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
     get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
   end
 
-  scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
+  scope module: "stdout", constraints: { subdomain: %w[stdout], domain: %w[keygen.sh], format: "jsonapi" } do
     get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
   end
 
@@ -235,31 +235,33 @@ Rails.application.routes.draw do
 
   scope module: "api", constraints: { format: "jsonapi" } do
     namespace "v1" do
-      post "stripe", to: "stripe#receive_webhook"
+      constraints subdomain: %w[api], domain: %w[keygen.sh] do
+        post "stripe", to: "stripe#receive_webhook"
 
-      # Health checks
-      get "health", to: "health#general_health"
-      get "health/webhooks", to: "health#webhook_health"
+        # Health checks
+        get "health", to: "health#general_health"
+        get "health/webhooks", to: "health#webhook_health"
 
-      # Recover
-      post "recover", to: "recoveries#recover"
+        # Recover
+        post "recover", to: "recoveries#recover"
 
-      # Pricing
-      resources "plans", only: [:index, :show]
+        # Pricing
+        resources "plans", only: [:index, :show]
 
-      # Routes with :account namespace
-      resources "accounts", concerns: %i[v1], constraints: { subdomain: "api" }, except: [:index] do
-        scope module: "accounts/relationships" do
-          resource "billing", only: [:show, :update]
-          resource "plan", only: [:show, :update]
-        end
-        member do
-          scope "actions", module: "accounts/actions" do
-            post "manage-subscription", to: "subscription#manage"
-            post "pause-subscription", to: "subscription#pause"
-            post "resume-subscription", to: "subscription#resume"
-            post "cancel-subscription", to: "subscription#cancel"
-            post "renew-subscription", to: "subscription#renew"
+        # Routes with :account namespace
+        resources "accounts", concerns: %i[v1], except: [:index] do
+          scope module: "accounts/relationships" do
+            resource "billing", only: [:show, :update]
+            resource "plan", only: [:show, :update]
+          end
+          member do
+            scope "actions", module: "accounts/actions" do
+              post "manage-subscription", to: "subscription#manage"
+              post "pause-subscription", to: "subscription#pause"
+              post "resume-subscription", to: "subscription#resume"
+              post "cancel-subscription", to: "subscription#cancel"
+              post "renew-subscription", to: "subscription#renew"
+            end
           end
         end
       end
