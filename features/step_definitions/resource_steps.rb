@@ -4,14 +4,16 @@ World Rack::Test::Methods
 
 Given /^the following "([^\"]*)" exist:$/ do |resource, table|
   data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
-  data.each { |attributes| create(resource.singularize.underscore, attributes) }
+  data.each do |attributes|
+    create(resource.singularize.underscore, attributes.transform_values(&:presence))
+  end
 end
 
 Given /^the following "([^\"]*)" exists:$/ do |resource, body|
   parse_placeholders! body
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  create resource.singularize.underscore, attributes
+  create resource.singularize.underscore, attributes.transform_values(&:presence)
 end
 
 Given /^there exists an(?:other)? account "([^\"]*)"$/ do |slug|
