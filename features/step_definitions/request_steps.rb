@@ -692,7 +692,7 @@ Then /^the response should contain the following raw headers:$/ do |body|
 
 end
 
-Then /^the response should contain a valid(?: "([^"]+)")? signature header for "(\w+)"$/ do |expected_algorithm, account_id|
+Then /^the response should contain a valid(?: "([^"]+)")? signature header for "([^"]+)"$/ do |expected_algorithm, account_id|
   account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
   req     = last_request
   res     = last_response
@@ -738,7 +738,7 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
     ok = SignatureHelper.verify(
       account: account,
       method: req.request_method,
-      host: 'api.keygen.sh',
+      host: account.domain.presence || 'api.keygen.sh',
       uri: req.fullpath,
       body: res.body,
       signature_algorithm: algorithm,

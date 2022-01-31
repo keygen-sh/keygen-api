@@ -104,7 +104,7 @@ module SignatureHeaders
       keyid: keyid,
       date: httpdate,
       method: request.method,
-      host: 'api.keygen.sh',
+      host: request.host,
       uri: request.original_fullpath,
       digest: digest,
     )

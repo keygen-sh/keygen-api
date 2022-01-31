@@ -6,8 +6,8 @@ module CurrentAccountScope
   included do
     include ActiveSupport::Callbacks
 
-    ACCOUNT_SCOPE_INTERNAL_DOMAINS = %w[keygen.sh]
-    ACCOUNT_SCOPE_CACHE_TTL        = 15.minutes
+    ACCOUNT_SCOPE_INVALID_DOMAIN_RE = /keygen\.sh$/
+    ACCOUNT_SCOPE_CACHE_TTL         = 15.minutes
 
     # Define callback system for current account to allow controllers to run certain
     # callbacks before and after the current account has been set. For example, we
@@ -22,7 +22,7 @@ module CurrentAccountScope
                      params[:id]
 
         # Adds CNAME support for custom domains
-        account = find_by_account_domain(request.domain) ||
+        account = find_by_account_domain(request.host) ||
                   find_by_account_id!(account_id)
 
         Current.account = account
@@ -47,7 +47,7 @@ module CurrentAccountScope
         domain.present?
 
       raise Keygen::Error::InvalidAccountDomainError, 'domain is invalid' if
-        domain.in?(ACCOUNT_SCOPE_INTERNAL_DOMAINS)
+        domain.match?(ACCOUNT_SCOPE_INVALID_DOMAIN_RE)
 
       cache_key = Account.cache_key(domain)
 
