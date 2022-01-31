@@ -4,13 +4,6 @@ require 'sidekiq/web'
 require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
-  api_constraints =
-    if !Rails.env.development?
-      { constraints: { subdomain: %w[api keygen], format: "jsonapi" } }
-    else
-      { constraints: { format: "jsonapi" } }
-    end
-
   mount Sidekiq::Web, at: '/-/sidekiq'
 
   namespace "-" do
@@ -27,7 +20,18 @@ Rails.application.routes.draw do
     }
   end
 
+  scope module: "bin", constraints: { subdomain: %w[bin get], format: "jsonapi" } do
+    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
+    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
+  end
+
+  scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
+    get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
+  end
+
   concern :v1 do
+    get "ping", to: "health#general_ping"
+
     post   "tokens",     to: "tokens#generate"
     put    "tokens",     to: "tokens#regenerate_current"
     put    "tokens/:id", to: "tokens#regenerate"
@@ -229,14 +233,13 @@ Rails.application.routes.draw do
     post "search", to: "searches#search"
   end
 
-  scope module: "api", **api_constraints do
+  scope module: "api", constraints: { format: "jsonapi" } do
     namespace "v1" do
       post "stripe", to: "stripe#receive_webhook"
 
       # Health checks
       get "health", to: "health#general_health"
       get "health/webhooks", to: "health#webhook_health"
-      get "ping", to: "health#general_ping"
 
       # Recover
       post "recover", to: "recoveries#recover"
@@ -245,7 +248,7 @@ Rails.application.routes.draw do
       resources "plans", only: [:index, :show]
 
       # Routes with :account namespace
-      resources "accounts", concerns: %i[v1], except: [:index] do
+      resources "accounts", concerns: %i[v1], constraints: { subdomain: "api" }, except: [:index] do
         scope module: "accounts/relationships" do
           resource "billing", only: [:show, :update]
           resource "plan", only: [:show, :update]
@@ -264,15 +267,6 @@ Rails.application.routes.draw do
       # Routes without :account namespace (used via CNAMEs)
       concerns :v1
     end
-  end
-
-  scope module: "bin", constraints: { subdomain: %w[bin get], format: "jsonapi" } do
-    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
-    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
-  end
-
-  scope module: "stdout", constraints: { subdomain: %w[stdout], format: "jsonapi" } do
-    get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
   end
 
   %w[500 503].each do |code|
