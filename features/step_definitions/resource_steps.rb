@@ -75,6 +75,14 @@ Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
   end
 end
 
+Given /^the current account has the following attributes:$/ do |body|
+  parse_placeholders! body
+
+  attributes = JSON.parse(body).deep_transform_keys! &:underscore
+
+  @account.update attributes
+end
+
 Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
   count.to_i.times do
     create resource.singularize.underscore, account: @account

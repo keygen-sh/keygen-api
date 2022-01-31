@@ -6,6 +6,9 @@ module CurrentAccountScope
   included do
     include ActiveSupport::Callbacks
 
+    ACCOUNT_SCOPE_INTERNAL_DOMAINS = %w[keygen.sh]
+    ACCOUNT_SCOPE_CACHE_TTL        = 15.minutes
+
     # Define callback system for current account to allow controllers to run certain
     # callbacks before and after the current account has been set. For example, we
     # use this to validate signature-related headers, since we need to know the
@@ -19,15 +22,8 @@ module CurrentAccountScope
                      params[:id]
 
         # Adds CNAME support for custom domains
-        account = if request.domain == 'keygen.sh' || request.subdomain.empty?
-                    Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-                      FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
-                    end
-                  else
-                    Rails.cache.fetch(Account.cache_key(request.domain), skip_nil: true, expires_in: 15.minutes) do
-                      FindByAliasService.call(scope: Account, identifier: request.domain, aliases: :domain)
-                    end
-                  end
+        account = find_by_account_domain(request.domain) ||
+                  find_by_account_id!(account_id)
 
         Current.account = account
 
@@ -42,6 +38,39 @@ module CurrentAccountScope
 
     def self.after_current_account(callback)
       set_callback :current_account_scope, :after, callback
+    end
+
+    private
+
+    def find_by_account_domain!(domain)
+      return if
+        domain.in?(ACCOUNT_SCOPE_INTERNAL_DOMAINS)
+
+      cache_key = Account.cache_key(domain)
+
+      Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
+        Account.find_by!(domain: domain)
+      end
+    end
+
+    def find_by_account_domain(...)
+      find_by_account_domain!(...)
+    rescue ActiveRecord::RecordNotFound
+      nil
+    end
+
+    def find_by_account_id!(id)
+      cache_key = Account.cache_key(id)
+
+      Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
+        FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+      end
+    end
+
+    def find_by_account_id(...)
+      find_by_account_id!(...)
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
   end
 end
