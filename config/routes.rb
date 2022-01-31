@@ -6,7 +6,7 @@ require 'sidekiq_unique_jobs/web'
 Rails.application.routes.draw do
   api_constraints =
     if !Rails.env.development?
-      { constraints: { subdomain: "api", format: "jsonapi" } }
+      { constraints: { subdomain: %w[api keygen], format: "jsonapi" } }
     else
       { constraints: { format: "jsonapi" } }
     end
