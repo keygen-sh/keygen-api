@@ -43,23 +43,30 @@ module CurrentAccountScope
     private
 
     def find_by_account_domain!(domain)
-      return if
+      raise Keygen::Error::InvalidAccountDomainError, 'domain is required' unless
+        domain.present?
+
+      raise Keygen::Error::InvalidAccountDomainError, 'domain is invalid' if
         domain.in?(ACCOUNT_SCOPE_INTERNAL_DOMAINS)
 
       cache_key = Account.cache_key(domain)
 
       Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
-        Account.find_by!(domain: domain)
+        FindByAliasService.call(scope: Account, identifier: domain, aliases: :domain)
       end
     end
 
     def find_by_account_domain(...)
       find_by_account_domain!(...)
-    rescue ActiveRecord::RecordNotFound
+    rescue Keygen::Error::InvalidAccountDomainError,
+           Keygen::Error::NotFoundError
       nil
     end
 
     def find_by_account_id!(id)
+      raise Keygen::Error::InvalidAccountIdError, 'id is required' unless
+        id.present?
+
       cache_key = Account.cache_key(id)
 
       Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
@@ -69,7 +76,8 @@ module CurrentAccountScope
 
     def find_by_account_id(...)
       find_by_account_id!(...)
-    rescue ActiveRecord::RecordNotFound
+    rescue Keygen::Error::InvalidAccountIdError,
+           Keygen::Error::NotFoundError
       nil
     end
   end
