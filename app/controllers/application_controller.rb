@@ -280,6 +280,9 @@ class ApplicationController < ActionController::API
     else
       render_not_found
     end
+  rescue Keygen::Error::InvalidAccountDomainError,
+         Keygen::Error::InvalidAccountIdError
+    render_not_found
   rescue ActiveModel::RangeError
     render_bad_request detail: "integer is too large"
   rescue ActiveRecord::StatementInvalid => e
