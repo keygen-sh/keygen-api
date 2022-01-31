@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_21_175339) do
+ActiveRecord::Schema.define(version: 2022_01_31_182526) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -35,11 +35,15 @@ ActiveRecord::Schema.define(version: 2022_01_21_175339) do
     t.datetime "last_prompt_for_review_sent_at"
     t.text "ed25519_private_key"
     t.text "ed25519_public_key"
+    t.string "domain"
+    t.string "subdomain"
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
+    t.index ["domain"], name: "index_accounts_on_domain", unique: true
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
     t.index ["plan_id", "created_at"], name: "index_accounts_on_plan_id_and_created_at"
     t.index ["slug", "created_at"], name: "index_accounts_on_slug_and_created_at", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
+    t.index ["subdomain"], name: "index_accounts_on_subdomain", unique: true
   end
 
   create_table "billings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
