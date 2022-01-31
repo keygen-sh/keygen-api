@@ -510,7 +510,16 @@ module Stripe
     end
 
     def payment_method_for(customer)
-      customer.invoice_settings.default_payment_method.presence || customer.default_source
+      src = customer.invoice_settings.default_payment_method.presence || customer.default_source
+      case src
+      when Stripe::Source
+      when Stripe::Card
+        Stripe::PaymentMethod.retrieve(src.id)
+      when String
+        Stripe::PaymentMethod.retrieve(src)
+      else
+        src
+      end
     end
 
     def invoices_for(resource)
@@ -583,7 +592,9 @@ module Stripe
         converted_at =
           first_paid_invoice&.status_transitions&.paid_at ||
           payment_method.created
-        next if converted_at.nil?
+
+        next if
+          converted_at.nil?
 
         converted_at >= START_DATE
       end
