@@ -15,13 +15,23 @@ module CurrentAccountScope
 
     def scope_to_current_account!
       run_callbacks :current_account_scope do
-        account_id = params[:account_id] || params[:id]
-        account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
-          FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
-        end
+        account_id = params[:account_id] ||
+                     params[:id]
 
-        Current.account  = account
+        # Adds CNAME support for custom domains
+        account = if request.domain == 'keygen.sh' || request.subdomain.empty?
+                    Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
+                      FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
+                    end
+                  else
+                    Rails.cache.fetch(Account.cache_key(request.domain), skip_nil: true, expires_in: 15.minutes) do
+                      FindByAliasService.call(scope: Account, identifier: request.domain, aliases: :domain)
+                    end
+                  end
 
+        Current.account = account
+
+        # TODO(ezekg) Should we deprecate this?
         @current_account = account
       end
     end

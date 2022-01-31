@@ -6,6 +6,8 @@ Rails.application.configure do
   config.hosts << 'get.keygen.sh'
   config.hosts << 'bin.keygen.sh'
   config.hosts << 'stdout.keygen.sh'
+  config.hosts << 'backstage-licensing.spotify.com'
+  config.hosts << 'api.superlicenses.com'
 
   # Disables security vulnerability
   config.assets.compile = false
