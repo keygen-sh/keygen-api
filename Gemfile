@@ -20,7 +20,7 @@ gem 'jsonapi-rails', '0.4.0'
 gem 'oj'
 
 # Billing and subscriptions
-gem 'stripe'
+gem 'stripe', '~> 5.43'
 
 # Authorization
 gem 'pundit'
@@ -95,7 +95,7 @@ group :development do
 end
 
 group :test do
-  gem 'stripe-ruby-mock', '~> 2.3.1', require: 'stripe_mock'
+  gem 'stripe-ruby-mock', '~> 2.5.1', require: 'stripe_mock'
   gem 'cucumber-rails', '~> 2.2', require: false
   gem 'rspec-rails', '~> 3.5'
   gem 'rspec-expectations'
