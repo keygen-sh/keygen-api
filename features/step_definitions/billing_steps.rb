@@ -130,6 +130,32 @@ Given /^there is an incoming "([^\"]*)" event(?: with an? "([^\"]*)" status)?$/ 
   }.call
 end
 
+Given /^there is an incoming "([^\"]*)" event with a new plan$/ do |event_type|
+  @plan         = create :plan
+  @customer     = create :customer
+  @subscription = create :subscription, customer: @customer.id, plan: @plan.plan_id
+
+  @account = create :account
+  @billing = create :billing, {
+    account: @account,
+    customer_id: @customer.id,
+    subscription_id: @subscription.id,
+    subscription_status: @subscription.status,
+    subscription_period_start: @subscription.current_period_start,
+    subscription_period_end: @subscription.current_period_end
+  }
+
+  @event = StripeMock.mock_webhook_event event_type, Proc.new {
+    {
+      customer: @customer.id,
+      id: @subscription.id,
+      items: [{
+        plan: { id: @plan.plan_id }
+      }],
+    }
+  }.call
+end
+
 Given /^the account doesn't have a subscription$/ do
   @billing.update(
     subscription_id: nil,
@@ -162,6 +188,10 @@ end
 
 Then /^the account should be in a "([^\"]*)" state$/ do |state|
   expect(@billing.reload.state).to eq state
+end
+
+Then /^the account should have a(?:n? (?:new|updated)) plan$/ do
+  expect(@account.reload.plan.plan_id).to eq @event.data.object.items.first.plan.id
 end
 
 Then /^the account should have a(?:n? (?:new|updated)) card$/ do
