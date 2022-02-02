@@ -40,8 +40,9 @@ module Api::V1
           if account.plan.plan_id != plan_id
             plan = Plan.find_by(plan_id: plan_id, private: false)
 
-            puts "[stripe] action=change_plan account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}"
-            # account.update(plan: plan)
+            Keygen.logger.warn("[stripe] action=change_plan account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
+
+            account.update(plan: plan)
           end
         rescue => e
           Keygen.logger.exception(e)
