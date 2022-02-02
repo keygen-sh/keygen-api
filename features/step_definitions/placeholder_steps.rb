@@ -80,6 +80,8 @@ def parse_placeholders!(str)
         end
       when "current"
         @bearer.send attribute
+      when "token"
+        @crypt.first
       when "crypt"
         @crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .send attribute

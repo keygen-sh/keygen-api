@@ -9,12 +9,12 @@ module Billings
     end
 
     def call
-      c = Billings::Subscription.retrieve(subscription)
+      s = Billings::Subscription.retrieve(subscription)
 
-      c.trial_end = 'now'
-      c.plan      = plan
+      s.trial_end = 'now'
+      s.plan      = plan
 
-      c.save
+      s.save
     rescue Billings::Error => e
       Keygen.logger.exception(e)
 
