@@ -5,9 +5,7 @@ module PasswordResetable
   include Tokenable
 
   def generate_password_reset_token
-    token, enc = generate_hashed_token :password_reset_token, length: 16, version: "v1" do |token|
-      "#{account.id.delete "-"}.#{id.delete "-"}.#{token}"
-    end
+    token, enc = generate_hashed_token(:password_reset_token, length: 24)
 
     self.password_reset_sent_at = Time.current
     self.password_reset_token   = enc
