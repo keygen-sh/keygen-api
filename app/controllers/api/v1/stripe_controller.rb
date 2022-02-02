@@ -31,14 +31,20 @@ module Api::V1
           subscription_status: subscription.status,
         )
 
+        # FIXME(ezekg) Remove begin/rescue block after we confirm working
         # Update account plan if changed
-        account = billing.account
-        plan_id = subscription.items.first.plan.id
+        begin
+          account = billing.account
+          plan_id = subscription.items.first.plan.id
 
-        if account.plan.plan_id != plan_id
-          plan = Plan.find_by(plan_id: plan_id, private: false)
+          if account.plan.plan_id != plan_id
+            plan = Plan.find_by(plan_id: plan_id, private: false)
 
-          account.update(plan: plan)
+            puts "[stripe] action=change_plan account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}"
+            # account.update(plan: plan)
+          end
+        rescue => e
+          Keygen.logger.exception(e)
         end
 
         # Update billing state machine
