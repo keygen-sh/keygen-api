@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_31_182526) do
+ActiveRecord::Schema.define(version: 2022_02_02_214554) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(version: 2022_01_31_182526) do
     t.string "state"
     t.uuid "account_id"
     t.string "referral_id"
+    t.datetime "card_added_at"
     t.index ["account_id", "created_at"], name: "index_billings_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_billings_on_created_at", order: :desc
     t.index ["customer_id", "created_at"], name: "index_billings_on_customer_id_and_created_at"

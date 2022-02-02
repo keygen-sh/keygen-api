@@ -17,16 +17,31 @@ module Api::V1
       when "customer.subscription.created",
            "customer.subscription.updated"
         subscription = event.data.object
-        billing = Billing.find_by customer_id: subscription.customer
-        return unless billing
+        billing      = Billing.includes(:account, :plan)
+                              .find_by(customer_id: subscription.customer)
 
+        return unless
+          billing.present?
+
+        # Update billing's subscription data
         billing.update(
           subscription_period_start: Time.at(subscription.current_period_start),
           subscription_period_end: Time.at(subscription.current_period_end),
           subscription_id: subscription.id,
-          subscription_status: subscription.status
+          subscription_status: subscription.status,
         )
 
+        # Update account plan if changed
+        account = billing.account
+        plan_id = subscription.items.first.plan.id
+
+        if account.plan.plan_id != plan_id
+          plan = Plan.find_by(plan_id: plan_id, private: false)
+
+          account.update(plan: plan)
+        end
+
+        # Update billing state machine
         if subscription.cancel_at_period_end
           billing.cancel_subscription_at_period_end unless billing.canceling?
         else
@@ -68,6 +83,7 @@ module Api::V1
         return unless billing
 
         billing.update(
+          card_added_at: Time.current,
           card_expiry: DateTime.new(card.exp_year, card.exp_month),
           card_brand: card.brand,
           card_last4: card.last4
