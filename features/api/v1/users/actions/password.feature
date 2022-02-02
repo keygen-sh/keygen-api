@@ -152,15 +152,12 @@ Feature: User password actions
     Given the current account is "test1"
     And the current account has 3 "users"
     And I am a user of account "test1"
-    And I have the following attributes:
-      """
-      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
-      """
+    And I have a password reset token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
         "meta": {
-          "passwordResetToken": "password",
+          "passwordResetToken": "$token",
           "newPassword": "password2"
         }
       }
@@ -173,18 +170,15 @@ Feature: User password actions
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      {
-        "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS",
-        "passwordResetSentAt": "$time.23.hours.ago",
-        "email": "user@example.com"
-      }
+      { "email": "user@example.com" }
       """
     And I use an authentication token
+    And I have a password reset token
     When I send a POST request to "/accounts/test1/users/user@example.com/actions/reset-password" with the following:
       """
       {
         "meta": {
-          "passwordResetToken": "password",
+          "passwordResetToken": "$token",
           "newPassword": "password2"
         }
       }
@@ -198,18 +192,15 @@ Feature: User password actions
     And I am a user of account "test1"
     And I have the following attributes:
       """
-      {
-        "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS",
-        "passwordResetSentAt": "$time.23.hours.ago",
-        "email": "user@example.com"
-      }
+      { "email": "user@example.com" }
       """
     And I use an authentication token
+    And I have a password reset token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
         "meta": {
-          "passwordResetToken": "password",
+          "passwordResetToken": "$token",
           "newPassword": "bad"
         }
       }
@@ -232,10 +223,7 @@ Feature: User password actions
     Given the current account is "test1"
     And the current account has 3 "users"
     And I am a user of account "test1"
-    And I have the following attributes:
-      """
-      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.23.hours.ago" }
-      """
+    And I have a password reset token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
@@ -250,15 +238,12 @@ Feature: User password actions
     Given the current account is "test1"
     And the current account has 3 "users"
     And I am a user of account "test1"
-    And I have the following attributes:
-      """
-      { "passwordResetToken": "$2a$10$AD.XND.9m50jyB14J9BFdOHkmJwVcYnjWKWcaObuR9yOLmn3WHuaS", "passwordResetSentAt": "$time.25.hours.ago" }
-      """
+    And I have a password reset token that is expired
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
       """
       {
         "meta": {
-          "passwordResetToken": "password",
+          "passwordResetToken": "$token",
           "newPassword": "password2"
         }
       }

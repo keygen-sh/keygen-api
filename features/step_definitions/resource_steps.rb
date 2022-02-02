@@ -36,6 +36,15 @@ Given /^I have the following attributes:$/ do |body|
   @bearer.update attributes
 end
 
+Given /^I have a password reset token$/ do
+  @crypt << @bearer.generate_password_reset_token
+end
+
+Given /^I have a password reset token that is expired$/ do
+  @crypt << @bearer.generate_password_reset_token
+  @bearer.update password_reset_sent_at: 3.days.ago
+end
+
 Then /^the current token has the following attributes:$/ do |body|
   parse_placeholders! body
 
