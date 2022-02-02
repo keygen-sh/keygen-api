@@ -5,9 +5,10 @@ class UserMailer < ApplicationMailer
   layout "user_mailer"
 
   def password_reset(user:, token:)
-    @user, @token = user, token
+    @user    = user
     @account = @user.account
-    @expiration_date = @user.password_reset_sent_at + 24.hours
+    @expiry  = @user.password_reset_sent_at + 24.hours
+    @token   = [@account.id.remove('-'), @user.id.remove('-'), token].join('.')
 
     mail to: user.email, reply_to: @account.email, subject: "Password reset requested for your #{@account.name} account"
   end
