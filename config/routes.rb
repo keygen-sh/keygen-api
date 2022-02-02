@@ -4,6 +4,13 @@ require 'sidekiq/web'
 require 'sidekiq_unique_jobs/web'
 
 Rails.application.routes.draw do
+  domain_constraints =
+    if !Rails.env.development?
+      { domain: %w[keygen.sh] }
+    else
+      {}
+    end
+
   mount Sidekiq::Web, at: '/-/sidekiq'
 
   namespace "-" do
@@ -20,12 +27,12 @@ Rails.application.routes.draw do
     }
   end
 
-  scope module: "bin", constraints: { subdomain: %w[bin get], domain: %w[keygen.sh], format: "jsonapi" } do
+  scope module: "bin", constraints: { subdomain: %w[bin get], **domain_constraints, format: "jsonapi" } do
     get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
     get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
   end
 
-  scope module: "stdout", constraints: { subdomain: %w[stdout], domain: %w[keygen.sh], format: "jsonapi" } do
+  scope module: "stdout", constraints: { subdomain: %w[stdout], **domain_constraints, format: "jsonapi" } do
     get "unsub/:ciphertext", constraints: { ciphertext: /.*/ }, to: "subscribers#unsubscribe", as: "stdout_unsubscribe"
   end
 
@@ -235,7 +242,7 @@ Rails.application.routes.draw do
 
   scope module: "api", constraints: { format: "jsonapi" } do
     namespace "v1" do
-      constraints subdomain: %w[api], domain: %w[keygen.sh] do
+      constraints subdomain: %w[api], **domain_constraints do
         post "stripe", to: "stripe#receive_webhook"
 
         # Health checks
