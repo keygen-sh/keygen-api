@@ -26,11 +26,9 @@ module Api::V1::Users::Actions
     def reset_password
       skip_authorization
 
-      if user.compare_hashed_token(:password_reset_token, password_meta[:password_reset_token], version: "v1")
-        if user.password_reset_sent_at < 24.hours.ago
-          render_unauthorized detail: "is expired", source: {
-            pointer: "/meta/passwordResetToken" } and return
-        end
+      if user.compare_hashed_token(:password_reset_token, password_meta[:password_reset_token])
+        return render_unauthorized(detail: "is expired", source: { pointer: "/meta/passwordResetToken" }) if
+          user.password_reset_sent_at < 24.hours.ago
 
         if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
           render jsonapi: user
