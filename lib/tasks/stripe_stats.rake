@@ -8,8 +8,10 @@ include ActionView::Helpers::DateHelper
 module Stripe
   class Stats
     START_DATE = ENV.fetch('START_DATE') { 4.weeks.ago.beginning_of_day.to_time }.to_i
-    END_DATE = ENV.fetch('END_DATE') { Date.today.end_of_day.to_time }.to_i
-    FREE_TIER_PRODUCT_ID = 'prod_DvO2JQ0AtwO7Tp'
+    END_DATE   = ENV.fetch('END_DATE') { Date.today.end_of_day.to_time }.to_i
+
+    CNAME_ADD_ON_PRODUCT_ID = 'prod_L4Bb5NBRPnfATQ'
+    FREE_TIER_PRODUCT_ID    = 'prod_DvO2JQ0AtwO7Tp'
 
     def initialize(cache:)
       Stripe.api_key      = ENV.fetch('STRIPE_SECRET_KEY')
@@ -471,23 +473,34 @@ module Stripe
       revenues_for(churned_subscriptions)
     end
 
+    def plans_for(subscription)
+      return [subscription.plan] if
+        subscription.plan.present?
+
+      subscription.items.collect(&:plan)
+    end
+
     def revenue_for(subscription)
       coupon = subscription.discount&.coupon
-      plan = subscription.plan
-      amount =
-        if plan.interval == 'year'
-          plan.amount.to_f / 12
-        else
-          plan.amount.to_f
-        end
+      plans  = plans_for(subscription)
+      total  = 0.0
+
+      plans.each do |plan|
+        total += if plan.interval == 'year'
+                   plan.amount.to_f / 12.0
+                 else
+                   plan.amount.to_f
+                 end
+      end
+
       discount =
         if coupon.present? && coupon.duration == 'forever'
-          amount * (coupon.percent_off.to_f / 100)
+          total * (coupon.percent_off.to_f / 100.0)
         else
           0.0
         end
 
-      (amount - discount) * subscription.quantity / 100
+      (total - discount) / 100.0
     end
 
     def revenues_for(subscriptions)
@@ -522,6 +535,14 @@ module Stripe
       end
     end
 
+    def free_tier?(subscription)
+      plan = subscription.plan
+      return subscription.items.any? { |i| i.plan&.product == FREE_TIER_PRODUCT_ID } if
+        plan.nil?
+
+      plan.product == FREE_TIER_PRODUCT_ID
+    end
+
     def invoices_for(resource)
       @invoices_for ||= {}
 
@@ -537,7 +558,7 @@ module Stripe
 
         # Don't waste resources fetching invoices when subscription
         # is on the free tier
-        if resource.plan.product != FREE_TIER_PRODUCT_ID
+        if resource.plan&.product != FREE_TIER_PRODUCT_ID
           invoices =
             Stripe::Invoice.list(subscription: resource.id, limit: 100).auto_paging_each.to_a
         end
@@ -570,7 +591,8 @@ module Stripe
       @paid_subscriptions ||= subscriptions
         .filter { |s| s.status == 'active' || s.status == 'incomplete' || s.status == 'past_due' || s.status == 'unpaid' || s.status == 'trialing' }
         .filter do |s|
-          next if s.plan.product == FREE_TIER_PRODUCT_ID
+          next if
+            free_tier?(s)
 
           customer = s.customer
           invoices = invoices_for(customer)
@@ -581,7 +603,8 @@ module Stripe
 
     def new_paid_subscriptions
       @new_paid_subscriptions ||= paid_subscriptions.filter do |s|
-        next if s.plan.product == FREE_TIER_PRODUCT_ID
+        next if
+          free_tier?(s)
 
         customer = s.customer
         invoices = invoices_for(customer)
@@ -605,7 +628,7 @@ module Stripe
     end
 
     def free_subscriptions
-      @free_subscriptions ||= subscriptions.filter { |s| s.status == 'active' && s.plan.product == FREE_TIER_PRODUCT_ID }
+      @free_subscriptions ||= subscriptions.filter { |s| s.status == 'active' && free_tier?(s) }
     end
 
     def canceling_subscriptions
@@ -641,7 +664,8 @@ module Stripe
         .filter { |s| s.status == 'active' || s.status == 'trialing' || s.status == 'canceled' }
         .filter { |s| payment_method_for(s.customer).present? }
         .filter do |s|
-          next if s.plan.product == FREE_TIER_PRODUCT_ID
+          next if
+            free_tier?(s)
 
           invoices = invoices_for(s)
 
@@ -653,7 +677,8 @@ module Stripe
       @upgraded_subscriptions_from_free ||= subscriptions
         .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
         .filter do |s|
-          next if s.plan.product == FREE_TIER_PRODUCT_ID
+          next if
+            free_tier?(s)
 
           invoices = invoices_for(s)
           next unless invoices.any? { |i|
@@ -670,7 +695,8 @@ module Stripe
       @downgraded_subscriptions_to_free ||= subscriptions
         .filter { |s| s.status == 'active' || s.status == 'past_due' || s.status == 'trialing' }
         .filter do |s|
-          next unless s.plan.product == FREE_TIER_PRODUCT_ID
+          next unless
+            free_tier?(s)
 
           invoices = invoices_for(s)
           invoices.any? { |i| i.amount_paid > 0 }
