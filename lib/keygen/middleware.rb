@@ -196,13 +196,13 @@ module Keygen
         if content_type.empty? || content_type.include?('text/plain') || content_type.include?('application/x-www-form-urlencoded') || content_type.include?('multipart/form-data')
           begin
             req        = ActionDispatch::Request.new(env)
-            route      = Rails.application.routes.recognize_path(req.url, method: req.method)
+            route      = Rails.application.routes.recognize_path(req.url, method: req.method) rescue {}
             controller = route[:controller]
             action     = route[:action]
 
             # Default to JSON content-type header for non-artifact endpoints
             env['CONTENT_TYPE'] = 'application/json' unless
-              controller.ends_with?('/artifacts') &&
+              controller&.ends_with?('/artifacts') &&
               action == 'create'
           rescue => e
             Keygen.logger.exception(e)

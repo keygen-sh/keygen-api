@@ -42,16 +42,18 @@ module Keygen
 
     # FIXME(ezekg) Catch any JSON/URI parse errors, routing errors, etc. We're
     #              inserting this middleware twice because Rails is stupid and
-    #              emits this error at multiple layers in the stack, resulting
+    #              emits errors at multiple layers in the stack, resulting
     #              in this ugly hack.
     config.middleware.insert_before 0, Keygen::Middleware::RequestErrorWrapper
-    config.middleware.use Keygen::Middleware::RequestErrorWrapper
 
     # Add a default JSON content type
     config.middleware.use Keygen::Middleware::DefaultContentType
 
     # Protect against DDOS and other abuses
     config.middleware.use Rack::Attack
+
+    # See above comment about having to use this multiple
+    config.middleware.use Keygen::Middleware::RequestErrorWrapper
 
     # Use mailers queue
     config.action_mailer.deliver_later_queue_name = :mailers

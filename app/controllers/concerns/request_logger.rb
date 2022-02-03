@@ -38,7 +38,7 @@ module RequestLogger
       return false if
         REQUEST_LOG_IGNORED_HOSTS.include?(request.host)
 
-      route = Rails.application.routes.recognize_path(request.url, method: request.method)
+      route = Rails.application.routes.recognize_path(request.url, method: request.method) rescue {}
       return false unless
         route.key?(:controller)
 
