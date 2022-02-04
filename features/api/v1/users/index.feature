@@ -322,6 +322,46 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 1 "user"
 
+  Scenario: Product retrieves all users for their product (multiple licenses per-user)
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the current account has 4 "users"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[2]", "policyId": "$policies[0]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[0]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[1]" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "userId": "$users[1]", "policyId": "$policies[2]" }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "users"
+
   Scenario: Product retrieves all users of another product
     Given the current account is "test1"
     And the current account has 2 "products"
