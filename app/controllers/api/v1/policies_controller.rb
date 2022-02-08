@@ -112,6 +112,7 @@ module Api::V1
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
             param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
+            param :heartbeat_cull_strategy, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
           param :relationships, type: :hash do
@@ -152,6 +153,7 @@ module Api::V1
             param :check_in_interval, type: :string, optional: true, allow_nil: true
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
             param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
+            param :heartbeat_cull_strategy, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end

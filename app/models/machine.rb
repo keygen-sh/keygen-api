@@ -268,6 +268,37 @@ class Machine < ApplicationRecord
   scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 
+  scope :alive, -> {
+    joins(license: :policy)
+      .where(policy: { heartbeat_duration: nil }).or(
+        where(last_heartbeat_at: nil)
+      )
+      .or(
+        joins(license: :policy).where(<<~SQL, Time.current)
+          last_heartbeat_at >= ?::timestamp - (heartbeat_duration || ' seconds')::interval
+        SQL
+      )
+  }
+
+  scope :dead, -> {
+    joins(license: :policy)
+      .where.not(last_heartbeat_at: nil, policy: { heartbeat_duration: nil })
+      .where(<<~SQL, Time.current)
+        last_heartbeat_at < ?::timestamp - (heartbeat_duration || ' seconds')::interval
+      SQL
+  }
+
+  scope :with_status, -> status {
+    case status.to_s.upcase
+    when 'ALIVE'
+      self.alive
+    when 'DEAD'
+      self.dead
+    else
+      self.none
+    end
+  }
+
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)
     encoded_data = Base64.urlsafe_encode64(data)
@@ -291,10 +322,12 @@ class Machine < ApplicationRecord
   def heartbeat_alive?
     heartbeat_status == :ALIVE
   end
+  alias_method :alive?, :heartbeat_alive?
 
   def heartbeat_dead?
     heartbeat_status == :DEAD
   end
+  alias_method :dead?, :heartbeat_dead?
 
   def heartbeat_ok?
     heartbeat_not_started? || heartbeat_alive?
