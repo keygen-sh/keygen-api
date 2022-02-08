@@ -50,8 +50,8 @@ class Policy < ApplicationRecord
   ].freeze
 
   HEARTBEAT_CULL_STRATEGIES = %w[
-    DEACTIVATE
-    KEEP
+    DEACTIVATE_DEAD
+    KEEP_DEAD
   ]
 
   belongs_to :account
@@ -72,7 +72,7 @@ class Policy < ApplicationRecord
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
-  before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE' }, if: -> { heartbeat_cull_strategy.nil? }
+  before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -239,11 +239,11 @@ class Policy < ApplicationRecord
     return true if
       heartbeat_cull_strategy.nil?
 
-    heartbeat_cull_strategy == 'DEACTIVATE'
+    heartbeat_cull_strategy == 'DEACTIVATE_DEAD'
   end
 
   def keep_dead_machines?
-    heartbeat_cull_strategy == 'KEEP'
+    heartbeat_cull_strategy == 'KEEP_DEAD'
   end
 
   def fingerprint_uniq_per_account?
