@@ -14,21 +14,24 @@ class MachineHeartbeatWorker
     return unless
       machine.requires_heartbeat?
 
-    if machine.heartbeat_dead?
+    if machine.dead?
       BroadcastEventService.call(
         event: 'machine.heartbeat.dead',
         account: machine.account,
         resource: machine,
       )
 
-      machine.destroy! if machine.policy.deactivate_dead_machines?
-    else
-      BroadcastEventService.call(
-        event: 'machine.heartbeat.pong',
-        account: machine.account,
-        resource: machine,
-      )
+      machine.destroy! if
+        machine.policy.deactivate_dead_machines?
+
+      return
     end
+
+    BroadcastEventService.call(
+      event: 'machine.heartbeat.pong',
+      account: machine.account,
+      resource: machine,
+    )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
   end

@@ -28,6 +28,7 @@ class PolicySerializer < BaseSerializer
   attribute :check_in_interval
   attribute :check_in_interval_count
   attribute :heartbeat_duration
+  attribute :heartbeat_cull_strategy
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
