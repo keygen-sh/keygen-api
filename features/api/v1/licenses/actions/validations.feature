@@ -5075,3 +5075,97 @@ Feature: License validation actions
     Then sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2022-01-03T14:18:02.743Z"
+
+  Scenario: Anonymous validates a license key scoped to an alive machine
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "heartbeatDuration": "$time.1.hour" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.59.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": true,
+        "detail": "is valid",
+        "constant": "VALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
+
+  Scenario: Anonymous validates a license key scoped to a dead machine
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      { "heartbeatDuration": "$time.1.hour" }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.2.hours.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key",
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "valid": false,
+        "detail": "machine is dead",
+        "constant": "DEAD_MACHINE"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And sidekiq should have 1 "event-log" job
