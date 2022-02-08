@@ -46,22 +46,26 @@ class LicenseValidationService < BaseService
         when license.policy.floating? && license.machines_count == 0
           return [false, "machine is not activated (has no associated machines)", :NO_MACHINES]
         else
-          return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] if !license.machines.exists?(scope[:machine])
+          return [false, "machine is dead", :DEAD_MACHINE] if
+            license.machines.dead.exists?(scope[:machine])
+
+          return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] unless
+            license.machines.alive.exists?(scope[:machine])
         end
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
       end
       # Check against fingerprint scope requirements
       if scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
-        fingerprints = [].tap do |fp|
-          if scope.key?(:fingerprints)
-            fp.concat scope[:fingerprints]
-          else
-            fp << scope[:fingerprint]
-          end
-        end.compact.uniq
+        fingerprints = Array(scope[:fingerprint] || scope[:fingerprints])
+                         .compact
+                         .uniq
 
-        return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if fingerprints.empty?
+        return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if
+          fingerprints.empty?
+
+        return [false, 'machine is dead', :DEAD_MACHINE] if
+          license.machines.dead.with_fingerprint(fingerprints).count == fingerprints.size
 
         case
         when !license.policy.floating? && license.machines_count == 0
@@ -71,11 +75,14 @@ class LicenseValidationService < BaseService
         else
           case
           when license.policy.fingerprint_match_most?
-            return [false, "fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
+            return [false, "fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+              license.machines.alive.with_fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
           when license.policy.fingerprint_match_all?
-            return [false, "fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).count < fingerprints.size
+            return [false, "fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+              license.machines.alive.with_fingerprint(fingerprints).count < fingerprints.size
           else
-            return [false, "fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if license.machines.with_fingerprint(fingerprints).empty?
+            return [false, "fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
+              license.machines.alive.with_fingerprint(fingerprints).empty?
           end
         end
       else
