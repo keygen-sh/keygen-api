@@ -189,7 +189,7 @@ Feature: License heartbeat actions
       {
         "title": "Unprocessable entity",
         "detail": "is dead",
-        "code": "MACHINE_HEARTBEAT_DEAD",
+        "code": "HEARTBEAT_DEAD",
         "source": {
           "pointer": "/data/attributes/heartbeatStatus"
         }
