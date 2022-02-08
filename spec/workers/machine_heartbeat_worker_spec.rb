@@ -102,7 +102,7 @@ describe MachineHeartbeatWorker do
       end
 
       context 'when policy cull strategy is set to deactivate' do
-        let(:policy) { create(:policy, heartbeat_cull_strategy: 'DEACTIVATE', account: account) }
+        let(:policy) { create(:policy, heartbeat_cull_strategy: 'DEACTIVATE_DEAD', account: account) }
         let(:license) { create(:license, policy: policy, account: account) }
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 
@@ -127,7 +127,7 @@ describe MachineHeartbeatWorker do
       end
 
       context 'when policy cull strategy is set to keep' do
-        let(:policy) { create(:policy, heartbeat_cull_strategy: 'KEEP', account: account) }
+        let(:policy) { create(:policy, heartbeat_cull_strategy: 'KEEP_DEAD', account: account) }
         let(:license) { create(:license, policy: policy, account: account) }
         let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
 

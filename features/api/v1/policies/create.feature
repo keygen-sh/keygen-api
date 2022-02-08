@@ -89,7 +89,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
     And the JSON response should be a "policy" with the authenticationStrategy "TOKEN"
-    And the JSON response should be a "policy" with the heartbeatCullStrategy "DEACTIVATE"
+    And the JSON response should be a "policy" with the heartbeatCullStrategy "DEACTIVATE_DEAD"
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
@@ -163,7 +163,7 @@ Feature: Create policy
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_VALIDATION",
             "authenticationStrategy": "LICENSE",
-            "heartbeatCullStrategy": "KEEP",
+            "heartbeatCullStrategy": "KEEP_DEAD",
             "maxUses": 5
           },
           "relationships": {
@@ -183,7 +183,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
     And the JSON response should be a "policy" with the authenticationStrategy "LICENSE"
-    And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP"
+    And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
     And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent
