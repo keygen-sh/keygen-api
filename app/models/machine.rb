@@ -270,21 +270,23 @@ class Machine < ApplicationRecord
 
   scope :alive, -> {
     joins(license: :policy)
-      .where(policy: { heartbeat_duration: nil }).or(
-        where(last_heartbeat_at: nil)
-      )
+      .where(last_heartbeat_at: nil)
       .or(
-        joins(license: :policy).where(<<~SQL, Time.current)
-          last_heartbeat_at >= ?::timestamp - (heartbeat_duration || ' seconds')::interval
+        joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+          last_heartbeat_at >= ?::timestamp - (
+            COALESCE(heartbeat_duration, ?) || ' seconds'
+          )::interval
         SQL
       )
   }
 
   scope :dead, -> {
     joins(license: :policy)
-      .where.not(last_heartbeat_at: nil, policy: { heartbeat_duration: nil })
-      .where(<<~SQL, Time.current)
-        last_heartbeat_at < ?::timestamp - (heartbeat_duration || ' seconds')::interval
+      .where.not(last_heartbeat_at: nil)
+      .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
+        last_heartbeat_at < ?::timestamp - (
+          COALESCE(heartbeat_duration, ?) || ' seconds'
+        )::interval
       SQL
   }
 

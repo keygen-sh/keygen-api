@@ -100,6 +100,56 @@ describe MachineHeartbeatWorker do
 
         expect(Machine.count).to eq 0
       end
+
+      context 'when policy cull strategy is set to deactivate' do
+        let(:policy) { create(:policy, heartbeat_cull_strategy: 'DEACTIVATE', account: account) }
+        let(:license) { create(:license, policy: policy, account: account) }
+        let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
+
+        it 'should send a machine.heartbeat.dead webhook event' do
+          events = 0
+
+          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+
+          worker.perform_async machine.id
+          worker.drain
+
+          expect(events).to eq 1
+        end
+
+        it 'should deactivate the machine' do
+          worker.perform_async machine.id
+          worker.drain
+
+          expect(Machine.count).to eq 0
+        end
+      end
+
+      context 'when policy cull strategy is set to keep' do
+        let(:policy) { create(:policy, heartbeat_cull_strategy: 'KEEP', account: account) }
+        let(:license) { create(:license, policy: policy, account: account) }
+        let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
+
+        it 'should send a machine.heartbeat.dead webhook event' do
+          events = 0
+
+          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+
+          worker.perform_async machine.id
+          worker.drain
+
+          expect(events).to eq 1
+        end
+
+        it 'should not deactivate the machine' do
+          worker.perform_async machine.id
+          worker.drain
+
+          expect(Machine.count).to eq 1
+        end
+      end
     end
   end
 
