@@ -5161,8 +5161,8 @@ Feature: License validation actions
       """
       {
         "valid": false,
-        "detail": "machine is dead",
-        "constant": "DEAD_MACHINE"
+        "detail": "machine heartbeat is dead",
+        "constant": "HEARTBEAT_DEAD"
       }
       """
     And sidekiq should have 0 "webhook" jobs
