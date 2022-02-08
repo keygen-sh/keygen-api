@@ -64,15 +64,15 @@ class LicenseValidationService < BaseService
         return [false, "fingerprint scope is empty", :FINGERPRINT_SCOPE_EMPTY] if
           fingerprints.empty?
 
-        return [false, 'machine heartbeat is dead', :HEARTBEAT_DEAD] if
-          license.machines.dead.with_fingerprint(fingerprints).count == fingerprints.size
-
         case
         when !license.policy.floating? && license.machines_count == 0
           return [false, "fingerprint is not activated (has no associated machine)", :NO_MACHINE]
         when license.policy.floating? && license.machines_count == 0
           return [false, "fingerprint is not activated (has no associated machines)", :NO_MACHINES]
         else
+          return [false, 'machine heartbeat is dead', :HEARTBEAT_DEAD] if
+            license.machines.dead.with_fingerprint(fingerprints).count == fingerprints.size
+
           case
           when license.policy.fingerprint_match_most?
             return [false, "fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
