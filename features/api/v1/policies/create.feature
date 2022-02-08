@@ -89,6 +89,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
     And the JSON response should be a "policy" with the authenticationStrategy "TOKEN"
+    And the JSON response should be a "policy" with the heartbeatCullStrategy "DEACTIVATE"
     And the JSON response should be a "policy" with a nil maxMachines
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
@@ -162,6 +163,7 @@ Feature: Create policy
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_VALIDATION",
             "authenticationStrategy": "LICENSE",
+            "heartbeatCullStrategy": "KEEP",
             "maxUses": 5
           },
           "relationships": {
@@ -181,6 +183,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
     And the JSON response should be a "policy" with the authenticationStrategy "LICENSE"
+    And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP"
     And the JSON response should be a "policy" with the maxUses "5"
     And the JSON response should be a "policy" that is protected
     And the JSON response should be a "policy" that is concurrent
@@ -517,6 +520,49 @@ Feature: Create policy
         "code": "AUTHENTICATION_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/authenticationStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid heartbeat cull strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Bad Cull Strategy",
+            "heartbeatCullStrategy": "KILL"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported heartbeat cull strategy",
+        "code": "HEARTBEAT_CULL_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/heartbeatCullStrategy"
         }
       }
       """

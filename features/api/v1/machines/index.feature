@@ -238,6 +238,130 @@ Feature: List machines
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
 
+  Scenario: Admin retrieves all alive machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "heartbeatDuration": $time.30.minutes.to_i }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "heartbeatDuration": null }
+      """
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the current account has 5 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.1.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.32.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the third "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.11.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the fourth "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": null,
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And the fifth "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.11.minutes.ago",
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?status=alive"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "machines"
+
+  Scenario: Admin retrieves all dead machines
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "heartbeatDuration": $time.30.minutes.to_i }
+      """
+    And the second "policy" has the following attributes:
+      """
+      { "heartbeatDuration": null }
+      """
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "policyId": "$policies[1]" }
+      """
+    And the current account has 5 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.1.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.31.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the third "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.11.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the fourth "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": null,
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And the fifth "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.1.day.ago",
+        "licenseId": "$licenses[1]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?status=dead"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "machines"
+
   Scenario: Product retrieves all machines for their product
     Given the current account is "test1"
     And the current account has 1 "product"
