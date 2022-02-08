@@ -49,6 +49,11 @@ class Policy < ApplicationRecord
     NONE
   ].freeze
 
+  HEARTBEAT_CULL_STRATEGIES = %w[
+    DEACTIVATE_DEAD_MACHINES
+    KEEP_DEAD_MACHINES
+  ]
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -96,6 +101,10 @@ class Policy < ApplicationRecord
   validates :expiration_basis, inclusion: { in: EXPIRATION_BASES, message: "unsupported expiration basis" }, allow_nil: true
   validates :authentication_strategy,
     inclusion: { in: AUTHENTICATION_STRATEGIES, message: "unsupported authentication strategy" },
+    allow_nil: true
+
+  validates :heartbeat_cull_strategy,
+    inclusion: { in: HEARTBEAT_CULL_STRATEGIES, message: "unsupported heartbeat cull strategy" },
     allow_nil: true
 
   validate do
@@ -225,7 +234,15 @@ class Policy < ApplicationRecord
   end
 
   def deactivate_dead_machines?
-    true
+    # NOTE(ezekg) Backwards compat
+    return true if
+      heartbeat_cull_strategy.nil?
+
+    heartbeat_cull_strategy == 'DEACTIVATE_DEAD_MACHINES'
+  end
+
+  def keep_dead_machines?
+    heartbeat_cull_strategy == 'KEEP_DEAD_MACHINES'
   end
 
   def fingerprint_uniq_per_account?

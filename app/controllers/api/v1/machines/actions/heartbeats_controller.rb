@@ -9,56 +9,53 @@ module Api::V1::Machines::Actions
 
     # POST /machines/1/reset-heartbeat
     def reset_heartbeat
-      authorize @machine
+      authorize machine
 
-      if !@machine.update(last_heartbeat_at: nil)
-        render_unprocessable_resource(@machine) and return
-      end
+      machine.update!(last_heartbeat_at: nil)
 
       BroadcastEventService.call(
-        event: "machine.heartbeat.reset",
+        event: 'machine.heartbeat.reset',
         account: current_account,
-        resource: @machine
+        resource: machine
       )
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
     # POST /machines/1/ping-heartbeat
     def ping_heartbeat
-      authorize @machine
+      authorize machine
 
-      if @machine.heartbeat_dead?
-        render_unprocessable_entity(detail: "is dead", code: "MACHINE_HEARTBEAT_DEAD", source: { pointer: "/data/attributes/heartbeatStatus" }) and return
-      end
+      return render_unprocessable_entity(detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/heartbeatStatus' }) if
+        machine.dead?
 
-      if !@machine.update(last_heartbeat_at: Time.current)
-        render_unprocessable_resource(@machine) and return
-      end
+      machine.update!(last_heartbeat_at: Time.current)
 
       BroadcastEventService.call(
-        event: "machine.heartbeat.ping",
+        event: 'machine.heartbeat.ping',
         account: current_account,
-        resource: @machine
+        resource: machine
       )
 
       # Queue up heartbeat worker which will handle deactivating dead machines
       MachineHeartbeatWorker.perform_in(
-        @machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
-        @machine.id
+        machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
+        machine.id
       )
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
     private
+
+    attr_reader :machine
 
     def set_machine
       scoped_machines = policy_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
-      Current.resource = @machine
+      Current.resource = machine
     end
   end
 end

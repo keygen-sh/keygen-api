@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_02_214554) do
+ActiveRecord::Schema.define(version: 2022_02_08_143228) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -189,6 +189,7 @@ ActiveRecord::Schema.define(version: 2022_02_02_214554) do
     t.index ["fingerprint"], name: "index_machines_on_fingerprint", using: :gin
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
+    t.index ["last_heartbeat_at"], name: "index_machines_on_last_heartbeat_at"
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
   end
 
@@ -257,6 +258,7 @@ ActiveRecord::Schema.define(version: 2022_02_02_214554) do
     t.string "expiration_strategy"
     t.string "expiration_basis"
     t.string "authentication_strategy"
+    t.string "heartbeat_cull_strategy"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
