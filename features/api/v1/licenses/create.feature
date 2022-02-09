@@ -4399,7 +4399,7 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables
+  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %{key})
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -4437,7 +4437,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "key contains an invalid template variable",
+        "detail": "key contains an invalid template variable '%{bar}'",
         "code": "KEY_VARIABLE_INVALID",
         "source": {
           "pointer": "/data/attributes/key"
@@ -4446,4 +4446,86 @@ Feature: Create license
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %d)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{ \"key\": \"%d\" }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+      """
+      { "key": "%d" }
+      """
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %s)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{ \"1\": \"%s\", \"2\": \"%%s\", \"3\": \"%%%s\", \"4\": \"%%%%s\", \"5\": \"%%%%%s\" }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+      """
+      { "1": "%s", "2": "%s", "3": "%s", "4": "%s", "5": "%s" }
+      """
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

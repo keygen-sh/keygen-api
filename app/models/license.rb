@@ -589,9 +589,12 @@ class License < ApplicationRecord
     self.seed_key     = key
     self.key          = nil
 
-    # Apply template variables, e.g. %{expiry}
+    # Apply template variables, e.g. %{expiry} and %{id}. We ignore and escape any
+    # template variables that do not start with '%{', e.g. %s or %d. We're also
+    # removing duplicate %% symbols, to protect against e.g. %%%s.
     begin
-      self.seed_key %= {
+      seed_key_format = seed_key.gsub(/%+([^{])/, '%%\1')
+      self.seed_key   = seed_key_format % {
         account: account&.id,
         product: product&.id,
         policy: policy&.id,
@@ -603,7 +606,7 @@ class License < ApplicationRecord
         id: id,
       }
     rescue KeyError => e
-      errors.add :key, :variable_invalid, message: "key contains an invalid template variable"
+      errors.add :key, :variable_invalid, message: "key contains an invalid template variable '%%{#{e.key}}'"
 
       raise ActiveRecord::RecordInvalid
     end
