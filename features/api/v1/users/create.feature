@@ -1009,3 +1009,31 @@ Feature: Create user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
     And sidekiq should have 1 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing trailing garbage
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities"
+          }
+        }
+      }=
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
+        "code": "JSON_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
