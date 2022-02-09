@@ -4198,7 +4198,7 @@ Feature: Create license
           "type": "licenses",
           "id": "75481f3c-bf58-4d3f-8457-eea2b7291f4e",
           "attributes": {
-            "key": "{ \"id\": \"{{id}}\", \"email\": \"{{user_email}}\", \"expiry\": \"{{expiry}}\" }"
+            "key": "{ \"id\": \"{{id}}\", \"email\": \"{{email}}\", \"expiry\": \"{{expiry}}\" }"
           },
           "relationships": {
             "policy": {
@@ -4259,15 +4259,13 @@ Feature: Create license
           "type": "licenses",
           "attributes": {
             "key": "{
-              \"account\": \"{{account_id}}\",
-              \"product\": \"{{product_id}}\",
-              \"policy\": \"{{policy_id}}\",
-              \"user\": \"{{user_id}}\",
-              \"email\": \"{{user_email}}\",
+              \"account\": \"{{account}}\",
+              \"product\": \"{{product}}\",
+              \"policy\": \"{{policy}}\",
+              \"user\": \"{{user}}\",
+              \"email\": \"{{email}}\",
               \"created\": \"{{created}}\",
               \"expiry\": \"{{expiry}}\",
-              \"machines\": \"{{max_machines}}\",
-              \"cores\": \"{{max_cores}}\",
               \"duration\": \"{{duration}}\",
               \"id\": \"{{id}}\"
             }"
@@ -4301,8 +4299,6 @@ Feature: Create license
         "email": "$users[1].email",
         "created": "$licenses[0].created_at",
         "expiry": "$licenses[0].expiry",
-        "machines": "$policies[0].max_machines",
-        "cores": "$policies[0].max_cores",
         "duration": "$policies[0].duration",
         "id": "$licenses[0].id"
       }
@@ -4333,15 +4329,13 @@ Feature: Create license
           "type": "licenses",
           "attributes": {
             "key": "{
-              \"account\": \"{{accountId}}\",
-              \"product\": \"{{productId}}\",
-              \"policy\": \"{{policyId}}\",
-              \"user\": \"{{userId}}\",
-              \"email\": \"{{userEmail}}\",
+              \"account\": \"{{account}}\",
+              \"product\": \"{{product}}\",
+              \"policy\": \"{{policy}}\",
+              \"user\": \"{{user}}\",
+              \"email\": \"{{email}}\",
               \"created\": \"{{created}}\",
               \"expiry\": \"{{expiry}}\",
-              \"machines\": \"{{maxMachines}}\",
-              \"cores\": \"{{maxCores}}\",
               \"duration\": \"{{duration}}\",
               \"id\": \"{{id}}\"
             }"
@@ -4369,8 +4363,6 @@ Feature: Create license
         "email": "",
         "created": "$licenses[0].created_at",
         "expiry": "",
-        "machines": "",
-        "cores": "",
         "duration": "",
         "id": "$licenses[0].id"
       }
@@ -4391,7 +4383,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "{{accountId}}-{{productId}}-{{id}}"
+            "key": "{{account}}-{{product}}-{{id}}"
           },
           "relationships": {
             "policy": {
@@ -4406,7 +4398,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the key "{{accountId}}-{{productId}}-{{id}}"
+    And the JSON response should be a "license" with the key "{{account}}-{{product}}-{{id}}"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
