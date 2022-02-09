@@ -3,17 +3,17 @@
 class TemplateFormatService < BaseService
   TEMPLATE_FORMAT_RE = /\{\{(\w+)\}\}/i
 
-  def initialize(template:, **data)
+  def initialize(template:, **vars)
     @template = template.to_s
-    @data     = data.with_indifferent_access
+    @vars     = vars.with_indifferent_access
   end
 
   def call
-    template.gsub(TEMPLATE_FORMAT_RE) { data[$1.underscore.parameterize(separator: '_')] }
+    template.gsub(TEMPLATE_FORMAT_RE) { vars[$1.underscore.parameterize(separator: '_')] }
   end
 
   private
 
   attr_reader :template,
-              :data
+              :vars
 end
