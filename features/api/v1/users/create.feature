@@ -924,7 +924,8 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Anonymous attempts to send a request containing a unicode injection
+  # Ref: https://github.com/BishopFox/json-interop-vuln-labs/#attack-techniques
+  Scenario: Anonymous attempts to send a request containing a unicode injection (1)
     Given the current account is "test1"
     When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
       """
@@ -935,7 +936,7 @@ Feature: Create user
             "email": "bishopfox+blog@keygen.example",
             "password": "json-interoperability-vulnerabilities",
             "role": null,
-            "role": "admin\ud888"
+            "role\ud888": "admin"
           }
         }
       }
@@ -948,6 +949,126 @@ Feature: Create user
         "title": "Bad request",
         "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
         "code": "ENCODING_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing a unicode injection (2)
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities",
+            "role": null,
+            "role\x0d": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+        "code": "ENCODING_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing a stray backslash injection
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities",
+            "role": null,
+            "ro\le": "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+        "code": "ENCODING_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing a stray quotes injection
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities",
+            "role": null,
+            'role': "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
+        "code": "JSON_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing a missing quotes injection
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities",
+            "role": null,
+            role: "admin"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
+        "code": "JSON_INVALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1009,6 +1130,34 @@ Feature: Create user
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" jobs
     And sidekiq should have 1 "request-log" jobs
+
+  Scenario: Anonymous attempts to send a request containing a comment injection (3)
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following badly encoded data:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "bishopfox+blog@keygen.example",
+            "password": "json-interoperability-vulnerabilities",
+            "role": /*"admin"*/null
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/role"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing trailing garbage
     Given the current account is "test1"

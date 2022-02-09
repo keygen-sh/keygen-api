@@ -575,7 +575,7 @@ Feature: Create account
         "data": {
           "type": "accounts",
           "attributes": {
-            "name": "ace6b050-6dc0-4cb5-85e9-ad87f629255f"
+            "slug": "ace6b050-6dc0-4cb5-85e9-ad87f629255f"
           },
           "relationships": {
             "plan": {
@@ -1268,3 +1268,101 @@ Feature: Create account
   #       }
   #     }
   #     """
+
+  Scenario: Anonymous attempts to perform an account takeover using unicode truncation (slug collision)
+    Given the following "accounts" exist:
+      | id                                   | name | slug |
+      | ace6b050-6dc0-4cb5-85e9-ad87f629255f | Test | test |
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Test",
+            "slug": "test\ud888"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "test@hacker.example",
+                    "password": "secret123"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+        "code": "ENCODING_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Anonymous attempts to perform an account takeover using unicode truncation (ID collision)
+    Given the following "accounts" exist:
+      | id                                   | name | slug |
+      | ace6b050-6dc0-4cb5-85e9-ad87f629255f | Test | test |
+    When I send a POST request to "/accounts" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "name": "Test",
+            "slug": "ace6b050-6dc0-4cb5-85e9-ad87f629255f\ud888"
+          },
+          "relationships": {
+            "plan": {
+              "data": {
+                "type": "plans",
+                "id": "$plan[0]"
+              }
+            },
+            "admins": {
+              "data": [
+                {
+                  "type": "user",
+                  "attributes": {
+                    "email": "test@hacker.example",
+                    "password": "secret123"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
+        "code": "ENCODING_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
