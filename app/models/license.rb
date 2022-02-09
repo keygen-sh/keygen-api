@@ -586,30 +586,23 @@ class License < ApplicationRecord
     self.id         ||= SecureRandom.uuid
     self.created_at ||= Time.current
     self.updated_at ||= created_at
-    self.seed_key     = key
-    self.key          = nil
 
-    # Apply template variables, e.g. %{expiry} and %{id}. We ignore and escape any
-    # template variables that do not start with '%{', e.g. %s or %d. We're also
-    # removing duplicate %% symbols, to protect against e.g. %%%s.
-    begin
-      seed_key_format = seed_key.gsub(/%+([^{])/, '%%\1')
-      self.seed_key   = seed_key_format % {
-        account: account&.id,
-        product: product&.id,
-        policy: policy&.id,
-        user: user&.id,
-        email: user&.email,
-        created: created_at&.iso8601(3),
-        expiry: expiry&.iso8601(3),
-        duration: duration,
-        id: id,
-      }
-    rescue KeyError => e
-      errors.add :key, :variable_invalid, message: "key contains an invalid template variable '%%{#{e.key}}'"
+    # Apply template variables e.g. {{expiry}} and {{id}}
+    formatted_key = TemplateFormatService.call(
+      template: key,
+      account: account&.id,
+      product: product&.id,
+      policy: policy&.id,
+      user: user&.id,
+      email: user&.email,
+      created: created_at&.iso8601(3),
+      expiry: expiry&.iso8601(3),
+      duration: duration,
+      id: id,
+    )
 
-      raise ActiveRecord::RecordInvalid
-    end
+    self.seed_key = formatted_key
+    self.key      = nil
 
     case scheme
     when "RSA_2048_PKCS1_ENCRYPT"

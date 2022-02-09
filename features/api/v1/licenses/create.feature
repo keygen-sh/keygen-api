@@ -4146,7 +4146,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "{ \"id\": \"%{id}\", \"issued\": \"%{created}\", \"expires\": \"%{expiry}\" }"
+            "key": "{ \"id\": \"{{id}}\", \"issued\": \"{{created}}\", \"expires\": \"{{expiry}}\" }"
           },
           "relationships": {
             "policy": {
@@ -4198,7 +4198,7 @@ Feature: Create license
           "type": "licenses",
           "id": "75481f3c-bf58-4d3f-8457-eea2b7291f4e",
           "attributes": {
-            "key": "{ \"id\": \"%{id}\", \"email\": \"%{email}\", \"expiry\": \"%{expiry}\" }"
+            "key": "{ \"id\": \"{{id}}\", \"email\": \"{{email}}\", \"expiry\": \"{{expiry}}\" }"
           },
           "relationships": {
             "policy": {
@@ -4257,15 +4257,15 @@ Feature: Create license
           "type": "licenses",
           "attributes": {
             "key": "{
-              \"account\": \"%{account}\",
-              \"product\": \"%{product}\",
-              \"policy\": \"%{policy}\",
-              \"user\": \"%{user}\",
-              \"email\": \"%{email}\",
-              \"created\": \"%{created}\",
-              \"expiry\": \"%{expiry}\",
-              \"duration\": \"%{duration}\",
-              \"id\": \"%{id}\"
+              \"account\": \"{{account}}\",
+              \"product\": \"{{product}}\",
+              \"policy\": \"{{policy}}\",
+              \"user\": \"{{user}}\",
+              \"email\": \"{{email}}\",
+              \"created\": \"{{created}}\",
+              \"expiry\": \"{{expiry}}\",
+              \"duration\": \"{{duration}}\",
+              \"id\": \"{{id}}\"
             }"
           },
           "relationships": {
@@ -4325,15 +4325,15 @@ Feature: Create license
           "type": "licenses",
           "attributes": {
             "key": "{
-              \"account\": \"%{account}\",
-              \"product\": \"%{product}\",
-              \"policy\": \"%{policy}\",
-              \"user\": \"%{user}\",
-              \"email\": \"%{email}\",
-              \"created\": \"%{created}\",
-              \"expiry\": \"%{expiry}\",
-              \"duration\": \"%{duration}\",
-              \"id\": \"%{id}\"
+              \"account\": \"{{account}}\",
+              \"product\": \"{{product}}\",
+              \"policy\": \"{{policy}}\",
+              \"user\": \"{{user}}\",
+              \"email\": \"{{email}}\",
+              \"created\": \"{{created}}\",
+              \"expiry\": \"{{expiry}}\",
+              \"duration\": \"{{duration}}\",
+              \"id\": \"{{id}}\"
             }"
           },
           "relationships": {
@@ -4379,7 +4379,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "%{account}-%{product}-%{id}"
+            "key": "{{account}}-{{product}}-{{id}}"
           },
           "relationships": {
             "policy": {
@@ -4394,12 +4394,12 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the key "%{account}-%{product}-%{id}"
+    And the JSON response should be a "license" with the key "{{account}}-{{product}}-{{id}}"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %{key})
+  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -4418,56 +4418,7 @@ Feature: Create license
         "data": {
           "type": "licenses",
           "attributes": {
-            "key": "{ \"foo\": \"%{bar}\" }"
-          },
-          "relationships": {
-            "policy": {
-              "data": {
-                "type": "policies",
-                "id": "$policies[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the response should contain a valid signature header for "test1"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "key contains an invalid template variable '%{bar}'",
-        "code": "KEY_VARIABLE_INVALID",
-        "source": {
-          "pointer": "/data/attributes/key"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %d)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And the first "policy" has the following attributes:
-      """
-      {
-        "scheme": "ED25519_SIGN"
-      }
-      """
-    And the current account has 1 "user"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses" with the following:
-      """
-      {
-        "data": {
-          "type": "licenses",
-          "attributes": {
-            "key": "{ \"key\": \"%d\" }"
+            "key": "{ \"foo\": \"{{bar}}\", \"baz\": \"{{1}}\", \"qux\": \"{{{{private_key}}}}\" }"
           },
           "relationships": {
             "policy": {
@@ -4484,48 +4435,7 @@ Feature: Create license
     And the current account should have 1 "license"
     And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
       """
-      { "key": "%d" }
-      """
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables (format %s)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
-    And the first "policy" has the following attributes:
-      """
-      {
-        "scheme": "ED25519_SIGN"
-      }
-      """
-    And the current account has 1 "user"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses" with the following:
-      """
-      {
-        "data": {
-          "type": "licenses",
-          "attributes": {
-            "key": "{ \"1\": \"%s\", \"2\": \"%%s\", \"3\": \"%%%s\", \"4\": \"%%%%s\", \"5\": \"%%%%%s\" }"
-          },
-          "relationships": {
-            "policy": {
-              "data": {
-                "type": "policies",
-                "id": "$policies[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the current account should have 1 "license"
-    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
-      """
-      { "1": "%s", "2": "%s", "3": "%s", "4": "%s", "5": "%s" }
+      { "foo": "", "baz": "", "qux": "{{}}" }
       """
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
