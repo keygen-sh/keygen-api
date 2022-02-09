@@ -1829,6 +1829,60 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID and autogen key
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "00000000-ceca-491a-9741-fddf0082b567",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the id "00000000-ceca-491a-9741-fddf0082b567"
+    And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
+      """
+      {
+        "account": { "id": "$accounts[0].id" },
+        "product": { "id": "$products[0].id" },
+        "policy": {
+          "id": "$policies[0].id",
+          "duration": $policies[0].duration
+        },
+        "user": null,
+        "license": {
+          "id": "00000000-ceca-491a-9741-fddf0082b567",
+          "created": "$licenses[0].created_at",
+          "expiry": "$licenses[0].expiry"
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 with a pre-determined ID that conflicts with another license
     Given I am an admin of account "test1"
     And the current account is "test1"
