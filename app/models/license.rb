@@ -558,8 +558,9 @@ class License < ApplicationRecord
 
     # We need to define an ID and timestamps beforehand since they may
     # be used in an auto-generated key
-    self.created_at = self.updated_at = Time.current
-    self.id = SecureRandom.uuid if scheme?
+    self.id         ||= SecureRandom.uuid if scheme?
+    self.created_at ||= Time.current
+    self.updated_at ||= created_at
 
     case
     when legacy_encrypted?
