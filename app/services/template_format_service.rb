@@ -9,7 +9,7 @@ class TemplateFormatService < BaseService
   end
 
   def call
-    template.gsub(TEMPLATE_FORMAT_RE) { data[$1.downcase] }
+    template.gsub(TEMPLATE_FORMAT_RE) { data[$1.underscore.parameterize(separator: '_')] }
   end
 
   private
