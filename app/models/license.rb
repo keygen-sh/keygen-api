@@ -590,13 +590,15 @@ class License < ApplicationRecord
     # Apply template variables e.g. {{expiry}} and {{id}}
     formatted_key = TemplateFormatService.call(
       template: key,
-      account: account&.id,
-      product: product&.id,
-      policy: policy&.id,
-      user: user&.id,
-      email: user&.email,
+      account_id: account&.id,
+      product_id: product&.id,
+      policy_id: policy&.id,
+      user_id: user&.id,
+      user_email: user&.email,
       created: created_at&.iso8601(3),
       expiry: expiry&.iso8601(3),
+      max_machines: max_machines,
+      max_cores: max_cores,
       duration: duration,
       id: id,
     )
