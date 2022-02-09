@@ -583,8 +583,30 @@ class License < ApplicationRecord
   def crypt_key
     return unless key.present?
 
-    self.seed_key = key
-    self.key = nil
+    self.id         ||= SecureRandom.uuid
+    self.created_at ||= Time.current
+    self.updated_at ||= created_at
+    self.seed_key     = key
+    self.key          = nil
+
+    # Apply template variables, e.g. %{expiry}
+    begin
+      self.seed_key %= {
+        account: account&.id,
+        product: product&.id,
+        policy: policy&.id,
+        user: user&.id,
+        email: user&.email,
+        created: created_at&.iso8601(3),
+        expiry: expiry&.iso8601(3),
+        duration: duration,
+        id: id,
+      }
+    rescue KeyError => e
+      errors.add :key, :variable_invalid, message: "key contains an invalid template variable"
+
+      raise ActiveRecord::RecordInvalid
+    end
 
     case scheme
     when "RSA_2048_PKCS1_ENCRYPT"

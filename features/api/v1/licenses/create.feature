@@ -4126,3 +4126,324 @@ Feature: Create license
           "code": "KEY_TOO_SHORT"
         }
       """
+
+  Scenario: Admin creates a license using scheme ED25519_SIGN using template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{ \"id\": \"%{id}\", \"issued\": \"%{created}\", \"expires\": \"%{expiry}\" }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "ED25519_SIGN" key with the following dataset:
+      """
+      {
+        "id": "$licenses[0].id",
+        "issued": "$licenses[0].created_at",
+        "expires": "$licenses[0].expiry"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN_V2 using template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN_V2",
+        "duration": null
+      }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "email": "test@keygen.example" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "75481f3c-bf58-4d3f-8457-eea2b7291f4e",
+          "attributes": {
+            "key": "{ \"id\": \"%{id}\", \"email\": \"%{email}\", \"expiry\": \"%{expiry}\" }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the id "75481f3c-bf58-4d3f-8457-eea2b7291f4e"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN_V2" key with the following dataset:
+      """
+      {
+        "id": "75481f3c-bf58-4d3f-8457-eea2b7291f4e",
+        "email": "test@keygen.example",
+        "expiry": ""
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_SIGN_V2 using template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_SIGN_V2",
+        "duration": "$time.2.weeks"
+      }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "email": "test@keygen.example" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{
+              \"account\": \"%{account}\",
+              \"product\": \"%{product}\",
+              \"policy\": \"%{policy}\",
+              \"user\": \"%{user}\",
+              \"email\": \"%{email}\",
+              \"created\": \"%{created}\",
+              \"expiry\": \"%{expiry}\",
+              \"duration\": \"%{duration}\",
+              \"id\": \"%{id}\"
+            }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_SIGN_V2" key with the following dataset:
+      """
+      {
+        "account": "$accounts[0].id",
+        "product": "$products[0].id",
+        "policy": "$policies[0].id",
+        "user": "$users[1].id",
+        "email": "$users[1].email",
+        "created": "$licenses[0].created_at",
+        "expiry": "$licenses[0].expiry",
+        "duration": "$policies[0].duration",
+        "id": "$licenses[0].id"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme RSA_2048_PKCS1_PSS_SIGN using template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "RSA_2048_PKCS1_PSS_SIGN",
+        "duration": null
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{
+              \"account\": \"%{account}\",
+              \"product\": \"%{product}\",
+              \"policy\": \"%{policy}\",
+              \"user\": \"%{user}\",
+              \"email\": \"%{email}\",
+              \"created\": \"%{created}\",
+              \"expiry\": \"%{expiry}\",
+              \"duration\": \"%{duration}\",
+              \"id\": \"%{id}\"
+            }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should a "license" that contains a valid "RSA_2048_PKCS1_PSS_SIGN" key with the following dataset:
+      """
+      {
+        "account": "$accounts[0].id",
+        "product": "$products[0].id",
+        "policy": "$policies[0].id",
+        "user": "",
+        "email": "",
+        "created": "$licenses[0].created_at",
+        "expiry": "",
+        "duration": "",
+        "id": "$licenses[0].id"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license without a scheme using template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "%{account}-%{product}-%{id}"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the key "%{account}-%{product}-%{id}"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a license using scheme ED25519_SIGN using invalid template variables
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "scheme": "ED25519_SIGN"
+      }
+      """
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "{ \"foo\": \"%{bar}\" }"
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the response should contain a valid signature header for "test1"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "key contains an invalid template variable",
+        "code": "KEY_VARIABLE_INVALID",
+        "source": {
+          "pointer": "/data/attributes/key"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
