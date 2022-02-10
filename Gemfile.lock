@@ -319,7 +319,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.5.1)
+    redis (4.6.0)
     redis-prescription (1.0.0)
     regexp_parser (1.8.2)
     request_store (1.4.1)
@@ -363,7 +363,7 @@ GEM
     sendgrid-ruby (6.3.8)
       ruby_http_client (~> 3.4)
     sexp_processor (4.15.2)
-    sidekiq (6.4.0)
+    sidekiq (6.4.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -380,7 +380,7 @@ GEM
       concurrent-ruby
       redis-prescription
       sidekiq
-    sidekiq-unique-jobs (7.1.12)
+    sidekiq-unique-jobs (7.1.15)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
       sidekiq (>= 5.0, < 8.0)
@@ -406,7 +406,7 @@ GEM
     sys-uname (1.2.1)
       ffi (>= 1.0.0)
     temple (0.8.2)
-    thor (1.1.0)
+    thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
     timecop (0.9.1)
