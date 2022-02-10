@@ -6,8 +6,11 @@ class MachineHeartbeatWorker
 
   sidekiq_throttle concurrency: { limit: 25 }
   sidekiq_options queue: :critical,
-    lock: :until_executed,
-    on_conflict: :replace
+    lock: :until_executing,
+    on_conflict: {
+      client: :replace,
+      server: :raise,
+    }
 
   def perform(machine_id)
     machine = Machine.find(machine_id)
