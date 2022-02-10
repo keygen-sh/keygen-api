@@ -373,7 +373,7 @@ GEM
     sidekiq-cronitor (2.0.0)
       cronitor (~> 4.0)
       sidekiq (~> 6.0)
-    sidekiq-status (2.1.2)
+    sidekiq-status (2.1.3)
       chronic_duration
       sidekiq (>= 5.0)
     sidekiq-throttled (0.13.0)
@@ -474,9 +474,9 @@ DEPENDENCIES
   sidekiq (~> 6.4)
   sidekiq-cron (~> 1.2)
   sidekiq-cronitor (~> 2.0)
-  sidekiq-status (~> 2.1)
+  sidekiq-status (~> 2.1.3)
   sidekiq-throttled
-  sidekiq-unique-jobs (~> 7.1)
+  sidekiq-unique-jobs (~> 7.1.15)
   spring
   spring-watcher-listen (~> 2.0.0)
   sprockets (~> 3.0)
