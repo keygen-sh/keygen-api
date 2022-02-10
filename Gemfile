@@ -42,8 +42,8 @@ gem 'active_record_union'
 
 # Background jobs
 gem 'sidekiq', '~> 6.4'
-gem 'sidekiq-unique-jobs', '~> 7.1'
-gem 'sidekiq-status', '~> 2.1'
+gem 'sidekiq-unique-jobs', '~> 7.1.15'
+gem 'sidekiq-status', '~> 2.1.3'
 gem 'sidekiq-cron', '~> 1.2'
 gem 'sidekiq-throttled'
 gem 'sidekiq-cronitor', '~> 2.0'
