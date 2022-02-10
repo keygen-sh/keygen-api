@@ -554,7 +554,8 @@ class License < ApplicationRecord
   end
 
   def autogenerate_key
-    return if key.present?
+    return if
+      key.present?
 
     # We need to define an ID and timestamps beforehand since they may
     # be used in an auto-generated key
@@ -581,7 +582,8 @@ class License < ApplicationRecord
   # FIXME(ezekg) All of these callbacks need to be moved into a license key
   #              encryption/signing service
   def crypt_key
-    return unless key.present?
+    return unless
+      key.present?
 
     self.id         ||= SecureRandom.uuid
     self.created_at ||= Time.current
