@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TemplateFormatService < BaseService
-  TEMPLATE_FORMAT_RE = /\{\{(\w+)\}\}/i
+  TEMPLATE_FORMAT_RE = /{{(\w+)}}/i
 
   def initialize(template:, **vars)
     @template = template.to_s
