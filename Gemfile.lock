@@ -274,7 +274,7 @@ GEM
       thor
       thread_safe
     public_suffix (4.0.6)
-    puma (5.5.2)
+    puma (5.6.2)
       nio4r (~> 2.0)
     pundit (2.0.1)
       activesupport (>= 3.0.0)
@@ -456,12 +456,12 @@ DEPENDENCIES
   parallel_tests (~> 3.3)
   pg
   premailer-rails
-  puma (~> 5.5.1)
+  puma (~> 5.6.2)
   pundit
   rack-attack (~> 5.2)
   rack-cors
   rack-timeout
-  rails (~> 6.1.4.2)
+  rails (~> 6.1.4.6)
   rails_autoscale_agent
   redis
   rotp
