@@ -233,6 +233,8 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
+    # NOTE(ezekg) To assert that the RESURRECTED status is transient
+    And the first "machine" should have the heartbeatStatus "ALIVE"
     And sidekiq should have 1 "heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
