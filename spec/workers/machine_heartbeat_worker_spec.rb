@@ -150,6 +150,85 @@ describe MachineHeartbeatWorker do
           expect(Machine.count).to eq 1
         end
       end
+
+      context 'when policy resurrection strategy is set to always' do
+        let(:policy) { create(:policy, heartbeat_resurrection_strategy: 'ALWAYS_REVIVE', heartbeat_cull_strategy: 'KEEP_DEAD', account: account) }
+        let(:license) { create(:license, policy: policy, account: account) }
+        let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
+
+        it 'should send a machine.heartbeat.dead webhook event' do
+          events = 0
+
+          allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+          expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+
+          worker.perform_async machine.id
+          expect { worker.drain }.to_not raise_error
+
+          expect(events).to eq 1
+        end
+
+        it 'should not deactivate the machine' do
+          worker.perform_async machine.id
+          worker.drain
+
+          expect(Machine.count).to eq 1
+        end
+      end
+
+      context 'when policy resurrection strategy is set to 5 minutes' do
+        let(:policy) { create(:policy, heartbeat_resurrection_strategy: '5_MINUTE_REVIVE', heartbeat_cull_strategy: 'DEACTIVATE_DEAD', account: account) }
+        let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
+        let(:license) { create(:license, policy: policy, account: account) }
+        let(:error) { MachineHeartbeatWorker::ResurrectionPeriodNotPassedError }
+
+        context 'when resurrection period has not passed' do
+          let(:heartbeat_at) { 11.minutes.ago }
+
+          it 'should send a machine.heartbeat.dead webhook event' do
+            events = 0
+
+            allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+            expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+
+            worker.perform_async machine.id
+            expect { worker.drain }.to raise_error error
+
+            expect(events).to eq 1
+          end
+
+          it 'should not deactivate the machine' do
+            worker.perform_async machine.id
+            expect { worker.drain }.to raise_error error
+
+            expect(Machine.count).to eq 1
+          end
+        end
+
+        context 'when resurrection period has passed' do
+          let(:heartbeat_at) { 17.minutes.ago }
+          let(:machine) { create(:machine, last_heartbeat_at: heartbeat_at, license: license, account: account) }
+
+          it 'should send a machine.heartbeat.dead webhook event' do
+            events = 0
+
+            allow(BroadcastEventService).to receive(:new).with(hash_including(event: event)).and_call_original
+            expect_any_instance_of(BroadcastEventService).to receive(:call) { events += 1 }
+
+            worker.perform_async machine.id
+            expect { worker.drain }.to_not raise_error
+
+            expect(events).to eq 1
+          end
+
+          it 'should deactivate the machine' do
+            worker.perform_async machine.id
+            expect { worker.drain }.to_not raise_error
+
+            expect(Machine.count).to eq 0
+          end
+        end
+      end
     end
   end
 

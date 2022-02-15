@@ -200,6 +200,88 @@ Feature: License heartbeat actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin pings a dead machine's heartbeat that supports resurrection (period not passed)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
+        "heartbeatDuration": $time.5.minutes
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.7.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "200"
+    And the JSON response should be a "machine" that does requireHeartbeat
+    And the JSON response should be a "machine" with the heartbeatStatus "RESURRECTED"
+    And the JSON response should be a "machine" with a lastHeartbeat that is not nil
+    And the JSON response should be a "machine" with a nextHeartbeat that is not nil
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin pings a dead machine's heartbeat that supports resurrection (period passed)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
+        "heartbeatDuration": $time.5.minutes
+      }
+      """
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 1 "machine"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "lastHeartbeatAt": "$time.11.minutes.ago",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "is dead",
+        "code": "MACHINE_HEARTBEAT_DEAD",
+        "source": {
+          "pointer": "/data/attributes/heartbeatStatus"
+        }
+      }
+      """
+    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product pings a machine's heartbeat
     Given the current account is "test1"
     And the current account has 1 "product"
