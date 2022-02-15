@@ -77,6 +77,7 @@ Feature: Update policy
             "expirationBasis": "FROM_FIRST_ACTIVATION",
             "authenticationStrategy": "MIXED",
             "heartbeatCullStrategy": "KEEP_DEAD",
+            "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
             "name": "Test"
           }
         }
@@ -89,6 +90,7 @@ Feature: Update policy
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
     And the JSON response should be a "policy" with the authenticationStrategy "MIXED"
     And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
+    And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "ALWAYS_REVIVE"
     And the JSON response should be a "policy" with the name "Test"
 
   Scenario: Sales updates a policy for their account

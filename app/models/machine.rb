@@ -301,6 +301,10 @@ class Machine < ApplicationRecord
     end
   }
 
+  delegate :resurrect_dead_machines?, :lazarus_ttl,
+    allow_nil: true,
+    to: :policy
+
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)
     encoded_data = Base64.urlsafe_encode64(data)
@@ -311,6 +315,16 @@ class Machine < ApplicationRecord
     encoded_sig = Base64.urlsafe_encode64(sig)
 
     "#{signing_data}.#{encoded_sig}"
+  end
+
+  def ping!
+    update!(last_heartbeat_at: Time.current)
+  end
+
+  def resurrect!
+    update!(last_heartbeat_at: Time.current, last_death_event_sent_at: nil)
+
+    self.heartbeat_status_override = :RESURRECTED
   end
 
   def heartbeat_duration
@@ -334,6 +348,7 @@ class Machine < ApplicationRecord
   def heartbeat_ok?
     heartbeat_not_started? || heartbeat_alive?
   end
+  alias_method :ok?, :heartbeat_ok?
 
   def next_heartbeat_at
     return nil if last_heartbeat_at.nil?
@@ -346,7 +361,11 @@ class Machine < ApplicationRecord
   end
 
   def heartbeat_status
-    return :NOT_STARTED unless requires_heartbeat?
+    return heartbeat_status_override if
+      heartbeat_status_override.present?
+
+    return :NOT_STARTED unless
+      requires_heartbeat?
 
     if next_heartbeat_at >= Time.current
       :ALIVE
@@ -355,7 +374,18 @@ class Machine < ApplicationRecord
     end
   end
 
+  def resurrection_period_passed?
+    return true unless
+      resurrect_dead_machines? &&
+      requires_heartbeat?
+
+    Time.current > next_heartbeat_at +
+                   lazarus_ttl
+  end
+
   private
+
+  attr_accessor :heartbeat_status_override
 
   def default_proof_dataset
     {

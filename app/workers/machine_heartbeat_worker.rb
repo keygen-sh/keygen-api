@@ -5,6 +5,7 @@ class MachineHeartbeatWorker
   include Sidekiq::Throttled::Worker
 
   sidekiq_throttle concurrency: { limit: 25 }
+  sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
     lock: :until_executing,
     on_conflict: {
@@ -18,11 +19,25 @@ class MachineHeartbeatWorker
       machine.requires_heartbeat?
 
     if machine.dead?
-      BroadcastEventService.call(
-        event: 'machine.heartbeat.dead',
-        account: machine.account,
-        resource: machine,
-      )
+      if machine.last_death_event_sent_at.nil?
+        machine.touch(:last_death_event_sent_at)
+
+        # We only want to send this event once per lifecycle
+        BroadcastEventService.call(
+          event: 'machine.heartbeat.dead',
+          account: machine.account,
+          resource: machine,
+        )
+      end
+
+      # Exit early since machine will never be culled
+      return if
+        machine.policy.always_resurrect_dead_machines?
+
+      # Wait until the machine's resurrection period has passed before deactivating
+      raise ResurrectionPeriodNotPassedError if
+        machine.policy.resurrect_dead_machines? &&
+        !machine.resurrection_period_passed?
 
       machine.destroy! if
         machine.policy.deactivate_dead_machines?
@@ -37,5 +52,13 @@ class MachineHeartbeatWorker
     )
   rescue ActiveRecord::RecordNotFound
     # NOTE(ezekg) Already deactivated
+  end
+
+  private
+
+  class ResurrectionPeriodNotPassedError < StandardError
+    def backtrace
+      nil
+    end
   end
 end

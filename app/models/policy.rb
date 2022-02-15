@@ -54,6 +54,16 @@ class Policy < ApplicationRecord
     KEEP_DEAD
   ]
 
+  HEARTBEAT_RESURRECTION_STRATEGIES = %w[
+    ALWAYS_REVIVE
+    15_MINUTE_REVIVE
+    10_MINUTE_REVIVE
+    5_MINUTE_REVIVE
+    2_MINUTE_REVIVE
+    1_MINUTE_REVIVE
+    NO_REVIVE
+  ]
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -73,6 +83,7 @@ class Policy < ApplicationRecord
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
+  before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -106,6 +117,13 @@ class Policy < ApplicationRecord
 
   validates :heartbeat_cull_strategy,
     inclusion: { in: HEARTBEAT_CULL_STRATEGIES, message: "unsupported heartbeat cull strategy" },
+    allow_nil: true
+
+  validates :heartbeat_cull_strategy, inclusion: { in: %w[KEEP_DEAD], message: 'incompatible heartbeat cull strategy (must be KEEP_DEAD when resurrection strategy is ALWAYS_REVIVE)' },
+    if: :always_resurrect_dead_machines?
+
+  validates :heartbeat_resurrection_strategy,
+    inclusion: { in: HEARTBEAT_RESURRECTION_STRATEGIES, message: 'unsupported heartbeat resurrection strategy' },
     allow_nil: true
 
   validate do
@@ -235,7 +253,6 @@ class Policy < ApplicationRecord
   end
 
   def deactivate_dead_machines?
-    # NOTE(ezekg) Backwards compat
     return true if
       heartbeat_cull_strategy.nil?
 
@@ -244,6 +261,37 @@ class Policy < ApplicationRecord
 
   def keep_dead_machines?
     heartbeat_cull_strategy == 'KEEP_DEAD'
+  end
+
+  def resurrect_dead_machines?
+    # NOTE(ezekg) Backwards compat
+    return false if
+      heartbeat_resurrection_strategy.nil?
+
+    heartbeat_resurrection_strategy != 'NO_REVIVE'
+  end
+
+  def always_resurrect_dead_machines?
+    heartbeat_resurrection_strategy == 'ALWAYS_REVIVE'
+  end
+
+  def lazarus_ttl
+    ttl = case heartbeat_resurrection_strategy
+          when '15_MINUTE_REVIVE'
+            15.minutes
+          when '10_MINUTE_REVIVE'
+            10.minutes
+          when '5_MINUTE_REVIVE'
+            5.minutes
+          when '2_MINUTE_REVIVE'
+            2.minutes
+          when '1_MINUTE_REVIVE'
+            1.minute
+          else
+            nil
+          end
+
+    ttl.to_i
   end
 
   def fingerprint_uniq_per_account?
