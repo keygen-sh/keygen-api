@@ -22,7 +22,7 @@ class MachineHeartbeatWorker
       if machine.last_death_event_sent_at.nil?
         machine.touch(:last_death_event_sent_at)
 
-        # We only want to send this event once per lifecycle
+        # We only want to send this event once per lifecycle (reset on resurrection)
         BroadcastEventService.call(
           event: 'machine.heartbeat.dead',
           account: machine.account,
