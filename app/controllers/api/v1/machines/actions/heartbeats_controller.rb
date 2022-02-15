@@ -27,15 +27,29 @@ module Api::V1::Machines::Actions
       authorize machine
 
       return render_unprocessable_entity(detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/heartbeatStatus' }) if
-        machine.dead?
+        machine.dead? &&
+        (
+          !machine.policy.resurrect_dead_machines? ||
+          machine.resurrection_period_passed?
+        )
 
-      machine.update!(last_heartbeat_at: Time.current)
+      if machine.dead?
+        machine.resurrect!
 
-      BroadcastEventService.call(
-        event: 'machine.heartbeat.ping',
-        account: current_account,
-        resource: machine
-      )
+        BroadcastEventService.call(
+          event: 'machine.heartbeat.resurrected',
+          account: current_account,
+          resource: machine
+        )
+      else
+        machine.ping!
+
+        BroadcastEventService.call(
+          event: 'machine.heartbeat.ping',
+          account: current_account,
+          resource: machine
+        )
+      end
 
       # Queue up heartbeat worker which will handle deactivating dead machines
       MachineHeartbeatWorker.perform_in(
