@@ -638,10 +638,15 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(license.expiry).to be nil
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have the expiry "([^"]+)"$/ do |index_in_words, expiry|
-  license = @account.licenses.send(index_in_words)
+Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words, model_name, attribute_name, expected|
+  model  = @account.send(model_name.pluralize).send(index_in_words)
+  actual = model.send(attribute_name.underscore)
 
-  expect(license.expiry).to eq expiry
+  # HACK(ezekg) We can't compare against symbols since expected is a string
+  actual = actual.to_s if
+    actual.is_a?(Symbol)
+
+  expect(actual).to eq expected
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|

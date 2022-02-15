@@ -253,6 +253,7 @@ class Policy < ApplicationRecord
   end
 
   def deactivate_dead_machines?
+    # NOTE(ezekg) Backwards compat
     return true if
       heartbeat_cull_strategy.nil?
 
