@@ -16,7 +16,7 @@ module Api::V1::Machines::Actions
       BroadcastEventService.call(
         event: 'machine.heartbeat.reset',
         account: current_account,
-        resource: machine
+        resource: machine,
       )
 
       render jsonapi: machine
@@ -36,7 +36,7 @@ module Api::V1::Machines::Actions
         BroadcastEventService.call(
           event: 'machine.heartbeat.resurrected',
           account: current_account,
-          resource: machine
+          resource: machine,
         )
       else
         machine.ping!
@@ -44,14 +44,14 @@ module Api::V1::Machines::Actions
         BroadcastEventService.call(
           event: 'machine.heartbeat.ping',
           account: current_account,
-          resource: machine
+          resource: machine,
         )
       end
 
       # Queue up heartbeat worker which will handle deactivating dead machines
       MachineHeartbeatWorker.perform_in(
         machine.heartbeat_duration + Machine::HEARTBEAT_DRIFT,
-        machine.id
+        machine.id,
       )
 
       render jsonapi: machine
