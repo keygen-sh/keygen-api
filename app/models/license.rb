@@ -336,6 +336,7 @@ class License < ApplicationRecord
     :supports_license_auth?,
     :supports_mixed_auth?,
     :supports_auth?,
+    :require_heartbeat?,
     to: :policy,
     allow_nil: true
 
