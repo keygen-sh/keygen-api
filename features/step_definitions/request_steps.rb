@@ -396,7 +396,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+)(?: th
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does) (\w+)$/ do |name, attribute|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" that (?:is|does|has) (\w+)$/ do |name, attribute|
   json = JSON.parse last_response.body
   expect(name.pluralize).to eq json["data"]["type"]
 

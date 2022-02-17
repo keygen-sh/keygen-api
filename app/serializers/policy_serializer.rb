@@ -30,6 +30,7 @@ class PolicySerializer < BaseSerializer
   attribute :heartbeat_duration
   attribute :heartbeat_cull_strategy
   attribute :heartbeat_resurrection_strategy
+  attribute :require_heartbeat
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end

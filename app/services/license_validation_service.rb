@@ -46,11 +46,17 @@ class LicenseValidationService < BaseService
         when license.policy.floating? && license.machines_count == 0
           return [false, "machine is not activated (has no associated machines)", :NO_MACHINES]
         else
-          return [false, "machine heartbeat is dead", :HEARTBEAT_DEAD] if
-            license.machines.dead.exists?(scope[:machine])
+          machine = license.machines.find_by(id: scope[:machine])
 
           return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] unless
-            license.machines.alive.exists?(scope[:machine])
+            machine.present?
+
+          return [false, "machine heartbeat is dead", :HEARTBEAT_DEAD] if
+            machine.dead?
+
+          return [false, 'machine heartbeat is required', :HEARTBEAT_NOT_STARTED] if
+            license.policy.require_heartbeat? &&
+            machine.heartbeat_not_started?
         end
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
@@ -73,17 +79,24 @@ class LicenseValidationService < BaseService
           return [false, 'machine heartbeat is dead', :HEARTBEAT_DEAD] if
             license.machines.dead.with_fingerprint(fingerprints).count == fingerprints.size
 
+          machines = license.machines.with_fingerprint(fingerprints)
+                                     .alive
+
           case
           when license.policy.fingerprint_match_most?
             return [false, "fingerprint is not activated (does not match enough associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              license.machines.alive.with_fingerprint(fingerprints).count < (fingerprints.size / 2.0).ceil
+              machines.count < (fingerprints.size / 2.0).ceil
           when license.policy.fingerprint_match_all?
             return [false, "fingerprint is not activated (does not match all associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              license.machines.alive.with_fingerprint(fingerprints).count < fingerprints.size
+              machines.count < fingerprints.size
           else
             return [false, "fingerprint is not activated (does not match any associated machines)", :FINGERPRINT_SCOPE_MISMATCH] if
-              license.machines.alive.with_fingerprint(fingerprints).empty?
+              machines.empty?
           end
+
+          return [false, 'machine heartbeat is required', :HEARTBEAT_NOT_STARTED] if
+            license.policy.require_heartbeat? &&
+            machines.any?(&:not_started?)
         end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?

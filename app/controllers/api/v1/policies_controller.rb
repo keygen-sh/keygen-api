@@ -114,6 +114,7 @@ module Api::V1
             param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
             param :heartbeat_cull_strategy, type: :string, optional: true
             param :heartbeat_resurrection_strategy, type: :string, optional: true
+            param :require_heartbeat, type: :boolean, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
           param :relationships, type: :hash do
@@ -155,6 +156,7 @@ module Api::V1
             param :check_in_interval_count, type: :integer, optional: true, allow_nil: true
             param :heartbeat_duration, type: :integer, optional: true, allow_nil: true
             param :heartbeat_cull_strategy, type: :string, optional: true
+            param :require_heartbeat, type: :boolean, optional: true
             param :heartbeat_resurrection_strategy, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
