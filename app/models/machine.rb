@@ -334,6 +334,7 @@ class Machine < ApplicationRecord
   def heartbeat_not_started?
     heartbeat_status == :NOT_STARTED
   end
+  alias_method :not_started?, :heartbeat_not_started?
 
   def heartbeat_alive?
     heartbeat_status == :ALIVE
@@ -357,7 +358,7 @@ class Machine < ApplicationRecord
   end
 
   def requires_heartbeat?
-    !last_heartbeat_at.nil?
+    policy&.require_heartbeat? || !last_heartbeat_at.nil?
   end
 
   def heartbeat_status
@@ -365,7 +366,8 @@ class Machine < ApplicationRecord
       heartbeat_status_override.present?
 
     return :NOT_STARTED unless
-      requires_heartbeat?
+      requires_heartbeat? &&
+      last_heartbeat_at?
 
     if next_heartbeat_at >= Time.current
       :ALIVE

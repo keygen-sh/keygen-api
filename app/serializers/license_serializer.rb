@@ -40,6 +40,9 @@ class LicenseSerializer < BaseSerializer
   attribute :max_uses do
     @object.max_uses
   end
+  attribute :require_heartbeat do
+    @object.require_heartbeat?
+  end
   attribute :require_check_in do
     @object.requires_check_in?
   end

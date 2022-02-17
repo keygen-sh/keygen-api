@@ -78,6 +78,7 @@ Feature: Update policy
             "authenticationStrategy": "MIXED",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
+            "requireHeartbeat": true,
             "name": "Test"
           }
         }
