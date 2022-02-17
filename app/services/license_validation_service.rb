@@ -51,12 +51,12 @@ class LicenseValidationService < BaseService
           return [false, "machine is not activated (does not match any associated machines)", :MACHINE_SCOPE_MISMATCH] unless
             machine.present?
 
-          return [false, "machine heartbeat is dead", :HEARTBEAT_DEAD] if
-            machine.dead?
-
           return [false, 'machine heartbeat is required', :HEARTBEAT_NOT_STARTED] if
             license.policy.require_heartbeat? &&
             machine.heartbeat_not_started?
+
+          return [false, "machine heartbeat is dead", :HEARTBEAT_DEAD] if
+            machine.dead?
         end
       else
         return [false, "machine scope is required", :MACHINE_SCOPE_REQUIRED] if license.policy.require_machine_scope?
