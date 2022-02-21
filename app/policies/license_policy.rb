@@ -130,7 +130,7 @@ class LicensePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def upgrade?
+  def change_policy?
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
@@ -138,7 +138,7 @@ class LicensePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def transfer?
+  def change_user?
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||

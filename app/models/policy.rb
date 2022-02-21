@@ -42,6 +42,11 @@ class Policy < ApplicationRecord
     FROM_FIRST_USE
   ].freeze
 
+  TRANSFER_STRATEGIES = %w[
+    RESET_EXPIRY
+    KEEP_EXPIRY
+  ]
+
   AUTHENTICATION_STRATEGIES = %w[
     TOKEN
     LICENSE
@@ -81,6 +86,7 @@ class Policy < ApplicationRecord
   before_create -> { self.fingerprint_matching_strategy = 'MATCH_ANY' }, if: -> { fingerprint_matching_strategy.nil? }
   before_create -> { self.expiration_strategy = 'RESTRICT_ACCESS' }, if: -> { expiration_strategy.nil? }
   before_create -> { self.expiration_basis = 'FROM_CREATION' }, if: -> { expiration_basis.nil? }
+  before_create -> { self.transfer_strategy = 'KEEP_EXPIRY' }, if: -> { heartbeat_resurrection_strategy.nil? }
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
@@ -124,6 +130,10 @@ class Policy < ApplicationRecord
 
   validates :heartbeat_resurrection_strategy,
     inclusion: { in: HEARTBEAT_RESURRECTION_STRATEGIES, message: 'unsupported heartbeat resurrection strategy' },
+    allow_nil: true
+
+  validates :transfer_strategy,
+    inclusion: { in: TRANSFER_STRATEGIES, message: 'unsupported transfer strategy' },
     allow_nil: true
 
   validate do
@@ -381,6 +391,18 @@ class Policy < ApplicationRecord
 
   def supports_auth?
     authentication_strategy != 'NONE'
+  end
+
+  def reset_expiry_on_transfer?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      transfer_strategy.nil?
+
+    transfer_strategy == 'RESET_EXPIRY'
+  end
+
+  def keep_expiry_on_transfer?
+    transfer_strategy == 'KEEP_EXPIRY'
   end
 
   def pop!

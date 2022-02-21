@@ -467,6 +467,20 @@ class License < ApplicationRecord
     save
   end
 
+  def transfer!(new_policy)
+    self.policy = new_policy
+
+    if new_policy.present? && new_policy.reset_expiry_on_transfer?
+      if new_policy.duration?
+        self.expiry = Time.current + ActiveSupport::Duration.build(new_policy.duration)
+      else
+        self.expiry = nil
+      end
+    end
+
+    save!
+  end
+
   private
 
   attr_accessor :seed_key
