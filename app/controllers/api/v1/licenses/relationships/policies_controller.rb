@@ -9,18 +9,18 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/policy
     def show
-      @policy = @license.policy
-      authorize @policy
+      policy = license.policy
+      authorize policy
 
-      render jsonapi: @policy
+      render jsonapi: policy
     end
 
     # PUT /licenses/1/policy
     def update
-      authorize @license, :upgrade?
+      authorize license, :change_policy?
 
       new_policy = current_account.policies.find_by id: policy_params[:id]
-      old_policy = @license.policy
+      old_policy = license.policy
 
       case
       when new_policy.present? && old_policy.product != new_policy.product
@@ -62,26 +62,26 @@ module Api::V1::Licenses::Relationships
         return render_forbidden
       end
 
-      if @license.update(policy: new_policy)
-        BroadcastEventService.call(
-          event: "license.policy.updated",
-          account: current_account,
-          resource: @license
-        )
+      license.transfer!(new_policy)
 
-        render jsonapi: @license
-      else
-        render_unprocessable_resource @license
-      end
+      BroadcastEventService.call(
+        event: "license.policy.updated",
+        account: current_account,
+        resource: license
+      )
+
+      render jsonapi: license
     end
 
     private
 
+    attr_reader :license
+
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
-      authorize @license, :show?
+      authorize license, :show?
 
-      Current.resource = @license
+      Current.resource = license
     end
 
     typed_parameters format: :jsonapi do

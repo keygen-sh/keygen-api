@@ -16,6 +16,7 @@ class PolicySerializer < BaseSerializer
   attribute :fingerprint_matching_strategy
   attribute :expiration_strategy
   attribute :expiration_basis
+  attribute :transfer_strategy
   attribute :authentication_strategy
   attribute :scheme
   attribute :encrypted
