@@ -394,14 +394,14 @@ class Policy < ApplicationRecord
   end
 
   def reset_expiry_on_transfer?
-    # NOTE(ezekg) Backwards compat
-    return true if
-      transfer_strategy.nil?
-
     transfer_strategy == 'RESET_EXPIRY'
   end
 
   def keep_expiry_on_transfer?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      transfer_strategy.nil?
+
     transfer_strategy == 'KEEP_EXPIRY'
   end
 
