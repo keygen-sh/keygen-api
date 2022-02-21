@@ -564,6 +564,56 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin transfers a license to a new policy with a default transfer strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "productId": "$products[0]",
+        "duration": "$time.1.year"
+      }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2042-02-21T17:09:26.685Z"
+      }
+      """
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the expiry "2042-02-21T17:09:26.685Z"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "policy": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/policy" },
+          "data": { "type": "policies", "id": "$policies[1]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin transfers a license to a new policy with a KEEP_EXPIRY transfer strategy (has duration)
     Given I am an admin of account "test1"
     And the current account is "test1"
