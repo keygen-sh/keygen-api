@@ -17,7 +17,7 @@ module Api::V1::Licenses::Relationships
 
     # PUT /licenses/1/user
     def update
-      authorize @license, :transfer?
+      authorize @license, :change_user?
 
       user = current_account.users.find_by id: user_params[:id]
       if user.nil?

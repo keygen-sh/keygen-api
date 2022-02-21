@@ -88,6 +88,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ANY"
     And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
+    And the JSON response should be a "policy" with the transferStrategy "KEEP_EXPIRY"
     And the JSON response should be a "policy" with the authenticationStrategy "TOKEN"
     And the JSON response should be a "policy" with the heartbeatCullStrategy "DEACTIVATE_DEAD"
     And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "NO_REVIVE"
@@ -163,6 +164,7 @@ Feature: Create policy
             "fingerprintMatchingStrategy": "MATCH_ALL",
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_VALIDATION",
+            "transferStrategy": "RESET_EXPIRY",
             "authenticationStrategy": "LICENSE",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
@@ -184,6 +186,7 @@ Feature: Create policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ALL"
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
+    And the JSON response should be a "policy" with the transferStrategy "RESET_EXPIRY"
     And the JSON response should be a "policy" with the authenticationStrategy "LICENSE"
     And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
     And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "5_MINUTE_REVIVE"
@@ -653,6 +656,49 @@ Feature: Create policy
         "code": "HEARTBEAT_CULL_STRATEGY_NOT_ALLOWED",
         "source": {
           "pointer": "/data/attributes/heartbeatCullStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid transfer strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Bad Transfer Strategy",
+            "transferStrategy": "RENEW_EXPIRY"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported transfer strategy",
+        "code": "TRANSFER_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/transferStrategy"
         }
       }
       """

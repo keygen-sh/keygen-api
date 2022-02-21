@@ -75,6 +75,7 @@ Feature: Update policy
             "fingerprintMatchingStrategy": "MATCH_MOST",
             "expirationStrategy": "REVOKE_ACCESS",
             "expirationBasis": "FROM_FIRST_ACTIVATION",
+            "transferStrategy": "RESET_EXPIRY",
             "authenticationStrategy": "MIXED",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
@@ -89,6 +90,7 @@ Feature: Update policy
     And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_MOST"
     And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
     And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
+    And the JSON response should be a "policy" with the transferStrategy "RESET_EXPIRY"
     And the JSON response should be a "policy" with the authenticationStrategy "MIXED"
     And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
     And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "ALWAYS_REVIVE"
