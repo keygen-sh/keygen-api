@@ -20,6 +20,10 @@ class WebhookEvent < ApplicationRecord
 
   scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
 
+  # FIXME(ezekg) Products should only be able to read events that are
+  #              associated with the given product
+  scope :for_product, -> id { self }
+
   def status
     return :queued if updated_at.nil?
     return :unavailable if updated_at < 3.days.ago
