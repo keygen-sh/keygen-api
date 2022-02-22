@@ -533,7 +533,7 @@ Feature: License permit actions
       """
       {
         "title": "Unprocessable entity",
-        "detail": "cannot be renewed because the policy does have a duration"
+        "detail": "cannot be renewed because the policy does not have a duration"
       }
       """
     And sidekiq should have 0 "webhook" jobs
