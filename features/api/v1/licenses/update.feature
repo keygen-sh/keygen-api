@@ -17,7 +17,7 @@ Feature: Update license
     When I send a PATCH request to "/accounts/test1/licenses/$0"
     Then the response status should be "403"
 
-  Scenario: Admin updates a license expiry
+  Scenario: Admin updates a license expiry (ISO8103 format)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -39,6 +39,56 @@ Feature: Update license
     Then the response status should be "200"
     And the JSON response should be a "license" with the expiry "2016-09-05T22:53:37.000Z"
     And the JSON response should be a "license" with the name "Some Name"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a license expiry (UNIX string)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "expiry": "1645630138"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a license expiry (UNIX number)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "expiry": 1645630138
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the expiry "2022-02-23T15:28:58.000Z"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
