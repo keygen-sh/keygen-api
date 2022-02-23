@@ -7,7 +7,6 @@ class WebhookWorker
   ACCEPTABLE_CODES = (200..299).freeze
 
   include Sidekiq::Worker
-  include Sidekiq::Status::Worker
   include SignatureHeaders
 
   sidekiq_options queue: :webhooks, retry: 15, lock: :until_executed, dead: false
@@ -15,6 +14,16 @@ class WebhookWorker
     jitter = 10.minutes.to_i * rand(1..10)
 
     (count ** 4) + jitter
+  end
+
+  sidekiq_retries_exhausted do |job|
+    account_id, event_id, endpoint_id, payload = job['args']
+
+    event = WebhookEvent.find_by(account_id: account_id, id: event_id)
+    next if
+      event.nil?
+
+    event.update(status: 'FAILED')
   end
 
   def perform(account_id, event_id, endpoint_id, payload)
@@ -80,7 +89,8 @@ class WebhookWorker
 
       event.update!(
         last_response_code: res.code,
-        last_response_body: body
+        last_response_body: body,
+        status: ACCEPTABLE_CODES.include?(res.code) ? 'DELIVERED' : 'FAILING',
       )
     rescue => e
       Keygen.logger.exception e
@@ -94,15 +104,20 @@ class WebhookWorker
         Keygen.logger.warn "[webhook_worker] Disabling dead ngrok endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
         # Automatically disable dead ngrok tunnel endpoints
+        event.update!(status: 'FAILED')
         endpoint.disable!
 
         return
       in endpoint: /\.ngrok\.io/, last_response_code: 504
         Keygen.logger.warn "[webhook_worker] Skipping retries for bad ngrok endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
 
+        event.update!(status: 'FAILED')
+
         return
       in endpoint: /\.loca\.lt/, last_response_code: 504
         Keygen.logger.warn "[webhook_worker] Skipping retries for bad localtunnel endpoint: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=#{res.code}"
+
+        event.update!(status: 'FAILED')
 
         return
       else
@@ -118,7 +133,8 @@ class WebhookWorker
 
     event.update!(
       last_response_code: nil,
-      last_response_body: 'SSL_ERROR'
+      last_response_body: 'SSL_ERROR',
+      status: 'FAILED',
     )
   rescue Net::WriteTimeout, # Our request to the endpoint timed out
          Net::ReadTimeout,
@@ -127,21 +143,24 @@ class WebhookWorker
 
     event.update!(
       last_response_code: nil,
-      last_response_body: 'REQ_TIMEOUT'
+      last_response_body: 'REQ_TIMEOUT',
+      status: 'FAILED',
     )
   rescue Errno::ECONNREFUSED # Stop sending requests when the connection is refused
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=CONN_REFUSED"
 
     event.update!(
       last_response_code: nil,
-      last_response_body: 'CONN_REFUSED'
+      last_response_body: 'CONN_REFUSED',
+      status: 'FAILED',
     )
   rescue SocketError # Stop sending requests if DNS is no longer working for endpoint
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=DNS_ERROR"
 
     event.update!(
       last_response_code: nil,
-      last_response_body: 'DNS_ERROR'
+      last_response_body: 'DNS_ERROR',
+      status: 'FAILED',
     )
   end
 

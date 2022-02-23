@@ -21,6 +21,7 @@ class CreateWebhookEventsWorker
       webhook_event = account.webhook_events.create!(
         endpoint: endpoint.url,
         event_type: event_type,
+        status: 'DELIVERING',
       )
 
       # Serialize the event and decode so we can use in webhook job
