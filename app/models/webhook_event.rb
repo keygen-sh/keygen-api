@@ -18,13 +18,6 @@ class WebhookEvent < ApplicationRecord
   #              associated with the given product
   scope :for_product, -> id { self }
 
-  def status
-    return :queued if updated_at.nil?
-    return :unavailable if updated_at < 3.days.ago
-
-    Sidekiq::Status.status(jid) rescue :queued
-  end
-
   def deconstruct
     attributes.values
   end
