@@ -33,6 +33,7 @@ class TypedParameters
     string: String,
     hash: Hash,
     array: Array,
+    date_time: DateTime,
     datetime: DateTime,
     date: Date,
     time: Time
@@ -54,9 +55,9 @@ class TypedParameters
     decimal: lambda { |v| v.to_d },
     boolean: lambda { |v| TRUTHY_VALUES.include?(v) },
     string: lambda { |v| v.to_s },
-    datetime: lambda { |v| v.to_datetime },
+    datetime: lambda { |v| v.to_s.match?(/^\d+$/) ? Time.at(v.to_i).to_datetime : v.to_datetime },
     date: lambda { |v| v.to_date },
-    time: lambda { |v| v.to_time }
+    time: lambda { |v| v.to_s.match?(/^\d+$/) ? Time.at(v.to_i) : v.to_time }
   }
 
   def self.build(context, &block)
@@ -130,6 +131,10 @@ class TypedParameters
           :float
         when :string, :symbol
           :string
+        when :date_time, :datetime, :time
+          :datetime
+        when :date
+          :date
         else
           Keygen.logger.error("[typed_parameters] Unknown type: type=#{t_sym}")
 
