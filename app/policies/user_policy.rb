@@ -65,6 +65,20 @@ class UserPolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
+  def ban?
+    assert_account_scoped!
+
+    resource.has_role?(:user) &&
+      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+  end
+
+  def unban?
+    assert_account_scoped!
+
+    resource.has_role?(:user) &&
+      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+  end
+
   def update_password?
     assert_account_scoped!
 

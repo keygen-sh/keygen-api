@@ -177,6 +177,33 @@ class User < ApplicationRecord
     password_digest?
   end
 
+  def active?(t = 90.days.ago)
+    created_at >= t || licenses.active.any?
+  end
+
+  def banned?
+    banned_at?
+  end
+
+  def ban!
+    update!(banned_at: Time.current)
+  end
+
+  def unban!
+    update!(banned_at: nil)
+  end
+
+  def status
+    case
+    when banned?
+      :BANNED
+    when active?
+      :ACTIVE
+    else
+      :INACTIVE
+    end
+  end
+
   def second_factor_enabled?
     return false if second_factors.enabled.empty?
 

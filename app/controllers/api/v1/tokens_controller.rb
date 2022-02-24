@@ -46,6 +46,9 @@ module Api::V1
         end
 
         if user&.authenticate(password)
+          raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
+            user.banned?
+
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default
