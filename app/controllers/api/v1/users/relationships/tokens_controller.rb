@@ -7,29 +7,68 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
-    # GET /users/1/tokens
     def index
-      @tokens = policy_scope apply_scopes(@user.tokens)
-      authorize @tokens
+      authorize user, :list_tokens?
 
-      render jsonapi: @tokens
+      tokens = policy_scope apply_scopes(user.tokens)
+      authorize tokens
+
+      render jsonapi: tokens
     end
 
-    # GET /users/1/tokens/1
     def show
-      @token = @user.tokens.find params[:id]
-      authorize @token
+      authorize user, :show_token?
 
-      render jsonapi: @token
+      token = user.tokens.find params[:id]
+      authorize token
+
+      render jsonapi: token
+    end
+
+    def create
+      authorize user, :generate_token?
+
+      kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
+      if !kwargs.key?(:expiry)
+        kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
+      end
+
+      token = TokenGeneratorService.call(account: current_account, bearer: user, **kwargs)
+
+      return render_unprocessable_resource(token) unless
+        token.valid?
+
+      BroadcastEventService.call(
+        event: 'token.generated',
+        account: current_account,
+        resource: token,
+      )
+
+      render jsonapi: token
     end
 
     private
 
+    attr_reader :user
+
     def set_user
       @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize @user, :read_tokens?
+      authorize user, :show?
 
-      Current.resource = @user
+      Current.resource = user
+    end
+
+    typed_parameters format: :jsonapi do
+      options strict: true
+
+      on :create do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[token tokens]
+          param :attributes, type: :hash do
+            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+          end
+        end
+      end
     end
   end
 end

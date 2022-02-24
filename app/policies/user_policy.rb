@@ -38,10 +38,22 @@ class UserPolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer)
   end
 
-  def read_tokens?
+  def generate_token?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    resource.has_role?(:user) &&
+      bearer.has_role?(:admin, :developer, :product)
+  end
+
+  def list_tokens?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+      resource == bearer
+  end
+
+  def show_token?
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       resource == bearer
   end
 

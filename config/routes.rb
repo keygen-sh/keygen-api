@@ -82,7 +82,7 @@ Rails.application.routes.draw do
         resources "products", only: [:index, :show]
         resources "licenses", only: [:index, :show]
         resources "machines", only: [:index, :show]
-        resources "tokens", only: [:index, :show]
+        resources "tokens", only: [:index, :show, :create]
       end
       member do
         scope "actions", module: "users/actions" do

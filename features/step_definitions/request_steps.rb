@@ -345,8 +345,8 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+)
 
   expect(json["data"]["type"]).to eq resource.pluralize
 
-  t1 = json["data"]["attributes"][attribute].to_time
-  t2 = value.to_time
+  t1 = json["data"]["attributes"][attribute]&.to_time
+  t2 = value&.to_time
 
   expect(t1).to be_within(3.seconds).of t2
 
