@@ -407,7 +407,7 @@ class License < ApplicationRecord
   end
 
   def banned?
-    return false if user.nil?
+    return false if user_id.nil?
 
     user.banned?
   end
