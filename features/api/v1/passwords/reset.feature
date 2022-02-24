@@ -17,10 +17,30 @@ Feature: Password reset
     When I send a POST request to "/accounts/test1/passwords"
     Then the response status should not be "403"
 
-  Scenario: User resets their password
+  Scenario: User resets their password (has password)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "users"
+    When I send a POST request to "/accounts/test1/passwords" with the following:
+      """
+      {
+        "meta": {
+          "email": "$users[1].email"
+        }
+      }
+      """
+    Then the response status should be "204"
+    And the user should receive a "password reset" email
+    And sidekiq should have 1 "webhook" job
+
+  Scenario: User resets their password (no password)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And all "users" have the following attributes:
+      """
+      { "passwordDigest": null }
+      """
     When I send a POST request to "/accounts/test1/passwords" with the following:
       """
       {

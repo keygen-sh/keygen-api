@@ -173,6 +173,10 @@ class User < ApplicationRecord
     }
   end
 
+  def password?
+    password_digest?
+  end
+
   def second_factor_enabled?
     return false if second_factors.enabled.empty?
 

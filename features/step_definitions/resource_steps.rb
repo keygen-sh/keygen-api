@@ -649,7 +649,7 @@ Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words
   expect(actual).to eq expected
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   parse_placeholders!(body)
 
   account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
@@ -657,6 +657,24 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
 
   expect(model.attributes).to include attrs
+end
+
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, body|
+  parse_placeholders!(body)
+
+  model   = @account.send(model_name.pluralize).send(index_in_words)
+  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+
+  expect(model.attributes).to include attrs
+end
+
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the following attributes:$/ do |index_in_words, model_name, body|
+  parse_placeholders!(body)
+
+  model   = @account.send(model_name.pluralize).send(index_in_words)
+  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+
+  expect(model.attributes).to_not include attrs
 end
 
 Given /^the (\w+) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
