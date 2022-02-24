@@ -115,6 +115,29 @@ Feature: Create user
         }
       """
 
+  Scenario: Anonymous creates a user without a password
+    Given the current account is "test1"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "invite@keygen.example",
+            "password": null
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      { "email": "invite@keygen.example" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous creates a user with no name
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -185,8 +208,7 @@ Feature: Create user
           "type": "users",
           "attributes": {
             "firstName": "Clark",
-            "lastName": "Kent",
-            "email": "superman@keygen.sh"
+            "lastName": "Kent"
           }
         }
       }

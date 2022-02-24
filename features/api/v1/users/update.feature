@@ -1045,6 +1045,28 @@ Feature: Update user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to remove a user's password
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "users"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "password": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to update a user's password
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
