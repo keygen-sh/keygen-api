@@ -158,6 +158,9 @@ module TokenAuthentication
     end
 
     if current_license.present?
+      raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_BANNED', detail: 'License is banned') if
+        current_license.banned?
+
       raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_SUSPENDED', detail: 'License is suspended') if
         current_license.suspended?
 
