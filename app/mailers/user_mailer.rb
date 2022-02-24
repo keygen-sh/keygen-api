@@ -10,6 +10,12 @@ class UserMailer < ApplicationMailer
     @expiry  = @user.password_reset_sent_at + 24.hours
     @token   = [@account.id.remove('-'), @user.id.remove('-'), token].join('.')
 
-    mail to: user.email, reply_to: @account.email, subject: "Password reset requested for your #{@account.name} account"
+    subject = if @user.password?
+                "Password reset requested for your #{@account.name} account"
+              else
+                "Set a password for your #{@account.name} account"
+              end
+
+    mail to: user.email, reply_to: @account.email, subject: subject
   end
 end

@@ -113,6 +113,7 @@ Feature: User tokens relationship
       }
       """
     Then the response status should be "200"
+    And the JSON response should be a "token" with a token
     And the JSON response should be a "token" with the following attributes:
       """
       {

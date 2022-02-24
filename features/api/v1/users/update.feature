@@ -1041,6 +1041,10 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
+    And the third "user" should not have the following attributes:
+      """
+      { "passwordDigest": null }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1063,6 +1067,10 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
+    And the third "user" should have the following attributes:
+      """
+      { "passwordDigest": null }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

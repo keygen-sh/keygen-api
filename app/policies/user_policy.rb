@@ -53,8 +53,16 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show_token?
+    assert_account_scoped!
+
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       resource == bearer
+  end
+
+  def invite?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
   def update_password?
