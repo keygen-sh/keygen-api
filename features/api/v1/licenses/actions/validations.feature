@@ -222,6 +222,37 @@ Feature: License validation actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin quick validates a license belonging to a banned user
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["license.validation.failed"] }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "bannedAt": "$time.1.minute.ago" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "is banned", "constant": "BANNED" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin quick validates a strict floating license that has too many machines
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -995,6 +1026,33 @@ Feature: License validation actions
     And the JSON response should contain meta which includes the following:
       """
       { "valid": false, "detail": "is suspended", "constant": "SUSPENDED" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license belonging to a banned user
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "bannedAt": "$time.1.minute.ago" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "is banned", "constant": "BANNED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job

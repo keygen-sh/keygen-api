@@ -88,6 +88,8 @@ Rails.application.routes.draw do
         scope "actions", module: "users/actions" do
           post "update-password", to: "password#update_password"
           post "reset-password", to: "password#reset_password"
+          post "ban", to: "bans#ban"
+          post "unban", to: "bans#unban"
         end
       end
     end

@@ -7,6 +7,7 @@ class UserSerializer < BaseSerializer
   attribute :first_name
   attribute :last_name
   attribute :email
+  attribute :status
   attribute :role do
     @object.role&.name&.dasherize
   end

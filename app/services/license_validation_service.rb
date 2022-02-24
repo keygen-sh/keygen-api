@@ -14,6 +14,10 @@ class LicenseValidationService < BaseService
     touch_last_validated_at unless
       skip_touch?
 
+    # Check if license's user has been banned
+    return [false, "is banned", :BANNED] if
+      license.banned?
+
     # Check if license is suspended
     return [false, "is suspended", :SUSPENDED] if license.suspended?
 
