@@ -106,7 +106,7 @@ module Api::V1
             param :first_name, type: :string, optional: true
             param :last_name, type: :string, optional: true
             param :email, type: :string
-            param :password, type: :string
+            param :password, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_bearer&.has_role?(:admin)
               param :role, type: :string, inclusion: %w[user admin developer sales-agent support-agent], optional: true, transform: -> (k, v) {
@@ -126,7 +126,7 @@ module Api::V1
             param :last_name, type: :string, optional: true
             param :email, type: :string, optional: true
             if current_bearer&.has_role?(:admin, :product)
-              param :password, type: :string, optional: true
+              param :password, type: :string, optional: true, allow_nil: true
             end
             if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
               param :metadata, type: :hash, allow_non_scalars: true, optional: true

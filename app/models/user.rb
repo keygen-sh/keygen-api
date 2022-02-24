@@ -9,7 +9,7 @@ class User < ApplicationRecord
   include Roleable
   include Diffable
 
-  has_secure_password
+  has_secure_password :password, validations: false
 
   belongs_to :account
   has_one :role, as: :resource, dependent: :destroy
@@ -31,10 +31,10 @@ class User < ApplicationRecord
   before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }
   before_create :set_user_role!, if: -> { role.nil? }
 
-  before_save -> { self.email = email.downcase }
+  before_save -> { self.email = email.downcase.strip }
 
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
-  validates :password, length: { minimum: 6, maximum: 1.kilobyte }, if: -> { password.present? }
+  validates :password, length: { minimum: 6, maximum: 72.bytes }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
   scope :stdout_subscribers, -> {
