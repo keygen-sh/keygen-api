@@ -119,6 +119,10 @@ module TokenAuthentication
     raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_EXPIRED', detail: 'Token is expired') if
       current_token&.expired?
 
+    raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
+      current_bearer.respond_to?(:banned?) &&
+      current_bearer.banned?
+
     case
     when current_bearer&.has_role?(:license)
       raise Keygen::Error::ForbiddenError.new(code: 'TOKEN_NOT_ALLOWED', detail: 'Token authentication is not allowed by policy') unless

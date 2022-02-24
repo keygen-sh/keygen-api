@@ -352,6 +352,8 @@ class License < ApplicationRecord
 
   def status
     case
+    when banned?
+      :BANNED
     when suspended?
       :SUSPENDED
     when expired?
@@ -402,6 +404,12 @@ class License < ApplicationRecord
     return policy.protected? if protected.nil?
 
     protected
+  end
+
+  def banned?
+    return false if user.nil?
+
+    user.banned?
   end
 
   def suspended?
