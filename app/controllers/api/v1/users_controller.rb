@@ -5,7 +5,11 @@ module Api::V1
     has_scope(:metadata, type: :hash, only: :index) { |c, s, v| s.with_metadata(v) }
     has_scope(:roles, type: :array, default: [:user]) { |c, s, v| s.with_roles(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope :active
+    has_scope(:status) { |c, s, v| s.with_status(v) }
+
+    # NOTE(ezekg) This has an :active alias for backwards compatibility
+    has_scope(:assigned, :boolean) { |c, s, v| s.assigned(v) }
+    has_scope(:active, :boolean) { |c, s, v| s.assigned(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!, only: [:index, :create, :destroy]
@@ -15,7 +19,10 @@ module Api::V1
 
     # GET /users
     def index
-      @users = policy_scope apply_scopes(current_account.users.eager_load(:role))
+      # We're applying scopes and preloading after the policy scope because
+      # our policy scope may include a UNION, and scopes/preloading need to
+      # be applied after the UNION query has been performed.
+      @users = policy_scope(apply_scopes(current_account.users)).preload(:role)
       authorize @users
 
       render jsonapi: @users
