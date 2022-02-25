@@ -163,7 +163,7 @@ class User < ApplicationRecord
         joins(:licenses)
           .where('users.created_at < ?', t)
           .where(
-            'licenses.id IS NULL OR (licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t))',
+            'licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t)',
             t: t,
           )
       )
