@@ -16,10 +16,25 @@ Feature: List users
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves all users for their account
+  Scenario: Admin retrieves all users for their account (active)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "users"
+    And the current account has 15 "licenses" for existing "users"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "users"
+
+  Scenario: Admin retrieves all users for their account (inactive)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "users"
+    And all "users" have the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the current account has 15 "licenses" for existing "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
