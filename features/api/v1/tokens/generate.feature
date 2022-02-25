@@ -354,6 +354,32 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User attempts to generate a new token without a password set
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "passwordDigest": null }
+      """
+    And I am a user of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:secret\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "401"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unauthorized",
+        "detail": "Credentials must be valid",
+        "code": "CREDENTIALS_INVALID"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous attempts to send a null byte within the auth header
     Given the current account is "test1"
     And I send the following raw headers:

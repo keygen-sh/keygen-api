@@ -33,6 +33,27 @@ Feature: User password actions
     And the response should contain a valid signature header for "test1"
     Then the response status should be "200"
 
+  Scenario: User updates their password (no password set)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "passwordDigest": null }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/actions/update-password" with the following:
+      """
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "password2"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "401"
+
   Scenario: User updates their password (too short)
     Given the current account is "test1"
     And the current account has 3 "users"

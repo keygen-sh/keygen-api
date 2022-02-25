@@ -10,7 +10,7 @@ module Api::V1::Users::Actions
     def update_password
       authorize user
 
-      if user.try(:authenticate, password_meta[:old_password])
+      if user.password? && user.authenticate(password_meta[:old_password])
         if user.update(password: password_meta[:new_password])
           render jsonapi: user
         else
