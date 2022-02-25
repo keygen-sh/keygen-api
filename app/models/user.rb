@@ -131,13 +131,45 @@ class User < ApplicationRecord
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :with_roles, -> (*roles) { joins(:role).where roles: { name: roles.flatten.map { |r| r.to_s.underscore } } }
   scope :with_role, -> (role) { joins(:role).where(roles: { name: role.to_s.underscore }) }
+  scope :with_status, -> status {
+    case status.to_s.upcase
+    when 'BANNED'
+      self.banned
+    when 'INACTIVE'
+      self.inactive
+    when 'ACTIVE'
+      self.active
+    else
+      self.none
+    end
+  }
   scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:license).where licenses: id }
   scope :for_user, -> (id) { where id: id }
   scope :administrators, -> { with_roles(:admin, :developer, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
-  scope :active, -> (status = true) {
-    sub_query = License.where('"licenses"."user_id" = "users"."id"').select(1).arel.exists
+  scope :banned, -> { where.not(banned_at: nil) }
+  scope :active, -> (t = 90.days.ago) {
+    joins(:licenses).where('users.created_at >= ?', t).or(
+      joins(:licenses).where(
+        'licenses.created_at >= :t OR licenses.last_validated_at >= :t',
+        t: t,
+      )
+    )
+  }
+  scope :inactive, -> (t = 90.days.ago) {
+    where('users.created_at < ?', t).where.missing(:licenses)
+      .union(
+        joins(:licenses)
+          .where('users.created_at < ?', t)
+          .where(
+            'licenses.id IS NULL OR (licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t))',
+            t: t,
+          )
+      )
+  }
+  scope :assigned, -> (status = true) {
+    sub_query = License.where('licenses.user_id = users.id').select(1).arel.exists
 
     if ActiveRecord::Type::Boolean.new.cast(status)
       where(sub_query)

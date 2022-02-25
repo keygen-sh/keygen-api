@@ -193,7 +193,7 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 2 "users"
 
- Scenario: Admin retrieves all active users
+ Scenario: Admin retrieves all active (assigned) users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 9 "users"
@@ -215,7 +215,7 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 3 "users"
 
-  Scenario: Admin retrieves all inactive users
+  Scenario: Admin retrieves all inactive (unassigned) users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 9 "users"
@@ -334,6 +334,156 @@ Feature: List users
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "user"
+
+  Scenario: Admin retrieves users filtered by status (active)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 7 "users"
+    And the first "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the second "user" has the following attributes:
+      """
+      { "bannedAt": "$time.now" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the current account has 6 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[7]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[4]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.2.days.ago",
+        "createdAt": "$time.91.days.ago",
+        "userId": "$users[6]"
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.101.days.ago",
+        "userId": "$users[3]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?status=ACTIVE"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "users"
+
+  Scenario: Admin retrieves users filtered by status (inactive)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 7 "users"
+    And the first "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the second "user" has the following attributes:
+      """
+      { "bannedAt": "$time.now" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the current account has 6 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[7]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[4]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.2.days.ago",
+        "createdAt": "$time.91.days.ago",
+        "userId": "$users[6]"
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.101.days.ago",
+        "userId": "$users[3]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?status=INACTIVE"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "users"
+
+  Scenario: Admin retrieves users filtered by status (banned)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 7 "users"
+    And the first "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the second "user" has the following attributes:
+      """
+      { "bannedAt": "$time.now" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the current account has 6 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[7]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[4]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.2.days.ago",
+        "createdAt": "$time.91.days.ago",
+        "userId": "$users[6]"
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.101.days.ago",
+        "userId": "$users[3]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?status=BANNED"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "user"
 
