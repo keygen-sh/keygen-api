@@ -1053,6 +1053,32 @@ Feature: List license
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
 
+  Scenario: Admin retrieves licenses filtered by status (banned)
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the last "user" has the following attributes:
+      """
+      { "bannedAt": "$time.now" }
+      """
+    And the current account has 3 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[2]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "userId": "$users[3]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?status=BANNED"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+
   Scenario: Admin retrieves licenses filtered by status (invalid)
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -293,9 +293,14 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
+  scope :banned, -> {
+    joins(:user).where.not(user: { banned_at: nil })
+  }
   scope :with_metadata, -> (meta) { search_metadata meta }
   scope :with_status, -> status {
     case status.to_s.upcase
+    when 'BANNED'
+      self.banned
     when 'SUSPENDED'
       self.suspended
     when 'EXPIRED'
