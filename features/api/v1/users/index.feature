@@ -487,6 +487,56 @@ Feature: List users
     Then the response status should be "200"
     And the JSON response should be an array with 1 "user"
 
+  Scenario: Admin retrieves users filtered by status (invalid)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 7 "users"
+    And the first "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the second "user" has the following attributes:
+      """
+      { "bannedAt": "$time.now" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the current account has 6 userless "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[7]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "userId": "$users[4]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.2.days.ago",
+        "createdAt": "$time.91.days.ago",
+        "userId": "$users[6]"
+      }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "lastValidatedAt": "$time.91.days.ago",
+        "createdAt": "$time.101.days.ago",
+        "userId": "$users[3]"
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users?status=INVALID"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "users"
+
   Scenario: Product retrieves all users for their product (multiple licenses per-user)
     Given the current account is "test1"
     And the current account has 2 "products"
