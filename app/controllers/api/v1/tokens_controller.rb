@@ -45,7 +45,7 @@ module Api::V1
           end
         end
 
-        if user&.authenticate(password)
+        if user&.password? && user.authenticate(password)
           raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
             user.banned?
 
