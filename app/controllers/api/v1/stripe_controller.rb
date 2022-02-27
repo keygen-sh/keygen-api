@@ -11,7 +11,10 @@ module Api::V1
       head :accepted
 
       event = Billings::RetrieveEventService.call(event: params[:id])
-      return unless event
+      return unless
+        event.present?
+
+      Keygen.logger.info("[stripe] action=receiving event_id=#{event.id} event_type=#{event.type}")
 
       case event.type
       when "customer.subscription.created",
@@ -39,10 +42,11 @@ module Api::V1
 
           if account.plan.plan_id != plan_id
             plan = Plan.find_by(plan_id: plan_id, private: false)
+            if plan.present?
+              Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
 
-            Keygen.logger.warn("[stripe] action=change_plan account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
-
-            account.update(plan: plan)
+              account.update(plan: plan)
+            end
           end
         rescue => e
           Keygen.logger.exception(e)
@@ -168,6 +172,8 @@ module Api::V1
           plan: billing.plan.plan_id
         )
       end
+
+      Keygen.logger.info("[stripe] action=received event_id=#{event.id} event_type=#{event.type}")
     end
   end
 end
