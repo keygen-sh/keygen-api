@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_28_163722) do
+ActiveRecord::Schema.define(version: 2022_02_28_202804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -263,6 +263,7 @@ ActiveRecord::Schema.define(version: 2022_02_28_163722) do
     t.string "heartbeat_resurrection_strategy"
     t.boolean "require_heartbeat", default: false, null: false
     t.string "transfer_strategy"
+    t.boolean "require_user_scope", default: false, null: false
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

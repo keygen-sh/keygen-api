@@ -1348,6 +1348,9 @@ Feature: Create policy
             "name": "Premium Add-On",
             "requireFingerprintScope": true,
             "requireProductScope": true,
+            "requirePolicyScope": true,
+            "requireMachineScope": true,
+            "requireUserScope": true,
             "duration": null
           },
           "relationships": {
