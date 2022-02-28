@@ -104,7 +104,14 @@ class LicensePolicy < ApplicationPolicy
   def validate_by_key?
     assert_account_scoped!
 
-    true
+    # NOTE(ezekg) We have optional authn
+    return true unless
+      bearer.present?
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.user == bearer ||
+      resource.product == bearer ||
+      resource == bearer
   end
 
   def increment?
