@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_24_213354) do
+ActiveRecord::Schema.define(version: 2022_02_28_163722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -515,6 +515,7 @@ ActiveRecord::Schema.define(version: 2022_02_24_213354) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "users_tsv_metadata_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_users_on_account_id_and_created_at"
+    t.index ["banned_at"], name: "index_users_on_banned_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true
     t.index ["email"], name: "index_users_on_email", using: :gin
