@@ -5402,7 +5402,7 @@ Feature: License validation actions
         </meta>
       </validation>
       """
-   Then the response status should be "400"
+    Then the response status should be "400"
     And the first error should have the following properties:
       """
       {
@@ -5951,7 +5951,11 @@ Feature: License validation actions
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
 
   Scenario: A user validates a license key scoped to their own email
     Given the current account is "test1"
@@ -5978,7 +5982,11 @@ Feature: License validation actions
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
 
   Scenario: A user validates a license key scoped to a different user
     Given the current account is "test1"
@@ -6005,4 +6013,4 @@ Feature: License validation actions
         }
       }
       """
-    Then the response status should be "400"
+    Then the response status should be "403"

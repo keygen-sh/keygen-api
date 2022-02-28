@@ -10,9 +10,9 @@ module Api::V1::Licenses::Actions
 
     # GET /licenses/1/validate
     def quick_validate_by_id
-      authorize @license
+      authorize license
 
-      valid, detail, constant = LicenseValidationService.call(license: @license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
+      valid, detail, constant = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
         valid: valid,
@@ -20,19 +20,19 @@ module Api::V1::Licenses::Actions
         constant: constant,
       }
 
-      Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+      Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
 
-      Current.resource = @license if
-        @license.present?
+      Current.resource = license if
+        license.present?
 
-      render jsonapi: @license, meta: meta
+      render jsonapi: license, meta: meta
     end
 
     # POST /licenses/1/validate
     def validate_by_id
-      authorize @license
+      authorize license
 
-      valid, detail, constant = LicenseValidationService.call(license: @license, scope: validation_params.dig(:meta, :scope))
+      valid, detail, constant = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
       meta = {
         ts: Time.current,
         valid: valid,
@@ -48,26 +48,24 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Keygen.logger.info "[license.validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
-      if @license.present?
-        Current.resource = @license
+      if license.present?
+        Current.resource = license
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
-          resource: @license,
+          resource: license,
           meta: meta
         )
       end
 
-      render jsonapi: @license, meta: meta
+      render jsonapi: license, meta: meta
     end
 
     # POST /licenses/validate-key
     def validate_by_key
-      skip_authorization
-
       @license = LicenseKeyLookupService.call(
         account: current_account,
         key: validation_params[:meta][:key],
@@ -77,7 +75,14 @@ module Api::V1::Licenses::Actions
                           validation_params[:meta][:encrypted] == true
       )
 
-      valid, detail, constant = LicenseValidationService.call(license: @license, scope: validation_params[:meta][:scope])
+      # We can skip authorization when the license doesn't exist
+      if license.present?
+        authorize license
+      else
+        skip_authorization
+      end
+
+      valid, detail, constant = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])
       meta = {
         ts: Time.current,
         valid: valid,
@@ -93,23 +98,25 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate-key] account_id=#{current_account.id} license_id=#{@license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Keygen.logger.info "[license.validate-key] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
 
-      if @license.present?
-        Current.resource = @license
+      if license.present?
+        Current.resource = license
 
         BroadcastEventService.call(
           event: valid ? "license.validation.succeeded" : "license.validation.failed",
           account: current_account,
-          resource: @license,
+          resource: license,
           meta: meta
         )
       end
 
-      render jsonapi: @license, meta: meta
+      render jsonapi: license, meta: meta
     end
 
     private
+
+    attr_reader :license
 
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
@@ -154,8 +161,7 @@ module Api::V1::Licenses::Actions
             param :entitlements, type: :array, optional: true do
               items type: :string
             end
-            param :user, type: :string, optional: true unless
-              current_bearer&.has_role?(:user)
+            param :user, type: :string, optional: true
           end
         end
       end
