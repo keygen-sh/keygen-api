@@ -113,6 +113,16 @@ class LicenseValidationService < BaseService
 
         return [false, "is missing one or more required entitlements", :ENTITLEMENTS_MISSING] if license.entitlements.where(code: entitlements).count != entitlements.size
       end
+
+      # Check against :user scope requirements
+      if scope.present? && scope.key?(:user)
+        return [false, "user scope does not match", :USER_SCOPE_MISMATCH] unless
+          license.user&.email == scope[:user] ||
+          license.user&.id == scope[:user]
+      else
+        return [false, "user scope is required", :USER_SCOPE_REQUIRED] if
+          license.policy.require_user_scope?
+      end
     end
 
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).

@@ -144,9 +144,11 @@ Feature: Update policy
     And the first "policy" has the following attributes:
       """
       {
+        "requireUserScope": true,
         "requireCheckIn": true,
         "checkInInterval": "day",
-        "checkInIntervalCount": 1
+        "checkInIntervalCount": 1,
+        "duration": 86000
       }
       """
     And I use an authentication token
@@ -157,6 +159,7 @@ Feature: Update policy
           "type": "policies",
           "id": "$policies[0].id",
           "attributes": {
+            "requireUserScope": false,
             "requireCheckIn": false,
             "checkInInterval": null,
             "checkInIntervalCount": null,
@@ -166,8 +169,11 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
+    And the JSON response should be a "policy" that does not requireUserScope
+    And the JSON response should be a "policy" that does not requireCheckIn
     And the JSON response should be a "policy" with a nil checkInInterval
     And the JSON response should be a "policy" with a nil checkInIntervalCount
+    And the JSON response should be a "policy" with a nil duration
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

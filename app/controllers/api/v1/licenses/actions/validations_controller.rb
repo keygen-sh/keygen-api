@@ -132,6 +132,7 @@ module Api::V1::Licenses::Actions
             param :entitlements, type: :array, optional: true do
               items type: :string
             end
+            param :user, type: :string, optional: true
           end
         end
       end
@@ -153,6 +154,8 @@ module Api::V1::Licenses::Actions
             param :entitlements, type: :array, optional: true do
               items type: :string
             end
+            param :user, type: :string, optional: true unless
+              current_bearer&.has_role?(:user)
           end
         end
       end
