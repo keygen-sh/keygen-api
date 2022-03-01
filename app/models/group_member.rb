@@ -8,13 +8,13 @@ class GroupMember < ApplicationRecord
     polymorphic: true
 
   validates :account,
-    presence: true
+    presence: { message: 'must exist' }
   validates :group,
-    scope: { by: :account_id },
-    presence: true
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :member,
-    scope: { by: :account_id },
-    presence: true
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 
   validate on: :create do
     next unless
@@ -45,4 +45,7 @@ class GroupMember < ApplicationRecord
 
     errors.add :base, :machine_limit_exceeded, message: "machines count has exceeded maximum allowed by current group (#{group.max_machines})"
   end
+
+  scope :for_type,
+    -> t { where(member_type: t.to_s.underscore.singularize.classify) }
 end
