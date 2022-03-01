@@ -1,4 +1,7 @@
 class GroupMember < ApplicationRecord
+  include Limitable
+  include Pageable
+
   belongs_to :account
   belongs_to :group
   belongs_to :member,
