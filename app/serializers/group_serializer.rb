@@ -23,15 +23,27 @@ class GroupSerializer < BaseSerializer
     end
   end
 
-  relationship :members do
-    link :related do
-      @url_helpers.v1_account_group_members_path @object.account_id, @object.id
-    end
-  end
-
   relationship :owners do
     link :related do
       @url_helpers.v1_account_group_owners_path @object.account_id, @object.id
+    end
+  end
+
+  relationship :users do
+    link :related do
+      @url_helpers.v1_account_group_users_path @object.account_id, @object.id
+    end
+  end
+
+  relationship :licenses do
+    link :related do
+      @url_helpers.v1_account_group_licenses_path @object.account_id, @object.id
+    end
+  end
+
+  relationship :machines do
+    link :related do
+      @url_helpers.v1_account_group_machines_path @object.account_id, @object.id
     end
   end
 
