@@ -34,6 +34,9 @@ class Account < ApplicationRecord
   has_many :release_upload_links
   has_many :release_artifacts
   has_many :event_logs
+  has_many :groups
+  has_many :group_members
+  has_many :group_owners
 
   accepts_nested_attributes_for :users, limit: 10
 

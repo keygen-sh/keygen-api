@@ -1,4 +1,7 @@
 class Group < ApplicationRecord
+  include Limitable
+  include Pageable
+
   belongs_to :account
 
   has_many :licenses, -> { where(member_type: License.name) },

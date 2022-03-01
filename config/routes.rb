@@ -200,8 +200,14 @@ Rails.application.routes.draw do
     resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
     resources "platforms", only: [:index, :show]
     resources "channels", only: [:index, :show]
-
     resources "entitlements"
+
+    resources "groups" do
+      scope module: "groups/relationships" do
+        resource "members"
+        resource "owners"
+      end
+    end
 
     resources "webhook_endpoints", path: "webhook-endpoints"
     resources "webhook_events", path: "webhook-events", only: [:index, :show, :destroy] do
