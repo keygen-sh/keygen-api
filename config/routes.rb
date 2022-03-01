@@ -205,7 +205,9 @@ Rails.application.routes.draw do
 
     resources "groups" do
       scope module: "groups/relationships" do
-        resources "members", only: %i[index show]
+        resources "users", only: %i[index show]
+        resources "licenses", only: %i[index show]
+        resources "machines", only: %i[index show]
         resources "owners", only: %i[index show] do
           collection do
             post "/", to: "owners#attach", as: "attach"

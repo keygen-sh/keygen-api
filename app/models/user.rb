@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_secure_password :password, validations: false
 
   belongs_to :account
+  belongs_to :group
   has_one :role, as: :resource, dependent: :destroy
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
@@ -24,6 +25,10 @@ class User < ApplicationRecord
     through: :products
   has_many :event_logs,
     as: :resource
+  has_many :group_owners,
+    as: :owner
+  has_many :groups,
+    through: :group_owners
 
   accepts_nested_attributes_for :role, update_only: true
 
@@ -36,6 +41,19 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :password, length: { minimum: 6, maximum: 72.bytes }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+
+  validate on: %i[create update] do
+    next unless
+      group_id_changed?
+
+    next unless
+      group.present? && group.max_users.present?
+
+    next unless
+      group.users.count >= group.max_users
+
+    errors.add :group, :user_limit_exceeded, message: "user count has exceeded maximum allowed by current group (#{group.max_users})"
+  end
 
   scope :stdout_subscribers, -> {
     User.select('DISTINCT ON (users.email) users.*')

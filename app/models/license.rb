@@ -88,6 +88,19 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.max_uses})"
   end
 
+  validate on: %i[create update] do
+    next unless
+      group_id_changed?
+
+    next unless
+      group.present? && group.max_licenses.present?
+
+    next unless
+      group.licenses.count >= group.max_licenses
+
+    errors.add :base, :license_limit_exceeded, message: "license count has exceeded maximum allowed by current group (#{group.max_licenses})"
+  end
+
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
   validates :uses, numericality: { greater_than_or_equal_to: 0 }
 

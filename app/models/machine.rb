@@ -95,6 +95,19 @@ class Machine < ApplicationRecord
     end
   end
 
+  validate on: %i[create update] do
+    next unless
+      group_id_changed?
+
+    next unless
+      group.present? && group.max_machines.present?
+
+    next unless
+      group.machines.count >= group.max_machines
+
+    errors.add :base, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
+  end
+
   validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
 
