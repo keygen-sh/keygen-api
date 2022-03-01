@@ -200,12 +200,18 @@ Rails.application.routes.draw do
     resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
     resources "platforms", only: [:index, :show]
     resources "channels", only: [:index, :show]
+
     resources "entitlements"
 
     resources "groups" do
       scope module: "groups/relationships" do
-        resource "members"
-        resource "owners"
+        resources "members", only: %i[index show]
+        resources "owners", only: %i[index show] do
+          collection do
+            post "/", to: "owners#attach", as: "attach"
+            delete "/", to: "owners#detach", as: "detach"
+          end
+        end
       end
     end
 

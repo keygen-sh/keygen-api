@@ -30,4 +30,16 @@ class GroupPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer)
   end
+
+  def attach?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer)
+  end
+
+  def detach?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer)
+  end
 end

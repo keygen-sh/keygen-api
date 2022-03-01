@@ -11,9 +11,11 @@ class Group < ApplicationRecord
   has_many :machines, -> { where(member_type: Machine.name) },
     class_name: 'GroupMember'
   has_many :members,
-    class_name: 'GroupMember'
+    class_name: 'GroupMember',
+    dependent: :delete_all
   has_many :owners,
-    class_name: 'GroupOwner'
+    class_name: 'GroupOwner',
+    dependent: :delete_all
 
   validates :account,
     presence: true
