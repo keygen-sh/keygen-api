@@ -25,17 +25,17 @@ class GroupSerializer < BaseSerializer
 
   relationship :members do
     link :related do
-      @url_helpers.v1_account_group_members_path @object.account_id, @object
+      @url_helpers.v1_account_group_members_path @object.account_id, @object.id
     end
   end
 
   relationship :owners do
     link :related do
-      @url_helpers.v1_account_group_owners_path @object.account_id, @object
+      @url_helpers.v1_account_group_owners_path @object.account_id, @object.id
     end
   end
 
   link :self do
-    @url_helpers.v1_account_group_path @object.account_id, @object
+    @url_helpers.v1_account_group_path @object.account_id, @object.id
   end
 end

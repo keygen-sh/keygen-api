@@ -10,7 +10,9 @@ class CreateGroupOwners < ActiveRecord::Migration[6.1]
 
       t.index %i[account_id]
       t.index %i[group_id]
-      t.index %i[owner_type owner_id], unique: true
+
+      # Owners must be unique per-group
+      t.index %i[group_id owner_type owner_id], unique: true
     end
   end
 end

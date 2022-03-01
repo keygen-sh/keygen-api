@@ -5,14 +5,15 @@ class GroupOwner < ApplicationRecord
   belongs_to :account
   belongs_to :group
   belongs_to :owner,
-    polymorphic: true
+    class_name: 'User'
 
   validates :account,
-    presence: true
+    presence: { message: 'must exist' }
   validates :group,
-    scope: { by: :account_id },
-    presence: true
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
   validates :owner,
-    scope: { by: :account_id },
-    presence: true
+    uniqueness: { message: 'already exists', scope: %i[group_id owner_type owner_id] },
+    presence: { message: 'must exist' },
+    scope: { by: :account_id }
 end
