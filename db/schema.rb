@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_01_154612) do
+ActiveRecord::Schema.define(version: 2022_03_01_175001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -106,18 +106,6 @@ ActiveRecord::Schema.define(version: 2022_03_01_154612) do
     t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
-  create_table "group_members", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "account_id", null: false
-    t.uuid "group_id", null: false
-    t.string "member_type", null: false
-    t.uuid "member_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["account_id"], name: "index_group_members_on_account_id"
-    t.index ["group_id"], name: "index_group_members_on_group_id"
-    t.index ["member_type", "member_id"], name: "index_group_members_on_member_type_and_member_id", unique: true
-  end
-
   create_table "group_owners", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "group_id", null: false
@@ -132,13 +120,13 @@ ActiveRecord::Schema.define(version: 2022_03_01_154612) do
 
   create_table "groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
+    t.string "name"
     t.integer "max_users"
     t.integer "max_licenses"
     t.integer "max_machines"
-    t.string "name"
+    t.jsonb "metadata"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "metadata"
     t.index ["account_id"], name: "index_groups_on_account_id"
   end
 
@@ -191,6 +179,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_154612) do
     t.integer "max_machines_override"
     t.integer "max_cores_override"
     t.integer "max_uses_override"
+    t.uuid "group_id"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -217,6 +206,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_154612) do
     t.datetime "last_heartbeat_at"
     t.integer "cores"
     t.datetime "last_death_event_sent_at"
+    t.uuid "group_id"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -547,6 +537,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_154612) do
     t.datetime "stdout_unsubscribed_at"
     t.datetime "stdout_last_sent_at"
     t.datetime "banned_at"
+    t.uuid "group_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((last_name)::text, ''::text))", name: "users_tsv_last_name_idx", using: :gist

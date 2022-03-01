@@ -1,26 +1,24 @@
 # frozen_string_literal: true
 
 module Api::V1::Groups::Relationships
-  class MembersController < Api::V1::BaseController
-    has_scope(:type) { |c, s, v| s.for_type(v) }
-
+  class MachinesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
     before_action :set_group
 
     def index
-      members = policy_scope apply_scopes(group.members)
-      authorize members
+      machines = policy_scope apply_scopes(group.machines)
+      authorize machines
 
-      render jsonapi: members
+      render jsonapi: machines
     end
 
     def show
-      member = group.members.find(params[:id])
-      authorize member
+      machine = FindByAliasService.call(scope: group.machines, identifier: params[:id], aliases: :fingerprint)
+      authorize machine
 
-      render jsonapi: member
+      render jsonapi: machine
     end
 
     private
