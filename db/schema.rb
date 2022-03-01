@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_28_202804) do
+ActiveRecord::Schema.define(version: 2022_03_01_142908) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -104,6 +104,41 @@ ActiveRecord::Schema.define(version: 2022_02_28_202804) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["event"], name: "index_event_types_on_event", unique: true
+  end
+
+  create_table "group_members", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "group_id", null: false
+    t.string "member_type", null: false
+    t.uuid "member_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_group_members_on_account_id"
+    t.index ["group_id"], name: "index_group_members_on_group_id"
+    t.index ["member_type", "member_id"], name: "index_group_members_on_member_type_and_member_id", unique: true
+  end
+
+  create_table "group_owners", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "group_id", null: false
+    t.string "owner_type", null: false
+    t.uuid "owner_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_group_owners_on_account_id"
+    t.index ["group_id"], name: "index_group_owners_on_group_id"
+    t.index ["owner_type", "owner_id"], name: "index_group_owners_on_owner_type_and_owner_id", unique: true
+  end
+
+  create_table "groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.integer "max_users"
+    t.integer "max_licenses"
+    t.integer "max_machines"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["account_id"], name: "index_groups_on_account_id"
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
