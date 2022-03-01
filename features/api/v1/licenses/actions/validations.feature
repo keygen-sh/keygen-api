@@ -1656,7 +1656,7 @@ Feature: License validation actions
       {
         "meta": {
           "scope": {
-            "product": "$users[2]"
+            "user": "$users[2]"
           }
         }
       }
@@ -1666,7 +1666,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "user scope does not match", "constant": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
