@@ -29,6 +29,14 @@ class UserSerializer < BaseSerializer
       @url_helpers.v1_account_path @object.account_id
     end
   end
+  relationship :group do
+    linkage always: true do
+      { type: :groups, id: @object.group_id }
+    end
+    link :related do
+      @url_helpers.v1_account_user_group_path @object.account_id, @object
+    end
+  end
   relationship :products do
     link :related do
       @url_helpers.v1_account_user_products_path @object.account_id, @object

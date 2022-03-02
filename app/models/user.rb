@@ -26,8 +26,7 @@ class User < ApplicationRecord
     through: :products
   has_many :event_logs,
     as: :resource
-  has_many :group_owners,
-    as: :owner
+  has_many :group_owners
   has_many :groups,
     through: :group_owners
 
@@ -173,7 +172,8 @@ class User < ApplicationRecord
   }
   scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:license).where licenses: id }
-  scope :for_user, -> (id) { where id: id }
+  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_user, -> (id) { where(id: id).union(for_owner(id)).distinct }
   scope :administrators, -> { with_roles(:admin, :developer, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
   scope :banned, -> { where.not(banned_at: nil) }
