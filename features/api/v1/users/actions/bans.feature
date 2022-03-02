@@ -61,7 +61,7 @@ Feature: User ban actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "user"
-    And I am an product of account "test1"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
@@ -164,7 +164,7 @@ Feature: User ban actions
       """
       { "bannedAt": "$time.1.minute.ago" }
       """
-    And I am an product of account "test1"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/actions/unban"
     And the response should contain a valid signature header for "test1"

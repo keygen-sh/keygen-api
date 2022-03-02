@@ -88,6 +88,259 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Anonymous creates a grouped user for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.updated"] }
+      """
+    And the current account has 1 "group"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/relationships/group"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a grouped user for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "group"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the email "group@keygen.example"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped user for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.updated"] }
+      """
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the email "group@keygen.example"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped user for an account (null group)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the email "group@keygen.example"
+    And the JSON response should be a "user" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/users/$users[1]/group" },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "user"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped user for an account (invalid group)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": { "type": "groups", "id": "a7225f5d-2a2d-4611-b73d-cde8e83b0f5a" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "GROUP_BLANK",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped user for an account (limit exceeded)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxUsers": 1 }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "email": "group@keygen.example"
+          },
+          "relationships": {
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "user count has exceeded maximum allowed by current group (1)",
+        "code": "GROUP_USER_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous creates a user with a short password
     Given the current account is "test1"
     When I send a POST request to "/accounts/test1/users" with the following:
@@ -108,10 +361,10 @@ Feature: Create user
       {
           "title": "Unprocessable resource",
           "detail": "is too short (minimum is 6 characters)",
+          "code": "PASSWORD_TOO_SHORT",
           "source": {
             "pointer": "/data/attributes/password"
-          },
-          "code": "PASSWORD_TOO_SHORT"
+          }
         }
       """
 

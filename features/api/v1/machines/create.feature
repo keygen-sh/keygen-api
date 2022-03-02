@@ -133,6 +133,416 @@ Feature: Create machine
       """
     Then the response status should be "403"
 
+  Scenario: Admin creates a grouped machine for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (null group)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (invalid group)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "a5370623-b753-4114-830c-610db808543d" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "GROUP_BLANK",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (limit exceeded)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And the current account has 1 "license"
+    And the current account has 1 "machine"
+    And the last "machine" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed by current group (1)",
+        "code": "GROUP_MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (inherited from license)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (inherited from user)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a grouped machine for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "group"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a grouped machine for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/relationships/group"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License creates a grouped machine for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "group"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/relationships/group"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a machine for their account with a UUID fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -2237,11 +2647,13 @@ Feature: Create machine
 
   Scenario: Product activates a machine with an activation expiration basis (not set)
     Given the current account is "test1"
-    And the current account has 1 "policies"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
     And the first "policy" has the following attributes:
       """
       {
         "expirationBasis": "FROM_FIRST_ACTIVATION",
+        "productId": "$products[0]",
         "duration": $time.1.month
       }
       """
