@@ -25,10 +25,7 @@ module Api::V1::Groups::Relationships
       authorize group
 
       owners_data = owner_params.fetch(:data).map do |owner|
-        owner.merge(
-          account_id: current_account.id,
-          owner_type: User.name,
-        )
+        owner.merge(account_id: current_account.id)
       end
 
       attached = group.owners.create!(owners_data)
@@ -45,22 +42,19 @@ module Api::V1::Groups::Relationships
     def detach
       authorize group
 
-      owner_ids = owner_params.fetch(:data).map { |e| e[:owner_id] }.compact
-      owners    = group.owners.where(
-        owner_type: User.name,
-        owner_id: owner_ids,
-      )
+      user_ids = owner_params.fetch(:data).map { |e| e[:user_id] }.compact
+      owners   = group.owners.where(user_id: user_ids)
 
       # Ensure all owners exist. Deleting non-existing owners would be a noop, but
       # responding with a 2xx status code is a confusing DX.
-      if owners.size != owner_ids.size
-        valid_owner_ids   = owners.pluck(:owner_id)
-        invalid_owner_ids = owner_ids - valid_owner_ids
-        invalid_owner_id  = invalid_owner_ids.first
-        invalid_idx       = owner_ids.find_index(invalid_owner_id)
+      if owners.size != user_ids.size
+        valid_user_ids   = owners.pluck(:user_id)
+        invalid_user_ids = user_ids - valid_user_ids
+        invalid_user_id  = invalid_user_ids.first
+        invalid_idx      = user_ids.find_index(invalid_user_id)
 
         return render_unprocessable_entity(
-          detail: "owner '#{invalid_owner_id}' relationship not found",
+          detail: "owner relationship for user '#{invalid_user_id}' not found",
           source: {
             pointer: "/data/#{invalid_idx}"
           }
@@ -95,7 +89,7 @@ module Api::V1::Groups::Relationships
           items type: :hash do
             param :type, type: :string, inclusion: %w[user users], transform: -> (k, v) { [] }
             param :id, type: :string, transform: -> (k, v) {
-              [:owner_id, v]
+              [:user_id, v]
             }
           end
         end
@@ -106,7 +100,7 @@ module Api::V1::Groups::Relationships
           items type: :hash do
             param :type, type: :string, inclusion: %w[user users], transform: -> (k, v) { [] }
             param :id, type: :string, transform: -> (k, v) {
-              [:owner_id, v]
+              [:user_id, v]
             }
           end
         end

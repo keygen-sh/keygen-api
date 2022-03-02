@@ -28,10 +28,12 @@ class GroupOwnerSerializer < BaseSerializer
     end
   end
 
-  relationship :owner do
-    linkage always: true
+  relationship :user do
+    linkage always: true do
+      { type: :users, id: @object.user_id }
+    end
     link :related do
-      @url_helpers.send("v1_account_#{@object.owner_type.underscore}_path", @object.account_id, @object.owner_id)
+      @url_helpers.v1_account_user_path @object.account_id, @object.user_id
     end
   end
 

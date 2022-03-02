@@ -109,13 +109,13 @@ ActiveRecord::Schema.define(version: 2022_03_01_175001) do
   create_table "group_owners", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "group_id", null: false
-    t.string "owner_type", null: false
-    t.uuid "owner_id", null: false
+    t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["account_id"], name: "index_group_owners_on_account_id"
-    t.index ["group_id", "owner_type", "owner_id"], name: "index_group_owners_on_group_id_and_owner_type_and_owner_id", unique: true
+    t.index ["group_id", "user_id"], name: "index_group_owners_on_group_id_and_user_id", unique: true
     t.index ["group_id"], name: "index_group_owners_on_group_id"
+    t.index ["user_id"], name: "index_group_owners_on_user_id"
   end
 
   create_table "groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
