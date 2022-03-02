@@ -47,6 +47,8 @@ PLACEHOLDERS = %w[
   event_logs
   otp
   groups
+  group_owners
+  owners
 ]
 
 # Matches:
@@ -189,6 +191,8 @@ def parse_path_placeholders!(str)
             @account.release_artifacts.send(:[], index.to_i).id
           when "request-logs"
             @account.request_logs.send(:[], index.to_i).id
+          when "owners"
+            @account.group_owners.send(:[], index.to_i).id
           when "billing"
             @account.billing.id
           when "pool"

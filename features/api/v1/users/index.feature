@@ -624,10 +624,40 @@ Feature: List users
 
   Scenario: User attempts to retrieve all users for their account
     Given the current account is "test1"
-    And the current account has 1 "user"
+    And the current account has 5 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+
+  Scenario: User attempts to retrieve all users for their group
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 9 "users"
+    And the third "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fifth "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "group-owner"
+    And the last "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     And the current account has 3 "users"
     When I send a GET request to "/accounts/test1/users"
-    Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "users"

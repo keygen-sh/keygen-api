@@ -15,4 +15,7 @@ class GroupOwner < ApplicationRecord
     uniqueness: { message: 'already exists', scope: %i[group_id user_id] },
     presence: { message: 'must exist' },
     scope: { by: :account_id }
+
+  # Give products the ability to read all group owners
+  scope :for_product, -> id { self }
 end
