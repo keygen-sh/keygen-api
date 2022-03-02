@@ -225,6 +225,326 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a grouped license for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped license for their account (null group)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": null
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": null
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped license for their account (invalid group)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "d03322b2-765e-4220-8f50-3cdc1f2472cb" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must exist",
+        "code": "GROUP_BLANK",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped license for their account (limit exceeded)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxLicenses": 1 }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "license count has exceeded maximum allowed by current group (1)",
+        "code": "GROUP_LICENSE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped license for their account (inherited from user)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "user": {
+              "data": { "type": "users", "id": "$users[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a grouped license for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the current account has 1 "group"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 1 "license"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a grouped license for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "name": "Group License"
+          },
+          "relationships": {
+            "policy": {
+              "data": { "type": "policies", "id": "$policies[0]" }
+            },
+            "group": {
+              "data": { "type": "groups", "id": "$groups[0]" }
+            },
+            "user": {
+              "data": { "type": "users", "id": "$users[1]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/relationships/group"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a license for a user of their account with a key that contains a null byte
     Given I am an admin of account "test1"
     And the current account is "test1"
