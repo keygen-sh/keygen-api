@@ -1,5 +1,5 @@
 @api/v1
-Feature: License user relationship
+Feature: License group relationship
 
   Background:
     Given the following "accounts" exist:
@@ -14,116 +14,152 @@ Feature: License user relationship
     And the current account is "test1"
     And the current account has 1 "license"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves the user for a license
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "licenses"
-     And the first "license" has the following attributes:
+  Scenario: Admin retrieves the group for a license (by ID)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And the last "license" has the following attributes:
       """
-      { "key": "test-key" }
+      { "groupId": "$groups[0]" }
       """
+    And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/test-key/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the JSON response should be a "group"
     And the response should contain a valid signature header for "test1"
 
-  Scenario: Product retrieves the user for a license
+  Scenario: Admin retrieves the group for a license (by key)
     Given the current account is "test1"
-    And the current account has 2 "products"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And the last "license" has the following attributes:
+      """
+      {
+        "key": "24b0f13bdde2fa58038ec4a813631708",
+        "groupId": "$groups[0]"
+      }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/24b0f13bdde2fa58038ec4a813631708/group"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: Product retrieves the group for a license
+    Given the current account is "test1"
+    And the current account has 1 "product"
     And the current account has 1 "policy"
-    And all "policies" have the following attributes:
+    And the last "policy" has the following attributes:
       """
       { "productId": "$products[0]" }
       """
-    And the current account has 1 "user"
+    And the current account has 1 "group"
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "userId": "$users[1]"
+        "groupId": "$groups[0]"
       }
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "200"
-    And the JSON response should be a "user"
+    And the JSON response should be a "group"
 
-  Scenario: Product retrieves the user for a license of another product
+  Scenario: Product retrieves the group for a license of another product
     Given the current account is "test1"
-    And the current account has 3 "products"
+    And the current account has 2 "products"
     And the current account has 1 "policy"
-    And all "policies" have the following attributes:
+    And the last "policy" has the following attributes:
       """
-      { "productId": "$products[2]" }
+      { "productId": "$products[1]" }
       """
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "user"
+    And the current account has 1 "group"
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "userId": "$users[1]"
+        "groupId": "$groups[0]"
       }
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the user for a license they own
+  Scenario: User attempts to retrieve the group for a license they own
     Given the current account is "test1"
-    And the current account has 3 "licenses"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
     And the current account has 1 "user"
-    And I am a user of account "test1"
-    And the current user has 1 "license"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
-    Then the response status should be "200"
-    And the JSON response should be a "user"
-
-  Scenario: User attempts to retrieve the user for a license they don't own
-    Given the current account is "test1"
-    And the current account has 3 "licenses"
-    And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$2/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "403"
 
-  Scenario: Admin attempts to retrieve the user for a license of another account
-    Given I am an admin of account "test2"
-    And the current account is "test1"
-    And the current account has 3 "licenses"
+  Scenario: User attempts to retrieve the group for a license they don't own
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/user"
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the group for their license
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "group"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "403"
+
+  Scenario: Admin attempts to retrieve the group for a license of another account
+    Given the current account is "test1"
+    And the current account has 3 "licenses"
+    And I am an admin of account "test2"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "401"
 
-  Scenario: Admin changes a license's user relationship to another user
+  Scenario: Admin changes a license's group relationship to another group
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "users"
+    And the current account has 3 "groups"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
-      {
-        "userId": "$users[1]"
-      }
+      { "groupId": "$groups[0]" }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[2]"
+          "type": "groups",
+          "id": "$groups[2]"
         }
       }
       """
@@ -131,9 +167,9 @@ Feature: License user relationship
     And the JSON response should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
-          "data": { "type": "users", "id": "$users[2]" }
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[2]" }
         }
       }
       """
@@ -141,18 +177,18 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin removes a license's user relationship
+  Scenario: Admin removes a license's group relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "users"
+    And the current account has 3 "groups"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
-      { "userId": "$users[1]" }
+      { "groupId": "$groups[0]" }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       { "data": null }
       """
@@ -160,8 +196,8 @@ Feature: License user relationship
     And the JSON response should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
           "data": null
         }
       }
@@ -170,25 +206,23 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a non-existent user
+  Scenario: Admin changes a license's policy relationship to a non-existent group
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
-    And the current account has 1 "user"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "group"
+    And the last "license" has the following attributes:
       """
-      {
-        "userId": "$users[1]"
-      }
+      { "groupId": "$groups[0]" }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "8784f31d-ab66-4384-9fec-e69f1cdb189b"
+          "type": "groups",
+          "id": "ef842664-16c5-4c22-b415-fa9f538e9035"
         }
       }
       """
@@ -198,9 +232,9 @@ Feature: License user relationship
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "USER_BLANK",
+        "code": "GROUP_BLANK",
         "source": {
-          "pointer": "/data/relationships/user"
+          "pointer": "/data/relationships/group"
         }
       }
       """
@@ -208,25 +242,25 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's user relationship to a user for another account
+  Scenario: Admin changes a license's group relationship to a group for another account
     Given I am an admin of account "test1"
     And the current account is "test2"
-    And the current account has 2 "users"
+    And the current account has 2 "groups"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       {
-        "userId": "$users[0]"
+        "groupId": "$groups[0]"
       }
       """
     And I use an authentication token
-    When I send a PUT request to "/accounts/test2/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test2/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[1]"
+          "type": "groups",
+          "id": "$groups[0]"
         }
       }
       """
@@ -235,11 +269,11 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship to another user
+  Scenario: Product changes a license's group relationship to another group
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 4 "users"
+    And the current account has 4 "groups"
     And the current account has 3 "policies"
     And all "policies" have the following attributes:
       """
@@ -250,24 +284,24 @@ Feature: License user relationship
       """
       {
         "policyId": "$policies[0]",
-        "userId": "$users[0]"
+        "groupId": "$groups[0]"
       }
       """
     And the second "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "userId": "$users[1]"
+        "groupId": "$groups[0]"
       }
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[1]"
+          "type": "groups",
+          "id": "$groups[0]"
         }
       }
       """
@@ -275,9 +309,9 @@ Feature: License user relationship
     And the JSON response should be a "license" with the following relationships:
       """
       {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
-          "data": { "type": "users", "id": "$users[1]" }
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
         }
       }
       """
@@ -285,59 +319,18 @@ Feature: License user relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product changes a license's user relationship to a new user they don't own
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 3 "users"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
-    And I am a product of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
-      """
-      {
-        "data": {
-          "type": "users",
-          "id": "$users[1]"
-        }
-      }
-      """
-    Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
-      """
-      {
-        "user": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/user" },
-          "data": { "type": "users", "id": "$users[1]" }
-        }
-      }
-      """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Product changes a license's user relationship to a new user for a license they don't own
+  Scenario: Product changes a license's group relationship to a new group for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
+    And the current account has 1 "group"
     And the current account has 3 "policies"
     And the first "policy" has the following attributes:
       """
       { "productId": "$products[0]" }
       """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       {
         "policyId": "$policies[1]"
@@ -345,12 +338,12 @@ Feature: License user relationship
       """
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[0]"
+          "type": "groups",
+          "id": "$groups[0]"
         }
       }
       """
@@ -359,35 +352,25 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to change a license's user relationship
+  Scenario: User attempts to change a license's group relationship
     Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 1 "user"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
-      """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the last "license" has the following attributes:
       """
       {
-        "policyId": "$policies[0]",
+        "groupId": "$groups[0]",
         "userId": "$users[1]"
       }
       """
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
+          "type": "groups",
           "id": "$licenses[0]"
         }
       }
@@ -397,31 +380,26 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a license's user relationship to another user for a license they don't own
+  Scenario: User changes a license's group relationship to another group for a license they don't own
     Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
+    And the current account has 2 "groups"
+    And the current account has 2 "users"
+    And the current account has 2 "licenses"
     And all "licenses" have the following attributes:
       """
       {
-        "policyId": "$policies[0]"
+        "groupId": "$groups[0]",
+        "userId": "$users[2]"
       }
       """
-    And the current account has 3 "users"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[3]"
+          "type": "groups",
+          "id": "$groups[1]"
         }
       }
       """
@@ -430,29 +408,30 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous changes a license's user relationship to a different user
+  Scenario: Anonymous changes a license's group relationship to a different group
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
+    And the current account has 1 "group"
     And the current account has 3 "policies"
     And all "policies" have the following attributes:
       """
       { "productId": "$products[0]" }
       """
     And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the last "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "userId": null
+        "groupId": null
       }
       """
-    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
       """
       {
         "data": {
-          "type": "users",
-          "id": "$users[0]"
+          "type": "groups",
+          "id": "$groups[0]"
         }
       }
       """

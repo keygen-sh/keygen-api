@@ -49,7 +49,7 @@ class MachineSerializer < BaseSerializer
   relationship :group do
     linkage always: true do
       if @object.group_id?
-        { type: :users, id: @object.group_id }
+        { type: :groups, id: @object.group_id }
       else
         nil
       end

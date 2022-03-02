@@ -97,6 +97,12 @@ class UserPolicy < ApplicationPolicy
     resource == bearer
   end
 
+  def change_group?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :product)
+  end
+
   private
 
   def assert_role_ok!
