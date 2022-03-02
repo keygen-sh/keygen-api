@@ -9,53 +9,43 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/user
     def show
-      @user = @license.user
-      authorize @user
+      user = license.user
+      authorize user
 
-      render jsonapi: @user
+      render jsonapi: user
     end
 
     # PUT /licenses/1/user
     def update
-      authorize @license, :change_user?
+      authorize license, :change_user?
 
-      user = current_account.users.find_by id: user_params[:id]
-      if user.nil?
-        return render_unprocessable_entity(
-          detail: "user must exist",
-          source: {
-            pointer: "/data/relationships/user"
-          }
-        )
-      end
+      license.update!(user_id: user_params[:id])
 
-      if @license.update(user: user)
-        BroadcastEventService.call(
-          event: "license.user.updated",
-          account: current_account,
-          resource: @license
-        )
+      BroadcastEventService.call(
+        event: 'license.user.updated',
+        account: current_account,
+        resource: license,
+      )
 
-        render jsonapi: @license
-      else
-        render_unprocessable_resource @license
-      end
+      render jsonapi: license
     end
 
     private
 
+    attr_reader :license
+
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
-      authorize @license, :show?
+      authorize license, :show?
 
-      Current.resource = @license
+      Current.resource = license
     end
 
     typed_parameters format: :jsonapi do
       options strict: true
 
       on :update do
-        param :data, type: :hash do
+        param :data, type: :hash, allow_nil: true do
           param :type, type: :string, inclusion: %w[user users]
           param :id, type: :string
         end
