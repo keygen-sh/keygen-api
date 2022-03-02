@@ -365,6 +365,7 @@ class License < ApplicationRecord
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }
+  scope :for_group, -> id { where(group: id) }
 
   delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
     :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,

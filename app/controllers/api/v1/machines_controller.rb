@@ -12,6 +12,7 @@ module Api::V1
     has_scope(:license) { |c, s, v| s.for_license(v) }
     has_scope(:key) { |c, s, v| s.for_key(v) }
     has_scope(:user) { |c, s, v| s.for_user(v) }
+    has_scope(:group) { |c, s, v| s.for_group(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

@@ -174,6 +174,7 @@ class User < ApplicationRecord
   scope :for_license, -> (id) { joins(:license).where licenses: id }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> (id) { where(id: id).union(for_owner(id)).distinct }
+  scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
   scope :banned, -> { where.not(banned_at: nil) }
