@@ -63,6 +63,7 @@ Rails.application.routes.draw do
     resources "machines", constraints: { id: /[^\/]*/ } do
       scope module: "machines/relationships" do
         resource "product", only: [:show]
+        resource "group", only: [:show, :update]
         resource "license", only: [:show]
         resource "user", only: [:show]
       end
@@ -83,6 +84,7 @@ Rails.application.routes.draw do
         resources "licenses", only: [:index, :show]
         resources "machines", only: [:index, :show]
         resources "tokens", only: [:index, :show, :create]
+        resource "group", only: [:show, :update]
       end
       member do
         scope "actions", module: "users/actions" do
@@ -102,6 +104,7 @@ Rails.application.routes.draw do
         resources "tokens", only: [:index, :show]
         resource "product", only: [:show]
         resource "policy", only: [:show, :update]
+        resource "group", only: [:show, :update]
         resource "user", only: [:show, :update]
         resources "entitlements", only: [:index, :show] do
           collection do

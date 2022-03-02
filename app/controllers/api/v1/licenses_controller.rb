@@ -20,7 +20,7 @@ module Api::V1
 
     # GET /licenses
     def index
-      @licenses = policy_scope apply_scopes(current_account.licenses.preload(:user, :policy))
+      @licenses = policy_scope(apply_scopes(current_account.licenses)).preload(:user, :policy)
       authorize @licenses
 
       render jsonapi: @licenses
