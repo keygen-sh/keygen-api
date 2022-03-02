@@ -14,6 +14,9 @@ class Group < ApplicationRecord
   validates :account,
     presence: true
 
+  # Give products the ability to read all groups
+  scope :for_product, -> id { self }
+
   scope :for_user, -> u {
     joins(:users)
       .where(users: u)

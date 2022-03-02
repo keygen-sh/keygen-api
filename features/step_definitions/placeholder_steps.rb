@@ -44,7 +44,9 @@ PLACEHOLDERS = %w[
   time
   null_byte
   event_types
+  event_logs
   otp
+  groups
 ]
 
 # Matches:

@@ -4,6 +4,9 @@ class GroupSerializer < BaseSerializer
   type 'groups'
 
   attribute :name
+  attribute :max_users
+  attribute :max_licenses
+  attribute :max_machines
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
