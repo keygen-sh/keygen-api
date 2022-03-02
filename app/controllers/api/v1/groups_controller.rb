@@ -83,6 +83,9 @@ module Api::V1
           param :type, type: :string, inclusion: %w[group groups]
           param :attributes, type: :hash do
             param :name, type: :string
+            param :max_users, type: :integer, optional: true
+            param :max_licenses, type: :integer, optional: true
+            param :max_machines, type: :integer, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
@@ -94,6 +97,9 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
+            param :max_users, type: :integer, optional: true
+            param :max_licenses, type: :integer, optional: true
+            param :max_machines, type: :integer, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
