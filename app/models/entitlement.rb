@@ -19,6 +19,9 @@ class Entitlement < ApplicationRecord
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
 
+  # Give products the ability to read all entitlements
+  scope :for_product, -> id { self }
+
   scope :search_id, -> (term) {
     identifier = term.to_s
     return none if

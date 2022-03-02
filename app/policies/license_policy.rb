@@ -158,6 +158,13 @@ class LicensePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def change_group?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
+  end
+
   def generate_token?
     assert_account_scoped!
 

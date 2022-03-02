@@ -87,4 +87,5 @@ Feature: Show entitlement
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements/$0"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "entitlement"

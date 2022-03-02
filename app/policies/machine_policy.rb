@@ -79,4 +79,11 @@ class MachinePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource.license == bearer
   end
+
+  def change_group?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent) ||
+      resource.product == bearer
+  end
 end
