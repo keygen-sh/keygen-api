@@ -429,6 +429,8 @@ class TypedParameters
             data.map { |d| transformer.call(params.dup, d) }
           when Hash
             transformer.call(params, data)
+          else
+            params
           end
         end
       end
