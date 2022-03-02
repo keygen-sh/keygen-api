@@ -18,7 +18,7 @@ class Group < ApplicationRecord
     joins(:users)
       .where(users: u)
       .union(
-        joins(:owners).where(owners: { owner_type: User.name, owner_id: u })
+        joins(:owners).where(owners: { user_id: u })
       )
       .distinct
   }

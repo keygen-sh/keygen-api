@@ -4,16 +4,15 @@ class GroupOwner < ApplicationRecord
 
   belongs_to :account
   belongs_to :group
-  belongs_to :owner,
-    class_name: 'User'
+  belongs_to :user
 
   validates :account,
     presence: { message: 'must exist' }
   validates :group,
     presence: { message: 'must exist' },
     scope: { by: :account_id }
-  validates :owner,
-    uniqueness: { message: 'already exists', scope: %i[group_id owner_type owner_id] },
+  validates :user,
+    uniqueness: { message: 'already exists', scope: %i[group_id user_id] },
     presence: { message: 'must exist' },
     scope: { by: :account_id }
 end
