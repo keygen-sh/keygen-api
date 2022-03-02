@@ -11,6 +11,8 @@ class Machine < ApplicationRecord
 
   belongs_to :account
   belongs_to :license, counter_cache: true
+  belongs_to :group,
+    optional: true
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
@@ -30,6 +32,12 @@ class Machine < ApplicationRecord
   validates :license,
     presence: { message: "must exist" },
     scope: { by: :account_id }
+  validates :group,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> {
+      group_id_before_type_cast.nil?
+    }
 
   validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
 
@@ -105,7 +113,7 @@ class Machine < ApplicationRecord
     next unless
       group.machines.count >= group.max_machines
 
-    errors.add :base, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
+    errors.add :group, :machine_limit_exceeded, message: "machine count has exceeded maximum allowed by current group (#{group.max_machines})"
   end
 
   validates :fingerprint, presence: true, allow_blank: false, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }

@@ -11,6 +11,8 @@ class License < ApplicationRecord
   belongs_to :account
   belongs_to :user
   belongs_to :policy
+  belongs_to :group,
+    optional: true
   has_one :product, through: :policy
   has_one :role, as: :resource, dependent: :destroy
   has_many :license_entitlements, dependent: :delete_all
@@ -63,7 +65,19 @@ class License < ApplicationRecord
   validates :user,
     presence: { message: "must exist" },
     scope: { by: :account_id },
-    unless: -> { user_id.nil? }
+    unless: -> {
+      # Using before type cast because non-UUIDs are silently ignored and we
+      # want to raise an error in that case
+      user_id_before_type_cast.nil?
+    }
+
+  # Same for the group association
+  validates :group,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> {
+      group_id_before_type_cast.nil?
+    }
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
@@ -98,7 +112,7 @@ class License < ApplicationRecord
     next unless
       group.licenses.count >= group.max_licenses
 
-    errors.add :base, :license_limit_exceeded, message: "license count has exceeded maximum allowed by current group (#{group.max_licenses})"
+    errors.add :group, :license_limit_exceeded, message: "license count has exceeded maximum allowed by current group (#{group.max_licenses})"
   end
 
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
