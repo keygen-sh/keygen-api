@@ -48,7 +48,11 @@ class MachineSerializer < BaseSerializer
   end
   relationship :group do
     linkage always: true do
-      { type: :groups, id: @object.group_id }
+      if @object.group_id?
+        { type: :users, id: @object.group_id }
+      else
+        nil
+      end
     end
     link :related do
       @url_helpers.v1_account_machine_group_path @object.account_id, @object
