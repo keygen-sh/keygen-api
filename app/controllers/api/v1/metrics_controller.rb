@@ -17,7 +17,7 @@ module Api::V1
       authorize Metric
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        metrics = policy_scope apply_scopes(current_account.metrics.preload(:event_type))
+        metrics = policy_scope(apply_scopes(current_account.metrics)).preload(:event_type)
         data = Keygen::JSONAPI::Renderer.new.render(metrics)
 
         data.tap do |d|

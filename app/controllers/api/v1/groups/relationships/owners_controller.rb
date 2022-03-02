@@ -8,7 +8,7 @@ module Api::V1::Groups::Relationships
     before_action :set_group
 
     def index
-      owners = policy_scope apply_scopes(group.owners)
+      owners = policy_scope(apply_scopes(group.owners))
       authorize owners
 
       render jsonapi: owners

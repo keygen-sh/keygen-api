@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      artifacts = policy_scope apply_scopes(product.release_artifacts)
+      artifacts = policy_scope(apply_scopes(product.release_artifacts))
       authorize artifacts
 
       render jsonapi: artifacts
