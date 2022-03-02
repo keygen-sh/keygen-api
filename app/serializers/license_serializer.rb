@@ -89,6 +89,14 @@ class LicenseSerializer < BaseSerializer
       @url_helpers.v1_account_license_policy_path @object.account_id, @object
     end
   end
+  relationship :group do
+    linkage always: true do
+      { type: :groups, id: @object.group_id }
+    end
+    link :related do
+      @url_helpers.v1_account_license_group_path @object.account_id, @object
+    end
+  end
   relationship :user do
     linkage always: true do
       if @object.user_id.present?

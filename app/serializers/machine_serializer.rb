@@ -46,6 +46,14 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_product_path @object.account_id, @object
     end
   end
+  relationship :group do
+    linkage always: true do
+      { type: :groups, id: @object.group_id }
+    end
+    link :related do
+      @url_helpers.v1_account_machine_group_path @object.account_id, @object
+    end
+  end
   relationship :license do
     linkage always: true do
       { type: :licenses, id: @object.license_id }

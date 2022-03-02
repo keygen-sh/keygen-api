@@ -35,6 +35,10 @@ class License < ApplicationRecord
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
   after_create :set_role
 
+  # Licenses automatically inherit their user's group ID
+  before_create -> { self.group_id = user.group_id },
+    if: -> { user.present? && group_id.nil? }
+
   on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
     # NOTE(ezekg) No auto-release for high volume events to rate limit
     auto_release_lock: false,
@@ -344,13 +348,20 @@ class License < ApplicationRecord
   }
   scope :for_policy, -> (id) { where policy: id }
   scope :for_user, -> user {
-    case user
-    when User
-      where(user_id: user.id)
-    else
-      search_user(user)
-    end
+    scope = case user
+            when User
+              where(user_id: user.id)
+            else
+              search_user(user)
+            end
+
+    # Should also include the user's owned licenses through a group
+    scope.union(
+           for_owner(user)
+         )
+         .distinct
   }
+  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
   scope :for_machine, -> (id) { joins(:machines).where machines: { id: id } }
   scope :for_fingerprint, -> (fp) { joins(:machines).where machines: { fingerprint: fp } }

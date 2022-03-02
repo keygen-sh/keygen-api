@@ -19,6 +19,10 @@ class Machine < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  # Machines automatically inherit their license's group ID
+  before_create -> { self.group_id = license.group_id },
+    if: -> { license.present? && group_id.nil? }
+
   # Update license's total core count on machine create, update and destroy
   after_create :update_machines_core_count_on_create
   after_update :update_machines_core_count_on_update
@@ -285,7 +289,14 @@ class Machine < ApplicationRecord
   scope :with_ip, -> (ip_address) { where ip: ip_address }
   scope :for_license, -> (id) { where license: id }
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
-  scope :for_user, -> (id) { joins(:license).where licenses: { user_id: id } }
+  scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
+  scope :for_user, -> (id) {
+    joins(:license).where(licenses: { user_id: id })
+      .union(
+        for_owner(id)
+      )
+      .distinct
+  }
   scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }
 

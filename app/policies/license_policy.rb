@@ -9,7 +9,10 @@ class LicensePolicy < ApplicationPolicy
       (bearer.has_role?(:product) &&
         resource.all? { |r| r.policy.product_id == bearer.id }) ||
       (bearer.has_role?(:user) &&
-        resource.all? { |r| r.user_id == bearer.id })
+        resource.all? { |r| r.user_id == bearer.id }) ||
+      (bearer.has_role?(:user) &&
+        resource.filter { |r| r.group_id? }
+                .all? { |r| r.group_id.in?(bearer.group_ids) })
   end
 
   def show?
@@ -18,7 +21,9 @@ class LicensePolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
-      resource == bearer
+      resource == bearer ||
+      (bearer.has_role?(:user) &&
+        resource.group_id? && resource.group_id.in?(bearer.group_ids))
   end
 
   def create?
