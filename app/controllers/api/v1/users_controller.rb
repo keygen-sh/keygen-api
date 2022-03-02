@@ -123,10 +123,12 @@ module Api::V1
             end
           end
           param :relationships, type: :hash, optional: true do
-            param :group, type: :hash, optional: true do
-              param :data, type: :hash, allow_nil: true do
-                param :type, type: :string, inclusion: %w[group groups]
-                param :id, type: :string
+            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+              param :group, type: :hash, optional: true do
+                param :data, type: :hash, allow_nil: true do
+                  param :type, type: :string, inclusion: %w[group groups]
+                  param :id, type: :string
+                end
               end
             end
           end
