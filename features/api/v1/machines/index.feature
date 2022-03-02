@@ -381,6 +381,50 @@ Feature: List machines
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  Scenario: User attempts to retrieve all machines for their group
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 1 "user"
+    And the current account has 1 "group-owner"
+    And the last "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the current account has 7 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the second "machines" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the third "machines" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "machines" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the fifth "machines" has the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "machines"
+
   Scenario: User attempts to retrieve all machines for their account
     Given the current account is "test1"
     And the current account has 1 "user"
