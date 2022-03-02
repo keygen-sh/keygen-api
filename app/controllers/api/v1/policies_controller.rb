@@ -11,7 +11,7 @@ module Api::V1
 
     # GET /policies
     def index
-      @policies = policy_scope apply_scopes(current_account.policies)
+      @policies = policy_scope(apply_scopes(current_account.policies))
       authorize @policies
 
       render jsonapi: @policies

@@ -8,7 +8,7 @@ module Api::V1::Groups::Relationships
     before_action :set_group
 
     def index
-      machines = policy_scope apply_scopes(group.machines)
+      machines = policy_scope(apply_scopes(group.machines))
       authorize machines
 
       render jsonapi: machines

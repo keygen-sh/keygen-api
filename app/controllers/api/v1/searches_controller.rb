@@ -112,7 +112,7 @@ module Api::V1
         end
       end
 
-      search_results = policy_scope apply_scopes(res)
+      search_results = policy_scope(apply_scopes(res))
       authorize search_results, :index?
 
       render jsonapi: search_results
