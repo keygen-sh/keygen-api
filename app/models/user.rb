@@ -12,7 +12,8 @@ class User < ApplicationRecord
   has_secure_password :password, validations: false
 
   belongs_to :account
-  belongs_to :group
+  belongs_to :group,
+    optional: true
   has_one :role, as: :resource, dependent: :destroy
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
@@ -37,6 +38,15 @@ class User < ApplicationRecord
   before_create :set_user_role!, if: -> { role.nil? }
 
   before_save -> { self.email = email.downcase.strip }
+
+  validates :account,
+    presence: { message: 'must exist' }
+  validates :group,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> {
+      group_id_before_type_cast.nil?
+    }
 
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :password, length: { minimum: 6, maximum: 72.bytes }, allow_nil: true

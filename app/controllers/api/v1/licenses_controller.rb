@@ -124,6 +124,12 @@ module Api::V1
                 param :id, type: :string
               end
             end
+            param :group, type: :hash, optional: true do
+              param :data, type: :hash, allow_nil: true do
+                param :type, type: :string, inclusion: %w[group groups]
+                param :id, type: :string
+              end
+            end
           end
         end
       end
