@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      platforms = policy_scope apply_scopes(product.release_platforms)
+      platforms = policy_scope(apply_scopes(product.release_platforms))
       authorize platforms
 
       render jsonapi: platforms

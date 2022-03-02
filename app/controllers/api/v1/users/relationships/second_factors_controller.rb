@@ -9,7 +9,7 @@ module Api::V1::Users::Relationships
 
      # GET /users/1/second-factors
     def index
-      @second_factors = policy_scope apply_scopes(@user.second_factors)
+      @second_factors = policy_scope(apply_scopes(@user.second_factors))
       authorize @second_factors
 
       render jsonapi: @second_factors

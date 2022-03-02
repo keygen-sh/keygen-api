@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_group, only: [:show, :update, :destroy]
 
     def index
-      groups = policy_scope apply_scopes(current_account.groups)
+      groups = policy_scope(apply_scopes(current_account.groups))
       authorize groups
 
       render jsonapi: groups
@@ -21,7 +21,7 @@ module Api::V1
     end
 
     def create
-      group = current_account.groups.new group_params
+      group = current_account.groups.new(group_params)
       authorize group
 
       if group.save
