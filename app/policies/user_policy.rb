@@ -7,8 +7,9 @@ class UserPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.all? { |r| r.group_id? } &&
-        resource.all? { |r| r.group_id.in?(bearer.group_ids) })
+        resource.all? { |r|
+          r.group_id? && r.group_id.in?(bearer.group_ids) ||
+          r.id == bearer.id })
   end
 
   def show?
