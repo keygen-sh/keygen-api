@@ -10,7 +10,7 @@ class LicensePolicy < ApplicationPolicy
         resource.all? { |r| r.policy.product_id == bearer.id }) ||
       (bearer.has_role?(:user) &&
         resource.all? { |r| r.user_id == bearer.id }) ||
-      (bearer.has_role?(:user) &&
+      (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.any?   { |r| r.group_id? } &&
         resource.filter { |r| r.group_id? }
                 .all?   { |r| r.group_id.in?(bearer.group_ids) })
@@ -23,7 +23,7 @@ class LicensePolicy < ApplicationPolicy
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer ||
-      (bearer.has_role?(:user) &&
+      (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.group_id? && resource.group_id.in?(bearer.group_ids))
   end
 
