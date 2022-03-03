@@ -4,9 +4,12 @@ class Group < ApplicationRecord
 
   belongs_to :account
 
-  has_many :users
-  has_many :licenses
-  has_many :machines
+  has_many :users,
+    dependent: :nullify
+  has_many :licenses,
+    dependent: :nullify
+  has_many :machines,
+    dependent: :nullify
   has_many :owners,
     class_name: 'GroupOwner',
     dependent: :delete_all
