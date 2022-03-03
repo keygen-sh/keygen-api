@@ -657,7 +657,6 @@ Feature: List users
       """
     And I am a user of account "test1"
     And I use an authentication token
-    And the current account has 3 "users"
     When I send a GET request to "/accounts/test1/users"
     Then the response status should be "200"
     And the JSON response should be an array with 4 "users"

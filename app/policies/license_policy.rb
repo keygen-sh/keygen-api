@@ -11,8 +11,9 @@ class LicensePolicy < ApplicationPolicy
       (bearer.has_role?(:user) &&
         resource.all? { |r| r.user_id == bearer.id }) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.all? { |r| r.group_id? } &&
-        resource.all? { |r| r.group_id.in?(bearer.group_ids) })
+        resource.all? { |r|
+          r.group_id? && r.group_id.in?(bearer.group_ids) ||
+          r.user_id == bearer.id })
   end
 
   def show?
