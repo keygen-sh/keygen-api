@@ -6,7 +6,7 @@ class UserPolicy < ApplicationPolicy
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
-      (bearer.has_role?(:user) &&
+      (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.any?   { |r| r.group_id? } &&
         resource.filter { |r| r.group_id? }
                 .all?   { |r| r.group_id.in?(bearer.group_ids) })
@@ -17,7 +17,7 @@ class UserPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       resource == bearer ||
-      (bearer.has_role?(:user) &&
+      (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.group_id? && resource.group_id.in?(bearer.group_ids))
   end
 
