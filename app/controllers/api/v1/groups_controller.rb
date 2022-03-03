@@ -62,7 +62,7 @@ module Api::V1
         resource: group,
       )
 
-      group.destroy
+      group.destroy_async
     end
 
     private
