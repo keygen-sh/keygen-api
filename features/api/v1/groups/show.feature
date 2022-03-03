@@ -90,7 +90,7 @@ Feature: Show group
     Then the response status should be "200"
     And the JSON response should be a "group"
 
-  Scenario: User retrieves a group
+  Scenario: User retrieves a group (not a member)
     Given the current account is "test1"
     And the current account has 3 "groups"
     And the current account has 1 "user"
@@ -99,10 +99,54 @@ Feature: Show group
     When I send a GET request to "/accounts/test1/groups/$0"
     Then the response status should be "403"
 
-  Scenario: License retrieves a group
+  Scenario: User retrieves a group (a member)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "403"
+
+  Scenario: User retrieves a group (an owner)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "user"
+    And the current account has 1 "group-owners"
+    And the first "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
+
+  Scenario: License retrieves a group (not a member)
     Given the current account is "test1"
     And the current account has 3 "groups"
     And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0"
+    Then the response status should be "403"
+
+  Scenario: License retrieves a group (a member)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
