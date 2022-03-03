@@ -4,13 +4,17 @@ class GroupPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+      (bearer.has_role?(:user) &&
+        resource.all? { |r| r.id.in?(bearer.group_ids) })
   end
 
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+      (bearer.has_role?(:user) &&
+        resource.id.in?(bearer.group_ids))
   end
 
   def create?
