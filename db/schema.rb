@@ -186,6 +186,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_175001) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
+    t.index ["group_id"], name: "index_licenses_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_licenses_on_id_and_created_at_and_account_id", unique: true
     t.index ["key"], name: "licenses_hash_key_idx", using: :hash
     t.index ["policy_id", "created_at"], name: "index_licenses_on_policy_id_and_created_at"
@@ -215,6 +216,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_175001) do
     t.index ["created_at"], name: "index_machines_on_created_at", order: :desc
     t.index ["fingerprint"], name: "index_machines_on_fingerprint", using: :gin
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
+    t.index ["group_id"], name: "index_machines_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
     t.index ["last_heartbeat_at"], name: "index_machines_on_last_heartbeat_at"
     t.index ["license_id", "created_at"], name: "index_machines_on_license_id_and_created_at"
@@ -547,6 +549,7 @@ ActiveRecord::Schema.define(version: 2022_03_01_175001) do
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true
     t.index ["email"], name: "index_users_on_email", using: :gin
+    t.index ["group_id"], name: "index_users_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_users_on_id_and_created_at_and_account_id", unique: true
   end
 
