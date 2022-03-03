@@ -13,9 +13,8 @@ class MachinePolicy < ApplicationPolicy
       (bearer.has_role?(:license) &&
         resource.all? { |r| r.license_id == bearer.id }) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.any?   { |r| r.group_id? } &&
-        resource.filter { |r| r.group_id? }
-                .all?   { |r| r.group_id.in?(bearer.group_ids) })
+        resource.all? { |r| r.group_id? } &&
+        resource.all? { |r| r.group_id.in?(bearer.group_ids) })
   end
 
   def show?
