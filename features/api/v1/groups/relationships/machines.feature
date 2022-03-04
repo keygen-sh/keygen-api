@@ -98,7 +98,7 @@ Feature: Group machines relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "machines"
 
-  Scenario: User retrieves all machines for their group
+  Scenario: User retrieves all machines for their group (is owner)
     Given the current account is "test1"
     And the current account has 2 "groups"
     And the current account has 1 "user"
@@ -133,6 +133,48 @@ Feature: Group machines relationship
     Then the response status should be "200"
     And the JSON response should be an array with 2 "machines"
 
+  Scenario: User retrieves all machines for their group (is member)
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 7 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
+    And the current account has 7 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "groupId": "$groups[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the third "machine" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "groupId": "$groups[1]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+
   Scenario: User retrieves all machines for a group
     Given the current account is "test1"
     And the current account has 2 "groups"
@@ -157,6 +199,43 @@ Feature: Group machines relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
     Then the response status should be "403"
+
+  Scenario: License retrieves all machines for their group
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the current account has 7 "machines"
+    And the first "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "groupId": "$groups[0]"
+      }
+      """
+    And the second "machine" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the third "machine" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "machine" has the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "groupId": "$groups[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$1/machines"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
 
   Scenario: License retrieves all machines for a group
     Given the current account is "test1"

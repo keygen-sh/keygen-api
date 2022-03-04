@@ -21,6 +21,19 @@ class Group < ApplicationRecord
   scope :for_product, -> id { self }
 
   scope :for_user, -> u {
-    joins(:owners).where(owners: { user_id: u })
+    joins(:users)
+      .where(users: { id: u })
+      .union(
+        joins(:owners).where(owners: { user_id: u })
+      )
+      .distinct
+  }
+
+  scope :for_license, -> l {
+    joins(:licenses).where(licenses: { id: l })
+  }
+
+  scope :for_machine, -> m {
+    joins(:machines).where(machines: { id: m })
   }
 end
