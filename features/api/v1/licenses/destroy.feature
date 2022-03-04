@@ -104,6 +104,34 @@ Feature: Delete license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User attempts to delete a license for their group
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the current account has 1 "group-owner"
+    And the last "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the current account has 3 "licenses"
+    And all "licenses" have the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$1"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "licenses"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous user attempts to delete a license for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
