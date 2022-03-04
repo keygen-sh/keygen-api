@@ -103,7 +103,7 @@ Feature: Policy entitlements relationship
     When I send a GET request to "/accounts/test1/policies/$0/entitlements/$0"
     Then the response status should be "403"
 
-  Scenario: License attempst to retrieves an entitlement for a policy
+  Scenario: License attempts to retrieves an entitlement for a policy
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for existing "products"

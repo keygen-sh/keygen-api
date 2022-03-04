@@ -110,7 +110,8 @@ Feature: Show group
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: User retrieves a group (an owner)
     Given the current account is "test1"
@@ -150,7 +151,8 @@ Feature: Show group
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: Anonymous retrieves a group
     Given the current account is "test1"

@@ -95,7 +95,7 @@ Feature: License group relationship
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the group for a license they own
+  Scenario: User attempts to retrieve the group for a license they own (not in group)
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "group"
@@ -111,6 +111,28 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "403"
+
+  Scenario: User attempts to retrieve the group for a license they own (in group)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: User attempts to retrieve the group for a license they don't own
     Given the current account is "test1"
@@ -133,7 +155,8 @@ Feature: License group relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: Admin attempts to retrieve the group for a license of another account
     Given the current account is "test1"
@@ -206,7 +229,7 @@ Feature: License group relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin changes a license's policy relationship to a non-existent group
+  Scenario: Admin changes a license's group relationship to a non-existent group
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"

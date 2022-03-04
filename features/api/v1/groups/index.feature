@@ -162,7 +162,7 @@ Feature: List groups
     Then the response status should be "200"
     And the JSON response should be an array with 3 "groups"
 
-  Scenario: User attempts to retrieve all their groups
+  Scenario: User attempts to retrieve all their groups (group owner and member)
     Given the current account is "test1"
     And the current account has 3 "groups"
     And the current account has 1 "user"
@@ -182,9 +182,33 @@ Feature: List groups
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
     Then the response status should be "200"
+    And the JSON response should be an array with 2 "groups"
+
+  Scenario: User attempts to retrieve all their groups (group member)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups"
+    Then the response status should be "200"
     And the JSON response should be an array with 1 "group"
 
-  Scenario: License attempts to retrieve all their groups
+  Scenario: User attempts to retrieve all their groups (no groups)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "groups"
+
+  Scenario: License attempts to retrieve all their groups (group member)
     Given the current account is "test1"
     And the current account has 3 "groups"
     And the current account has 1 "license"
@@ -195,8 +219,18 @@ Feature: List groups
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups"
-    Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "group"
+
+  Scenario: License attempts to retrieve all their groups (no groups)
+    Given the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "groups"
 
   Scenario: Anonymous attempts to retrieve all groups for their account
     Given the current account is "test1"
