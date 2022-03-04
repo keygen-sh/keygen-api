@@ -307,14 +307,14 @@ Feature: License group relationship
       """
       {
         "policyId": "$policies[0]",
-        "groupId": "$groups[0]"
+        "groupId": "$groups[3]"
       }
       """
     And the second "license" has the following attributes:
       """
       {
         "policyId": "$policies[0]",
-        "groupId": "$groups[0]"
+        "groupId": "$groups[2]"
       }
       """
     And I am a product of account "test1"
