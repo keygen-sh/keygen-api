@@ -97,7 +97,7 @@ Feature: Group licenses relationship
     Then the response status should be "200"
     And the JSON response should be an array with 3 "licenses"
 
-  Scenario: User retrieves all licenses for their group
+  Scenario: User retrieves all licenses for their group (is owner)
     Given the current account is "test1"
     And the current account has 2 "groups"
     And the current account has 1 "user"
@@ -131,6 +131,43 @@ Feature: Group licenses relationship
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "200"
     And the JSON response should be an array with 2 "licenses"
+
+  Scenario: User retrieves all licenses for their group (is member)
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 7 "licenses"
+    And the first "license" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      {
+        "groupId": "$groups[1]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
 
   Scenario: User retrieves all licenses for a group
     Given the current account is "test1"

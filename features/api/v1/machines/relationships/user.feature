@@ -121,7 +121,7 @@ Feature: Machine user relationship
     When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "404"
 
-  Scenario: License attempst to retrieve their user
+  Scenario: License attempts to retrieve their user
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the first "user"

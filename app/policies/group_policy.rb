@@ -6,7 +6,9 @@ class GroupPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
-        resource.all? { |r| r.id.in?(bearer.group_ids) })
+        resource.all? { |r| r.id == bearer.group_id || r.id.in?(bearer.group_ids) }) ||
+      (bearer.has_role?(:license) &&
+        resource.all? { |r| r.id == bearer.group_id })
   end
 
   def show?
@@ -14,7 +16,9 @@ class GroupPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
-        resource.id.in?(bearer.group_ids))
+        (resource.id == bearer.group_id || resource.id.in?(bearer.group_ids))) ||
+      (bearer.has_role?(:license) &&
+        resource.id == bearer.group_id)
   end
 
   def create?
