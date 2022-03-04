@@ -39,7 +39,7 @@ Feature: Create groups
       }
       """
     Then the response status should be "201"
-    And the JSON response should be an "group" with the following attributes:
+    And the JSON response should be a "group" with the following attributes:
       """
       {
         "name": "Test Group",

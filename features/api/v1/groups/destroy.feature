@@ -30,6 +30,42 @@ Feature: Delete groups
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin deletes a group (should nullify user groups)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "groups"
+    And the current account has 4 "users" for the second "group"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/groups/$1"
+    Then the response status should be "204"
+    And the current account should have 2 "groups"
+    And the current account should have 4 "users"
+
+  Scenario: Admin deletes a group (should nullify license groups)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "groups"
+    And the current account has 4 "licenses" for the last "group"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/groups/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "groups"
+    And the current account should have 4 "licenses"
+
+  Scenario: Admin deletes a group (should nullify machine groups)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "groups"
+    And the current account has 4 "machines" for the first "group"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/groups/$0"
+    Then the response status should be "204"
+    And the current account should have 2 "groups"
+    And the current account should have 4 "machines"
+
   Scenario: Admin attempts to delete a group for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
