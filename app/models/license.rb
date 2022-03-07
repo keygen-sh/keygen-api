@@ -36,9 +36,12 @@ class License < ApplicationRecord
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
   after_create :set_role
 
-  # Licenses automatically inherit their user's group ID
-  before_create -> { self.group_id = user.group_id },
-    if: -> { user.present? && group_id.nil? }
+  # Licenses automatically inherit their user's group ID. We're using before_validation
+  # instead of before_create so that this can be run when the user is changed as well,
+  # and so that we can keep our group limit validations in play.
+  before_validation -> { self.group_id = user.group_id },
+    if: -> { user_id_changed? && user.present? && group_id.nil? },
+    on: %i[create update]
 
   on_exclusive_event 'license.validation.*', :set_expiry_on_first_validation!,
     # NOTE(ezekg) No auto-release for high volume events to rate limit

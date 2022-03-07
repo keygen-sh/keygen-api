@@ -359,6 +359,62 @@ Feature: License user relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product changes a license's user relationship that would exceed group limits
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxLicenses": 1 }
+      """
+    And the current account has 3 "users"
+    And all "users" have the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 2 "policies"
+    And the first "policy" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the current account has 2 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/user" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "id": "$users[2]"
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "license count has exceeded maximum allowed by current group (1)",
+        "code": "GROUP_LICENSE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User attempts to change a license's user relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
