@@ -258,7 +258,7 @@ Feature: Create machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a grouped machine for their account (limit exceeded)
+  Scenario: Admin creates a grouped machine for their account (limit exceeded, explicit group)
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "group"
@@ -288,6 +288,59 @@ Feature: Create machine
             },
             "group": {
               "data": { "type": "groups", "id": "$groups[0]" }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed by current group (1)",
+        "code": "GROUP_MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data/relationships/group"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a grouped machine for their account (limit exceeded, inherited group)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "group"
+    And the last "group" has the following attributes:
+      """
+      { "maxMachines": 1 }
+      """
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "machine"
+    And the last "machine" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "4d:Eq:UV:D3:XZ:tL:WN:Bz:mA:Eg:E6:Mk:YX:dK:NC"
+          },
+          "relationships": {
+            "license": {
+              "data": { "type": "licenses", "id": "$licenses[0]" }
             }
           }
         }

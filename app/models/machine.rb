@@ -20,8 +20,9 @@ class Machine < ApplicationRecord
     as: :resource
 
   # Machines automatically inherit their license's group ID
-  before_create -> { self.group_id = license.group_id },
-    if: -> { license.present? && group_id.nil? }
+  before_validation -> { self.group_id = license.group_id },
+    if: -> { license.present? && group_id.nil? },
+    on: %i[create]
 
   # Update license's total core count on machine create, update and destroy
   after_create :update_machines_core_count_on_create
