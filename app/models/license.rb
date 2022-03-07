@@ -9,7 +9,8 @@ class License < ApplicationRecord
   include Diffable
 
   belongs_to :account
-  belongs_to :user
+  belongs_to :user,
+    optional: true
   belongs_to :policy
   belongs_to :group,
     optional: true
