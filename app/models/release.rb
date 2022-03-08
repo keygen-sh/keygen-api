@@ -2,6 +2,7 @@
 
 class Release < ApplicationRecord
   include Limitable
+  include Orderable
   include Pageable
   include Diffable
 

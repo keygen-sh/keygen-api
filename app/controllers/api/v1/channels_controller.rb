@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_channel, only: [:show]
 
     def index
-      channels = apply_scopes(policy_scope(current_account.release_channels))
+      channels = apply_pagination(apply_scopes(policy_scope(current_account.release_channels)))
       authorize channels
 
       render jsonapi: channels

@@ -15,7 +15,7 @@ module Pageable
   extend ActiveSupport::Concern
 
   included do
-    scope :page, -> (number, size) {
+    scope :with_pagination, -> (number, size) {
       raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page number must be a number" unless
         number.respond_to?(:to_i)
 
@@ -35,7 +35,7 @@ module Pageable
 
       # Active record relations store the real model class in klass
       model =
-        if self.respond_to? :klass
+        if self.respond_to?(:klass)
           self.klass
         else
           self.class

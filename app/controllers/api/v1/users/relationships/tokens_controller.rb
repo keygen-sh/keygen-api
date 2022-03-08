@@ -10,7 +10,7 @@ module Api::V1::Users::Relationships
     def index
       authorize user, :list_tokens?
 
-      tokens = policy_scope(apply_scopes(user.tokens))
+      tokens = apply_pagination(policy_scope(apply_scopes(user.tokens)))
       authorize tokens
 
       render jsonapi: tokens

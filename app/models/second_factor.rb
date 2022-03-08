@@ -5,6 +5,7 @@ class SecondFactor < ApplicationRecord
   SECOND_FACTOR_IMAGE = 'https://keygen.sh/authy-icon.png'
 
   include Limitable
+  include Orderable
   include Pageable
 
   belongs_to :account

@@ -3,6 +3,7 @@
 class Metric < ApplicationRecord
   include DateRangeable
   include Limitable
+  include Orderable
   include Pageable
 
   METRIC_TYPES = %w[

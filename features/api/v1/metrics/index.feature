@@ -27,7 +27,7 @@ Feature: List metrics
     And the JSON response should be an array with 3 "metrics"
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin retrieves a list of metrics that is automatically paginated
+  Scenario: Admin retrieves a list of metrics that is automatically limited
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 250 "metrics"
@@ -38,15 +38,21 @@ Feature: List metrics
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
+    And the JSON response should be an array with 10 "metrics"
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves a list of metrics with a limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 250 "metrics"
+    And 52 "metrics" have the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
+    Then the response status should be "200"
     And the JSON response should be an array with 100 "metrics"
-    And the JSON response should contain the following links:
-      """
-      {
-        "self": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
-        "prev": null,
-        "next": "/v1/accounts/test1/metrics?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
-      }
-      """
     And sidekiq should have 0 "request-log" jobs
 
   Scenario: Admin retrieves an unsupported paginated list of metrics
@@ -90,7 +96,7 @@ Feature: List metrics
     And the current account is "test1"
     And the current account has 20 "metrics"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow"
+    When I send a GET request to "/accounts/test1/metrics?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "metrics"
     And sidekiq should have 0 "request-log" jobs

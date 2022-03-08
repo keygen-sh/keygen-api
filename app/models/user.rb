@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   include PasswordResetable
   include Limitable
+  include Orderable
   include Pageable
   include Roleable
   include Diffable

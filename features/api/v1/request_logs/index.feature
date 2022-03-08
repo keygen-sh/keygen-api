@@ -26,7 +26,7 @@ Feature: List request logs
     Then the response status should be "200"
     And the JSON response should be an array with 3 "request-logs"
 
-  Scenario: Admin retrieves a list of logs that is automatically paginated
+  Scenario: Admin retrieves a list of logs that is automatically limited
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 250 "request-logs"
@@ -37,15 +37,20 @@ Feature: List request logs
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
-    And the JSON response should be an array with 100 "request-logs"
-    And the JSON response should contain the following links:
+    And the JSON response should be an array with 10 "request-logs"
+
+  Scenario: Admin retrieves a list of logs with a limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 250 "request-logs"
+    And 50 "request-logs" have the following attributes:
       """
-      {
-        "self": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=1&page[size]=100",
-        "prev": null,
-        "next": "/v1/accounts/test1/request-logs?date[end]=$date.tomorrow&date[start]=$date.yesterday&page[number]=2&page[size]=100"
-      }
+      { "createdAt": "$time.1.year.ago" }
       """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=75"
+    Then the response status should be "200"
+    And the JSON response should be an array with 75 "request-logs"
 
   Scenario: Admin retrieves an unsupported paginated list of logs
     Given I am an admin of account "test1"
@@ -69,7 +74,7 @@ Feature: List request logs
     And the current account is "test1"
     And the current account has 20 "request-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
+    When I send a GET request to "/accounts/test1/request-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "request-logs"
 

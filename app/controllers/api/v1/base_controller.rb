@@ -8,7 +8,6 @@ module Api::V1
     include CurrentAccountConstraints
     include CurrentAccountScope
     include TokenAuthentication
-    include SharedScopes
     include Pagination
   end
 end

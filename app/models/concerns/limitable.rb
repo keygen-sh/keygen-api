@@ -7,16 +7,14 @@ module Limitable
   extend ActiveSupport::Concern
 
   included do
-    # Since we can't redefine limit (stupid), we're defining a lim scope to add
-    # additional validation on the allowed range for limit
-    scope :lim, -> (num) {
+    scope :with_limit, -> num {
       num = num.to_i
 
       if num < LIMIT_LOWER || num > LIMIT_UPPER
         raise Keygen::Error::InvalidScopeError.new(parameter: "limit"), "limit must be a number between #{LIMIT_LOWER} and #{LIMIT_UPPER} (got #{num})"
       end
 
-      limit num
+      limit(num)
     }
   end
 end

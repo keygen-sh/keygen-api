@@ -10,7 +10,7 @@ module Api::V1::Licenses::Relationships
     def index
       authorize @license, :list_entitlements?
 
-      @entitlements = apply_scopes(@license.entitlements)
+      @entitlements = apply_pagination(apply_scopes(@license.entitlements))
 
       render jsonapi: @entitlements
     end

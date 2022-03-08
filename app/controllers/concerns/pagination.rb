@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 module Pagination
+  DEFAULT_SORT_ORDER = 'desc'
+  DEFAULT_PAGE_SIZE  = 10
+
   extend ActiveSupport::Concern
 
-  # Overload render method to append pagination links to response
   included do
+    # Overload render method to append pagination links to response
     def render(args)
       resource = args[:jsonapi]
 
@@ -13,6 +16,25 @@ module Pagination
       Keygen.logger.exception e
 
       super args unless performed? # Avoid double render
+    end
+
+    private
+
+    def apply_pagination(scope)
+      query = request.query_parameters
+
+      scope = scope.with_order(query.fetch(:order, DEFAULT_SORT_ORDER)) if
+        scope.model < Orderable
+
+      if query.key?(:page)
+        scope = scope.with_pagination(query[:page][:number], query[:page][:size]) if
+          scope.model < Pageable
+      else
+        scope = scope.with_limit(query.fetch(:limit, DEFAULT_PAGE_SIZE)) if
+          scope.model < Limitable
+      end
+
+      scope
     end
   end
 

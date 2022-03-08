@@ -3,6 +3,7 @@
 class License < ApplicationRecord
   include Envented::Callbacks
   include Limitable
+  include Orderable
   include Tokenable
   include Pageable
   include Roleable

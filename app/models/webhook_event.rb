@@ -3,6 +3,7 @@
 class WebhookEvent < ApplicationRecord
   include Idempotentable
   include Limitable
+  include Orderable
   include Pageable
 
   belongs_to :account

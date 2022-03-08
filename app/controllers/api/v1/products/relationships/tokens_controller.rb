@@ -30,7 +30,7 @@ module Api::V1::Products::Relationships
     def index
       authorize @product, :show?
 
-      @tokens = policy_scope(apply_scopes(@product.tokens))
+      @tokens = apply_pagination(policy_scope(apply_scopes(@product.tokens)))
       authorize @tokens
 
       render jsonapi: @tokens

@@ -3,7 +3,6 @@
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index
-    has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
     has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
@@ -22,7 +21,7 @@ module Api::V1
       authorize RequestLog
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = policy_scope(apply_scopes(current_account.request_logs)).without_blobs
+        request_logs = apply_pagination(policy_scope(apply_scopes(current_account.request_logs)).without_blobs)
         data = Keygen::JSONAPI::Renderer.new.render(request_logs)
 
         data.tap do |d|

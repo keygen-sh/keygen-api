@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      channels = policy_scope(apply_scopes(product.release_channels))
+      channels = apply_pagination(policy_scope(apply_scopes(product.release_channels)))
       authorize channels
 
       render jsonapi: channels

@@ -8,7 +8,7 @@ module Api::V1::Groups::Relationships
     before_action :set_group
 
     def index
-      licenses = policy_scope(apply_scopes(group.licenses)).preload(:user, :policy)
+      licenses = apply_pagination(policy_scope(apply_scopes(group.licenses)).preload(:user, :policy))
       authorize licenses
 
       render jsonapi: licenses

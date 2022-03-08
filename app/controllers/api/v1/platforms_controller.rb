@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_platform, only: [:show]
 
     def index
-      platforms = apply_scopes(policy_scope(current_account.release_platforms.with_releases))
+      platforms = apply_pagination(apply_scopes(policy_scope(current_account.release_platforms.with_releases)))
       authorize platforms
 
       render jsonapi: platforms

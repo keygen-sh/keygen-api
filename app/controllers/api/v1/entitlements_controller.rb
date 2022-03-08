@@ -8,7 +8,7 @@ module Api::V1
     before_action :set_entitlement, only: [:show, :update, :destroy]
 
     def index
-      @entitlements = policy_scope(apply_scopes(current_account.entitlements))
+      @entitlements = apply_pagination(policy_scope(apply_scopes(current_account.entitlements)))
       authorize @entitlements
 
       render jsonapi: @entitlements

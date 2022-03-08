@@ -3,6 +3,7 @@
 class RequestLog < ApplicationRecord
   include DateRangeable
   include Limitable
+  include Orderable
   include Pageable
 
   belongs_to :account

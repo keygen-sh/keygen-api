@@ -3,6 +3,7 @@
 class Machine < ApplicationRecord
   include Envented::Callbacks
   include Limitable
+  include Orderable
   include Pageable
   include Diffable
 
