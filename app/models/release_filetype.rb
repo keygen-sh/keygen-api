@@ -2,6 +2,7 @@
 
 class ReleaseFiletype < ApplicationRecord
   include Limitable
+  include Orderable
   include Pageable
 
   belongs_to :account,

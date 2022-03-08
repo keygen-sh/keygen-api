@@ -2,6 +2,7 @@
 
 class Plan < ApplicationRecord
   include Limitable
+  include Orderable
   include Pageable
 
   has_many :accounts

@@ -10,7 +10,7 @@ module Api::V1::Policies::Relationships
     def index
       authorize @policy, :list_entitlements?
 
-      @entitlements = apply_scopes(@policy.entitlements)
+      @entitlements = apply_pagination(apply_scopes(@policy.entitlements))
 
       render jsonapi: @entitlements
     end

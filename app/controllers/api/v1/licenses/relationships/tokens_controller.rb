@@ -43,7 +43,7 @@ module Api::V1::Licenses::Relationships
       #              tokens that belong to licenses they own. Current behavior
       #              is that non-admin bearers can only see their own tokens.
       #              The scoping is happening within the main app policy.
-      @tokens = apply_scopes(@license.tokens)
+      @tokens = apply_pagination(apply_scopes(@license.tokens))
       authorize @tokens
 
       render jsonapi: @tokens

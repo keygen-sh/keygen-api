@@ -81,6 +81,57 @@ Feature: List machines
     When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "machine"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]",
+        "prev": null,
+        "next": null,
+        "first": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]",
+        "last": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&policy=$policies[0]",
+        "meta": {
+          "pages": 1,
+          "count": 1
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a paginated list of machines scoped to user
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the current account has 20 "machines"
+    And the first "machine" has the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "machine"
+    And the JSON response should contain the following links:
+      """
+      {
+        "self": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]",
+        "prev": null,
+        "next": null,
+        "first": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]",
+        "last": "/v1/accounts/test1/machines?page[number]=1&page[size]=100&user=$users[1]",
+        "meta": {
+          "pages": 1,
+          "count": 1
+        }
+      }
+      """
 
   Scenario: Admin retrieves a paginated list of machines with a page size that is too high
     Given I am an admin of account "test1"

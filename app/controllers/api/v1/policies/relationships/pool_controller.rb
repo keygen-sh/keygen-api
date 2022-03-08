@@ -9,7 +9,7 @@ module Api::V1::Policies::Relationships
 
     # GET /policies/1/pool
     def index
-      @pool = policy_scope(apply_scopes(@policy.pool)).preload(:product)
+      @pool = apply_pagination(policy_scope(apply_scopes(@policy.pool)).preload(:product))
       authorize @pool
 
       render jsonapi: @pool

@@ -4,6 +4,7 @@ class Account < ApplicationRecord
   include ActiveModel::Validations
   include Welcomeable
   include Limitable
+  include Orderable
   include Pageable
   include Billable
 

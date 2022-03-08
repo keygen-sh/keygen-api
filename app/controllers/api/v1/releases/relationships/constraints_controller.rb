@@ -10,7 +10,7 @@ module Api::V1::Releases::Relationships
     def index
       authorize release, :list_constraints?
 
-      constraints = apply_scopes(release.constraints)
+      constraints = apply_pagination(apply_scopes(release.constraints))
 
       render jsonapi: constraints
     end

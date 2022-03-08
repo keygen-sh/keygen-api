@@ -8,7 +8,7 @@ module Api::V1::Groups::Relationships
     before_action :set_group
 
     def index
-      users = policy_scope(apply_scopes(group.users)).preload(:role)
+      users = apply_pagination(policy_scope(apply_scopes(group.users)).preload(:role))
       authorize users
 
       render jsonapi: users

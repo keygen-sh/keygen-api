@@ -13,7 +13,7 @@ module Api::V1
       # We're applying scopes after the policy scope because our policy scope
       # may include a UNION, and scopes/preloading need to be applied after
       # the UNION query has been performed. E.g. for LIMIT.
-      artifacts = apply_scopes(policy_scope(current_account.release_artifacts))
+      artifacts = apply_pagination(apply_scopes(policy_scope(current_account.release_artifacts)))
       authorize artifacts
 
       render jsonapi: artifacts

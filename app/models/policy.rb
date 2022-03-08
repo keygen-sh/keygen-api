@@ -2,6 +2,7 @@
 
 class Policy < ApplicationRecord
   include Limitable
+  include Orderable
   include Pageable
   include Diffable
 

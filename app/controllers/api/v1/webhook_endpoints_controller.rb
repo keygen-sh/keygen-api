@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /webhook-endpoints
     def index
-      @endpoints = policy_scope(apply_scopes(current_account.webhook_endpoints))
+      @endpoints = apply_pagination(policy_scope(apply_scopes(current_account.webhook_endpoints)))
       authorize @endpoints
 
       render jsonapi: @endpoints

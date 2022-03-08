@@ -3,7 +3,6 @@
 module Api::V1
   class MetricsController < Api::V1::BaseController
     has_scope :date, type: :hash, using: [:start, :end], only: :index
-    has_scope :page, type: :hash, using: [:number, :size], default: { number: 1, size: 100 }, only: :index
     has_scope(:metrics, type: :array) { |c, s, v| s.with_events(v) }
     has_scope(:events, type: :array) { |c, s, v| s.with_events(v) }
 
@@ -17,7 +16,7 @@ module Api::V1
       authorize Metric
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        metrics = policy_scope(apply_scopes(current_account.metrics)).preload(:event_type)
+        metrics = apply_pagination(policy_scope(apply_scopes(current_account.metrics)).preload(:event_type))
         data = Keygen::JSONAPI::Renderer.new.render(metrics)
 
         data.tap do |d|
