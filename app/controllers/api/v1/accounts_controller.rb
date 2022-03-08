@@ -85,6 +85,14 @@ module Api::V1
                     param :metadata, type: :hash, allow_non_scalars: true, optional: true
                     param :role, type: :string, optional: true, transform: -> (k, v) { [] }
                   end
+                  param :relationships, type: :hash, optional: true, transform: -> (k, v) { [] } do
+                    param :group, type: :hash, optional: true do
+                      param :data, type: :hash, allow_nil: true do
+                        param :type, type: :string, inclusion: %w[group groups]
+                        param :id, type: :string
+                      end
+                    end
+                  end
                 end
               end
             end
