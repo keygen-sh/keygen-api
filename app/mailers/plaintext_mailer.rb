@@ -170,4 +170,45 @@ class PlaintextMailer < ApplicationMailer
       TXT
     )
   end
+
+  def price_increase_notice(account:)
+    account.admins.each do |admin|
+      mail(
+        content_type: "text/plain",
+        to: admin.email,
+        subject: "Attention: price increase starting May 1st, 2022",
+        body: <<~TXT
+          Hey team,
+
+          Honestly, this is an email that I really hate writing. And I want to start off with some thanks -- thanks to all of our current and past customers, for supporting Keygen over the years, and for being such great people. Keygen has been growing non-stop and I can't wait to see what the future brings. We have some awesome stuff in store for 2022!
+
+          But due to increased operating costs, we're going to be increasing prices across the board on May 1st, 2022. In our nearly 7 years in business, we've never raised prices for our customers -- we've *always* grandfathered in existing customers when making any pricing changes. But with these increased operating costs and the additional value we've added to the service over the years, we feel that a price increase is necessary.
+
+          If you'd like to lock yourself into your current pricing for the next year, please upgrade to a yearly plan before May 1st, 2022. If you're already on a yearly plan, these changes will come into effect upon renewal.
+
+          Below are the new prices, going into effect on May 1st, 2022. Your account will automatically be upgraded, unless canceled (and we'd hate that -- so please reach out if that's the case.)
+
+          - Tier 0: $19 to $29/mo ($290/yr, discontinued)
+          - Tier 1: $39 to $49/mo ($490/yr)
+          - Tier 2: $59 to $79/mo ($790/yr)
+          - Tier 3: $99 to $129/mo ($1,290/yr)
+          - Tier 4: $159 to $199/mo ($1,990/yr)
+          - Tier 5: $319 to $399/mo ($3,990/yr)
+          - Tier 6: $639 to $799/mo ($7,990/yr)
+          - Ent 1: $1,279 to $1,599 ($15,990/yr)
+          - Ent 2: $2,559 to $3,199 ($31,990/yr)
+          - Ent 3: $4,919 to $6,149 ($61,490/yr)
+
+          If you're on an even older plan than these (thanks for sticking with us!), we ask that you upgrade to one of the new plans. You can choose a yearly plan before May 1st to be locked into our current pricing as of this email.
+
+          We don't make these changes lightly, and we hope that you understand. Please let me know if you have any questions or concerns.
+
+          --
+          Zeke, Founder <https://keygen.sh>
+
+          p.s. We just launched Groups, so be sure to peek our changelog and check that out. I know it's been a highly-requested feature!
+        TXT
+      )
+    end
+  end
 end
