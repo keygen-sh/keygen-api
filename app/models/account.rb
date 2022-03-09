@@ -61,7 +61,7 @@ class Account < ApplicationRecord
   end
 
   scope :active, -> (t = 90.days.ago) {
-    joins(:billing, :request_logs)
+    joins(:billing)
       .where(billings: { state: %i[subscribed trialing pending] })
       .where(<<~SQL.squish, t)
         EXISTS (
