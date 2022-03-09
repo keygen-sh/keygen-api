@@ -201,7 +201,7 @@ class PlaintextMailer < ApplicationMailer
           - Ent 2: $2,559 to $3,199 ($31,990/yr)
           - Ent 3: $4,919 to $6,149 ($61,490/yr)
 
-          If you're on an even older plan than these (thanks for sticking with us!), we ask that you upgrade to one of the new plans. You can choose a yearly plan before May 1st to be locked into our current pricing as of this email.
+          If you're on an even older plan than these (thanks for sticking with us!), we ask that you upgrade to one of the new plans. If you're on the free tier, you will continue to stay on the free tier. You can choose a yearly plan before May 1st to be locked into our current pricing as of this email.
 
           We don't make these changes lightly, and we hope that you understand. Please let me know if you have any questions or concerns.
 
