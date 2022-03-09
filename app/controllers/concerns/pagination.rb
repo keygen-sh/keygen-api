@@ -27,7 +27,10 @@ module Pagination
         scope.model < Orderable
 
       if query.key?(:page)
-        scope = scope.with_pagination(query[:page][:number], query[:page][:size]) if
+        raise Keygen::Error::InvalidScopeError.new(parameter: "page"), "page must be an object" unless
+          query[:page].is_a?(Hash)
+
+        scope = scope.with_pagination(query.dig(:page, :number), query.dig(:page, :size)) if
           scope.model < Pageable
       else
         scope = scope.with_limit(query.fetch(:limit, DEFAULT_PAGE_SIZE)) if
