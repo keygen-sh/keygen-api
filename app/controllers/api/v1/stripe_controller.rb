@@ -41,7 +41,7 @@ module Api::V1
           plan_id = subscription.items.first.plan.id
 
           if account.plan.plan_id != plan_id
-            plan = Plan.find_by(plan_id: plan_id, private: false)
+            plan = Plan.find_by(plan_id: plan_id)
             if plan.present?
               Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
 
