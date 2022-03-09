@@ -180,6 +180,8 @@ class PlaintextMailer < ApplicationMailer
         body: <<~TXT
           Hey team,
 
+          (You're receiving this email because you're an admin of Keygen account `#{account.slug}`.)
+
           Honestly, this is an email that I really hate writing. And I want to start off with some thanks -- thanks to all of our current and past customers, for supporting Keygen over the years, and for being such great people. Keygen has been growing non-stop and I can't wait to see what the future brings. We have some awesome stuff in store for 2022!
 
           But due to increased operating costs, we're going to be increasing prices across the board on May 1st, 2022. In our nearly 7 years in business, we've never raised prices for our customers -- we've *always* grandfathered in existing customers when making any pricing changes. But with these increased operating costs and the additional value we've added to the service over the years, we feel that a price increase is necessary.
