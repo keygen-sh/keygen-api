@@ -63,9 +63,19 @@ class Account < ApplicationRecord
   scope :active, -> (t = 90.days.ago) {
     joins(:billing, :request_logs)
       .where(billings: { state: %i[subscribed trialing pending] })
-      .where('request_logs.created_at > ?', t)
-      .group('accounts.id')
-      .having('count(request_logs.id) > 0')
+      .where(<<~SQL.squish, t)
+        EXISTS (
+          SELECT
+            1
+          FROM
+            "request_logs"
+          WHERE
+            "request_logs"."account_id" = "accounts"."id" AND
+            "request_logs"."created_at" < ?
+          LIMIT
+            1
+        )
+      SQL
   }
   scope :paid, -> { joins(:plan, :billing).where(plan: Plan.paid, billings: { state: 'subscribed' }) }
   scope :free, -> { joins(:plan, :billing).where(plan: Plan.free, billings: { state: 'subscribed' }) }
