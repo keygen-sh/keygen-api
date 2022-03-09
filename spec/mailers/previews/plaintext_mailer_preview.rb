@@ -30,6 +30,10 @@ class PlaintextMailerPreview < ActionMailer::Preview
     PlaintextMailer.prompt_for_first_impression account: account
   end
 
+  def price_increase_notice
+    PlaintextMailer.price_increase_notice account: account
+  end
+
   private
 
   def account
