@@ -203,6 +203,8 @@ class PlaintextMailer < ApplicationMailer
 
           If you're on an even older plan than these (thanks for sticking with us!), we ask that you upgrade to one of the new plans. If you're on the free tier, you will continue to stay on the free tier. You can choose a yearly plan before May 1st to be locked into our current pricing as of this email.
 
+          You can upgrade your plan from your billing dashboard: https://app.keygen.sh/billing (if you don't see your desired yearly plan listed -- let me know and I'll get it squared away for you.)
+
           We don't make these changes lightly, and we hope that you understand. Please let me know if you have any questions or concerns.
 
           --
