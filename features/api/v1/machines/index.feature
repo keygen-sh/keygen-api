@@ -157,6 +157,14 @@ Feature: List machines
     When I send a GET request to "/accounts/test1/machines?page[number]=-1&page[size]=10"
     Then the response status should be "400"
 
+  Scenario: Admin retrieves a paginated list of machines with an invalid page param
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 20 "machines"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines?page=1&size=100"
+    Then the response status should be "400"
+
   Scenario: Admin retrieves all machines without a limit for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
