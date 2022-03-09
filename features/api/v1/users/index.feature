@@ -341,21 +341,9 @@ Feature: List users
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 7 "users"
-    And the first "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
     And the second "user" has the following attributes:
       """
       { "bannedAt": "$time.now" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "createdAt": "$time.1.year.ago" }
       """
     And the current account has 6 userless "licenses"
     And the first "license" has the following attributes:
@@ -371,7 +359,7 @@ Feature: List users
       {
         "lastValidatedAt": "$time.2.days.ago",
         "createdAt": "$time.91.days.ago",
-        "userId": "$users[6]"
+        "userId": "$users[5]"
       }
       """
     And the fourth "license" has the following attributes:
@@ -382,10 +370,24 @@ Feature: List users
         "userId": "$users[3]"
       }
       """
+    # NOTE(ezekg) Updating user created timestamps in reverse order,
+    #             after license assignment.
+    And the fifth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "createdAt": "$time.1.year.ago" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users?status=ACTIVE"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "users"
+    And the JSON response should be an array with 5 "users"
 
   Scenario: Admin retrieves users filtered by status (inactive)
     Given I am an admin of account "test1"

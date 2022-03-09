@@ -180,18 +180,25 @@ class User < ApplicationRecord
   scope :admins, -> { with_role(:admin) }
   scope :banned, -> { where.not(banned_at: nil) }
   scope :active, -> (t = 90.days.ago) {
-    joins(:licenses).where('users.created_at >= ?', t).or(
-      joins(:licenses).where(
-        'licenses.created_at >= :t OR licenses.last_validated_at >= :t',
-        t: t,
+    where('users.created_at >= ?', t)
+      .where(banned_at: nil)
+      .union(
+        joins(:licenses)
+          .where(banned_at: nil)
+          .where(
+            'licenses.created_at >= :t OR licenses.last_validated_at >= :t',
+            t: t,
+          )
       )
-    )
   }
   scope :inactive, -> (t = 90.days.ago) {
-    where('users.created_at < ?', t).where.missing(:licenses)
+    where('users.created_at < ?', t)
+      .where.missing(:licenses)
+      .where(banned_at: nil)
       .union(
         joins(:licenses)
           .where('users.created_at < ?', t)
+          .where(banned_at: nil)
           .where(
             'licenses.created_at < :t AND (licenses.last_validated_at IS NULL OR licenses.last_validated_at < :t)',
             t: t,
@@ -241,6 +248,10 @@ class User < ApplicationRecord
 
   def active?(t = 90.days.ago)
     created_at >= t || licenses.active.any?
+  end
+
+  def inactive?(t = 90.days.ago)
+    created_at < t && licenses.active.empty?
   end
 
   def banned?
