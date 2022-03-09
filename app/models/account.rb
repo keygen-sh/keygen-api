@@ -71,7 +71,7 @@ class Account < ApplicationRecord
             "request_logs"
           WHERE
             "request_logs"."account_id" = "accounts"."id" AND
-            "request_logs"."created_at" < ?
+            "request_logs"."created_at" > ?
           LIMIT
             1
         )
