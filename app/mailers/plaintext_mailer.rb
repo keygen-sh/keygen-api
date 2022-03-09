@@ -215,4 +215,44 @@ class PlaintextMailer < ApplicationMailer
       )
     end
   end
+
+  def price_increase_reminder(account:)
+    account.admins.each do |admin|
+      mail(
+        content_type: "text/plain",
+        to: admin.email,
+        subject: "Reminder: price increase starting May 1st, 2022",
+        body: <<~TXT
+          Hey team,
+
+          (You're receiving this email because you're an admin of Keygen account `#{account.slug}`.)
+
+          Quick reminder that we'll be increasing our prices soon. Again, this is the first time we've ever increased prices for our customers, and we don't take this event lightly. We'll be increasing prices across the board due to increased operating costs.
+
+          Below are the new prices, going into effect on May 1st, 2022. Your account will automatically be upgraded, unless canceled (and we'd really hate that -- so please reach out.)
+
+          - Dev Tier: no changes (i.e. it's still free)
+          - Tier 0: $19 to $29/mo ($290/yr)
+          - Tier 1: $39 to $49/mo ($490/yr)
+          - Tier 2: $59 to $79/mo ($790/yr)
+          - Tier 3: $99 to $129/mo ($1,290/yr)
+          - Tier 4: $159 to $199/mo ($1,990/yr)
+          - Tier 5: $319 to $399/mo ($3,990/yr)
+          - Tier 6: $639 to $799/mo ($7,990/yr)
+          - Ent 1: $1,279 to $1,599 ($15,990/yr)
+          - Ent 2: $2,559 to $3,199 ($31,990/yr)
+          - Ent 3: $4,919 to $6,149 ($61,490/yr)
+
+          If you'd like to lock yourself into our current pricing for the next 12 months, please upgrade to a yearly plan before May 1st, 2022. If you're already on a yearly plan, these changes will automatically come into effect upon renewal.
+
+          You can upgrade your plan from your billing dashboard: https://app.keygen.sh/billing (if you don't see your desired yearly plan listed -- let me know and I'll get it squared away for you.)
+
+          Thanks again for your understanding and continued business. Let me know if you have any questions or concerns.
+
+          --
+          Zeke, Founder <https://keygen.sh>
+        TXT
+      )
+    end
+  end
 end
