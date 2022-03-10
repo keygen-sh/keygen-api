@@ -46,6 +46,8 @@ module Api::V1
               Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=#{plan.id} old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
 
               account.update(plan: plan)
+            else
+              Keygen.logger.warn("[stripe] action=change_plan event_id=#{event.id} account_id=#{account.id} plan_id=N/A old_plan_sid=#{account.plan.plan_id} new_plan_sid=#{plan_id}")
             end
           end
         rescue => e
