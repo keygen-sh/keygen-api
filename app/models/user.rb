@@ -152,7 +152,7 @@ class User < ApplicationRecord
 
     joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
                 .or(
-                  joins(:role).where(tsv_query.squish, role_identifier)
+                  joins(:role).where(tsv_query.squish, role_identifier.gsub(SANITIZE_TSV_RX, ' '))
                 )
   }
 

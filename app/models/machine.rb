@@ -202,7 +202,7 @@ class Machine < ApplicationRecord
 
     joins(:license).where('licenses.name ILIKE ?', "%#{license_identifier}%")
                    .or(
-                     joins(:license).where(tsv_query.squish, license_identifier)
+                     joins(:license).where(tsv_query.squish, license_identifier.gsub(SANITIZE_TSV_RX, ' '))
                    )
   }
 
@@ -228,7 +228,7 @@ class Machine < ApplicationRecord
 
     joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
                 .or(
-                  joins(:user).where(tsv_query.squish, user_identifier)
+                  joins(:user).where(tsv_query.squish, user_identifier.gsub(SANITIZE_TSV_RX, ' '))
                 )
   }
 
@@ -255,7 +255,7 @@ class Machine < ApplicationRecord
     joins(policy: :product)
       .where('products.name ILIKE ?', "%#{product_identifier}%")
       .or(
-        joins(policy: :product).where(tsv_query.squish, product_identifier)
+        joins(policy: :product).where(tsv_query.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
       )
   }
 
@@ -281,7 +281,7 @@ class Machine < ApplicationRecord
 
     joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
                   .or(
-                    joins(:policy).where(tsv_query.squish, policy_identifier)
+                    joins(:policy).where(tsv_query.squish, policy_identifier.gsub(SANITIZE_TSV_RX, ' '))
                   )
   }
 
