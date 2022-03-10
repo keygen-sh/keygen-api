@@ -217,7 +217,7 @@ class Policy < ApplicationRecord
     joins(:product)
       .where('products.name ILIKE ?', "%#{product_identifier}%")
       .or(
-        joins(:product).where(tsv_query.squish, product_identifier)
+        joins(:product).where(tsv_query.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
       )
   }
 

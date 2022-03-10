@@ -1224,3 +1224,14 @@ Feature: List license
     When I send a GET request to "/accounts/test1/licenses?metadata[id]=9cd5a11f-7649-4770-8744-74bd794ddc08"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "license"
+
+  Scenario: User attempts an SQL injection attack for all licenses
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current account has 3 "licenses"
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/licenses?user=ef8e7a71-6b54-4a9b-8717-778516c9ad25%27%20or%201=1"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "licenses"
