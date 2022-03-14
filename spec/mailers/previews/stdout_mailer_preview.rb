@@ -8,4 +8,8 @@ class StdoutMailerPreview < ActionMailer::Preview
   def issue_1
     StdoutMailer.issue_one(subscriber: User.first)
   end
+
+  def issue_2
+    StdoutMailer.issue_two(subscriber: User.first)
+  end
 end
