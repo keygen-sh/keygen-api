@@ -214,6 +214,104 @@ class StdoutMailer < ApplicationMailer
     )
   end
 
+  def issue_two(subscriber:)
+    return if
+      subscriber.stdout_unsubscribed_at?
+
+    enc_email = encrypt(subscriber.email)
+    return if
+      enc_email.nil?
+
+    unsub_link = stdout_unsubscribe_url(enc_email, protocol: 'https', host: 'stdout.keygen.sh')
+    greeting   = if subscriber.first_name?
+                    "Hey, #{subscriber.first_name}"
+                  else
+                    'Hey'
+                  end
+
+    mail(
+      content_type: 'text/plain',
+      to: subscriber.email,
+      subject: "What's new in Keygen: Q1 2022",
+      body: <<~TXT
+        #{greeting} -- Zeke here with another quick update.
+
+        (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
+
+          #{unsub_link}
+
+        --
+
+        Lots has happened this year! It's actually shaping up to be one of our most productive years yet, and we're just getting started.
+
+        So what's new in Keygen? Let's dig in and find out.
+
+        ## Zapier
+
+        Our Zapier integration has officially moved out of beta! Thanks for all the feedback over the last couple months. We're super stoked to partner with Zapier here, and we're already seeing some really cool and creative ways of using Keygen with Zapier.
+
+        Check it out: https://keygen.sh/integrate/zapier/
+
+        ## Custom domains
+
+        A few months ago we "officially" rolled out custom domains. It had been available for awhile, but we just didn't really advertise it much outside of our Ent tiers. Now available for all tiers, custom domains let you set up Keygen behind your own domain name using a CNAME DNS record. It's super easy to set up, and allows your team to completely whitelabel our API behind your own domain. If you want to get set up, ping me and we can chat. Pricing starts at $995/yr.
+
+        More info here: https://keygen.sh/docs/custom-domains/
+
+        ## Groups (about time!)
+
+        It's been a *long* time coming, but it's finally here -- Groups. User, license and machine resources can be added into Groups, allowing you to natively set up a Team structure and more easily offer licensing options to larger teams. In addition, groups can have limits on the number of each resource allowed in the group. For example, you could create a group that allows up to 5 users, 5 licenses and 10 total machines. These group rules would be enforced alongside each license's policy ruleset.
+
+        In the future, we'll be expanding upon the Group resource to add Owners, paving the way for self-management options of Groups.
+
+        Docs: https://keygen.sh/docs/api/groups/
+
+        ## Dead or alive?
+
+        We've added quite a few nifty features to our machine heartbeat system. You can now configure how dead machines are culled, whether or not dead machines can be resurrected, and finally, we added the ability to enforce heartbeats monitors for all licenses. These changes add a lot of additional depth to our heartbeat system, overall making the system a lot more flexible, especially for licensing virtual and cloud environments.
+
+        We can't wait to see what people build with these.
+
+        ## User-locked licensing
+
+        We've made a few small but significant changes to our User model that should make implementing a user-locked licensing model much more straightforward.
+
+        1. We removed the requirement for a user to have a password. Now, a user simply needs an email address. (We call these passwordless users.)
+
+        2. We added the ability to scope license validations to a specific user, by email address.
+
+        3. We added the ability to ban a user -- very similar to suspending a license.
+
+        All of these combined make the typical user-locked licensing flow of prompting for an email address and license key super easy -- you send both of those values to our API during a license validation request, and we assert that the license is valid and owned by a user with that email. We're hoping this really smooths out our offering for user-locked licensing.
+
+        Docs: https://keygen.sh/docs/choosing-a-licensing-model/user-locked-licenses/
+
+        ## Template variables
+
+        Last but not least --
+
+        We've added support for template variables in signed license keys. Previously, creating a signed license key that contained the license's "expiry" required you to manually calculate the expiry, and then set it in the license's signed dataset, in addtion to the license's expiry attribute during creation. Well, we heard your cries and we've simplified things. Moving forward, you can use the `{{expiry}}` template variable for this. It's precalculated by us, and guaranteed to match the license's value at time of creation.
+
+        There are other variables as well, for example `{{id}}` and `{{created}}`. As needs arise, we'll continue to expand upon the available template variables for signed keys.
+
+        We hope this simplifies crafting signed key datasets.
+
+        Docs: https://keygen.sh/docs/api/cryptography/#cryptographic-keys-template-vars
+
+        --
+
+        That's it for the third installment of Stdout. We're looking forward to what's coming up. Let me know if you have any feedback for me -- would love to hear it.
+
+        Until next time.
+
+        --
+        Zeke, Founder <https://keygen.sh>
+
+        p.s. all of these changes and more are covered in our changelog: https://keygen.sh/changelog/
+      TXT
+    )
+  end
+
   private
 
   def encrypt(plaintext)
