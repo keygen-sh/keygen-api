@@ -200,7 +200,7 @@ describe BroadcastEventService do
     expect(event.last_response_body).to eq 'REQ_TIMEOUT'
   end
 
-  it 'should skip when event delivery fails due to open timeout error' do
+  it 'should raise when event delivery fails due to open timeout error' do
     allow(WebhookWorker::Request).to receive(:post) {
       raise Net::OpenTimeout.new
     }
