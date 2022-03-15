@@ -134,8 +134,10 @@ class WebhookWorker
     event.update!(
       last_response_code: nil,
       last_response_body: 'SSL_ERROR',
-      status: 'FAILED',
+      status: 'FAILING',
     )
+
+    raise FailedRequestError
   rescue Net::WriteTimeout, # Our request to the endpoint timed out
          Net::ReadTimeout,
          Net::OpenTimeout
@@ -144,8 +146,10 @@ class WebhookWorker
     event.update!(
       last_response_code: nil,
       last_response_body: 'REQ_TIMEOUT',
-      status: 'FAILED',
+      status: 'FAILING',
     )
+
+    raise FailedRequestError
   rescue Errno::ECONNREFUSED # Stop sending requests when the connection is refused
     Keygen.logger.warn "[webhook_worker] Failed webhook event: type=#{event_type.event} account=#{account.id} event=#{event.id} endpoint=#{endpoint.id} url=#{endpoint.url} code=CONN_REFUSED"
 

@@ -176,24 +176,26 @@ describe BroadcastEventService do
     expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
   end
 
-  it 'should skip when event delivery fails due to SSL error' do
+  it 'should raise when event delivery fails due to SSL error' do
     allow(WebhookWorker::Request).to receive(:post) {
       raise OpenSSL::SSL::SSLError.new
     }
 
-    event = nil
-    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
+    event = WebhookEvent.last
+
     expect(event).to_not be_nil
     expect(event.last_response_body).to eq 'SSL_ERROR'
   end
 
-  it 'should skip when event delivery fails due to read timeout error' do
+  it 'should raise when event delivery fails due to read timeout error' do
     allow(WebhookWorker::Request).to receive(:post) {
       raise Net::ReadTimeout.new
     }
 
-    event = nil
-    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
+    event = WebhookEvent.last
+
     expect(event).to_not be_nil
     expect(event.last_response_body).to eq 'REQ_TIMEOUT'
   end
@@ -203,8 +205,9 @@ describe BroadcastEventService do
       raise Net::OpenTimeout.new
     }
 
-    event = nil
-    expect { event = create_webhook_event!(account, resource) }.to_not raise_error
+    expect { create_webhook_event!(account, resource) }.to raise_error WebhookWorker::FailedRequestError
+    event = WebhookEvent.last
+
     expect(event).to_not be_nil
     expect(event.last_response_body).to eq 'REQ_TIMEOUT'
   end
