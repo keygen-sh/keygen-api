@@ -155,11 +155,9 @@ class PlaintextMailer < ApplicationMailer
     mail(
       content_type: "text/plain",
       to: admin.email,
-      subject: "What is your first impression?",
+      subject: "What are you working on?",
       body: <<~TXT
-        I know you're still early in your licensing journey, but I'd love to hear your first impression while your thoughts are fresh.
-
-        What do you think the most valuable features are so far? Is there anything missing?
+        Hope things are well. I know you're still early in your licensing journey, but I'd love to hear more about what you're working on?
 
         Also, please let me know if there's anything you're looking for but can’t find or if you're experiencing any technical issues.
 
@@ -238,7 +236,6 @@ class PlaintextMailer < ApplicationMailer
           - Tier 3: $99 to $129/mo ($1,290/yr)
           - Tier 4: $159 to $199/mo ($1,990/yr)
           - Tier 5: $319 to $399/mo ($3,990/yr)
-          - Tier 6: $639 to $799/mo ($7,990/yr)
           - More: https://keygen.sh/pricing/
 
           If you'd like to lock yourself into your current rate for the next 12 months, please upgrade to a yearly plan before May 1st, 2022. If you're already on a yearly plan, these changes will automatically come into effect upon renewal.
