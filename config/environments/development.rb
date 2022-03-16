@@ -76,4 +76,9 @@ Rails.application.configure do
     Bullet.bullet_logger = true
     Bullet.rails_logger = true
   end
+
+  # Clear cache on reload when using caching (see https://github.com/rails/rails/issues/43767)
+  unless config.cache_classes
+    config.to_prepare { Rails.cache.clear }
+  end
 end
