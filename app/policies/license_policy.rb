@@ -120,6 +120,13 @@ class LicensePolicy < ApplicationPolicy
       resource == bearer
   end
 
+  def checkout?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.product == bearer
+  end
+
   def increment?
     assert_account_scoped!
 

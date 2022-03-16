@@ -8,7 +8,7 @@ class AbstractCheckoutService < BaseService
   ENCRYPT_ALGORITHM = 'aes-128-gcm'
   ENCODE_ALGORITHM  = 'base64'
 
-  def initialize(account:, algorithm:, encrypt: true, ttl: 1.month, includes: [])
+  def initialize(account:, algorithm:, encrypt: true, ttl: 1.month, include: [])
     raise InvalidTTLError.new('must be greater than or equal to 3600 (1 hour)') if
       ttl.present? && ttl < 1.hour
 
@@ -17,7 +17,7 @@ class AbstractCheckoutService < BaseService
     @algorithm = algorithm
     @encrypted = encrypt
     @ttl       = ttl
-    @includes  = includes
+    @includes  = include
   end
 
   def call
