@@ -55,6 +55,13 @@ class MachinePolicy < ApplicationPolicy
       resource.license == bearer
   end
 
+  def checkout?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+      resource.product == bearer
+  end
+
   def ping_heartbeat?
     assert_account_scoped!
 
