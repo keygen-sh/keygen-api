@@ -9,8 +9,23 @@ class LicenseCheckoutService < AbstractCheckoutService
     user
   ]
 
-  def initialize(...)
-    super(...)
+  def initialize(license:, **kwargs)
+    @license = license
+
+    kwargs[:algorithm] ||=
+      case license.scheme
+      when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+           'RSA_2048_PKCS1_PSS_SIGN'
+        'rsa-pss-sha256'
+      when 'RSA_2048_PKCS1_SIGN_V2',
+           'RSA_2048_PKCS1_SIGN'
+        'rsa-sha256'
+      when 'ED25519_SIGN',
+           nil
+        'ed25519'
+      end
+
+    super(**kwargs)
   end
 
   def call
@@ -25,9 +40,9 @@ class LicenseCheckoutService < AbstractCheckoutService
     sig = sign(enc, prefix: 'license')
 
     alg = if encrypted?
-            "#{encryption_alg}+#{signing_alg}"
+            "#{ENCRYPT_ALGORITHM}+#{algorithm}"
           else
-            "#{encoding_alg}+#{signing_alg}"
+            "#{ENCODE_ALGORITHM}+#{algorithm}"
           end
 
     iat = Time.current
@@ -46,4 +61,8 @@ class LicenseCheckoutService < AbstractCheckoutService
       -----END LICENSE FILE-----
     TXT
   end
+
+  private
+
+  attr_reader :license
 end
