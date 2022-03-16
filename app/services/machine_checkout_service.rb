@@ -13,7 +13,18 @@ class MachineCheckoutService < AbstractCheckoutService
   def initialize(machine:, **kwargs)
     @machine = machine
 
-    kwargs.merge!(license: machine.license)
+    kwargs[:algorithm] ||=
+      case machine.license.scheme
+      when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+           'RSA_2048_PKCS1_PSS_SIGN'
+        'rsa-pss-sha256'
+      when 'RSA_2048_PKCS1_SIGN_V2',
+           'RSA_2048_PKCS1_SIGN'
+        'rsa-sha256'
+      when 'ED25519_SIGN',
+           nil
+        'ed25519'
+      end
 
     super(**kwargs)
   end
@@ -30,9 +41,9 @@ class MachineCheckoutService < AbstractCheckoutService
     sig = sign(enc, prefix: 'machine')
 
     alg = if encrypted?
-            "#{encryption_alg}+#{signing_alg}"
+            "#{ENCRYPT_ALGORITHM}+#{algorithm}"
           else
-            "#{encoding_alg}+#{signing_alg}"
+            "#{ENCODE_ALGORITHM}+#{algorithm}"
           end
 
     iat = Time.current
