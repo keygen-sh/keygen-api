@@ -50,8 +50,8 @@ class LicenseCheckoutService < BaseService
 
     doc = { enc: enc, sig: sig, alg: alg, iat: iat, exp: exp }
     enc = encode(doc.to_json)
-    dec     = JSON.parse(Base64.decode64(enc))
-    pp dec
+    # dec = JSON.parse(Base64.decode64(enc))
+    # pp dec
 
     <<~TXT
       -----BEGIN LICENSE FILE-----
@@ -91,12 +91,12 @@ class LicenseCheckoutService < BaseService
 
   def signing_alg
     case license.scheme
-    when 'RSA_2048_PKCS1_SIGN_V2',
-         'RSA_2048_PKCS1_SIGN'
-      'rsa-pkcs1'
     when 'RSA_2048_PKCS1_PSS_SIGN_V2',
          'RSA_2048_PKCS1_PSS_SIGN'
-      'rsa-pkcs1-pss'
+      'rsa-pss-sha256'
+    when 'RSA_2048_PKCS1_SIGN_V2',
+         'RSA_2048_PKCS1_SIGN'
+      'rsa-sha256'
     when 'ED25519_SIGN',
          nil
       'ed25519'
@@ -136,12 +136,12 @@ class LicenseCheckoutService < BaseService
     data = "#{prefix}/#{value}"
 
     case signing_alg
-    when 'rsa-pkcs1'
-      pkey = OpenSSL::PKey::RSA.new(account.private_key)
-      sig = pkey.sign(OpenSSL::Digest::SHA256.new, data)
-    when 'rsa-pkcs1-pss'
+    when 'rsa-pss-sha256'
       pkey = OpenSSL::PKey::RSA.new(account.private_key)
       sig  = pkey.sign_pss(OpenSSL::Digest::SHA256.new, data, salt_length: :max, mgf1_hash: 'SHA256')
+    when 'rsa-sha256'
+      pkey = OpenSSL::PKey::RSA.new(account.private_key)
+      sig = pkey.sign(OpenSSL::Digest::SHA256.new, data)
     when 'ed25519'
       pkey = Ed25519::SigningKey.new [account.ed25519_private_key].pack('H*')
       sig  = pkey.sign(data)
