@@ -2,6 +2,7 @@
 
 class LicenseCheckoutService < BaseService
   class InvalidAlgorithmError < StandardError; end
+  class InvalidSchemeError < StandardError; end
   class InvalidTTLError < StandardError; end
 
   ENCRYPT_ALGORITHM = 'aes-128-gcm'
@@ -52,8 +53,10 @@ class LicenseCheckoutService < BaseService
 
     doc = { enc: enc, sig: sig, alg: alg, iat: iat, exp: exp }
     enc = encode(doc.to_json)
-    # dec = JSON.parse(Base64.decode64(enc))
-    # pp dec
+
+    # FIXME(ezekg) Remove logging
+    dec = JSON.parse(Base64.decode64(enc))
+    pp dec
 
     <<~TXT
       -----BEGIN LICENSE FILE-----
@@ -103,7 +106,7 @@ class LicenseCheckoutService < BaseService
          nil
       'ed25519'
     else
-      nil
+      raise InvalidSchemeError, 'license scheme is not supported'
     end
   end
 
