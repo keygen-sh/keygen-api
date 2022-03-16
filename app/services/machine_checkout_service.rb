@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MachineCheckoutService < BaseService
   ALLOWED_INCLUDES = %w[
     entitlements

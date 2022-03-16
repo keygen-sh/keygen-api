@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LicenseCheckoutService < BaseService
   class InvalidAlgorithmError < StandardError; end
   class InvalidTTLError < StandardError; end
