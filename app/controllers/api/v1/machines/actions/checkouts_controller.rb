@@ -44,9 +44,9 @@ module Api::V1::Machines::Actions
     typed_query do
       on :checkout do
         if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-          param :include, type: :string, optional: true, transform: -> k, v { [k, v.split(',')] }
-          param :encrypt, type: :boolean, optional: true
-          param :ttl, type: :integer, optional: true
+          param :include, type: :array, coerce: true, optional: true
+          param :encrypt, type: :boolean, coerce: true, optional: true
+          param :ttl, type: :integer, coerce: true, optional: true
         end
       end
     end
