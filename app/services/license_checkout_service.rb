@@ -47,7 +47,7 @@ class LicenseCheckoutService < AbstractCheckoutService
 
     iat = Time.current
     exp = if ttl?
-            iat + ttl
+            iat + ActiveSupport::Duration.build(ttl)
           else
             nil
           end
