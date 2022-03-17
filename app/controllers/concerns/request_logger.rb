@@ -125,7 +125,7 @@ module RequestLogger
         body.present?
 
       return body unless
-        request.format.json?
+        response.content_type.include?('json')
 
       params   = JSON.parse(body)
       filterer = ActiveSupport::ParameterFilter.new(%i[password digest token])
