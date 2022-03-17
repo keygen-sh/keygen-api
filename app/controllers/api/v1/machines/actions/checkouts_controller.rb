@@ -10,7 +10,14 @@ module Api::V1::Machines::Actions
     def checkout
       authorize machine
 
-      kwargs = checkout_query.to_h.symbolize_keys.slice(:include, :encrypt, :ttl)
+      kwargs = checkout_query.merge(checkout_meta)
+                             .symbolize_keys
+                             .slice(
+                               :include,
+                               :encrypt,
+                               :ttl,
+                              )
+
       file   = MachineCheckoutService.call(
         account: current_account,
         machine: machine,
@@ -45,6 +52,20 @@ module Api::V1::Machines::Actions
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
       Current.resource = machine
+    end
+
+    typed_parameters do
+      options strict: true
+
+      on :checkout do
+        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+          param :meta, type: :hash, optional: true do
+            param :include, type: :array, optional: true
+            param :encrypt, type: :boolean, optional: true
+            param :ttl, type: :integer, optional: true
+          end
+        end
+      end
     end
 
     typed_query do
