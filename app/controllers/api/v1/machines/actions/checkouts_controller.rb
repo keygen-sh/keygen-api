@@ -27,6 +27,12 @@ module Api::V1::Machines::Actions
       response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: file
+    rescue MachineCheckoutService::InvalidIncludeError => e
+      render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
+    rescue MachineCheckoutService::InvalidTTLError => e
+      render_bad_request detail: e.message, code: :CHECKOUT_TTL_INVALID, source: { parameter: :ttl }
+    rescue MachineCheckoutService::InvalidAlgorithmError => e
+      render_unprocessable_entity detail: e.message
     end
 
     private
