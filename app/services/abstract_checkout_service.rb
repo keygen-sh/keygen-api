@@ -46,6 +46,8 @@ class AbstractCheckoutService < BaseService
   end
 
   def encrypt(value, secret:)
+    Keygen.logger.debug { "encrypting=#{value}" }
+
     cipher = OpenSSL::Cipher::Cipher.new(ENCRYPT_ALGORITHM)
     cipher.encrypt
 
@@ -63,6 +65,8 @@ class AbstractCheckoutService < BaseService
   end
 
   def encode(value, strict: false)
+    Keygen.logger.debug { "encoding=#{value} strict=#{strict}" }
+
     enc = if strict
             Base64.strict_encode64(value)
           else
@@ -73,6 +77,8 @@ class AbstractCheckoutService < BaseService
   end
 
   def sign(value, prefix:)
+    Keygen.logger.debug { "signing=#{value} prefix=#{prefix}" }
+
     data = "#{prefix}/#{value}"
 
     case algorithm
