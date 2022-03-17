@@ -24,7 +24,7 @@ module Api::V1::Licenses::Actions
       )
 
       response.headers['Content-Disposition'] = %(attachment; filename="license+#{license.id}.lic")
-      response.headers['Content-Type']        = 'text/plain'
+      response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: file
     end
