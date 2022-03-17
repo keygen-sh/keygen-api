@@ -124,8 +124,8 @@ module RequestLogger
       return unless
         body.present?
 
-      return body if
-        response.content_type == 'text/plain'
+      return body unless
+        request.format.symbol == :json
 
       params   = JSON.parse(body)
       filterer = ActiveSupport::ParameterFilter.new(%i[password digest token])

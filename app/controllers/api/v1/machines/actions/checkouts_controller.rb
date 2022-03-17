@@ -24,7 +24,7 @@ module Api::V1::Machines::Actions
       )
 
       response.headers['Content-Disposition'] = %(attachment; filename="machine+#{machine.id}.lic")
-      response.headers['Content-Type']        = 'text/plain'
+      response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: file
     end
