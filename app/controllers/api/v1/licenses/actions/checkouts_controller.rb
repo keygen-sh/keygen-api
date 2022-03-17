@@ -10,7 +10,14 @@ module Api::V1::Licenses::Actions
     def checkout
       authorize license
 
-      kwargs = checkout_query.to_h.symbolize_keys.slice(:include, :encrypt, :ttl)
+      kwargs = checkout_query.merge(checkout_meta)
+                             .symbolize_keys
+                             .slice(
+                               :include,
+                               :encrypt,
+                               :ttl,
+                              )
+
       file   = LicenseCheckoutService.call(
         account: current_account,
         license: license,
@@ -45,6 +52,20 @@ module Api::V1::Licenses::Actions
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
       Current.resource = license
+    end
+
+    typed_parameters do
+      options strict: true
+
+      on :checkout do
+        if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+          param :meta, type: :hash, optional: true do
+            param :include, type: :array, optional: true
+            param :encrypt, type: :boolean, optional: true
+            param :ttl, type: :integer, optional: true
+          end
+        end
+      end
     end
 
     typed_query do
