@@ -86,7 +86,7 @@ class AbstractCheckoutService < BaseService
       pkey = Ed25519::SigningKey.new([account.ed25519_private_key].pack('H*'))
       sig  = pkey.sign(data)
     else
-      raise InvalidAlgorithmError, 'signing algorithm is invalid'
+      raise InvalidAlgorithmError, 'signing scheme is not supported'
     end
 
     encode(sig, strict: true)
