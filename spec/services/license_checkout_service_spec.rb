@@ -599,6 +599,32 @@ describe LicenseCheckoutService do
   end
 
   context 'when including relationships' do
+    it 'should not return the included relationships' do
+      cert = LicenseCheckoutService.call(
+        account: account,
+        license: license,
+        include: [],
+      )
+
+      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                    .delete_suffix("-----END LICENSE FILE-----\n")
+
+      json = JSON.parse(Base64.decode64(payload))
+      enc  = json.fetch('enc')
+      data = nil
+
+      expect { data = JSON.parse(Base64.strict_decode64(enc)) }.to_not raise_error
+
+      expect(data).to_not be_nil
+      expect(data).to_not have_key('included')
+      expect(data).to include(
+        'data' => include(
+          'type' => 'licenses',
+          'id' => license.id,
+        ),
+      )
+    end
+
     it 'should return the included relationships' do
       cert = LicenseCheckoutService.call(
         account: account,
