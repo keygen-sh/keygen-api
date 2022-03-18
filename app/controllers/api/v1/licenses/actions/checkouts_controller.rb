@@ -34,11 +34,11 @@ module Api::V1::Licenses::Actions
       response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: file
-    rescue MachineCheckoutService::InvalidIncludeError => e
+    rescue LicenseCheckoutService::InvalidIncludeError => e
       render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
-    rescue MachineCheckoutService::InvalidTTLError => e
+    rescue LicenseCheckoutService::InvalidTTLError => e
       render_bad_request detail: e.message, code: :CHECKOUT_TTL_INVALID, source: { parameter: :ttl }
-    rescue MachineCheckoutService::InvalidAlgorithmError => e
+    rescue LicenseCheckoutService::InvalidAlgorithmError => e
       render_unprocessable_entity detail: e.message
     end
 
