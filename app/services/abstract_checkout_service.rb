@@ -5,7 +5,7 @@ class AbstractCheckoutService < BaseService
   class InvalidPrivateKeyError < StandardError; end
   class InvalidTTLError < StandardError; end
 
-  ENCRYPT_ALGORITHM = 'aes-128-gcm'
+  ENCRYPT_ALGORITHM = 'aes-256-cbc'
   ENCODE_ALGORITHM  = 'base64'
 
   def initialize(private_key:, algorithm:, encrypt:, ttl:, include:)
@@ -54,16 +54,16 @@ class AbstractCheckoutService < BaseService
   def encrypt(value, secret:)
     Keygen.logger.debug { "encrypting=#{value}" }
 
-    cipher = OpenSSL::Cipher::Cipher.new(ENCRYPT_ALGORITHM)
-    cipher.encrypt
+    aes = OpenSSL::Cipher.new(ENCRYPT_ALGORITHM)
+    aes.encrypt
 
-    key = OpenSSL::Digest::MD5.digest(secret)
-    iv  = cipher.random_iv
+    key = OpenSSL::Digest::SHA256.digest(secret)
+    iv  = aes.random_iv
 
-    cipher.key = key
-    cipher.iv  = iv
+    aes.key = key
+    aes.iv  = iv
 
-    ciphertext = cipher.update(value) + cipher.final
+    ciphertext = aes.update(value) + aes.final
 
     [ciphertext, iv].map { encode(_1, strict: true) }
                     .join('.')
