@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
                                :ttl,
                               )
 
-      file = LicenseCheckoutService.call(
+      cert = LicenseCheckoutService.call(
         account: current_account,
         license: license,
         **kwargs,
@@ -33,7 +33,7 @@ module Api::V1::Licenses::Actions
       response.headers['Content-Disposition'] = %(attachment; filename="license+#{license.id}.lic")
       response.headers['Content-Type']        = 'application/octet-stream'
 
-      render body: file
+      render body: cert
     rescue LicenseCheckoutService::InvalidIncludeError => e
       render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
     rescue LicenseCheckoutService::InvalidTTLError => e
