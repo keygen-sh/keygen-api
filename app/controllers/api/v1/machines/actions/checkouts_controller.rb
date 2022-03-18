@@ -18,7 +18,7 @@ module Api::V1::Machines::Actions
                                :ttl,
                               )
 
-      file   = MachineCheckoutService.call(
+      file = MachineCheckoutService.call(
         account: current_account,
         machine: machine,
         **kwargs,

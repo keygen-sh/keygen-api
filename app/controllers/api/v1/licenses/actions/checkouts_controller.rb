@@ -18,7 +18,7 @@ module Api::V1::Licenses::Actions
                                :ttl,
                               )
 
-      file   = LicenseCheckoutService.call(
+      file = LicenseCheckoutService.call(
         account: current_account,
         license: license,
         **kwargs,
