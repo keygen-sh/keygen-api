@@ -2,22 +2,28 @@
 
 class AbstractCheckoutService < BaseService
   class InvalidAlgorithmError < StandardError; end
-  class InvalidIncludeError < StandardError; end
+  class InvalidPrivateKeyError < StandardError; end
   class InvalidTTLError < StandardError; end
 
   ENCRYPT_ALGORITHM = 'aes-128-gcm'
   ENCODE_ALGORITHM  = 'base64'
 
-  def initialize(account:, algorithm:, encrypt: true, ttl: 1.month, include: [])
-    raise InvalidTTLError.new('must be greater than or equal to 3600 (1 hour)') if
+  def initialize(private_key:, algorithm:, encrypt:, ttl:, include:)
+    raise InvalidPrivateKeyError, 'private key is missing' unless
+      private_key.present?
+
+    raise InvalidAlgorithmError, 'algorithm is missing' unless
+      algorithm.present?
+
+    raise InvalidTTLError, 'must be greater than or equal to 3600 (1 hour)' if
       ttl.present? && ttl < 1.hour
 
-    @renderer  = Keygen::JSONAPI::Renderer.new(context: :checkout)
-    @account   = account
-    @algorithm = algorithm
-    @encrypted = encrypt
-    @ttl       = ttl
-    @includes  = include
+    @renderer    = Keygen::JSONAPI::Renderer.new(context: :checkout)
+    @private_key = private_key
+    @algorithm   = algorithm
+    @encrypted   = encrypt
+    @ttl         = ttl
+    @includes    = include
   end
 
   def call
@@ -27,7 +33,7 @@ class AbstractCheckoutService < BaseService
   private
 
   attr_reader :renderer,
-              :account,
+              :private_key,
               :algorithm,
               :encrypted,
               :ttl,
@@ -83,13 +89,13 @@ class AbstractCheckoutService < BaseService
 
     case algorithm
     when 'rsa-pss-sha256'
-      pkey = OpenSSL::PKey::RSA.new(account.private_key)
+      pkey = OpenSSL::PKey::RSA.new(private_key)
       sig  = pkey.sign_pss(OpenSSL::Digest::SHA256.new, data, salt_length: :max, mgf1_hash: 'SHA256')
     when 'rsa-sha256'
-      pkey = OpenSSL::PKey::RSA.new(account.private_key)
+      pkey = OpenSSL::PKey::RSA.new(private_key)
       sig = pkey.sign(OpenSSL::Digest::SHA256.new, data)
     when 'ed25519'
-      pkey = Ed25519::SigningKey.new([account.ed25519_private_key].pack('H*'))
+      pkey = Ed25519::SigningKey.new([private_key].pack('H*'))
       sig  = pkey.sign(data)
     else
       raise InvalidAlgorithmError, 'signing scheme is not supported'

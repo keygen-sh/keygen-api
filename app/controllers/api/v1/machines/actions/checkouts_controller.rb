@@ -18,7 +18,7 @@ module Api::V1::Machines::Actions
                                :ttl,
                               )
 
-      file = MachineCheckoutService.call(
+      cert = MachineCheckoutService.call(
         account: current_account,
         machine: machine,
         **kwargs,
@@ -33,7 +33,7 @@ module Api::V1::Machines::Actions
       response.headers['Content-Disposition'] = %(attachment; filename="machine+#{machine.id}.lic")
       response.headers['Content-Type']        = 'application/octet-stream'
 
-      render body: file
+      render body: cert
     rescue MachineCheckoutService::InvalidIncludeError => e
       render_bad_request detail: e.message, code: :CHECKOUT_INCLUDE_INVALID, source: { parameter: :include }
     rescue MachineCheckoutService::InvalidTTLError => e
