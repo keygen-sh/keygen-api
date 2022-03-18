@@ -8,10 +8,10 @@ class MachineCheckoutService < AbstractCheckoutService
 
   ALLOWED_INCLUDES = %w[
     license.entitlements
+    license.product
     license.policy
     license.user
     license
-    product
     group
   ]
 
