@@ -657,4 +657,54 @@ describe LicenseCheckoutService do
       )
     end
   end
+
+  context 'when using a TTL' do
+    it 'should return a cert that expires after the default TTL' do
+      cert = LicenseCheckoutService.call(
+        account: account,
+        license: license,
+      )
+
+      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                    .delete_suffix("-----END LICENSE FILE-----\n")
+
+      json = JSON.parse(Base64.decode64(payload))
+      iat  = Time.parse(json.fetch('iat'))
+      exp  = Time.parse(json.fetch('exp'))
+
+      expect(exp).to eq(iat + 1.month)
+    end
+
+    it 'should return a cert that expires after a custom TTL' do
+      cert = LicenseCheckoutService.call(
+        account: account,
+        license: license,
+        ttl: 1.week,
+      )
+
+      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                    .delete_suffix("-----END LICENSE FILE-----\n")
+
+      json = JSON.parse(Base64.decode64(payload))
+      iat  = Time.parse(json.fetch('iat'))
+      exp  = Time.parse(json.fetch('exp'))
+
+      expect(exp).to eq(iat + 1.week)
+    end
+
+    it 'should return a cert that has no expiry' do
+      cert = LicenseCheckoutService.call(
+        account: account,
+        license: license,
+        ttl: nil,
+      )
+
+      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                    .delete_suffix("-----END LICENSE FILE-----\n")
+
+      json = JSON.parse(Base64.decode64(payload))
+
+      expect(json.fetch('exp')).to be_nil
+    end
+  end
 end
