@@ -51,8 +51,6 @@ describe LicenseCheckoutService do
       'enc' => a_kind_of(String),
       'sig' => a_kind_of(String),
       'alg' => a_kind_of(String),
-      'iat' => a_kind_of(String),
-      'exp' => a_kind_of(String),
     )
   end
 
@@ -73,6 +71,11 @@ describe LicenseCheckoutService do
 
     expect(data).to_not be_nil
     expect(data).to include(
+      'meta' => include(
+        'iat' => a_kind_of(String),
+        'exp' => a_kind_of(String),
+        'ttl' => a_kind_of(Integer),
+      ),
       'data' => include(
         'type' => 'licenses',
         'id' => license.id,
@@ -551,8 +554,6 @@ describe LicenseCheckoutService do
         'enc' => a_kind_of(String),
         'sig' => a_kind_of(String),
         'alg' => a_kind_of(String),
-        'iat' => a_kind_of(String),
-        'exp' => a_kind_of(String),
       )
     end
 
@@ -590,6 +591,11 @@ describe LicenseCheckoutService do
 
       expect(data).to_not be_nil
       expect(data).to include(
+        'meta' => include(
+          'iat' => a_kind_of(String),
+          'exp' => a_kind_of(String),
+          'ttl' => a_kind_of(Integer),
+        ),
         'data' => include(
           'type' => 'licenses',
           'id' => license.id,
@@ -618,6 +624,11 @@ describe LicenseCheckoutService do
       expect(data).to_not be_nil
       expect(data).to_not have_key('included')
       expect(data).to include(
+        'meta' => include(
+          'iat' => a_kind_of(String),
+          'exp' => a_kind_of(String),
+          'ttl' => a_kind_of(Integer),
+        ),
         'data' => include(
           'type' => 'licenses',
           'id' => license.id,
@@ -650,6 +661,11 @@ describe LicenseCheckoutService do
           include('type' => 'products', 'id' => license.product.id),
           include('type' => 'policies', 'id' => license.policy.id),
         ),
+        'meta' => include(
+          'iat' => a_kind_of(String),
+          'exp' => a_kind_of(String),
+          'ttl' => a_kind_of(Integer),
+        ),
         'data' => include(
           'type' => 'licenses',
           'id' => license.id,
@@ -660,51 +676,86 @@ describe LicenseCheckoutService do
 
   context 'when using a TTL' do
     it 'should return a cert that expires after the default TTL' do
-      cert = LicenseCheckoutService.call(
-        account: account,
-        license: license,
-      )
+      freeze_time do
+        cert = LicenseCheckoutService.call(
+          account: account,
+          license: license,
+        )
 
-      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
-                    .delete_suffix("-----END LICENSE FILE-----\n")
+        payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                      .delete_suffix("-----END LICENSE FILE-----\n")
 
-      json = JSON.parse(Base64.decode64(payload))
-      iat  = Time.parse(json.fetch('iat'))
-      exp  = Time.parse(json.fetch('exp'))
+        json = JSON.parse(Base64.decode64(payload))
+        enc  = json.fetch('enc')
+        data = nil
 
-      expect(exp).to eq(iat + 1.month)
+        expect { data = JSON.parse(Base64.strict_decode64(enc)) }.to_not raise_error
+
+        expect(data).to_not be_nil
+        expect(data).to include(
+          'meta' => include(
+            'iat' => Time.current,
+            'exp' => 1.month.from_now,
+            'ttl' => 1.month,
+          ),
+        )
+      end
     end
 
     it 'should return a cert that expires after a custom TTL' do
-      cert = LicenseCheckoutService.call(
-        account: account,
-        license: license,
-        ttl: 1.week,
-      )
+      freeze_time do
+        cert = LicenseCheckoutService.call(
+          account: account,
+          license: license,
+          ttl: 1.week,
+        )
 
-      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
-                    .delete_suffix("-----END LICENSE FILE-----\n")
+        payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                      .delete_suffix("-----END LICENSE FILE-----\n")
 
-      json = JSON.parse(Base64.decode64(payload))
-      iat  = Time.parse(json.fetch('iat'))
-      exp  = Time.parse(json.fetch('exp'))
+        json = JSON.parse(Base64.decode64(payload))
+        enc  = json.fetch('enc')
+        data = nil
 
-      expect(exp).to eq(iat + 1.week)
+        expect { data = JSON.parse(Base64.strict_decode64(enc)) }.to_not raise_error
+
+        expect(data).to_not be_nil
+        expect(data).to include(
+          'meta' => include(
+            'iat' => Time.current,
+            'exp' => 1.week.from_now,
+            'ttl' => 1.week,
+          ),
+        )
+      end
     end
 
-    it 'should return a cert that has no expiry' do
-      cert = LicenseCheckoutService.call(
-        account: account,
-        license: license,
-        ttl: nil,
-      )
+    it 'should return a cert that has no TTL' do
+      freeze_time do
+        cert = LicenseCheckoutService.call(
+          account: account,
+          license: license,
+          ttl: nil,
+        )
 
-      payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
-                    .delete_suffix("-----END LICENSE FILE-----\n")
+        payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                      .delete_suffix("-----END LICENSE FILE-----\n")
 
-      json = JSON.parse(Base64.decode64(payload))
+        json = JSON.parse(Base64.decode64(payload))
+        enc  = json.fetch('enc')
+        data = nil
 
-      expect(json.fetch('exp')).to be_nil
+        expect { data = JSON.parse(Base64.strict_decode64(enc)) }.to_not raise_error
+
+        expect(data).to_not be_nil
+        expect(data).to include(
+          'meta' => include(
+            'iat' => Time.current,
+            'exp' => nil,
+            'ttl' => nil,
+          ),
+        )
+      end
     end
   end
 end
