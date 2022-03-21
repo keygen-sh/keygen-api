@@ -17,6 +17,7 @@ FactoryGirl.define do
 
     account nil
     product nil
+    artifact nil
 
     association :platform, factory: :release_platform
     association :filetype, factory: :release_filetype
@@ -28,6 +29,23 @@ FactoryGirl.define do
       release.platform ||= evaluator.platform.presence || create(:release_platform, account: release.account)
       release.filetype ||= evaluator.filetype.presence || create(:release_filetype, account: release.account)
       release.channel  ||= evaluator.channel.presence || create(:release_channel, account: release.account)
+    end
+
+    trait :unpublished do
+      after :build do |release, evaluator|
+        release.artifact = nil
+      end
+    end
+
+    trait :published do
+      after :build do |release, evaluator|
+        release.artifact ||= build(:release_artifact,
+          account: release.account,
+          product: release.product,
+          release: release,
+          key: release.filename,
+        )
+      end
     end
   end
 end
