@@ -26,34 +26,7 @@ class LicenseCheckoutService < AbstractCheckoutService
     @account = account
     @license = license
 
-    private_key =
-      case license.scheme
-      when 'RSA_2048_PKCS1_PSS_SIGN_V2',
-           'RSA_2048_PKCS1_SIGN_V2',
-           'RSA_2048_PKCS1_PSS_SIGN',
-           'RSA_2048_PKCS1_SIGN',
-           'RSA_2048_PKCS1_ENCRYPT',
-           'RSA_2048_JWT_RS256'
-        account.private_key
-      else
-        account.ed25519_private_key
-      end
-
-    algorithm =
-      case license.scheme
-      when 'RSA_2048_PKCS1_PSS_SIGN_V2',
-           'RSA_2048_PKCS1_PSS_SIGN'
-        'rsa-pss-sha256'
-      when 'RSA_2048_PKCS1_SIGN_V2',
-           'RSA_2048_PKCS1_SIGN',
-           'RSA_2048_PKCS1_ENCRYPT',
-           'RSA_2048_JWT_RS256'
-        'rsa-sha256'
-      else
-        'ed25519'
-      end
-
-    super(private_key: private_key, algorithm: algorithm, encrypt: encrypt, ttl: ttl, include: include)
+    super(encrypt: encrypt, ttl: ttl, include: include)
   end
 
   def call
@@ -74,7 +47,7 @@ class LicenseCheckoutService < AbstractCheckoutService
           else
             encode(data, strict: true)
           end
-    sig = sign(enc, prefix: 'license')
+    sig = sign(enc, key: private_key, algorithm: algorithm, prefix: 'license')
 
     alg = if encrypted?
             "#{ENCRYPT_ALGORITHM}+#{algorithm}"
@@ -96,4 +69,33 @@ class LicenseCheckoutService < AbstractCheckoutService
 
   attr_reader :account,
               :license
+
+  def private_key
+    case license.scheme
+    when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+         'RSA_2048_PKCS1_SIGN_V2',
+         'RSA_2048_PKCS1_PSS_SIGN',
+         'RSA_2048_PKCS1_SIGN',
+         'RSA_2048_PKCS1_ENCRYPT',
+         'RSA_2048_JWT_RS256'
+      account.private_key
+    else
+      account.ed25519_private_key
+    end
+  end
+
+  def algorithm
+    case license.scheme
+    when 'RSA_2048_PKCS1_PSS_SIGN_V2',
+         'RSA_2048_PKCS1_PSS_SIGN'
+      'rsa-pss-sha256'
+    when 'RSA_2048_PKCS1_SIGN_V2',
+         'RSA_2048_PKCS1_SIGN',
+         'RSA_2048_PKCS1_ENCRYPT',
+         'RSA_2048_JWT_RS256'
+      'rsa-sha256'
+    else
+      'ed25519'
+    end
+  end
 end
