@@ -62,7 +62,16 @@ class MachineCheckoutService < AbstractCheckoutService
   end
 
   def call
-    data = renderer.render(machine, include: includes & ALLOWED_INCLUDES)
+    iat = Time.current
+    exp = if ttl?
+            iat + ActiveSupport::Duration.build(ttl)
+          else
+            nil
+          end
+
+    meta = { iat: iat, exp: exp, ttl: ttl }
+    incl = includes & ALLOWED_INCLUDES
+    data = renderer.render(machine, meta: meta, include: incl)
                    .to_json
 
     enc = if encrypted?
@@ -78,14 +87,7 @@ class MachineCheckoutService < AbstractCheckoutService
             "#{ENCODE_ALGORITHM}+#{algorithm}"
           end
 
-    iat = Time.current
-    exp = if ttl?
-            iat + ActiveSupport::Duration.build(ttl)
-          else
-            nil
-          end
-
-    doc = { enc: enc, sig: sig, alg: alg, iat: iat, exp: exp }
+    doc = { enc: enc, sig: sig, alg: alg }
     enc = encode(doc.to_json)
 
     <<~TXT
