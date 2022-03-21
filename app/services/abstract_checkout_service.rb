@@ -5,10 +5,15 @@ class AbstractCheckoutService < BaseService
   class InvalidPrivateKeyError < StandardError; end
   class InvalidTTLError < StandardError; end
 
-  ENCRYPT_ALGORITHM = 'aes-256-cbc'
-  ENCODE_ALGORITHM  = 'base64'
+  ENCRYPT_ALGORITHM  = 'aes-256-cbc'
+  ENCODE_ALGORITHM   = 'base64'
+  ALLOWED_ALGORITHMS = %w[
+    ed25519
+    rsa-pss-sha256
+    rsa-sha256
+  ]
 
-  def initialize(private_key:, algorithm:, encrypt:, ttl:, include:)
+  def initialize(encrypt:, ttl:, include:)
     raise InvalidPrivateKeyError, 'private key is missing' unless
       private_key.present?
 
@@ -19,8 +24,6 @@ class AbstractCheckoutService < BaseService
       ttl.present? && ttl < 1.hour
 
     @renderer    = Keygen::JSONAPI::Renderer.new(context: :checkout)
-    @private_key = private_key
-    @algorithm   = algorithm
     @encrypted   = encrypt
     @ttl         = ttl
     @includes    = include
@@ -33,8 +36,6 @@ class AbstractCheckoutService < BaseService
   private
 
   attr_reader :renderer,
-              :private_key,
-              :algorithm,
               :encrypted,
               :ttl,
               :includes
@@ -52,8 +53,6 @@ class AbstractCheckoutService < BaseService
   end
 
   def encrypt(value, secret:)
-    Keygen.logger.debug { "encrypting=#{value}" }
-
     aes = OpenSSL::Cipher.new(ENCRYPT_ALGORITHM)
     aes.encrypt
 
@@ -71,8 +70,6 @@ class AbstractCheckoutService < BaseService
   end
 
   def encode(value, strict: false)
-    Keygen.logger.debug { "encoding=#{value} strict=#{strict}" }
-
     enc = if strict
             Base64.strict_encode64(value)
           else
@@ -82,21 +79,22 @@ class AbstractCheckoutService < BaseService
     enc.chomp
   end
 
-  def sign(value, prefix:)
-    Keygen.logger.debug { "signing=#{value} prefix=#{prefix}" }
+  def sign(value, key:, algorithm:, prefix:)
+    raise InvalidAlgorithmError, 'algorithm is invalid' unless
+      ALLOWED_ALGORITHMS.include?(algorithm)
 
     data = "#{prefix}/#{value}"
 
     case algorithm
     when 'rsa-pss-sha256'
-      pkey = OpenSSL::PKey::RSA.new(private_key)
-      sig  = pkey.sign_pss(OpenSSL::Digest::SHA256.new, data, salt_length: :max, mgf1_hash: 'SHA256')
+      rsa = OpenSSL::PKey::RSA.new(key)
+      sig  = rsa.sign_pss(OpenSSL::Digest::SHA256.new, data, salt_length: :max, mgf1_hash: 'SHA256')
     when 'rsa-sha256'
-      pkey = OpenSSL::PKey::RSA.new(private_key)
-      sig = pkey.sign(OpenSSL::Digest::SHA256.new, data)
+      rsa = OpenSSL::PKey::RSA.new(key)
+      sig = rsa.sign(OpenSSL::Digest::SHA256.new, data)
     when 'ed25519'
-      pkey = Ed25519::SigningKey.new([private_key].pack('H*'))
-      sig  = pkey.sign(data)
+      ed25519 = Ed25519::SigningKey.new([key].pack('H*'))
+      sig     = ed25519.sign(data)
     else
       raise InvalidAlgorithmError, 'signing scheme is not supported'
     end
