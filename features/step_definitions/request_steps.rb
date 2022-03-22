@@ -13,6 +13,14 @@ Given /^I send and accept JSON$/ do
     rand(0...6) == 0 # Dice roll to test for no header
 end
 
+Given /^time is frozen at "([^\"]*)"$/ do |t|
+  travel_to(t)
+end
+
+Then /^time is unfrozen$/ do
+  travel_back
+end
+
 When /^I send a GET request to "([^\"]*)"$/ do |path|
   parse_path_placeholders! path
 
@@ -748,5 +756,136 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
     )
 
     expect(ok).to be true
+  end
+end
+
+Then /^the response should be a "([^"]+)" cert signed with "([^"]+)"$/ do |type, expected_alg|
+  account = @account
+  req     = last_request
+  res     = last_response
+
+  cert     = last_response.body
+  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  json = JSON.parse(Base64.decode64(payload))
+  alg  = json.fetch('alg')
+  enc  = json.fetch('enc')
+  sig  = json.fetch('sig')
+
+  expect(alg).to end_with expected_alg
+
+  signing_prefix = type.downcase
+  signing_data   = "#{signing_prefix}/#{enc}"
+  sig_bytes      = Base64.strict_decode64(sig)
+  ok             = false
+
+  case alg
+  when /ed25519/
+    ed25519 = Ed25519::VerifyKey.new [account.ed25519_public_key].pack('H*')
+    ok      = ed25519.verify(sig_bytes, signing_data) rescue false
+  when /rsa-pss-sha256/
+    rsa = OpenSSL::PKey::RSA.new(account.public_key)
+    ok  = rsa.verify_pss(OpenSSL::Digest::SHA256.new, sig_bytes, signing_data, salt_length: :auto, mgf1_hash: 'SHA256') rescue false
+  when /rsa-sha256/
+    rsa = OpenSSL::PKey::RSA.new(account.public_key)
+    ok  = rsa.verify(OpenSSL::Digest::SHA256.new, sig_bytes, signing_data) rescue false
+  end
+
+  expect(ok).to be true
+end
+
+Then /^the response should be a "([^"]+)" cert with the following encoded data:$/ do |type, body|
+  parse_placeholders! body
+
+  req = last_request
+  res = last_response
+
+  cert     = last_response.body
+  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  json = JSON.parse(Base64.decode64(payload))
+  enc  = json.fetch('enc')
+  data = JSON.parse(Base64.decode64(enc))
+
+  actual_data = data.fetch('data')     { nil }
+  actual_meta = data.fetch('meta')     { nil }
+  actual_incl = data.fetch('included') { nil }
+
+  expected_json = JSON.parse(body)
+  expected_data = expected_json.fetch('data')     { nil }
+  expected_meta = expected_json.fetch('meta')     { nil }
+  expected_incl = expected_json.fetch('included') { nil }
+
+  if expected_data.present?
+    expect(actual_data).to include expected_data
+  end
+
+  if expected_meta.present?
+    expect(actual_meta).to include expected_meta
+  end
+
+  if expected_incl.present?
+    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+  else
+    expect(actual_incl).to be_nil
+  end
+end
+
+Then /^the response should be a "([^"]+)" cert with the following encrypted data:$/ do |type, body|
+  parse_placeholders! body
+
+  req = last_request
+  res = last_response
+
+  cert     = last_response.body
+  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  json = JSON.parse(Base64.decode64(payload))
+  enc  = json.fetch('enc')
+  aes  = OpenSSL::Cipher::AES256.new(:CBC)
+  aes.decrypt
+
+  secret =
+    case type.downcase
+    when 'license'
+      License.first.key
+    when 'machine'
+      Machine.first.fingerprint
+    end
+
+  key            = OpenSSL::Digest::SHA256.digest(secret)
+  ciphertext, iv = enc.split('.')
+                      .map { Base64.strict_decode64(_1) }
+
+  aes.key = key
+  aes.iv  = iv
+
+  plaintext = aes.update(ciphertext) + aes.final
+  data      = JSON.parse(plaintext)
+
+  actual_data = data.fetch('data')     { nil }
+  actual_meta = data.fetch('meta')     { nil }
+  actual_incl = data.fetch('included') { nil }
+
+  expected_json = JSON.parse(body)
+  expected_data = expected_json.fetch('data')     { nil }
+  expected_meta = expected_json.fetch('meta')     { nil }
+  expected_incl = expected_json.fetch('included') { nil }
+
+  if expected_data.present?
+    expect(actual_data).to include expected_data
+  end
+
+  if expected_meta.present?
+    expect(actual_meta).to include expected_meta
+  end
+
+  if expected_incl.present?
+    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+  else
+    expect(actual_incl).to be_nil
   end
 end
