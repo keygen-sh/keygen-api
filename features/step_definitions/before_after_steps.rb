@@ -48,7 +48,7 @@ After do |scenario|
       response: {
         status: last_response.status,
         headers: (last_response.headers.to_h rescue {}),
-        body: (JSON.parse(last_response.body) rescue nil)
+        body: (JSON.parse(last_response.body) rescue last_response.body)
       }
     )
   end
