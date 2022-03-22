@@ -289,6 +289,29 @@ Feature: License checkout actions
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
+  Scenario: Admin performs a license checkout (invalid TTL)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/checkout?ttl=1"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be greater than or equal to 3600 (1 hour)",
+        "code": "CHECKOUT_TTL_INVALID",
+        "source": {
+          "parameter": "ttl"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin performs a license checkout (included policy)
     Given time is frozen at "2022-03-22T14:52:48.642Z"
     And the current account is "test1"
@@ -422,3 +445,26 @@ Feature: License checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
+
+  Scenario: Admin performs a license checkout (invalid includes)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/checkout?include=account"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "invalid includes",
+        "code": "CHECKOUT_INCLUDE_INVALID",
+        "source": {
+          "parameter": "include"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
