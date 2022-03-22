@@ -763,10 +763,13 @@ Then /^the response should be a "([^"]+)" cert signed with "([^"]+)"$/ do |type,
   account = @account
   req     = last_request
   res     = last_response
+  cert    = last_response.body
 
-  cert     = last_response.body
-  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
-                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
   json = JSON.parse(Base64.decode64(payload))
   alg  = json.fetch('alg')
@@ -798,12 +801,15 @@ end
 Then /^the response should be a "([^"]+)" cert with the following encoded data:$/ do |type, body|
   parse_placeholders! body
 
-  req = last_request
-  res = last_response
+  req  = last_request
+  res  = last_response
+  cert = last_response.body
 
-  cert     = last_response.body
-  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
-                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
   json = JSON.parse(Base64.decode64(payload))
   enc  = json.fetch('enc')
@@ -836,12 +842,15 @@ end
 Then /^the response should be a "([^"]+)" cert with the following encrypted data:$/ do |type, body|
   parse_placeholders! body
 
-  req = last_request
-  res = last_response
+  req  = last_request
+  res  = last_response
+  cert = last_response.body
 
-  cert     = last_response.body
-  payload  = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
-                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
   json = JSON.parse(Base64.decode64(payload))
   enc  = json.fetch('enc')
