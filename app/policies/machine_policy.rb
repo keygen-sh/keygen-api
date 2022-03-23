@@ -59,7 +59,9 @@ class MachinePolicy < ApplicationPolicy
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      resource.product == bearer
+      (!resource.license.protected? && resource.user == bearer) ||
+      resource.product == bearer ||
+      resource.license == bearer
   end
 
   def ping_heartbeat?

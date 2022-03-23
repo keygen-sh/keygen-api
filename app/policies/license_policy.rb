@@ -124,7 +124,9 @@ class LicensePolicy < ApplicationPolicy
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      resource.product == bearer
+      (!resource.policy.protected? && resource.user == bearer) ||
+      resource.product == bearer ||
+      resource == bearer
   end
 
   def increment?
