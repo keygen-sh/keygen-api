@@ -483,7 +483,7 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Disposition: attachment; filename="license+dc664944-c4e3-49a5-a3f8-a8804ffd804d.lic"
+      Content-Disposition: attachment; filename="dc664944-c4e3-49a5-a3f8-a8804ffd804d.lic"
       Content-Type: application/octet-stream
       """
     And sidekiq should have 1 "webhook" job

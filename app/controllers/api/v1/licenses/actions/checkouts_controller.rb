@@ -30,7 +30,7 @@ module Api::V1::Licenses::Actions
         resource: license,
       )
 
-      response.headers['Content-Disposition'] = %(attachment; filename="license+#{license.id}.lic")
+      response.headers['Content-Disposition'] = %(attachment; filename="#{license.id}.lic")
       response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: cert

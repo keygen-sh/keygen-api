@@ -485,7 +485,7 @@ Feature: Machine checkout actions
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
-      Content-Disposition: attachment; filename="machine+da27f701-b813-4f82-9a7e-9dcf6c594d0e.lic"
+      Content-Disposition: attachment; filename="da27f701-b813-4f82-9a7e-9dcf6c594d0e.lic"
       Content-Type: application/octet-stream
       """
     And sidekiq should have 1 "webhook" job
