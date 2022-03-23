@@ -30,7 +30,7 @@ module Api::V1::Machines::Actions
         resource: machine,
       )
 
-      response.headers['Content-Disposition'] = %(attachment; filename="machine+#{machine.id}.lic")
+      response.headers['Content-Disposition'] = %(attachment; filename="#{machine.id}.lic")
       response.headers['Content-Type']        = 'application/octet-stream'
 
       render body: cert
