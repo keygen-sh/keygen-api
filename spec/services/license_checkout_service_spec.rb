@@ -79,8 +79,8 @@ describe LicenseCheckoutService do
     expect(data).to_not be_nil
     expect(data).to include(
       'meta' => include(
-        'iat' => license_file.issued_at.iso8601(3),
-        'exp' => license_file.expires_at.iso8601(3),
+        'issued' => license_file.issued_at.iso8601(3),
+        'expiry' => license_file.expires_at.iso8601(3),
         'ttl' => license_file.ttl,
       ),
       'data' => include(
@@ -617,8 +617,8 @@ describe LicenseCheckoutService do
       expect(data).to_not be_nil
       expect(data).to include(
         'meta' => include(
-          'iat' => license_file.issued_at.iso8601(3),
-          'exp' => license_file.expires_at.iso8601(3),
+          'issued' => license_file.issued_at.iso8601(3),
+          'expiry' => license_file.expires_at.iso8601(3),
           'ttl' => license_file.ttl,
         ),
         'data' => include(
@@ -651,8 +651,8 @@ describe LicenseCheckoutService do
       expect(data).to_not have_key('included')
       expect(data).to include(
         'meta' => include(
-          'iat' => license_file.issued_at.iso8601(3),
-          'exp' => license_file.expires_at.iso8601(3),
+          'issued' => license_file.issued_at.iso8601(3),
+          'expiry' => license_file.expires_at.iso8601(3),
           'ttl' => license_file.ttl,
         ),
         'data' => include(
@@ -689,8 +689,8 @@ describe LicenseCheckoutService do
           include('type' => 'policies', 'id' => license.policy.id),
         ),
         'meta' => include(
-          'iat' => license_file.issued_at.iso8601(3),
-          'exp' => license_file.expires_at.iso8601(3),
+          'issued' => license_file.issued_at.iso8601(3),
+          'expiry' => license_file.expires_at.iso8601(3),
           'ttl' => license_file.ttl,
         ),
         'data' => include(
@@ -722,8 +722,8 @@ describe LicenseCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => 1.month.from_now,
+            'issued' => Time.current,
+            'expiry' => 1.month.from_now,
             'ttl' => 1.month,
           ),
         )
@@ -751,8 +751,8 @@ describe LicenseCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => 1.week.from_now,
+            'issued' => Time.current,
+            'expiry' => 1.week.from_now,
             'ttl' => 1.week,
           ),
         )
@@ -780,8 +780,8 @@ describe LicenseCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => nil,
+            'issued' => Time.current,
+            'expiry' => nil,
             'ttl' => nil,
           ),
         )

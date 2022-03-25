@@ -228,7 +228,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with a (\w+) that 
   end
 end
 
-Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (?:encrypted|signed|jwt) key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) (?:encrypted|signed|JWT) key (?:of )?(?:"([^\"]*)"|'([^\']*)') using "([^\"]*)"$/ do |resource, v1, v2, scheme|
   json = JSON.parse last_response.body
 
   # Double quotes vs single quotes
