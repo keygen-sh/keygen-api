@@ -72,8 +72,8 @@ Rails.application.routes.draw do
           post "generate-offline-proof", to: "proofs#generate_offline_proof"
           post "reset-heartbeat", to: "heartbeats#reset_heartbeat"
           post "ping-heartbeat", to: "heartbeats#ping_heartbeat"
-          post "checkout", to: "checkouts#create"
-          get "checkout", to: "checkouts#show"
+          post "check-out", to: "checkouts#create"
+          get "check-out", to: "checkouts#show"
         end
       end
     end
@@ -130,8 +130,8 @@ Rails.application.routes.draw do
           post "increment-usage", to: "uses#increment"
           post "decrement-usage", to: "uses#decrement"
           post "reset-usage", to: "uses#reset"
-          post "checkout", to: "checkouts#create"
-          get "checkout", to: "checkouts#show"
+          post "check-out", to: "checkouts#create"
+          get "check-out", to: "checkouts#show"
         end
       end
       collection do

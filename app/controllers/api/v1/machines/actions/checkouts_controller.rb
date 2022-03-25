@@ -73,7 +73,7 @@ module Api::V1::Machines::Actions
       machine_file.validate!
 
       BroadcastEventService.call(
-        event: 'machine.checkout',
+        event: 'machine.checked-out',
         account: current_account,
         resource: machine,
       )

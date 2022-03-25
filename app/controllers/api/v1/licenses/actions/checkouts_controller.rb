@@ -73,7 +73,7 @@ module Api::V1::Licenses::Actions
       license_file.validate!
 
       BroadcastEventService.call(
-        event: 'license.checkout',
+        event: 'license.checked-out',
         account: current_account,
         resource: license,
       )
