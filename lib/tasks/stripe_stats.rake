@@ -764,7 +764,6 @@ module Stripe
           .group('accounts.id')
           .having('count(request_logs.id) > 0')
           .to_a
-          .to_json
     end
 
     def active_free_accounts
@@ -775,7 +774,6 @@ module Stripe
           .group('accounts.id')
           .having('count(request_logs.id) > 0')
           .to_a
-          .to_json
     end
 
     private
