@@ -14,7 +14,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "403"
 
   Scenario: Endpoint should be inaccessible when account is disabled (GET)
@@ -23,14 +23,14 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "403"
 
   Scenario: Anonymous performs a machine checkout (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -40,7 +40,7 @@ Feature: Machine checkout actions
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "401"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -53,7 +53,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
@@ -107,7 +107,7 @@ Feature: Machine checkout actions
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should contain the following raw headers:
       """
@@ -141,7 +141,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "encrypt": true } }
       """
@@ -173,7 +173,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?encrypt=1"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?encrypt=1"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "ed25519"
     And the response should be a "MACHINE" certificate with the following encrypted data:
@@ -207,7 +207,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file" with a certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
@@ -226,7 +226,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "ed25519"
     And sidekiq should have 1 "webhook" job
@@ -245,7 +245,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file" with a certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
@@ -264,7 +264,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "rsa-pss-sha256"
     And sidekiq should have 1 "webhook" job
@@ -283,7 +283,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file" with a certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
@@ -302,7 +302,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate signed using "rsa-sha256"
     And sidekiq should have 1 "webhook" job
@@ -316,7 +316,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "ttl": 86400 } }
       """
@@ -343,7 +343,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?ttl=3600"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?ttl=3600"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -366,7 +366,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "ttl": null } }
       """
@@ -385,7 +385,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?ttl="
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?ttl="
     Then the response status should be "400"
     And the first error should have the following properties:
       """
@@ -408,7 +408,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "ttl": 60 } }
       """
@@ -434,7 +434,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?ttl=1"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?ttl=1"
     Then the response status should be "400"
     And the first error should have the following properties:
       """
@@ -459,7 +459,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout?include=license"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license"
     Then the response status should be "200"
     And the JSON response should be a "machine-file" with the following encoded certificate data:
       """
@@ -481,7 +481,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=license"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -503,7 +503,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout?include=license.policy"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
     Then the response status should be "200"
     And the JSON response should be a "machine-file" with the following encoded certificate data:
       """
@@ -526,7 +526,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=license.policy"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -550,7 +550,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "include": ["license.product"] } }
       """
@@ -577,7 +577,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=license.product"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -602,7 +602,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "include": ["license.entitlements"] } }
       """
@@ -632,7 +632,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=license.entitlements"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.entitlements"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -660,7 +660,7 @@ Feature: Machine checkout actions
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "include": ["group"] } }
       """
@@ -688,7 +688,7 @@ Feature: Machine checkout actions
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=group"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=group"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encoded data:
       """
@@ -717,7 +717,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout?include=license.policy,license.user" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy,license.user" with the following:
       """
       { "meta": { "encrypt": true } }
       """
@@ -751,7 +751,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=license.policy,license.user&encrypt=true"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy,license.user&encrypt=true"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate with the following encrypted data:
       """
@@ -773,7 +773,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout" with the following:
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
       """
       { "meta": { "include": ["account"] } }
       """
@@ -803,7 +803,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout?include=account"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=account"
     Then the response status should be "400"
     And the response should contain the following raw headers:
       """
@@ -834,7 +834,7 @@ Feature: Machine checkout actions
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/41:34:7C:7E:B2:AD:65:96:5A/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/41:34:7C:7E:B2:AD:65:96:5A/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file"
     And sidekiq should have 1 "webhook" job
@@ -851,7 +851,7 @@ Feature: Machine checkout actions
       """
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/41:34:7C:7E:B2:AD:65:96:5A/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/41:34:7C:7E:B2:AD:65:96:5A/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
@@ -867,7 +867,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file"
     And sidekiq should have 1 "webhook" job
@@ -883,7 +883,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
@@ -897,7 +897,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -910,7 +910,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -923,7 +923,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file"
     And sidekiq should have 1 "webhook" job
@@ -937,7 +937,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
@@ -951,7 +951,7 @@ Feature: Machine checkout actions
     And the current account has 2 "machines"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$1/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -964,7 +964,7 @@ Feature: Machine checkout actions
     And the current account has 2 "machines"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$1/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$1/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -978,7 +978,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the JSON response should be a "machine-file"
     And sidekiq should have 1 "webhook" job
@@ -993,7 +993,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "200"
     And the response should be a "MACHINE" certificate
     And sidekiq should have 1 "webhook" job
@@ -1007,7 +1007,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -1020,7 +1020,7 @@ Feature: Machine checkout actions
     And the current account has 1 "machine"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/checkout"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out"
     Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
