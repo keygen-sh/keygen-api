@@ -36,14 +36,14 @@ class MachineCheckoutService < AbstractCheckoutService
   end
 
   def call
-    iat = Time.current
-    exp = if ttl?
-            iat + ActiveSupport::Duration.build(ttl)
-          else
-            nil
-          end
+    issued_at  = Time.current
+    expires_at = if ttl?
+                   issued_at + ActiveSupport::Duration.build(ttl)
+                 else
+                   nil
+                 end
 
-    meta = { iat: iat, exp: exp, ttl: ttl }
+    meta = { issued: issued_at, expiry: expires_at, ttl: ttl }
     incl = includes & ALLOWED_INCLUDES
     data = renderer.render(machine, meta: meta, include: incl)
                    .to_json
@@ -74,8 +74,8 @@ class MachineCheckoutService < AbstractCheckoutService
       license_id: license.id,
       machine_id: machine.id,
       certificate: cert,
-      issued_at: iat,
-      expires_at: exp,
+      issued_at: issued_at,
+      expires_at: expires_at,
       ttl: ttl,
     )
   end

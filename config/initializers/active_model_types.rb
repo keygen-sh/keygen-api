@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ActiveModel::Type::UUID
   def cast(value)
     value
