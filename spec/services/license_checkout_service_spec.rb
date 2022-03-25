@@ -209,7 +209,7 @@ describe LicenseCheckoutService do
           json = JSON.parse(dec)
 
           expect(json).to include(
-            'alg' => 'aes-256-cbc+ed25519'
+            'alg' => 'aes-256-gcm+ed25519'
           )
         end
 
@@ -314,7 +314,7 @@ describe LicenseCheckoutService do
           json = JSON.parse(dec)
 
           expect(json).to include(
-            'alg' => 'aes-256-cbc+rsa-pss-sha256'
+            'alg' => 'aes-256-gcm+rsa-pss-sha256'
           )
         end
 
@@ -422,7 +422,7 @@ describe LicenseCheckoutService do
           json = JSON.parse(dec)
 
           expect(json).to include(
-            'alg' => 'aes-256-cbc+rsa-sha256'
+            'alg' => 'aes-256-gcm+rsa-sha256'
           )
         end
 
@@ -522,7 +522,7 @@ describe LicenseCheckoutService do
         json = JSON.parse(dec)
 
         expect(json).to include(
-          'alg' => 'aes-256-cbc+ed25519'
+          'alg' => 'aes-256-gcm+ed25519'
         )
       end
 
@@ -595,15 +595,20 @@ describe LicenseCheckoutService do
       json    = JSON.parse(Base64.decode64(payload))
       enc     = json.fetch('enc')
       decrypt = -> {
-        aes = OpenSSL::Cipher::AES256.new(:CBC)
+        aes = OpenSSL::Cipher::AES256.new(:GCM)
         aes.decrypt
 
         key            = OpenSSL::Digest::SHA256.digest(license.key)
-        ciphertext, iv = enc.split('.')
+        ciphertext,
+        iv,
+        auth_tag       = enc.split('.')
                             .map { Base64.strict_decode64(_1) }
 
         aes.key = key
         aes.iv  = iv
+
+        aes.auth_tag  = auth_tag
+        aes.auth_data = ''
 
         plaintext = aes.update(ciphertext) + aes.final
 
