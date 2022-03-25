@@ -759,7 +759,17 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
   end
 end
 
-Then /^the response should be a "([^"]+)" cert signed with "([^"]+)"$/ do |type, expected_alg|
+Then /^the response should be a "([^"]+)" certificate$/ do |type|
+  account = @account
+  req     = last_request
+  res     = last_response
+  cert    = last_response.body
+
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+end
+
+Then /^the response should be a "([^"]+)" certificate signed using "([^"]+)"$/ do |type, expected_alg|
   account = @account
   req     = last_request
   res     = last_response
@@ -771,10 +781,10 @@ Then /^the response should be a "([^"]+)" cert signed with "([^"]+)"$/ do |type,
   payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
-  json = JSON.parse(Base64.decode64(payload))
-  alg  = json.fetch('alg')
-  enc  = json.fetch('enc')
-  sig  = json.fetch('sig')
+  attrs = JSON.parse(Base64.decode64(payload))
+  alg   = attrs.fetch('alg')
+  enc   = attrs.fetch('enc')
+  sig   = attrs.fetch('sig')
 
   expect(alg).to end_with expected_alg
 
@@ -798,7 +808,7 @@ Then /^the response should be a "([^"]+)" cert signed with "([^"]+)"$/ do |type,
   expect(ok).to be true
 end
 
-Then /^the response should be a "([^"]+)" cert with the following encoded data:$/ do |type, body|
+Then /^the response should be a "([^"]+)" certificate with the following encoded data:$/ do |type, body|
   parse_placeholders! body
 
   req  = last_request
@@ -811,9 +821,9 @@ Then /^the response should be a "([^"]+)" cert with the following encoded data:$
   payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
-  json = JSON.parse(Base64.decode64(payload))
-  enc  = json.fetch('enc')
-  data = JSON.parse(Base64.decode64(enc))
+  attrs = JSON.parse(Base64.decode64(payload))
+  enc   = attrs.fetch('enc')
+  data  = JSON.parse(Base64.decode64(enc))
 
   actual_data = data.fetch('data')     { nil }
   actual_meta = data.fetch('meta')     { nil }
@@ -839,12 +849,13 @@ Then /^the response should be a "([^"]+)" cert with the following encoded data:$
   end
 end
 
-Then /^the response should be a "([^"]+)" cert with the following encrypted data:$/ do |type, body|
+Then /^the response should be a "([^"]+)" certificate with the following encrypted data:$/ do |type, body|
   parse_placeholders! body
 
-  req  = last_request
-  res  = last_response
-  cert = last_response.body
+  account = @account
+  req     = last_request
+  res     = last_response
+  cert    = last_response.body
 
   expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
   expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
@@ -852,17 +863,184 @@ Then /^the response should be a "([^"]+)" cert with the following encrypted data
   payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
-  json = JSON.parse(Base64.decode64(payload))
-  enc  = json.fetch('enc')
-  aes  = OpenSSL::Cipher::AES256.new(:CBC)
+  attrs = JSON.parse(Base64.decode64(payload))
+  enc   = attrs.fetch('enc')
+  aes   = OpenSSL::Cipher::AES256.new(:CBC)
+  aes.decrypt
+
+  # FIXME(ezekg) This should not assume first record
+  secret =
+    case type.downcase
+    when 'license'
+      account.licenses.first.key
+    when 'machine'
+      account.machines.first.fingerprint
+    end
+
+  key            = OpenSSL::Digest::SHA256.digest(secret)
+  ciphertext, iv = enc.split('.')
+                      .map { Base64.strict_decode64(_1) }
+
+  aes.key = key
+  aes.iv  = iv
+
+  plaintext = aes.update(ciphertext) + aes.final
+  data      = JSON.parse(plaintext)
+
+  actual_data = data.fetch('data')     { nil }
+  actual_meta = data.fetch('meta')     { nil }
+  actual_incl = data.fetch('included') { nil }
+
+  expected_json = JSON.parse(body)
+  expected_data = expected_json.fetch('data')     { nil }
+  expected_meta = expected_json.fetch('meta')     { nil }
+  expected_incl = expected_json.fetch('included') { nil }
+
+  if expected_data.present?
+    expect(actual_data).to include expected_data
+  end
+
+  if expected_meta.present?
+    expect(actual_meta).to include expected_meta
+  end
+
+  if expected_incl.present?
+    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+  else
+    expect(actual_incl).to be_nil
+  end
+end
+
+Then /^the JSON response should be a "([^"]+)" with a certificate signed using "([^"]+)"$/ do |resource_type, expected_alg|
+  account = @account
+  req     = last_request
+  res     = last_response
+  json    = JSON.parse(last_response.body)
+  cert    = json.dig('data', 'attributes', 'certificate')
+  type    = json.dig('data', 'type')
+
+  expect(type).to eq resource_type.pluralize
+
+  type = type.delete_suffix('-files')
+             .singularize
+
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  attrs = JSON.parse(Base64.decode64(payload))
+  alg   = attrs.fetch('alg')
+  enc   = attrs.fetch('enc')
+  sig   = attrs.fetch('sig')
+
+  expect(alg).to end_with expected_alg
+
+  signing_prefix = type.downcase
+  signing_data   = "#{signing_prefix}/#{enc}"
+  sig_bytes      = Base64.strict_decode64(sig)
+  ok             = false
+
+  case alg
+  when /ed25519/
+    ed25519 = Ed25519::VerifyKey.new [account.ed25519_public_key].pack('H*')
+    ok      = ed25519.verify(sig_bytes, signing_data) rescue false
+  when /rsa-pss-sha256/
+    rsa = OpenSSL::PKey::RSA.new(account.public_key)
+    ok  = rsa.verify_pss(OpenSSL::Digest::SHA256.new, sig_bytes, signing_data, salt_length: :auto, mgf1_hash: 'SHA256') rescue false
+  when /rsa-sha256/
+    rsa = OpenSSL::PKey::RSA.new(account.public_key)
+    ok  = rsa.verify(OpenSSL::Digest::SHA256.new, sig_bytes, signing_data) rescue false
+  end
+
+  expect(ok).to be true
+end
+
+Then /^the JSON response should be a "([^"]+)" with the following encoded certificate data:$/ do |resource_type, body|
+  parse_placeholders! body
+
+  req  = last_request
+  res  = last_response
+  json = JSON.parse(last_response.body)
+  cert = json.dig('data', 'attributes', 'certificate')
+  type = json.dig('data', 'type')
+
+  expect(type).to eq resource_type.pluralize
+
+  type = type.delete_suffix('-files')
+             .singularize
+
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  attrs = JSON.parse(Base64.decode64(payload))
+  enc   = attrs.fetch('enc')
+  data  = JSON.parse(Base64.decode64(enc))
+
+  actual_data = data.fetch('data')     { nil }
+  actual_meta = data.fetch('meta')     { nil }
+  actual_incl = data.fetch('included') { nil }
+
+  expected_json = JSON.parse(body)
+  expected_data = expected_json.fetch('data')     { nil }
+  expected_meta = expected_json.fetch('meta')     { nil }
+  expected_incl = expected_json.fetch('included') { nil }
+
+  if expected_data.present?
+    expect(actual_data).to include expected_data
+  end
+
+  if expected_meta.present?
+    expect(actual_meta).to include expected_meta
+  end
+
+  if expected_incl.present?
+    expect(actual_incl).to include *expected_incl.map { |i| include(i) }
+  else
+    expect(actual_incl).to be_nil
+  end
+end
+
+Then /^the JSON response should be a "([^"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
+  parse_placeholders! body
+
+  account = @account
+  req     = last_request
+  res     = last_response
+  json    = JSON.parse(last_response.body)
+  cert    = json.dig('data', 'attributes', 'certificate')
+  type    = json.dig('data', 'type')
+
+  expect(type).to eq resource_type.pluralize
+
+  type = type.delete_suffix('-files')
+             .singularize
+
+  expect(cert).to start_with "-----BEGIN #{type.upcase} FILE-----\n"
+  expect(cert).to end_with "-----END #{type.upcase} FILE-----\n"
+
+  payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
+                .delete_suffix("-----END #{type.upcase} FILE-----\n")
+
+  attrs = JSON.parse(Base64.decode64(payload))
+  enc   = attrs.fetch('enc')
+  aes   = OpenSSL::Cipher::AES256.new(:CBC)
   aes.decrypt
 
   secret =
     case type.downcase
     when 'license'
-      License.first.key
+      license_id = json.dig('data', 'relationships', 'license', 'data', 'id')
+
+      account.licenses.find(license_id).key
     when 'machine'
-      Machine.first.fingerprint
+      machine_id = json.dig('data', 'relationships', 'machine', 'data', 'id')
+
+      account.machines.find(machine_id).fingerprint
     end
 
   key            = OpenSSL::Digest::SHA256.digest(secret)

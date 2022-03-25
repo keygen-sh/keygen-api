@@ -22,24 +22,31 @@ describe MachineCheckoutService do
   end
 
   it 'should return a machine file certificate' do
-    cert = MachineCheckoutService.call(
+    machine_file = MachineCheckoutService.call(
       account: account,
       machine: machine,
     )
+
+    cert = machine_file.certificate
+
+    expect(machine_file.account_id).to eq account.id
+    expect(machine_file.machine_id).to eq machine.id
+    expect(machine_file.license_id).to eq license.id
 
     expect(cert).to start_with "-----BEGIN MACHINE FILE-----\n"
     expect(cert).to end_with "-----END MACHINE FILE-----\n"
   end
 
   it 'should return an encoded JSON payload' do
-    cert = MachineCheckoutService.call(
+    machine_file = MachineCheckoutService.call(
       account: account,
       machine: machine,
     )
 
-    dec = nil
-    enc = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
-              .delete_suffix("-----END MACHINE FILE-----\n")
+    cert = machine_file.certificate
+    dec  = nil
+    enc  = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
+               .delete_suffix("-----END MACHINE FILE-----\n")
 
     expect { dec = Base64.decode64(enc) }.to_not raise_error
     expect(dec).to_not be_nil
@@ -56,11 +63,12 @@ describe MachineCheckoutService do
   end
 
   it 'should return an encoded machine' do
-    cert = MachineCheckoutService.call(
+    machine_file = MachineCheckoutService.call(
       account: account,
       machine: machine,
     )
 
+    cert    = machine_file.certificate
     payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                   .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -73,9 +81,9 @@ describe MachineCheckoutService do
     expect(data).to_not be_nil
     expect(data).to include(
       'meta' => include(
-        'iat' => a_kind_of(String),
-        'exp' => a_kind_of(String),
-        'ttl' => a_kind_of(Integer),
+        'iat' => machine_file.issued_at.iso8601(3),
+        'exp' => machine_file.expires_at.iso8601(3),
+        'ttl' => machine_file.ttl,
       ),
       'data' => include(
         'type' => 'machines',
@@ -143,11 +151,12 @@ describe MachineCheckoutService do
 
       context 'when the machine file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -160,11 +169,12 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -187,12 +197,13 @@ describe MachineCheckoutService do
 
       context 'when the machine file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -205,12 +216,13 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -243,11 +255,12 @@ describe MachineCheckoutService do
 
       context 'when the machine file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -260,11 +273,12 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -288,12 +302,13 @@ describe MachineCheckoutService do
 
       context 'when the machine file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -306,12 +321,13 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -347,11 +363,12 @@ describe MachineCheckoutService do
 
       context 'when the machine file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -364,11 +381,12 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -392,12 +410,13 @@ describe MachineCheckoutService do
 
       context 'when the machine file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -410,12 +429,13 @@ describe MachineCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = MachineCheckoutService.call(
+          machine_file = MachineCheckoutService.call(
             account: account,
             machine: machine,
             encrypt: true,
           )
 
+          cert    = machine_file.certificate
           payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                         .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -444,11 +464,12 @@ describe MachineCheckoutService do
 
     context 'when the machine file is not encrypted' do
       it 'should have a correct algorithm' do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -461,11 +482,12 @@ describe MachineCheckoutService do
       end
 
       it 'should sign the encoded payload' do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -488,12 +510,13 @@ describe MachineCheckoutService do
 
     context 'when the machine file is encrypted' do
       it 'should have a correct algorithm' do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
           encrypt: true,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -506,12 +529,13 @@ describe MachineCheckoutService do
       end
 
       it 'should sign the encrypted payload' do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
           encrypt: true,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -535,14 +559,15 @@ describe MachineCheckoutService do
 
   context 'when using encryption' do
     it 'should return an encoded JSON payload' do
-      cert = MachineCheckoutService.call(
+      machine_file = MachineCheckoutService.call(
         account: account,
         machine: machine,
       )
 
-      dec = nil
-      enc = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
-                .delete_suffix("-----END MACHINE FILE-----\n")
+      cert = machine_file.certificate
+      dec  = nil
+      enc  = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
+                 .delete_suffix("-----END MACHINE FILE-----\n")
 
       expect { dec = Base64.decode64(enc) }.to_not raise_error
       expect(dec).to_not be_nil
@@ -559,12 +584,13 @@ describe MachineCheckoutService do
     end
 
     it 'should return an encrypted machine' do
-      cert = MachineCheckoutService.call(
+      machine_file = MachineCheckoutService.call(
         account: account,
         machine: machine,
         encrypt: true,
       )
 
+      cert    = machine_file.certificate
       payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                     .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -593,10 +619,10 @@ describe MachineCheckoutService do
       expect(data).to_not be_nil
       expect(data).to include(
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
-        ),
+        'iat' => machine_file.issued_at.iso8601(3),
+        'exp' => machine_file.expires_at.iso8601(3),
+        'ttl' => machine_file.ttl,
+      ),
         'data' => include(
           'type' => 'machines',
           'id' => machine.id,
@@ -607,12 +633,13 @@ describe MachineCheckoutService do
 
   context 'when including relationships' do
     it 'should not return the included relationships' do
-      cert = MachineCheckoutService.call(
+      machine_file = MachineCheckoutService.call(
         account: account,
         machine: machine,
         include: [],
       )
 
+      cert    = machine_file.certificate
       payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                     .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -626,9 +653,9 @@ describe MachineCheckoutService do
       expect(data).to_not have_key('included')
       expect(data).to include(
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
+          'iat' => machine_file.issued_at.iso8601(3),
+          'exp' => machine_file.expires_at.iso8601(3),
+          'ttl' => machine_file.ttl,
         ),
         'data' => include(
           'type' => 'machines',
@@ -638,7 +665,7 @@ describe MachineCheckoutService do
     end
 
     it 'should return the included relationships' do
-      cert = MachineCheckoutService.call(
+      machine_file = MachineCheckoutService.call(
         account: account,
         machine: machine,
         include: %w[
@@ -648,6 +675,7 @@ describe MachineCheckoutService do
         ],
       )
 
+      cert    = machine_file.certificate
       payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                     .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -665,9 +693,9 @@ describe MachineCheckoutService do
           include('type' => 'licenses', 'id' => machine.license.id),
         ),
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
+          'iat' => machine_file.issued_at.iso8601(3),
+          'exp' => machine_file.expires_at.iso8601(3),
+          'ttl' => machine_file.ttl,
         ),
         'data' => include(
           'type' => 'machines',
@@ -680,11 +708,12 @@ describe MachineCheckoutService do
   context 'when using a TTL' do
     it 'should return a cert that expires after the default TTL' do
       freeze_time do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -707,12 +736,13 @@ describe MachineCheckoutService do
 
     it 'should return a cert that expires after a custom TTL' do
       freeze_time do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
           ttl: 1.week,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
@@ -735,12 +765,13 @@ describe MachineCheckoutService do
 
     it 'should return a cert that has no TTL' do
       freeze_time do
-        cert = MachineCheckoutService.call(
+        machine_file = MachineCheckoutService.call(
           account: account,
           machine: machine,
           ttl: nil,
         )
 
+        cert    = machine_file.certificate
         payload = cert.delete_prefix("-----BEGIN MACHINE FILE-----\n")
                       .delete_suffix("-----END MACHINE FILE-----\n")
 
