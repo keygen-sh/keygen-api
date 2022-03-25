@@ -1,13 +1,13 @@
 class LicenseFile
   include ActiveModel::Model
+  include ActiveModel::Attributes
 
-  attr_accessor :account_id,
-                :license_id,
-                :certificate,
-                :issued_at,
-                :expires_at,
-                :ttl
-
+  attribute :account_id,  :uuid
+  attribute :license_id,  :uuid
+  attribute :certificate, :string
+  attribute :issued_at,   :timestamp
+  attribute :expires_at,  :timestamp
+  attribute :ttl,         :integer
 
   validates :account_id,  presence: true
   validates :license_id,  presence: true
