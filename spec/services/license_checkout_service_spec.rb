@@ -21,24 +21,30 @@ describe LicenseCheckoutService do
   end
 
   it 'should return a license file certificate' do
-    cert = LicenseCheckoutService.call(
+    license_file = LicenseCheckoutService.call(
       account: account,
       license: license,
     )
+
+    cert = license_file.certificate
+
+    expect(license_file.account_id).to eq account.id
+    expect(license_file.license_id).to eq license.id
 
     expect(cert).to start_with "-----BEGIN LICENSE FILE-----\n"
     expect(cert).to end_with "-----END LICENSE FILE-----\n"
   end
 
   it 'should return an encoded JSON payload' do
-    cert = LicenseCheckoutService.call(
+    license_file = LicenseCheckoutService.call(
       account: account,
       license: license,
     )
 
-    dec = nil
-    enc = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
-              .delete_suffix("-----END LICENSE FILE-----\n")
+    cert = license_file.certificate
+    dec =  nil
+    enc =  cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+               .delete_suffix("-----END LICENSE FILE-----\n")
 
     expect { dec = Base64.decode64(enc) }.to_not raise_error
     expect(dec).to_not be_nil
@@ -55,11 +61,12 @@ describe LicenseCheckoutService do
   end
 
   it 'should return an encoded license' do
-    cert = LicenseCheckoutService.call(
+    license_file = LicenseCheckoutService.call(
       account: account,
       license: license,
     )
 
+    cert    = license_file.certificate
     payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                   .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -72,9 +79,9 @@ describe LicenseCheckoutService do
     expect(data).to_not be_nil
     expect(data).to include(
       'meta' => include(
-        'iat' => a_kind_of(String),
-        'exp' => a_kind_of(String),
-        'ttl' => a_kind_of(Integer),
+        'iat' => license_file.issued_at.iso8601(3),
+        'exp' => license_file.expires_at.iso8601(3),
+        'ttl' => license_file.ttl,
       ),
       'data' => include(
         'type' => 'licenses',
@@ -142,11 +149,12 @@ describe LicenseCheckoutService do
 
       context 'when the license file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -159,11 +167,12 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -186,12 +195,13 @@ describe LicenseCheckoutService do
 
       context 'when the license file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -204,12 +214,13 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -242,11 +253,12 @@ describe LicenseCheckoutService do
 
       context 'when the license file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -259,11 +271,12 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -287,12 +300,13 @@ describe LicenseCheckoutService do
 
       context 'when the license file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -305,12 +319,13 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -346,11 +361,12 @@ describe LicenseCheckoutService do
 
       context 'when the license file is not encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -363,11 +379,12 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encoded payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -391,12 +408,13 @@ describe LicenseCheckoutService do
 
       context 'when the license file is encrypted' do
         it 'should have a correct algorithm' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -409,12 +427,13 @@ describe LicenseCheckoutService do
         end
 
         it 'should sign the encrypted payload' do
-          cert = LicenseCheckoutService.call(
+          license_file = LicenseCheckoutService.call(
             account: account,
             license: license,
             encrypt: true,
           )
 
+          cert    = license_file.certificate
           payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                         .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -443,11 +462,12 @@ describe LicenseCheckoutService do
 
     context 'when the license file is not encrypted' do
       it 'should have a correct algorithm' do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -460,11 +480,12 @@ describe LicenseCheckoutService do
       end
 
       it 'should sign the encoded payload' do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -487,12 +508,13 @@ describe LicenseCheckoutService do
 
     context 'when the license file is encrypted' do
       it 'should have a correct algorithm' do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
           encrypt: true,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -505,12 +527,13 @@ describe LicenseCheckoutService do
       end
 
       it 'should sign the encrypted payload' do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
           encrypt: true,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -534,14 +557,15 @@ describe LicenseCheckoutService do
 
   context 'when using encryption' do
     it 'should return an encoded JSON payload' do
-      cert = LicenseCheckoutService.call(
+      license_file = LicenseCheckoutService.call(
         account: account,
         license: license,
       )
 
-      dec = nil
-      enc = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
-                .delete_suffix("-----END LICENSE FILE-----\n")
+      cert = license_file.certificate
+      dec  = nil
+      enc  = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
+                 .delete_suffix("-----END LICENSE FILE-----\n")
 
       expect { dec = Base64.decode64(enc) }.to_not raise_error
       expect(dec).to_not be_nil
@@ -558,12 +582,13 @@ describe LicenseCheckoutService do
     end
 
     it 'should return an encrypted license' do
-      cert = LicenseCheckoutService.call(
+      license_file = LicenseCheckoutService.call(
         account: account,
         license: license,
         encrypt: true,
       )
 
+      cert    = license_file.certificate
       payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                     .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -592,9 +617,9 @@ describe LicenseCheckoutService do
       expect(data).to_not be_nil
       expect(data).to include(
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
+          'iat' => license_file.issued_at.iso8601(3),
+          'exp' => license_file.expires_at.iso8601(3),
+          'ttl' => license_file.ttl,
         ),
         'data' => include(
           'type' => 'licenses',
@@ -606,12 +631,13 @@ describe LicenseCheckoutService do
 
   context 'when including relationships' do
     it 'should not return the included relationships' do
-      cert = LicenseCheckoutService.call(
+      license_file = LicenseCheckoutService.call(
         account: account,
         license: license,
         include: [],
       )
 
+      cert    = license_file.certificate
       payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                     .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -625,9 +651,9 @@ describe LicenseCheckoutService do
       expect(data).to_not have_key('included')
       expect(data).to include(
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
+          'iat' => license_file.issued_at.iso8601(3),
+          'exp' => license_file.expires_at.iso8601(3),
+          'ttl' => license_file.ttl,
         ),
         'data' => include(
           'type' => 'licenses',
@@ -637,7 +663,7 @@ describe LicenseCheckoutService do
     end
 
     it 'should return the included relationships' do
-      cert = LicenseCheckoutService.call(
+      license_file = LicenseCheckoutService.call(
         account: account,
         license: license,
         include: %w[
@@ -646,6 +672,7 @@ describe LicenseCheckoutService do
         ],
       )
 
+      cert    = license_file.certificate
       payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                     .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -662,9 +689,9 @@ describe LicenseCheckoutService do
           include('type' => 'policies', 'id' => license.policy.id),
         ),
         'meta' => include(
-          'iat' => a_kind_of(String),
-          'exp' => a_kind_of(String),
-          'ttl' => a_kind_of(Integer),
+          'iat' => license_file.issued_at.iso8601(3),
+          'exp' => license_file.expires_at.iso8601(3),
+          'ttl' => license_file.ttl,
         ),
         'data' => include(
           'type' => 'licenses',
@@ -677,11 +704,12 @@ describe LicenseCheckoutService do
   context 'when using a TTL' do
     it 'should return a cert that expires after the default TTL' do
       freeze_time do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -704,12 +732,13 @@ describe LicenseCheckoutService do
 
     it 'should return a cert that expires after a custom TTL' do
       freeze_time do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
           ttl: 1.week,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 
@@ -732,12 +761,13 @@ describe LicenseCheckoutService do
 
     it 'should return a cert that has no TTL' do
       freeze_time do
-        cert = LicenseCheckoutService.call(
+        license_file = LicenseCheckoutService.call(
           account: account,
           license: license,
           ttl: nil,
         )
 
+        cert    = license_file.certificate
         payload = cert.delete_prefix("-----BEGIN LICENSE FILE-----\n")
                       .delete_suffix("-----END LICENSE FILE-----\n")
 

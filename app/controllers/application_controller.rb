@@ -155,11 +155,13 @@ class ApplicationController < ActionController::API
       errs.each_with_index.map do |err, i|
         # Transform users[0].email into [users, 0, email] so that we can put it
         # back together as a proper pointer: /users/data/0/attributes/email
-        path = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
-        src = path.map { |p| p.to_s.camelize :lower }
+        path    = attr.to_s.gsub(/\[(\d+)\]/, '.\1').split "."
+        src     = path.map { |p| p.to_s.camelize :lower }
         pointer = nil
+        klass   = resource.class
 
-        if resource.class.reflect_on_association(path.first)
+        if klass.respond_to?(:reflect_on_association) &&
+           klass.reflect_on_association(path.first)
           # FIXME(ezekg) Matching on error message is dirty
           case
           when err == "must exist" && src.size > 1
@@ -313,6 +315,8 @@ class ApplicationController < ActionController::API
     render_unprocessable_resource e.record
   rescue ActiveRecord::RecordNotUnique
     render_conflict # Race condition on unique index
+  rescue ActiveModel::ValidationError => e
+    render_unprocessable_resource e.model
   rescue ArgumentError => e
     case e.message
     when /invalid byte sequence in UTF-8/,

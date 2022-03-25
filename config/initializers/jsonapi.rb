@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# Register JSON API mime-type
-Mime::Type.register "application/vnd.api+json", :jsonapi, %W[
-  application/vnd.keygen+json
-  application/vnd.api+json
-  application/json
-]
-
 # Register parameter parser for JSON API mime-type to transform param keys from
 # camel case to snake case
 ActionDispatch::Request.parameter_parsers[:json]    =

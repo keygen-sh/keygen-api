@@ -30,6 +30,7 @@ class MachineCheckoutService < AbstractCheckoutService
 
     @account = account
     @machine = machine
+    @license = machine.license
 
     super(encrypt: encrypt, ttl: ttl, include: include)
   end
@@ -60,23 +61,33 @@ class MachineCheckoutService < AbstractCheckoutService
             "#{ENCODE_ALGORITHM}+#{algorithm}"
           end
 
-    doc = { enc: enc, sig: sig, alg: alg }
-    enc = encode(doc.to_json)
-
-    <<~TXT
+    doc  = { enc: enc, sig: sig, alg: alg }
+    enc  = encode(doc.to_json)
+    cert = <<~TXT
       -----BEGIN MACHINE FILE-----
       #{enc}
       -----END MACHINE FILE-----
     TXT
+
+    MachineFile.new(
+      account_id: account.id,
+      license_id: license.id,
+      machine_id: machine.id,
+      certificate: cert,
+      issued_at: iat,
+      expires_at: exp,
+      ttl: ttl,
+    )
   end
 
   private
 
   attr_reader :account,
-              :machine
+              :machine,
+              :license
 
   def private_key
-    case machine.license.scheme
+    case license.scheme
     when 'RSA_2048_PKCS1_PSS_SIGN_V2',
          'RSA_2048_PKCS1_SIGN_V2',
          'RSA_2048_PKCS1_PSS_SIGN',
@@ -90,7 +101,7 @@ class MachineCheckoutService < AbstractCheckoutService
   end
 
   def algorithm
-    case machine.license.scheme
+    case license.scheme
     when 'RSA_2048_PKCS1_PSS_SIGN_V2',
          'RSA_2048_PKCS1_PSS_SIGN'
       'rsa-pss-sha256'
