@@ -14,11 +14,3 @@ class ActiveModel::Type::UUID
 
   ActiveModel::Type.register(:uuid, self)
 end
-
-class ActiveModel::Type::Timestamp < ActiveModel::Type::DateTime
-  def type
-    :timestamp
-  end
-
-  ActiveModel::Type.register(:timestamp, self)
-end
