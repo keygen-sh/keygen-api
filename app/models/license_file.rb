@@ -15,6 +15,7 @@ class LicenseFile
   validates :license_id,  presence: true
   validates :certificate, presence: true
   validates :issued_at,   presence: true
+  validates :expires_at,  presence: true
   validates :ttl,         presence: true
 
   validates_format_of :certificate, with: /\A-----BEGIN LICENSE FILE-----\n/
