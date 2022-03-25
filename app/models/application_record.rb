@@ -17,6 +17,12 @@ class ApplicationRecord < ActiveRecord::Base
     end
   }
 
+  # This is a preventative measure to assert we never accidentally serialize
+  # a model outside of our JSONAPI serializers
+  def serializable_hash(...)
+    raise NotImplementedError
+  end
+
   def destroy_async
     DestroyModelWorker.perform_async self.class.name, self.id
   end
