@@ -81,8 +81,8 @@ describe MachineCheckoutService do
     expect(data).to_not be_nil
     expect(data).to include(
       'meta' => include(
-        'iat' => machine_file.issued_at.iso8601(3),
-        'exp' => machine_file.expires_at.iso8601(3),
+        'issued' => machine_file.issued_at.iso8601(3),
+        'expiry' => machine_file.expires_at.iso8601(3),
         'ttl' => machine_file.ttl,
       ),
       'data' => include(
@@ -619,8 +619,8 @@ describe MachineCheckoutService do
       expect(data).to_not be_nil
       expect(data).to include(
         'meta' => include(
-        'iat' => machine_file.issued_at.iso8601(3),
-        'exp' => machine_file.expires_at.iso8601(3),
+        'issued' => machine_file.issued_at.iso8601(3),
+        'expiry' => machine_file.expires_at.iso8601(3),
         'ttl' => machine_file.ttl,
       ),
         'data' => include(
@@ -653,8 +653,8 @@ describe MachineCheckoutService do
       expect(data).to_not have_key('included')
       expect(data).to include(
         'meta' => include(
-          'iat' => machine_file.issued_at.iso8601(3),
-          'exp' => machine_file.expires_at.iso8601(3),
+          'issued' => machine_file.issued_at.iso8601(3),
+          'expiry' => machine_file.expires_at.iso8601(3),
           'ttl' => machine_file.ttl,
         ),
         'data' => include(
@@ -693,8 +693,8 @@ describe MachineCheckoutService do
           include('type' => 'licenses', 'id' => machine.license.id),
         ),
         'meta' => include(
-          'iat' => machine_file.issued_at.iso8601(3),
-          'exp' => machine_file.expires_at.iso8601(3),
+          'issued' => machine_file.issued_at.iso8601(3),
+          'expiry' => machine_file.expires_at.iso8601(3),
           'ttl' => machine_file.ttl,
         ),
         'data' => include(
@@ -726,8 +726,8 @@ describe MachineCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => 1.month.from_now,
+            'issued' => Time.current,
+            'expiry' => 1.month.from_now,
             'ttl' => 1.month,
           ),
         )
@@ -755,8 +755,8 @@ describe MachineCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => 1.week.from_now,
+            'issued' => Time.current,
+            'expiry' => 1.week.from_now,
             'ttl' => 1.week,
           ),
         )
@@ -784,8 +784,8 @@ describe MachineCheckoutService do
         expect(data).to_not be_nil
         expect(data).to include(
           'meta' => include(
-            'iat' => Time.current,
-            'exp' => nil,
+            'issued' => Time.current,
+            'expiry' => nil,
             'ttl' => nil,
           ),
         )

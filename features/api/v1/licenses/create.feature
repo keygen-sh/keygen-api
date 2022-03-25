@@ -1941,7 +1941,7 @@ Feature: Create license
       """
     Then the response status should be "201"
     And the current account should have 1 "license"
-    And the JSON response should be a "license" with the jwt key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
+    And the JSON response should be a "license" with the JWT key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
     And the JSON response should be a "license" with the scheme "RSA_2048_JWT_RS256"
     And the JSON response should be a "license" that is not encrypted
     And the JSON response should be a "license" that is not strict
