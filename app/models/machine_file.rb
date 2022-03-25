@@ -6,8 +6,8 @@ class MachineFile
   attribute :license_id,  :uuid
   attribute :machine_id,  :uuid
   attribute :certificate, :string
-  attribute :issued_at,   :timestamp
-  attribute :expires_at,  :timestamp
+  attribute :issued_at,   :datetime
+  attribute :expires_at,  :datetime
   attribute :ttl,         :integer
 
   validates :account_id,  presence: true
