@@ -40,7 +40,7 @@ module DefaultHeaders
       # Skip accept header enforcement for artifacts#show so that we play
       # nicely with package managers such as pip
       render_bad_request(detail: "The content type of the request is not supported (check accept header)", code: 'ACCEPT_INVALID') unless
-        artifact_route?
+        artifact_route? || checkout_route?
 
       return
     end
@@ -123,6 +123,14 @@ module DefaultHeaders
     action     = params[:action]
 
     controller.ends_with?('/artifacts') &&
+      action == 'show'
+  end
+
+  def checkout_route?
+    controller = params[:controller]
+    action     = params[:action]
+
+    controller.ends_with?('/actions/checkouts') &&
       action == 'show'
   end
 end

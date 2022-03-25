@@ -55,14 +55,22 @@ class LicenseCheckoutService < AbstractCheckoutService
             "#{ENCODE_ALGORITHM}+#{algorithm}"
           end
 
-    doc = { enc: enc, sig: sig, alg: alg }
-    enc = encode(doc.to_json)
-
-    <<~TXT
+    doc  = { enc: enc, sig: sig, alg: alg }
+    enc  = encode(doc.to_json)
+    cert = <<~TXT
       -----BEGIN LICENSE FILE-----
       #{enc}
       -----END LICENSE FILE-----
     TXT
+
+    LicenseFile.new(
+      account_id: account.id,
+      license_id: license.id,
+      certificate: cert,
+      issued_at: iat,
+      expires_at: exp,
+      ttl: ttl,
+    )
   end
 
   private
