@@ -5,7 +5,7 @@ class AbstractCheckoutService < BaseService
   class InvalidPrivateKeyError < StandardError; end
   class InvalidTTLError < StandardError; end
 
-  ENCRYPT_ALGORITHM  = 'aes-256-cbc'
+  ENCRYPT_ALGORITHM  = 'aes-256-gcm'
   ENCODE_ALGORITHM   = 'base64'
   ALLOWED_ALGORITHMS = %w[
     ed25519
@@ -63,10 +63,11 @@ class AbstractCheckoutService < BaseService
     aes.iv  = iv
 
     ciphertext = aes.update(value) + aes.final
+    auth_tag   = aes.auth_tag
 
-    [ciphertext, iv].map { encode(_1, strict: true) }
-                    .join('.')
-                    .chomp
+    [ciphertext, iv, auth_tag]
+      .map { encode(_1, strict: true) }
+      .join('.')
   end
 
   def encode(value, strict: false)

@@ -865,8 +865,6 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
 
   attrs = JSON.parse(Base64.decode64(payload))
   enc   = attrs.fetch('enc')
-  aes   = OpenSSL::Cipher::AES256.new(:CBC)
-  aes.decrypt
 
   # FIXME(ezekg) This should not assume first record
   secret =
@@ -877,12 +875,20 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
       account.machines.first.fingerprint
     end
 
+  aes = OpenSSL::Cipher::AES256.new(:GCM)
+  aes.decrypt
+
   key            = OpenSSL::Digest::SHA256.digest(secret)
-  ciphertext, iv = enc.split('.')
+  ciphertext,
+  iv,
+  auth_tag       = enc.split('.')
                       .map { Base64.strict_decode64(_1) }
 
   aes.key = key
   aes.iv  = iv
+
+  aes.auth_tag  = auth_tag
+  aes.auth_data = ''
 
   plaintext = aes.update(ciphertext) + aes.final
   data      = JSON.parse(plaintext)
@@ -1026,11 +1032,8 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
   payload = cert.delete_prefix("-----BEGIN #{type.upcase} FILE-----\n")
                 .delete_suffix("-----END #{type.upcase} FILE-----\n")
 
-  attrs = JSON.parse(Base64.decode64(payload))
-  enc   = attrs.fetch('enc')
-  aes   = OpenSSL::Cipher::AES256.new(:CBC)
-  aes.decrypt
-
+  attrs  = JSON.parse(Base64.decode64(payload))
+  enc    = attrs.fetch('enc')
   secret =
     case type.downcase
     when 'license'
@@ -1043,12 +1046,20 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
       account.machines.find(machine_id).fingerprint
     end
 
-  key            = OpenSSL::Digest::SHA256.digest(secret)
-  ciphertext, iv = enc.split('.')
-                      .map { Base64.strict_decode64(_1) }
+    aes = OpenSSL::Cipher::AES256.new(:GCM)
+    aes.decrypt
 
-  aes.key = key
-  aes.iv  = iv
+    key            = OpenSSL::Digest::SHA256.digest(secret)
+    ciphertext,
+    iv,
+    auth_tag       = enc.split('.')
+                        .map { Base64.strict_decode64(_1) }
+
+    aes.key = key
+    aes.iv  = iv
+
+    aes.auth_tag  = auth_tag
+    aes.auth_data = ''
 
   plaintext = aes.update(ciphertext) + aes.final
   data      = JSON.parse(plaintext)
