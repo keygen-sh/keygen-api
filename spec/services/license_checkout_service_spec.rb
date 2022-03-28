@@ -20,16 +20,17 @@ describe LicenseCheckoutService do
     DatabaseCleaner.clean
   end
 
-  it 'should return a license file certificate' do
+  it 'should return a valid license file certificate' do
     license_file = LicenseCheckoutService.call(
       account: account,
       license: license,
     )
 
-    cert = license_file.certificate
-
+    expect { license_file.validate! }.to_not raise_error
     expect(license_file.account_id).to eq account.id
     expect(license_file.license_id).to eq license.id
+
+    cert = license_file.certificate
 
     expect(cert).to start_with "-----BEGIN LICENSE FILE-----\n"
     expect(cert).to end_with "-----END LICENSE FILE-----\n"
