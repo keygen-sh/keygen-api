@@ -21,17 +21,18 @@ describe MachineCheckoutService do
     DatabaseCleaner.clean
   end
 
-  it 'should return a machine file certificate' do
+  it 'should return valid a machine file certificate' do
     machine_file = MachineCheckoutService.call(
       account: account,
       machine: machine,
     )
 
-    cert = machine_file.certificate
-
+    expect { machine_file.validate! }.to_not raise_error
     expect(machine_file.account_id).to eq account.id
     expect(machine_file.machine_id).to eq machine.id
     expect(machine_file.license_id).to eq license.id
+
+    cert = machine_file.certificate
 
     expect(cert).to start_with "-----BEGIN MACHINE FILE-----\n"
     expect(cert).to end_with "-----END MACHINE FILE-----\n"
