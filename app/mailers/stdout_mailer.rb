@@ -232,7 +232,7 @@ class StdoutMailer < ApplicationMailer
     mail(
       content_type: 'text/plain',
       to: subscriber.email,
-      subject: "What's new in Keygen: Q1 2022",
+      subject: "What's happened in 2022 so far",
       body: <<~TXT
         #{greeting} -- Zeke here with another quick update.
 
@@ -246,6 +246,38 @@ class StdoutMailer < ApplicationMailer
 
         So what's new in Keygen? Let's dig in and find out.
 
+        ## License files
+
+        Since 2016, our process for licensing offline devices has evolved quite a few times. First, we didn't do much for offline licensing. (Very much to our customer's dismay.)
+
+        Then, we added the ability to sign and encrypt license keys. This was a hit! Now customers were able to transfer data to offline devices and cryptographically verify the integrity of their license keys.
+
+        Then, we added the ability to generate activation "proofs." These allowed a customer to cryptographically sign a proof of activation for a device, typically activated elsewhere on behalf of the offline device.
+
+        But although those have worked great, the embedded datasets are immutable. We wanted something easier, something more standardized, and something that was able to provide the same up-to-date datasets that our API can provide, but to offline and air-gapped environments.
+
+        Enter, license files --
+
+        Starting today, you can "check-out" a license or machine resource, using their check-out action, and in return, we'll send you a cryptographically signed "certificate" that looks something like this:
+
+          -----BEGIN LICENSE FILE-----
+          eyJlbmMiOiJsSTc4N0QwcGZua1RvRDVOSjFpRXlaU093Q09QQ0NOdktKZHpC
+          MlpSYlZBQzVsQUhjdzJSUi8xTEhrcXc0ZG5rUEl3TFVYRzhmUzk1R0JWTmtz
+          d2JDTmllWm1uOElHeGpkbUY2T1RmNjRzOHlpbFRpL3FlUzJSTlhBdGJBWjUw
+          ...
+          QWtpVnBudmFWTFhVdkY1UGJJYjNFRXA0YlZNOU1xWjBhNjhQa1R1MW5VS0E0
+          TlJWWGp6Ym5DRkF6V3lOU3NUeG9xZm9MV2FlWlhITEZnR21Ub2VBdz09Iiwi
+          YWxnIjoiYWVzLTI1Ni1nY20rZWQyNTUxOSJ9
+          -----END LICENSE FILE-----
+
+        License file certificates can be decoded (and decrypted), giving you an up-to-date "snapshot" of a machine, a license, and even their entitlement data. They have a digitally signed expiration so you can know exactly when your customer's next check-out should be.
+
+        License file certificates can be saved with a `.lic` file extension and can be distributed to offline or air-gapped devices using email, USB flash drive, license dongle, or any other means (like QR codes!)
+
+        License files work great alongside signed license keys. And we believe they're a great replacement for machine proofs, so please check them out if you're utilizing proofs.
+
+        Check out the docs: https://keygen.sh/docs/api/licenses/#licenses-actions-check-out
+
         ## Zapier
 
         Our Zapier integration has officially moved out of beta! Thanks for all the feedback over the last couple months. We're super stoked to partner with Zapier here, and we're already seeing some really cool and creative ways of using Keygen with Zapier.
@@ -254,13 +286,19 @@ class StdoutMailer < ApplicationMailer
 
         ## Custom domains
 
-        A few months ago we "officially" rolled out custom domains. It had been available for awhile, but we just didn't really advertise it much outside of our Ent tiers. Now available for all tiers, custom domains let you set up Keygen behind your own domain name using a CNAME DNS record. It's super easy to set up, and allows your team to completely whitelabel our API behind your own domain. If you want to get set up, ping me and we can chat. Pricing starts at $995/yr.
+        A few months ago we "officially" rolled out custom domains. It had been available for awhile, but we just didn't really advertise it much outside of our Ent tiers unless customers asked. Now available to purchase for all tiers, custom domains let you set up Keygen behind your own domain name using a CNAME DNS record. The add-on is super easy to set up, and allows your team to completely whitelabel our API behind your own domain.
+
+        If you want to get set up with a custom domain, reply back and we can chat. Pricing starts at $995/yr.
 
         More info here: https://keygen.sh/docs/custom-domains/
 
         ## Groups (about time!)
 
-        It's been a *long* time coming, but it's finally here -- Groups. User, license and machine resources can be added into Groups, allowing you to natively set up a Team structure and more easily offer licensing options to larger teams. In addition, groups can have limits on the number of each resource allowed in the group. For example, you could create a group that allows up to 5 users, 5 licenses and 10 total machines. These group rules would be enforced alongside each license's policy ruleset.
+        It's been a *long* time coming, but it's finally here -- Groups!
+
+        User, license and machine resources can be added into Groups, allowing you to natively set up a "team" or company structure to more easily offer licensing options to larger groups. In addition, groups can have limits on the number of each resource allowed in the group.
+
+        For example, you could create a group that allows up to 5 users, 5 licenses and 10 total machines. These group rules would be enforced collectively for all licenses in addition to each license's individual ruleset.
 
         In the future, we'll be expanding upon the Group resource to add Owners, paving the way for self-management options of Groups.
 
@@ -268,7 +306,9 @@ class StdoutMailer < ApplicationMailer
 
         ## Dead or alive?
 
-        We've added quite a few nifty features to our machine heartbeat system. You can now configure how dead machines are culled, whether or not dead machines can be resurrected, and finally, we added the ability to enforce heartbeats monitors for all licenses. These changes add a lot of additional depth to our heartbeat system, overall making the system a lot more flexible, especially for licensing virtual and cloud environments.
+        We've added quite a few nifty features to our machine heartbeat system. You can now configure how dead machines are culled, whether or not dead machines can be resurrected, and finally, we added the ability to enforce heartbeats monitors on all licenses.
+
+        These changes add a lot of additional depth to our heartbeat system, overall making the system a lot more flexible, especially when licensing virtual and cloud environments.
 
         We can't wait to see what people build with these.
 
@@ -282,7 +322,9 @@ class StdoutMailer < ApplicationMailer
 
         3. We added the ability to ban a user -- very similar to suspending a license.
 
-        All of these combined make the typical user-locked licensing flow of prompting for an email address and license key super easy -- you send both of those values to our API during a license validation request, and we assert that the license is valid and owned by a user with that email. We're hoping this really smooths out our offering for user-locked licensing.
+        All of these combined make the typical user-locked licensing flow of prompting for an email address and license key super easy -- you send both of those values to our API during a license validation request, and we assert that the license is valid and owned by a user with that email.
+
+        We're hoping this really smooths out our offering for user-locked licensing.
 
         Docs: https://keygen.sh/docs/choosing-a-licensing-model/user-locked-licenses/
 
@@ -301,6 +343,8 @@ class StdoutMailer < ApplicationMailer
         --
 
         That's it for the third installment of Stdout. We're looking forward to what's coming up. Let me know if you have any feedback for me -- would love to hear it.
+
+        (And yes -- the new UI is coming! Soon. Lots of behind-the-scenes API work has been happening, like all of the above, to accomodate the new UI's features.)
 
         Until next time.
 
