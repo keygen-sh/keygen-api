@@ -157,6 +157,8 @@ module TokenAuthentication
      raise Keygen::Error::UnauthorizedError.new(code: 'LICENSE_INVALID')
     end
 
+    Current.bearer = current_license
+
     if current_license.present?
       raise Keygen::Error::ForbiddenError.new(code: 'LICENSE_BANNED', detail: 'License is banned') if
         current_license.banned?
