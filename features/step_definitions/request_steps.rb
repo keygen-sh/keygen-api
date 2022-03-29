@@ -872,7 +872,7 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
     when 'license'
       account.licenses.first.key
     when 'machine'
-      account.machines.first.fingerprint
+      account.licenses.first.key + account.machines.first.fingerprint
     end
 
   aes = OpenSSL::Cipher::AES256.new(:GCM)
@@ -881,13 +881,13 @@ Then /^the response should be a "([^"]+)" certificate with the following encrypt
   key            = OpenSSL::Digest::SHA256.digest(secret)
   ciphertext,
   iv,
-  auth_tag       = enc.split('.')
+  tag            = enc.split('.')
                       .map { Base64.strict_decode64(_1) }
 
   aes.key = key
   aes.iv  = iv
 
-  aes.auth_tag  = auth_tag
+  aes.auth_tag  = tag
   aes.auth_data = ''
 
   plaintext = aes.update(ciphertext) + aes.final
@@ -1041,9 +1041,11 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
 
       account.licenses.find(license_id).key
     when 'machine'
+      license_id = json.dig('data', 'relationships', 'license', 'data', 'id')
       machine_id = json.dig('data', 'relationships', 'machine', 'data', 'id')
 
-      account.machines.find(machine_id).fingerprint
+      account.licenses.find(license_id).key +
+        account.machines.find(machine_id).fingerprint
     end
 
     aes = OpenSSL::Cipher::AES256.new(:GCM)
@@ -1052,13 +1054,13 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
     key            = OpenSSL::Digest::SHA256.digest(secret)
     ciphertext,
     iv,
-    auth_tag       = enc.split('.')
+    tag            = enc.split('.')
                         .map { Base64.strict_decode64(_1) }
 
     aes.key = key
     aes.iv  = iv
 
-    aes.auth_tag  = auth_tag
+    aes.auth_tag  = tag
     aes.auth_data = ''
 
   plaintext = aes.update(ciphertext) + aes.final

@@ -49,7 +49,7 @@ class MachineCheckoutService < AbstractCheckoutService
                    .to_json
 
     enc = if encrypted?
-            encrypt(data, secret: machine.fingerprint)
+            encrypt(data, secret: license.key + machine.fingerprint)
           else
             encode(data, strict: true)
           end
