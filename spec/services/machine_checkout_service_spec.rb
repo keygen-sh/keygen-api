@@ -601,16 +601,16 @@ describe MachineCheckoutService do
         aes = OpenSSL::Cipher::AES256.new(:GCM)
         aes.decrypt
 
-        key            = OpenSSL::Digest::SHA256.digest(machine.fingerprint)
+        key            = OpenSSL::Digest::SHA256.digest(license.key + machine.fingerprint)
         ciphertext,
         iv,
-        auth_tag       = enc.split('.')
+        tag            = enc.split('.')
                             .map { Base64.strict_decode64(_1) }
 
         aes.key = key
         aes.iv  = iv
 
-        aes.auth_tag  = auth_tag
+        aes.auth_tag  = tag
         aes.auth_data = ''
 
         plaintext = aes.update(ciphertext) + aes.final

@@ -602,13 +602,13 @@ describe LicenseCheckoutService do
         key            = OpenSSL::Digest::SHA256.digest(license.key)
         ciphertext,
         iv,
-        auth_tag       = enc.split('.')
+        tag            = enc.split('.')
                             .map { Base64.strict_decode64(_1) }
 
         aes.key = key
         aes.iv  = iv
 
-        aes.auth_tag  = auth_tag
+        aes.auth_tag  = tag
         aes.auth_data = ''
 
         plaintext = aes.update(ciphertext) + aes.final
