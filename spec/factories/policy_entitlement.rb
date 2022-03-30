@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :policy_entitlement do
-    account nil
-    entitlement nil
+    account { nil }
+    entitlement { nil }
     policy
 
     after :build do |policy_entitlement, evaluator|

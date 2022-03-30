@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '2.7.5'
+ruby '3.1.1'
 
-gem 'rails', '~> 6.1.4.6'
-gem 'pg'
+gem 'rails', '~> 7.0.2.3'
+gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 5.6.2'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-timeout', require: 'rack/timeout/base'
@@ -26,12 +26,12 @@ gem 'stripe', '~> 5.43'
 gem 'pundit'
 
 # Cryptography
-gem 'openssl'
+gem 'openssl', '~> 2.2.1'
 gem 'ed25519'
 gem 'jwt'
 
 # 2FA/TOTP
-gem 'rotp'
+gem 'rotp', '~> 6.2'
 
 # Scopes and pagination
 gem 'has_scope'
@@ -83,8 +83,8 @@ end
 group :development, :test do
   gem 'byebug', platform: :mri
   gem 'dotenv-rails'
-  gem 'timecop'
-  gem 'bullet'
+  gem 'timecop', '~> 0.9.5'
+  gem 'bullet', '~> 7.0.1'
   gem 'parallel_tests', '~> 3.3'
 end
 
@@ -93,12 +93,12 @@ group :development do
 end
 
 group :test do
-  gem 'stripe-ruby-mock', '~> 2.5.1', require: 'stripe_mock'
-  gem 'cucumber-rails', '~> 2.2', require: false
-  gem 'rspec-rails', '~> 3.5'
-  gem 'rspec-expectations'
-  gem 'factory_girl_rails', '4.8.0'
+  gem 'stripe-ruby-mock', '~> 3.1.0.rc3', require: 'stripe_mock'
+  gem 'cucumber-rails', '~> 2.5', require: false
+  gem 'rspec-rails', '~> 5.1.1'
+  gem 'rspec-expectations', '~> 3.11'
+  gem 'factory_bot_rails', '~> 6.2'
   gem 'database_cleaner'
-  gem 'faker', '~> 2.14.0'
-  gem 'webmock'
+  gem 'faker', '~> 2.20.0'
+  gem 'webmock', '~> 3.14.0'
 end

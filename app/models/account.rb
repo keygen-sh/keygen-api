@@ -8,7 +8,7 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  belongs_to :plan
+  belongs_to :plan, optional: true
   has_one :billing
   has_many :webhook_endpoints
   has_many :webhook_events

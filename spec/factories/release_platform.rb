@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :release_platform do
     name { "macOS" }
     key { "darwin" }
 
-    account nil
+    account { nil }
 
     after :build do |release, evaluator|
       account = evaluator.account.presence || create(:account)

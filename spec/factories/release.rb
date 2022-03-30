@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :release do
     name { Faker::App.name }
     filename { "#{name}-#{version}.#{filetype.key}" }
@@ -15,9 +15,9 @@ FactoryGirl.define do
       end
     }
 
-    account nil
-    product nil
-    artifact nil
+    account { nil }
+    product { nil }
+    artifact { nil }
 
     association :platform, factory: :release_platform
     association :filetype, factory: :release_filetype

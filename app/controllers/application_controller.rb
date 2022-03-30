@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
-  include Pundit
+  include Pundit::Authorization
 
   # NOTE(ezekg) Including these at the end so that they're run last
   include RequestCounter

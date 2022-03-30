@@ -9,4 +9,4 @@ ActionController::Base.allow_rescue = false
 
 DatabaseCleaner.strategy = :transaction
 
-World FactoryGirl::Syntax::Methods
+World FactoryBot::Syntax::Methods

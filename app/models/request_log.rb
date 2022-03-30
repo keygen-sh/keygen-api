@@ -7,8 +7,8 @@ class RequestLog < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :requestor, polymorphic: true
-  belongs_to :resource, polymorphic: true
+  belongs_to :requestor, polymorphic: true, optional: true
+  belongs_to :resource, polymorphic: true, optional: true
 
   validates :account, presence: { message: "must exist" }
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :plan do
     name { Faker::Company.buzzword }
     price { Faker::Number.number digits: 4 }
@@ -13,7 +13,9 @@ FactoryGirl.define do
 
     transient do
       stripe_plan do
-        StripeHelper.create_plan(id: SecureRandom.hex, amount: price, trial_period_days: 7) rescue nil
+        product = StripeHelper.create_product(id: SecureRandom.hex)
+
+        StripeHelper.create_plan(id: SecureRandom.hex, amount: price, trial_period_days: 7, product: product.id)
       end
     end
 

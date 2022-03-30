@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :machine do
     fingerprint { SecureRandom.hex(12).upcase.scan(/.{2}/).join ":" }
     name { Faker::Company.buzzword }
 
-    account nil
-    license nil
+    account { nil }
+    license { nil }
 
     after :build do |machine, evaluator|
       account = evaluator.account.presence || create(:account)
