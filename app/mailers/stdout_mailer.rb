@@ -234,7 +234,7 @@ class StdoutMailer < ApplicationMailer
       to: subscriber.email,
       subject: "What's happened in 2022 so far",
       body: <<~TXT
-        #{greeting} -- Zeke here with yet another update! (I figured I'd sneek into your inbox before it's flooded on April 1st.)
+        #{greeting} -- Zeke here with yet another update! (I figured I'd sneek into your inbox before it's flooded with jokes on April 1st.)
 
         (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
 
