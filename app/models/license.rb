@@ -546,7 +546,7 @@ class License < ApplicationRecord
   def default_seed_key
     case scheme
     when "RSA_2048_PKCS1_ENCRYPT"
-      JSON.generate(id: id, created: created_at, duration: duration, expiry: expiry)
+      JSON.generate(id: id, created: created_at.iso8601(3), duration: duration, expiry: expiry.iso8601(3))
     when "RSA_2048_JWT_RS256"
       claims = { jti: SecureRandom.uuid, iss: 'https://keygen.sh', aud: account.id, sub: id, iat: created_at.to_i, nbf: created_at.to_i }
       claims[:exp] = expiry.to_i if expiry.present?
@@ -564,8 +564,8 @@ class License < ApplicationRecord
               end,
         license: {
           id: id,
-          created: created_at,
-          expiry: expiry,
+          created: created_at.iso8601(3),
+          expiry: expiry.iso8601(3),
         }
       )
     end
