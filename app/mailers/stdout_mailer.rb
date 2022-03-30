@@ -234,7 +234,7 @@ class StdoutMailer < ApplicationMailer
       to: subscriber.email,
       subject: "What's happened in 2022 so far",
       body: <<~TXT
-        #{greeting} -- Zeke here with another quick update.
+        #{greeting} -- Zeke here with yet another update! (I figured I'd sneak into your inbox before it's flooded on April 1st.)
 
         (You're receiving this email because you or your team signed up for a Keygen account. If you don't find this email useful, you can unsubscribe below.)
 
@@ -282,13 +282,15 @@ class StdoutMailer < ApplicationMailer
 
         Our Zapier integration has officially moved out of beta! Thanks for all the feedback over the last couple months. We're super stoked to partner with Zapier here, and we're already seeing some really cool and creative ways of using Keygen with Zapier.
 
-        Check it out: https://keygen.sh/integrate/zapier/
+        If you're looking for a no-code solution for integrating Keygen with other third-party services, such as ChargeBee or Stripe, or even SalesForce, maybe give Zapier a peek.
+
+        More info here: https://keygen.sh/integrate/zapier/
 
         ## Custom domains
 
         A few months ago we "officially" rolled out custom domains. It had been available for awhile, but we just didn't really advertise it much outside of our Ent tiers unless customers asked. Now available to purchase for all tiers, custom domains let you set up Keygen behind your own domain name using a CNAME DNS record. The add-on is super easy to set up, and allows your team to completely whitelabel our API behind your own domain.
 
-        If you want to get set up with a custom domain, reply back and we can chat. Pricing starts at $995/yr.
+        If you want to get set up with a custom domain, reply back and we can chat. Pricing starts at $995/yr/domain.
 
         More info here: https://keygen.sh/docs/custom-domains/
 
