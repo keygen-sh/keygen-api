@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :product do
     name { Faker::App.name }
     platforms {
@@ -11,7 +11,7 @@ FactoryGirl.define do
       ]
     }
 
-    account nil
+    account { nil }
 
     after :build do |product, evaluator|
       account = evaluator.account.presence || create(:account)

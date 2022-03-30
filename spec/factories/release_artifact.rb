@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :release_artifact do
     key { SecureRandom.hex }
 
-    account nil
-    product nil
+    account { nil }
+    product { nil }
     release
 
     after :build do |artifact, evaluator|

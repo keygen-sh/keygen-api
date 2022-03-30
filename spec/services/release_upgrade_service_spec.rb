@@ -14,10 +14,12 @@ describe ReleaseUpgradeService do
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
     Sidekiq::Testing.fake!
+    StripeHelper.start
   end
 
   after do
     DatabaseCleaner.clean
+    StripeHelper.stop
   end
 
   context 'when invalid parameters are supplied to the service' do

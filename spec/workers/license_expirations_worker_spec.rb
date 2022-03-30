@@ -14,10 +14,12 @@ describe LicenseExpirationsWorker do
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
     Sidekiq::Testing.fake!
+    StripeHelper.start
   end
 
   after do
     DatabaseCleaner.clean
+    StripeHelper.stop
   end
 
   it 'should enqueue and run the worker' do
