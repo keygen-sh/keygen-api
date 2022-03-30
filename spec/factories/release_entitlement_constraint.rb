@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :release_entitlement_constraint do
-    account nil
-    entitlement nil
+    account { nil }
+    entitlement { nil }
     release
 
     after :build do |constraint, evaluator|

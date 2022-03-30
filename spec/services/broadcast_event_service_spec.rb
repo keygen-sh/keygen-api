@@ -12,6 +12,17 @@ describe BroadcastEventService do
   let(:endpoint) { create(:webhook_endpoint, account: account) }
   let(:resource) { create(:license, account: account) }
 
+  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
+  before do
+    Sidekiq::Testing.fake!
+    StripeHelper.start
+  end
+
+  after do
+    DatabaseCleaner.clean
+    StripeHelper.stop
+  end
+
   def create_webhook_event!(account, resource)
     throw if endpoint.nil?
 

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :license do
-    account nil
-    policy nil
-    user nil
+    account { nil }
+    policy { nil }
+    user { nil }
 
     after :build do |license, evaluator|
       account = evaluator.account.presence || create(:account)
@@ -98,7 +98,7 @@ FactoryGirl.define do
     trait :userless do |license|
       # FIXME(ezekg) This kind of acts as a sentinel value to not create a user
       #              in the factory's create hook (above)
-      user false
+      user { false }
     end
   end
 end

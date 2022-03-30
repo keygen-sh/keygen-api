@@ -15,10 +15,12 @@ describe MachineCheckoutService do
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
     Sidekiq::Testing.fake!
+    StripeHelper.start
   end
 
   after do
     DatabaseCleaner.clean
+    StripeHelper.stop
   end
 
   it 'should return valid a machine file certificate' do

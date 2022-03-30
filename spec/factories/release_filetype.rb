@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :release_filetype do
     name { "DMG" }
     key { "dmg" }
 
-    account nil
+    account { nil }
 
     after :build do |release, evaluator|
       account = evaluator.account.presence || create(:account)

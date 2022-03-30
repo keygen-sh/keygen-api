@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :second_factor do
-    account nil
-    user nil
+    account { nil }
+    user { nil }
 
     after :build do |second_factor, evaluator|
       account = evaluator.account.presence || create(:account)

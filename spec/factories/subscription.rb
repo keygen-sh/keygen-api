@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   Stripe::Subscription.send :alias_method, :save!, :save
 
   factory :subscription, class: Stripe::Subscription do

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :token do
-    account nil
-    bearer nil
+    account { nil }
+    bearer { nil }
 
     after :build do |token, evaluator|
       account = evaluator.account.presence || create(:account)
