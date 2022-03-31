@@ -11,7 +11,7 @@ module Api::V1::Users::Actions
       authorize user
 
       if user.password? && user.authenticate(password_meta[:old_password])
-        if user.update(password: password_meta[:new_password])
+        if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
           render jsonapi: user
         else
           render_unprocessable_resource user
