@@ -341,7 +341,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "GROUP_BLANK",
+        "code": "GROUP_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/group"
         }
@@ -685,7 +685,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "POLICY_BLANK",
+        "code": "POLICY_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -729,7 +729,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "USER_BLANK",
+        "code": "USER_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/user"
         }
@@ -2651,7 +2651,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "POLICY_BLANK",
+        "code": "POLICY_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -3654,7 +3654,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "POLICY_BLANK",
+        "code": "POLICY_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -3738,7 +3738,7 @@ Feature: Create license
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "USER_BLANK",
+        "code": "USER_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/user"
         }
@@ -3972,7 +3972,7 @@ Feature: Create license
       {
         "title": "Unauthorized",
         "detail": "You must be authenticated to complete the request",
-        "code": "TOKEN_BLANK"
+        "code": "TOKEN_MISSING"
       }
       """
     And sidekiq should have 0 "webhook" jobs
