@@ -191,7 +191,7 @@ Feature: Policy entitlements relationship
         "source": {
           "pointer": "/data/relationships/entitlement"
         },
-        "code": "ENTITLEMENT_BLANK"
+        "code": "ENTITLEMENT_NOT_FOUND"
       }
       """
     And sidekiq should have 0 "webhook" jobs

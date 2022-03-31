@@ -198,7 +198,7 @@ Feature: License user relationship
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "USER_BLANK",
+        "code": "USER_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/user"
         }

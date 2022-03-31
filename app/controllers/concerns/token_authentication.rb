@@ -182,7 +182,7 @@ module TokenAuthentication
 
     case
     when current_http_token.blank?
-      raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_BLANK')
+      raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_MISSING')
     else
       raise Keygen::Error::UnauthorizedError.new(code: 'TOKEN_INVALID')
     end
