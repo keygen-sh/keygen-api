@@ -293,22 +293,14 @@ class User < ApplicationRecord
     second_factor.verify(otp)
   end
 
-  def revoke_tokens!(except: nil)
-    transaction do
-      s = if except.present?
-            tokens.where.not(id: except)
-          else
-            tokens
-          end
+  def revoke_tokens(except: nil)
+    s = if except.present?
+          tokens.where.not(id: except)
+        else
+          tokens
+        end
 
-      s.delete_all
-    end
-  end
-
-  def revoke_tokens(...)
-    revoke_tokens!(...)
-  rescue
-    nil
+    s.delete_all
   end
 
   # Our async destroy logic needs to be a bit different to prevent accounts
