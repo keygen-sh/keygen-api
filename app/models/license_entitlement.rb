@@ -10,13 +10,10 @@ class LicenseEntitlement < ApplicationRecord
   belongs_to :entitlement
   has_one :policy, through: :license
 
-  validates :account, presence: { message: 'must exist' }
   validates :license,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
   validates :entitlement,
     uniqueness: { message: 'already exists', scope: [:account_id, :license_id, :entitlement_id] },
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   validate on: :create do

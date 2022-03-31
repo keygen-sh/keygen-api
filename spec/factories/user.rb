@@ -10,11 +10,7 @@ FactoryBot.define do
     account { nil }
 
     after :build do |user, evaluator|
-      account = evaluator.account.presence || create(:account)
-
-      user.assign_attributes(
-        account: account
-      )
+      user.account ||= evaluator.account.presence
     end
 
     after :create do |user|

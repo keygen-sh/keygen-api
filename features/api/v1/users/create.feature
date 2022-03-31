@@ -1191,8 +1191,8 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
-        "code": "ENCODING_INVALID"
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
+        "code": "JSON_INVALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1222,8 +1222,8 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
-        "code": "ENCODING_INVALID"
+        "detail": "The request could not be completed because it contains invalid JSON (check formatting/encoding)",
+        "code": "JSON_INVALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -1252,13 +1252,12 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
-        "code": "ENCODING_INVALID"
+        "detail": "Unpermitted parameters: /data/attributes/role, /data/attributes/rolex0d"
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing a stray backslash injection
     Given the current account is "test1"
@@ -1282,13 +1281,12 @@ Feature: Create user
       """
       {
         "title": "Bad request",
-        "detail": "The request could not be completed because it contains an invalid byte sequence (check encoding)",
-        "code": "ENCODING_INVALID"
+        "detail": "Unpermitted parameters: /data/attributes/role"
       }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 0 "request-log" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous attempts to send a request containing a stray quotes injection
     Given the current account is "test1"

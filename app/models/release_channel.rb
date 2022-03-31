@@ -16,9 +16,6 @@ class ReleaseChannel < ApplicationRecord
   has_many :users,
     through: :licenses
 
-  validates :account,
-    presence: { message: 'must exist' }
-
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id },

@@ -10,7 +10,7 @@ Given /^the following "([^\"]*)" exist:$/ do |resource, table|
 end
 
 Given /^the following "([^\"]*)" exists:$/ do |resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
   create resource.singularize.underscore, attributes.transform_values(&:presence)
@@ -21,7 +21,7 @@ Given /^there exists an(?:other)? account "([^\"]*)"$/ do |slug|
 end
 
 Given /^the account "([^\"]*)" has the following attributes:$/ do |id, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
@@ -30,7 +30,7 @@ Given /^the account "([^\"]*)" has the following attributes:$/ do |id, body|
 end
 
 Given /^I have the following attributes:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
   @bearer.update attributes
@@ -46,7 +46,7 @@ Given /^I have a password reset token that is expired$/ do
 end
 
 Then /^the current token has the following attributes:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
   @token.update attributes
@@ -87,7 +87,7 @@ Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
 end
 
 Given /^the current account has the following attributes:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
@@ -101,7 +101,7 @@ Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
 end
 
 Given /^the current account has (\d+) "([^\"]*)" with the following:$/ do |count, resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
 
@@ -339,7 +339,7 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
 end
 
 Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources = @account.send(resource.pluralize.underscore)
@@ -348,7 +348,7 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
 end
 
 Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources = @account.send(resource.pluralize.underscore).limit(count)
@@ -357,7 +357,7 @@ Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, r
 end
 
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources = @account.send(resource.pluralize.underscore).limit(count)
@@ -366,7 +366,7 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
 end
 
 Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   start_idx = start_index.to_i
   end_idx   = end_index.to_i
@@ -385,7 +385,7 @@ Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/
 end
 
 Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   idx       = index.to_i
   resources = @account.send(resource.pluralize.underscore).limit(idx + 1)
@@ -396,7 +396,7 @@ Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, bo
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |named_idx, resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   model =
@@ -412,7 +412,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   metadata = JSON.parse(body).deep_transform_keys!(&:underscore)
   model    =
@@ -428,7 +428,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
 end
 
 Given /^the (first|second|third|fourth|fifth) "license" has the following policy entitlements:$/ do |named_index, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   license = @account.licenses.send(named_index)
   codes = JSON.parse(body)
@@ -441,7 +441,7 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following policy
 end
 
 Given /^the (first|second|third|fourth|fifth) "license" has the following license entitlements:$/ do |named_index, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   license = @account.licenses.send(named_index)
   codes = JSON.parse(body)
@@ -486,7 +486,7 @@ Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   numbers = {
@@ -511,7 +511,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   numbers = {
@@ -590,7 +590,7 @@ Then /^the account "([^\"]*)" should not have a referral$/ do |account_id|
 end
 
 Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
@@ -599,7 +599,7 @@ Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, bo
 end
 
 Then /^the current token should have the following attributes:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
@@ -650,7 +650,7 @@ Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words
 end
 
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
-  parse_placeholders!(body)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: account_id, aliases: :slug)
   model   = account.send(model_name.pluralize).send(index_in_words)
@@ -660,7 +660,7 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]
 end
 
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, body|
-  parse_placeholders!(body)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   model   = @account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
@@ -669,7 +669,7 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the fol
 end
 
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the following attributes:$/ do |index_in_words, model_name, body|
-  parse_placeholders!(body)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   model   = @account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)

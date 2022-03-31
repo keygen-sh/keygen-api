@@ -272,7 +272,7 @@ Feature: Generate authentication token for license
     And the current product has 3 "licenses"
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/licenses/$0/tokens/$3"
+    When I send a GET request to "/accounts/test1/licenses/$0/tokens/$1"
     Then the response status should be "200"
     And the JSON response should be a "token"
 

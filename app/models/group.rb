@@ -15,9 +15,6 @@ class Group < ApplicationRecord
     class_name: 'GroupOwner',
     dependent: :delete_all
 
-  validates :account,
-    presence: true
-
   # Give products the ability to read all groups
   scope :for_product, -> id { self }
 

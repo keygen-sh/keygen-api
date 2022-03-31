@@ -94,9 +94,7 @@ class Policy < ApplicationRecord
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
-  validates :account, presence: { message: "must exist" }
   validates :product,
-    presence: { message: "must exist" },
     scope: { by: :account_id }
 
   validates :name, presence: true

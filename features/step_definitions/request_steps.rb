@@ -22,7 +22,7 @@ Then /^time is unfrozen$/ do
 end
 
 When /^I send a GET request to "([^\"]*)"$/ do |path|
-  parse_path_placeholders! path
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
   if !path.starts_with?('//')
     get "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
@@ -32,60 +32,60 @@ When /^I send a GET request to "([^\"]*)"$/ do |path|
 end
 
 When /^I send a POST request to "([^\"]*)"$/ do |path|
-  parse_path_placeholders! path
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a PUT request to "([^\"]*)"$/ do |path|
-  parse_path_placeholders! path
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a PATCH request to "([^\"]*)"$/ do |path|
-  parse_path_placeholders! path
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
   patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 end
 
 When /^I send a POST request to "([^\"]*)" with the following:$/ do |path, body|
-  parse_path_placeholders! path
-  parse_placeholders! body
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a POST request to "([^\"]*)" with the following badly encoded data:$/ do |path, body|
-  parse_path_placeholders! path
-  parse_placeholders! body
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   post "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body.encode!('CP1252')
 end
 
 When /^I send a PATCH request to "([^\"]*)" with the following:$/ do |path, body|
-  parse_path_placeholders! path
-  parse_placeholders! body
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   patch "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a PUT request to "([^\"]*)" with the following:$/ do |path, body|
-  parse_path_placeholders! path
-  parse_placeholders! body
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   put "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a DELETE request to "([^\"]*)" with the following:$/ do |path, body|
-  parse_path_placeholders! path
-  parse_placeholders! body
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}", body
 end
 
 When /^I send a DELETE request to "([^\"]*)"$/ do |path|
-  parse_path_placeholders! path
+  path = parse_path_placeholders(path, account: @account, bearer: @bearer, crypt: @crypt)
 
   delete "//api.keygen.sh/#{@api_version}/#{path.sub(/^\//, '')}"
 
@@ -172,7 +172,7 @@ Then /^the JSON response should contain an included "([^\"]*)"$/ do |name|
 end
 
 Then /^the JSON response should contain an included "([^\"]*)" with the following relationships:$/ do |name, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
   incl = json["included"]
@@ -347,7 +347,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:the|an?) e
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with (?:an?) (\w+) within seconds of "([^\"]*)"$/ do |resource, attribute, value|
-  parse_placeholders! value
+  value = parse_placeholders(value, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
 
@@ -444,7 +444,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" without an? (\w+) 
 end
 
 Then /^the JSON response should be meta that contains a valid activation proof of the following dataset:/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expected_dataset = JSON.parse(body)
@@ -466,7 +466,7 @@ Then /^the JSON response should be meta that contains a valid activation proof o
 end
 
 Then /^the JSON response should a "license" that contains a valid "([^\"]*)" key with the following dataset:$/ do |scheme, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
   resource_type = json.dig("data", "type")
@@ -585,7 +585,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following attributes:$/ do |resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -599,7 +599,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following relationships:$/ do |resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -613,7 +613,7 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
 end
 
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["data"]["type"]).to eq resource.pluralize
@@ -628,14 +628,14 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with no meta$/ do 
 end
 
 Then /^the JSON response should (?:contain|be) meta with the following:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to eq JSON.parse(body)
 end
 
 Then /^the JSON response should (?:contain|be) meta which includes the following:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
 
   expect(json["meta"]).to include JSON.parse(body)
@@ -654,7 +654,7 @@ Then /^the JSON response should (?:contain|be) an array of errors?$/ do
 end
 
 Given /^the (\w+) error should have the following properties:$/ do |i, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
   numbers = {
@@ -674,7 +674,7 @@ Given /^the (\w+) error should have the following properties:$/ do |i, body|
 end
 
 Then /^the JSON response should contain the following links:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   json = JSON.parse last_response.body
 
@@ -682,13 +682,13 @@ Then /^the JSON response should contain the following links:$/ do |body|
 end
 
 Then /^the response should contain the following headers:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   expect(last_response.headers).to include JSON.parse(body)
 end
 
 Then /^the response should contain the following raw headers:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   headers = body.split /\n/
 
@@ -809,7 +809,7 @@ Then /^the response should be a "([^"]+)" certificate signed using "([^"]+)"$/ d
 end
 
 Then /^the response should be a "([^"]+)" certificate with the following encoded data:$/ do |type, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   req  = last_request
   res  = last_response
@@ -850,7 +850,7 @@ Then /^the response should be a "([^"]+)" certificate with the following encoded
 end
 
 Then /^the response should be a "([^"]+)" certificate with the following encrypted data:$/ do |type, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = @account
   req     = last_request
@@ -964,7 +964,7 @@ Then /^the JSON response should be a "([^"]+)" with a certificate signed using "
 end
 
 Then /^the JSON response should be a "([^"]+)" with the following encoded certificate data:$/ do |resource_type, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   req  = last_request
   res  = last_response
@@ -1012,7 +1012,7 @@ Then /^the JSON response should be a "([^"]+)" with the following encoded certif
 end
 
 Then /^the JSON response should be a "([^"]+)" with the following encrypted certificate data:$/ do |resource_type, body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = @account
   req     = last_request

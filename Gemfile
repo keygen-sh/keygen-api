@@ -8,7 +8,7 @@ gem 'pg', '~> 1.3.4'
 gem 'puma', '~> 5.6.2'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-timeout', require: 'rack/timeout/base'
-gem 'rack-attack', '~> 5.2'
+gem 'rack-attack', '~> 6.6'
 gem 'rack-cors'
 
 # Redis for caching and background jobs
@@ -44,7 +44,7 @@ gem 'active_record_union'
 gem 'sidekiq', '~> 6.4'
 gem 'sidekiq-unique-jobs', '~> 7.1.15'
 gem 'sidekiq-status', '~> 2.1.3'
-gem 'sidekiq-cron', '~> 1.2'
+gem 'sidekiq-cron', github: 'citusdata/sidekiq-cron', ref: '56b3d32aeedeb5dfdebbf498d0079dbb0bbee890'
 gem 'sidekiq-throttled'
 gem 'sidekiq-cronitor', '~> 2.0'
 
@@ -85,7 +85,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'timecop', '~> 0.9.5'
   gem 'bullet', '~> 7.0.1'
-  gem 'parallel_tests', '~> 3.3'
+  gem 'parallel_tests', '~> 3.8'
 end
 
 group :development do
@@ -98,7 +98,7 @@ group :test do
   gem 'rspec-rails', '~> 5.1.1'
   gem 'rspec-expectations', '~> 3.11'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'database_cleaner'
+  gem 'database_cleaner', '~> 2.0'
   gem 'faker', '~> 2.20.0'
   gem 'webmock', '~> 3.14.0'
 end

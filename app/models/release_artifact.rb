@@ -13,13 +13,9 @@ class ReleaseArtifact < ApplicationRecord
   has_many :licenses,
     through: :product
 
-  validates :account,
-    presence: { message: 'must exist' }
   validates :product,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
   validates :release,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   scope :for_product, -> product {

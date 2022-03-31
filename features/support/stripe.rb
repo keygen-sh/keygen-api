@@ -25,7 +25,7 @@ module StripeMock
 
           billing_portal_sessions[params[:id]] = Data.mock_billing_portal_session(params)
         end
-    end
+      end
     end
   end
 

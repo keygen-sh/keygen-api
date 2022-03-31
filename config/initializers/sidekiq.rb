@@ -20,6 +20,25 @@ class Sidekiq::Status::ClientMiddleware
   end
 end
 
+Sidekiq::Cron::Job.class_eval do
+  # NOTE(ezekg) Fix for https://github.com/ondrejbartas/sidekiq-cron/issues/310
+  def self.all
+    job_hashes = nil
+    Sidekiq.redis do |conn|
+      set_members = conn.smembers(jobs_key)
+      job_hashes = conn.pipelined do |pipeline|
+        set_members.each do |key|
+          pipeline.hgetall(key)
+        end
+      end
+    end
+    job_hashes.compact.reject(&:empty?).collect do |h|
+      # no need to fetch missing args from redis since we just got this hash from there
+      Sidekiq::Cron::Job.new(h.merge(fetch_missing_args: false))
+    end
+  end
+end
+
 # Configure Sidekiq's web interface to use basic authentication
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
   compare = -> (a, b) { Rack::Utils.secure_compare(a, b) }

@@ -24,13 +24,13 @@ FactoryBot.define do
     product { nil }
 
     after :build do |policy, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account.presence
       product =
         case
         when evaluator.product.present?
           evaluator.product
         else
-          create :product, account: account
+          build(:product, account: account)
         end
 
       policy.assign_attributes(

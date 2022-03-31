@@ -10,10 +10,7 @@ class ReleaseUpgradeLink < ApplicationRecord
     counter_cache: :upgrade_count,
     inverse_of: :upgrade_links
 
-  validates :account,
-    presence: { message: 'must exist' }
   validates :release,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   validates :url,
