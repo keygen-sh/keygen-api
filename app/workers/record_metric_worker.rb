@@ -32,11 +32,11 @@ class RecordMetricWorker
         { resource: resource_id }
       end
 
-    account.metrics.insert!(
+    account.metrics.insert!({
       event_type_id: event_type.id,
       created_at: recorded_at,
       updated_at: recorded_at,
-      data: data
-    )
+      data: data,
+    })
   end
 end

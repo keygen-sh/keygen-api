@@ -30,7 +30,7 @@ class RequestLogWorker
     return if
       account.nil?
 
-    account.request_logs.insert!(
+    account.request_logs.insert!({
       id: request_id,
       requestor_type: requestor_type,
       requestor_id: requestor_id,
@@ -46,7 +46,7 @@ class RequestLogWorker
       response_signature: response_signature,
       response_body: response_body,
       status: response_status,
-    )
+    })
   rescue PG::UniqueViolation
     # NOTE(ezekg) Don't log duplicates
   end
