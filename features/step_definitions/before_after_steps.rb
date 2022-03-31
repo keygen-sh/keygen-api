@@ -2,6 +2,10 @@
 
 World Rack::Test::Methods
 
+# Around do |scenario, block|
+#   DatabaseCleaner.cleaning(&block)
+# end
+
 Before "@api/v1" do
   @api_version = "v1"
 end

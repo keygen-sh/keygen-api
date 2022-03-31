@@ -6,12 +6,12 @@ FactoryBot.define do
     user { nil }
 
     after :build do |second_factor, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account.presence
       user =
         if evaluator.user.present?
           evaluator.user
         else
-          create :user, account: account
+          build(:user, account: account)
         end
 
       second_factor.assign_attributes(

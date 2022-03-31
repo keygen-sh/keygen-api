@@ -10,9 +10,6 @@ class ReleaseFiletype < ApplicationRecord
   has_many :releases,
     inverse_of: :filetype
 
-  validates :account,
-    presence: { message: 'must exist' }
-
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id }

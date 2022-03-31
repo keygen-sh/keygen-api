@@ -243,9 +243,9 @@ rescue => e
   nil
 end
 
-Rack::Attack.throttled_response = -> (env) {
-  match_data = env["rack.attack.match_data"] || {}
-  match_key  = env['rack.attack.matched'] || ''
+Rack::Attack.throttled_responder = -> req {
+  match_data = req.env["rack.attack.match_data"] || {}
+  match_key  = req.env['rack.attack.matched'] || ''
 
   window      = match_key.split('/').last
   count       = match_data[:count].to_i
@@ -275,7 +275,7 @@ Rack::Attack.throttled_response = -> (env) {
   ]
 }
 
-Rack::Attack.blocklisted_response = -> (env) {
+Rack::Attack.blocklisted_responder = -> req {
   [
     403,
     {

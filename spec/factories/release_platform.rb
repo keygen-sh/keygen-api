@@ -1,18 +1,14 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :release_platform do
-    name { "macOS" }
-    key { "darwin" }
+  factory :release_platform, aliases: %i[platform] do
+    name { 'macOS' }
+    key { 'darwin' }
 
     account { nil }
 
-    after :build do |release, evaluator|
-      account = evaluator.account.presence || create(:account)
-
-      release.assign_attributes(
-        account: account
-      )
+    after :build do |platform, evaluator|
+      platform.account ||= evaluator.account.presence
     end
   end
 end

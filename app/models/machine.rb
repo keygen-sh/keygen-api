@@ -34,9 +34,7 @@ class Machine < ApplicationRecord
   on_exclusive_event 'machine.created', -> { license.notify_of_event!('machine.created') },
     auto_release_lock: true
 
-  validates :account, presence: { message: "must exist" }
   validates :license,
-    presence: { message: "must exist" },
     scope: { by: :account_id }
   validates :group,
     presence: { message: 'must exist' },
@@ -432,12 +430,12 @@ class Machine < ApplicationRecord
       license: {
         id: license.id,
         key: license.key,
-        expiry: license.expiry,
+        expiry: license.expiry&.iso8601(3),
       },
       machine: {
         id: id,
         fingerprint: fingerprint,
-        created: created_at,
+        created: created_at.iso8601(3),
       },
       ts: Time.current,
     }

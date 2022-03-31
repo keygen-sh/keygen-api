@@ -898,17 +898,17 @@ namespace :stripe do
       s << "\e[34m  - P95: \e[36m#{report.p95_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34m  - P99: \e[36m#{report.p99_time_on_free.to_s(:rounded, precision: 2)} days\e[0m\n"
       s << "\e[34mUsers:\e[0m\n"
-      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_s(:delimited)}\e[34m (API usage over last 90 days, #{report.active_paid_accounts_percentage.to_s(:percentage, precision: 2)} of paid, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} of free)\e[0m\n"
-      s << "\e[34m  - Total: \e[32m#{report.total_users.to_s(:delimited)}\e[34m (free + paid)\e[0m\n"
-      s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_s(:delimited)}\e[34m (new sign ups)\e[0m\n"
-      s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_s(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_s(:delimited)} w/ payment method)\e[0m\n"
-      s << "\e[34m  - Free: \e[36m#{report.free_users.to_s(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of all users, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} active last 90 days)\e[0m\n"
-      s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_s(:delimited)}\e[34m (#{report.new_paid_users.to_s(:delimited)} new)\e[0m\n"
-      s << "\e[34m  - Upgrades: \e[32m#{report.upgraded_users_from_free.to_s(:delimited)}\e[34m (free to paid)\e[0m\n"
-      s << "\e[34m  - Downgrades: \e[33m#{report.downgraded_users_to_free.to_s(:delimited)}\e[34m (paid to free)\e[0m\n"
-      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_s(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
-      s << "\e[34m  - Canceling: \e[31m#{report.canceling_users.to_s(:delimited)}\e[0m\n"
-      s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_s(:delimited)}\e[0m\n"
+      s << "\e[34m  - Active: \e[32m#{report.total_active_accounts.to_fs(:delimited)}\e[34m (API usage over last 90 days, #{report.active_paid_accounts_percentage.to_s(:percentage, precision: 2)} of paid, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} of free)\e[0m\n"
+      s << "\e[34m  - Total: \e[32m#{report.total_users.to_fs(:delimited)}\e[34m (free + paid)\e[0m\n"
+      s << "\e[34m  - New: \e[32m#{report.new_sign_ups.to_fs(:delimited)}\e[34m (new sign ups)\e[0m\n"
+      s << "\e[34m  - Trialing: \e[33m#{report.trialing_users.to_fs(:delimited)}\e[34m (#{report.trialing_users_with_payment_method.to_fs(:delimited)} w/ payment method)\e[0m\n"
+      s << "\e[34m  - Free: \e[36m#{report.free_users.to_fs(:delimited)}\e[34m (#{report.free_users_percentage.to_s(:percentage, precision: 2)} of all users, #{report.active_free_accounts_percentage.to_s(:percentage, precision: 2)} active last 90 days)\e[0m\n"
+      s << "\e[34m  - Paid: \e[32m#{report.paid_users.to_fs(:delimited)}\e[34m (#{report.new_paid_users.to_fs(:delimited)} new)\e[0m\n"
+      s << "\e[34m  - Upgrades: \e[32m#{report.upgraded_users_from_free.to_fs(:delimited)}\e[34m (free to paid)\e[0m\n"
+      s << "\e[34m  - Downgrades: \e[33m#{report.downgraded_users_to_free.to_fs(:delimited)}\e[34m (paid to free)\e[0m\n"
+      s << "\e[34m  - At-Risk: \e[33m#{report.at_risk_users.to_fs(:delimited)}\e[34m (overdue, no payment method, etc.)\e[0m\n"
+      s << "\e[34m  - Canceling: \e[31m#{report.canceling_users.to_fs(:delimited)}\e[0m\n"
+      s << "\e[34m  - Churned: \e[31m#{report.churned_users.to_fs(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
@@ -945,7 +945,7 @@ namespace :stripe do
       s << "\e[34mLost Revenue: \e[31m#{lost_revenue.to_s(:currency)}/mo\e[0m\n"
       s << "\e[34mChurn Rate: \e[31m#{churn_rate.to_s(:percentage, precision: 2)}\e[0m\n"
 
-      s << "\e[34mAt-Risk:\e[34m (\e[33m#{at_risk_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+      s << "\e[34mAt-Risk:\e[34m (\e[33m#{at_risk_subscriptions.size.to_fs(:delimited)}\e[34m total)\e[0m\n"
 
       at_risk_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
@@ -955,7 +955,7 @@ namespace :stripe do
         s << "\e[34m  - \e[33m#{customer.email}\e[34m is at-risk (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
-      s << "\e[34mCanceling:\e[34m (\e[31m#{canceling_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+      s << "\e[34mCanceling:\e[34m (\e[31m#{canceling_subscriptions.size.to_fs(:delimited)}\e[34m total)\e[0m\n"
 
       canceling_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
@@ -965,7 +965,7 @@ namespace :stripe do
         s << "\e[34m  - \e[31m#{customer.email}\e[34m is canceling (LT=#{life_time.to_s(:rounded, precision: 2)}mo LTV=#{life_time_value.to_s(:currency)})\e[0m\n"
       end
 
-      s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_s(:delimited)}\e[34m total)\e[0m\n"
+      s << "\e[34mChurned:\e[34m (\e[31m#{churned_subscriptions.size.to_fs(:delimited)}\e[34m total)\e[0m\n"
 
       churned_subscriptions.each do |subscription|
         life_time = stats.subscription_length_for(subscription)
@@ -1003,9 +1003,9 @@ namespace :stripe do
 
       s = ''
       s << "\e[34m======================\e[0m\n"
-      s << "\e[34mActive: \e[32m#{total_active_accounts.to_s(:delimited)}\e[0m\n"
-      s << "\e[34mPaid: \e[32m#{active_paid_accounts.to_s(:delimited)}\e[0m\n"
-      s << "\e[34mFree: \e[32m#{active_free_accounts.to_s(:delimited)}\e[0m\n"
+      s << "\e[34mActive: \e[32m#{total_active_accounts.to_fs(:delimited)}\e[0m\n"
+      s << "\e[34mPaid: \e[32m#{active_paid_accounts.to_fs(:delimited)}\e[0m\n"
+      s << "\e[34mFree: \e[32m#{active_free_accounts.to_fs(:delimited)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"
       s << "\e[34mTime elapsed: #{distance_of_time_in_words(t1, t2, include_seconds: true)}\e[0m\n"
       s << "\e[34m======================\e[0m\n"

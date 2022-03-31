@@ -65,10 +65,7 @@ class Release < ApplicationRecord
 
   before_create :enforce_release_limit_on_account!
 
-  validates :account,
-    presence: { message: 'must exist' }
   validates :product,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
   validates :filetype,
     presence: { message: 'must exist' },
@@ -79,7 +76,6 @@ class Release < ApplicationRecord
     scope: { by: :account_id },
     unless: -> { platform.nil? }
   validates :channel,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   validates :version,
@@ -474,7 +470,7 @@ class Release < ApplicationRecord
               release_limit.nil?
 
     if release_count >= release_limit
-      errors.add :account, :release_limit_exceeded, message: "Your tier's release limit of #{release_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
+      errors.add :account, :release_limit_exceeded, message: "Your tier's release limit of #{release_limit.to_fs(:delimited)} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
 
       throw :abort
     end

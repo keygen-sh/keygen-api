@@ -7,23 +7,23 @@ FactoryBot.define do
     user { nil }
 
     after :build do |license, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account.presence
       policy =
         if evaluator.policy.present?
           case
           when evaluator.policy.scheme?
             scheme = evaluator.policy.scheme.downcase.to_sym
 
-            create :policy, scheme, account: account
+            build(:policy, scheme, account: account)
           when evaluator.policy.require_check_in?
             interval = "#{evaluator.policy.check_in_interval}_check_in".to_sym
 
-            create :policy, interval, account: account
+            build(:policy, interval, account: account)
           else
             evaluator.policy
           end
         else
-          create :policy, account: account
+          build(:policy, account: account)
         end
       user =
         case
@@ -32,13 +32,13 @@ FactoryBot.define do
         when evaluator.user.present?
           evaluator.user
         else
-          create :user, account: account
+          build(:user, account: account)
         end
 
       license.assign_attributes(
         account: account,
         policy: policy,
-        user: user
+        user: user,
       )
     end
 

@@ -3,5 +3,7 @@
 FactoryBot.define do
   factory :webhook_endpoint do
     url { "https://#{SecureRandom.hex}.example" }
+
+    account { nil }
   end
 end

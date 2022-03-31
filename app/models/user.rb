@@ -39,8 +39,6 @@ class User < ApplicationRecord
 
   before_save -> { self.email = email.downcase.strip }
 
-  validates :account,
-    presence: { message: 'must exist' }
   validates :group,
     presence: { message: 'must exist' },
     scope: { by: :account_id },

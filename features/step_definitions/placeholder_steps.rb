@@ -55,7 +55,7 @@ PLACEHOLDERS = %w[
 # $resource[0].attribute (where 0 is an index)
 # $resource.attribute (random resource)
 # $current.attribute (current user)
-def parse_placeholders!(str)
+def parse_placeholders(str, account:, bearer:, crypt:)
   str.dup.scan /((?<!\\)\$(!)?(~)?([-\w]+)(?:\[([^\]]+)\])?(?:\.([-.\w]+))?)/ do |pattern, *matches|
     escape, encode, resource, index, attribute = matches
 
@@ -78,16 +78,16 @@ def parse_placeholders!(str)
       when "account"
         case attribute
         when /(\w+)\.(\w+)/
-          @account.send($1).send $2
+          account.send($1).send $2
         else
-          @account.send attribute
+          account.send attribute
         end
       when "current"
-        @bearer.send attribute
+        bearer.send attribute
       when "token"
-        @crypt.first
+        crypt.first
       when "crypt"
-        @crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+        crypt.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .send attribute
       when "date"
         case attribute
@@ -119,12 +119,12 @@ def parse_placeholders!(str)
         ROTP::TOTP.new(@second_factor.secret).now
       else
         model =
-          if @account && resource.singularize != 'account'
+          if account && resource.singularize != 'account'
             case resource.singularize
             when 'constraint'
-              @account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             else
-              @account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+              account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             end
           else
             resource.singularize
@@ -158,50 +158,52 @@ def parse_placeholders!(str)
       value = Base64.strict_encode64 value
     end
 
-    str.sub! pattern.to_s, value
+    str = str.sub(pattern.to_s, value)
   end
+
+  str
 end
 
 # Matches:
 # resource/$current (current user or account)
 # resource/$0 (where 0 is a resource ID)
-def parse_path_placeholders!(str)
+def parse_path_placeholders(str, account:, bearer:, crypt:)
   str.dup.scan(/([-\w]+)\/((?<!\\)\$(\w+))/) do |resource, pattern, index|
     value =
       case index
       when "current"
         case resource
         when "users", "products"
-          @bearer.id
+          bearer.id
         else
           instance_variable_get("@#{resource.singularize}").id
         end
       else
-        if @account && resource.singularize != 'account'
+        if account && resource.singularize != 'account'
           case resource.underscore
           when "constraints"
-            @account.release_entitlement_constraints.send(:[], index.to_i).id
+            account.release_entitlement_constraints.send(:[], index.to_i).id
           when "platforms"
-            @account.release_platforms.send(:[], index.to_i).id
+            account.release_platforms.send(:[], index.to_i).id
           when "channels"
-            @account.release_channels.send(:[], index.to_i).id
+            account.release_channels.send(:[], index.to_i).id
           when "filetypes"
-            @account.release_filetypes.send(:[], index.to_i).id
+            account.release_filetypes.send(:[], index.to_i).id
           when "artifacts"
-            @account.release_artifacts.send(:[], index.to_i).id
+            account.release_artifacts.send(:[], index.to_i).id
           when "request-logs"
-            @account.request_logs.send(:[], index.to_i).id
+            account.request_logs.send(:[], index.to_i).id
           when "owners"
-            @account.group_owners.send(:[], index.to_i).id
+            account.group_owners.send(:[], index.to_i).id
           when "billing"
-            @account.billing.id
+            account.billing.id
           when "pool"
-            @account.keys
+            account.keys
               .all
               .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .id
           else
-            @account.send(resource.underscore)
+            account.send(resource.underscore)
               .all
               .send(*(index.nil? ? [:sample] : [:[], index.to_i]))
               .id
@@ -217,7 +219,10 @@ def parse_path_placeholders!(str)
         end
       end
 
-    str.sub! pattern.to_s, value
+    str = str.sub(pattern.to_s, value)
   end
-  parse_placeholders! str
+
+  str = parse_placeholders(str, account: account, bearer: bearer, crypt: crypt)
+
+  str
 end

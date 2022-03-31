@@ -13,9 +13,7 @@ class SecondFactor < ApplicationRecord
 
   before_create :generate_secret!
 
-  validates :account, presence: { message: 'must exist' }
   validates :user,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   scope :enabled, -> { where(enabled: true) }

@@ -9,13 +9,13 @@ FactoryBot.define do
     license { nil }
 
     after :build do |machine, evaluator|
-      account = evaluator.account.presence || create(:account)
+      account = evaluator.account.presence
       license =
         case
         when evaluator.license.present?
           evaluator.license
         else
-          create :license, account: account
+          build(:license, account: account)
         end
 
       machine.assign_attributes(

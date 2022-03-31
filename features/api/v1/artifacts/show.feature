@@ -10,7 +10,7 @@ Feature: Show release artifact
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
-    Given I am an admin of account "test1"
+    And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
     And the first "release" has an artifact that is uploaded
