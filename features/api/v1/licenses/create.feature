@@ -1884,7 +1884,7 @@ Feature: Create license
       """
       {
         "title": "Unprocessable resource",
-        "detail": "key is not a valid JWT claims payload (exp claim must be an integer)",
+        "detail": "key is not a valid JWT claims payload (exp claim must be a numeric value but it is a string)",
         "code": "KEY_JWT_CLAIMS_INVALID",
         "source": {
           "pointer": "/data/attributes/key"

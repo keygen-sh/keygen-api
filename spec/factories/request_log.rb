@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :request_log do
-
+    account { nil }
   end
 end

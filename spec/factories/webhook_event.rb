@@ -2,10 +2,11 @@
 
 FactoryBot.define do
   factory :webhook_event do
-    association :event_type
-
     endpoint { Faker::Internet.url }
     payload { { payload: "payload" }.to_json }
     jid { SecureRandom.hex }
+
+    account { nil }
+    event_type
   end
 end

@@ -36,6 +36,6 @@ class TokenSerializer < BaseSerializer
   end
 
   link :self do
-    @url_helpers.v1_account_token_path @object.account, @object
+    @url_helpers.v1_account_token_path @object.account_id, @object
   end
 end

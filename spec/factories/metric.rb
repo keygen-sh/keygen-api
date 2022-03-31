@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :metric do
-    association :event_type
-
     data {
       { data: { foo: 'bar' } }
     }
+
+    event_type
   end
 end

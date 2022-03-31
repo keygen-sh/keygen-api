@@ -3,14 +3,13 @@
 FactoryBot.define do
   factory :account do
     name { Faker::Company.name }
-    slug { [Faker::Internet.domain_word, SecureRandom.hex].join }
+    slug { Faker::Internet.domain_name.parameterize }
 
-    users { [] }
     billing { nil }
     plan
 
-    before :create do |account|
-      account.billing = create(:billing, account: account)
+    after :build do |account|
+      account.billing = build(:billing, account: account)
       account.users << build(:admin, account: account)
     end
   end

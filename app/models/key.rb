@@ -12,9 +12,7 @@ class Key < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  validates :account, presence: { message: "must exist" }
   validates :policy,
-    presence: { message: "must exist" },
     scope: { by: :account_id }
 
   validates :key,

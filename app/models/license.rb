@@ -65,9 +65,7 @@ class License < ApplicationRecord
     auto_release_lock: true,
     unless: :expiry?
 
-  validates :account, presence: { message: "must exist" }
   validates :policy,
-    presence: { message: "must exist" },
     scope: { by: :account_id }
 
   # Validate this association only if we've been given a user (because it's optional)
@@ -546,7 +544,7 @@ class License < ApplicationRecord
   def default_seed_key
     case scheme
     when "RSA_2048_PKCS1_ENCRYPT"
-      JSON.generate(id: id, created: created_at.iso8601(3), duration: duration, expiry: expiry.iso8601(3))
+      JSON.generate(id: id, created: created_at.iso8601(3), duration: duration, expiry: expiry&.iso8601(3))
     when "RSA_2048_JWT_RS256"
       claims = { jti: SecureRandom.uuid, iss: 'https://keygen.sh', aud: account.id, sub: id, iat: created_at.to_i, nbf: created_at.to_i }
       claims[:exp] = expiry.to_i if expiry.present?
@@ -565,7 +563,7 @@ class License < ApplicationRecord
         license: {
           id: id,
           created: created_at.iso8601(3),
-          expiry: expiry.iso8601(3),
+          expiry: expiry&.iso8601(3),
         }
       )
     end
@@ -801,7 +799,7 @@ class License < ApplicationRecord
          JSON::ParserError
     errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (must be a valid JSON encoded string)"
   rescue JWT::InvalidPayload => e
-    errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message})"
+    errors.add :key, :jwt_claims_invalid, message: "key is not a valid JWT claims payload (#{e.message.downcase})"
   end
 
   def generate_ed25519_signed_key!
@@ -829,7 +827,7 @@ class License < ApplicationRecord
               active_licensed_user_limit.nil?
 
     if active_licensed_user_count >= active_licensed_user_limit
-      errors.add :account, :license_limit_exceeded, message: "Your tier's active licensed user limit of #{active_licensed_user_limit.to_s :delimited} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
+      errors.add :account, :license_limit_exceeded, message: "Your tier's active licensed user limit of #{active_licensed_user_limit.to_fs(:delimited)} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
 
       throw :abort
     end

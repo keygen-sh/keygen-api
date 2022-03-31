@@ -3,6 +3,10 @@
 require 'bullet'
 
 Rails.application.configure do
+  # Configure 'rails notes' to inspect Cucumber files
+  config.annotations.register_directories('features')
+  config.annotations.register_extensions('feature') { |tag| /#\s*(#{tag}):?\s*(.*)$/ }
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Allow subdomains for localhost
@@ -21,6 +25,9 @@ Rails.application.configure do
 
   # Route exceptions to error controller.
   config.exceptions_app = self.routes
+
+  # Enable server timing
+  config.server_timing = true
 
   # Raise errors on unpermitted params.
   config.action_controller.action_on_unpermitted_parameters = :raise

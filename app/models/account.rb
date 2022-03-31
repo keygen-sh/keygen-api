@@ -8,7 +8,7 @@ class Account < ApplicationRecord
   include Pageable
   include Billable
 
-  belongs_to :plan, optional: true
+  belongs_to :plan
   has_one :billing
   has_many :webhook_endpoints
   has_many :webhook_events
@@ -50,7 +50,6 @@ class Account < ApplicationRecord
   before_create :generate_rsa_keys!
   before_create :generate_ed25519_keys!
 
-  validates :plan, presence: { message: "must exist" }
   validates :users, length: { minimum: 1, message: "must have at least one admin user" }
 
   validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }

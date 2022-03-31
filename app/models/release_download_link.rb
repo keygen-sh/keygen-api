@@ -10,10 +10,7 @@ class ReleaseDownloadLink < ApplicationRecord
     counter_cache: :download_count,
     inverse_of: :download_links
 
-  validates :account,
-    presence: { message: 'must exist' }
   validates :release,
-    presence: { message: 'must exist' },
     scope: { by: :account_id }
 
   validates :url,

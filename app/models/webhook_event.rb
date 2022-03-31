@@ -9,8 +9,6 @@ class WebhookEvent < ApplicationRecord
   belongs_to :account
   belongs_to :event_type
 
-  validates :account, presence: { message: "must exist" }
-  validates :event_type, presence: { message: "must exist" }
   validates :endpoint, url: true, presence: true
 
   scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }

@@ -46,7 +46,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "(user|a
 end
 
 Given /^I send the following headers:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   headers = JSON.parse body
 
   # Base64 encode basic credentials
@@ -62,7 +62,7 @@ Given /^I send the following headers:$/ do |body|
 end
 
 Given /^I send the following badly encoded headers:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   headers = JSON.parse body
 
   # Base64 encode basic credentials
@@ -78,7 +78,7 @@ Given /^I send the following badly encoded headers:$/ do |body|
 end
 
 Given /^I send the following raw headers:$/ do |body|
-  parse_placeholders! body
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   headers = body.split /\n/
 
   headers.each do |raw|
@@ -89,7 +89,7 @@ Given /^I send the following raw headers:$/ do |body|
 end
 
 Given /^I use an authentication token$/ do
-  @token = @bearer.tokens.first_or_create account: @bearer.account
+  @token = @bearer.tokens.first_or_create(account: @bearer.account)
 
   # Randomly pick a token version to test. We're doing it this way so
   # that we can evenly distribute tests for all token versions, to

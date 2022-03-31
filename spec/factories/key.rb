@@ -8,13 +8,8 @@ FactoryBot.define do
     policy { nil }
 
     after :build do |key, evaluator|
-      account = evaluator.account.presence || create(:account)
-      policy = create :policy, :pooled, account: account
-
-      key.assign_attributes(
-        account: account,
-        policy: policy
-      )
+      key.account ||= evaluator.account.presence
+      key.policy  ||= evaluator.policy.presence || build(:policy, :pooled, account: key.account)
     end
   end
 end

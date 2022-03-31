@@ -15,8 +15,6 @@ class Entitlement < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  validates :account, presence: { message: 'must exist' }
-
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
 

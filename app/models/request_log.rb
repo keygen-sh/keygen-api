@@ -10,8 +10,6 @@ class RequestLog < ApplicationRecord
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true
 
-  validates :account, presence: { message: "must exist" }
-
   # NOTE(ezekg) A lot of the time, we don't need to load the request
   #             or response body, e.g. when listing logs.
   scope :without_blobs, -> {
