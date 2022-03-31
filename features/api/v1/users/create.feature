@@ -280,7 +280,7 @@ Feature: Create user
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "GROUP_BLANK",
+        "code": "GROUP_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/group"
         }

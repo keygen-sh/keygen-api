@@ -213,15 +213,21 @@ class ApplicationController < ActionController::API
             code =
               case detail
               when :greater_than_or_equal_to,
-                  :less_than_or_equal_to,
-                  :greater_than,
-                  :less_than,
-                  :equal_to,
-                  :other_than
+                   :less_than_or_equal_to,
+                   :greater_than,
+                   :less_than,
+                   :equal_to,
+                   :other_than
                 "invalid"
               when :inclusion,
                    :exclusion
                 "not_allowed"
+              when :blank
+                if pointer.starts_with?("/data/relationships")
+                  "not_found"
+                else
+                  "missing"
+                end
               else
                 detail.to_s
               end

@@ -247,7 +247,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "GROUP_BLANK",
+        "code": "GROUP_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/group"
         }
@@ -1138,7 +1138,7 @@ Feature: Create machine
       {
         "title": "Unprocessable resource",
         "detail": "can't be blank",
-        "code": "FINGERPRINT_BLANK",
+        "code": "FINGERPRINT_MISSING",
         "source": {
           "pointer": "/data/attributes/fingerprint"
         }

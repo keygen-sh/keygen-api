@@ -1876,7 +1876,7 @@ Feature: Upsert release
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
+        "code": "CONSTRAINTS_ENTITLEMENT_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/constraints/data/0/relationships/entitlement"
         }
@@ -1887,7 +1887,7 @@ Feature: Upsert release
       {
         "title": "Unprocessable resource",
         "detail": "must exist",
-        "code": "CONSTRAINTS_ENTITLEMENT_BLANK",
+        "code": "CONSTRAINTS_ENTITLEMENT_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/constraints/data/1/relationships/entitlement"
         }
