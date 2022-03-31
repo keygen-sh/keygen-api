@@ -151,7 +151,7 @@ rescue => e
 end
 
 # Rate limit password reset requests
-Rack::Attack.throttle("req/ip/rstpwd", limit: 5, period: 1.minute) do |rack_req|
+Rack::Attack.throttle("req/ip/rstpwd", limit: 5, period: 1.hour) do |rack_req|
   next unless
     rack_req.post? && rack_req.path.ends_with?('/passwords')
 
@@ -180,7 +180,7 @@ rescue => e
 end
 
 # Rate limit password mutations (i.e. update password, reset password)
-Rack::Attack.throttle("req/ip/mutpwd", limit: 5, period: 1.minute) do |rack_req|
+Rack::Attack.throttle("req/ip/mutpwd", limit: 5, period: 10.minutes) do |rack_req|
   next unless
     rack_req.post? && (
       rack_req.path.ends_with?('/update-password') ||
@@ -212,7 +212,7 @@ rescue => e
 end
 
 # Rate limit MFA mutations (i.e. second factors, etc.)
-Rack::Attack.throttle("req/ip/mutmfa", limit: 5, period: 1.minute) do |rack_req|
+Rack::Attack.throttle("req/ip/mutmfa", limit: 5, period: 10.minutes) do |rack_req|
   next unless
     (rack_req.post? && rack_req.path.ends_with?('/second-factors')) ||
     (rack_req.delete? && rack_req.path.include?('/second-factors/')) ||
