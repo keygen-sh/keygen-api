@@ -18,7 +18,8 @@ Feature: User password actions
 
   Scenario: User updates their password
     Given the current account is "test1"
-    And the current account has 3 "users"
+    And the current account has 1 "user"
+    And the current account has 3 "tokens" for the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/actions/update-password" with the following:
@@ -31,6 +32,7 @@ Feature: User password actions
       }
       """
     And the response should contain a valid signature header for "test1"
+    And the current user should have 1 "token"
     Then the response status should be "200"
 
   Scenario: User updates their password (no password set)
@@ -171,7 +173,8 @@ Feature: User password actions
 
   Scenario: User resets their password
     Given the current account is "test1"
-    And the current account has 3 "users"
+    And the current account has 1 "user"
+    And the current account has 3 "tokens" for the last "user"
     And I am a user of account "test1"
     And I have a password reset token
     When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
@@ -184,6 +187,7 @@ Feature: User password actions
       }
       """
     Then the response status should be "200"
+    And the current user should have 0 "tokens"
 
   Scenario: User resets their password by using their email
     Given the current account is "test1"
