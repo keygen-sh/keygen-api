@@ -154,7 +154,13 @@ end
 Given /^the current account has (\d+) "([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
-    association_name = association.singularize.underscore.to_sym
+    association_name =
+      case resource.singularize
+      when "token"
+        :bearer
+      else
+        association.singularize.underscore.to_sym
+      end
 
     create resource.singularize.underscore, account: @account, association_name => associated_record
   end
@@ -552,6 +558,12 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
+end
+
+Then /^the current (?:bearer|user|license|product) should have (\d+) "([^\"]*)"$/ do |expected_count, resource|
+  count = @bearer.send(resource.pluralize.underscore).count
+
+  expect(count).to eq(expected_count.to_i)
 end
 
 Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, resource|
