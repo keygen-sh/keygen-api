@@ -10,7 +10,6 @@ Rails.application.config.filter_parameters += %i[
   secret
   private_key
   salt
-  certificate
   otp
   ssn
 ]
