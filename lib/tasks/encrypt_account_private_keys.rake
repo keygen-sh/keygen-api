@@ -7,5 +7,6 @@ task encrypt_account_private_keys: :environment do
       account.encrypted_attribute?(:private_key)
 
     account.encrypt
+    account.clear_cache!
   end
 end
