@@ -8,5 +8,7 @@ task encrypt_account_private_keys: :environment do
 
     account.encrypt
     account.clear_cache!
+
+    sleep 0.1
   end
 end
