@@ -55,6 +55,15 @@ module Keygen
     # See above comment about having to use this multiple
     config.middleware.use Keygen::Middleware::RequestErrorWrapper
 
+    # FIXME(ezekg) Should we migrate to credentials?
+    config.active_record.encryption.primary_key         = ENV.fetch('ENCRYPTION_PRIMARY_KEY')
+    config.active_record.encryption.deterministic_key   = ENV.fetch('ENCRYPTION_DETERMINISTIC_KEY')
+    config.active_record.encryption.key_derivation_salt = ENV.fetch('ENCRYPTION_KEY_DERIVATION_SALT')
+
+    # TODO(ezekg) Remove these once our data is migrated
+    config.active_record.encryption.support_unencrypted_data = true
+    config.active_record.encryption.extend_queries           = true
+
     # Use mailers queue
     config.action_mailer.deliver_later_queue_name = :mailers
 
