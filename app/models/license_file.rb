@@ -18,11 +18,16 @@ class LicenseFile
   validates :expires_at,  presence: true
   validates :ttl,         presence: true
 
-  validates_format_of :certificate, with: /\A-----BEGIN LICENSE FILE-----\n/
-  validates_format_of :certificate, with: /-----END LICENSE FILE-----\n\z/
+  validates_format_of :certificate,
+    with: /\A-----BEGIN LICENSE FILE-----\n/,
+    message: 'invalid prefix'
+  validates_format_of :certificate,
+    with: /-----END LICENSE FILE-----\n\z/,
+    message: 'invalid suffix'
 
   validates_numericality_of :ttl,
-    greater_than_or_equal_to: 1.hour
+    greater_than_or_equal_to: 1.hour,
+    less_than_or_equal_to: 1.year
 
   def persisted?
     false

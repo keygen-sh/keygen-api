@@ -402,7 +402,7 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin performs a machine checkout with an invalid TTL (POST)
+  Scenario: Admin performs a machine checkout with a TTL that is too short (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -428,7 +428,7 @@ Feature: Machine checkout actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin performs a machine checkout with an invalid TTL (GET)
+  Scenario: Admin performs a machine checkout with a TTL that is too short (GET)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "machine"
@@ -441,6 +441,55 @@ Feature: Machine checkout actions
       {
         "title": "Bad request",
         "detail": "must be greater than or equal to 3600 (1 hour)",
+        "code": "CHECKOUT_TTL_INVALID",
+        "source": {
+          "parameter": "ttl"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with a TTL that is too long (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out" with the following:
+      """
+      { "meta": { "ttl": 31556953 } }
+      """
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 31556952 (1 year)",
+        "code": "CHECKOUT_TTL_INVALID",
+        "source": {
+          "parameter": "ttl"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin performs a machine checkout with a TTL that is too long (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?ttl=94670856"
+    Then the response status should be "400"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be less than or equal to 31556952 (1 year)",
         "code": "CHECKOUT_TTL_INVALID",
         "source": {
           "parameter": "ttl"
