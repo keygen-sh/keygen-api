@@ -20,6 +20,9 @@ class AbstractCheckoutService < BaseService
     raise InvalidAlgorithmError, 'algorithm is missing' unless
       algorithm.present?
 
+    raise InvalidTTLError, 'must be less than or equal to 31556952 (1 year)' if
+      ttl.present? && ttl > 1.year
+
     raise InvalidTTLError, 'must be greater than or equal to 3600 (1 hour)' if
       ttl.present? && ttl < 1.hour
 
