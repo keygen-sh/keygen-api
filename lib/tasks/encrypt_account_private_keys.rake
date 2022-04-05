@@ -4,7 +4,7 @@ desc 'encrypt account private keys'
 task encrypt_account_private_keys: :environment do
   Account.find_each do |account|
     next if
-      account.encrypted_attribute?(:private_key)
+      account.encrypted_attributes?
 
     account.encrypt
     account.clear_cache!
