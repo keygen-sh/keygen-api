@@ -4,7 +4,8 @@ class EventLog < ApplicationRecord
   belongs_to :account
   belongs_to :event_type
   belongs_to :resource,
-    polymorphic: true
+    polymorphic: true,
+    optional: true
   belongs_to :whodunnit,
     polymorphic: true,
     optional: true
