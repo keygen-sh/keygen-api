@@ -48,7 +48,7 @@ class ApplicationController < ActionController::API
     }, status: :forbidden
   end
 
-  def render_unauthorized(opts = {})
+  def render_unauthorized(**kwargs)
     skip_authorization
 
     self.headers["WWW-Authenticate"] = %(Bearer realm="keygen")
@@ -57,7 +57,7 @@ class ApplicationController < ActionController::API
       errors: [{
         title: "Unauthorized",
         detail: "You must be authenticated to complete the request"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :unauthorized
   end
 
@@ -267,11 +267,24 @@ class ApplicationController < ActionController::API
          Keygen::Error::InvalidScopeError => e
     render_bad_request detail: e.message, source: e.source
   rescue Keygen::Error::UnauthorizedError => e
-    if e.detail.present?
-      render_unauthorized code: e.code, detail: e.detail
-    else
-      render_unauthorized code: e.code
+    kwargs = { code: e.code }
+
+    kwargs[:detail] = e.detail if
+      e.detail.present?
+
+    # Add additional properties based on code
+    case e.code
+    when 'LICENSE_NOT_ALLOWED',
+        'LICENSE_INVALID'
+      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
+    when 'TOKEN_NOT_ALLOWED',
+         'TOKEN_INVALID'
+      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#token-authentication' }
+    when 'TOKEN_MISSING'
+      kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/' }
     end
+
+    render_unauthorized(**kwargs)
   rescue Keygen::Error::ForbiddenError => e
     if e.detail.present?
       render_forbidden code: e.code, detail: e.detail
