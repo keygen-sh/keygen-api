@@ -670,7 +670,7 @@ Given /^the (\w+) error should have the following properties:$/ do |i, body|
   }
 
   err = json["errors"].send :[], numbers[i]
-  expect(err).to eq JSON.parse(body)
+  expect(err).to include JSON.parse(body)
 end
 
 Then /^the JSON response should contain the following links:$/ do |body|
