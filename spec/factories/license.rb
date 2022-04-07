@@ -8,24 +8,8 @@ FactoryBot.define do
 
     after :build do |license, evaluator|
       account = evaluator.account.presence
-      policy =
-        if evaluator.policy.present?
-          case
-          when evaluator.policy.scheme?
-            scheme = evaluator.policy.scheme.downcase.to_sym
-
-            build(:policy, scheme, account: account)
-          when evaluator.policy.require_check_in?
-            interval = "#{evaluator.policy.check_in_interval}_check_in".to_sym
-
-            build(:policy, interval, account: account)
-          else
-            evaluator.policy
-          end
-        else
-          build(:policy, account: account)
-        end
-      user =
+      policy  = evaluator.policy.presence || build(:policy, account: account)
+      user    =
         case
         when evaluator.user == false
           nil

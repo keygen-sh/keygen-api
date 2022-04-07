@@ -83,20 +83,9 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 3 "policies" for the first "product"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -125,20 +114,9 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 3 "policies" for the first "product"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -158,24 +136,10 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "products"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the second "policy" has the following attributes:
-      """
-      { "productId": "$products[1]" }
-      """
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -190,8 +154,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change to a policy for another product",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -205,30 +170,17 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "encrypted": true
-      }
+      { "encrypted": true }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "encrypted": false
-      }
+      { "encrypted": false }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -243,8 +195,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -258,30 +211,17 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "encrypted": false
-      }
+      { "encrypted": false }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "encrypted": true
-      }
+      { "encrypted": true }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -296,8 +236,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -311,30 +252,17 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "scheme": "RSA_2048_JWT_RS256"
-      }
+      { "scheme": "RSA_2048_JWT_RS256" }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "scheme": "RSA_2048_PKCS1_ENCRYPT"
-      }
+      { "scheme": "RSA_2048_PKCS1_ENCRYPT" }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -349,8 +277,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change to a policy with a different scheme",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -364,30 +293,18 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "usePool": true
-      }
+      { "usePool": true }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "usePool": false
-      }
+      { "usePool": false }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "key" for the first "policy"
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -402,8 +319,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -417,30 +335,17 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "usePool": false
-      }
+      { "usePool": false }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "usePool": true
-      }
+      { "usePool": true }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
@@ -455,8 +360,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -470,20 +376,9 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test2"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 3 "policies" for the first "product"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And I use an authentication token
     When I send a PUT request to "/accounts/test2/licenses/$0/policy" with the following:
       """
@@ -503,27 +398,17 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE",
-        "productId": "$products[0]"
-      }
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE" }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
-        "productId": "$products[0]"
-      }
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 2 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
+    And the current account has 2 "licenses" for the first "policy"
     And the current account has 2 "machines"
     And the first "machine" has the following attributes:
       """
@@ -553,8 +438,9 @@ Feature: License policy relationship
     And the first error should have the following properties:
       """
       {
-        "title": "Unprocessable entity",
+        "title": "Unprocessable resource",
         "detail": "cannot change to a policy with a different fingerprint uniqueness strategy",
+        "code": "POLICY_NOT_COMPATIBLE",
         "source": {
           "pointer": "/data/relationships/policy"
         }
@@ -568,26 +454,16 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 2 "policies" for the first "product"
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "duration": "$time.1.year"
-      }
+      { "duration": "$time.1.year" }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2042-02-21T17:09:26.685Z"
-      }
+      { "expiry": "2042-02-21T17:09:26.685Z" }
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -618,27 +494,19 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 2 "policies" for the first "product"
     And the second "policy" has the following attributes:
       """
       {
         "transferStrategy": "KEEP_EXPIRY",
-        "productId": "$products[0]",
         "duration": "$time.1.year"
       }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2042-02-21T17:09:26.685Z"
-      }
+      { "expiry": "2042-02-21T17:09:26.685Z" }
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -669,27 +537,19 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 2 "policies" for the first "product"
     And the second "policy" has the following attributes:
       """
       {
         "transferStrategy": "KEEP_EXPIRY",
-        "productId": "$products[0]",
         "duration": null
       }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2042-02-21T17:09:26.685Z"
-      }
+      { "expiry": "2042-02-21T17:09:26.685Z" }
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -720,27 +580,19 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 2 "policies" for the first "product"
     And the second "policy" has the following attributes:
       """
       {
         "transferStrategy": "RESET_EXPIRY",
-        "productId": "$products[0]",
         "duration": "$time.1.year"
       }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2042-02-21T17:09:26.685Z"
-      }
+      { "expiry": "2042-02-21T17:09:26.685Z" }
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -771,27 +623,19 @@ Feature: License policy relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 2 "policies" for the first "product"
     And the second "policy" has the following attributes:
       """
       {
         "transferStrategy": "RESET_EXPIRY",
-        "productId": "$products[0]",
         "duration": null
       }
       """
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "2042-02-21T17:09:26.685Z"
-      }
+      { "expiry": "2042-02-21T17:09:26.685Z" }
       """
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -822,19 +666,8 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 3 "policies" for the first "product"
+    And the current account has 1 "license" for the first "policy"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -863,20 +696,10 @@ Feature: License policy relationship
   Scenario: Product changes a license's policy relationship to a new policy they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the current account has 1 "license" for the first "policy"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -888,37 +711,29 @@ Feature: License policy relationship
         }
       }
       """
-    Then the response status should be "200"
-    And the JSON response should be a "license" with the following relationships:
+    Then the response status should be "422"
+    And the first error should have the following properties:
       """
       {
-        "policy": {
-          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/policy" },
-          "data": { "type": "policies", "id": "$policies[1]" }
+        "title": "Unprocessable resource",
+        "detail": "cannot change to a policy for another product",
+        "code": "POLICY_NOT_COMPATIBLE",
+        "source": {
+          "pointer": "/data/relationships/policy"
         }
       }
       """
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Product changes a license's policy relationship to a new policy for a license they don't own
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
-    And the current account has 3 "policies"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[1]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "policy" for the second "product"
+    And the current account has 1 "license" for the second "policy"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
@@ -939,21 +754,15 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
+    And the current account has 3 "policies" for the first "product"
     And all "policies" have the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
+      { "protected": false }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
+      { "expiry": "$time.1.day.from_now" }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -986,21 +795,15 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
+    And the current account has 3 "policies" for the first "product"
     And all "policies" have the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": true
-      }
+      { "protected": true }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
+      { "expiry": "$time.1.day.from_now" }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -1024,29 +827,16 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
+      { "protected": false }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": true
-      }
+      { "protected": true }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license"
@@ -1061,6 +851,10 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "403"
+    And the first "license" should have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -1069,29 +863,16 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 2 "policies"
+    And the current account has 2 "policies" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": true
-      }
+      { "protected": true }
       """
     And the second "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
+      { "protected": false }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license"
@@ -1106,6 +887,10 @@ Feature: License policy relationship
       }
       """
     Then the response status should be "403"
+    And the first "license" should have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -1114,22 +899,12 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 1 "policy"
+    And the current account has 1 "policy" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "productId": "$products[0]",
-        "protected": false
-      }
+      { "protected": false }
       """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current user has 1 "license"
@@ -1139,7 +914,7 @@ Feature: License policy relationship
       {
         "data": {
           "type": "policies",
-          "id": "$licenses[0]"
+          "id": "5e9527ce-a9ba-4f0f-a881-980129f4d36c"
         }
       }
       """
@@ -1152,20 +927,12 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 3 "policies" for the first "product"
     And the current account has 2 "users"
-    And the current account has 1 "license"
+    And the current account has 1 "license" for the first "policy"
     And all "licenses" have the following attributes:
       """
-      {
-        "policyId": "$policies[0]",
-        "userId": "$users[2]",
-        "expiry": "$time.1.day.from_now"
-      }
+      { "userId": "$users[2]" }
       """
     And I am a user of account "test1"
     And I use an authentication token
@@ -1187,19 +954,8 @@ Feature: License policy relationship
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 3 "policies"
-    And all "policies" have the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "expiry": "$time.1.day.from_now"
-      }
-      """
+    And the current account has 3 "policies" for the first "product"
+    And the current account has 1 "license" for the first "policy"
     When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
       """
       {
