@@ -41,7 +41,8 @@ module TokenAuthentication
   end
 
   def authenticate_with_query_token(&auth_procedure)
-    query_token = request.query_parameters[:token]
+    query_token = request.query_parameters[:token] ||
+                  request.query_parameters[:auth]
 
     auth_procedure.call(query_token)
   end
@@ -60,7 +61,17 @@ module TokenAuthentication
     return nil if
       current_account.nil? || query_token.blank?
 
-    http_token_authenticator(query_token)
+    type, auth = query_token.split(':', 2)
+
+    case type
+    when 'license'
+      http_license_authenticator(auth)
+    when 'token'
+      http_token_authenticator(auth)
+    else
+      # NOTE(ezekg) For backwards compatibility
+      http_token_authenticator(query_token)
+    end
   end
 
   def http_basic_authenticator(username = nil, password = nil)
