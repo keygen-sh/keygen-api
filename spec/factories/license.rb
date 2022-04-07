@@ -32,51 +32,75 @@ FactoryBot.define do
     end
 
     trait :legacy_encrypt do
-      association :policy, :legacy_encrypt, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :legacy_encrypt, account: license.account)
+      end
     end
 
     trait :rsa_2048_pkcs1_encrypt do
-      association :policy, :rsa_2048_pkcs1_encrypt, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_pkcs1_encrypt, account: license.account)
+      end
     end
 
     trait :rsa_2048_pkcs1_sign do
-      association :policy, :rsa_2048_pkcs1_sign, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_pkcs1_sign, account: license.account)
+      end
     end
 
     trait :rsa_2048_pkcs1_pss_sign do
-      association :policy, :rsa_2048_pkcs1_pss_sign, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_pkcs1_pss_sign, account: license.account)
+      end
     end
 
     trait :rsa_2048_jwt_rs256 do
-      association :policy, :rsa_2048_jwt_rs256, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_jwt_rs256, account: license.account)
+      end
     end
 
     trait :rsa_2048_pkcs1_sign_v2 do
-      association :policy, :rsa_2048_pkcs1_sign_v2, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_pkcs1_sign_v2, account: license.account)
+      end
     end
 
     trait :rsa_2048_pkcs1_pss_sign_v2 do
-      association :policy, :rsa_2048_pkcs1_pss_sign_v2, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :rsa_2048_pkcs1_pss_sign_v2, account: license.account)
+      end
     end
 
     trait :ed25519_sign do
-      association :policy, :ed25519_sign, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :ed25519_sign, account: license.account)
+      end
     end
 
     trait :day_check_in do
-      association :policy, :day_check_in, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :day_check_in, account: license.account)
+      end
     end
 
     trait :week_check_in do
-      association :policy, :week_check_in, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :week_check_in, account: license.account)
+      end
     end
 
     trait :month_check_in do
-      association :policy, :month_check_in, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :month_check_in, account: license.account)
+      end
     end
 
     trait :year_check_in do
-      association :policy, :year_check_in, strategy: :build
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :year_check_in, account: license.account)
+      end
     end
 
     trait :userless do |license|
