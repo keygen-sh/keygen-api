@@ -61,16 +61,16 @@ module TokenAuthentication
     return nil if
       current_account.nil? || query_token.blank?
 
-    type, auth = query_token.split(':', 2)
+    username, password = query_token.split(':', 2)
 
-    case type
+    case username
     when 'license'
-      http_license_authenticator(auth)
+      http_license_authenticator(password)
     when 'token'
-      http_token_authenticator(auth)
+      http_token_authenticator(password)
     else
       # NOTE(ezekg) For backwards compatibility
-      http_token_authenticator(query_token)
+      http_token_authenticator(username)
     end
   end
 
