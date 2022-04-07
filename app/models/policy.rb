@@ -24,6 +24,14 @@ class Policy < ApplicationRecord
     UNIQUE_PER_LICENSE
   ].freeze
 
+  FINGERPRINT_UNIQUENESS_RANKS = {
+    UNIQUE_PER_ACCOUNT: 3,
+    UNIQUE_PER_PRODUCT: 2,
+    UNIQUE_PER_POLICY:  1,
+    UNIQUE_PER_LICENSE: 0,
+  }.with_indifferent_access
+   .freeze
+
   FINGERPRINT_MATCHING_STRATEGIES = %w[
     MATCH_ANY
     MATCH_MOST
@@ -320,6 +328,10 @@ class Policy < ApplicationRecord
     return true if fingerprint_uniqueness_strategy.nil? # NOTE(ezekg) Backwards compat
 
     fingerprint_uniqueness_strategy == 'UNIQUE_PER_LICENSE'
+  end
+
+  def fingerprint_uniq_rank
+    FINGERPRINT_UNIQUENESS_RANKS.fetch(fingerprint_uniqueness_strategy) { -1 }
   end
 
   def fingerprint_match_any?
