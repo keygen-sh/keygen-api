@@ -38,7 +38,8 @@ class Release < ApplicationRecord
     index_errors: true,
     autosave: true
   has_many :entitlements,
-    through: :constraints
+    through: :constraints,
+    index_errors: true
   has_many :download_links,
     class_name: 'ReleaseDownloadLink',
     inverse_of: :release,

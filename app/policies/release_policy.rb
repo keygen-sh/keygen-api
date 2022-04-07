@@ -81,6 +81,20 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def list_entitlements?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
+  def show_entitlement?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
   def list_constraints?
     assert_account_scoped!
 
