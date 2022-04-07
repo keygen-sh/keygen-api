@@ -19,50 +19,15 @@ module Api::V1::Licenses::Relationships
     def update
       authorize license, :change_policy?
 
-      new_policy = current_account.policies.find_by id: policy_params[:id]
+      new_policy = current_account.policies.find_by(id: policy_params[:id])
       old_policy = license.policy
 
-      case
-      when new_policy.present? && old_policy.product != new_policy.product
-        return render_unprocessable_entity(
-          detail: "cannot change to a policy for another product",
-          source: {
-            pointer: "/data/relationships/policy"
-          }
-        )
-      when new_policy.present? && old_policy.encrypted? != new_policy.encrypted?
-        return render_unprocessable_entity(
-          detail: "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)",
-          source: {
-            pointer: "/data/relationships/policy"
-          }
-        )
-      when new_policy.present? && old_policy.pool? != new_policy.pool?
-        return render_unprocessable_entity(
-          detail: "cannot change from a pooled policy to an unpooled policy (or vice-versa)",
-          source: {
-            pointer: "/data/relationships/policy"
-          }
-        )
-      when new_policy.present? && old_policy.scheme != new_policy.scheme
-        return render_unprocessable_entity(
-          detail: "cannot change to a policy with a different scheme",
-          source: {
-            pointer: "/data/relationships/policy"
-          }
-        )
-      when new_policy.present? && old_policy.fingerprint_uniqueness_strategy != new_policy.fingerprint_uniqueness_strategy
-        return render_unprocessable_entity(
-          detail: "cannot change to a policy with a different fingerprint uniqueness strategy",
-          source: {
-            pointer: "/data/relationships/policy"
-          }
-        )
-      when current_bearer.has_role?(:user) && new_policy&.protected?
-        return render_forbidden
-      end
+      license.transaction do
+        license.transfer!(new_policy)
 
-      license.transfer!(new_policy)
+        # Need to perform the authz again to assert new policy can be accessed
+        authorize license, :change_policy?
+      end
 
       BroadcastEventService.call(
         event: "license.policy.updated",

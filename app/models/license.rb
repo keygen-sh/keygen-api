@@ -109,6 +109,32 @@ class License < ApplicationRecord
     license.errors.add :uses, :limit_exceeded, message: "usage exceeds maximum allowed by current policy (#{license.max_uses})"
   end
 
+  validate on: :update do |license|
+    next unless
+      license.policy_id_changed? &&
+      license.policy_id_was.present? &&
+      license.policy_id.present?
+
+    prev_policy = account.policies.find_by(id: policy_id_was)
+    next_policy = license.policy
+
+    next if
+      prev_policy.nil?
+
+    case
+    when next_policy.product_id != prev_policy.product_id
+      license.errors.add :policy, :not_compatible, message: "cannot change to a policy for another product"
+    when next_policy.encrypted? != prev_policy.encrypted?
+      license.errors.add :policy, :not_compatible, message: "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)"
+    when next_policy.pool? != prev_policy.pool?
+      license.errors.add :policy, :not_compatible, message: "cannot change from a pooled policy to an unpooled policy (or vice-versa)"
+    when next_policy.scheme != prev_policy.scheme
+      license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a different scheme"
+    when next_policy.fingerprint_uniqueness_strategy != prev_policy.fingerprint_uniqueness_strategy
+      license.errors.add :policy, :not_compatible, message: "cannot change to a policy with a different fingerprint uniqueness strategy"
+    end
+  end
+
   validate on: %i[create update] do
     next unless
       group_id_changed?
