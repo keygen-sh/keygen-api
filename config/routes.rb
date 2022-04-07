@@ -181,6 +181,7 @@ Rails.application.routes.draw do
         put "/", to: "releases#upsert", as: "upsert"
       end
       scope module: "releases/relationships" do
+        resources "entitlements", only: [:index, :show]
         resources "constraints", only: [:index, :show] do
           collection do
             post "/", to: "constraints#attach", as: "attach"
