@@ -991,6 +991,55 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User transfers a license to a protected policy with a RESET_EXPIRY transfer strategy
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 2 "policies" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "protected": false }
+      """
+    And the second "policy" has the following attributes:
+      """
+      {
+        "transferStrategy": "RESET_EXPIRY",
+        "duration": "$time.1.year",
+        "protected": true
+      }
+      """
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      {
+        "expiry": "2042-02-21T17:09:26.685Z",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/policy" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[1]"
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the first "license" should have the following attributes:
+      """
+      {
+        "expiry": "2042-02-21T17:09:26.685Z",
+        "policyId": "$policies[0]"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous changes a license's policy relationship to a new policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

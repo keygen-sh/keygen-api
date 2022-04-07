@@ -607,7 +607,7 @@ Then /^the account "([^\"]*)" should have the following attributes:$/ do |id, bo
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
-  expect(account.attributes).to include attributes
+  expect(account.attributes.as_json).to include attributes
 end
 
 Then /^the current token should have the following attributes:$/ do |body|
@@ -615,7 +615,7 @@ Then /^the current token should have the following attributes:$/ do |body|
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
-  expect(@token.reload.attributes).to include attributes
+  expect(@token.reload.attributes.as_json).to include attributes
 end
 
 Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have a correct machine core count$/ do |word_index|
@@ -677,7 +677,7 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the fol
   model   = @account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
 
-  expect(model.attributes).to include attrs
+  expect(model.attributes.as_json).to include attrs
 end
 
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the following attributes:$/ do |index_in_words, model_name, body|
@@ -686,7 +686,7 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the
   model   = @account.send(model_name.pluralize).send(index_in_words)
   attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
 
-  expect(model.attributes).to_not include attrs
+  expect(model.attributes.as_json).to_not include attrs
 end
 
 Given /^the (\w+) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
