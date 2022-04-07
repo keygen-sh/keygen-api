@@ -1839,7 +1839,7 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a machine with a fingerprint from another license's machine for a policy-scoped fingerprint uniqueness strategy (same policy)
+  Scenario: License creates a machine with a fingerprint matching another license's machine for a policy-scoped fingerprint uniqueness strategy (same policy)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -1847,14 +1847,7 @@ Feature: Create machine
       """
       { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
-    And the current account has 2 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "protected": true
-      }
-      """
+    And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
       """
@@ -1922,21 +1915,8 @@ Feature: Create machine
       """
       { "fingerprintUniquenessStrategy": "UNIQUE_PER_POLICY" }
       """
-    And the current account has 2 "licenses"
-    And the first "license" has the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "protected": true
-      }
-      """
-    And the second "license" has the following attributes:
-      """
-      {
-        "policyId": "$policies[1]",
-        "protected": true
-      }
-      """
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license" for the second "policy"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
       """
@@ -1989,22 +1969,12 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 1 "product"
-    And the current account has 1 "policy"
+    And the current account has 1 "policy" for the first "product"
     And all "policies" have the following attributes:
       """
-      {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
-        "productId": "$products[0]"
-      }
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
-    And the current account has 2 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "protected": true
-      }
-      """
+    And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
       """
@@ -2068,36 +2038,18 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     And the current account has 2 "products"
-    And the current account has 2 "policies"
+    And the current account has 1 "policy" for the first "product"
     And the first "policy" has the following attributes:
       """
-      {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
-        "productId": "$products[0]"
-      }
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
+    And the current account has 1 "policy" for the second "product"
     And the second "policy" has the following attributes:
       """
-      {
-        "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
-        "productId": "$products[1]"
-      }
+      { "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT" }
       """
-    And the current account has 2 "licenses"
-    And the first "license" has the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "protected": true
-      }
-      """
-    And the second "license" has the following attributes:
-      """
-      {
-        "policyId": "$policies[1]",
-        "protected": true
-      }
-      """
+    And the current account has 1 "license" for the first "product"
+    And the current account has 1 "license" for the second "product"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
       """
@@ -2150,18 +2102,11 @@ Feature: Create machine
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
-    And all "policies" have the following attributes:
+    And the first "policy" has the following attributes:
       """
       { "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT" }
       """
-    And the current account has 2 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]",
-        "protected": true
-      }
-      """
+    And the current account has 2 "licenses" for the first "policy"
     And the current account has 1 "machine"
     And the first "machine" has the following attributes:
       """
