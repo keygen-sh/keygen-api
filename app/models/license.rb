@@ -122,8 +122,6 @@ class License < ApplicationRecord
       prev_policy.nil?
 
     case
-    when next_policy.product_id != prev_policy.product_id
-      license.errors.add :policy, :not_compatible, message: "cannot change to a policy for another product"
     when next_policy.encrypted? != prev_policy.encrypted?
       license.errors.add :policy, :not_compatible, message: "cannot change from an encrypted policy to an unencrypted policy (or vice-versa)"
     when next_policy.pool? != prev_policy.pool?

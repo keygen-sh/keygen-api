@@ -150,20 +150,18 @@ Feature: License policy relationship
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following relationships:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "cannot change to a policy for another product",
-        "code": "POLICY_NOT_COMPATIBLE",
-        "source": {
-          "pointer": "/data/relationships/policy"
+        "policy": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/policy" },
+          "data": { "type": "policies", "id": "$policies[1]" }
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a encrypted license's policy relationship to a new unencrypted policy
@@ -711,18 +709,7 @@ Feature: License policy relationship
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "cannot change to a policy for another product",
-        "code": "POLICY_NOT_COMPATIBLE",
-        "source": {
-          "pointer": "/data/relationships/policy"
-        }
-      }
-      """
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
