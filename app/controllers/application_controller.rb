@@ -260,7 +260,14 @@ class ApplicationController < ActionController::API
           Keygen.logger.exception(e)
         end
 
-        res
+        # Update sort order for my OCD
+        res.slice(
+          :title,
+          :detail,
+          :code,
+          :source,
+          :links,
+        )
       end
     }.flatten
 
