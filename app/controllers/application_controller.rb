@@ -235,9 +235,29 @@ class ApplicationController < ActionController::API
             res.merge! code: "#{subject}_#{code}".parameterize.underscore.upcase
           end
         rescue => e
-          Keygen.logger.exception e
+          Keygen.logger.exception(e)
+        end
 
-          raise e
+        # Provide a docs link when possible
+        begin
+          if pointer.present?
+            (_, docs_type, docs_attr, *) = pointer.delete_prefix('/').split('/')
+            docs_object = klass.name.underscore.pluralize
+
+            # FIXME(ezekg) Special case (need to update docs)
+            docs_type = 'attrs' if
+              docs_type == 'attributes'
+
+            if docs_object.present? && docs_type.present? && docs_attr.present?
+              links = {
+                about: "https://keygen.sh/docs/api/#{docs_object}/##{docs_object}-object-#{docs_type}-#{docs_attr}"
+              }
+
+              res.merge!(links:)
+            end
+          end
+        rescue => e
+          Keygen.logger.exception(e)
         end
 
         res
