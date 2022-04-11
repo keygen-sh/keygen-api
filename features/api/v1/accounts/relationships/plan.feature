@@ -46,6 +46,14 @@ Feature: Account plan relationship
     When I send a GET request to "/accounts/test1/plan"
     Then the response status should be "200"
 
+  Scenario: Read-only attempts to retrieve the plan for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/plan"
+    Then the response status should be "200"
+
   Scenario: Product attempts to retrieve the plan for their account
     Given the account "test1" is subscribed
     And the account "test1" has 1 "product"

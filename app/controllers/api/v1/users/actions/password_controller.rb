@@ -26,7 +26,7 @@ module Api::V1::Users::Actions
 
     # POST /users/1/reset-password
     def reset_password
-      skip_authorization
+      authorize user
 
       if user.compare_hashed_token(:password_reset_token, password_meta[:password_reset_token])
         return render_unauthorized(detail: "is expired", source: { pointer: "/meta/passwordResetToken" }) if

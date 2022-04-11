@@ -407,6 +407,28 @@ Feature: Update license
       """
     Then the response status should be "200"
 
+  Scenario: Read-only updates a license expiry
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "id": "$licenses[0].id",
+          "attributes": {
+            "expiry": "2016-09-05T22:53:37.000Z",
+            "name": "Some Name"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin updates a license name
     Given I am an admin of account "test1"
     And the current account is "test1"

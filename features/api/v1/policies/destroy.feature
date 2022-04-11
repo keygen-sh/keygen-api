@@ -64,6 +64,16 @@ Feature: Delete policy
     When I send a DELETE request to "/accounts/test1/policies/$2"
     Then the response status should be "403"
 
+  Scenario: Read-only deletes one of their policies
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "policies"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$2"
+    Then the response status should be "403"
+
   Scenario: Admin attempts to delete a policy for another account
     Given I am an admin of account "test2"
     But the current account is "test1"

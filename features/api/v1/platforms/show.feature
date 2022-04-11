@@ -53,6 +53,15 @@ Feature: Show release platform
     When I send a GET request to "/accounts/test1/platforms/$0"
     Then the response status should be "200"
 
+  Scenario: Read-only retrieves a platform for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/platforms/$0"
+    Then the response status should be "200"
+
   Scenario: Admin retrieves an invalid platform for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

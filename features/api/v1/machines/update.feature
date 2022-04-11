@@ -105,6 +105,27 @@ Feature: Update machine
       """
     Then the response status should be "200"
 
+  Scenario: Read-only updates a machine
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "id": "$machines[0].id",
+          "attributes": {
+            "name": "Home iMac"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin removes a machine's IP address
     Given I am an admin of account "test1"
     And the current account is "test1"

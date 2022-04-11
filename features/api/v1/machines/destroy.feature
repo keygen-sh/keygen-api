@@ -73,6 +73,17 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 3 "machines"
 
+  Scenario: Read-only deletes one of their machines
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "machines"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "403"
+    And the current account should have 3 "machines"
+
   Scenario: Admin deletes one of their machines by fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"

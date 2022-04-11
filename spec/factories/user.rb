@@ -45,5 +45,12 @@ FactoryBot.define do
         create :token, bearer: agent
       end
     end
+
+    factory :read_only do
+      after :create do |user|
+        user.role = create :role, :read_only, resource: user
+        create :token, bearer: user
+      end
+    end
   end
 end

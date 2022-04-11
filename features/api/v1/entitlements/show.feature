@@ -56,6 +56,16 @@ Feature: Show entitlement
     Then the response status should be "200"
     And the JSON response should be a "entitlement"
 
+  Scenario: Read-only retrieves an entitlement for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 3 "entitlements"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "entitlement"
+
   Scenario: Admin retrieves an invalid entitlement for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

@@ -297,6 +297,30 @@ Feature: Update product
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read-only updates a product for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "id": "$products[0].id",
+          "attributes": {
+            "name": "Updated App"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product updates the platforms for itself
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

@@ -5,7 +5,7 @@ class TokenPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
         # FIXME(ezekg) Eager load licenses and ensure product owns it
         resource.all? { |r| r.bearer_type == License.name || r.bearer_type == bearer.class.name && r.bearer_id == bearer.id }) ||
@@ -16,7 +16,7 @@ class TokenPolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.bearer == bearer
   end
 

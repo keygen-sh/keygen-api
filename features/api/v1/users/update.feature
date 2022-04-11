@@ -118,6 +118,25 @@ Feature: Update user
       """
     Then the response status should be "403"
 
+  Scenario: Read-only updates a user for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Mr. Robot"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin updates a user for their account including the wrong id
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -243,6 +262,37 @@ Feature: Update user
     Then the response status should be "200"
     And the JSON response should be a "user"
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin sets a user to read-only for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "users"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "read-only"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: user, admin, developer, sales-agent, support-agent (received read-only)",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
+      }
+      """
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin promotes a user with an invalid role name for their account
@@ -386,6 +436,31 @@ Feature: Update user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
     And the account "test1" should have 0 "support-agent"
+    And the account "test1" should have 1 "admin"
+
+  Scenario: User attempts to escalate their privileges to a read only role
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "read-only"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+    And the account "test1" should have 0 "read-only"
     And the account "test1" should have 1 "admin"
 
   Scenario: User attempts to escalate their privileges to a product role

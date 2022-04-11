@@ -5,7 +5,7 @@ class KeyPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
         resource.all? { |r| r.product.id == bearer.id })
   end
@@ -13,7 +13,7 @@ class KeyPolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 

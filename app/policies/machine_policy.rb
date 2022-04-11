@@ -5,7 +5,7 @@ class MachinePolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
         resource.all? { |r| r.product.id == bearer.id }) ||
       (bearer.has_role?(:user) &&
@@ -21,7 +21,7 @@ class MachinePolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource.license == bearer ||

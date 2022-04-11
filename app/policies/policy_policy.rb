@@ -5,7 +5,7 @@ class PolicyPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
         resource.all? { |r| r.product_id == bearer.id })
   end
@@ -13,7 +13,7 @@ class PolicyPolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
@@ -62,14 +62,14 @@ class PolicyPolicy < ApplicationPolicy
   def list_entitlements?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
   def show_entitlement?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 end

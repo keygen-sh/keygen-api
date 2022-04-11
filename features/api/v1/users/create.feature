@@ -630,6 +630,31 @@ Feature: Create user
       """
     Then the response status should be "403"
 
+  Scenario: Read-only creates a user for their account
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "secret123"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin creates an admin for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -754,6 +779,46 @@ Feature: Create user
     And the JSON response should be a "user" with the role "support-agent"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a read-only for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And I use an authentication token
+    And the current account has 1 "webhook-endpoint"
+    And all "webhook-endpoints" have the following attributes:
+      """
+      { "subscriptions": ["user.created"] }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Pam",
+            "lastName": "Beesly",
+            "email": "beesly@keygen.sh",
+            "password": "jimjimjimjim",
+            "role": "read-only"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: user, admin, developer, sales-agent, support-agent (received read-only)",
+        "source": {
+          "pointer": "/data/attributes/role"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Developer attempts to create an admin for their account
@@ -1026,6 +1091,37 @@ Feature: Create user
             "email": "thor@keygen.sh",
             "password": "mjolnir++",
             "role": "support-agent"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/role"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous attempts to create a user with a read-only role for an account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Thor",
+            "lastName": "Thor",
+            "email": "thor@keygen.sh",
+            "password": "mjolnir++",
+            "role": "read-only"
           }
         }
       }

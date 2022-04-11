@@ -122,6 +122,20 @@ Feature: Delete groups
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read-only attempts to delete a group
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "groups"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/groups/$2"
+    Then the response status should be "403"
+    And the current account should have 3 "groups"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to delete a group
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

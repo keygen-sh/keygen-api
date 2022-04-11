@@ -65,6 +65,18 @@ Feature: Delete license
     Then the response status should be "403"
     And the current account should have 3 "licenses"
 
+  Scenario: Read-only deletes one of their licenses
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/licenses/$2"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"
+    And the current account should have 3 "licenses"
+
   Scenario: User attempts to delete one of their licenses
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

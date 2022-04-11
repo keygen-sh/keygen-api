@@ -179,6 +179,27 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read-only generates a new token via basic authentication
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens"
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      {
+        "kind": "read-only-token",
+        "expiry": null
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin generates a new token with a custom expiry via basic authentication
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
