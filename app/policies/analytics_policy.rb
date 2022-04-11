@@ -1,6 +1,6 @@
 class AnalyticsPolicy < Struct.new(:context, :resource)
   def read?
-    bearer.has_role?(:admin, :developer)
+    bearer.has_role?(:admin, :developer, :read_only)
   end
 
   private
