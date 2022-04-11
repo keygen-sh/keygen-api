@@ -171,6 +171,23 @@ Feature: User password actions
       """
     Then the response status should be "403"
 
+  Scenario: Read only updates their password
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$current/actions/update-password" with the following:
+      """
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "password2"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"
+
   Scenario: User resets their password
     Given the current account is "test1"
     And the current account has 1 "user"
@@ -274,3 +291,20 @@ Feature: User password actions
       }
       """
     Then the response status should be "401"
+
+  Scenario: Read only updates their password
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I have a password reset token
+    When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
+      """
+      {
+        "meta": {
+          "passwordResetToken": "$token",
+          "newPassword": "password2"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"

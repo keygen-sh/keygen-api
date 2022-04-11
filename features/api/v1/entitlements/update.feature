@@ -176,6 +176,30 @@ Feature: Update entitlements
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read-only updates an entitlement for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "entitlements"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/entitlements/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "entitlements",
+          "id": "$entitlements[0].id",
+          "attributes": {
+            "name": "Support Entitlement"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to update an entitlement
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

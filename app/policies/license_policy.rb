@@ -5,7 +5,7 @@ class LicensePolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
         resource.all? { |r| r.policy.product_id == bearer.id }) ||
       (bearer.has_role?(:user) &&
@@ -19,7 +19,7 @@ class LicensePolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer ||
@@ -92,7 +92,7 @@ class LicensePolicy < ApplicationPolicy
   def quick_validate_by_id?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer
@@ -101,7 +101,7 @@ class LicensePolicy < ApplicationPolicy
   def validate_by_id?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer
@@ -114,7 +114,7 @@ class LicensePolicy < ApplicationPolicy
     return true unless
       bearer.present?
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer
@@ -184,12 +184,12 @@ class LicensePolicy < ApplicationPolicy
   def list_tokens?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
   def show_token?
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
@@ -210,7 +210,7 @@ class LicensePolicy < ApplicationPolicy
   def list_entitlements?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer
@@ -219,7 +219,7 @@ class LicensePolicy < ApplicationPolicy
   def show_entitlement?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
       resource.product == bearer ||
       resource == bearer

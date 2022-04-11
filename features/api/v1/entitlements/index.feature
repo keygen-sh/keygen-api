@@ -56,6 +56,16 @@ Feature: List entitlements
     Then the response status should be "200"
     And the JSON response should be an array with 5 "entitlements"
 
+  Scenario: Read-only retrieves all entitlements for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 5 "entitlements"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "entitlements"
+
   Scenario: Admin retrieves a paginated list of entitlements
     Given I am an admin of account "test1"
     And the current account is "test1"

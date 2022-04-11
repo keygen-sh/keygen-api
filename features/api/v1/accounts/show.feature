@@ -56,6 +56,14 @@ Feature: Show account
     When I send a GET request to "/accounts/test1"
     Then the response status should be "200"
 
+  Scenario: Read-only user retrieves their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1"
+    Then the response status should be "200"
+
   Scenario: Admin attempts to retrieve another account
     Given I am an admin of account "test2"
     And I use an authentication token

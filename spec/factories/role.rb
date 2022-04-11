@@ -24,6 +24,10 @@ FactoryBot.define do
       name { :support_agent }
     end
 
+    trait :read_only do
+      name { :read_only }
+    end
+
     trait :product do
       name { :product }
     end

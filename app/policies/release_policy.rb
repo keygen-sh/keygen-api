@@ -54,7 +54,7 @@ class ReleasePolicy < ApplicationPolicy
     return false if
       bearer.nil?
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer ||
       (
         !resource.product.closed_distribution? && (
@@ -84,28 +84,28 @@ class ReleasePolicy < ApplicationPolicy
   def list_entitlements?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer) ||
+    bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
   end
 
   def show_entitlement?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer) ||
+    bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
   end
 
   def list_constraints?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer) ||
+    bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
   end
 
   def show_constraint?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer) ||
+    bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
   end
 

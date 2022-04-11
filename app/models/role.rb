@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 class Role < ApplicationRecord
-  USER_ROLES    = %w[user admin developer sales_agent support_agent].freeze
+  USER_ROLES    = %w[user admin developer read_only sales_agent support_agent].freeze
   PRODUCT_ROLES = %w[product].freeze
   LICENSE_ROLES = %w[license].freeze
   ROLE_RANK     = {
-    admin:         5,
-    developer:     4,
-    product:       3,
-    sales_agent:   2,
-    support_agent: 1,
+    admin:         6,
+    developer:     5,
+    product:       4,
+    sales_agent:   3,
+    support_agent: 2,
+    read_only:     1,
     license:       0,
     user:          0,
   }.with_indifferent_access

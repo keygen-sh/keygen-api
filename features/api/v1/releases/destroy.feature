@@ -64,6 +64,16 @@ Feature: Delete release
     When I send a DELETE request to "/accounts/test1/releases/$2"
     Then the response status should be "403"
 
+  Scenario: Read-only deletes one of their releases
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/releases/$2"
+    Then the response status should be "403"
+
   Scenario: Product deletes one of their releases
     Given the current account is "test1"
     And the current account has 1 "product"

@@ -49,7 +49,7 @@ class ApplicationPolicy
   def search?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
   end
 
   protected
@@ -101,7 +101,7 @@ class ApplicationPolicy
       return scope.none if bearer.nil?
 
       case
-      when bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
+      when bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
         scope
       when scope.respond_to?(:for_bearer) && bearer.has_role?(:product, :user, :license)
         scope.for_bearer(bearer.class.name, bearer.id)

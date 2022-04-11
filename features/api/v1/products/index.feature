@@ -56,6 +56,16 @@ Feature: List products
     Then the response status should be "200"
     And the JSON response should be an array with 5 "products"
 
+  Scenario: Read-only retrieves all products for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 5 "products"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "products"
+
   Scenario: Admin retrieves a paginated list of products
     Given I am an admin of account "test1"
     And the current account is "test1"

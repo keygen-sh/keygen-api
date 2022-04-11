@@ -184,6 +184,28 @@ Feature: Create groups
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Read-only attempts to create a group for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And I use an authentication token
+    And the current account has 2 "webhook-endpoints"
+    When I send a POST request to "/accounts/test1/groups" with the following:
+      """
+      {
+        "data": {
+          "type": "groups",
+          "attributes": {
+            "name": "Support Group"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product attempts to create a group for their account
     Given the current account is "test1"
     And the current account has 1 "product"

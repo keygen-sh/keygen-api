@@ -61,6 +61,15 @@ Feature: Account subscription actions
     When I send a POST request to "/accounts/test1/actions/manage-subscription"
     Then the response status should be "403"
 
+   Scenario: Read-only attempts to manage their subscription account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/actions/manage-subscription"
+    Then the response status should be "403"
+
   Scenario: Admin pauses their subscribed account
     Given the account "test1" is subscribed
     And I am an admin of account "test1"

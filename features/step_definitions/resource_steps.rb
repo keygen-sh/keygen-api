@@ -553,6 +553,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.users.with_role(:sales_agent).count).to eq count.to_i
   when /^support-agents?$/
     expect(@account.users.with_role(:support_agent).count).to eq count.to_i
+  when /^read[-_]?onlys?$/
+    expect(@account.users.with_role(:read_only).count).to eq count.to_i
   when /^users?$/
     expect(@account.users.with_role(:user).count).to eq count.to_i
   else
@@ -580,6 +582,8 @@ Then /^the account "([^\"]*)" should have (\d+) "([^\"]*)"$/ do |id, count, reso
     expect(account.users.with_role(:sales_agent).count).to eq count.to_i
   when /^support-agents?$/
     expect(account.users.with_role(:support_agent).count).to eq count.to_i
+  when /^read[-_]?onlys?$/
+    expect(account.users.with_role(:read_only).count).to eq count.to_i
   when /^users?$/
     expect(account.users.with_role(:user).count).to eq count.to_i
   else

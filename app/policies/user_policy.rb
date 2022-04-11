@@ -5,7 +5,7 @@ class UserPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.all? { |r|
           r.group_id? && r.group_id.in?(bearer.group_ids) ||
@@ -15,7 +15,7 @@ class UserPolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       resource == bearer ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
         resource.group_id? && resource.group_id.in?(bearer.group_ids))
@@ -54,14 +54,14 @@ class UserPolicy < ApplicationPolicy
   def list_tokens?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       resource == bearer
   end
 
   def show_token?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product) ||
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       resource == bearer
   end
 
@@ -88,7 +88,19 @@ class UserPolicy < ApplicationPolicy
   def update_password?
     assert_account_scoped!
 
+    return false if
+      resource.has_role?(:read_only)
+
     resource == bearer
+  end
+
+  def reset_password?
+    assert_account_scoped!
+
+    return false if
+      resource.has_role?(:read_only)
+
+    true
   end
 
   def me?

@@ -136,6 +136,26 @@ Feature: Update policy
       """
     Then the response status should be "403"
 
+  Scenario: Read-only updates a policy for their account
+    Given the current account is "test1"
+    And the current account has 1 "read-only"
+    And I am a read only of account "test1"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "name": "Test"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: Admin removes attributes from a policy for their account
     Given I am an admin of account "test1"
     And the current account is "test1"

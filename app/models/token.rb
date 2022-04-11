@@ -157,6 +157,12 @@ class Token < ApplicationRecord
     bearer.has_role? :support_agent
   end
 
+  def read_only_token?
+    return false if orphaned_token?
+
+    bearer.has_role?(:read_only)
+  end
+
   def user_token?
     return false if orphaned_token?
 
@@ -187,6 +193,8 @@ class Token < ApplicationRecord
       "sales-token"
     when support_token?
       "support-token"
+    when read_only_token?
+      "read-only-token"
     else
       "token"
     end
