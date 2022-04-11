@@ -20,17 +20,26 @@ class SecondFactorPolicy < ApplicationPolicy
   def create?
     assert_account_scoped!
 
+    return false if
+      bearer.has_role?(:read_only)
+
     resource.user == bearer
   end
 
   def update?
     assert_account_scoped!
 
+    return false if
+      bearer.has_role?(:read_only)
+
     resource.user == bearer
   end
 
   def destroy?
     assert_account_scoped!
+
+    return false if
+      bearer.has_role?(:read_only)
 
     resource.user == bearer
   end
