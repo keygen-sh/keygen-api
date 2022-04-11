@@ -5,13 +5,13 @@ class WebhookEventPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :product)
+    bearer.has_role?(:admin, :developer, :read_only, :product)
   end
 
   def show?
     assert_account_scoped!
 
-    bearer.has_role?(:admin, :developer, :product)
+    bearer.has_role?(:admin, :developer, :read_only, :product)
   end
 
   def destroy?
