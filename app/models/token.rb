@@ -216,6 +216,8 @@ class Token < ApplicationRecord
       :sales
     when support_token?
       :spprt
+    when read_only_token?
+      :read
     else
       :token
     end
