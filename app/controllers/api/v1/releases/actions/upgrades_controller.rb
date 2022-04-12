@@ -52,8 +52,8 @@ module Api::V1::Releases::Actions
     rescue ReleaseUpgradeService::InvalidProductError,
            ReleaseUpgradeService::InvalidPlatformError,
            ReleaseUpgradeService::InvalidFiletypeError,
-           ReleaseUpgradeService::InvalidVersionError
-      render_unprocessable_entity
+           ReleaseUpgradeService::InvalidVersionError => e
+      render_unprocessable_entity detail: e.message
     rescue Pundit::NotAuthorizedError
       render status: :no_content
     end
