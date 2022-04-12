@@ -141,7 +141,7 @@ module RequestLogger
     end
 
     def request_log_signature
-      response.headers['X-Signature'] || response.headers['Keygen-Signature']
+      response.headers['Keygen-Signature']
     end
   end
 end
