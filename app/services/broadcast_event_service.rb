@@ -23,6 +23,8 @@ class BroadcastEventService < BaseService
         case event
         when /^release\.upgraded$/
           { prev: meta[:current], next: meta[:next] }
+        when /^release\.downloaded$/
+          { version: resource.version }
         when /^license\.validation\./
           { code: meta[:constant] }
         when /\.updated$/
