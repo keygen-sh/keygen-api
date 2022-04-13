@@ -18,6 +18,9 @@ class ReleaseArtifact < ApplicationRecord
   validates :release,
     scope: { by: :account_id }
 
+  delegate :version, :semver, :platform, :channel, :filename, :filetype, :filesize,
+    to: :release
+
   scope :for_product, -> product {
     where(product: product)
   }
