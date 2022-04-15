@@ -26,14 +26,14 @@ Given /^the account "([^\"]*)" has the following attributes:$/ do |id, body|
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
-  account.update attributes
+  account.update!(attributes)
 end
 
 Given /^I have the following attributes:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  @bearer.update attributes
+  @bearer.update!(attributes)
 end
 
 Given /^I have a password reset token$/ do
@@ -42,14 +42,14 @@ end
 
 Given /^I have a password reset token that is expired$/ do
   @crypt << @bearer.generate_password_reset_token
-  @bearer.update password_reset_sent_at: 3.days.ago
+  @bearer.update!(password_reset_sent_at: 3.days.ago)
 end
 
 Then /^the current token has the following attributes:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
-  @token.update attributes
+  @token.update!(attributes)
 end
 
 Given /^the current account is "([^\"]*)"$/ do |id|
@@ -91,7 +91,7 @@ Given /^the current account has the following attributes:$/ do |body|
 
   attributes = JSON.parse(body).deep_transform_keys! &:underscore
 
-  @account.update attributes
+  @account.update!(attributes)
 end
 
 Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
@@ -229,7 +229,7 @@ Given /^the current product has (\d+) "([^\"]*)"$/ do |count, resource|
       end
     end
 
-    r.save
+    r.save!
   end
 end
 
@@ -263,7 +263,7 @@ Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
       end
     end
 
-    r.save
+    r.save!
   end
 end
 
@@ -310,14 +310,14 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product 
       end
     end
 
-    r.save
+    r.save!
   end
 end
 
 Given /^the current user has (\d+) "([^\"]*)"$/ do |count, resource|
   @account.send(resource.pluralize.underscore).limit(count.to_i).all.each do |r|
     r.user = @bearer
-    r.save
+    r.save!
   end
 end
 
@@ -348,7 +348,13 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
-  resources = @account.send(resource.pluralize.underscore)
+  resources =
+    case resource.underscore.pluralize
+    when 'processes'
+      @account.machine_processes
+    else
+      @account.send(resource.pluralize.underscore)
+    end
 
   resources.each { |r| r.update(attrs) }
 end
@@ -398,7 +404,7 @@ Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, bo
   attrs     = JSON.parse(body).deep_transform_keys!(&:underscore)
   resource  = resources[idx]
 
-  resource.update(attrs)
+  resource.update!(attrs)
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |named_idx, resource, body|
@@ -406,15 +412,18 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   model =
-    if resource.singularize == "plan"
+    case resource.singularize
+    when "plan"
       Plan.send(named_idx)
+    when "process"
+      @account.machine_processes.send(named_idx)
     else
       @account.send(resource.pluralize.underscore).send(named_idx)
     end
 
   model.assign_attributes(attrs)
 
-  model.save validate: false
+  model.save!(validate: false)
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
@@ -422,15 +431,18 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
 
   metadata = JSON.parse(body).deep_transform_keys!(&:underscore)
   model    =
-    if resource.singularize == "plan"
+    case resource.singularize
+    when "plan"
       Plan.send(named_idx)
+    when "process"
+      @account.machine_processes.send(named_idx)
     else
       @account.send(resource.pluralize.underscore).send(named_idx)
     end
 
   model.assign_attributes(metadata: metadata)
 
-  model.save validate: false
+  model.save!(validate: false)
 end
 
 Given /^the (first|second|third|fourth|fifth) "license" has the following policy entitlements:$/ do |named_index, body|
@@ -513,7 +525,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
     JSON.parse(body).deep_transform_keys! &:underscore
   )
 
-  m.save validate: false
+  m.save!(validate: false)
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
@@ -538,7 +550,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
     metadata: JSON.parse(body).deep_transform_keys!(&:underscore)
   )
 
-  m.save validate: false
+  m.save!(validate: false)
 end
 
 Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
@@ -557,6 +569,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.users.with_role(:read_only).count).to eq count.to_i
   when /^users?$/
     expect(@account.users.with_role(:user).count).to eq count.to_i
+  when /^process(es)?$/
+    expect(@account.machine_processes.count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
@@ -655,7 +669,17 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
 end
 
 Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words, model_name, attribute_name, expected|
-  model  = @account.send(model_name.pluralize).send(index_in_words)
+  model =
+    case model_name.pluralize
+    when 'processes'
+      @account.machine_processes.send(index_in_words)
+    else
+      @account.send(model_name.pluralize).send(index_in_words)
+    end
+
+  # FIXME(ezekg) Why do we need this?
+  model.reload
+
   actual = model.send(attribute_name.underscore)
 
   # HACK(ezekg) We can't compare against symbols since expected is a string

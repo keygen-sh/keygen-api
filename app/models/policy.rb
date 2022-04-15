@@ -78,6 +78,11 @@ class Policy < ApplicationRecord
     NO_REVIVE
   ]
 
+  LEASING_STRATEGIES = %w[
+    PER_LICENSE
+    PER_MACHINE
+  ]
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -133,7 +138,7 @@ class Policy < ApplicationRecord
     allow_nil: true
 
   validates :heartbeat_cull_strategy, inclusion: { in: %w[KEEP_DEAD], message: 'incompatible heartbeat cull strategy (must be KEEP_DEAD when resurrection strategy is ALWAYS_REVIVE)' },
-    if: :always_resurrect_dead_machines?
+    if: :always_resurrect_dead?
 
   validates :heartbeat_resurrection_strategy,
     inclusion: { in: HEARTBEAT_RESURRECTION_STRATEGIES, message: 'unsupported heartbeat resurrection strategy' },
@@ -141,6 +146,14 @@ class Policy < ApplicationRecord
 
   validates :transfer_strategy,
     inclusion: { in: TRANSFER_STRATEGIES, message: 'unsupported transfer strategy' },
+    allow_nil: true
+
+  validates :leasing_strategy,
+    inclusion: { in: LEASING_STRATEGIES, message: 'unsupported leasing strategy' },
+    allow_nil: true
+
+  validates :max_processes,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true
 
   validate do
@@ -269,7 +282,7 @@ class Policy < ApplicationRecord
     require_check_in
   end
 
-  def deactivate_dead_machines?
+  def deactivate_dead?
     # NOTE(ezekg) Backwards compat
     return true if
       heartbeat_cull_strategy.nil?
@@ -277,11 +290,11 @@ class Policy < ApplicationRecord
     heartbeat_cull_strategy == 'DEACTIVATE_DEAD'
   end
 
-  def keep_dead_machines?
+  def keep_dead?
     heartbeat_cull_strategy == 'KEEP_DEAD'
   end
 
-  def resurrect_dead_machines?
+  def resurrect_dead?
     # NOTE(ezekg) Backwards compat
     return false if
       heartbeat_resurrection_strategy.nil?
@@ -289,7 +302,7 @@ class Policy < ApplicationRecord
     heartbeat_resurrection_strategy != 'NO_REVIVE'
   end
 
-  def always_resurrect_dead_machines?
+  def always_resurrect_dead?
     heartbeat_resurrection_strategy == 'ALWAYS_REVIVE'
   end
 
@@ -414,6 +427,14 @@ class Policy < ApplicationRecord
       transfer_strategy.nil?
 
     transfer_strategy == 'KEEP_EXPIRY'
+  end
+
+  def lease_per_license?
+    leasing_strategy == 'PER_LICENSE'
+  end
+
+  def lease_per_machine?
+    leasing_strategy == 'PER_MACHINE'
   end
 
   def pop!

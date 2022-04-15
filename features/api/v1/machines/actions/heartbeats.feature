@@ -1,5 +1,5 @@
 @api/v1
-Feature: License heartbeat actions
+Feature: Machine heartbeat actions
 
   Background:
     Given the following "accounts" exist:
@@ -97,7 +97,7 @@ Feature: License heartbeat actions
     And the current account has 1 "machine"
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "401"
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -119,7 +119,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -145,7 +145,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -167,7 +167,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -195,7 +195,7 @@ Feature: License heartbeat actions
         }
       }
       """
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -235,7 +235,7 @@ Feature: License heartbeat actions
     And the response should contain a valid signature header for "test1"
     # NOTE(ezekg) To assert that the RESURRECTED status is transient
     And the first "machine" should have the heartbeatStatus "ALIVE"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -279,7 +279,7 @@ Feature: License heartbeat actions
         }
       }
       """
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -303,7 +303,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -321,7 +321,7 @@ Feature: License heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -345,7 +345,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
     And the JSON response should be a "machine" with a nextHeartbeat within seconds of "$time.10.minutes.from_now.iso"
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job queued in 10.5 minutes
+    And sidekiq should have 1 "machine-heartbeat" job queued in 10.5 minutes
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -378,7 +378,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat within seconds of "$time.now.iso"
     And the JSON response should be a "machine" with a nextHeartbeat within seconds of "$time.1.week.from_now.iso"
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job queued in 1 week
+    And sidekiq should have 1 "machine-heartbeat" job queued in 1 week
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -396,7 +396,7 @@ Feature: License heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -428,7 +428,7 @@ Feature: License heartbeat actions
     And the JSON response should be a "machine" with a lastHeartbeat that is not nil
     And the JSON response should be a "machine" with a nextHeartbeat that is not nil
     And the response should contain a valid signature header for "test1"
-    And sidekiq should have 1 "heartbeat" job
+    And sidekiq should have 1 "machine-heartbeat" job
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -455,7 +455,7 @@ Feature: License heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "403"
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -473,7 +473,7 @@ Feature: License heartbeat actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
     Then the response status should be "404"
-    And sidekiq should have 0 "heartbeat" jobs
+    And sidekiq should have 0 "machine-heartbeat" jobs
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
