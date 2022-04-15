@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_04_15_131706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -21,18 +20,18 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.string "slug"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "plan_id"
     t.boolean "protected", default: false
     t.text "public_key"
     t.text "private_key"
     t.text "secret_key"
-    t.datetime "last_low_activity_lifeline_sent_at"
-    t.datetime "last_trial_will_end_sent_at"
-    t.datetime "last_license_limit_exceeded_sent_at"
-    t.datetime "last_request_limit_exceeded_sent_at"
-    t.datetime "last_prompt_for_review_sent_at"
+    t.datetime "last_low_activity_lifeline_sent_at", precision: nil
+    t.datetime "last_trial_will_end_sent_at", precision: nil
+    t.datetime "last_license_limit_exceeded_sent_at", precision: nil
+    t.datetime "last_request_limit_exceeded_sent_at", precision: nil
+    t.datetime "last_prompt_for_review_sent_at", precision: nil
     t.text "ed25519_private_key"
     t.text "ed25519_public_key"
     t.string "domain"
@@ -49,18 +48,18 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "billings", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "customer_id"
     t.string "subscription_status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "subscription_id"
-    t.datetime "subscription_period_start"
-    t.datetime "subscription_period_end"
-    t.datetime "card_expiry"
+    t.datetime "subscription_period_start", precision: nil
+    t.datetime "subscription_period_end", precision: nil
+    t.datetime "card_expiry", precision: nil
     t.string "card_brand"
     t.string "card_last4"
     t.string "state"
     t.uuid "account_id"
     t.string "referral_id"
-    t.datetime "card_added_at"
+    t.datetime "card_added_at", precision: nil
     t.index ["account_id", "created_at"], name: "index_billings_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_billings_on_created_at", order: :desc
     t.index ["customer_id", "created_at"], name: "index_billings_on_customer_id_and_created_at"
@@ -73,8 +72,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.string "name", null: false
     t.string "code", null: false
     t.jsonb "metadata"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "code"], name: "index_entitlements_on_account_id_and_code", unique: true
     t.index ["code"], name: "index_entitlements_on_code"
   end
@@ -89,8 +88,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "request_log_id"
     t.string "idempotency_key"
     t.jsonb "metadata"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_event_logs_on_account_id"
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
@@ -101,8 +100,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
 
   create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "event"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["event"], name: "index_event_types_on_event", unique: true
   end
 
@@ -110,8 +109,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.uuid "group_id", null: false
     t.uuid "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_group_owners_on_account_id"
     t.index ["group_id", "user_id"], name: "index_group_owners_on_group_id_and_user_id", unique: true
     t.index ["group_id"], name: "index_group_owners_on_group_id"
@@ -125,15 +124,15 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.integer "max_licenses"
     t.integer "max_machines"
     t.jsonb "metadata"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_groups_on_account_id"
   end
 
   create_table "keys", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "key"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "policy_id"
     t.uuid "account_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "keys_tsv_id_idx", using: :gist
@@ -148,8 +147,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.uuid "license_id", null: false
     t.uuid "entitlement_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "license_id", "entitlement_id"], name: "license_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_license_entitlements_on_entitlement_id"
     t.index ["license_id"], name: "index_license_entitlements_on_license_id"
@@ -157,29 +156,30 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
 
   create_table "licenses", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "key", null: false
-    t.datetime "expiry"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "expiry", precision: nil
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.jsonb "metadata"
     t.uuid "user_id"
     t.uuid "policy_id"
     t.uuid "account_id"
     t.boolean "suspended", default: false
-    t.datetime "last_check_in_at"
-    t.datetime "last_expiration_event_sent_at"
-    t.datetime "last_check_in_event_sent_at"
-    t.datetime "last_expiring_soon_event_sent_at"
-    t.datetime "last_check_in_soon_event_sent_at"
+    t.datetime "last_check_in_at", precision: nil
+    t.datetime "last_expiration_event_sent_at", precision: nil
+    t.datetime "last_check_in_event_sent_at", precision: nil
+    t.datetime "last_expiring_soon_event_sent_at", precision: nil
+    t.datetime "last_check_in_soon_event_sent_at", precision: nil
     t.integer "uses", default: 0
     t.boolean "protected"
     t.string "name"
     t.integer "machines_count", default: 0
-    t.datetime "last_validated_at"
+    t.datetime "last_validated_at", precision: nil
     t.integer "machines_core_count"
     t.integer "max_machines_override"
     t.integer "max_cores_override"
     t.integer "max_uses_override"
     t.uuid "group_id"
+    t.integer "max_processes_override"
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
@@ -194,21 +194,37 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.index ["user_id", "created_at"], name: "index_licenses_on_user_id_and_created_at"
   end
 
+  create_table "machine_processes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.uuid "machine_id", null: false
+    t.string "pid", null: false
+    t.datetime "last_heartbeat_at", null: false
+    t.datetime "last_death_event_sent_at"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "machine_id, md5((pid)::text)", name: "index_machine_processes_on_machine_id_md5_pid", unique: true
+    t.index ["account_id"], name: "index_machine_processes_on_account_id"
+    t.index ["last_heartbeat_at"], name: "index_machine_processes_on_last_heartbeat_at"
+    t.index ["machine_id"], name: "index_machine_processes_on_machine_id"
+  end
+
   create_table "machines", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "fingerprint"
     t.string "ip"
     t.string "hostname"
     t.string "platform"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "name"
     t.jsonb "metadata"
     t.uuid "account_id"
     t.uuid "license_id"
-    t.datetime "last_heartbeat_at"
+    t.datetime "last_heartbeat_at", precision: nil
     t.integer "cores"
-    t.datetime "last_death_event_sent_at"
+    t.datetime "last_death_event_sent_at", precision: nil
     t.uuid "group_id"
+    t.integer "max_processes_override"
     t.index "license_id, md5((fingerprint)::text)", name: "machines_license_id_fingerprint_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "machines_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "machines_tsv_metadata_idx", using: :gist
@@ -226,8 +242,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "metrics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id"
     t.jsonb "data"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "event_type_id", null: false
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id <> ALL (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid, '6f75f2c4-6451-405a-a389-fa029137f6f0'::uuid]))"
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_high_vol_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id = ANY (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid]))"
@@ -242,8 +258,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.integer "max_users"
     t.integer "max_policies"
     t.integer "max_licenses"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "max_products"
     t.string "plan_id"
     t.boolean "private", default: false
@@ -262,8 +278,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.boolean "strict", default: false
     t.boolean "floating", default: false
     t.boolean "use_pool", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "lock_version", default: 0, null: false
     t.integer "max_machines"
     t.boolean "encrypted", default: false
@@ -293,6 +309,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.boolean "require_heartbeat", default: false, null: false
     t.string "transfer_strategy"
     t.boolean "require_user_scope", default: false, null: false
+    t.string "leasing_strategy"
+    t.integer "max_processes"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist
@@ -306,8 +324,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.uuid "policy_id", null: false
     t.uuid "entitlement_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "policy_id", "entitlement_id"], name: "policy_entitlements_acct_lic_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_policy_entitlements_on_entitlement_id"
     t.index ["policy_id"], name: "index_policy_entitlements_on_policy_id"
@@ -315,8 +333,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
 
   create_table "products", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.jsonb "platforms"
     t.jsonb "metadata"
     t.uuid "account_id"
@@ -335,8 +353,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.string "invoice_id"
     t.integer "amount"
     t.boolean "paid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "billing_id"
     t.index ["billing_id", "created_at"], name: "index_receipts_on_billing_id_and_created_at"
     t.index ["created_at"], name: "index_receipts_on_created_at", order: :desc
@@ -349,8 +367,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "release_id", null: false
     t.string "key", null: false
     t.string "etag"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "content_length"
     t.string "content_type"
     t.index ["account_id", "product_id", "release_id"], name: "releases_artifacts_acct_prod_rel_idx", unique: true
@@ -362,8 +380,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.string "name"
     t.string "key"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_channels_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_channels_on_account_id_and_key", unique: true
   end
@@ -373,8 +391,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "release_id", null: false
     t.text "url"
     t.integer "ttl"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_download_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["release_id"], name: "index_release_download_links_on_release_id"
   end
@@ -383,8 +401,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.uuid "release_id", null: false
     t.uuid "entitlement_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "release_entls_acct_created_idx", order: { created_at: :desc }
     t.index ["account_id", "release_id", "entitlement_id"], name: "release_entls_acct_rel_ent_ids_idx", unique: true
     t.index ["entitlement_id"], name: "index_release_entitlement_constraints_on_entitlement_id"
@@ -395,8 +413,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "account_id", null: false
     t.string "name"
     t.string "key"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_filetypes_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_filetypes_on_account_id_and_key", unique: true
   end
@@ -406,8 +424,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.string "name"
     t.string "key"
     t.jsonb "metadata"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_platforms_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["account_id", "key"], name: "index_release_platforms_on_account_id_and_key", unique: true
   end
@@ -417,8 +435,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "release_id", null: false
     t.text "url"
     t.integer "ttl"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_upgrade_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["release_id"], name: "index_release_upgrade_links_on_release_id"
   end
@@ -428,8 +446,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "release_id", null: false
     t.text "url"
     t.integer "ttl"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id", "created_at"], name: "index_release_upload_links_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["release_id"], name: "index_release_upload_links_on_release_id"
   end
@@ -445,9 +463,9 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.bigint "filesize"
     t.bigint "download_count", default: 0
     t.jsonb "metadata"
-    t.datetime "yanked_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "yanked_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "upgrade_count", default: 0
     t.uuid "release_filetype_id"
     t.text "description"
@@ -469,8 +487,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.string "ip"
     t.string "user_agent"
     t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "requestor_type"
     t.uuid "requestor_id"
     t.text "request_body"
@@ -484,8 +502,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.uuid "resource_id"
     t.index ["created_at"], name: "index_roles_on_created_at", order: :desc
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
@@ -498,9 +516,9 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
     t.uuid "user_id", null: false
     t.text "secret", null: false
     t.boolean "enabled", default: false, null: false
-    t.datetime "last_verified_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "last_verified_at", precision: nil
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "created_at"], name: "index_second_factors_on_account_id_and_created_at"
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
     t.index ["secret"], name: "index_second_factors_on_secret", unique: true
@@ -510,9 +528,9 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "digest"
     t.string "bearer_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "expiry"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.datetime "expiry", precision: nil
     t.uuid "bearer_id"
     t.uuid "account_id"
     t.integer "max_activations"
@@ -529,17 +547,17 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "password_reset_token"
-    t.datetime "password_reset_sent_at"
+    t.datetime "password_reset_sent_at", precision: nil
     t.jsonb "metadata"
     t.uuid "account_id"
     t.string "first_name"
     t.string "last_name"
-    t.datetime "stdout_unsubscribed_at"
-    t.datetime "stdout_last_sent_at"
-    t.datetime "banned_at"
+    t.datetime "stdout_unsubscribed_at", precision: nil
+    t.datetime "stdout_last_sent_at", precision: nil
+    t.datetime "banned_at", precision: nil
     t.uuid "group_id"
     t.index "to_tsvector('simple'::regconfig, COALESCE((first_name)::text, ''::text))", name: "users_tsv_first_name_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "users_tsv_id_idx", using: :gist
@@ -556,8 +574,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
 
   create_table "webhook_endpoints", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "url"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.uuid "account_id"
     t.jsonb "subscriptions", default: ["*"]
     t.string "signature_algorithm", default: "ed25519"
@@ -569,8 +587,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_03_30_152915) do
   create_table "webhook_events", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text "payload"
     t.string "jid"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "endpoint"
     t.uuid "account_id"
     t.string "idempotency_token"

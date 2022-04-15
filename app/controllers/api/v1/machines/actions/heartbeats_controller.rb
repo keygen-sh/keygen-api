@@ -28,8 +28,7 @@ module Api::V1::Machines::Actions
 
       if machine.dead?
         return render_unprocessable_entity(detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/heartbeatStatus' }) unless
-          machine.policy.resurrect_dead_machines? &&
-          !machine.resurrection_period_passed?
+          machine.policy.resurrect_dead? && !machine.resurrection_period_passed?
 
         machine.resurrect!
 

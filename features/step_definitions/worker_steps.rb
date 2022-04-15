@@ -11,8 +11,10 @@ Then /^sidekiq should (?:have|process) (\d+) "([^\"]*)" jobs?(?: queued in ([.\d
       "request_log_worker"
     when "event-log"
       "event_log_worker"
-    when "heartbeat"
+    when "machine-heartbeat"
       "machine_heartbeat_worker"
+    when "process-heartbeat"
+      "process_heartbeat_worker"
     else
       "#{worker_name.singularize.underscore}_worker"
     end

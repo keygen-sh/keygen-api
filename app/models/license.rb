@@ -21,6 +21,7 @@ class License < ApplicationRecord
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :delete_all
+  has_many :processes, through: :machines
   has_many :releases, -> l { for_license(l.id) },
     through: :product
   has_many :event_logs,
@@ -188,6 +189,11 @@ class License < ApplicationRecord
     numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true,
     if: -> { max_uses_override? }
+
+  validates :max_processes,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true,
+    if: -> { max_processes_override? }
 
   scope :search_id, -> (term) {
     identifier = term.to_s
@@ -476,6 +482,17 @@ class License < ApplicationRecord
       max_uses_override?
 
     policy&.max_uses
+  end
+
+  def max_processes=(value)
+    self.max_processes_override = value
+  end
+
+  def max_processes
+    return max_processes_override if
+      max_processes_override?
+
+    policy&.max_processes
   end
 
   def protected?

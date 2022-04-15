@@ -17,6 +17,10 @@ class Machine < ApplicationRecord
   has_one :product, through: :license
   has_one :policy, through: :license
   has_one :user, through: :license
+  has_many :processes,
+    class_name: 'MachineProcess',
+    inverse_of: :machine,
+    dependent: :delete_all
   has_many :event_logs,
     as: :resource
 
@@ -44,6 +48,11 @@ class Machine < ApplicationRecord
     }
 
   validates :cores, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 2_147_483_647 }, allow_nil: true
+
+  validates :max_processes,
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    allow_nil: true,
+    if: -> { max_processes_override? }
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
@@ -309,8 +318,8 @@ class Machine < ApplicationRecord
       .where(last_heartbeat_at: nil)
       .or(
         joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
-          last_heartbeat_at >= ?::timestamp - (
-            COALESCE(heartbeat_duration, ?) || ' seconds'
+          machines.last_heartbeat_at >= ?::timestamp - (
+            COALESCE(policies.heartbeat_duration, ?) || ' seconds'
           )::interval
         SQL
       )
@@ -320,8 +329,8 @@ class Machine < ApplicationRecord
     joins(license: :policy)
       .where.not(last_heartbeat_at: nil)
       .where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
-        last_heartbeat_at < ?::timestamp - (
-          COALESCE(heartbeat_duration, ?) || ' seconds'
+        machines.last_heartbeat_at < ?::timestamp - (
+          COALESCE(policies.heartbeat_duration, ?) || ' seconds'
         )::interval
       SQL
   }
@@ -337,9 +346,20 @@ class Machine < ApplicationRecord
     end
   }
 
-  delegate :resurrect_dead_machines?, :lazarus_ttl,
+  delegate :resurrect_dead?, :lazarus_ttl,
     allow_nil: true,
     to: :policy
+
+  def max_processes=(value)
+    self.max_processes_override = value
+  end
+
+  def max_processes
+    return max_processes_override if
+      max_processes_override?
+
+    license&.max_processes
+  end
 
   def generate_proof(dataset: nil)
     data = JSON.generate(dataset || default_proof_dataset)
@@ -414,7 +434,7 @@ class Machine < ApplicationRecord
 
   def resurrection_period_passed?
     return true unless
-      resurrect_dead_machines? &&
+      resurrect_dead? &&
       requires_heartbeat?
 
     Time.current > next_heartbeat_at +

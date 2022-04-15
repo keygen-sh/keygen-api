@@ -84,6 +84,32 @@ Feature: Delete machine
     Then the response status should be "403"
     And the current account should have 3 "machines"
 
+  Scenario: Product deletes a machine
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "204"
+    And the current account should have 2 "machines"
+
+  Scenario: Product deletes a machine for a different product
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 2 "products"
+    And the current account has 1 "policy" for the second "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/machines/$2"
+    Then the response status should be "404"
+    And the current account should have 3 "machines"
+
   Scenario: Admin deletes one of their machines by fingerprint
     Given I am an admin of account "test1"
     And the current account is "test1"
