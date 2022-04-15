@@ -62,6 +62,7 @@ Rails.application.routes.draw do
     #             their fingerprint attr, which can be an arbitrary string.
     resources "machines", constraints: { id: /[^\/]*/ } do
       scope module: "machines/relationships" do
+        resources "processes", only: %i[index show]
         resource "product", only: [:show]
         resource "group", only: [:show, :update]
         resource "license", only: [:show]
@@ -74,6 +75,19 @@ Rails.application.routes.draw do
           post "ping-heartbeat", to: "heartbeats#ping_heartbeat"
           post "check-out", to: "checkouts#create"
           get "check-out", to: "checkouts#show"
+        end
+      end
+    end
+
+    resources "processes" do
+      scope module: "processes/relationships" do
+        resource "product", only: %i[show]
+        resource "license", only: %i[show]
+        resource "machine", only: %i[show]
+      end
+      member do
+        scope "actions", module: "processes/actions" do
+          post "ping", to: "heartbeats#ping"
         end
       end
     end

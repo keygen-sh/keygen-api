@@ -22,6 +22,7 @@ class Account < ApplicationRecord
   has_many :keys
   has_many :licenses
   has_many :machines
+  has_many :machine_processes
   has_many :entitlements
   has_many :policy_entitlements
   has_many :license_entitlements

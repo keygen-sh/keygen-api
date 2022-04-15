@@ -78,6 +78,11 @@ class MachineSerializer < BaseSerializer
       @url_helpers.v1_account_machine_user_path @object.account_id, @object
     end
   end
+  relationship :processes do
+    link :related do
+      @url_helpers.v1_account_machine_processes_path @object.account_id, @object
+    end
+  end
 
   link :self do
     @url_helpers.v1_account_machine_path @object.account_id, @object
