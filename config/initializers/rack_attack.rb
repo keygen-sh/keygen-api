@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-WHITELISTED_DOMAINS = %w[
-  dist.keygen.sh
-  app.keygen.sh
-]
-
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   next unless Rails.env.development?
 
@@ -12,18 +7,6 @@ Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   "127.0.0.1" == ip || "::1" == ip
-rescue => e
-  Keygen.logger.exception(e)
-
-  false
-end
-
-Rack::Attack.safelist("req/allow/internal") do |rack_req|
-  req    = ActionDispatch::Request.new rack_req.env
-  origin = URI.parse(req.headers['origin']) rescue nil
-
-  WHITELISTED_DOMAINS.include?(req.host) ||
-    (!origin.nil? && WHITELISTED_DOMAINS.include?(origin.host))
 rescue => e
   Keygen.logger.exception(e)
 
