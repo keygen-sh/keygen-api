@@ -57,6 +57,7 @@ Feature: Create machine process
       }
       """
     And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "process-heartbeat" job
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
