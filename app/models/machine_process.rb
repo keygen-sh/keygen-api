@@ -107,7 +107,7 @@ class MachineProcess < ApplicationRecord
   def resurrect!
     update!(last_heartbeat_at: Time.current, last_death_event_sent_at: nil)
 
-    self.heartbeat_status_override = :RESURRECTED
+    self.status_override = :RESURRECTED
   end
 
   def heartbeat_duration
@@ -128,8 +128,8 @@ class MachineProcess < ApplicationRecord
 
   def status
     case
-    when heartbeat_status_override.present?
-      heartbeat_status_override
+    when status_override.present?
+      status_override
     when next_heartbeat_at >= Time.current
       :ALIVE
     else
@@ -147,5 +147,5 @@ class MachineProcess < ApplicationRecord
 
   private
 
-  attr_accessor :heartbeat_status_override
+  attr_accessor :status_override
 end
