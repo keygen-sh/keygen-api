@@ -109,6 +109,7 @@ module Api::V1
               param :max_machines, type: :integer, optional: true, allow_nil: true
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true
+              param :max_processes, type: :integer, optional: true, allow_nil: true
             end
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
@@ -151,6 +152,7 @@ module Api::V1
               param :max_machines, type: :integer, optional: true, allow_nil: true
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true
+              param :max_processes, type: :integer, optional: true, allow_nil: true
             end
           end
         end

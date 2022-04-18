@@ -31,15 +31,10 @@ class LicenseSerializer < BaseSerializer
   attribute :protected do
     @object.protected?
   end
-  attribute :max_machines do
-    @object.max_machines
-  end
-  attribute :max_cores do
-    @object.max_cores
-  end
-  attribute :max_uses do
-    @object.max_uses
-  end
+  attribute :max_machines
+  attribute :max_processes
+  attribute :max_cores
+  attribute :max_uses
   attribute :require_heartbeat do
     @object.require_heartbeat?
   end
