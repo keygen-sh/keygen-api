@@ -10,7 +10,7 @@ module Api::V1::Machines::Relationships
     before_action :set_machine
 
     def index
-      processes = apply_pagination(policy_scope(apply_scopes(machine.processes)).preload(:machine, :license, :policy, :product, :group, :user))
+      processes = apply_pagination(policy_scope(apply_scopes(machine.processes)).preload(:machine, :license, :policy, :product, :group))
       authorize processes
 
       render jsonapi: processes
