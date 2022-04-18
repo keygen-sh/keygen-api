@@ -9,6 +9,8 @@ class RequestLog < ApplicationRecord
   belongs_to :account
   belongs_to :requestor, polymorphic: true, optional: true
   belongs_to :resource, polymorphic: true, optional: true
+  has_one :event_log,
+    inverse_of: :request_log
 
   # NOTE(ezekg) A lot of the time, we don't need to load the request
   #             or response body, e.g. when listing logs.
@@ -21,6 +23,12 @@ class RequestLog < ApplicationRecord
     date_end = Time.current
 
     where created_at: (date_start..date_end)
+  }
+
+  scope :for_event_type, -> event {
+    joins(event_log: :event_type).where(
+      event_logs: { event_types: { event: event } }
+    )
   }
 
   scope :search_request_id, -> (term) {
