@@ -10,6 +10,7 @@ module Api::V1
     has_scope(:method) { |c, s, v| s.search_method(v) }
     has_scope(:url) { |c, s, v| s.search_url(v) }
     has_scope(:status) { |c, s, v| s.search_status(v) }
+    has_scope(:event) { |c, s, v| s.for_event_type(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
