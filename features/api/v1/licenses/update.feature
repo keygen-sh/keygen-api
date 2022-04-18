@@ -341,6 +341,81 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin overrides a floating license's max processes
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+     And the first "policy" has the following attributes:
+      """
+      { "maxProcesses": 1 }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxProcesses": 2 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "maxProcesses": 10
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "maxProcesses": 10 }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes a floating license's max machine override
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "maxProcesses": 5,
+        "floating": true
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "maxProcesses": 1 }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "maxProcesses": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      { "maxProcesses": 5 }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Developer updates a license expiry
     Given the current account is "test1"
     And the current account has 1 "developer"
