@@ -35,13 +35,13 @@ class MachineProcess < ApplicationRecord
   validates :last_heartbeat_at,
     presence: true
 
-    validate on: :create, if: -> { id_before_type_cast.present? } do
-      errors.add :id, :invalid, message: 'must be a valid UUID' if
-        !UUID_REGEX.match?(id_before_type_cast)
+  validate on: :create, if: -> { id_before_type_cast.present? } do
+    errors.add :id, :invalid, message: 'must be a valid UUID' if
+      !UUID_REGEX.match?(id_before_type_cast)
 
-      errors.add :id, :conflict, message: 'must not conflict with another process' if
-        MachineProcess.exists?(id)
-    end
+    errors.add :id, :conflict, message: 'must not conflict with another process' if
+      MachineProcess.exists?(id)
+  end
 
   validate on: %i[create update] do
     next unless
