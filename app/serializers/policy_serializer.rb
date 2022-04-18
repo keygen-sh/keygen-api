@@ -9,6 +9,7 @@ class PolicySerializer < BaseSerializer
   attribute :floating
   attribute :use_pool
   attribute :max_machines
+  attribute :max_processes
   attribute :max_cores
   attribute :max_uses
   attribute :concurrent
@@ -18,6 +19,7 @@ class PolicySerializer < BaseSerializer
   attribute :expiration_basis
   attribute :transfer_strategy
   attribute :authentication_strategy
+  attribute :leasing_strategy
   attribute :scheme
   attribute :encrypted
   attribute :protected
