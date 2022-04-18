@@ -119,7 +119,7 @@ class MachineProcess < ApplicationRecord
   end
 
   def alive?
-    status == :ALIVE
+    status == :ALIVE || status == :RESURRECTED
   end
 
   def dead?

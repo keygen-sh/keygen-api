@@ -393,7 +393,7 @@ class Machine < ApplicationRecord
   alias_method :not_started?, :heartbeat_not_started?
 
   def heartbeat_alive?
-    heartbeat_status == :ALIVE
+    heartbeat_status == :ALIVE || heartbeat_status == :RESURRECTED
   end
   alias_method :alive?, :heartbeat_alive?
 
