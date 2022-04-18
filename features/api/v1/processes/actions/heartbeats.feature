@@ -180,8 +180,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: Product pings a process for a different product
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "process"
@@ -193,7 +192,6 @@ Feature: Process heartbeat actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: License pings a process's heartbeat
     Given time is frozen at "2022-04-15T14:52:48.000Z"
@@ -253,8 +251,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: License pings a process's heartbeat that doesn't belong to them
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
     And the current account has 1 "process"
@@ -266,7 +263,6 @@ Feature: Process heartbeat actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
 
   Scenario: User pings an unprotected process's heartbeat
     Given the current account is "test1"
@@ -334,8 +330,7 @@ Feature: Process heartbeat actions
     And time is unfrozen
 
   Scenario: User pings a process's heartbeat that doesn't belong to them
-    Given time is frozen at "2022-04-15T14:52:48.000Z"
-    And the current account is "test1"
+    Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
     And the current account has 1 "process"
@@ -347,4 +342,3 @@ Feature: Process heartbeat actions
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
-    And time is unfrozen
