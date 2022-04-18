@@ -97,6 +97,7 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :concurrent, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true, allow_nil: true
+            param :max_processes, type: :integer, optional: true, allow_nil: true
             param :max_cores, type: :integer, optional: true, allow_nil: true
             param :max_uses, type: :integer, optional: true, allow_nil: true
             param :fingerprint_uniqueness_strategy, type: :string, optional: true
@@ -105,6 +106,7 @@ module Api::V1
             param :expiration_basis, type: :string, optional: true
             param :transfer_strategy, type: :string, optional: true
             param :authentication_strategy, type: :string, optional: true
+            param :leasing_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true
@@ -142,6 +144,7 @@ module Api::V1
             param :protected, type: :boolean, optional: true
             param :concurrent, type: :boolean, optional: true
             param :max_machines, type: :integer, optional: true, allow_nil: true
+            param :max_processes, type: :integer, optional: true, allow_nil: true
             param :max_cores, type: :integer, optional: true, allow_nil: true
             param :max_uses, type: :integer, optional: true, allow_nil: true
             param :fingerprint_uniqueness_strategy, type: :string, optional: true
@@ -150,6 +153,7 @@ module Api::V1
             param :expiration_basis, type: :string, optional: true
             param :transfer_strategy, type: :string, optional: true
             param :authentication_strategy, type: :string, optional: true
+            param :leasing_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true

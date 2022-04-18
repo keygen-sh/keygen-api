@@ -104,6 +104,7 @@ class Policy < ApplicationRecord
   before_create -> { self.authentication_strategy = 'TOKEN' }, if: -> { authentication_strategy.nil? }
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
+  before_create -> { self.leasing_strategy = 'PER_MACHINE' }, if: -> { leasing_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -153,7 +154,7 @@ class Policy < ApplicationRecord
     allow_nil: true
 
   validates :max_processes,
-    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2_147_483_647 },
+    numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true
 
   validate do
