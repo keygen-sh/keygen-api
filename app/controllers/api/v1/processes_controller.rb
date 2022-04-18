@@ -31,6 +31,11 @@ module Api::V1
       authorize @process
 
       if @process.save
+        ProcessHeartbeatWorker.perform_in(
+          @process.heartbeat_duration + MachineProcess::HEARTBEAT_DRIFT,
+          @process.id,
+        )
+
         BroadcastEventService.call(
           event: 'process.created',
           account: current_account,
