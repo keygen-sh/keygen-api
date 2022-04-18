@@ -84,20 +84,29 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_LICENSE"
-    And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ANY"
-    And the JSON response should be a "policy" with the expirationStrategy "RESTRICT_ACCESS"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_CREATION"
-    And the JSON response should be a "policy" with the transferStrategy "KEEP_EXPIRY"
-    And the JSON response should be a "policy" with the authenticationStrategy "TOKEN"
-    And the JSON response should be a "policy" with the heartbeatCullStrategy "DEACTIVATE_DEAD"
-    And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "NO_REVIVE"
-    And the JSON response should be a "policy" with a nil maxMachines
-    And the JSON response should be a "policy" with a nil maxUses
-    And the JSON response should be a "policy" that is not strict
-    And the JSON response should be a "policy" with a nil scheme
-    And the JSON response should be a "policy" that is not encrypted
-    And the JSON response should be a "policy" that is floating
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Premium Add-On",
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_LICENSE",
+        "fingerprintMatchingStrategy": "MATCH_ANY",
+        "expirationStrategy": "RESTRICT_ACCESS",
+        "expirationBasis": "FROM_CREATION",
+        "transferStrategy": "KEEP_EXPIRY",
+        "authenticationStrategy": "TOKEN",
+        "heartbeatCullStrategy": "DEACTIVATE_DEAD",
+        "heartbeatResurrectionStrategy": "NO_REVIVE",
+        "leasingStrategy": "PER_MACHINE",
+        "duration": 1209600,
+        "maxMachines": null,
+        "maxProcesses": null,
+        "maxUses": null,
+        "strict": false,
+        "scheme": null,
+        "encrypted": false,
+        "floating": true
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -168,6 +177,7 @@ Feature: Create policy
             "authenticationStrategy": "LICENSE",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
+            "leasingStrategy": "PER_LICENSE",
             "maxUses": 5
           },
           "relationships": {
@@ -182,17 +192,23 @@ Feature: Create policy
       }
       """
     Then the response status should be "201"
-    And the JSON response should be a "policy" with the name "Actionsack Map Pack"
-    And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_ALL"
-    And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_VALIDATION"
-    And the JSON response should be a "policy" with the transferStrategy "RESET_EXPIRY"
-    And the JSON response should be a "policy" with the authenticationStrategy "LICENSE"
-    And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
-    And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "5_MINUTE_REVIVE"
-    And the JSON response should be a "policy" with the maxUses "5"
-    And the JSON response should be a "policy" that is protected
-    And the JSON response should be a "policy" that is concurrent
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Actionsack Map Pack",
+        "fingerprintMatchingStrategy": "MATCH_ALL",
+        "expirationStrategy": "REVOKE_ACCESS",
+        "expirationBasis": "FROM_FIRST_VALIDATION",
+        "transferStrategy": "RESET_EXPIRY",
+        "authenticationStrategy": "LICENSE",
+        "heartbeatCullStrategy": "KEEP_DEAD",
+        "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxUses": 5,
+        "protected": true,
+        "concurrent": true
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2227,6 +2243,86 @@ Feature: Create policy
         "code": "MAX_CORES_INVALID",
         "source": {
           "pointer": "/data/attributes/maxCores"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a maximum process count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Per-Process",
+            "maxProcesses": 16
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Per-Process",
+        "maxProcesses": 16
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid maximum process count
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Per-Process",
+            "maxProcesses": 0
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "must be greater than 0",
+        "code": "MAX_PROCESSES_INVALID",
+        "source": {
+          "pointer": "/data/attributes/maxProcesses"
         }
       }
       """

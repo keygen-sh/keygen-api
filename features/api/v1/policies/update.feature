@@ -79,6 +79,7 @@ Feature: Update policy
             "authenticationStrategy": "MIXED",
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
+            "leasingStrategy": "PER_LICENSE",
             "requireHeartbeat": true,
             "name": "Test"
           }
@@ -86,15 +87,22 @@ Feature: Update policy
       }
       """
     Then the response status should be "200"
-    And the JSON response should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_ACCOUNT"
-    And the JSON response should be a "policy" with the fingerprintMatchingStrategy "MATCH_MOST"
-    And the JSON response should be a "policy" with the expirationStrategy "REVOKE_ACCESS"
-    And the JSON response should be a "policy" with the expirationBasis "FROM_FIRST_ACTIVATION"
-    And the JSON response should be a "policy" with the transferStrategy "RESET_EXPIRY"
-    And the JSON response should be a "policy" with the authenticationStrategy "MIXED"
-    And the JSON response should be a "policy" with the heartbeatCullStrategy "KEEP_DEAD"
-    And the JSON response should be a "policy" with the heartbeatResurrectionStrategy "ALWAYS_REVIVE"
-    And the JSON response should be a "policy" with the name "Test"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "fingerprintUniquenessStrategy": "UNIQUE_PER_ACCOUNT",
+        "fingerprintMatchingStrategy": "MATCH_MOST",
+        "expirationStrategy": "REVOKE_ACCESS",
+        "expirationBasis": "FROM_FIRST_ACTIVATION",
+        "transferStrategy": "RESET_EXPIRY",
+        "authenticationStrategy": "MIXED",
+        "heartbeatCullStrategy": "KEEP_DEAD",
+        "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
+        "leasingStrategy": "PER_LICENSE",
+        "requireHeartbeat": true,
+        "name": "Test"
+      }
+      """
 
   Scenario: Sales updates a policy for their account
     Given the current account is "test1"
