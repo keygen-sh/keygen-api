@@ -32,7 +32,7 @@ module Api::V1
 
       if @process.save
         ProcessHeartbeatWorker.perform_in(
-          @process.heartbeat_duration + MachineProcess::HEARTBEAT_DRIFT,
+          @process.interval + MachineProcess::HEARTBEAT_DRIFT,
           @process.id,
         )
 

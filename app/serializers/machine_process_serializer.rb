@@ -9,6 +9,7 @@ class MachineProcessSerializer < BaseSerializer
   attribute :next_heartbeat do
     @object.next_heartbeat_at
   end
+  attribute :interval
   attribute :status
   attribute :pid
   attribute :created do
