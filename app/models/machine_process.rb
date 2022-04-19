@@ -110,12 +110,12 @@ class MachineProcess < ApplicationRecord
     self.status_override = :RESURRECTED
   end
 
-  def heartbeat_duration
+  def interval
     machine&.heartbeat_duration || HEARTBEAT_TTL.to_i
   end
 
   def next_heartbeat_at
-    last_heartbeat_at + heartbeat_duration
+    last_heartbeat_at + interval
   end
 
   def alive?

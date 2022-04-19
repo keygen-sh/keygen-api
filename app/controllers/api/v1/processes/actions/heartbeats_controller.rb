@@ -33,7 +33,7 @@ module Api::V1::Processes::Actions
 
       # Queue up heartbeat worker which will handle deactivating dead processes
       ProcessHeartbeatWorker.perform_in(
-        @process.heartbeat_duration + MachineProcess::HEARTBEAT_DRIFT,
+        @process.interval + MachineProcess::HEARTBEAT_DRIFT,
         @process.id,
       )
 
