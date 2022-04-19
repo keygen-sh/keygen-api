@@ -141,7 +141,7 @@ class Release < ApplicationRecord
   scope :for_platform, -> platform {
     case platform
     when ReleasePlatform,
-         UUID_REGEX
+         UUID_RX
       where(platform: platform)
     else
       joins(:platform).where(platform: { key: platform.to_s })
@@ -151,7 +151,7 @@ class Release < ApplicationRecord
   scope :for_filetype, -> filetype {
     case filetype
     when ReleaseFiletype,
-         UUID_REGEX
+         UUID_RX
       where(filetype: filetype)
     else
       joins(:filetype).where(filetype: { key: filetype.to_s })
@@ -161,7 +161,7 @@ class Release < ApplicationRecord
   scope :for_channel, -> channel {
     key =
       case channel
-      when UUID_REGEX
+      when UUID_RX
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show releases for stable, rc and beta channels.
         joins(:channel).select('release_channels.key')

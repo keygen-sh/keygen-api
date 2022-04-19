@@ -155,7 +155,7 @@ class Policy < ApplicationRecord
       identifier.empty?
 
     return where(id: identifier) if
-      UUID_REGEX.match?(identifier)
+      UUID_RX.match?(identifier)
 
     where('policies.id::text ILIKE ?', "%#{identifier}%")
   }
@@ -206,25 +206,25 @@ class Policy < ApplicationRecord
       product_identifier.empty?
 
     return where(product_id: product_identifier) if
-      UUID_REGEX.match?(product_identifier)
+      UUID_RX.match?(product_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', products.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(product_identifier)
 
-    joins(:product)
-      .where('products.name ILIKE ?', "%#{product_identifier}%")
-      .or(
-        joins(:product).where(tsv_query.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
-      )
+    scope.or(
+      joins(:product).where(<<~SQL.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', products.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :for_product, -> (id) { where product: id }

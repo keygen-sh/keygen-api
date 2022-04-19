@@ -37,7 +37,7 @@ class RequestLog < ApplicationRecord
       request_id.empty?
 
     return where(request_id: request_id) if
-      UUID_REGEX.match?(request_id)
+      UUID_RX.match?(request_id)
 
     where('request_logs.request_id::text ILIKE ?', "%#{request_id}%")
   }
@@ -60,7 +60,7 @@ class RequestLog < ApplicationRecord
       requestor_id.empty?
 
     return where(requestor_id: requestor_id) if
-      UUID_REGEX.match?(requestor_id)
+      UUID_RX.match?(requestor_id)
 
     where('request_logs.requestor_id::text ILIKE ?', "%#{requestor_id}%")
   }
@@ -83,7 +83,7 @@ class RequestLog < ApplicationRecord
       resource_id.empty?
 
     return where(resource_id: resource_id) if
-      UUID_REGEX.match?(resource_id)
+      UUID_RX.match?(resource_id)
 
     where('request_logs.resource_id::text ILIKE ?', "%#{resource_id}%")
   }

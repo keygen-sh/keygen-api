@@ -47,7 +47,7 @@ class Machine < ApplicationRecord
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
-      !UUID_REGEX.match?(id_before_type_cast)
+      !UUID_RX.match?(id_before_type_cast)
 
     errors.add :id, :conflict, message: 'must not conflict with another machine' if
       Machine.exists?(id)
@@ -129,7 +129,7 @@ class Machine < ApplicationRecord
       identifier.empty?
 
     return where(id: identifier) if
-      UUID_REGEX.match?(identifier)
+      UUID_RX.match?(identifier)
 
     where('machines.id::text ILIKE ?', "%#{identifier}%")
   }
@@ -184,24 +184,25 @@ class Machine < ApplicationRecord
       license_identifier.empty?
 
     return where(license_id: license_identifier) if
-      UUID_REGEX.match?(license_identifier)
+      UUID_RX.match?(license_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', licenses.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:license).where('licenses.name ILIKE ?', "%#{license_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(license_identifier)
 
-    joins(:license).where('licenses.name ILIKE ?', "%#{license_identifier}%")
-                   .or(
-                     joins(:license).where(tsv_query.squish, license_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                   )
+    scope.or(
+      joins(:license).where(<<~SQL.squish, license_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', licenses.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :search_user, -> (term) {
@@ -210,24 +211,25 @@ class Machine < ApplicationRecord
       user_identifier.empty?
 
     return joins(:user).where(user: { id: user_identifier }) if
-      UUID_REGEX.match?(user_identifier)
+      UUID_RX.match?(user_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', users.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(user_identifier)
 
-    joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
-                .or(
-                  joins(:user).where(tsv_query.squish, user_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                )
+    scope.or(
+      joins(:user).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', users.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :search_product, -> (term) {
@@ -236,25 +238,25 @@ class Machine < ApplicationRecord
       product_identifier.empty?
 
     return joins(:policy).where(policy: { product_id: product_identifier }) if
-      UUID_REGEX.match?(product_identifier)
+      UUID_RX.match?(product_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', products.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(policy: :product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(product_identifier)
 
-    joins(policy: :product)
-      .where('products.name ILIKE ?', "%#{product_identifier}%")
-      .or(
-        joins(policy: :product).where(tsv_query.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
-      )
+    scope.or(
+      joins(policy: :product).where(<<~SQL.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', products.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :search_policy, -> (term) {
@@ -263,24 +265,25 @@ class Machine < ApplicationRecord
       policy_identifier.empty?
 
     return where(policy_id: policy_identifier) if
-      UUID_REGEX.match?(policy_identifier)
+      UUID_RX.match?(policy_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', policy_id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(policy_identifier)
 
-    joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
-                  .or(
-                    joins(:policy).where(tsv_query.squish, policy_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                  )
+    scope.or(
+      joins(:policy).where(<<~SQL.squish, policy_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', policy_id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :with_metadata, -> (meta) { search_metadata meta }

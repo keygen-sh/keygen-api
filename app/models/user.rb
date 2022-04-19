@@ -134,24 +134,25 @@ class User < ApplicationRecord
       role_identifier.empty?
 
     return joins(:role).where(role: { id: role_identifier }) if
-      UUID_REGEX.match?(role_identifier)
+      UUID_RX.match?(role_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', roles.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(role_identifier)
 
-    joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
-                .or(
-                  joins(:role).where(tsv_query.squish, role_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                )
+    scope.or(
+      joins(:role).where(<<~SQL.squish, role_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', roles.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :with_metadata, -> (meta) { search_metadata meta }
