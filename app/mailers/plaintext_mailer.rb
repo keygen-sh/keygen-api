@@ -170,6 +170,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def price_increase_notice(account:)
+    return if
+      account.ent_tier?
+
     account.admins.each do |admin|
       mail(
         content_type: "text/plain",
@@ -215,6 +218,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def price_increase_reminder(account:)
+    return if
+      account.ent_tier?
+
     account.admins.each do |admin|
       mail(
         content_type: "text/plain",
