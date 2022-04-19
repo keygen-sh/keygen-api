@@ -88,14 +88,14 @@ class License < ApplicationRecord
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
-      !UUID_REGEX.match?(id_before_type_cast)
+      !UUID_RX.match?(id_before_type_cast)
 
     errors.add :id, :conflict, message: 'must not conflict with another license' if
       License.exists?(id)
   end
 
   validate on: :create, unless: -> { policy.nil? } do
-    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if key.present? && key =~ UUID_REGEX && account.licenses.exists?(key)
+    errors.add :key, :conflict, message: "must not conflict with another license's identifier (UUID)" if key.present? && key =~ UUID_RX && account.licenses.exists?(key)
 
     # This is for our original "encrypted" keys only (legacy scheme)
     errors.add :key, :not_supported, message: "cannot be specified for a legacy encrypted license" if key.present? && legacy_encrypted?
@@ -195,7 +195,7 @@ class License < ApplicationRecord
       identifier.empty?
 
     return where(id: identifier) if
-      UUID_REGEX.match?(identifier)
+      UUID_RX.match?(identifier)
 
     where('licenses.id::text ILIKE ?', "%#{identifier}%")
   }
@@ -250,24 +250,25 @@ class License < ApplicationRecord
       user_identifier.empty?
 
     return where(user_id: user_identifier) if
-      UUID_REGEX.match?(user_identifier)
+      UUID_RX.match?(user_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', users.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(user_identifier)
 
-    joins(:user).where('users.email ILIKE ?', "%#{user_identifier}%")
-                .or(
-                  joins(:user).where(tsv_query.squish, user_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                )
+    scope.or(
+      joins(:user).where(<<~SQL.squish, user_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', users.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :search_product, -> (term) {
@@ -276,25 +277,25 @@ class License < ApplicationRecord
       product_identifier.empty?
 
     return joins(:policy).where(policy: { product_id: product_identifier }) if
-      UUID_REGEX.match?(product_identifier)
+      UUID_RX.match?(product_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', products.id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(policy: :product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(product_identifier)
 
-    joins(policy: :product)
-      .where('products.name ILIKE ?', "%#{product_identifier}%")
-      .or(
-        joins(policy: :product).where(tsv_query.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
-      )
+    scope.or(
+      joins(policy: :product).where(<<~SQL.squish, product_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', products.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :search_policy, -> (term) {
@@ -303,24 +304,25 @@ class License < ApplicationRecord
       policy_identifier.empty?
 
     return where(policy_id: policy_identifier) if
-      UUID_REGEX.match?(policy_identifier)
+      UUID_RX.match?(policy_identifier)
 
-    tsv_query = <<~SQL
-      to_tsvector('simple', policy_id::text)
-      @@
-      to_tsquery(
-        'simple',
-        ''' ' ||
-        ?     ||
-        ' ''' ||
-        ':*'
-      )
-    SQL
+    scope = joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
+    return scope unless
+      UUID_CHAR_RX.match?(policy_identifier)
 
-    joins(:policy).where('policies.name ILIKE ?', "%#{policy_identifier}%")
-                  .or(
-                    joins(:policy).where(tsv_query.squish, policy_identifier.gsub(SANITIZE_TSV_RX, ' '))
-                  )
+    scope.or(
+      joins(:policy).where(<<~SQL.squish, policy_identifier.gsub(SANITIZE_TSV_RX, ' '))
+        to_tsvector('simple', policy_id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
   }
 
   scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
@@ -382,6 +384,9 @@ class License < ApplicationRecord
             else
               search_user(user)
             end
+
+    return scope if
+      user.is_a?(String) && !UUID_RX.match?(user)
 
     # Should also include the user's owned licenses through a group
     scope.union(

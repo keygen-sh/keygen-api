@@ -27,7 +27,7 @@ class Entitlement < ApplicationRecord
       identifier.empty?
 
     return where(id: identifier) if
-      UUID_REGEX.match?(identifier)
+      UUID_RX.match?(identifier)
 
     where('entitlements.id::text ILIKE ?', "%#{identifier}%")
   }

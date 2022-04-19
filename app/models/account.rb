@@ -60,7 +60,7 @@ class Account < ApplicationRecord
 
   validate on: [:create, :update] do
     clean_slug = "#{slug}".tr "-", ""
-    errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_REGEX
+    errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_RX
   end
 
   scope :active, -> (t = 90.days.ago) {
@@ -279,7 +279,7 @@ class Account < ApplicationRecord
     end
 
     # FIXME(ezekg) Duplicate slug validation (name may be a UUID)
-    if autogen_slug =~ UUID_REGEX
+    if autogen_slug =~ UUID_RX
       errors.add :slug, :not_allowed, message: "cannot resemble a UUID"
 
       throw :abort
