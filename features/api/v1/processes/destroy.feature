@@ -1,5 +1,5 @@
 @api/v1
-Feature: Delete machine process
+Feature: Kill machine process
 
   Background:
     Given the following "accounts" exist:
@@ -17,7 +17,7 @@ Feature: Delete machine process
     When I send a DELETE request to "/accounts/test1/processes/$0"
     Then the response status should be "403"
 
-  Scenario: Admin deletes one of their processes
+  Scenario: Admin kills one of their processes
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -31,7 +31,7 @@ Feature: Delete machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Developer deletes one of their processes
+  Scenario: Developer kills one of their processes
     Given the current account is "test1"
     And the current account has 1 "developer"
     And I am a developer of account "test1"
@@ -41,7 +41,7 @@ Feature: Delete machine process
     Then the response status should be "204"
     And the current account should have 2 "processes"
 
-  Scenario: Sales deletes one of their processes
+  Scenario: Sales kills one of their processes
     Given the current account is "test1"
     And the current account has 1 "sales-agent"
     And I am a sales agent of account "test1"
@@ -51,7 +51,7 @@ Feature: Delete machine process
     Then the response status should be "204"
     And the current account should have 2 "processes"
 
-  Scenario: Support deletes one of their processes
+  Scenario: Support kills one of their processes
     Given the current account is "test1"
     And the current account has 1 "support-agent"
     And I am a support agent of account "test1"
@@ -61,7 +61,7 @@ Feature: Delete machine process
     Then the response status should be "403"
     And the current account should have 3 "processes"
 
-  Scenario: Read-only deletes one of their processes
+  Scenario: Read-only kills one of their processes
     Given the current account is "test1"
     And the current account has 1 "read-only"
     And I am a read only of account "test1"
@@ -71,7 +71,7 @@ Feature: Delete machine process
     Then the response status should be "403"
     And the current account should have 3 "processes"
 
-  Scenario: Product deletes one of their processes
+  Scenario: Product kills one of their processes
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
@@ -87,7 +87,7 @@ Feature: Delete machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product deletes a process for a different product
+  Scenario: Product kills a process for a different product
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 2 "products"
@@ -103,7 +103,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to delete a process that belongs to another user
+  Scenario: User attempts to kill a process that belongs to another user
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 3 "processes"
@@ -118,7 +118,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User deletes a process for their unprotected license
+  Scenario: User kills a process for their unprotected license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -143,7 +143,7 @@ Feature: Delete machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User deletes a process for their protected license
+  Scenario: User kills a process for their protected license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "policy"
@@ -168,7 +168,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User deletes a process for a machine in their group
+  Scenario: User kills a process for a machine in their group
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "group"
@@ -199,7 +199,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License deletes a process for one of their machines
+  Scenario: License kills a process for one of their machines
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -214,7 +214,7 @@ Feature: Delete machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License deletes a process for a different license
+  Scenario: License kills a process for a different license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -228,7 +228,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous user attempts to delete a process for their account
+  Scenario: Anonymous user attempts to kill a process for their account
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 3 "processes"
@@ -240,7 +240,7 @@ Feature: Delete machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin attempts to delete a process for another account
+  Scenario: Admin attempts to kill a process for another account
     Given I am an admin of account "test2"
     But the current account is "test1"
     And the current account has 2 "webhook-endpoints"
