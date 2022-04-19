@@ -227,7 +227,7 @@ class PlaintextMailer < ApplicationMailer
 
           Quick reminder that we'll be increasing our prices soon. Again, this is the first time we've ever increased prices for our customers, and we don't take this event lightly. We'll be increasing prices across the board due to increased operating costs.
 
-          Below are the new prices, going into effect on May 1st, 2022 (next week). Your account will automatically be upgraded, unless you're on a free tier or you cancel (and we'd really hate that -- so please reach out).
+          Below are the new prices, going into effect on May 1st, 2022 (less than 2 weeks). Your account will automatically be upgraded, unless you're on a free tier or you cancel (and we'd really hate that -- so please reach out).
 
           - Dev 0: no changes (i.e. it's still free)
           - Tier 0: $19 to $29/mo ($290/yr)
