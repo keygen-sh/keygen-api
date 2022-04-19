@@ -249,7 +249,7 @@ class PlaintextMailer < ApplicationMailer
           --
           Zeke, Founder <https://keygen.sh>
 
-          p.s. We just rolled out "processes", a great way to control application concurrency on machines.
+          p.s. We just rolled out "processes", a great way to control application concurrency on machines. (More: https://keygen.sh/docs/api/processes/)
         TXT
       )
     end
