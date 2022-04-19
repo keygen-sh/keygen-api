@@ -812,7 +812,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Short Heartbeat Policy",
-            "heartbeatDuration": 60
+            "heartbeatDuration": 59
           },
           "relationships": {
             "product": {
@@ -831,7 +831,7 @@ Feature: Create policy
       """
       {
         "title": "Unprocessable resource",
-        "detail": "must be greater than or equal to 120 (2 minutes)",
+        "detail": "must be greater than or equal to 60 (1 minute)",
         "code": "HEARTBEAT_DURATION_INVALID",
         "source": {
           "pointer": "/data/attributes/heartbeatDuration"
