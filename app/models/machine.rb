@@ -294,11 +294,15 @@ class Machine < ApplicationRecord
   scope :for_key, -> (key) { joins(:license).where licenses: { key: key } }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> (id) {
-    joins(:license).where(licenses: { user_id: id })
-      .union(
-        for_owner(id)
-      )
-      .distinct
+    distinct.from(
+      joins(:license).where(licenses: { user_id: id })
+                     .union(
+                       for_owner(id)
+                     )
+                     .distinct_on(:id)
+                     .reorder(:id),
+      table_name,
+    )
   }
   scope :for_product, -> (id) { joins(license: [:policy]).where policies: { product_id: id } }
   scope :for_policy, -> (id) { joins(license: [:policy]).where policies: { id: id } }

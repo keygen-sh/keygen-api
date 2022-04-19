@@ -22,36 +22,72 @@ class ReleaseChannel < ApplicationRecord
     inclusion: { in: %w[stable rc beta alpha dev] }
 
   scope :for_product, -> id {
-    joins(:products).where(products: { id: id }).distinct
+    distinct.from(
+      joins(:products).where(products: { id: id })
+                      .distinct_on(:id)
+                      .reorder(:id),
+      table_name,
+    )
   }
 
   scope :for_user, -> user {
-    joins(products: %i[users])
-      .where(
-        products: { distribution_strategy: ['LICENSED', nil] },
-        users: { id: user },
-      )
-      .distinct
-      .union(
-        self.open
-      )
+    distinct.from(
+      joins(products: %i[users])
+        .where(
+          products: { distribution_strategy: ['LICENSED', nil] },
+          users: { id: user },
+        )
+        .union(
+          self.open
+        )
+        .distinct_on(:id)
+        .reorder(:id),
+      table_name,
+    )
   }
 
   scope :for_license, -> license {
-    joins(products: %i[licenses])
-      .where(
-        products: { distribution_strategy: ['LICENSED', nil] },
-        licenses: { id: license },
-      )
-      .distinct
-      .union(
-        self.open
-      )
+    distinct.from(
+      joins(products: %i[licenses])
+        .where(
+          products: { distribution_strategy: ['LICENSED', nil] },
+          licenses: { id: license },
+        )
+        .union(
+          self.open
+        )
+        .distinct_on(:id)
+        .reorder(:id),
+      table_name,
+    )
   }
 
-  scope :licensed, -> { joins(:products).where(products: { distribution_strategy: ['LICENSED', nil] }).distinct }
-  scope :open, -> { joins(:products).where(products: { distribution_strategy: 'OPEN' }).distinct }
-  scope :closed, -> { joins(:products).where(products: { distribution_strategy: 'CLOSED' }).distinct }
+  scope :licensed, -> {
+    distinct.from(
+      joins(:products).where(products: { distribution_strategy: ['LICENSED', nil] })
+                      .distinct_on(:id)
+                      .reorder(:id),
+      table_name,
+    )
+  }
+
+  scope :open, -> {
+    distinct.from(
+      joins(:products).where(products: { distribution_strategy: 'OPEN' })
+                      .distinct_on(:id)
+                      .reorder(:id),
+      table_name,
+    )
+  }
+
+  scope :closed, -> {
+    distinct.from(
+      joins(:products).where(products: { distribution_strategy: 'CLOSED' })
+                      .distinct_on(:id)
+                      .reorder(:id),
+      table_name,
+    )
+  }
 
   def stable?
     key == 'stable'

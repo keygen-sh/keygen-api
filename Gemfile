@@ -39,6 +39,7 @@ gem 'kaminari', '~> 1.2.0'
 
 # Postgres extensions
 gem 'active_record_union'
+gem 'active_record_distinct_on'
 
 # Background jobs
 gem 'sidekiq', '~> 6.4'

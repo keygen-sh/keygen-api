@@ -389,10 +389,14 @@ class License < ApplicationRecord
       user.is_a?(String) && !UUID_RX.match?(user)
 
     # Should also include the user's owned licenses through a group
-    scope.union(
-           for_owner(user)
-         )
-         .distinct
+    distinct.from(
+      scope.union(
+              for_owner(user)
+            )
+            .distinct_on(:id)
+            .reorder(:id),
+      table_name,
+    )
   }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
@@ -419,13 +423,18 @@ class License < ApplicationRecord
     allow_nil: true
 
   def entitlements
-    entl = Entitlement.where(account_id: account_id).distinct
+    entl = Entitlement.where(account_id: account_id)
 
-    entl.left_outer_joins(:policy_entitlements, :license_entitlements)
-        .where(policy_entitlements: { policy_id: policy_id })
-        .or(
-          entl.where(license_entitlements: { license_id: id })
-        )
+    Entitlement.distinct.from(
+      entl.left_outer_joins(:policy_entitlements, :license_entitlements)
+          .where(policy_entitlements: { policy_id: policy_id })
+          .or(
+            entl.where(license_entitlements: { license_id: id })
+          )
+          .distinct_on(:id)
+          .reorder(:id),
+      :entitlements,
+    )
   end
 
   def status

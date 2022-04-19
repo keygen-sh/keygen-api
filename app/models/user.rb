@@ -64,7 +64,7 @@ class User < ApplicationRecord
   end
 
   scope :stdout_subscribers, -> {
-    User.select('DISTINCT ON (users.email) users.*')
+    User.distinct_on(:email)
         .where(account: Account.active, stdout_unsubscribed_at: nil)
         .with_roles(:admin, :developer)
         .reorder(:email, :created_at)
@@ -173,7 +173,12 @@ class User < ApplicationRecord
   scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:license).where licenses: id }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user, -> (id) { where(id: id).union(for_owner(id)).distinct }
+  scope :for_user, -> (id) {
+    distinct.from(
+      where(id: id).union(for_owner(id)).distinct_on(:id).reorder(:id),
+      table_name,
+    )
+  }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
@@ -215,13 +220,18 @@ class User < ApplicationRecord
   }
 
   def entitlements
-    entl = Entitlement.where(account_id: account_id).distinct
+    entl = Entitlement.where(account_id: account_id)
 
-    entl.left_outer_joins(:policy_entitlements, :license_entitlements)
-        .where(policy_entitlements: { policy_id: licenses.reorder(nil).select(:policy_id) })
-        .or(
-          entl.where(license_entitlements: { license_id: licenses.reorder(nil).select(:id) })
-        )
+    Entitlement.distinct.from(
+      entl.left_outer_joins(:policy_entitlements, :license_entitlements)
+          .where(policy_entitlements: { policy_id: licenses.reorder(nil).select(:policy_id) })
+          .or(
+            entl.where(license_entitlements: { license_id: licenses.reorder(nil).select(:id) })
+          )
+          .distinct_on(:id)
+          .reorder(:id),
+      :entitlements,
+    )
   end
 
   def full_name

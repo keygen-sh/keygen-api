@@ -19,12 +19,15 @@ class Group < ApplicationRecord
   scope :for_product, -> id { self }
 
   scope :for_user, -> u {
-    joins(:users)
-      .where(users: { id: u })
-      .union(
-        joins(:owners).where(owners: { user_id: u })
-      )
-      .distinct
+    distinct.from(
+      joins(:users).where(users: { id: u })
+                   .union(
+                     joins(:owners).where(owners: { user_id: u })
+                   )
+                   .distinct_on(:id)
+                   .reorder(:id),
+      table_name,
+    )
   }
 
   scope :for_license, -> l {
