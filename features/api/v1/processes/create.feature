@@ -1,5 +1,5 @@
 @api/v1
-Feature: Create machine process
+Feature: Spawn machine process
 
   Background:
     Given the following "accounts" exist:
@@ -20,7 +20,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for their account
+  Scenario: Admin spawns a process for their account
     Given time is frozen at "2022-04-15T14:52:48.000Z"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -63,7 +63,7 @@ Feature: Create machine process
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
-  Scenario: Developer creates a process for their account
+  Scenario: Developer spawns a process for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
     And I am a developer of account "test1"
@@ -90,7 +90,7 @@ Feature: Create machine process
       """
     Then the response status should be "201"
 
-  Scenario: Sales creates a process for their account
+  Scenario: Sales spawns a process for their account
     Given the current account is "test1"
     And the current account has 1 "sales-agent"
     And I am a sales agent of account "test1"
@@ -117,7 +117,7 @@ Feature: Create machine process
       """
     Then the response status should be "201"
 
-  Scenario: Support attempts to create a process for their account
+  Scenario: Support attempts to spawn a process for their account
     Given the current account is "test1"
     And the current account has 1 "support-agent"
     And I am a support agent of account "test1"
@@ -144,7 +144,7 @@ Feature: Create machine process
       """
     Then the response status should be "403"
 
-  Scenario: Read-only attempts to create a process for their account
+  Scenario: Read-only attempts to spawn a process for their account
     Given the current account is "test1"
     And the current account has 1 "read-only"
     And I am a read only of account "test1"
@@ -171,7 +171,7 @@ Feature: Create machine process
       """
     Then the response status should be "403"
 
-  Scenario: Admin creates a process for their account with a UUID pid
+  Scenario: Admin spawns a process for their account with a UUID pid
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -203,7 +203,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process a pid matching another process's ID (different machine)
+  Scenario: Admin spawns a process with a pid matching another process's ID (different machine)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -238,7 +238,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process a pid matching another process's ID (same machine)
+  Scenario: Admin spawns a process with a pid matching another process's ID (same machine)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -284,7 +284,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for their account with a pid matching a reserved word
+  Scenario: Admin spawns a process for their account with a pid matching a reserved word
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -315,7 +315,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process with missing pid
+  Scenario: Admin spawns a process with missing pid
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -342,7 +342,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process with missing machine
+  Scenario: Admin spawns a process with missing machine
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -364,7 +364,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process with an invalid machine UUID
+  Scenario: Admin spawns a process with an invalid machine UUID
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -394,7 +394,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has no limit (PER_MACHINE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has no limit (PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -436,7 +436,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has no limit (PER_LICENSE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has no limit (PER_LICENSE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -478,7 +478,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has not reached its limit (PER_MACHINE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has not reached its limit (PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -519,7 +519,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has not reached its limit (PER_LICENSE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has not reached its limit (PER_LICENSE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -561,7 +561,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has almost reached its limit (PER_MACHINE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -603,7 +603,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has almost reached its limit (PER_LICENSE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has almost reached its limit (PER_LICENSE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -646,7 +646,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has reached its limit (PER_MACHINE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has reached its limit (PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -697,7 +697,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a process for a machine that has reached its limit (PER_LICENSE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has reached its limit (PER_LICENSE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -750,7 +750,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates a process for their machine
+  Scenario: User spawns a process for their machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "user"
@@ -783,7 +783,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates a process for their machine with a protected policy
+  Scenario: User spawns a process for their machine with a protected policy
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
@@ -824,7 +824,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates a process for an unprotected machine
+  Scenario: User spawns a process for an unprotected machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
@@ -866,7 +866,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a process for their machine
+  Scenario: License spawns a process for their machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
@@ -898,7 +898,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a process for a protected machine
+  Scenario: License spawns a process for a protected machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "policy"
@@ -935,7 +935,7 @@ Feature: Create machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a process for their machine with a duplicate pid
+  Scenario: License spawns a process for their machine with a duplicate pid
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
@@ -983,7 +983,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a process for their machine with a blank pid
+  Scenario: License spawns a process for their machine with a blank pid
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "license"
@@ -1026,7 +1026,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates a process for another license's machine
+  Scenario: License spawns a process for another license's machine
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "machines"
@@ -1056,7 +1056,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product creates a process for another product's machine
+  Scenario: Product spawns a process for another product's machine
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -1089,7 +1089,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates a process for another user's machine
+  Scenario: User spawns a process for another user's machine
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
@@ -1120,7 +1120,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous attempts to create a process
+  Scenario: Anonymous attempts to spawn a process
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "machine"
@@ -1148,7 +1148,7 @@ Feature: Create machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin of another account attempts to create a process
+  Scenario: Admin of another account attempts to spawn a process
     Given the current account is "test1"
     And the current account has 10 "webhook-endpoints"
     And the current account has 1 "machine"
