@@ -229,7 +229,7 @@ class PlaintextMailer < ApplicationMailer
 
           Below are the new prices, going into effect on May 1st, 2022 (next week). Your account will automatically be upgraded, unless you're on a free tier or you cancel (and we'd really hate that -- so please reach out).
 
-          - Dev Tier: no changes (i.e. it's still free)
+          - Dev 0: no changes (i.e. it's still free)
           - Tier 0: $19 to $29/mo ($290/yr)
           - Tier 1: $39 to $49/mo ($490/yr)
           - Tier 2: $59 to $79/mo ($790/yr)
@@ -242,12 +242,14 @@ class PlaintextMailer < ApplicationMailer
 
           Please reach out if you'd like me to switch you over to a yearly subscription at your current rate and I can get that handled for you.
 
+          For low volume accounts, we also have a free tier called Dev 0 which you can downgrade to at anytime.
+
           Thanks again for your understanding and continued business. Let me know if you have any questions or concerns.
 
           --
           Zeke, Founder <https://keygen.sh>
 
-          p.s. For low volume accounts, we also have a free tier which you can downgrade to at anytime.
+          p.s. We just rolled out "processes", a great way to control application concurrency on machines.
         TXT
       )
     end
