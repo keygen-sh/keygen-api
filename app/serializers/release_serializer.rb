@@ -70,16 +70,9 @@ class ReleaseSerializer < BaseSerializer
       @url_helpers.v1_account_release_constraints_path @object.account_id, @object
     end
   end
-  relationship :artifact do
-    linkage always: true do
-      if @object.artifact.present?
-        { type: :artifacts, id: @object.artifact.id }
-      else
-        nil
-      end
-    end
+  relationship :artifacts do
     link :related do
-      @url_helpers.v1_account_release_artifact_path @object.account_id, @object
+      @url_helpers.v1_account_release_artifacts_path @object.account_id, @object
     end
   end
 

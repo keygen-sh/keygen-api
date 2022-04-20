@@ -4,9 +4,16 @@ module Api::V1::Releases::Relationships
   class ArtifactsController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
-    before_action :authenticate_with_token!, except: %i[show]
-    before_action :authenticate_with_token, only: %i[show]
+    before_action :authenticate_with_token!, except: %i[index show]
+    before_action :authenticate_with_token, only: %i[index show]
     before_action :set_release
+
+    def index
+      artifacts = apply_pagination(apply_scopes(policy_scope(release.artifacts)))
+      authorize artifacts
+
+      render jsonapi: artifacts
+    end
 
     def show
       authorize release, :download?

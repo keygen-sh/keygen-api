@@ -16,7 +16,7 @@ class ReleaseDownloadService < BaseService
       release.present?
 
     raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)') unless
-      release.artifact.present?
+      release.artifacts.any?
 
     raise YankedReleaseError.new('has been yanked') if
       release.yanked?
@@ -34,7 +34,7 @@ class ReleaseDownloadService < BaseService
   end
 
   def call
-    artifact = release.artifact
+    artifact = release.artifacts.sole
 
     # Assert artifact exists before redirecting to S3
     if !artifact.etag?
@@ -63,7 +63,8 @@ class ReleaseDownloadService < BaseService
       redirect_url: link.url,
       artifact: artifact,
     )
-  rescue Aws::S3::Errors::NotFound,
+  rescue ActiveRecord::RecordNotFound,
+         Aws::S3::Errors::NotFound,
          Timeout::Error => e
     Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
