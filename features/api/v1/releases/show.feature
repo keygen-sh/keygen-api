@@ -17,14 +17,61 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves a release for their account by ID
+  Scenario: Admin retrieves a release for their account by ID (v1.1)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
     And I use an authentication token
+    And I use API version "v1.1"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
-    And the JSON response should be a "release"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves a published release for their account by ID (v1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
+    And I use an authentication token
+    And I use API version "v1"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": { "type": "artifacts", "id": "$artifacts[0]" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves an unpublished release for their account by ID (v1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is nil
+    And I use an authentication token
+    And I use API version "v1"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": null
+        }
+      }
+      """
 
   Scenario: Admin retrieves a release for their account by filename
     Given I am an admin of account "test1"
