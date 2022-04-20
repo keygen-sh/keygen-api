@@ -17,7 +17,7 @@ class ApplicationController < ActionController::API
   # NOTE(ezekg) We're using an around_action here so that our request
   #             logger concern can log the resulting response body.
   #             Otherwise, the logged response may be incorrect.
-  around_action :rescue_from_exceptions
+  prepend_around_action :rescue_from_exceptions
   after_action :verify_authorized
 
   attr_accessor :current_http_scheme
@@ -389,6 +389,14 @@ class ApplicationController < ActionController::API
           end
 
     render_forbidden detail: msg
+  rescue Versionist::InvalidVersion
+    render_bad_request(
+      detail: 'invalid API version requested',
+      code: 'INVALID_API_VERSION',
+      links: {
+        about: 'https://keygen.sh/docs/api/versioning/',
+      },
+    )
   end
 
   class AuthorizationContext < OpenStruct; end
