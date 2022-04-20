@@ -101,7 +101,7 @@ module Versionist
     end
 
     included do
-      prepend_around_action :transform!
+      around_action :transform!
 
       private
 
