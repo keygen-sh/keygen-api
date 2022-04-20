@@ -15,6 +15,7 @@ class ReleaseArtifactHasManyToOneTransform < Versionist::Transform
     body = JSON.parse(res.body, symbolize_names: true)
     data = body[:data]
 
+    # FIXME(ezekg) This should be 2 separate transforms
     case data
     when Array
       account_id  = data[0][:relationships][:account][:data][:id]
