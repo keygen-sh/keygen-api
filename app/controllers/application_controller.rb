@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  include Versionist::Transformer[
-    '1.1' => [ReleaseArtifactHasManyToOneTransform],
-  ]
-
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
@@ -17,7 +13,14 @@ class ApplicationController < ActionController::API
   # NOTE(ezekg) We're using an around_action here so that our request
   #             logger concern can log the resulting response body.
   #             Otherwise, the logged response may be incorrect.
-  prepend_around_action :rescue_from_exceptions
+  around_action :rescue_from_exceptions
+
+  # NOTE(ezekg) This is after the rescues so that we can rescue from
+  #             invalid version errors.
+  include Versionist::Transformer[
+    '1.1' => [ReleaseArtifactHasManyToOneTransform],
+  ]
+
   after_action :verify_authorized
 
   attr_accessor :current_http_scheme
