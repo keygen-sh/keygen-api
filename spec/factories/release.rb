@@ -9,7 +9,7 @@ FactoryBot.define do
 
     account { nil }
     product { nil }
-    artifact { nil }
+    artifacts { [] }
     platform { nil }
     filetype { nil }
     channel { nil }
@@ -38,13 +38,13 @@ FactoryBot.define do
 
     trait :unpublished do
       after :build do |release, evaluator|
-        release.artifact = nil
+        release.artifacts = []
       end
     end
 
     trait :published do
       after :build do |release, evaluator|
-        release.artifact ||= build(:release_artifact,
+        release.artifacts << build(:release_artifact,
           account: release.account,
           product: release.product,
           release: release,

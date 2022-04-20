@@ -494,12 +494,12 @@ Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (
     releases = @account.releases.all
 
     releases.each do |release|
-      release.create_artifact!(key: release.filename, account: release.account, product: release.product)
+      release.artifacts.create!(key: release.filename, account: release.account, product: release.product)
     end
   else
     release = @account.releases.send(named_index)
 
-    release.create_artifact!(key: release.filename, account: release.account, product: release.product)
+    release.artifacts.create!(key: release.filename, account: release.account, product: release.product)
   end
 end
 

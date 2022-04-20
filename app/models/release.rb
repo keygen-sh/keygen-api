@@ -52,10 +52,10 @@ class Release < ApplicationRecord
     class_name: 'ReleaseUploadLink',
     inverse_of: :release,
     dependent: :delete_all
-  has_one :artifact,
+  has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
-    dependent: :delete
+    dependent: :delete_all
   has_many :event_logs,
     as: :resource
 
@@ -205,17 +205,17 @@ class Release < ApplicationRecord
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_version, -> version { where(version: version) }
-  scope :with_artifact, -> { joins(:artifact) }
-  scope :without_artifact, -> { where.missing(:artifact) }
+  scope :with_artifacts, -> { where.associated(:artifacts) }
+  scope :without_artifacts, -> { where.missing(:artifacts) }
   scope :with_status, -> status {
     case status.to_s.upcase
     when 'YANKED'
       self.yanked
     when 'NOT_PUBLISHED',
          'DRAFT'
-      self.unyanked.without_artifact
+      self.unyanked.without_artifacts
     when 'PUBLISHED'
-      self.unyanked.with_artifact
+      self.unyanked.with_artifacts
     else
       self.none
     end
@@ -260,7 +260,7 @@ class Release < ApplicationRecord
     case
     when yanked?
       :YANKED
-    when artifact.nil?
+    when artifacts.empty?
       :NOT_PUBLISHED
     else
       :PUBLISHED

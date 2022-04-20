@@ -25,10 +25,12 @@ class ReleaseYankService < BaseService
 
     release.touch(:yanked_at)
 
-    artifact = release.artifact
+    artifact = release.artifacts.sole
     artifact.destroy unless
       artifact.nil?
 
+    nil
+  rescue ActiveRecord::RecordNotFound
     nil
   end
 
