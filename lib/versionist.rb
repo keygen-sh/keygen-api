@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Versionist
+  class InvalidVersion < StandardError; end
+
   CURRENT_VERSION = '1.1'
 
   class Transform
@@ -90,11 +92,18 @@ module Versionist
       private
 
       def transform!
+        validate_current_version!
         transform_request!
 
         yield
 
         transform_response!
+      end
+
+      def validate_current_version!
+        Semverse::Version.coerce(current_version)
+      rescue Semverse::InvalidVersionFormat
+        raise InvalidVersion, 'invalid version string provided'
       end
 
       def transform_request!
@@ -134,7 +143,8 @@ module Versionist
       def transforms
         t = Transformer.transforms || []
 
-        t.sort.reverse
+        t.sort_by { |(v, _)| Semverse::Version.coerce(v.delete_prefix('v')) }
+         .reverse
       end
 
       def current_version
