@@ -5,6 +5,20 @@ module Versionist
 
   CURRENT_VERSION = '1.1'
 
+  def self.config
+    @config ||= Configuration.new
+  end
+
+  def self.configure
+    yield config
+  end
+
+  class Configuration
+    include ActiveSupport::Configurable
+
+    config_accessor(:logger) { Rails.logger }
+  end
+
   class Transform
     include Rails.application.routes.url_helpers
 
@@ -26,7 +40,7 @@ module Versionist
       __versionist_request_transformers.each do |transformer|
         instance_exec(@request, &transformer)
       rescue => e
-        Keygen.logger.exception(e)
+        Versionist.config.logger.error(e)
       end
     end
 
@@ -37,7 +51,7 @@ module Versionist
       __versionist_response_transformers.each do |transformer|
         instance_exec(@response, &transformer)
       rescue => e
-        Keygen.logger.exception(e)
+        Versionist.config.logger.error(e)
       end
     end
 
@@ -118,7 +132,7 @@ module Versionist
 
             t.transform_request!
           rescue => e
-            Keygen.logger.exception(e)
+            Versionist.config.logger.error(e)
           end
         end
       end
@@ -135,7 +149,7 @@ module Versionist
 
             t.transform_response!
           rescue => e
-            Keygen.logger.exception(e)
+            Versionist.config.logger.error(e)
           end
         end
       end
