@@ -127,6 +127,8 @@ def parse_placeholders(str, account:, bearer:, crypt:)
               account.release_entitlement_constraints.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             when 'process'
               account.machine_processes.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
+            when 'artifact'
+              account.release_artifacts.all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             else
               account.send(resource.underscore).all.send(*(index.nil? ? [:sample] : [:[], index.to_i]))
             end
