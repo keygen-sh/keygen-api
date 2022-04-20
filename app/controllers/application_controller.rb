@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include Versionist::Transformer[
+    '1.1' => [ReleaseArtifactHasManyToOneTransform],
+  ]
+
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
