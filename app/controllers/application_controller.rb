@@ -31,9 +31,9 @@ class ApplicationController < ActionController::API
   attr_accessor :current_token
 
   def current_api_version
-    @current_api_version ||=
-      request.headers.fetch('Keygen-Version') { KEYGEN_API_VERSION }
-                     .delete_prefix('v')
+    request.headers['Keygen-Version']&.delete_prefix('v') ||
+      current_account&.api_version ||
+      KEYGEN_API_VERSION
   end
   alias :versionist_version :current_api_version
 

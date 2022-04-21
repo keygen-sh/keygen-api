@@ -152,6 +152,7 @@ class Account < ApplicationRecord
 
   def clear_cache!
     Account.clear_cache! id
+    Account.clear_cache! slug
   end
 
   def self.daily_request_count_cache_key_ts
