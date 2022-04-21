@@ -5,6 +5,10 @@ module Versionist
 
   VERSION_METHOD = :versionist_version
 
+  def self.logger
+    Versionist.config.logger
+  end
+
   def self.config
     @config ||= Configuration.new
   end
@@ -22,84 +26,137 @@ module Versionist
   end
 
   class Migration
-    include Rails.application.routes.url_helpers
-
-    mattr_accessor :__versionist_request_migrations,  default: []
-    mattr_accessor :__versionist_response_migrations, default: []
-    mattr_accessor :__versionist_routes,                default: []
-
-    def initialize(version:, controller: nil, request: nil, response: nil)
-      @version    = Semverse::Version.new(version.delete_prefix('v'))
-      @controller = controller
-      @request    = request
-      @response   = response
+    def self.[](version)
+      Class.new(VersionedMigration) { |c| c.version = version }
     end
+  end
 
-    def migrate_request!
+  class VersionedMigration
+    def self.transform!(data)
       return unless
-        @request.present?
+        data.present? && @migrations.any?
 
-      __versionist_request_migrations.each do |migration|
-        instance_exec(@request, &migration)
+      @migrations.select(&:for_data?).each do |migration|
+        instance_exec(data, &migration)
       rescue => e
-        Versionist.config.logger.error(e)
+        logger.error(e.message)
+        logger.error(e.backtrace.join("\n"))
       end
     end
 
-    def migrate_response!
+    def self.migrate_request!(request)
       return unless
-        @response.present?
+        request.present? && @migrations.any?
 
-      __versionist_response_migrations.each do |migration|
-        instance_exec(@response, &migration)
+      @migrations.select(&:for_request?).each do |migration|
+        instance_exec(request, &migration)
       rescue => e
-        Versionist.config.logger.error(e)
+        logger.error(e.message)
+        logger.error(e.backtrace.join("\n"))
       end
     end
 
-    def migration_version?(version)
+    def self.migrate_response!(response)
+      return unless
+        response.present? && @migrations.any?
+
+      @migrations.select(&:for_response?).each do |migration|
+        instance_exec(response, &migration)
+      rescue => e
+        logger.error(e.message)
+        logger.error(e.backtrace.join("\n"))
+      end
+    end
+
+    def self.migrate_version?(version)
       version = Semverse::Version.coerce(version)
 
-      version < @version
+      version < @@version
     end
 
-    def migration_route?(route)
-      __versionist_routes.include?(route.to_sym)
+    def self.migrate_route?(route)
+      @routes.include?(route.to_sym)
     end
 
     private
 
-    def self.request(&block)
-      __versionist_request_migrations << block
+    def self.version=(version)
+      @@version = Semverse::Version.new(version.to_s.delete_prefix('v'))
     end
 
-    def self.response(&block)
-      __versionist_response_migrations << block
+    def self.transform(&)
+      @migrations ||= []
+      @migrations << DataMigrationBlock.new(&)
+    end
+
+    def self.request(&)
+      @migrations ||= []
+      @migrations << RequestMigrationBlock.new(&)
+    end
+
+    def self.response(&)
+      @migrations ||= []
+      @migrations << ResponseMigrationBlock.new(&)
     end
 
     def self.route(route)
-      __versionist_routes << route.to_sym
+      @routes ||= []
+      @routes << route.to_sym
     end
 
     def self.routes(*routes)
-      routes.each { |r| self.route(r) }
+      routes.each { |r| route(r) }
     end
 
     def self.description(...)= nil
+
+    def self.url_helpers
+      Rails.application.routes.url_helpers
+    end
+
+    def self.logger
+      Versionist.logger
+    end
+  end
+
+  class AbstractMigrationBlock
+    attr_reader :block
+
+    def initialize(&block)
+      @block = block
+    end
+
+    def call(...) = block.call(...)
+    def to_proc   = block
+
+    def for_data?     = false
+    def for_request?  = false
+    def for_response? = false
+  end
+
+  class DataMigrationBlock < AbstractMigrationBlock
+    def for_data? = true
+  end
+
+  class RequestMigrationBlock < AbstractMigrationBlock
+    def for_request? = true
+  end
+
+  class ResponseMigrationBlock < AbstractMigrationBlock
+    def for_response? = true
   end
 
   module Migrations
     extend ActiveSupport::Concern
 
-    # FIXME(ezekg) This should allow migrating multiple controllers
-    def self.[](migration)
-      @migration = migration
+    def self.[](*migrations)
+      @migrations = migrations
 
       self
     end
 
-    def self.migration
-      @migration
+    def self.migrations
+      @migrations
     end
 
     included do
@@ -123,44 +180,33 @@ module Versionist
       end
 
       def migrate_request!
-        migration.each do |version, migrations|
-          migrations.each do |migration|
-            t = migration.new(version: version, controller: self, request: request)
-            next unless
-              t.migration_version?(current_version)
+        Migrations.migrations.reverse.each do |migration|
+          next unless
+            migration.migrate_version?(current_version)
 
-            next unless
-              t.migration_route?(current_route)
+          next unless
+            migration.migrate_route?(current_route)
 
-            t.migrate_request!
-          rescue => e
-            Versionist.config.logger.error(e)
-          end
+          migration.migrate_request!(request)
+        rescue => e
+          Versionist.logger.error(e.message)
+          Versionist.logger.error(e.backtrace.join("\n"))
         end
       end
 
       def migrate_response!
-        migration.each do |version, migrations|
-          migrations.each do |migration|
-            t = migration.new(version: version, controller: self, response: response)
-            next unless
-              t.migration_version?(current_version)
+        Migrations.migrations.reverse.each do |migration|
+          next unless
+            migration.migrate_version?(current_version)
 
-            next unless
-              t.migration_route?(current_route)
+          next unless
+            migration.migrate_route?(current_route)
 
-            t.migrate_response!
-          rescue => e
-            Versionist.config.logger.error(e)
-          end
+          migration.migrate_response!(response)
+        rescue => e
+          Versionist.logger.error(e.message)
+          Versionist.logger.error(e.backtrace.join("\n"))
         end
-      end
-
-      def migration
-        t = Migrations.migration || []
-
-        t.sort_by { |(v, _)| Semverse::Version.coerce(v.delete_prefix('v')) }
-         .reverse
       end
 
       def current_version
