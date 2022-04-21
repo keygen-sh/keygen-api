@@ -11,12 +11,19 @@ class ArtifactHasManyToHasOneForReleasesMigration < Versionist::Migration[1.1]
       data.present?
 
     case data
-    in data: [*, { type: 'releases' }, *]
+    in data: [*, { type: 'releases', id: _, relationships: { account: { data: { type: 'accounts', id: _ } } } }, *]
+      account_ids = data[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
+      release_ids = data[:data].collect { _1[:id] }.compact.uniq
+
+      artifacts = ReleaseArtifact.distinct_on(:release_id)
+                                 .where(account_id: account_ids, release_id: release_ids)
+                                 .reorder(:release_id, created_at: :desc)
+                                 .group_by(&:release_id)
+
       data[:data].each do |release|
         case release
         in type: 'releases', id: release_id, relationships: { account: { data: { type: 'accounts', id: account_id } } }
-          # FIXME(ezekg) N+1 query
-          artifact = ReleaseArtifact.find_by(account_id:, release_id:)
+          artifact = artifacts[release_id]&.first
 
           release[:relationships].tap do |rels|
             rels[:artifact] = {
