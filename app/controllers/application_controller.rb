@@ -29,6 +29,13 @@ class ApplicationController < ActionController::API
   attr_accessor :current_bearer
   attr_accessor :current_token
 
+  def current_api_version
+    @current_api_version ||=
+      request.headers.fetch('Keygen-Version') { KEYGEN_API_VERSION }
+                     .delete_prefix('v')
+  end
+  alias :versionist_version :current_api_version
+
   def pundit_user
     AuthorizationContext.new(
       account: current_account,
@@ -392,7 +399,7 @@ class ApplicationController < ActionController::API
           end
 
     render_forbidden detail: msg
-  rescue Versionist::InvalidVersion
+  rescue Versionist::InvalidVersionError
     render_bad_request(
       detail: 'invalid API version requested',
       code: 'INVALID_API_VERSION',
