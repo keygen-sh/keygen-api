@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_15_131706) do
+ActiveRecord::Schema[7.0].define(version: 2022_04_21_190515) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -36,6 +36,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_15_131706) do
     t.text "ed25519_public_key"
     t.string "domain"
     t.string "subdomain"
+    t.string "api_version"
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true
@@ -579,6 +580,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_15_131706) do
     t.uuid "account_id"
     t.jsonb "subscriptions", default: ["*"]
     t.string "signature_algorithm", default: "ed25519"
+    t.string "api_version"
     t.index ["account_id", "created_at"], name: "index_webhook_endpoints_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_webhook_endpoints_on_created_at", order: :desc
     t.index ["id", "created_at", "account_id"], name: "index_webhook_endpoints_on_id_and_created_at_and_account_id", unique: true

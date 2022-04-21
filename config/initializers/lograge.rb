@@ -13,6 +13,7 @@ Rails.application.configure do
     token_id = controller.current_token&.id
     authn = controller.current_http_scheme
     authz = controller.current_bearer&.role&.name
+    api_version = controller.current_api_version
     req = controller.request
     res = controller.response
     query_params =
@@ -83,6 +84,7 @@ Rails.application.configure do
 
     {
       request_id: req.request_id,
+      api_version: api_version || 'N/A',
       query_params: query_params || 'N/A',
       account_id: account_id || 'N/A',
       account_slug: account_slug || 'N/A',
