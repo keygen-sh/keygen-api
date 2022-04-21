@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Versionist
-  class InvalidVersion < StandardError; end
+  class InvalidVersionError < StandardError; end
 
-  CURRENT_VERSION = '1.1'
+  VERSION_METHOD = :versionist_version
 
   def self.config
     @config ||= Configuration.new
@@ -117,7 +117,7 @@ module Versionist
       def validate_current_version!
         Semverse::Version.coerce(current_version)
       rescue Semverse::InvalidVersionFormat
-        raise InvalidVersion, 'invalid version string provided'
+        raise InvalidVersionError, 'invalid version format'
       end
 
       def transform_request!
@@ -162,8 +162,7 @@ module Versionist
       end
 
       def current_version
-        request.headers.fetch('Keygen-Version', CURRENT_VERSION)
-                       .delete_prefix('v')
+        send(VERSION_METHOD)
       end
 
       def current_route
