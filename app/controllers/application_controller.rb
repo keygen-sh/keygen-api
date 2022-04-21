@@ -18,10 +18,8 @@ class ApplicationController < ActionController::API
   # NOTE(ezekg) This is after the rescues so that we can rescue from
   #             invalid version errors.
   include Versionist::Migrations[
-    '1.1' => [
-      ArtifactHasManyToHasOneForReleasesMigration,
-      ArtifactHasManyToHasOneForReleaseMigration,
-    ],
+    ArtifactHasManyToHasOneForReleasesMigration,
+    ArtifactHasManyToHasOneForReleaseMigration,
   ]
 
   after_action :verify_authorized
