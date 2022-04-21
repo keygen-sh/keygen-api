@@ -64,7 +64,7 @@ class User < ApplicationRecord
   end
 
   scope :stdout_subscribers, -> {
-    User.select('DISTINCT ON (users.email) users.*')
+    User.distinct_on(:email)
         .where(account: Account.active, stdout_unsubscribed_at: nil)
         .with_roles(:admin, :developer)
         .reorder(:email, :created_at)
