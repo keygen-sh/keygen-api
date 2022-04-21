@@ -7,6 +7,7 @@ class WebhookEndpoint < ApplicationRecord
 
   belongs_to :account
 
+  before_create -> { self.api_version ||= account.api_version }
   before_save -> { self.subscriptions = subscriptions.uniq }
 
   validates :subscriptions, length: { minimum: 1, message: "must have at least 1 webhook event subscription" }
