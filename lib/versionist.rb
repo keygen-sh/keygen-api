@@ -16,14 +16,16 @@ module Versionist
   class Configuration
     include ActiveSupport::Configurable
 
+    # TODO(ezekg) Add support for version format, e.g. semver, date, etc.
+
     config_accessor(:logger) { Rails.logger }
   end
 
-  class Transform
+  class Migration
     include Rails.application.routes.url_helpers
 
-    mattr_accessor :__versionist_request_transformers,  default: []
-    mattr_accessor :__versionist_response_transformers, default: []
+    mattr_accessor :__versionist_request_migrations,  default: []
+    mattr_accessor :__versionist_response_migrations, default: []
     mattr_accessor :__versionist_routes,                default: []
 
     def initialize(version:, controller: nil, request: nil, response: nil)
@@ -33,46 +35,46 @@ module Versionist
       @response   = response
     end
 
-    def transform_request!
+    def migrate_request!
       return unless
         @request.present?
 
-      __versionist_request_transformers.each do |transformer|
-        instance_exec(@request, &transformer)
+      __versionist_request_migrations.each do |migration|
+        instance_exec(@request, &migration)
       rescue => e
         Versionist.config.logger.error(e)
       end
     end
 
-    def transform_response!
+    def migrate_response!
       return unless
         @response.present?
 
-      __versionist_response_transformers.each do |transformer|
-        instance_exec(@response, &transformer)
+      __versionist_response_migrations.each do |migration|
+        instance_exec(@response, &migration)
       rescue => e
         Versionist.config.logger.error(e)
       end
     end
 
-    def transforms_version?(version)
+    def migration_version?(version)
       version = Semverse::Version.coerce(version)
 
       version < @version
     end
 
-    def transforms_route?(route)
+    def migration_route?(route)
       __versionist_routes.include?(route.to_sym)
     end
 
     private
 
     def self.request(&block)
-      __versionist_request_transformers << block
+      __versionist_request_migrations << block
     end
 
     def self.response(&block)
-      __versionist_response_transformers << block
+      __versionist_response_migrations << block
     end
 
     def self.route(route)
@@ -86,32 +88,32 @@ module Versionist
     def self.description(...)= nil
   end
 
-  module Transformer
+  module Migrations
     extend ActiveSupport::Concern
 
-    # FIXME(ezekg) This should allow transforming multiple controllers
-    def self.[](transforms)
-      @transforms = transforms
+    # FIXME(ezekg) This should allow migrating multiple controllers
+    def self.[](migration)
+      @migration = migration
 
       self
     end
 
-    def self.transforms
-      @transforms
+    def self.migration
+      @migration
     end
 
     included do
-      around_action :transform!
+      around_action :migrate!
 
       private
 
-      def transform!
+      def migrate!
         validate_current_version!
-        transform_request!
+        migrate_request!
 
         yield
 
-        transform_response!
+        migrate_response!
       end
 
       def validate_current_version!
@@ -120,42 +122,42 @@ module Versionist
         raise InvalidVersionError, 'invalid version format'
       end
 
-      def transform_request!
-        transforms.each do |version, transformers|
-          transformers.each do |transformer|
-            t = transformer.new(version: version, controller: self, request: request)
+      def migrate_request!
+        migration.each do |version, migrations|
+          migrations.each do |migration|
+            t = migration.new(version: version, controller: self, request: request)
             next unless
-              t.transforms_version?(current_version)
+              t.migration_version?(current_version)
 
             next unless
-              t.transforms_route?(current_route)
+              t.migration_route?(current_route)
 
-            t.transform_request!
+            t.migrate_request!
           rescue => e
             Versionist.config.logger.error(e)
           end
         end
       end
 
-      def transform_response!
-        transforms.each do |version, transformers|
-          transformers.each do |transformer|
-            t = transformer.new(version: version, controller: self, response: response)
+      def migrate_response!
+        migration.each do |version, migrations|
+          migrations.each do |migration|
+            t = migration.new(version: version, controller: self, response: response)
             next unless
-              t.transforms_version?(current_version)
+              t.migration_version?(current_version)
 
             next unless
-              t.transforms_route?(current_route)
+              t.migration_route?(current_route)
 
-            t.transform_response!
+            t.migrate_response!
           rescue => e
             Versionist.config.logger.error(e)
           end
         end
       end
 
-      def transforms
-        t = Transformer.transforms || []
+      def migration
+        t = Migrations.migration || []
 
         t.sort_by { |(v, _)| Semverse::Version.coerce(v.delete_prefix('v')) }
          .reverse
