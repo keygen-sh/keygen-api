@@ -55,6 +55,117 @@ Feature: Update release
         }
       }
       """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a release for their account (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Fixed Release",
+            "description": "a note",
+            "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+            "checksum": null,
+            "filesize": 209715200,
+            "metadata": {
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Fixed Release",
+        "description": "a note",
+        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+        "checksum": null,
+        "filesize": 209715200,
+        "metadata": {
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a release for their account (v1.0)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Fixed Release",
+            "description": "a note",
+            "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+            "checksum": null,
+            "filesize": 209715200,
+            "metadata": {
+              "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Fixed Release",
+        "description": "a note",
+        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
+        "checksum": null,
+        "filesize": 209715200,
+        "metadata": {
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": null
+        }
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

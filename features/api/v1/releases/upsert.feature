@@ -73,6 +73,14 @@ Feature: Upsert release
         }
       }
       """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
+        }
+      }
+      """
     And the current account should have 1 "release"
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -91,6 +99,7 @@ Feature: Upsert release
       }
       """
     And I use an authentication token
+    And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases" with the following:
       """
       {
@@ -139,6 +148,15 @@ Feature: Upsert release
         },
         "metadata": {
           "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": null
         }
       }
       """
