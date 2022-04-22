@@ -34,7 +34,7 @@ class ReleaseDownloadService < BaseService
   end
 
   def call
-    artifact = release.artifacts.sole
+    artifact = release.artifacts.first
 
     # Assert artifact exists before redirecting to S3
     if !artifact.etag?
