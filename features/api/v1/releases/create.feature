@@ -75,6 +75,158 @@ Feature: Create release
         }
       }
       """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[14]/artifacts" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a new release for their account (v1.1)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 3 "releases"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Keygen v1.1",
+            "filename": "Keygen-1.1.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.1.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Keygen v1.1",
+        "filename": "Keygen-1.1.0.dmg",
+        "filetype": "dmg",
+        "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "status": "NOT_PUBLISHED",
+        "version": "1.1.0",
+        "semver": {
+          "major": 1,
+          "minor": 1,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[3]/artifacts" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a new release for their account (v1.0)
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Keygen v1.0",
+            "filename": "Keygen-1.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Keygen v1.0",
+        "filename": "Keygen-1.0.0.dmg",
+        "filetype": "dmg",
+        "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "status": "NOT_PUBLISHED",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": null
+        }
+      }
+      """
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

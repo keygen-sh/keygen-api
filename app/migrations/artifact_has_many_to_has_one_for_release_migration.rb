@@ -22,7 +22,7 @@ class ArtifactHasManyToHasOneForReleaseMigration < Versionist::Migration
     end
   end
 
-  response if: -> res { res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'show' | 'create' | 'update' } do |res|
+  response if: -> res { res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'show' | 'create' | 'upsert' | 'update' } do |res|
     next unless
       res.successful?
 
