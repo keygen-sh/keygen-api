@@ -8,7 +8,7 @@ loop do
   batch ||= 0
   batch  += 1
 
-  count = WebhookEvent.connection.update(<<~SQL.squish)
+  count = WebhookEndpoint.connection.update(<<~SQL.squish)
     UPDATE
       webhook_endpoints AS w1
     SET
