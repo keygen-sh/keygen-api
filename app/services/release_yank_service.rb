@@ -25,7 +25,7 @@ class ReleaseYankService < BaseService
 
     release.touch(:yanked_at)
 
-    artifact = release.artifacts.sole
+    artifact = release.artifacts.first
     artifact.destroy unless
       artifact.nil?
 
