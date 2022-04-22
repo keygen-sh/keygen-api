@@ -94,8 +94,6 @@ module Versionist
 
     extend DSL
 
-    def initialize = nil
-
     def migrate_request!(request)
       self.class.request_blocks.each { |b|
         instance_exec(request) { |r| b.call(self, r) }
