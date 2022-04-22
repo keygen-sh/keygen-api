@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_21_190515) do
+ActiveRecord::Schema[7.0].define(version: 2022_04_22_203901) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -598,6 +598,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_21_190515) do
     t.text "last_response_body"
     t.uuid "event_type_id", null: false
     t.string "status"
+    t.string "api_version"
     t.index ["account_id", "created_at"], name: "index_webhook_events_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["event_type_id"], name: "index_webhook_events_on_event_type_id"
     t.index ["id", "created_at", "account_id"], name: "index_webhook_events_on_id_and_created_at_and_account_id", unique: true
