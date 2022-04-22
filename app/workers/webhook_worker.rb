@@ -26,7 +26,7 @@ class WebhookWorker
     event.update(status: 'FAILED')
   end
 
-  def perform(account_id, event_id, endpoint_id, payload)
+  def perform(account_id, event_id, endpoint_id, event_data)
     account = Rails.cache.fetch(Account.cache_key(account_id), skip_nil: true, expires_in: 15.minutes) do
       Account.find(account_id)
     end
@@ -43,16 +43,33 @@ class WebhookWorker
     return unless
       endpoint.subscribed?(event_type.event)
 
-    # Migrate payload
-    version  = endpoint.api_version || account.api_version
-    migrator = Versionist::Migrator.new(from: KEYGEN_API_VERSION, to: version)
-    migrator.migrate!(data: payload)
+    # Migrate event payload
+    current_version = event.api_version || KEYGEN_API_VERSION
+    target_version  = endpoint.api_version || account.api_version
+    migrator        = Versionist::Migrator.new(
+      from: current_version,
+      to: target_version,
+    )
+
+    body =
+      case e = JSON.parse(event_data, symbolize_names: true)
+      in data: { type: 'webhook-events', attributes: { payload: json } }
+        data = JSON.parse(json, symbolize_names: true)
+
+        migrator.migrate!(data:)
+
+        # Re-encode event payload
+        e[:data][:attributes][:payload] = JSON.generate(data)
+
+        # Re-encode event
+        JSON.generate(e)
+      end
 
     # Sign payload
     date     = Time.current
     httpdate = date.httpdate
     uri      = URI.parse(endpoint.url)
-    digest   = generate_digest_header(body: payload)
+    digest   = generate_digest_header(body:)
     sig      = generate_signature_header(
       account: account,
       algorithm: endpoint.signature_algorithm.presence || :ed25519,
@@ -65,26 +82,26 @@ class WebhookWorker
     )
 
     headers = {
-      'User-Agent' => "Keygen/#{version} (+https://keygen.sh/docs/api/#webhooks)",
+      'User-Agent' => "Keygen/#{target_version} (+https://keygen.sh/docs/api/#webhooks)",
       'Content-Type' => 'application/json',
       'Date' => httpdate,
       'Digest' => digest,
       'Keygen-Date' => httpdate,
       'Keygen-Digest' => digest,
       'Keygen-Signature' => sig,
-      'Keygen-Version' => version,
+      'Keygen-Version' => target_version,
     }
 
     # NOTE(ezekg) Legacy signatures are deprecated
-    headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: account, data: payload) if
+    headers['X-Signature'] = sign_response_data(algorithm: :legacy, account: account, data: body) if
       account.created_at < SignatureHeaders::LEGACY_SIGNATURE_UNTIL
 
     res = Request.post(endpoint.url, {
       write_timeout: 15.seconds.to_i,
       read_timeout: 15.seconds.to_i,
       open_timeout: 15.seconds.to_i,
-      headers: headers,
-      body: payload,
+      headers:,
+      body:,
     })
 
     # TODO(ezekg) Remove this error handling after we know everything is working
