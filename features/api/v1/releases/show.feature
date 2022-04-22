@@ -23,7 +23,7 @@ Feature: Show release
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    And I use API version "v1.1"
+    And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
     And the JSON response should be a "release" with the following relationships:
@@ -41,7 +41,7 @@ Feature: Show release
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    And I use API version "v1"
+    And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
     And the JSON response should be a "release" with the following relationships:
@@ -60,7 +60,7 @@ Feature: Show release
     And the current account has 3 "releases"
     And the first "release" has an artifact that is nil
     And I use an authentication token
-    And I use API version "v1"
+    And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
     And the JSON response should be a "release" with the following relationships:

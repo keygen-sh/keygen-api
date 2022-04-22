@@ -32,14 +32,23 @@ class WebhookWorker
     end
 
     endpoint = account.webhook_endpoints.find_by(id: endpoint_id)
-    return if endpoint.nil?
+    return if
+      endpoint.nil?
 
     event = account.webhook_events.find_by(id: event_id)
-    return if event.nil?
+    return if
+      event.nil?
 
     event_type = event.event_type
-    return unless endpoint.subscribed?(event_type.event)
+    return unless
+      endpoint.subscribed?(event_type.event)
 
+    # Migrate payload
+    version  = endpoint.api_version || account.api_version
+    migrator = Versionist::Migrator.new(from: KEYGEN_API_VERSION, to: version)
+    migrator.migrate!(data: payload)
+
+    # Sign payload
     date     = Time.current
     httpdate = date.httpdate
     uri      = URI.parse(endpoint.url)
@@ -56,14 +65,14 @@ class WebhookWorker
     )
 
     headers = {
-      'User-Agent' => 'Keygen/1.0 (+https://keygen.sh/docs/api/#webhooks)',
+      'User-Agent' => "Keygen/#{version} (+https://keygen.sh/docs/api/#webhooks)",
       'Content-Type' => 'application/json',
       'Date' => httpdate,
       'Digest' => digest,
       'Keygen-Date' => httpdate,
       'Keygen-Digest' => digest,
       'Keygen-Signature' => sig,
-      'Keygen-Version' => '1.0',
+      'Keygen-Version' => version,
     }
 
     # NOTE(ezekg) Legacy signatures are deprecated
