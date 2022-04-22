@@ -8,7 +8,7 @@ loop do
   batch ||= 0
   batch  += 1
 
-  count = WebhookEvent.connection.update("
+  count = Account.connection.update(<<~SQL.squish)
     UPDATE
       accounts AS a1
     SET
@@ -24,7 +24,7 @@ loop do
         LIMIT
           #{BATCH_SIZE}
       )
-  ")
+  SQL
 
   Keygen.logger.info { "[scripts.seed_v1_api_version_for_accounts] Updated #{count} account rows (batch ##{batch})" }
 

@@ -1,12 +1,22 @@
 # frozen_string_literal: true
 
 module Versionist
+  class InvalidVersionFormatError < StandardError; end
+  class UnsupportedVersionError < StandardError; end
   class InvalidVersionError < StandardError; end
 
-  VERSION_METHOD = :versionist_version
+  SUPPORTED_VERSION_FORMATS = %i[semver date float integer string].freeze
+  TARGET_VERSION_METHOD     = :versionist_version
 
   def self.logger
-    Versionist.config.logger
+    @logger ||= Versionist.config.logger.tagged(:versionist)
+  end
+
+  def self.supported_versions
+    @supported_versions ||= [
+      Versionist.config.current_version,
+      *Versionist.config.versions.keys,
+    ].uniq.freeze
   end
 
   def self.config
@@ -20,202 +30,248 @@ module Versionist
   class Configuration
     include ActiveSupport::Configurable
 
-    # TODO(ezekg) Add support for version format, e.g. semver, date, etc.
-
-    config_accessor(:logger) { Rails.logger }
+    config_accessor(:logger)          { Rails.logger }
+    config_accessor(:version_format)  { :semver }
+    config_accessor(:current_version) { nil }
+    config_accessor(:versions)        { [] }
   end
 
   class Migration
-    def self.[](version)
-      Class.new(VersionedMigration) { |c| c.version = version }
+    class ConditionalBlock
+      def initialize(if: nil, &block)
+        @if    = binding.local_variable_get(:if)
+        @block = block
+      end
+
+      def call(ctx, *args)
+        return if
+          @if.respond_to?(:call) && !@if.call(*args)
+
+        ctx.instance_exec(*args, &@block)
+      end
+    end
+
+    module DSL
+      def self.extended(klass)
+        class << klass
+          attr_accessor :description_value,
+                        :request_blocks,
+                        :migration_blocks,
+                        :response_blocks
+        end
+
+        klass.description_value = nil
+        klass.request_blocks    = []
+        klass.migration_blocks  = []
+        klass.response_blocks   = []
+      end
+
+      def inherited(klass)
+        klass.description_value = description_value.dup
+        klass.request_blocks    = request_blocks.dup
+        klass.migration_blocks  = migration_blocks.dup
+        klass.response_blocks   = response_blocks.dup
+      end
+
+      def description(desc)
+        self.description_value = desc
+      end
+
+      def request(if: nil, &block)
+        self.request_blocks << ConditionalBlock.new(if:, &block)
+      end
+
+      def migrate(if: nil, &block)
+        self.migration_blocks << ConditionalBlock.new(if:, &block)
+      end
+
+      def response(if: nil, &block)
+        self.response_blocks << ConditionalBlock.new(if:, &block)
+      end
+    end
+
+    include Rails.application.routes.url_helpers
+
+    extend DSL
+
+    def initialize = nil
+
+    def migrate_request!(request)
+      self.class.request_blocks.each { |b|
+        instance_exec(request) { |r| b.call(self, r) }
+      }
+    end
+
+    def migrate!(data)
+      self.class.migration_blocks.each { |b|
+        instance_exec(data) { |d| b.call(self, d) }
+      }
+    end
+
+    def migrate_response!(response)
+      self.class.response_blocks.each { |b|
+        instance_exec(response) { |r| b.call(self, r) }
+      }
     end
   end
 
-  class VersionedMigration
-    def self.transform!(data)
-      return unless
-        data.present? && @migrations.any?
+  class Version
+    include Comparable
 
-      @migrations.select(&:for_data?).each do |migration|
-        instance_exec(data, &migration)
-      rescue => e
-        logger.error(e.message)
-        logger.error(e.backtrace.join("\n"))
+    attr_reader :format,
+                :value
+
+    def initialize(version)
+      raise UnsupportedVersionError, "version is unsupported: #{version}" unless
+        version.in?(Versionist.supported_versions)
+
+      @format = Versionist.config.version_format.to_sym
+      @value  = case @format
+                when :semver
+                  Semverse::Version.coerce(version)
+                when :date
+                  Date.parse(version)
+                when :integer
+                  version.to_i
+                when :float
+                  version.to_f
+                when :string
+                  version.to_s
+                else
+                  raise InvalidVersionFormatError, "invalid version format: #{@format} (must be one of: #{SUPPORTED_VERSION_FORMATS.join(',')}"
+                end
+    rescue Semverse::InvalidVersionFormat,
+           Date::Error
+      raise InvalidVersionError, "invalid #{@format} version given: #{version}"
+    end
+
+    def <=>(other)
+      @value <=> Version.coerce(other).value
+    end
+
+    def to_s
+      @value.to_s
+    end
+
+    class << self
+      def coerce(version)
+        version.is_a?(self) ? version : new(version)
       end
     end
+  end
 
-    def self.migrate_request!(request)
-      return unless
-        request.present? && @migrations.any?
-
-      @migrations.select(&:for_request?).each do |migration|
-        instance_exec(request, &migration)
-      rescue => e
-        logger.error(e.message)
-        logger.error(e.backtrace.join("\n"))
-      end
+  class Migrator
+    def initialize(from:, to:)
+      @current_version = Version.new(from)
+      @target_version  = Version.new(to)
     end
 
-    def self.migrate_response!(response)
-      return unless
-        response.present? && @migrations.any?
+    def migrate!(data:)
+      logger.debug { "Migrating from #{current_version} to #{target_version} (#{migrations.size} potential migrations)" }
 
-      @migrations.select(&:for_response?).each do |migration|
-        instance_exec(response, &migration)
-      rescue => e
-        logger.error(e.message)
-        logger.error(e.backtrace.join("\n"))
-      end
-    end
+      migrations.each_with_index { |migration_name, i|
+        logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
 
-    def self.migrate_version?(version)
-      version = Semverse::Version.coerce(version)
+        klass     = migration_name.to_s.classify.constantize
+        migration = klass.new
 
-      version < @@version
-    end
+        migration.migrate!(data)
+      }
 
-    def self.migrate_route?(route)
-      @routes.include?(route.to_sym)
+      logger.debug { "Migrated from #{current_version} to #{target_version}" }
     end
 
     private
 
-    def self.version=(version)
-      @@version = Semverse::Version.new(version.to_s.delete_prefix('v'))
+    attr_accessor :current_version,
+                  :target_version
+
+    # TODO(ezekg) These should be sorted
+    def migrations
+      @migrations ||= Versionist.config.versions
+                                       .filter_map { |(version, migration_set)|
+                                         migration_set_version = Version.new(version)
+
+                                         migration_set if
+                                           migration_set_version <= current_version &&
+                                           migration_set_version > target_version
+                                       }
+                                       .flatten
     end
 
-    def self.transform(&)
-      @migrations ||= []
-      @migrations << DataMigrationBlock.new(&)
-    end
-
-    def self.request(&)
-      @migrations ||= []
-      @migrations << RequestMigrationBlock.new(&)
-    end
-
-    def self.response(&)
-      @migrations ||= []
-      @migrations << ResponseMigrationBlock.new(&)
-    end
-
-    def self.route(route)
-      @routes ||= []
-      @routes << route.to_sym
-    end
-
-    def self.routes(*routes)
-      routes.each { |r| route(r) }
-    end
-
-    def self.description(...)= nil
-
-    def self.url_helpers
-      Rails.application.routes.url_helpers
-    end
-
-    def self.logger
+    def logger
       Versionist.logger
     end
   end
 
-  class AbstractMigrationBlock
-    attr_reader :block
+  module Controller
+    class Migrator < Migrator
+      def initialize(request:, response:, **kwargs)
+        super(**kwargs)
 
-    def initialize(&block)
-      @block = block
-    end
+        @request  = request
+        @response = response
+      end
 
-    def call(...) = block.call(...)
-    def to_proc   = block
+      def migrate!
+        logger.debug { "Migrating from #{current_version} to #{target_version} (#{migrations.size} potential migrations)" }
 
-    def for_data?     = false
-    def for_request?  = false
-    def for_response? = false
-  end
+        migrations.each_with_index { |migration_name, i|
+          logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
 
-  class DataMigrationBlock < AbstractMigrationBlock
-    def for_data? = true
-  end
+          klass     = migration_name.to_s.classify.constantize
+          migration = klass.new
 
-  class RequestMigrationBlock < AbstractMigrationBlock
-    def for_request? = true
-  end
+          migration.migrate_request!(request)
+        }
 
-  class ResponseMigrationBlock < AbstractMigrationBlock
-    def for_response? = true
-  end
+        yield if
+          block_given?
 
-  module Migrations
-    extend ActiveSupport::Concern
+        migrations.each_with_index { |migration_name, i|
+          logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
 
-    def self.[](*migrations)
-      @migrations = migrations
+          klass     = migration_name.to_s.classify.constantize
+          migration = klass.new
 
-      self
-    end
+          migration.migrate_response!(response)
+        }
 
-    def self.migrations
-      @migrations
-    end
-
-    included do
-      around_action :migrate!
+        logger.debug { "Migrated from #{current_version} to #{target_version}" }
+      end
 
       private
 
-      def migrate!
-        validate_current_version!
-        migrate_request!
+      attr_accessor :request,
+                    :response
 
-        yield
-
-        migrate_response!
+      def logger
+        Versionist.logger.tagged(request&.request_id)
       end
 
-      def validate_current_version!
-        Semverse::Version.coerce(current_version)
-      rescue Semverse::InvalidVersionFormat
-        raise InvalidVersionError, 'invalid version format'
+      def router
+        Rails.application.routes.router
       end
 
-      def migrate_request!
-        Migrations.migrations.reverse.each do |migration|
-          next unless
-            migration.migrate_version?(current_version)
-
-          next unless
-            migration.migrate_route?(current_route)
-
-          migration.migrate_request!(request)
-        rescue => e
-          Versionist.logger.error(e.message)
-          Versionist.logger.error(e.backtrace.join("\n"))
-        end
+      def route
+        router.recognize(request) { |r| return r.name }
       end
+    end
 
-      def migrate_response!
-        Migrations.migrations.reverse.each do |migration|
-          next unless
-            migration.migrate_version?(current_version)
+    module Migrations
+      extend ActiveSupport::Concern
 
-          next unless
-            migration.migrate_route?(current_route)
+      included do
+        around_action :apply_migrations!
 
-          migration.migrate_response!(response)
-        rescue => e
-          Versionist.logger.error(e.message)
-          Versionist.logger.error(e.backtrace.join("\n"))
-        end
-      end
+        private
 
-      def current_version
-        send(VERSION_METHOD)
-      end
+        def apply_migrations!
+          current_version = Versionist.config.current_version
+          target_version  = send(TARGET_VERSION_METHOD)
 
-      def current_route
-        Rails.application.routes.router.recognize(request) do |route, matches, param|
-          return route.name
+          migrator = Migrator.new(from: current_version, to: target_version, request:, response:)
+          migrator.migrate! { yield }
         end
       end
     end

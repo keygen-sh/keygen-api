@@ -15,12 +15,9 @@ class ApplicationController < ActionController::API
   #             Otherwise, the logged response may be incorrect.
   around_action :rescue_from_exceptions
 
-  # NOTE(ezekg) This is after the rescues so that we can rescue from
-  #             invalid version errors.
-  include Versionist::Migrations[
-    ArtifactHasManyToHasOneForReleasesMigration,
-    ArtifactHasManyToHasOneForReleaseMigration,
-  ]
+  # NOTE(ezekg) This is after the rescues have been hooked so that we
+  #             can rescue from invalid version errors.
+  include Versionist::Controller::Migrations
 
   after_action :verify_authorized
 
@@ -400,9 +397,9 @@ class ApplicationController < ActionController::API
           end
 
     render_forbidden detail: msg
-  rescue Versionist::InvalidVersionError
+  rescue Versionist::UnsupportedVersionError
     render_bad_request(
-      detail: 'invalid API version requested',
+      detail: 'unsupported API version requested',
       code: 'INVALID_API_VERSION',
       links: {
         about: 'https://keygen.sh/docs/api/versioning/',
