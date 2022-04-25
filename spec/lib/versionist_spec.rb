@@ -111,6 +111,10 @@ describe ActionController::Base, type: :controller do
     end
   end
 
+  let(:request_content_type) { request.headers['Content-Type'] }
+  let(:response_content_type) { response.headers['Content-Type'] }
+  let(:response_body) { JSON.parse(response.body) }
+
   context 'when requesting the current version' do
     before do
       request.headers['Content-Type'] = 'application/vnd.test+json'
@@ -120,14 +124,14 @@ describe ActionController::Base, type: :controller do
     it 'should not migrate the request' do
       get :show, params: { id: 'user_x7ydbo6fjd6pubeu' }
 
-      expect(request.headers['Content-Type']).to eq 'application/vnd.test+json'
+      expect(request_content_type).to eq 'application/vnd.test+json'
     end
 
     it 'should not migrate the response' do
       get :show, params: { id: 'user_x7ydbo6fjd6pubeu' }
 
-      expect(response.headers['Content-Type']).to eq 'application/vnd.test+json'
-      expect(JSON.parse(response.body)).to eq(
+      expect(response_content_type).to eq 'application/vnd.test+json'
+      expect(response_body).to eq(
         'type' => 'users',
         'id' => 'user_x7ydbo6fjd6pubeu',
         'first_name' => 'John',
@@ -146,14 +150,14 @@ describe ActionController::Base, type: :controller do
     it 'should not migrate the request' do
       get :show, params: { id: 'user_ogb9gjingwtvuj50' }
 
-      expect(request.headers['Content-Type']).to eq 'application/vnd.test+json'
+      expect(request_content_type).to eq 'application/vnd.test+json'
     end
 
     it 'should migrate the response resource type' do
       get :show, params: { id: 'user_ogb9gjingwtvuj50' }
 
-      expect(response.headers['Content-Type']).to eq 'application/vnd.test+json'
-      expect(JSON.parse(response.body)).to eq(
+      expect(response_content_type).to eq 'application/vnd.test+json'
+      expect(response_body).to eq(
         'type' => 'user',
         'id' => 'user_ogb9gjingwtvuj50',
         'first_name' => 'Jane',
@@ -172,14 +176,14 @@ describe ActionController::Base, type: :controller do
     it 'should not migrate the request' do
       get :show, params: { id: 'user_x7ydbo6fjd6pubeu' }
 
-      expect(request.headers['Content-Type']).to eq 'application/vnd.test+json'
+      expect(request_content_type).to eq 'application/vnd.test+json'
     end
 
     it 'should migrate the response content type and user name' do
       get :show, params: { id: 'user_x7ydbo6fjd6pubeu' }
 
-      expect(response.headers['Content-Type']).to eq 'application/json'
-      expect(JSON.parse(response.body)).to eq(
+      expect(response_content_type).to eq 'application/json'
+      expect(response_body).to eq(
         'type' => 'user',
         'id' => 'user_x7ydbo6fjd6pubeu',
         'name' => 'John Smith',
@@ -197,16 +201,16 @@ describe ActionController::Base, type: :controller do
     it 'should migrate the request content type' do
       get :show, params: { id: 'ogb9gjingwtvuj50' }
 
-      expect(request.headers['Content-Type']).to eq 'application/json'
+      expect(request_content_type).to eq 'application/json'
     end
 
     it 'should migrate the response resource IDs' do
       get :show, params: { id: 'ogb9gjingwtvuj50' }
 
-      data = JSON.parse(response.body)
+      data = response_body
 
-      expect(response.headers['Content-Type']).to eq 'application/json'
-      expect(JSON.parse(response.body)).to eq(
+      expect(response_content_type).to eq 'application/json'
+      expect(response_body).to eq(
         'type' => 'user',
         'id' => 'ogb9gjingwtvuj50',
         'name' => 'Jane Doe',
@@ -221,7 +225,7 @@ describe ActionController::Base, type: :controller do
       get :show, params: { id: 'ogb9gjingwtvuj50' }
 
       expect(response).to have_http_status :bad_request
-      expect(JSON.parse(response.body)).to eq(
+      expect(response_body).to eq(
         'error' => 'unsupported version',
       )
     end
