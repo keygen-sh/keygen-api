@@ -243,14 +243,6 @@ module Versionist
       def logger
         Versionist.logger.tagged(request&.request_id)
       end
-
-      def router
-        Rails.application.routes.router
-      end
-
-      def route
-        router.recognize(request) { |r| return r.name }
-      end
     end
 
     module Migrations
