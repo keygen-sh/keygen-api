@@ -55,12 +55,14 @@ module Versionist
       def self.extended(klass)
         class << klass
           attr_accessor :description_value,
+                        :changeset_value,
                         :request_blocks,
                         :migration_blocks,
                         :response_blocks
         end
 
         klass.description_value = nil
+        klass.changeset_value   = nil
         klass.request_blocks    = []
         klass.migration_blocks  = []
         klass.response_blocks   = []
@@ -68,13 +70,20 @@ module Versionist
 
       def inherited(klass)
         klass.description_value = description_value.dup
+        klass.changeset_value   = changeset_value.dup
         klass.request_blocks    = request_blocks.dup
         klass.migration_blocks  = migration_blocks.dup
         klass.response_blocks   = response_blocks.dup
       end
 
+      # TODO(ezekg) Auto-generate changelog?
       def description(desc)
         self.description_value = desc
+      end
+
+      # TODO(ezekg) Auto-generate changelog?
+      def changeset(subject:, from:, to:)
+        self.changeset_value = { subject:, from:, to: }
       end
 
       def request(if: nil, &block)
