@@ -5,7 +5,7 @@ class ArtifactHasManyToHasOneForReleaseMigration < BaseMigration
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
-    in data: { type: 'releases', id: release_id, relationships: { account: { data: { type: 'accounts', id: account_id } } } }
+    in data: { type: /releases/, id: release_id, relationships: { account: { data: { type: /accounts/, id: account_id } }, artifacts: { ** } } }
       artifact = ReleaseArtifact.select(:id)
                                 .find_by(release_id:, account_id:)
 

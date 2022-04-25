@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MachineProcessSerializer < BaseSerializer
-  type :processes
+  type 'processes'
 
   attribute :last_heartbeat do
     @object.last_heartbeat_at

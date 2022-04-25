@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LicenseSerializer < BaseSerializer
-  type :licenses
+  type 'licenses'
 
   attribute :name
   attribute :key, unless: -> { @object.legacy_encrypted? && @object.raw.nil? } do

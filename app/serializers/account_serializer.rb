@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AccountSerializer < BaseSerializer
-  type :accounts
+  type 'accounts'
 
   attribute :name
   attribute :slug
