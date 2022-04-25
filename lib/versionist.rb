@@ -221,8 +221,7 @@ module Versionist
           migration.migrate_request!(request)
         }
 
-        yield if
-          block_given?
+        yield
 
         migrations.each_with_index { |migration_name, i|
           logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
