@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProductSerializer < BaseSerializer
-  type :products
+  type 'products'
 
   attribute :name
   attribute :distribution_strategy

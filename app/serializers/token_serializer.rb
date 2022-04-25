@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TokenSerializer < BaseSerializer
-  type :tokens
+  type 'tokens'
 
   attribute :kind
   attribute :token, if: -> { @object.raw.present? && @context != :webhook } do

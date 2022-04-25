@@ -24,5 +24,7 @@ module Keygen
 
       attr_reader :default_options
     end
+
+    def self.render(...) = Renderer.new.render(...)
   end
 end

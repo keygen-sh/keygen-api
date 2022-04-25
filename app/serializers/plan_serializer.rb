@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PlanSerializer < BaseSerializer
-  type :plans
+  type 'plans'
 
   attribute :name
   attribute :price

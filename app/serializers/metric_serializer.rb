@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MetricSerializer < BaseSerializer
-  type :metrics
+  type 'metrics'
 
   attribute :metric do
     @object.event_type.event

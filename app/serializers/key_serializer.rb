@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class KeySerializer < BaseSerializer
-  type :keys
+  type 'keys'
 
   attribute :key
   attribute :created do

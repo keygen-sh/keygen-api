@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BillingSerializer < BaseSerializer
-  type :billings
+  type 'billings'
 
   attribute :subscription_status
   attribute :subscription_period_start

@@ -5,7 +5,7 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
 
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [*, { type: 'releases', id: _, relationships: { account: { data: { type: 'accounts', id: _ } } } }, *]
+    in data: [*, { type: /releases/, id: _, relationships: { account: { data: { type: /accounts/, id: _ } }, artifacts: { ** } } }, *]
       account_ids = body[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
       release_ids = body[:data].collect { _1[:id] }.compact.uniq
 
@@ -17,7 +17,7 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
 
       body[:data].each do |release|
         case release
-        in type: 'releases', id: release_id, relationships: { account: { data: { type: 'accounts', id: account_id } } }
+        in type: /releases/, id: release_id, relationships: { account: { data: { type: /accounts/, id: account_id } } }
           artifact = artifacts[release_id]&.first
 
           release[:relationships].tap do |rels|
