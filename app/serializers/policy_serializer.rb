@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PolicySerializer < BaseSerializer
-  type :policies
+  type 'policies'
 
   attribute :name
   attribute :duration

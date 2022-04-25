@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserSerializer < BaseSerializer
-  type :users
+  type 'users'
 
   attribute :full_name
   attribute :first_name

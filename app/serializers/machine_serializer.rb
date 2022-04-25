@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MachineSerializer < BaseSerializer
-  type :machines
+  type 'machines'
 
   attribute :fingerprint
   attribute :cores
