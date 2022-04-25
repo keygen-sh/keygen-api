@@ -90,8 +90,6 @@ module Versionist
       end
     end
 
-    include Rails.application.routes.url_helpers
-
     extend DSL
 
     def migrate_request!(request)
