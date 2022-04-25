@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ArtifactHasManyToHasOneForReleasesMigration < Versionist::Migration
+class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
   description "transforms a collection of Releases' artifacts from has-many to has-one relationships"
 
   migrate if: -> body { body in data: [*] } do |body|

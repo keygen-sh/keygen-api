@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-class ArtifactHasManyToHasOneForReleaseMigration < Versionist::Migration
+class ArtifactHasManyToHasOneForReleaseMigration < BaseMigration
   description "transforms a Release's artifacts from a has-many to has-one relationship"
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
     in data: { type: 'releases', id: release_id, relationships: { account: { data: { type: 'accounts', id: account_id } } } }
-      artifact = ReleaseArtifact.find_by(release_id:, account_id:)
+      artifact = ReleaseArtifact.select(:id)
+                                .find_by(release_id:, account_id:)
 
       body[:data][:relationships].tap do |rels|
         rels[:artifact] = {
