@@ -43,6 +43,80 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[5]/artifacts" }
+        }
+      }
+      """
+    And the second "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[4]/artifacts" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all releases for their account (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "releases"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is nil
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[1]/artifacts" }
+        }
+      }
+      """
+    And the second "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves all releases for their account (v1.0)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "releases"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is nil
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[1]/artifact" },
+          "data": null
+        }
+      }
+      """
+    And the second "release" should have the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+          "data": { "type": "artifacts", "id": "$artifacts[0]" }
+        }
+      }
+      """
 
   Scenario: Admin retrieves all win32 beta releases for their account
     Given I am an admin of account "test1"

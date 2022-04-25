@@ -30,6 +30,61 @@ Feature: Product releases relationship
     When I send a GET request to "/accounts/test1/products/$0/releases"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifacts" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves the releases for a product (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases"
+    And all "releases" have the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a GET request to "/accounts/test1/products/$0/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifacts" }
+        }
+      }
+      """
+
+  Scenario: Admin retrieves the releases for a product (v1.0)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases"
+    And all "releases" have the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/products/$0/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifact" },
+          "data": null
+        }
+      }
+      """
 
   Scenario: Product retrieves the releases for a product
     Given the current account is "test1"
