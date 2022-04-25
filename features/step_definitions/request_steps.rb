@@ -616,6 +616,15 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   end
 end
 
+Then /^the (\w+) "([^\"]*)" should have the following relationships:$/ do |word_index, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  data = json['data'].select { _1['type'] == resource.pluralize }
+                     .send(word_index)
+
+  expect(data['relationships']).to include JSON.parse(body)
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following meta:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
