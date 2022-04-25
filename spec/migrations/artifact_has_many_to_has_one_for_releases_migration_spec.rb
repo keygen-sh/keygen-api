@@ -59,7 +59,7 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
             },
           ),
         ),
-      ]
+      ],
     )
 
     migrator.migrate!(data:)
@@ -74,22 +74,22 @@ describe ArtifactHasManyToHasOneForReleasesMigration do
                 related: v1_account_release_legacy_artifact_path(release_without_artifact.account_id, release_without_artifact.id),
               },
             },
-          )
+          ),
         ),
         include(
           relationships: include(
             artifact: {
               data: {
-                type: 'artifacts',
+                type: :artifacts,
                 id: release_with_artifact.artifacts.sole.id,
               },
               links: {
                 related: v1_account_release_legacy_artifact_path(release_with_artifact.account_id, release_with_artifact.id),
               },
             },
-          )
+          ),
         ),
-      ]
+      ],
     )
   end
 end

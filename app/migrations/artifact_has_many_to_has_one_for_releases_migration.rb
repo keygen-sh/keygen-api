@@ -22,7 +22,7 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
 
           release[:relationships].tap do |rels|
             rels[:artifact] = {
-              data: artifact.present? ? { type: 'artifacts', id: artifact.id } : nil,
+              data: artifact.present? ? { type: :artifacts, id: artifact.id } : nil,
               links: {
                 related: v1_account_release_legacy_artifact_path(account_id, release_id),
               },
