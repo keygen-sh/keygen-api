@@ -93,20 +93,20 @@ module Versionist
     extend DSL
 
     def migrate_request!(request)
-      self.class.request_blocks.each { |b|
-        instance_exec(request) { |r| b.call(self, r) }
+      self.class.request_blocks.each { |block|
+        instance_exec(request) { block.call(self, _1) }
       }
     end
 
     def migrate!(data)
-      self.class.migration_blocks.each { |b|
-        instance_exec(data) { |d| b.call(self, d) }
+      self.class.migration_blocks.each { |block|
+        instance_exec(data) { block.call(self, _1) }
       }
     end
 
     def migrate_response!(response)
-      self.class.response_blocks.each { |b|
-        instance_exec(response) { |r| b.call(self, r) }
+      self.class.response_blocks.each { |block|
+        instance_exec(response) { block.call(self, _1) }
       }
     end
   end
