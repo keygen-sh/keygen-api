@@ -174,13 +174,16 @@ module Versionist
     def migrate!(data:)
       logger.debug { "Migrating from #{current_version} to #{target_version} (#{migrations.size} potential migrations)" }
 
-      migrations.each_with_index { |migration_name, i|
-        logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
+      migrations.each_with_index { |migration, i|
+        logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-        klass     = migration_name.to_s.classify.constantize
-        migration = klass.new
+        m = if migration.is_a?(Symbol)
+              migration.to_s.classify.constantize.new
+            else
+              migration.new
+            end
 
-        migration.migrate!(data)
+        m.migrate!(data)
       }
 
       logger.debug { "Migrated from #{current_version} to #{target_version}" }
@@ -195,11 +198,7 @@ module Versionist
     def migrations
       @migrations ||= Versionist.config.versions
                                        .filter_map { |(version, migration_set)|
-                                         migration_set_version = Version.new(version)
-
-                                         migration_set if
-                                           migration_set_version <= current_version &&
-                                           migration_set_version > target_version
+                                         migration_set if Version.new(version).between?(target_version, current_version)
                                        }
                                        .flatten
     end
@@ -221,24 +220,30 @@ module Versionist
       def migrate!
         logger.debug { "Migrating from #{current_version} to #{target_version} (#{migrations.size} potential migrations)" }
 
-        migrations.each_with_index { |migration_name, i|
-          logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
+        migrations.each_with_index { |migration, i|
+          logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-          klass     = migration_name.to_s.classify.constantize
-          migration = klass.new
+          m = if migration.is_a?(Symbol)
+                migration.to_s.classify.constantize.new
+              else
+                migration.new
+              end
 
-          migration.migrate_request!(request)
+          m.migrate_request!(request)
         }
 
         yield
 
-        migrations.each_with_index { |migration_name, i|
-          logger.debug { "Applying migration #{migration_name} (#{i + 1}/#{migrations.size})" }
+        migrations.each_with_index { |migration, i|
+          logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-          klass     = migration_name.to_s.classify.constantize
-          migration = klass.new
+          m = if migration.is_a?(Symbol)
+                migration.to_s.classify.constantize.new
+              else
+                migration.new
+              end
 
-          migration.migrate_response!(response)
+          m.migrate_response!(response)
         }
 
         logger.debug { "Migrated from #{current_version} to #{target_version}" }
