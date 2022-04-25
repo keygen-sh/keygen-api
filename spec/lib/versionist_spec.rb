@@ -9,17 +9,19 @@ describe ActionController::Base, type: :controller do
   controller do
     include Versionist::Controller::Migrations
 
-    before_action :set_content_type
+    rescue_from Versionist::UnsupportedVersionError, with: -> { render json: { error: 'unsupported version' }, status: :bad_request }
 
-    def versionist_version
-      request.headers.fetch('Version') { Versionist.config.current_version }
-    end
+    before_action :set_content_type
 
     def show
       render json: users.find { _1[:id].ends_with?(params[:id]) }
     end
 
     private
+
+    def versionist_version
+      request.headers.fetch('Version') { Versionist.config.current_version }
+    end
 
     def set_content_type
       response.headers['Content-Type'] = request.headers['Accept']
@@ -109,7 +111,7 @@ describe ActionController::Base, type: :controller do
     end
   end
 
-  context 'when using version 1.3' do
+  context 'when requesting the current version' do
     before do
       request.headers['Content-Type'] = 'application/vnd.test+json'
       request.headers['Accept']       = 'application/vnd.test+json'
@@ -134,7 +136,7 @@ describe ActionController::Base, type: :controller do
     end
   end
 
-  context 'when using version 1.2' do
+  context 'when requesting version 1.2' do
     before do
       request.headers['Content-Type'] = 'application/vnd.test+json'
       request.headers['Accept']       = 'application/vnd.test+json'
@@ -160,7 +162,7 @@ describe ActionController::Base, type: :controller do
     end
   end
 
-  context 'when using version 1.1' do
+  context 'when requesting version 1.1' do
     before do
       request.headers['Content-Type'] = 'application/vnd.test+json'
       request.headers['Accept']       = 'application/vnd.test+json'
@@ -185,7 +187,7 @@ describe ActionController::Base, type: :controller do
     end
   end
 
-  context 'when using version 1.0' do
+  context 'when requesting version 1.0' do
     before do
       request.headers['Content-Type'] = 'application/vnd.test+json'
       request.headers['Accept']       = 'application/vnd.test+json'
@@ -208,6 +210,34 @@ describe ActionController::Base, type: :controller do
         'type' => 'user',
         'id' => 'ogb9gjingwtvuj50',
         'name' => 'Jane Doe',
+      )
+    end
+  end
+
+  context 'when requesting an unsupported version' do
+    before { request.headers['Version'] = '2.0' }
+
+    it 'should respond with an error' do
+      get :show, params: { id: 'ogb9gjingwtvuj50' }
+
+      expect(response).to have_http_status :bad_request
+      expect(JSON.parse(response.body)).to eq(
+        'error' => 'unsupported version',
+      )
+    end
+  end
+
+  context 'when using a one-off migrator' do
+    let(:data) { { type: 'users', id: 'user_x7ydbo6fjd6pubeu', first_name: 'John', last_name: 'Smith' } }
+
+    it 'should migrate between versions' do
+      migrator = Versionist::Migrator.new(from: '1.3', to: '1.1')
+      migrator.migrate!(data:)
+
+      expect(data).to eq(
+        type: 'user',
+        id: 'user_x7ydbo6fjd6pubeu',
+        name: 'John Smith',
       )
     end
   end
