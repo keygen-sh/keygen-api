@@ -83,8 +83,8 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
                 related: v1_account_release_artifacts_path(subject.account_id, subject.id),
               },
             },
-          )
-        )
+          ),
+        ),
       )
 
       migrator.migrate!(data:)
@@ -94,15 +94,15 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
           relationships: include(
             artifact: {
               data: {
-                type: 'artifacts',
+                type: :artifacts,
                 id: subject.artifacts.sole.id,
               },
               links: {
                 related: v1_account_release_legacy_artifact_path(subject.account_id, subject.id),
               },
             },
-          )
-        )
+          ),
+        ),
       )
     end
   end
