@@ -36,10 +36,7 @@ class ArtifactHasManyToHasOneForReleasesMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'index' } do |res|
-    next unless
-      res.successful?
-
+  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'index' } do |res|
     data = JSON.parse(res.body, symbolize_names: true)
 
     migrate!(data)
