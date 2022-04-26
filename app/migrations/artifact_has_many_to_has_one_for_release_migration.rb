@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArtifactHasManyToHasOneForReleaseMigration < BaseMigration
-  description "transforms a Release's artifacts from a has-many to has-one relationship"
+  description %(transforms a Release's artifacts from a has-many to has-one relationship)
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
