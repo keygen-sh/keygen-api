@@ -245,4 +245,67 @@ describe ActionController::Base, type: :controller do
       )
     end
   end
+
+  context 'when using an invalid config' do
+    [
+      42,
+      4.2,
+      -> {},
+      {},
+      [],
+      true,
+      false,
+      nil,
+    ].each do |migration|
+      it "should raise error for invalid migration type: #{migration.class.name}" do
+        Versionist.configure do |config|
+          config.current_version = '1.1'
+          config.versions        = {
+            '1.0' => [migration],
+          }
+        end
+
+        migrator = Versionist::Migrator.new(from: '1.1', to: '1.0')
+
+        expect { migrator.migrate!(data: {}) }.to raise_error Versionist::UnsupportedMigrationError
+      end
+    end
+  end
+
+  context 'when using a valid config' do
+    before do
+      stub_const('TestMigration', Class.new(Versionist::Migration))
+    end
+
+    [
+      :test_migration,
+      'test_migration',
+    ].each do |migration|
+      it "should not raise error for valid migration type: #{migration.class.name}" do
+        Versionist.configure do |config|
+          config.current_version = '1.1'
+          config.versions        = {
+            '1.0' => [migration],
+          }
+        end
+
+        migrator = Versionist::Migrator.new(from: '1.1', to: '1.0')
+
+        expect { migrator.migrate!(data: {}) }.to_not raise_error
+      end
+    end
+
+    it "should not raise error for valid migration type: constant" do
+      Versionist.configure do |config|
+        config.current_version = '1.1'
+        config.versions        = {
+          '1.0' => [TestMigration],
+        }
+      end
+
+      migrator = Versionist::Migrator.new(from: '1.1', to: '1.0')
+
+      expect { migrator.migrate!(data: {}) }.to_not raise_error
+    end
+  end
 end
