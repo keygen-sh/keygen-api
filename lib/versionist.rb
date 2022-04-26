@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Versionist
+  class UnsupportedMigrationError < StandardError; end
   class InvalidVersionFormatError < StandardError; end
   class UnsupportedVersionError < StandardError; end
   class InvalidVersionError < StandardError; end
@@ -177,13 +178,7 @@ module Versionist
       migrations.each_with_index { |migration, i|
         logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-        m = if migration.is_a?(Symbol)
-              migration.to_s.classify.constantize.new
-            else
-              migration.new
-            end
-
-        m.migrate!(data)
+        migration.new.migrate!(data)
       }
 
       logger.debug { "Migrated from #{current_version} to #{target_version}" }
@@ -196,11 +191,22 @@ module Versionist
 
     # TODO(ezekg) These should be sorted
     def migrations
-      @migrations ||= Versionist.config.versions
-                                       .filter_map { |(version, migration_set)|
-                                         migration_set if Version.new(version).between?(target_version, current_version)
-                                       }
-                                       .flatten
+      @migrations ||=
+        Versionist.config.versions
+          .filter { |(version, _)| Version.new(version).between?(target_version, current_version) }
+          .flat_map { |(_, migrations)| migrations }
+          .map { |migration|
+            case migration
+            when Symbol
+              migration.to_s.classify.constantize
+            when String
+              migration.classify.constantize
+            when Class
+              migration
+            else
+              raise UnsupportedMigrationError, "migration type is unsupported: #{migration}"
+            end
+          }
     end
 
     def logger
@@ -223,13 +229,7 @@ module Versionist
         migrations.each_with_index { |migration, i|
           logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-          m = if migration.is_a?(Symbol)
-                migration.to_s.classify.constantize.new
-              else
-                migration.new
-              end
-
-          m.migrate_request!(request)
+          migration.new.migrate_request!(request)
         }
 
         yield
@@ -237,13 +237,7 @@ module Versionist
         migrations.each_with_index { |migration, i|
           logger.debug { "Applying migration #{migration} (#{i + 1}/#{migrations.size})" }
 
-          m = if migration.is_a?(Symbol)
-                migration.to_s.classify.constantize.new
-              else
-                migration.new
-              end
-
-          m.migrate_response!(response)
+          migration.new.migrate_response!(response)
         }
 
         logger.debug { "Migrated from #{current_version} to #{target_version}" }
