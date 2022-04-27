@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TokenAuthenticationService < BaseService
-  TOKEN_ID_REGEX = /\A([^\.]+)\.([^\.]+)/ # Form: {account}.{id}.xxx
+  TOKEN_ID_RE = /\A([^\.]+)\.([^\.]+)/ # Form: {account}.{id}.xxx
 
   def initialize(account:, token:)
     @account = account
@@ -16,7 +16,7 @@ class TokenAuthenticationService < BaseService
 
     case version
     when "v1"
-      matches = TOKEN_ID_REGEX.match token
+      matches = TOKEN_ID_RE.match token
       return nil unless matches.present? &&
                         "#{account.id}".delete("-") == matches[1]
 

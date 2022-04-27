@@ -55,9 +55,9 @@ class TypedParameters
     decimal: lambda { |v| v.to_d },
     boolean: lambda { |v| TRUTHY_VALUES.include?(v) },
     string: lambda { |v| v.to_s },
-    datetime: lambda { |v| v.to_s.match?(/^\d+$/) ? Time.at(v.to_i).to_datetime : v.to_datetime },
+    datetime: lambda { |v| v.to_s.match?(/\A\d+\z/) ? Time.at(v.to_i).to_datetime : v.to_datetime },
     date: lambda { |v| v.to_date },
-    time: lambda { |v| v.to_s.match?(/^\d+$/) ? Time.at(v.to_i) : v.to_time },
+    time: lambda { |v| v.to_s.match?(/\A\d+\z/) ? Time.at(v.to_i) : v.to_time },
     array: lambda { |v| v.is_a?(String) ? v.split(',') : Array(v) },
   }
 

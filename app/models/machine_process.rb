@@ -37,7 +37,7 @@ class MachineProcess < ApplicationRecord
 
   validate on: :create, if: -> { id_before_type_cast.present? } do
     errors.add :id, :invalid, message: 'must be a valid UUID' if
-      !UUID_RX.match?(id_before_type_cast)
+      !UUID_RE.match?(id_before_type_cast)
 
     errors.add :id, :conflict, message: 'must not conflict with another process' if
       MachineProcess.exists?(id)

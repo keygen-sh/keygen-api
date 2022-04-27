@@ -95,7 +95,7 @@ module TokenAuthentication
 
     # Make sure token matches our expected format. This is also here to help users
     # who may be mistakenly using a UUID as a token, which is a common mistake.
-    if http_token.present? && http_token =~ UUID_RX
+    if http_token.present? && http_token =~ UUID_RE
       raise Keygen::Error::UnauthorizedError.new(
         detail: "Token format is invalid (make sure that you're providing a token value, not a token's UUID identifier)",
         code: 'TOKEN_FORMAT_INVALID',

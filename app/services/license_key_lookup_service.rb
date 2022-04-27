@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class LicenseKeyLookupService < BaseService
-  ENCRYPTED_KEY_REGEX = /\A(.{#{UUID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
+  ENCRYPTED_KEY_RE = /\A(.{#{UUID_LENGTH}})/ # Form: {uuid}-xxxx-xxxx-xxxx
 
   def initialize(account:, key:, legacy_encrypted: false)
     @account          = account
@@ -14,7 +14,7 @@ class LicenseKeyLookupService < BaseService
 
     # FIXME(ezekg) So wrong but it's my own dang vault: hashing != encryption
     if legacy_encrypted
-      matches = ENCRYPTED_KEY_REGEX.match key
+      matches = ENCRYPTED_KEY_RE.match key
       license = licenses.find_by id: matches[1]
 
       if license&.compare_hashed_token(:key, key, version: "v1")

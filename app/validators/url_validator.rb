@@ -46,6 +46,6 @@ class UrlValidator < ActiveModel::EachValidator
     host = uri.host
     return false if BLACKLISTED_HOSTS.include? host
 
-    host =~ /^.*?\.[a-zA-Z]{2,}$/
+    host =~ /\A.*?\.[a-zA-Z]{2,}\z/
   end
 end

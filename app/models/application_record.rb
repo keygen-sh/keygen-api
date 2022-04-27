@@ -4,7 +4,7 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
   EXCLUDED_ALIASES = %w[actions action].freeze
-  SANITIZE_TSV_RX  = /['?\\:‘’|&!*]/.freeze
+  SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
   TEST_ENV         = 'test'.freeze
 
   default_scope -> {

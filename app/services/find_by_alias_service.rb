@@ -24,7 +24,7 @@ class FindByAliasService < BaseService
 
     # Strip out ID attribute if the finder doesn't resemble a UUID (pg will throw)
     columns = [:id, *aliases].uniq
-    columns.reject! { |c| c == :id } unless identifier =~ UUID_RX
+    columns.reject! { |c| c == :id } unless identifier =~ UUID_RE
     if columns.empty?
       raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier)
     end
