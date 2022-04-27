@@ -134,14 +134,14 @@ class User < ApplicationRecord
       role_identifier.empty?
 
     return joins(:role).where(role: { id: role_identifier }) if
-      UUID_RX.match?(role_identifier)
+      UUID_RE.match?(role_identifier)
 
     scope = joins(:role).where('roles.name ILIKE ?', "%#{role_identifier}%")
     return scope unless
-      UUID_CHAR_RX.match?(role_identifier)
+      UUID_CHAR_RE.match?(role_identifier)
 
     scope.or(
-      joins(:role).where(<<~SQL.squish, role_identifier.gsub(SANITIZE_TSV_RX, ' '))
+      joins(:role).where(<<~SQL.squish, role_identifier.gsub(SANITIZE_TSV_RE, ' '))
         to_tsvector('simple', roles.id::text)
         @@
         to_tsquery(

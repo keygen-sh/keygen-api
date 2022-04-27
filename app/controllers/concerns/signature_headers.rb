@@ -6,7 +6,7 @@ module SignatureHeaders
   SUPPORTED_SIGNATURE_ALGORITHMS = %w[ed25519 rsa-pss-sha256 rsa-sha256].freeze
   DEFAULT_SIGNATURE_ALGORITHM    = 'ed25519'.freeze
   DEFAULT_ACCEPT_SIGNATURE       = %(algorithm="#{DEFAULT_SIGNATURE_ALGORITHM}").freeze
-  ACCEPT_SIGNATURE_REGEX         =
+  ACCEPT_SIGNATURE_RE            =
     %r{
       \A
       (keyid="(?<keyid>[^"]+)")?
@@ -155,7 +155,7 @@ module SignatureHeaders
   end
 
   def parse_accept_signature_header(accept_signature)
-    ACCEPT_SIGNATURE_REGEX.match(accept_signature)
+    ACCEPT_SIGNATURE_RE.match(accept_signature)
   end
 
   def supports_signature_algorithm?(algorithm)

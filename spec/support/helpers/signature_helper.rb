@@ -1,7 +1,7 @@
 class SignatureHelper
   class InvalidSignatureHeaderError < StandardError; end
 
-  SIGNATURE_REGEX = %r{
+  SIGNATURE_RE = %r{
     \A
     (keyid="(?<keyid>[^"]+)")?
     (\s*,\s*)
@@ -15,7 +15,7 @@ class SignatureHelper
   }xi
 
   def self.parse(signature_header)
-    attrs = SIGNATURE_REGEX.match(signature_header)
+    attrs = SIGNATURE_RE.match(signature_header)
     raise InvalidSignatureHeaderError, 'invalid signature header' if
       attrs.nil?
 

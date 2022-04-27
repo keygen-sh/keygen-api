@@ -11,7 +11,7 @@ class ActiveModel::Type::UUID
 
   def assert_valid_value(value)
     raise ArgumentError, "#{value.inspect} is not a valid UUID v4" unless
-      value.match?(UUID_RX)
+      value.match?(UUID_RE)
   end
 
   ActiveModel::Type.register(:uuid, self)

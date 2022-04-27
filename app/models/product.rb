@@ -43,7 +43,7 @@ class Product < ApplicationRecord
       identifier.empty?
 
     return where(id: identifier) if
-      UUID_RX.match?(identifier)
+      UUID_RE.match?(identifier)
 
     where('products.id::text ILIKE ?', "%#{identifier}%")
   }
