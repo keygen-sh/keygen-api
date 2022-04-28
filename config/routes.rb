@@ -203,7 +203,7 @@ Rails.application.routes.draw do
           end
         end
         resources "artifacts", only: [:index, :show]
-        resource "artifact", only: [:show, :destroy], as: :legacy_artifact do
+        resource "artifact", only: [:show, :destroy], as: :legacy_artifact, controller: "artifact" do
           put :create
         end
         resource "product", only: [:show]
