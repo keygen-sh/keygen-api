@@ -6,8 +6,14 @@ World Rack::Test::Methods
 #   DatabaseCleaner.cleaning(&block)
 # end
 
-Before "@api/v1" do
-  @api_version = "v1"
+Versionist.supported_versions.each do |version|
+  semver = Semverse::Version.new(version)
+  mm     = [semver.major, semver.minor].reject(&:zero?)
+                                       .join('.')
+
+  Before "@api/v#{mm}" do
+    @api_version = "v#{semver.major}"
+  end
 end
 
 # FIXME(ezekg) This is super hacky but there's no easy way to disable
