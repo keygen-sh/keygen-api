@@ -14,3 +14,7 @@ end
 def stub_cache
   allow(Rails.cache).to receive(:fetch) { |&block| block.call }
 end
+
+def stub_s3
+  Aws.config[:s3] = { stub_responses: { delete_object: [], head_object: [] } }
+end

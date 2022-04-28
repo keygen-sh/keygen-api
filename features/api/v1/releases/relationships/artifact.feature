@@ -28,6 +28,22 @@ Feature: Release artifact relationship
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
+  Scenario: Admin downloads an artifact for a release that has more than 1 artifact
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 3 "artifacts" for the last "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "multiple artifacts are not supported by this endpoint"
+      }
+      """
+
    Scenario: Admin retrieves the artifact for a release (1 hour TTL)
     Given I am an admin of account "test1"
     And the current account is "test1"

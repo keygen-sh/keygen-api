@@ -588,6 +588,14 @@ Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following
   end
 end
 
+Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following data:$/ do |resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse last_response.body
+
+  expect(json["data"]["type"]).to eq resource.pluralize
+  expect(json["data"]).to include JSON.parse(body)
+end
+
 Then /^the JSON response should (?:contain|be) an? "([^\"]*)" with the following attributes:$/ do |resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
   json = JSON.parse last_response.body
