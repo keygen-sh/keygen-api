@@ -4,6 +4,7 @@ class ReleaseDownloadService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidReleaseError < StandardError; end
   class InvalidArtifactError < StandardError; end
+  class TooManyArtifactsError < StandardError; end
   class YankedReleaseError < StandardError; end
   class InvalidTTLError < StandardError; end
   class DownloadResult < OpenStruct; end
@@ -69,6 +70,8 @@ class ReleaseDownloadService < BaseService
     Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
     raise InvalidArtifactError.new('artifact is unavailable (ensure it has been fully uploaded)')
+  rescue ActiveRecord::SoleRecordExceeded
+    raise TooManyArtifactsError.new('too many artifacts for release')
   end
 
   private
