@@ -1,5 +1,5 @@
-@api/v1 @deprecated
-Feature: Release artifact relationship
+@api/v1.1
+Feature: Release artifacts relationship
 
   Background:
     Given the following "accounts" exist:
@@ -8,23 +8,134 @@ Feature: Release artifact relationship
       | Test 2  | test2 |
     And I send and accept JSON
 
-  Scenario: Endpoint should be inaccessible when account is disabled
+  Scenario: List endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
+    And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "403"
 
-  # Artifact download links
+  Scenario: Download endpoint should be inaccessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the first "release" has an artifact that is uploaded
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "403"
+
+  # List artifacts
+  Scenario: Admin retrieves the artifacts for a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "artifact"
+
+  Scenario: Product retrieves the artifacts for a release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "artifact"
+
+  Scenario: Product retrieves the artifacts for a release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the artifacts for a release of a different product
+    Given the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the artifacts for a release of their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "artifact"
+
+  Scenario: User attempts to retrieve the artifacts for a release they don't have a license for
+    Given the current account is "test1"
+    And the current account has 3 "releases"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve the artifacts for a release they do have a license for
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "release" has an artifact that is uploaded
+    And the second "release" has an artifact that is uploaded
+    And the third "release" has an artifact that is nil
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "artifact"
+
+  Scenario: Admin attempts to retrieve the artifacts for a release of another account
+    Given I am an admin of account "test2"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the first "release" has an artifact that is uploaded
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "401"
+
+  # Download artifact
   Scenario: Admin retrieves the artifact for a release
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -34,7 +145,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=3600"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=3600"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -44,7 +155,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=10"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=10"
     Then the response status should be "400"
     And the first error should have the following properties:
       """
@@ -63,7 +174,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=1209600"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=1209600"
     Then the response status should be "400"
     And the first error should have the following properties:
       """
@@ -82,7 +193,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has an artifact that is not uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
     And the first error should have the following properties:
       """
@@ -103,7 +214,7 @@ Feature: Release artifact relationship
       { "yankedAt": "$time.now" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "422"
     And the first error should have the following properties:
       """
@@ -120,7 +231,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     Given I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -131,7 +242,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     Given I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=604800"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=604800"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -142,7 +253,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     Given I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product
@@ -154,7 +265,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -167,7 +278,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=86400"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=86400"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -184,7 +295,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (expired after release, restrict access)
@@ -208,7 +319,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -233,7 +344,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (suspended)
@@ -249,7 +360,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, expired)
@@ -272,7 +383,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I authenticate with my license key
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, expired after release, restrict access)
@@ -299,7 +410,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I authenticate with my license key
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -327,7 +438,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I authenticate with my license key
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of their product (key auth, suspended)
@@ -347,7 +458,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I authenticate with my license key
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves the artifact for a release of a different product
@@ -358,7 +469,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves a release artifact of their product (has single entitlement)
@@ -385,7 +496,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: License retrieves a release artifact of their product (has multiple entitlements)
@@ -426,7 +537,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: License retrieves a release artifact of their product (missing some entitlements)
@@ -460,7 +571,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: License retrieves a release artifact of their product (missing all entitlements)
@@ -473,7 +584,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: User retrieves a release artifact with a license for it
@@ -487,7 +598,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -502,7 +613,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=120"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=120"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -521,7 +632,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: User retrieves a release artifact with a license for it (expired after release)
@@ -543,7 +654,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
@@ -562,7 +673,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: User retrieves a release artifact with multiple licenses for it (expired and non-expired)
@@ -580,7 +691,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 2 "licenses"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves a release artifact with multiple licenses for it (suspended, expired and valid)
@@ -602,7 +713,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 3 "licenses"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves a release artifact with a license for it (has single entitlement)
@@ -631,7 +742,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves a release artifact with a license for it (has multiple entitlements)
@@ -674,7 +785,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves a release artifact with a license for it (missing some entitlements)
@@ -710,7 +821,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: User retrieves a release artifact with a license for it (missing all entitlements)
@@ -725,7 +836,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "403"
 
   Scenario: User retrieves a release artifact without a license for it
@@ -735,7 +846,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   # Licensed distribution strategy
@@ -748,7 +859,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the first "release" has an artifact that is uploaded
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves a LICENSED release without a license for it
@@ -763,7 +874,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves a LICENSED release with a license for it
@@ -779,7 +890,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves a LICENSED release without a license for it
@@ -796,7 +907,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a LICENSED release with a license for it
@@ -814,7 +925,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Product retrieves a LICENSED release
@@ -828,7 +939,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Product retrieves a LICENSED release of another product
@@ -842,7 +953,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: Admin retrieves a LICENSED release
@@ -856,7 +967,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   # Open distribution strategy
@@ -869,7 +980,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the first "release" has an artifact that is uploaded
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Anonymous retrieves an OPEN release
@@ -881,7 +992,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the first "release" has an artifact that is uploaded
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: License retrieves an OPEN release without a license for it
@@ -896,7 +1007,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: License retrieves an OPEN release with a license for it
@@ -912,7 +1023,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves an OPEN release without a license for it
@@ -929,7 +1040,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: User retrieves an OPEN release with a license for it
@@ -947,7 +1058,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Product retrieves an OPEN release
@@ -961,7 +1072,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Product retrieves an OPEN release of another product
@@ -975,7 +1086,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: Admin retrieves an OPEN release
@@ -989,7 +1100,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   # Closed distribution strategy
@@ -1002,7 +1113,7 @@ Feature: Release artifact relationship
       """
     And the current account has 1 "release" for the first "product"
     And the first "release" has an artifact that is uploaded
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves a CLOSED release without a license for it
@@ -1017,7 +1128,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: License retrieves a CLOSED release with a license for it
@@ -1033,7 +1144,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a CLOSED release without a license for it
@@ -1050,7 +1161,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: User retrieves a CLOSED release with a license for it
@@ -1068,7 +1179,7 @@ Feature: Release artifact relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: Product retrieves a CLOSED release
@@ -1082,7 +1193,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
 
   Scenario: Product retrieves a CLOSED release of another product
@@ -1096,7 +1207,7 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
   Scenario: Admin retrieves a CLOSED release
@@ -1110,231 +1221,8 @@ Feature: Release artifact relationship
     And the first "release" has an artifact that is uploaded
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-
-  # Artifact upload links
-  Scenario: Admin uploads an artifact for a release (not uploaded)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "307"
-    And the JSON response should be an "artifact"
-
-  Scenario: Admin uploads an artifact for a release (already uploaded)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "307"
-    And the JSON response should be an "artifact"
-
-  Scenario: Admin uploads an artifact for a release that has been yanked
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
-    And the first "release" has the following attributes:
-      """
-      { "yankedAt": "$time.now" }
-      """
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable entity",
-        "detail": "has been yanked"
-      }
-      """
-
-  Scenario: Product uploads an artifact for a release of their product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is not uploaded
-    Given I am a product of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "307"
-    And the JSON response should be an "artifact"
-
-  Scenario: Product uploads an artifact for a release of a different product
-    Given the current account is "test1"
-    And the current account has 2 "products"
-    And the current account has 2 "releases" for the second "product"
-    And the first "release" has an artifact that is not uploaded
-    Given I am a product of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-
-  Scenario: License uploads an artifact for a release of their product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
-
-  Scenario: License uploads an artifact for a release of a different product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "license"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-
-  Scenario: User uploads an artifact for a release with a license for it
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a user of account "test1"
-    And I use an authentication token
-    And the current user has 1 "license"
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
-
-  Scenario: User uploads an artifact for a release without a license for it
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-
-  # Artifact yank
-  Scenario: Admin yanks an artifact for a release (not uploaded)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "204"
-    And the first "release" should be yanked
-
-  Scenario: Admin yanks an artifact for a release (uploaded)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "204"
-    And the first "release" should be yanked
-
-  Scenario: Admin yanks an artifact for a release (yanked)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
-    And the first "release" has the following attributes:
-      """
-      { "yankedAt": "$time.now" }
-      """
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable entity",
-        "detail": "has been yanked"
-      }
-      """
-
-  Scenario: Product yanks an artifact for a release of their product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    Given I am a product of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "204"
-    And the first "release" should be yanked
-
-  Scenario: Product yanks an artifact for a release of a different product
-    Given the current account is "test1"
-    And the current account has 2 "products"
-    And the current account has 2 "releases" for the second "product"
-    And the first "release" has an artifact that is not uploaded
-    Given I am a product of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-    And the first "release" should not be yanked
-
-  Scenario: License yanks an artifact for a release of their product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
-    And the first "release" should not be yanked
-
-  Scenario: License yanks an artifact for a release of a different product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "license"
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-    And the first "release" should not be yanked
-
-  Scenario: User yanks an artifact for a release with a license for it
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
-    And I am a user of account "test1"
-    And I use an authentication token
-    And the current user has 1 "license"
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "403"
-    And the first "release" should not be yanked
-
-  Scenario: User yanks an artifact for a release without a license for it
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
-    And the first "release" should not be yanked
 
   # Expiration basis
   Scenario: License downloads an artifact with a download expiration basis (not set)
@@ -1360,7 +1248,7 @@ Feature: Release artifact relationship
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
@@ -1389,7 +1277,7 @@ Feature: Release artifact relationship
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
