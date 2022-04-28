@@ -31,7 +31,7 @@ module Api::V1::Releases::Relationships
       )
 
       render jsonapi: download.artifact, status: :see_other, location: download.redirect_url
-    rescue ActiveRecord::SoleRecordExceeded => e
+    rescue ReleaseDownloadService::TooManyArtifactsError
       render_unprocessable_entity detail: 'multiple artifacts are not supported by this endpoint'
     rescue ReleaseDownloadService::InvalidTTLError => e
       render_bad_request detail: e.message, source: { parameter: :ttl }
