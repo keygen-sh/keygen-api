@@ -18,24 +18,24 @@ module Api::V1::Products::Relationships
       artifact = FindByAliasService.call(scope: product.release_artifacts, identifier: params[:id], aliases: :key)
       authorize artifact
 
-      download = ReleaseDownloadService.call(
+      download = DownloadArtifactService.call(
         account: current_account,
-        release: artifact.release,
         ttl: artifact_query[:ttl],
+        artifact:,
       )
 
       BroadcastEventService.call(
         event: 'release.downloaded',
         account: current_account,
-        resource: download.artifact,
+        resource: artifact,
       )
 
-      render jsonapi: download.artifact, status: :see_other, location: download.redirect_url
-    rescue ReleaseDownloadService::InvalidTTLError => e
+      render jsonapi: artifact, status: :see_other, location: download.redirect_url
+    rescue DownloadArtifactService::InvalidTTLError => e
       render_bad_request detail: e.message, source: { parameter: :ttl }
-    rescue ReleaseDownloadService::InvalidArtifactError => e
+    rescue DownloadArtifactService::InvalidArtifactError => e
       render_not_found detail: e.message
-    rescue ReleaseDownloadService::YankedReleaseError => e
+    rescue DownloadArtifactService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 

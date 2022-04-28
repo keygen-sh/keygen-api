@@ -51,6 +51,6 @@ class ReleaseArtifact < ApplicationRecord
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  delegate :yanked?,
+  delegate :s3_object_key, :yanked?,
     to: :release
 end
