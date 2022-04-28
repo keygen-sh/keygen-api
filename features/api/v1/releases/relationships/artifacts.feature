@@ -148,14 +148,21 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/b101bee6-d965-4977-9421-4ffa07bb846e"
     Then the response status should be "404"
 
-  Scenario: Admin downloads an artifact that has more than 1 artifact
+  Scenario: Admin downloads an artifact for a release that has more than 1 artifact
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
     And the current account has 3 "artifacts" for the last "release"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$1"
     Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following data:
+      """
+      {
+        "type": "artifacts",
+        "id": "$artifacts[1]"
+      }
+      """
 
   Scenario: Admin retrieves the artifact for a release that has not been uploaded
     Given I am an admin of account "test1"

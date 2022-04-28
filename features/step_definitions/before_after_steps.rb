@@ -31,6 +31,7 @@ Before do
 
   stub_account_keygens
   stub_cache
+  stub_s3
 
   @crypt = []
 end
