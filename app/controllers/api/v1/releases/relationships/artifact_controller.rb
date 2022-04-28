@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Api::V1::Releases::Relationships
-  class ArtifactsController < Api::V1::BaseController
+  class ArtifactController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!, except: %i[index show]
@@ -16,13 +16,11 @@ module Api::V1::Releases::Relationships
     end
 
     def show
-      artifact = FindByAliasService.call(scope: release.artifacts, identifier: params[:id], aliases: :key)
-      authorize artifact
+      authorize release, :download?
 
-      # FIXME(ezekg) This should support multiple artifacts
       download = ReleaseDownloadService.call(
         account: current_account,
-        release: artifact.release,
+        release: release,
         ttl: artifact_query[:ttl],
       )
 
@@ -38,6 +36,39 @@ module Api::V1::Releases::Relationships
     rescue ReleaseDownloadService::InvalidArtifactError => e
       render_not_found detail: e.message
     rescue ReleaseDownloadService::YankedReleaseError => e
+      render_unprocessable_entity detail: e.message
+    end
+
+    def create
+      authorize release, :upload?
+
+      upload = ReleaseUploadService.call(
+        account: current_account,
+        release: release,
+      )
+
+      BroadcastEventService.call(
+        event: 'release.uploaded',
+        account: current_account,
+        resource: release
+      )
+
+      render jsonapi: upload.artifact, status: :temporary_redirect, location: upload.redirect_url
+    rescue ReleaseUploadService::YankedReleaseError => e
+      render_unprocessable_entity detail: e.message
+    end
+
+    def destroy
+      authorize release, :yank?
+
+      ReleaseYankService.call(account: current_account, release: release)
+
+      BroadcastEventService.call(
+        event: 'release.yanked',
+        account: current_account,
+        resource: release
+      )
+    rescue ReleaseYankService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 

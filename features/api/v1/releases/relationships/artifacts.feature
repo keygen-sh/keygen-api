@@ -139,53 +139,23 @@ Feature: Release artifacts relationship
     Then the response status should be "303"
     And the JSON response should be an "artifact"
 
-   Scenario: Admin retrieves the artifact for a release (1 hour TTL)
+  Scenario: Admin retrieves an artifact that does not exist
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
     And the first "release" has an artifact that is uploaded
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=3600"
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/b101bee6-d965-4977-9421-4ffa07bb846e"
+    Then the response status should be "404"
+
+  Scenario: Admin downloads an artifact that has more than 1 artifact
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 3 "artifacts" for the last "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
-
-  Scenario: Admin retrieves the artifact for a release (10 second TTL)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=10"
-    Then the response status should be "400"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "must be greater than or equal to 60 (1 minute)",
-        "source": {
-          "parameter": "ttl"
-        }
-      }
-      """
-
-  Scenario: Admin retrieves the artifact for a release (2 week TTL)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=1209600"
-    Then the response status should be "400"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "must be less than or equal to 604800 (1 week)",
-        "source": {
-          "parameter": "ttl"
-        }
-      }
-      """
 
   Scenario: Admin retrieves the artifact for a release that has not been uploaded
     Given I am an admin of account "test1"
@@ -1251,7 +1221,7 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And sidekiq should process 1 "event-log" job
-    And sidekiq should process 1 "event-notification" job
+    And sidekiq should process 1 "event-notification" jobs
     And the first "license" should have a 1 year expiry
 
   Scenario: License downloads an artifact with a download expiration basis (set)
