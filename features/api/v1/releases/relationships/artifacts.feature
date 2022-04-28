@@ -41,6 +41,16 @@ Feature: Release artifacts relationship
     Then the response status should be "200"
     And the JSON response should be an array with 1 "artifact"
 
+  Scenario: Admin retrieves artifacts for a release that has more than 1 artifact
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 3 "artifacts" for the last "release"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
   Scenario: Product retrieves the artifacts for a release
     Given the current account is "test1"
     And the current account has 1 "product"
