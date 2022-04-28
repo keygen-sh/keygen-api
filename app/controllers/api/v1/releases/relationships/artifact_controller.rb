@@ -8,13 +8,6 @@ module Api::V1::Releases::Relationships
     before_action :authenticate_with_token, only: %i[index show]
     before_action :set_release
 
-    def index
-      artifacts = apply_pagination(apply_scopes(policy_scope(release.artifacts)))
-      authorize artifacts
-
-      render jsonapi: artifacts
-    end
-
     def show
       authorize release, :download?
 
