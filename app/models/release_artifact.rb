@@ -50,4 +50,7 @@ class ReleaseArtifact < ApplicationRecord
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
+
+  delegate :yanked?,
+    to: :release
 end
