@@ -312,11 +312,15 @@ module Versionist
         end
 
         def matches?(request)
-          version = Version.coerce(
-            Versionist.config.request_version_resolver.call(request),
-          )
+          version = Version.coerce(resolver.call(request))
 
           @constraint.satisfies?(version)
+        end
+
+        private
+
+        def resolver
+          Versionist.config.request_version_resolver
         end
       end
 

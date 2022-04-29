@@ -205,8 +205,10 @@ Rails.application.routes.draw do
         resources "artifacts", only: [:index, :show]
         resource "product", only: [:show]
         version_constraint "<=1.0" do
-          resource "artifact", only: [:show, :destroy], as: :legacy_artifact, controller: "artifact" do
-            put :create
+          scope module: 'v0' do
+            resource "artifact", only: [:show, :destroy], as: :legacy_artifact do
+              put :create
+            end
           end
         end
       end
