@@ -12,19 +12,16 @@ module Versionist
     @logger ||= Versionist.config.logger.tagged(:versionist)
   end
 
-  def self.supported_versions
-    @supported_versions ||= [
-      Versionist.config.current_version,
-      *Versionist.config.versions.keys,
-    ].uniq.freeze
-  end
-
   def self.config
     @config ||= Configuration.new
   end
 
   def self.configure
     yield config
+  end
+
+  def self.supported_versions
+    [Versionist.config.current_version, *Versionist.config.versions.keys].uniq.freeze
   end
 
   class Configuration
