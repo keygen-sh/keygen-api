@@ -19,10 +19,6 @@ describe ActionController::Base, type: :controller do
 
     private
 
-    def versionist_version
-      request.headers.fetch('Version') { Versionist.config.current_version }
-    end
-
     def set_content_type
       response.headers['Content-Type'] = request.headers['Accept']
     end
@@ -37,6 +33,10 @@ describe ActionController::Base, type: :controller do
 
   before do
     Versionist.configure do |config|
+      config.request_version_resolver = -> request {
+        request.headers.fetch('Version') { Versionist.config.current_version }
+      }
+
       config.current_version = '1.3'
       config.versions        = {
         '1.2' => [
