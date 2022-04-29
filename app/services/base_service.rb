@@ -5,6 +5,10 @@ class BaseService
     raise NotImplementedError, '#call must be implemented by the service'
   end
 
+  def self.call!(...)
+    new(...).call!
+  end
+
   def self.call(...)
     new(...).call
   end

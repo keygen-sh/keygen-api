@@ -3,6 +3,14 @@
 require_dependency Rails.root.join('lib', 'versionist')
 
 Versionist.configure do |config|
+  config.request_version_resolver = -> request {
+    Current.account ||= ResolveAccountService.call(request:)
+
+    request.headers['Keygen-Version']&.delete_prefix('v') ||
+      Current.account&.api_version ||
+      KEYGEN_API_VERSION
+  }
+
   config.current_version = KEYGEN_API_VERSION
   config.versions        = {
     '1.0' => [

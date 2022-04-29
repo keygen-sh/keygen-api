@@ -28,11 +28,8 @@ class ApplicationController < ActionController::API
   attr_accessor :current_token
 
   def current_api_version
-    request.headers['Keygen-Version']&.delete_prefix('v') ||
-      current_account&.api_version ||
-      KEYGEN_API_VERSION
+    Versionist.config.request_version_resolver.call(request)
   end
-  alias :versionist_version :current_api_version
 
   def pundit_user
     AuthorizationContext.new(

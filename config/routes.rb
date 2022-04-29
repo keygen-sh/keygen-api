@@ -203,10 +203,12 @@ Rails.application.routes.draw do
           end
         end
         resources "artifacts", only: [:index, :show]
-        resource "artifact", only: [:show, :destroy], as: :legacy_artifact, controller: "artifact" do
-          put :create
-        end
         resource "product", only: [:show]
+        version_constraint "<=1.0" do
+          resource "artifact", only: [:show, :destroy], as: :legacy_artifact, controller: "artifact" do
+            put :create
+          end
+        end
       end
       member do
         scope "actions", module: "releases/actions" do

@@ -6,9 +6,6 @@ module CurrentAccountScope
   included do
     include ActiveSupport::Callbacks
 
-    ACCOUNT_SCOPE_INVALID_DOMAIN_RE = /keygen\.sh$/
-    ACCOUNT_SCOPE_CACHE_TTL         = 15.minutes
-
     # Define callback system for current account to allow controllers to run certain
     # callbacks before and after the current account has been set. For example, we
     # use this to validate signature-related headers, since we need to know the
@@ -18,17 +15,10 @@ module CurrentAccountScope
 
     def scope_to_current_account!
       run_callbacks :current_account_scope do
-        account_id = params[:account_id] ||
-                     params[:id]
-
-        # Adds CNAME support for custom domains
-        account = find_by_account_domain(request.host) ||
-                  find_by_account_id!(account_id)
-
-        Current.account = account
+        Current.account ||= ResolveAccountService.call!(request:)
 
         # TODO(ezekg) Should we deprecate this?
-        @current_account = account
+        @current_account = Current.account
       end
     end
 
@@ -38,47 +28,6 @@ module CurrentAccountScope
 
     def self.after_current_account(callback)
       set_callback :current_account_scope, :after, callback
-    end
-
-    private
-
-    def find_by_account_domain!(domain)
-      raise Keygen::Error::InvalidAccountDomainError, 'domain is required' unless
-        domain.present?
-
-      raise Keygen::Error::InvalidAccountDomainError, 'domain is invalid' if
-        domain.match?(ACCOUNT_SCOPE_INVALID_DOMAIN_RE)
-
-      cache_key = Account.cache_key(domain)
-
-      Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
-        FindByAliasService.call(scope: Account, identifier: domain, aliases: :domain)
-      end
-    end
-
-    def find_by_account_domain(...)
-      find_by_account_domain!(...)
-    rescue Keygen::Error::InvalidAccountDomainError,
-           Keygen::Error::NotFoundError
-      nil
-    end
-
-    def find_by_account_id!(id)
-      raise Keygen::Error::InvalidAccountIdError, 'id is required' unless
-        id.present?
-
-      cache_key = Account.cache_key(id)
-
-      Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
-        FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
-      end
-    end
-
-    def find_by_account_id(...)
-      find_by_account_id!(...)
-    rescue Keygen::Error::InvalidAccountIdError,
-           Keygen::Error::NotFoundError
-      nil
     end
   end
 end

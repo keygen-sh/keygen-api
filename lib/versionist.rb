@@ -7,7 +7,6 @@ module Versionist
   class InvalidVersionError < StandardError; end
 
   SUPPORTED_VERSION_FORMATS = %i[semver date float integer string].freeze
-  TARGET_VERSION_METHOD     = :versionist_version
 
   def self.logger
     @logger ||= Versionist.config.logger.tagged(:versionist)
@@ -31,10 +30,11 @@ module Versionist
   class Configuration
     include ActiveSupport::Configurable
 
-    config_accessor(:logger)          { Rails.logger }
-    config_accessor(:version_format)  { :semver }
-    config_accessor(:current_version) { nil }
-    config_accessor(:versions)        { [] }
+    config_accessor(:logger)                   { Rails.logger }
+    config_accessor(:request_version_resolver) { -> req { self.current_version } }
+    config_accessor(:version_format)           { :semver }
+    config_accessor(:current_version)          { nil }
+    config_accessor(:versions)                 { [] }
   end
 
   class Migration
@@ -164,6 +164,30 @@ module Versionist
         version.is_a?(self) ? version : new(version)
       end
     end
+
+    class Constraint
+      attr_reader :format,
+                  :value
+
+      def initialize(constraint)
+        @format     = Versionist.config.version_format.to_sym
+        @constraint = case @format
+                      when :semver
+                        Semverse::Constraint.coerce(constraint)
+                      when :date,
+                           :integer,
+                           :float,
+                           :string
+                        raise NotImplementedError, "#{@format} constraints are not supported"
+                      else
+                        raise InvalidVersionFormatError, "invalid version constraint format: #{@format} (must be one of: #{SUPPORTED_VERSION_FORMATS.join(',')}"
+                      end
+      end
+
+      def satisfies?(other)
+        @constraint.satisfies?(other)
+      end
+    end
   end
 
   class Migrator
@@ -263,12 +287,46 @@ module Versionist
 
         def apply_migrations!
           current_version = Versionist.config.current_version
-          target_version  = send(TARGET_VERSION_METHOD)
+          target_version  = Versionist.config.request_version_resolver.call(request)
 
           migrator = Migrator.new(from: current_version, to: target_version, request:, response:)
           migrator.migrate! { yield }
         end
       end
     end
+
+    module Constraints
+      extend ActiveSupport::Concern
+
+      included do
+        # TODO(ezekg) Implement controller-level version constraints
+      end
+    end
   end
+
+  module Router
+    module Constraints
+      class VersionConstraint
+        def initialize(constraint:)
+          @constraint = Version::Constraint.new(constraint)
+        end
+
+        def matches?(request)
+          version = Version.coerce(
+            Versionist.config.request_version_resolver.call(request),
+          )
+
+          @constraint.satisfies?(version)
+        end
+      end
+
+      def version_constraint(constraint, &)
+        constraints VersionConstraint.new(constraint:) do
+          instance_eval(&)
+        end
+      end
+    end
+  end
+
+  ActionDispatch::Routing::Mapper.send(:include, Router::Constraints)
 end
