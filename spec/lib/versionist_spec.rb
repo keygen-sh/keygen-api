@@ -295,6 +295,8 @@ describe ActionController::Base, type: :controller do
       end
     end
 
+    # NOTE(ezekg) Have to run this separately so we aren't hit with an
+    #             uninitialized constant error
     it "should not raise error for valid migration type: constant" do
       Versionist.configure do |config|
         config.current_version = '1.1'
@@ -306,6 +308,47 @@ describe ActionController::Base, type: :controller do
       migrator = Versionist::Migrator.new(from: '1.1', to: '1.0')
 
       expect { migrator.migrate!(data: {}) }.to_not raise_error
+    end
+
+    [
+      [:semver, '1.0', '2.0'],
+      [:date, Date.yesterday.iso8601, Date.today.iso8601],
+      [:integer, 1, 2],
+      [:float, 1.0, 2.0],
+      [:string, 'a', 'b'],
+    ].each do |(version_format, prev_version, version)|
+      it "should not raise error for valid version format: #{version_format}" do
+        Versionist.configure do |config|
+          config.version_format  = version_format
+          config.current_version = version
+          config.versions        = {
+            prev_version => [:test_migration],
+          }
+        end
+
+        expect { Versionist::Migrator.new(from: version, to: prev_version).migrate!(data: {}) }
+          .to_not raise_error
+      end
+    end
+
+    [
+      [:class, Class.new, Class.new],
+      [:hash, { v: 1 }, { v: 2 }],
+      [:array, [1], [2]],
+      [:symbol, :a, :b],
+    ].each do |(version_format, prev_version, version)|
+      it "should raise error for invalid version format: #{version_format}" do
+        Versionist.configure do |config|
+          config.version_format  = version_format
+          config.current_version = version
+          config.versions        = {
+            prev_version => [:test_migration],
+          }
+        end
+
+        expect { Versionist::Migrator.new(from: version, to: prev_version).migrate!(data: {}) }
+          .to raise_error Versionist::InvalidVersionFormatError
+      end
     end
   end
 end
