@@ -1,4 +1,4 @@
-@api/v1 @deprecated
+@api/v1.0 @deprecated
 Feature: Release artifact relationship
 
   Background:
