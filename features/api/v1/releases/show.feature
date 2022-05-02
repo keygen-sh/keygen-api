@@ -28,9 +28,8 @@ Feature: Show release
     And the JSON response should be a "release" with the following relationships:
       """
       {
-        "artifact": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-          "data": { "type": "artifacts", "id": "$artifacts[0]" }
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
         }
       }
       """

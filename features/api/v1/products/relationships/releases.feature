@@ -33,9 +33,8 @@ Feature: Product releases relationship
     And the first "release" should have the following relationships:
       """
       {
-        "artifact": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifact" },
-          "data": null
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifacts" }
         }
       }
       """
