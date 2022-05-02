@@ -1,8 +1,8 @@
-# heroku run -e BATCH_SIZE=1000000 rails runner db/scripts/seed_v1_api_version_for_webhook_endpoints.rb
+# heroku run -e BATCH_SIZE=1000000 rails runner db/scripts/seed_api_version_for_webhook_endpoints.rb
 
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
 
-Keygen.logger.info { "[scripts.seed_v1_api_version_for_webhook_endpoints] Starting" }
+Keygen.logger.info { "[scripts.seed_api_version_for_webhook_endpoints] Starting" }
 
 loop do
   batch ||= 0
@@ -26,10 +26,10 @@ loop do
       )
   SQL
 
-  Keygen.logger.info { "[scripts.seed_v1_api_version_for_webhook_endpoints] Updated #{count} endpoint rows (batch ##{batch})" }
+  Keygen.logger.info { "[scripts.seed_api_version_for_webhook_endpoints] Updated #{count} endpoint rows (batch ##{batch})" }
 
   break if
     count == 0
 end
 
-Keygen.logger.info { "[scripts.seed_v1_api_version_for_webhook_endpoints] Done" }
+Keygen.logger.info { "[scripts.seed_api_version_for_webhook_endpoints] Done" }
