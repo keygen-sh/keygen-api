@@ -212,19 +212,25 @@ Rails.application.routes.draw do
           end
         end
       end
-      member do
-        scope "actions", module: "releases/actions" do
-          get "upgrade", to: "upgrades#check_for_upgrade_by_id"
+      version_constraint "<=1.0" do
+        member do
+          scope "actions", module: "releases/actions" do
+            scope module: :v1x0 do
+              get "upgrade", to: "upgrades#check_for_upgrade_by_id"
+            end
+          end
         end
-      end
-      collection do
-        scope "actions", module: "releases/actions" do
-          get "upgrade", to: "upgrades#check_for_upgrade_by_query"
+        collection do
+          scope "actions", module: "releases/actions" do
+            scope module: :v1x0 do
+              get "upgrade", to: "upgrades#check_for_upgrade_by_query"
+            end
+          end
         end
       end
     end
 
-    resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
+    resources "artifacts", constraints: { id: /.*/ }
     resources "platforms", only: [:index, :show]
     resources "channels", only: [:index, :show]
 
