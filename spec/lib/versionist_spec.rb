@@ -273,13 +273,12 @@ describe ActionController::Base, type: :controller do
   end
 
   context 'when using a valid config' do
-    before do
-      stub_const('TestMigration', Class.new(Versionist::Migration))
-    end
+    TestMigration = Class.new(Versionist::Migration)
 
     [
       :test_migration,
       'test_migration',
+      TestMigration,
     ].each do |migration|
       it "should not raise error for valid migration type: #{migration.class.name}" do
         Versionist.configure do |config|
@@ -293,21 +292,6 @@ describe ActionController::Base, type: :controller do
 
         expect { migrator.migrate!(data: {}) }.to_not raise_error
       end
-    end
-
-    # NOTE(ezekg) Have to run this separately so we aren't hit with an
-    #             uninitialized constant error
-    it "should not raise error for valid migration type: constant" do
-      Versionist.configure do |config|
-        config.current_version = '1.1'
-        config.versions        = {
-          '1.0' => [TestMigration],
-        }
-      end
-
-      migrator = Versionist::Migrator.new(from: '1.1', to: '1.0')
-
-      expect { migrator.migrate!(data: {}) }.to_not raise_error
     end
 
     [
