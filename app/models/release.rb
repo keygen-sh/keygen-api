@@ -14,18 +14,6 @@ class Release < ApplicationRecord
     through: :product
   has_many :licenses,
     through: :product
-  belongs_to :platform,
-    class_name: 'ReleasePlatform',
-    foreign_key: :release_platform_id,
-    inverse_of: :releases,
-    autosave: true,
-    optional: true
-  belongs_to :filetype,
-    class_name: 'ReleaseFiletype',
-    foreign_key: :release_filetype_id,
-    inverse_of: :releases,
-    autosave: true,
-    optional: true
   belongs_to :channel,
     class_name: 'ReleaseChannel',
     foreign_key: :release_channel_id,
@@ -56,26 +44,24 @@ class Release < ApplicationRecord
     class_name: 'ReleaseArtifact',
     inverse_of: :release,
     dependent: :delete_all
+  has_many :filetypes,
+    through: :artifacts
+  has_many :platforms,
+    through: :artifacts
+  has_many :arches,
+    through: :artifacts
   has_many :event_logs,
     as: :resource
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
-  accepts_nested_attributes_for :platform
-  accepts_nested_attributes_for :filetype
+  accepts_nested_attributes_for :artifacts, limit: 1
   accepts_nested_attributes_for :channel
 
   before_create :enforce_release_limit_on_account!
 
   validates :product,
     scope: { by: :account_id }
-  validates :filetype,
-    presence: { message: 'must exist' },
-    scope: { by: :account_id },
-    unless: -> { filetype.nil? }
-  validates :platform,
-    presence: { message: 'must exist' },
-    scope: { by: :account_id },
-    unless: -> { platform.nil? }
+
   validates :channel,
     scope: { by: :account_id }
 
@@ -83,33 +69,9 @@ class Release < ApplicationRecord
     presence: true,
     semver: true,
     uniqueness: {
-      # This error scenario is one of our most confusing, so we're giving as
-      # much context as possible to the end-user.
-      scope: %i[account_id product_id release_platform_id release_channel_id release_filetype_id],
-      message: proc { |release|
-        filetype = release.filetype.key
-        platform = release.platform.key
-        channel  = release.channel.key
-
-        # We're going to remove % chars since Rails treats these special,
-        # e.g. %{value}.
-        "version already exists for '#{platform}' platform with '#{filetype}' filetype on '#{channel}' channel".remove('%')
-      },
-      # We only want to assert this validation if the filetype and platform
-      # are present, since the unique index doesn't include nulls, and we
-      # want to allow duplicates when these attrs are nil.
-      if: -> {
-        filetype&.key.present? &&
-        platform&.key.present? &&
-        channel&.key.present?
-      }
+      scope: %i[account_id product_id release_channel_id],
+      message: 'version already exists on channel',
     }
-  validates :filename,
-    presence: true,
-    uniqueness: { message: 'already exists', scope: %i[account_id product_id] }
-  validates :filesize,
-    allow_blank: true,
-    numericality: { greater_than_or_equal_to: 0 }
 
   scope :for_product, -> product {
     where(product: product)
@@ -224,28 +186,29 @@ class Release < ApplicationRecord
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
 
-  def filetype_id=(id)
-    self.release_platform_id = id
+  # FIXME(ezekg) Setters backwards compatibility. Remove when no longer in use.
+  def platform=(key)
+    @artifact ||= artifacts.new(account_id:)
+
+    @artifact.assign_attributes(platform_attributes: { key: })
   end
 
-  def platform_id=(id)
-    self.release_filetype_id = id
+  def filetype=(key)
+    @artifact ||= artifacts.new(account_id:)
+
+    @artifact.assign_attributes(filetype_attributes: { key: })
   end
 
-  def channel_id=(id)
-    self.release_channel_id = id
+  def filename=(filename)
+    @artifact ||= artifacts.new(account_id:)
+
+    @artifact.assign_attributes(filename:)
   end
 
-  def platform_id
-    release_platform_id
-  end
+  def filesize=(filesize)
+    @artifact ||= artifacts.new(account_id:)
 
-  def filetype_id
-    release_filetype_id
-  end
-
-  def channel_id
-    release_channel_id
+    @artifact.assign_attributes(filesize:)
   end
 
   def s3_object_key
@@ -275,111 +238,6 @@ class Release < ApplicationRecord
 
   private
 
-  def validate_associated_records_for_platform
-    return unless
-      platform.present?
-
-    # Clear platform if the key is empty e.g. "" or nil
-    return self.platform = nil unless
-      platform.key?
-
-    # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
-    #              our current transaction by using DB exceptions
-    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id: account.id, key: platform.key }]
-      WITH ins AS (
-        INSERT INTO "release_platforms"
-          (
-            "account_id",
-            "key",
-            "created_at",
-            "updated_at"
-          )
-        VALUES
-          (
-            :account_id,
-            :key,
-            current_timestamp(6),
-            current_timestamp(6)
-          )
-        ON CONFLICT ("account_id", "key")
-          DO NOTHING
-        RETURNING
-          *
-      )
-      SELECT
-        *
-      FROM
-        ins
-
-      UNION
-
-      SELECT
-        *
-      FROM
-        "release_platforms"
-      WHERE
-        "release_platforms"."account_id" = :account_id AND
-        "release_platforms"."key"        = :key
-    SQL
-
-    self.platform = rows.first
-  end
-
-  def validate_associated_records_for_filetype
-    return unless
-      filetype.present?
-
-    # Clear filetype if the key is empty e.g. "" or nil
-    return self.filetype = nil unless
-      filetype.key?
-
-    filetype.key.delete_prefix!('.')
-
-    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") if
-      filename.include?('.') && !filename.downcase.ends_with?(".#{filetype.key}")
-
-    # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
-    #              our current transaction by using DB exceptions
-    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id: account.id, key: filetype.key }]
-      WITH ins AS (
-        INSERT INTO "release_filetypes"
-          (
-            "account_id",
-            "key",
-            "created_at",
-            "updated_at"
-          )
-        VALUES
-          (
-            :account_id,
-            :key,
-            current_timestamp(6),
-            current_timestamp(6)
-          )
-        ON CONFLICT ("account_id", "key")
-          DO NOTHING
-        RETURNING
-          *
-      )
-      SELECT
-        *
-      FROM
-        ins
-
-      UNION
-
-      SELECT
-        *
-      FROM
-        "release_filetypes"
-      WHERE
-        "release_filetypes"."account_id" = :account_id AND
-        "release_filetypes"."key"        = :key
-    SQL
-
-    self.filetype = rows.first
-  end
-
   def validate_associated_records_for_channel
     return unless
       channel.present?
@@ -395,7 +253,7 @@ class Release < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id: account.id, key: channel.key }]
+    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id:, key: channel.key }]
       WITH ins AS (
         INSERT INTO "release_channels"
           (

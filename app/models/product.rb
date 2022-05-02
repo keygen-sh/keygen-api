@@ -23,7 +23,7 @@ class Product < ApplicationRecord
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :releases, inverse_of: :product, dependent: :destroy
   has_many :release_channels, through: :releases, source: :channel
-  has_many :release_artifacts, inverse_of: :product
+  has_many :release_artifacts, through: :releases, source: :artifacts
   has_many :release_platforms, through: :release_artifacts, source: :platform
   has_many :release_arches, through: :release_artifacts, source: :arch
   has_many :event_logs,
