@@ -5,16 +5,6 @@ class ReleaseSerializer < BaseSerializer
 
   attribute :name
   attribute :description
-  attribute :signature
-  attribute :checksum
-  attribute :filename
-  attribute :filetype do
-    @object.filetype&.key
-  end
-  attribute :filesize
-  attribute :platform do
-    @object.platform&.key
-  end
   attribute :channel do
     @object.channel&.key
   end

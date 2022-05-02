@@ -33,6 +33,7 @@ module Api::V1
     end
 
     def create
+      puts(release_params:)
       release = current_account.releases.new release_params
       authorize release
 
@@ -142,12 +143,8 @@ module Api::V1
             param :name, type: :string, optional: true
             param :filename, type: :string
             param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, optional: true, transform: -> (k, v) {
-              [:filetype_attributes, { key: v.downcase.presence }]
-            }
-            param :platform, type: :string, optional: true, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase.presence }]
-            }
+            param :filetype, type: :string, optional: true
+            param :platform, type: :string, optional: true
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
               [:channel_attributes, { key: v.downcase.presence }]
             }
