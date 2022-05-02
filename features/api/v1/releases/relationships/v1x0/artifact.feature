@@ -12,16 +12,19 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
+    And the first "release" has an artifact that is uploaded
     And I use an authentication token
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
-    Then the response status should be "404"
+    # Then the response status should be "404"
+    Then the response status should be "303"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
+    And the first "release" has an artifact that is uploaded
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
