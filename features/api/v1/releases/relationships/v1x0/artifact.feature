@@ -23,6 +23,7 @@ Feature: Release artifact relationship
     And the current account is "test1"
     And the current account has 1 "release"
     And I use an authentication token
+    And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "403"
 
