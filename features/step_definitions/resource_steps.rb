@@ -571,6 +571,8 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.users.with_role(:user).count).to eq count.to_i
   when /^process(es)?$/
     expect(@account.machine_processes.count).to eq count.to_i
+  when /^artifacts?$/
+    expect(@account.release_artifacts.count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end
