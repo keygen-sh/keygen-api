@@ -7,8 +7,11 @@ class ReleaseFiletype < ApplicationRecord
 
   belongs_to :account,
     inverse_of: :release_filetypes
-  has_many :releases,
+  has_many :artifacts,
+    class_name: 'ReleaseArtifact',
     inverse_of: :filetype
+  has_many :releases,
+    through: :artifacts
 
   validates :key,
     presence: true,

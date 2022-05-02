@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_22_203901) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_02_203322) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -362,19 +362,41 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_22_203901) do
     t.index ["id", "created_at"], name: "index_receipts_on_id_and_created_at", unique: true
   end
 
+  create_table "release_arches", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "account_id", null: false
+    t.string "name"
+    t.string "key"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_release_arches_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id", "key"], name: "index_release_arches_on_account_id_and_key", unique: true
+  end
+
   create_table "release_artifacts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.uuid "product_id", null: false
     t.uuid "release_id", null: false
-    t.string "key", null: false
+    t.string "key"
     t.string "etag"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "content_length"
     t.string "content_type"
-    t.index ["account_id", "product_id", "release_id"], name: "releases_artifacts_acct_prod_rel_idx", unique: true
+    t.uuid "release_platform_id"
+    t.uuid "release_filetype_id"
+    t.string "filename"
+    t.bigint "filesize"
+    t.string "signature"
+    t.string "checksum"
+    t.uuid "release_arch_id"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
-    t.index ["key", "product_id", "account_id"], name: "index_release_artifacts_on_key_and_product_id_and_account_id", unique: true
+    t.index ["filename"], name: "index_release_artifacts_on_filename"
+    t.index ["key", "product_id", "account_id"], name: "release_artifacts_uniq_key_idx", unique: true, where: "(key IS NOT NULL)"
+    t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"
+    t.index ["release_filetype_id"], name: "index_release_artifacts_on_release_filetype_id"
+    t.index ["release_id", "filename"], name: "index_release_artifacts_on_release_id_and_filename", unique: true
+    t.index ["release_platform_id"], name: "index_release_artifacts_on_release_platform_id"
   end
 
   create_table "release_channels", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

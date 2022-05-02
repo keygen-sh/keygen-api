@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Api::V1::Releases::Actions
+module Api::V1::Releases::Actions::V1x0
   class UpgradesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

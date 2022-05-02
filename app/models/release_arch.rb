@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReleasePlatform < ApplicationRecord
+class ReleaseArch < ApplicationRecord
   include Limitable
   include Orderable
   include Pageable
@@ -9,7 +9,7 @@ class ReleasePlatform < ApplicationRecord
     inverse_of: :release_platforms
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
-    inverse_of: :platform
+    inverse_of: :arch
   has_many :releases,
     through: :artifacts
   has_many :products,
