@@ -8,10 +8,12 @@ World Rack::Test::Methods
 
 Versionist.supported_versions.each do |version|
   semver = Semverse::Version.new(version)
-  mm     = [semver.major, semver.minor].reject(&:zero?)
-                                       .join('.')
 
-  Before "@api/v#{mm}" do
+  Before "@api/v#{semver.major}.#{semver.minor}" do
+    @api_version = "v#{semver.major}"
+  end
+
+  Before "@api/v#{semver.major}" do
     @api_version = "v#{semver.major}"
   end
 end
