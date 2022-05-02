@@ -59,7 +59,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
             artifact: {
               data: nil,
               links: {
-                related: v1_account_release_legacy_artifact_path(subject.account_id, subject.id),
+                related: v1_account_release_v1_0_artifact_path(subject.account_id, subject.id),
               },
             },
           )
@@ -98,7 +98,7 @@ describe ArtifactHasManyToHasOneForReleaseMigration do
                 id: subject.artifacts.sole.id,
               },
               links: {
-                related: v1_account_release_legacy_artifact_path(subject.account_id, subject.id),
+                related: v1_account_release_v1_0_artifact_path(subject.account_id, subject.id),
               },
             },
           ),
