@@ -19,7 +19,7 @@ class CreateWebhookEventsWorker
 
       # Create a partial event (we'll complete it after the job is fired)
       webhook_event = account.webhook_events.create!(
-        api_version: endpoint.api_version,
+        api_version: KEYGEN_API_VERSION,
         endpoint: endpoint.url,
         event_type: event_type,
         status: 'DELIVERING',
