@@ -76,9 +76,8 @@ Feature: Upsert release
     And the JSON response should be a "release" with the following relationships:
       """
       {
-        "artifact": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-          "data": null
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifacts" }
         }
       }
       """

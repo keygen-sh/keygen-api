@@ -78,9 +78,8 @@ Feature: Create release
     And the JSON response should be a "release" with the following relationships:
       """
       {
-        "artifact": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[14]/artifact" },
-          "data": null
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[14]/artifacts" }
         }
       }
       """
