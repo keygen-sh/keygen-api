@@ -6,7 +6,6 @@ class ReleaseArtifact < ApplicationRecord
   include Pageable
 
   belongs_to :account
-  belongs_to :product
   belongs_to :release
   belongs_to :platform,
     class_name: 'ReleasePlatform',
@@ -26,6 +25,8 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
+  has_one :product,
+    through: :release
   has_many :users,
     through: :product
   has_many :licenses,
@@ -35,14 +36,36 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :arch
 
-  # FIXME(ezekg) This should be normalized, i.e. `has_one :product, through: :release``.
-  #              Currently duped for `key` uniqueness index.
-  before_validation -> { self.product_id ||= release.product_id }
+  before_validation -> { self.account_id ||= release.account_id }
 
   validates :product,
     scope: { by: :account_id }
+
   validates :release,
     scope: { by: :account_id }
+
+  validates :filetype,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> { filetype.nil? }
+
+  validates :platform,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> { platform.nil? }
+
+  validates :arch,
+    presence: { message: 'must exist' },
+    scope: { by: :account_id },
+    unless: -> { arch.nil? }
+
+  validates :filename,
+    presence: true,
+    uniqueness: { message: 'already exists', scope: %i[account_id release_id] }
+
+  validates :filesize,
+    allow_blank: true,
+    numericality: { greater_than_or_equal_to: 0 }
 
   delegate :version, :semver, :channel,
     to: :release
@@ -155,7 +178,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id: account.id, key: filetype.key }]
+    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id:, key: filetype.key }]
       WITH ins AS (
         INSERT INTO "release_filetypes"
           (
@@ -205,7 +228,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id: account.id, key: platform.key }]
+    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key }]
       WITH ins AS (
         INSERT INTO "release_platforms"
           (
@@ -255,7 +278,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id: account.id, key: arch.key }]
+    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key }]
       WITH ins AS (
         INSERT INTO "release_arches"
           (

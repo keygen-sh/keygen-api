@@ -3,7 +3,19 @@
 class ReleaseArtifactSerializer < BaseSerializer
   type 'artifacts'
 
-  attribute :key
+  attribute :filename
+  attribute :filetype do
+    @object.filetype&.key
+  end
+  attribute :filesize
+  attribute :platform do
+    @object.platform&.key
+  end
+  attribute :arch do
+    @object.arch&.key
+  end
+  attribute :signature
+  attribute :checksum
   attribute :created do
     @object.created_at
   end
@@ -17,14 +29,6 @@ class ReleaseArtifactSerializer < BaseSerializer
     end
     link :related do
       @url_helpers.v1_account_path @object.account_id
-    end
-  end
-  relationship :product do
-    linkage always: true do
-      { type: :products, id: @object.product_id }
-    end
-    link :related do
-      @url_helpers.v1_account_product_path @object.account_id, @object.product_id
     end
   end
   relationship :release do
