@@ -46,16 +46,18 @@ Feature: List releases
     And the first "release" should have the following relationships:
       """
       {
-        "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[5]/artifacts" }
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[5]/artifact" },
+          "data": null
         }
       }
       """
     And the second "release" should have the following relationships:
       """
       {
-        "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[4]/artifacts" }
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[4]/artifact" },
+          "data": null
         }
       }
       """
