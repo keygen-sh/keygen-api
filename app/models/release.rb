@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Release < ApplicationRecord
+  # FIXME(ezekg) Drop these columns after they're moved to artifacts
+  self.ignored_columns = %w[release_platform_id release_filetype_id filename filesize signature checksum]
+
   include Limitable
   include Orderable
   include Pageable
@@ -83,7 +86,7 @@ class Release < ApplicationRecord
     semver: true,
     uniqueness: {
       scope: %i[account_id product_id release_channel_id],
-      message: 'version already exists on channel',
+      message: 'version already exists',
     }
 
   validates :status,
@@ -262,7 +265,7 @@ class Release < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id:, key: channel.key }]
+    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id:, key: channel.key.downcase.strip }]
       WITH ins AS (
         INSERT INTO "release_channels"
           (
