@@ -171,14 +171,17 @@ class ReleaseArtifact < ApplicationRecord
     return self.filetype = nil unless
       filetype.key?
 
-    filetype.key.delete_prefix!('.')
+    # Clean up filetype
+    key = filetype.key.downcase
+                      .delete_prefix('.')
+                      .strip
 
-    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{filetype.key})") if
-      filename.include?('.') && !filename.downcase.ends_with?(".#{filetype.key}")
+    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{key})") if
+      filename.include?('.') && !filename.downcase.ends_with?(".#{key}")
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id:, key: filetype.key }]
+    rows = ReleaseFiletype.find_by_sql [<<~SQL.squish, { account_id:, key: }]
       WITH ins AS (
         INSERT INTO "release_filetypes"
           (
@@ -228,7 +231,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key }]
+    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key.downcase.strip }]
       WITH ins AS (
         INSERT INTO "release_platforms"
           (
@@ -278,7 +281,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key }]
+    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key.downcase.strip }]
       WITH ins AS (
         INSERT INTO "release_arches"
           (

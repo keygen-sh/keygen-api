@@ -23,6 +23,8 @@ class ReleaseArch < ApplicationRecord
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id }
 
+  before_create -> { self.key = key.downcase.strip }
+
   scope :for_product, -> id {
     joins(:products).where(products: { id: id }).distinct
   }

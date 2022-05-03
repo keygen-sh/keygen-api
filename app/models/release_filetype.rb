@@ -16,4 +16,6 @@ class ReleaseFiletype < ApplicationRecord
   validates :key,
     presence: true,
     uniqueness: { message: 'already exists', scope: :account_id }
+
+  before_create -> { self.key = key.downcase.strip }
 end
