@@ -182,6 +182,7 @@ Rails.application.routes.draw do
         resources "users", only: [:index, :show]
         resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
         resources "platforms", only: [:index, :show]
+        resources "arches", only: [:index, :show]
         resources "releases", only: [:index, :show]
         resources "channels", only: [:index, :show]
         member do
@@ -233,6 +234,7 @@ Rails.application.routes.draw do
 
     resources "artifacts", constraints: { id: /.*/ }
     resources "platforms", only: [:index, :show]
+    resources "arches", only: [:index, :show]
     resources "channels", only: [:index, :show]
 
     resources "entitlements"

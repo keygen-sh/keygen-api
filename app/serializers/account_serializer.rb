@@ -50,6 +50,11 @@ class AccountSerializer < BaseSerializer
       @url_helpers.v1_account_platforms_path @object
     end
   end
+  relationship :arches do
+    link :related do
+      @url_helpers.v1_account_arches_path @object
+    end
+  end
   relationship :channels do
     link :related do
       @url_helpers.v1_account_channels_path @object

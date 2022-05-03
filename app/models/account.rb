@@ -28,6 +28,7 @@ class Account < ApplicationRecord
   has_many :license_entitlements
   has_many :releases
   has_many :release_platforms
+  has_many :release_arches
   has_many :release_filetypes
   has_many :release_channels
   has_many :release_entitlement_constraints
