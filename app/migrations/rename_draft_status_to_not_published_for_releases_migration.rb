@@ -9,17 +9,9 @@ class RenameDraftStatusToNotPublishedForReleasesMigration < BaseMigration
       account_ids = body[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
       release_ids = body[:data].collect { _1[:id] }.compact.uniq
 
-      artifacts = ReleaseArtifact.distinct_on(:release_id)
-                                 .select(:id, :release_id)
-                                 .where(account_id: account_ids, release_id: release_ids)
-                                 .reorder(:release_id, created_at: :desc)
-                                 .group_by(&:release_id)
-
       body[:data].each do |release|
         case release
         in type: /\Areleases\z/, id: release_id, attributes: { status: 'DRAFT' }
-          artifact = artifacts[release_id]&.first
-
           release[:attributes].tap do |attrs|
             attrs[:status] = 'NOT_PUBLISHED'
           end
