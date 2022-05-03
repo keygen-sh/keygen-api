@@ -81,7 +81,7 @@ module Api::V1::Releases::Relationships
     def set_release
       scoped_releases = policy_scope(current_account.releases)
 
-      @release = FindByAliasService.call(scope: scoped_releases, identifier: params[:release_id], aliases: :filename)
+      @release = scoped_releases.find(params[:release_id])
       authorize release, :show?
 
       Current.resource = release

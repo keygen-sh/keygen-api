@@ -81,7 +81,7 @@ Feature: Create release
       {
         "artifact": {
           "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-           "data": { "type": "artifacts", "id": "$artifacts[0]" }
+          "data": { "type": "artifacts", "id": "$artifacts[0]" }
         }
       }
       """
@@ -153,7 +153,7 @@ Feature: Create release
       {
         "artifact": {
           "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-           "data": { "type": "artifacts", "id": "$artifacts[0]" }
+          "data": { "type": "artifacts", "id": "$artifacts[0]" }
         }
       }
       """
