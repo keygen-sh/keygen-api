@@ -5,19 +5,18 @@ class RenameDraftStatusToNotPublishedForReleaseMigration < BaseMigration
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
-    in data: { type: /\Areleases\z/, id: release_id, attributes: { status: 'DRAFT' }, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } } } }
-      body[:data][:attributes].tap do |attrs|
-        attrs[:status] = 'NOT_PUBLISHED'
-      end
+    in data: { type: /\Areleases\z/, attributes: { status: 'DRAFT' } }
+      body[:data][:attributes][:status] = 'NOT_PUBLISHED'
     else
     end
   end
 
-  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'show' | 'create' | 'upsert' | 'update' } do |res|
-    data = JSON.parse(res.body, symbolize_names: true)
+  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
+                                                                 action: 'show' | 'create' | 'update' } do |res|
+    body = JSON.parse(res.body, symbolize_names: true)
 
-    migrate!(data)
+    migrate!(body)
 
-    res.body = JSON.generate(data)
+    res.body = JSON.generate(body)
   end
 end

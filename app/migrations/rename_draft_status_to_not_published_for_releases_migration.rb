@@ -5,16 +5,11 @@ class RenameDraftStatusToNotPublishedForReleasesMigration < BaseMigration
 
   migrate if: -> body { body in data: [*] } do |body|
     case body
-    in data: [*, { type: /\Areleases\z/, id: _, attributes: { status: 'DRAFT' }, relationships: { account: { data: { type: /\Aaccounts\z/, id: _ } } } }, *]
-      account_ids = body[:data].collect { _1[:relationships][:account][:data][:id] }.compact.uniq
-      release_ids = body[:data].collect { _1[:id] }.compact.uniq
-
+    in data: [*, { type: /\Areleases\z/, attributes: { status: 'DRAFT' } }, *]
       body[:data].each do |release|
         case release
-        in type: /\Areleases\z/, id: release_id, attributes: { status: 'DRAFT' }
-          release[:attributes].tap do |attrs|
-            attrs[:status] = 'NOT_PUBLISHED'
-          end
+        in type: /\Areleases\z/, attributes: { status: 'DRAFT' }
+          release[:attributes][:status] = 'NOT_PUBLISHED'
         else
         end
       end
@@ -22,11 +17,12 @@ class RenameDraftStatusToNotPublishedForReleasesMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases', action: 'index' } do |res|
-    data = JSON.parse(res.body, symbolize_names: true)
+  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
+                                                                 action: 'index' } do |res|
+    body = JSON.parse(res.body, symbolize_names: true)
 
-    migrate!(data)
+    migrate!(body)
 
-    res.body = JSON.generate(data)
+    res.body = JSON.generate(body)
   end
 end
