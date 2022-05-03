@@ -191,9 +191,6 @@ Rails.application.routes.draw do
     end
 
     resources "releases", constraints: { id: /.*/ } do
-      collection do
-        put "/", to: "releases#upsert", as: "upsert"
-      end
       scope module: "releases/relationships" do
         resources "entitlements", only: [:index, :show]
         resources "constraints", only: [:index, :show] do
@@ -204,6 +201,7 @@ Rails.application.routes.draw do
         end
         resources "artifacts", only: [:index, :show]
         resource "product", only: [:show]
+
         version_constraint "<=1.0" do
           scope module: :v1x0 do
             resource "artifact", only: [:show, :destroy], as: :v1_0_artifact do
@@ -212,6 +210,7 @@ Rails.application.routes.draw do
           end
         end
       end
+
       version_constraint "<=1.0" do
         member do
           scope "actions", module: "releases/actions" do
@@ -221,6 +220,8 @@ Rails.application.routes.draw do
           end
         end
         collection do
+          put "/", to: "releases#create", as: "upsert"
+
           scope "actions", module: "releases/actions" do
             scope module: :v1x0 do
               get "upgrade", to: "upgrades#check_for_upgrade_by_query"
