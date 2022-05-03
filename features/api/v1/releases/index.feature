@@ -498,7 +498,7 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 5 "releases"
 
-  Scenario: License attempts to retrieve all unpublished releases
+  Scenario: License attempts to retrieve all draft releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the first "product" has the following attributes:

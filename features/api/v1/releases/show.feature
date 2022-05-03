@@ -71,7 +71,7 @@ Feature: Show release
       }
       """
 
-  Scenario: Admin retrieves an unpublished release for their account by ID (v1)
+  Scenario: Admin retrieves a draft release for their account by ID (v1)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"

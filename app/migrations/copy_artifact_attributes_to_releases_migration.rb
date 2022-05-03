@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class ArtifactAttributesToReleasesMigration < BaseMigration
-  description %(moves Artifact attributes to a collection of Releases)
+class CopyArtifactAttributesToReleasesMigration < BaseMigration
+  description %(copies Artifact attributes onto a collection of Releases)
 
   migrate if: -> body { body in data: [*] } do |body|
     case body

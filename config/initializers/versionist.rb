@@ -13,11 +13,13 @@ Versionist.configure do |config|
 
   config.current_version = KEYGEN_API_VERSION
   config.versions        = {
-    '1.0' => [
-      :artifact_has_many_to_has_one_for_releases_migration,
-      :artifact_has_many_to_has_one_for_release_migration,
-      :artifact_attributes_to_releases_migration,
-      :artifact_attributes_to_release_migration,
+    '1.0' => %i[
+      artifact_has_many_to_has_one_for_releases_migration
+      artifact_has_many_to_has_one_for_release_migration
+      copy_artifact_attributes_to_releases_migration
+      copy_artifact_attributes_to_release_migration
+      rename_draft_status_to_not_published_for_releases_migration
+      rename_draft_status_to_not_published_for_release_migration
     ],
   }
 end
