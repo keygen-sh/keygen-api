@@ -53,8 +53,14 @@ class Release < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  # FIXME(ezekg) For v1.0 backwards compatibility
+  has_one :artifact,
+    class_name: 'ReleaseArtifact',
+    inverse_of: :release,
+    dependent: :delete
+
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
-  accepts_nested_attributes_for :artifacts, limit: 1
+  accepts_nested_attributes_for :artifact
   accepts_nested_attributes_for :channel
 
   before_create :enforce_release_limit_on_account!
@@ -188,27 +194,19 @@ class Release < ApplicationRecord
 
   # FIXME(ezekg) Setters backwards compatibility. Remove when no longer in use.
   def platform=(key)
-    @artifact ||= artifacts.new(account_id:)
-
-    @artifact.assign_attributes(platform_attributes: { key: })
+    assign_attributes(artifact_attributes: { platform_attributes: { key: } })
   end
 
   def filetype=(key)
-    @artifact ||= artifacts.new(account_id:)
-
-    @artifact.assign_attributes(filetype_attributes: { key: })
+    assign_attributes(artifact_attributes: { filetype_attributes: { key: } })
   end
 
   def filename=(filename)
-    @artifact ||= artifacts.new(account_id:)
-
-    @artifact.assign_attributes(filename:)
+    assign_attributes(artifact_attributes: { filename: })
   end
 
   def filesize=(filesize)
-    @artifact ||= artifacts.new(account_id:)
-
-    @artifact.assign_attributes(filesize:)
+    assign_attributes(artifact_attributes: { filesize: })
   end
 
   def s3_object_key
