@@ -16,6 +16,8 @@ Versionist.configure do |config|
     '1.0' => [
       :artifact_has_many_to_has_one_for_releases_migration,
       :artifact_has_many_to_has_one_for_release_migration,
+      :artifact_attributes_to_releases_migration,
+      :artifact_attributes_to_release_migration,
     ],
   }
 end
