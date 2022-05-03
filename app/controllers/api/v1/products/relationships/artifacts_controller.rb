@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      artifacts = apply_pagination(policy_scope(apply_scopes(product.release_artifacts)))
+      artifacts = apply_pagination(policy_scope(apply_scopes(product.release_artifacts)).preload(:platform, :arch, :filetype))
       authorize artifacts
 
       render jsonapi: artifacts

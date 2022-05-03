@@ -5,6 +5,7 @@ module Api::V1
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
+    has_scope(:arch) { |c, s, v| s.for_arch(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:version) { |c, s, v| s.with_version(v) }
@@ -20,7 +21,7 @@ module Api::V1
       # We're applying scopes and preloading after the policy scope because
       # our policy scope may include a UNION, and scopes/preloading need to
       # be applied after the UNION query has been performed.
-      releases = apply_pagination(apply_scopes(policy_scope(current_account.releases)).preload(:artifacts, :platform, :filetype, :channel))
+      releases = apply_pagination(apply_scopes(policy_scope(current_account.releases)).preload(:channel))
       authorize releases
 
       render jsonapi: releases

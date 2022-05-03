@@ -83,11 +83,7 @@ class Release < ApplicationRecord
 
   validates :version,
     presence: true,
-    semver: true,
-    uniqueness: {
-      scope: %i[account_id product_id release_channel_id],
-      message: 'version already exists',
-    }
+    semver: true
 
   validates :status,
     presence: true,
@@ -127,9 +123,19 @@ class Release < ApplicationRecord
     case platform
     when ReleasePlatform,
          UUID_RE
-      where(platform: platform)
+      joins(:platforms).where(platforms: { id: platform })
     else
-      joins(:platform).where(platform: { key: platform.to_s })
+      joins(:platforms).where(platforms: { key: platform.to_s })
+    end
+  }
+
+  scope :for_arch, -> arch {
+    case arch
+    when ReleaseArch,
+         UUID_RE
+      joins(:arches).where(arches: { id: arch })
+    else
+      joins(:arches).where(arches: { key: arch.to_s })
     end
   }
 
@@ -137,9 +143,9 @@ class Release < ApplicationRecord
     case filetype
     when ReleaseFiletype,
          UUID_RE
-      where(filetype: filetype)
+      joins(:filetypes).where(filetypes: { id: filetype })
     else
-      joins(:filetype).where(filetype: { key: filetype.to_s })
+      joins(:filetypes).where(filetypes: { key: filetype.to_s })
     end
   }
 
@@ -253,6 +259,10 @@ class Release < ApplicationRecord
   def validate_associated_records_for_channel
     return unless
       channel.present?
+
+    # Clear channel if the key is empty e.g. "" or nil
+    return self.channel = nil unless
+      channel.key?
 
     case
     when pre_release?

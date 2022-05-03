@@ -132,8 +132,14 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
         **hash,
       )
     when :artifact
-      hash[:artifact_attributes] = { key: hash.delete(:platform) }
+      hash[:platform_attributes] = { key: hash.delete(:platform) }
+      hash[:arch_attributes]     = { key: hash.delete(:arch)     }
       hash[:filetype_attributes] = { key: hash.delete(:filetype) }
+
+      create(:artifact,
+        account: @account,
+        **hash,
+      )
     else
       create(factory,
         account: @account,
