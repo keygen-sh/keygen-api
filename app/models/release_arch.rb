@@ -6,7 +6,7 @@ class ReleaseArch < ApplicationRecord
   include Pageable
 
   belongs_to :account,
-    inverse_of: :release_platforms
+    inverse_of: :release_arches
   has_many :artifacts,
     class_name: 'ReleaseArtifact',
     inverse_of: :arch
