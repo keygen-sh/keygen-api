@@ -13,7 +13,7 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
     end
   end
 
-  context 'the errors contain a ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
+  context 'the errors contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
     it 'should migrate the error' do
       migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
       data    = {
@@ -29,6 +29,14 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
               about: 'https://keygen.sh/docs/api/releases/#releases-object-relationships-artifact',
             },
           },
+          {
+            title: 'Unprocessable resource',
+            detail: 'must be a valid version',
+            code: 'VERSION_INVALID',
+            source: {
+              pointer: '/data/attributes/version',
+            },
+          },
         ],
       }
 
@@ -42,12 +50,18 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
               pointer: '/data/attributes/filename',
             },
           ),
+          include(
+            code: 'VERSION_INVALID',
+            source: {
+              pointer: '/data/attributes/version',
+            },
+          ),
         ],
       )
     end
   end
 
-  context 'the errors do not contain a ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
+  context 'the errors do not contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
     it 'should migrate the error' do
       migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
       data    = {
