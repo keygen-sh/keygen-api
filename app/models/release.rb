@@ -69,7 +69,7 @@ class Release < ApplicationRecord
     dependent: :delete
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
-  accepts_nested_attributes_for :artifact
+  accepts_nested_attributes_for :artifact, update_only: true, reject_if: :persisted?
   accepts_nested_attributes_for :channel
 
   before_validation -> { self.status ||= 'DRAFT' }

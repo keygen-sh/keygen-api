@@ -49,49 +49,6 @@ module Api::V1
       end
     end
 
-    def upsert
-      # NOTE(ezekg) Upserts use unique index: account_id, product_id, filename
-      conditions = release_params.slice(:product_id, :filename)
-
-      # Attempt to avoid race conditions for concurrent upserts by retrying
-      # conflict errors once
-      begin
-        retries ||= 0
-        release   = current_account.releases.find_or_initialize_by(conditions)
-        authorize release
-
-        release.update!(release_params)
-      rescue ActiveRecord::RecordInvalid => e
-        has_conflict_error = e.record.errors.any? { |e| e.type == :taken }
-        raise if !has_conflict_error ||
-                 (retries += 1) > 1
-
-        retry
-      rescue ActiveRecord::RecordNotUnique
-        raise if (retries += 1) > 1
-
-        retry
-      end
-
-      if release.previously_new_record?
-        BroadcastEventService.call(
-          event: 'release.created',
-          account: current_account,
-          resource: release,
-        )
-
-        render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
-      else
-        BroadcastEventService.call(
-          event: 'release.replaced',
-          account: current_account,
-          resource: release,
-        )
-
-        render jsonapi: release, status: :ok
-      end
-    end
-
     def update
       authorize release
 
@@ -140,64 +97,17 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
-              [:channel_attributes, { key: }]
-            }
-            param :version, type: :string
-            param :metadata, type: :hash, allow_non_scalars: true, optional: true
-            if current_api_version == '1.0'
-              param :filename, type: :string, optional: true
-              param :filesize, type: :integer, optional: true
-              param :filetype, type: :string, optional: true
-              param :platform, type: :string, optional: true
-              param :description, type: :string, optional: true
-              param :signature, type: :string, optional: true
-              param :checksum, type: :string, optional: true
-            end
-          end
-          param :relationships, type: :hash do
-            param :product, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[product products]
-                param :id, type: :string
-              end
-            end
-            param :constraints, type: :hash, optional: true do
-              param :data, type: :array do
-                items type: :hash do
-                  param :type, type: :string, inclusion: %w[constraint constraints]
-                  param :relationships, type: :hash do
-                    param :entitlement, type: :hash do
-                      param :data, type: :hash do
-                        param :type, type: :string, inclusion: %w[entitlement entitlements]
-                        param :id, type: :string
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-
-      on :upsert do
-        param :data, type: :hash do
-          param :type, type: :string, inclusion: %w[release releases]
-          param :attributes, type: :hash do
-            param :name, type: :string, optional: true, allow_nil: true
-            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
-              [:channel_attributes, { key: }]
-            }
-            param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true
+            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
+              [:channel_attributes, { key: }]
+            }
+            param :version, type: :string
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_api_version == '1.0'
               param :filename, type: :string, optional: true
               param :filesize, type: :integer, optional: true
               param :filetype, type: :string, optional: true
               param :platform, type: :string, optional: true
-              param :description, type: :string, optional: true
               param :signature, type: :string, optional: true
               param :checksum, type: :string, optional: true
             end

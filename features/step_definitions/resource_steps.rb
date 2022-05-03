@@ -125,14 +125,15 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
         hash[:constraints_attributes] = entitlements
       end
 
-      hash[:platform_attributes] = { key: hash.delete(:platform) }
-      hash[:filetype_attributes] = { key: hash.delete(:filetype) }
       hash[:channel_attributes]  = { key: hash.delete(:channel) }
 
       create(:release,
         account: @account,
         **hash,
       )
+    when :artifact
+      hash[:artifact_attributes] = { key: hash.delete(:platform) }
+      hash[:filetype_attributes] = { key: hash.delete(:filetype) }
     else
       create(factory,
         account: @account,
@@ -417,6 +418,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([
       Plan.send(named_idx)
     when "process"
       @account.machine_processes.send(named_idx)
+    when "artifact"
+      @account.release_artifacts.send(named_idx)
     else
       @account.send(resource.pluralize.underscore).send(named_idx)
     end
@@ -436,6 +439,8 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
       Plan.send(named_idx)
     when "process"
       @account.machine_processes.send(named_idx)
+    when "artifact"
+      @account.release_artifacts.send(named_idx)
     else
       @account.send(resource.pluralize.underscore).send(named_idx)
     end

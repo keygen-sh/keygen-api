@@ -89,6 +89,78 @@ Feature: Create release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin upserts a new release for their account
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Keygen v1.0",
+            "filename": "Keygen-1.0.0.dmg",
+            "filetype": "dmg",
+            "filesize": 209715200,
+            "platform": "darwin",
+            "channel": "stable",
+            "version": "1.0.0",
+            "metadata": {
+              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+            }
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Keygen v1.0",
+        "filename": "Keygen-1.0.0.dmg",
+        "filetype": "dmg",
+        "filesize": 209715200,
+        "platform": "darwin",
+        "channel": "stable",
+        "status": "NOT_PUBLISHED",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        },
+        "metadata": {
+          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifact": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
+           "data": { "type": "artifacts", "id": "$artifacts[0]" }
+        }
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a new release for their account (free tier, limit not reached)
     Given the account "test1" is on a free tier
     And the account "test1" is subscribed
@@ -282,9 +354,7 @@ Feature: Create release
     And the current account has 1 "release" for an existing "product"
     And the first "release" has the following attributes:
       """
-      {
-        "version": "1.0.0"
-      }
+      { "version": "1.0.0" }
       """
     And I use an authentication token
     And I use API version "1.0"
@@ -329,70 +399,16 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a duplicate release (by version, with malicious platform)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "webhook-endpoints"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
-    And the current account has the following "release" rows:
-      | product_id                           | version      | filename                   | filetype | platform       | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Product-1.0.0.dmg.blockmap | blockmap | %{injection}   | stable   |
-    And I use an authentication token
-    And I use API version "1.0"
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Duplicate Release",
-            "filename": "Product-1.0.0.zip.blockmap",
-            "filetype": ".blockmap",
-            "platform": "%{injection}",
-            "channel": "stable",
-            "version": "1.0.0"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "6198261a-48b5-4445-a045-9fed4afc7735"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "version already exists for '{injection}' platform with 'blockmap' filetype on 'stable' channel",
-        "code": "VERSION_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/version"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
-    And sidekiq should have 1 "request-log" job
-
   Scenario: Admin creates a duplicate release (by filename)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
       """
-      {
-        "filename": "Product-1.0.0.dmg"
-      }
+      { "filename": "Product-1.0.0.dmg" }
       """
     And I use an authentication token
     And I use API version "1.0"
@@ -420,21 +436,9 @@ Feature: Create release
         }
       }
       """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    Then the response status should be "201"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates an rc release
@@ -1281,20 +1285,16 @@ Feature: Create release
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
-        }
+        "filename": "gems/latest_specs.4.8.gz",
+        "platform": null
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release with a null filetype
@@ -1336,18 +1336,15 @@ Feature: Create release
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
-        }
+        "filename": "gems/specs.4.8",
+        "filetype": null,
+        "platform": null
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" jobs
+    And sidekiq should have 1 "metric" jobs
     And sidekiq should have 1 "request-log" job
