@@ -6,9 +6,6 @@ class RenameDraftStatusToNotPublishedForReleaseMigration < BaseMigration
   migrate if: -> body { body in data: { ** } } do |body|
     case body
     in data: { type: /\Areleases\z/, id: release_id, attributes: { status: 'DRAFT' }, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } } } }
-      artifact = ReleaseArtifact.preload(:platform, :filetype)
-                                .find_by(release_id:, account_id:)
-
       body[:data][:attributes].tap do |attrs|
         attrs[:status] = 'NOT_PUBLISHED'
       end
