@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class ArtifactAttributesToReleaseMigration < BaseMigration
-  description %(moves Artifact attributes to a Release)
+class CopyArtifactAttributesToReleaseMigration < BaseMigration
+  description %(copies Artifact attributes onto a Release)
 
   migrate if: -> body { body in data: { ** } } do |body|
     case body
-    in data: { type: /\Areleases\z/, id: release_id, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } }, artifacts: { ** } } }
+    in data: { type: /\Areleases\z/, id: release_id, attributes: { ** }, relationships: { account: { data: { type: /\Aaccounts\z/, id: account_id } } } }
       artifact = ReleaseArtifact.preload(:platform, :filetype)
                                 .find_by(release_id:, account_id:)
 

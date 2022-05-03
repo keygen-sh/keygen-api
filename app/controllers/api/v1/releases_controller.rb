@@ -33,7 +33,6 @@ module Api::V1
     end
 
     def create
-      puts(release_params:)
       release = current_account.releases.new release_params
       authorize release
 
@@ -141,18 +140,20 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :filename, type: :string
-            param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, optional: true
-            param :platform, type: :string, optional: true
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
               [:channel_attributes, { key: v.downcase.presence }]
             }
             param :version, type: :string
-            param :description, type: :string, optional: true
-            param :signature, type: :string, optional: true
-            param :checksum, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
+            if current_api_version == '1.0'
+              param :filename, type: :string, optional: true
+              param :filesize, type: :integer, optional: true
+              param :filetype, type: :string, optional: true
+              param :platform, type: :string, optional: true
+              param :description, type: :string, optional: true
+              param :signature, type: :string, optional: true
+              param :checksum, type: :string, optional: true
+            end
           end
           param :relationships, type: :hash do
             param :product, type: :hash do
@@ -185,22 +186,21 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
-            param :filename, type: :string
-            param :filesize, type: :integer, optional: true, allow_nil: true
-            param :filetype, type: :string, optional: true, transform: -> (k, v) {
-              [:filetype_attributes, { key: v.downcase.presence }]
-            }
-            param :platform, type: :string, optional: true, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase.presence }]
-            }
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
               [:channel_attributes, { key: v.downcase.presence }]
             }
             param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true
-            param :signature, type: :string, optional: true, allow_nil: true
-            param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
+            if current_api_version == '1.0'
+              param :filename, type: :string, optional: true
+              param :filesize, type: :integer, optional: true
+              param :filetype, type: :string, optional: true
+              param :platform, type: :string, optional: true
+              param :description, type: :string, optional: true
+              param :signature, type: :string, optional: true
+              param :checksum, type: :string, optional: true
+            end
           end
           param :relationships, type: :hash do
             param :product, type: :hash do
@@ -234,11 +234,13 @@ module Api::V1
           param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
-            param :filesize, type: :integer, optional: true, allow_nil: true
             param :description, type: :string, optional: true, allow_nil: true
-            param :signature, type: :string, optional: true, allow_nil: true
-            param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
+            if current_api_version == '1.0'
+              param :filesize, type: :integer, optional: true
+              param :signature, type: :string, optional: true
+              param :checksum, type: :string, optional: true
+            end
           end
         end
       end

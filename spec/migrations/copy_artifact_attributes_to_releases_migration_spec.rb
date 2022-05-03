@@ -7,10 +7,10 @@ require 'sidekiq/testing'
 
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
-describe ArtifactAttributesToReleasesMigration do
+describe CopyArtifactAttributesToReleasesMigration do
   let(:account)                  { create(:account) }
   let(:product)                  { create(:product, account:) }
-  let(:release_without_artifact) { create(:release, :unpublished, account:, product:) }
+  let(:release_without_artifact) { create(:release, :draft, account:, product:) }
   let(:release_with_artifact)    { create(:release, :published, account:, product:) }
 
   before do
@@ -27,12 +27,12 @@ describe ArtifactAttributesToReleasesMigration do
     Versionist.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
-        '1.0' => [ArtifactAttributesToReleasesMigration],
+        '1.0' => [CopyArtifactAttributesToReleasesMigration],
       }
     end
   end
 
-  it 'should migrate releases artifact relationships' do
+  it 'should migrate release attributes' do
     migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
     data     = Keygen::JSONAPI.render([
       release_without_artifact,

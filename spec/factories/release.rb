@@ -10,7 +10,7 @@ FactoryBot.define do
     artifacts { [] }
     channel { nil }
 
-    unpublished
+    draft
 
     after :build do |release, evaluator|
       release.account  ||= evaluator.account.presence
@@ -26,14 +26,16 @@ FactoryBot.define do
         end
     end
 
-    trait :unpublished do
+    trait :draft do
       after :build do |release, evaluator|
+        release.status = 'DRAFT'
         release.artifacts = []
       end
     end
 
     trait :published do
       after :build do |release, evaluator|
+        release.status = 'PUBLISHED'
         release.artifacts << build(:release_artifact,
           account: release.account,
           product: release.product,

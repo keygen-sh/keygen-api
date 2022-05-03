@@ -172,7 +172,7 @@ describe ReleaseUpgradeService do
     end
   end
 
-  context 'when there is an unpublished upgrade' do
+  context 'when there is a draft upgrade' do
     let(:platform) { create(:release_platform, key: 'win', account: account) }
     let(:filetype) { create(:release_filetype, key: 'exe', account: account) }
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
@@ -194,7 +194,7 @@ describe ReleaseUpgradeService do
     let!(:next_release) {
       create(
         :release,
-        :unpublished,
+        :draft,
         platform: platform,
         filename: "#{SecureRandom.hex}.#{filetype.key}",
         filetype: filetype,

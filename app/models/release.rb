@@ -6,6 +6,12 @@ class Release < ApplicationRecord
   include Pageable
   include Diffable
 
+  STATUSES = %w[
+    DRAFT
+    PUBLISHED
+    YANKED
+  ]
+
   belongs_to :account,
     inverse_of: :releases
   belongs_to :product,
@@ -63,6 +69,7 @@ class Release < ApplicationRecord
   accepts_nested_attributes_for :artifact
   accepts_nested_attributes_for :channel
 
+  before_validation -> { self.status ||= 'DRAFT' }
   before_create :enforce_release_limit_on_account!
 
   validates :product,
@@ -77,6 +84,13 @@ class Release < ApplicationRecord
     uniqueness: {
       scope: %i[account_id product_id release_channel_id],
       message: 'version already exists on channel',
+    }
+
+  validates :status,
+    presence: true,
+    inclusion: {
+      message: 'unsupported status',
+      in: STATUSES,
     }
 
   scope :for_product, -> product {
@@ -192,7 +206,11 @@ class Release < ApplicationRecord
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
 
-  # FIXME(ezekg) Setters backwards compatibility. Remove when no longer in use.
+  # FIXME(ezekg) For v1.0 backwards compatibility
+  delegate :s3_object_key,
+    to: :artifact
+
+  # FIXME(ezekg) Setters for v1.0 backwards compatibility
   def platform=(key)
     assign_attributes(artifact_attributes: { platform_attributes: { key: } })
   end
@@ -209,23 +227,16 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { filesize: })
   end
 
-  def s3_object_key
-    "artifacts/#{account_id}/#{id}/#{filename}"
+  def signature=(signature)
+    assign_attributes(artifact_attributes: { signature: })
+  end
+
+  def checksum=(checksum)
+    assign_attributes(artifact_attributes: { checksum: })
   end
 
   def yanked?
     yanked_at.present?
-  end
-
-  def status
-    case
-    when yanked?
-      :YANKED
-    when artifacts.empty?
-      :NOT_PUBLISHED
-    else
-      :PUBLISHED
-    end
   end
 
   def semver

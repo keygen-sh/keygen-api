@@ -10,7 +10,7 @@ DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 describe ArtifactHasManyToHasOneForReleasesMigration do
   let(:account)                  { create(:account) }
   let(:product)                  { create(:product, account:) }
-  let(:release_without_artifact) { create(:release, :unpublished, account:, product:) }
+  let(:release_without_artifact) { create(:release, :draft, account:, product:) }
   let(:release_with_artifact)    { create(:release, :published, account:, product:) }
 
   before do
