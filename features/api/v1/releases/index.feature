@@ -32,13 +32,21 @@ Feature: List releases
       | id                                   | name     |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename                  | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
+      | id                                   | product_id                           | version      | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta     |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta     |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg        | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg        | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg        | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-beta.2.exe | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
@@ -64,8 +72,7 @@ Feature: List releases
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "releases"
-    And the first "release" has an artifact that is uploaded
-    And the second "release" has an artifact that is nil
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases"
@@ -92,8 +99,7 @@ Feature: List releases
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "releases"
-    And the first "release" has an artifact that is uploaded
-    And the second "release" has an artifact that is nil
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases"
@@ -125,13 +131,21 @@ Feature: List releases
       | id                                   | name     |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename                  | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
+      | id                                   | product_id                           | version      | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta     |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta     |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg        | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg        | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg        | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-beta.2.exe | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta&platform=win32"
     Then the response status should be "200"
@@ -145,13 +159,21 @@ Feature: List releases
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename                  | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
+      | id                                   | product_id                           | version      | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1 | beta     |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2 | beta     |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg        | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg        | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg        | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-beta.2.exe | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?product=121f9da8-dbe6-4d51-ac6c-dbbb024725ec"
     Then the response status should be "200"
@@ -165,16 +187,29 @@ Feature: List releases
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | rc       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | alpha    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | alpha    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | beta     |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | beta     |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | dev      |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-alpha.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | Test-App.1.0.0-beta.2.exe  | exe      | win32    |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | Test-App.1.0.0-dev.1.exe   | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=stable"
     Then the response status should be "200"
@@ -188,39 +223,65 @@ Feature: List releases
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | rc       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | alpha    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | alpha    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | beta     |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | beta     |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | dev      |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-alpha.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | Test-App.1.0.0-beta.2.exe  | exe      | win32    |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | Test-App.1.0.0-dev.1.exe   | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the JSON response should be an array with 7 "releases"
 
   Scenario: Admin retrieves all rc releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
+      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    | rc       |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | rc       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | alpha    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | alpha    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | beta     |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | beta     |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | dev      |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-alpha.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | Test-App.1.0.0-beta.2.exe  | exe      | win32    |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | Test-App.1.0.0-dev.1.exe   | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=rc"
     Then the response status should be "200"
@@ -234,20 +295,33 @@ Feature: List releases
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | rc       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | alpha    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | alpha    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | beta     |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | beta     |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | dev      |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-alpha.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | Test-App.1.0.0-beta.2.exe  | exe      | win32    |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | Test-App.1.0.0-dev.1.exe   | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=alpha"
     Then the response status should be "200"
-    And the JSON response should be an array with 8 "releases"
+    And the JSON response should be an array with 9 "releases"
 
   Scenario: Admin retrieves all dev releases for their account
     Given I am an admin of account "test1"
@@ -257,15 +331,29 @@ Feature: List releases
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Mac App |
       | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | Win App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | Test-App-1.0.1.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | Test-App.1.0.0-dev.1.exe   | exe      | win32    | dev      |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | Test-App.1.0.0-alpha.1.exe | exe      | win32    | alpha    |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | Test-App.1.0.0-beta.2.exe  | exe      | win32    | beta     |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-rc.1    | rc       |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.1 | alpha    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-alpha.2 | alpha    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.1  | beta     |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-beta.2  | beta     |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | 121f9da8-dbe6-4d51-ac6c-dbbb024725ec | 1.0.0-dev.1   | dev      |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App-1.2.0-rc.1.dmg    | dmg      | macos    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-alpha.1.exe | exe      | win32    |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | ab9a4dcd-9ef8-48f7-985e-53534540f73f | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 2d2e4756-0ff8-4142-8132-762f836a0c76 | Test-App.1.0.0-beta.2.exe  | exe      | win32    |
+      | 7cad471e-cc3c-4378-847e-8a5b821d0ca1 | Test-App.1.0.0-dev.1.exe   | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=dev"
     Then the response status should be "200"
@@ -278,13 +366,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App.1.0.0.exe         | exe      | win32    | stable   |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
@@ -297,13 +393,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App.1.0.0.exe         | exe      | win32    | stable   |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
     Then the response status should be "200"
@@ -316,12 +420,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App.1.0.0.exe         | exe      | win32    | stable   |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=exe"
     Then the response status should be "200"
@@ -334,12 +447,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=dmg"
     Then the response status should be "200"
@@ -352,12 +474,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?platform=macos"
     Then the response status should be "200"
@@ -370,16 +501,25 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?platform=win32"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the JSON response should be an array with 3 "releases"
 
   Scenario: Admin retrieves all linux releases for their account
     Given I am an admin of account "test1"
@@ -388,13 +528,21 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |
-    And I use an authentication token
+      | id                                   | product_id                           | version       | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                   | filetype | platform |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
+      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     When I send a GET request to "/accounts/test1/releases?platform=linux"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
@@ -406,13 +554,13 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  | yanked_at                |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.exe         | exe      | win32    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |                          |
+      | product_id                           | version       | channel | yanked_at                |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=false"
     Then the response status should be "200"
@@ -425,13 +573,13 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | filename                   | filetype | platform | channel  | yanked_at                |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.dmg         | dmg      | macos    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | Test-App-1.1.0.dmg         | dmg      | macos    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    | beta     | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | Test-App-1.0.0.exe         | exe      | win32    | stable   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | Test-App.1.0.0-alpha.2.exe | exe      | win32    | alpha    |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | Test-App.1.0.0-beta.1.exe  | exe      | win32    | beta     |                          |
+      | product_id                           | version       | channel | yanked_at                |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=true"
     Then the response status should be "200"
@@ -517,7 +665,7 @@ Feature: List releases
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?status=NOT_PUBLISHED"
+    When I send a GET request to "/accounts/test1/releases?status=DRAFT"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 
