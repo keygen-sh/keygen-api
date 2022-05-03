@@ -140,8 +140,8 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
-            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
-              [:channel_attributes, { key: v.downcase.presence }]
+            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
+              [:channel_attributes, { key: }]
             }
             param :version, type: :string
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
@@ -186,8 +186,8 @@ module Api::V1
           param :type, type: :string, inclusion: %w[release releases]
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
-            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (k, v) {
-              [:channel_attributes, { key: v.downcase.presence }]
+            param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
+              [:channel_attributes, { key: }]
             }
             param :version, type: :string
             param :description, type: :string, optional: true, allow_nil: true

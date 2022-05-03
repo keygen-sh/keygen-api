@@ -21,6 +21,8 @@ class ReleaseChannel < ApplicationRecord
     uniqueness: { message: 'already exists', scope: :account_id },
     inclusion: { in: %w[stable rc beta alpha dev] }
 
+  before_create -> { self.key = key.downcase.strip }
+
   scope :for_product, -> id {
     joins(:products).where(products: { id: id }).distinct
   }

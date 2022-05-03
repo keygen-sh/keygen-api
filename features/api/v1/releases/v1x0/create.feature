@@ -81,7 +81,7 @@ Feature: Create release
       {
         "artifact": {
           "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-          "data": null
+           "data": { "type": "artifacts", "id": "$artifacts[0]" }
         }
       }
       """
@@ -318,7 +318,7 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "version already exists for 'darwin' platform with 'dmg' filetype on 'stable' channel",
+        "detail": "version already exists",
         "code": "VERSION_TAKEN",
         "source": {
           "pointer": "/data/attributes/version"
