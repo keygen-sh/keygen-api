@@ -21,7 +21,7 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      release = FindByAliasService.call(scope: product.releases, identifier: params[:id], aliases: :filename)
+      release = product.releases.find(params[:id])
       authorize release
 
       render jsonapi: release

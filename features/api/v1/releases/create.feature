@@ -55,7 +55,7 @@ Feature: Create release
       {
         "name": "Launch Release",
         "channel": "stable",
-        "status": "NOT_PUBLISHED",
+        "status": "DRAFT",
         "version": "1.0.0",
         "semver": {
           "major": 1,
@@ -83,92 +83,26 @@ Feature: Create release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a new release for their account (v1.1)
+  Scenario: Admin upserts a new release for their account
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
     And the current account has 1 "product"
-    And the current account has 3 "releases"
+    And the current account has 14 "releases"
     And I am an admin of account "test1"
     And I use an authentication token
-    And I use API version "1.1"
-    When I send a POST request to "/accounts/test1/releases" with the following:
+    When I send a PUT request to "/accounts/test1/releases" with the following:
       """
       {
         "data": {
           "type": "releases",
           "attributes": {
-            "name": "Keygen v1.1",
-            "channel": "stable",
-            "version": "1.1.0",
-            "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-            }
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
-      """
-      {
-        "name": "Keygen v1.1",
-        "channel": "stable",
-        "status": "NOT_PUBLISHED",
-        "version": "1.1.0",
-        "semver": {
-          "major": 1,
-          "minor": 1,
-          "patch": 0,
-          "prerelease": null,
-          "build": null
-        },
-        "metadata": {
-          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-        }
-      }
-      """
-    And the JSON response should be a "release" with the following relationships:
-      """
-      {
-        "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[3]/artifacts" }
-        }
-      }
-      """
-    And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a new release for their account (v1.1)
-    Given the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "product"
-    And I am an admin of account "test1"
-    And I use an authentication token
-    And I use API version "1.1"
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Keygen v1.0",
-            "filename": "Keygen-1.0.0.dmg",
-            "filetype": "dmg",
-            "filesize": 209715200,
-            "platform": "darwin",
+            "name": "Launch Release",
             "channel": "stable",
             "version": "1.0.0",
             "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              "shasums": [
+                "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              ]
             }
           },
           "relationships": {
@@ -182,89 +116,9 @@ Feature: Create release
         }
       }
       """
-    Then the response status should be "400"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Bad request",
-        "detail": "Unpermitted parameters: /data/attributes/filename, /data/attributes/filetype, /data/attributes/filesize, /data/attributes/platform"
-      }
-      """
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a new release for their account (v1.0)
-    Given the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "product"
-    And I am an admin of account "test1"
-    And I use an authentication token
-    And I use API version "1.0"
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Keygen v1.0",
-            "filename": "Keygen-1.0.0.dmg",
-            "filetype": "dmg",
-            "filesize": 209715200,
-            "platform": "darwin",
-            "channel": "stable",
-            "version": "1.0.0",
-            "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-            }
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
-      """
-      {
-        "name": "Keygen v1.0",
-        "filename": "Keygen-1.0.0.dmg",
-        "filetype": "dmg",
-        "filesize": 209715200,
-        "platform": "darwin",
-        "channel": "stable",
-        "status": "NOT_PUBLISHED",
-        "version": "1.0.0",
-        "semver": {
-          "major": 1,
-          "minor": 0,
-          "patch": 0,
-          "prerelease": null,
-          "build": null
-        },
-        "metadata": {
-          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-        }
-      }
-      """
-    And the JSON response should be a "release" with the following relationships:
-      """
-      {
-        "artifact": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-          "data": null
-        }
-      }
-      """
-    And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a new release for their account (free tier, limit not reached)
@@ -283,14 +137,12 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Launch Release",
-            "filename": "Product-1.0.0.dmg",
-            "filetype": "dmg",
-            "filesize": 209715200,
-            "platform": "darwin",
             "channel": "stable",
             "version": "1.0.0",
             "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              "shasums": [
+                "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              ]
             }
           },
           "relationships": {
@@ -309,12 +161,8 @@ Feature: Create release
       """
       {
         "name": "Launch Release",
-        "filename": "Product-1.0.0.dmg",
-        "filetype": "dmg",
-        "filesize": 209715200,
-        "platform": "darwin",
         "channel": "stable",
-        "status": "NOT_PUBLISHED",
+        "status": "DRAFT",
         "version": "1.0.0",
         "semver": {
           "major": 1,
@@ -324,7 +172,9 @@ Feature: Create release
           "build": null
         },
         "metadata": {
-          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+          "shasums": [
+            "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+          ]
         }
       }
       """
@@ -348,14 +198,12 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Launch Release",
-            "filename": "Product-1.0.0.dmg",
-            "filetype": "dmg",
-            "filesize": 209715200,
-            "platform": "darwin",
             "channel": "stable",
             "version": "1.0.0",
             "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              "shasums": [
+                "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
+              ]
             }
           },
           "relationships": {
@@ -386,69 +234,6 @@ Feature: Create release
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a new release for their account (non-lowercase filetype)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "product"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Launch Release",
-            "description": "Our first release",
-            "filename": "Product-1.0.0.AppImage",
-            "filetype": ".AppImage",
-            "filesize": 209715200,
-            "platform": "linux",
-            "channel": "stable",
-            "version": "1.0.0",
-            "metadata": {
-              "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-            }
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
-      """
-      {
-        "name": "Launch Release",
-        "description": "Our first release",
-        "filename": "Product-1.0.0.AppImage",
-        "filetype": "appimage",
-        "filesize": 209715200,
-        "platform": "linux",
-        "channel": "stable",
-        "version": "1.0.0",
-        "semver": {
-          "major": 1,
-          "minor": 0,
-          "patch": 0,
-          "prerelease": null,
-          "build": null
-        },
-        "metadata": {
-          "sha512": "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
-        }
-      }
-      """
-    And sidekiq should have 2 "webhook" jobs
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
   Scenario: Admin creates a duplicate release (by version)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -457,9 +242,7 @@ Feature: Create release
     And the current account has 1 "release" for an existing "product"
     And the first "release" has the following attributes:
       """
-      {
-        "version": "1.0.0"
-      }
+      { "version": "1.0.0" }
       """
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases" with the following:
@@ -469,9 +252,6 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Duplicate Release",
-            "filename": "Product-1.0.0.dmg",
-            "filetype": "dmg",
-            "platform": "darwin",
             "channel": "stable",
             "version": "1.0.0"
           },
@@ -492,116 +272,10 @@ Feature: Create release
       """
       {
         "title": "Unprocessable resource",
-        "detail": "version already exists for 'darwin' platform with 'dmg' filetype on 'stable' channel",
+        "detail": "version already exists",
         "code": "VERSION_TAKEN",
         "source": {
           "pointer": "/data/attributes/version"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a duplicate release (by version, with malicious platform)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 3 "webhook-endpoints"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
-    And the current account has the following "release" rows:
-      | product_id                           | version      | filename                   | filetype | platform       | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Product-1.0.0.dmg.blockmap | blockmap | %{injection}   | stable   |
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Duplicate Release",
-            "filename": "Product-1.0.0.zip.blockmap",
-            "filetype": ".blockmap",
-            "platform": "%{injection}",
-            "channel": "stable",
-            "version": "1.0.0"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "6198261a-48b5-4445-a045-9fed4afc7735"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "version already exists for '{injection}' platform with 'blockmap' filetype on 'stable' channel",
-        "code": "VERSION_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/version"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a duplicate release (by filename)
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
-      """
-      {
-        "filename": "Product-1.0.0.dmg"
-      }
-      """
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Duplicate Release",
-            "filename": "Product-1.0.0.dmg",
-            "filetype": "dmg",
-            "platform": "darwin",
-            "channel": "stable",
-            "version": "1.0.0"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
         }
       }
       """
@@ -622,11 +296,6 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "filename": "Product-1.0.0-rc.99.zip",
-            "filetype": "zip",
-            "filesize": 1342177280,
-            "platform": "macos",
             "channel": "rc",
             "version": "1.0.0-rc.99"
           },
@@ -647,12 +316,6 @@ Feature: Create release
       {
         "name": null,
         "description": null,
-        "signature": null,
-        "checksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "filename": "Product-1.0.0-rc.99.zip",
-        "filetype": "zip",
-        "filesize": 1342177280,
-        "platform": "macos",
         "channel": "rc",
         "version": "1.0.0-rc.99",
         "semver": {
@@ -682,11 +345,6 @@ Feature: Create release
           "attributes": {
             "name": "Alpha Release",
             "description": null,
-            "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
-            "checksum": null,
-            "filename": "Product-1.0.0-alpha.1.exe",
-            "filetype": "exe",
-            "platform": "win32",
             "channel": "alpha",
             "version": "1.0.0-alpha.1"
           },
@@ -707,12 +365,6 @@ Feature: Create release
       {
         "name": "Alpha Release",
         "description": null,
-        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==",
-        "checksum": null,
-        "filename": "Product-1.0.0-alpha.1.exe",
-        "filetype": "exe",
-        "filesize": null,
-        "platform": "win32",
         "channel": "alpha",
         "version": "1.0.0-alpha.1",
         "semver": {
@@ -741,10 +393,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "filename": "Product-2.11.0-beta.1.tar.gz",
             "version": "2.11.0-beta.1",
-            "platform": "linux",
-            "filetype": "tar.gz",
             "channel": "beta"
           },
           "relationships": {
@@ -763,12 +412,8 @@ Feature: Create release
       """
       {
         "name": null,
-        "filename": "Product-2.11.0-beta.1.tar.gz",
         "version": "2.11.0-beta.1",
-        "platform": "linux",
-        "filetype": "tar.gz",
         "channel": "beta",
-        "filesize": null,
         "semver": {
           "major": 2,
           "minor": 11,
@@ -795,13 +440,10 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": null,
-            "filename": "Product-3.0.0-dev.9+build.93214.tar.gz",
-            "filetype": ".tar.gz",
             "version": "3.0.0-dev.9+build.93214",
-            "platform": "linux",
             "channel": "dev",
             "metadata": {
-              "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
+              "contributors": ["@ezekg"]
             }
           },
           "relationships": {
@@ -820,10 +462,6 @@ Feature: Create release
       """
       {
         "name": null,
-        "filename": "Product-3.0.0-dev.9+build.93214.tar.gz",
-        "filetype": "tar.gz",
-        "filesize": null,
-        "platform": "linux",
         "channel": "dev",
         "version": "3.0.0-dev.9+build.93214",
         "semver": {
@@ -834,7 +472,7 @@ Feature: Create release
           "build": "build.93214"
         },
         "metadata": {
-          "sha256": "b6d094cb3f6a6855ec668f9ac8d2d33739d6a120ec7caca968d07c6bb667857b"
+          "contributors": ["@ezekg"]
         }
       }
       """
@@ -855,9 +493,6 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
-            "filename": "Product-1.0.0-alpha.1.exe",
-            "filetype": "exe",
-            "platform": "win32",
             "channel": "stable",
             "version": "1.0.0-alpha.1"
           },
@@ -902,10 +537,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Alpha Release",
-            "filename": "Product-1.0.0-alpha.1.exe",
             "version": "1.0.0-alpha.1",
-            "platform": "win32",
-            "filetype": "exe",
             "channel": "beta"
           },
           "relationships": {
@@ -936,88 +568,6 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a release with a mismatched filetype
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "Release Candidate #1",
-            "filename": "Product-2.0.0-rc.1.zip",
-            "version": "2.0.0-rc.1",
-            "platform": "win32",
-            "filetype": "exe",
-            "channel": "rc"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "filename extension does not match filetype (expected exe)",
-        "code": "FILENAME_EXTENSION_INVALID",
-        "source": {
-          "pointer": "/data/attributes/filename"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a release without an extension in the filename
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "releases",
-          "attributes": {
-            "name": "NPM Package Manifest",
-            "filename": "@npm/module",
-            "version": "1.0.0",
-            "platform": "npm",
-            "filetype": "json",
-            "channel": "stable"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "products",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
   Scenario: Admin creates a release with an invalid version (not a semver)
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -1031,10 +581,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Bad Version: Invalid",
-            "filename": "Product.zip",
             "version": "1.2.34.56789",
-            "platform": "win32",
-            "filetype": "zip",
             "channel": "stable"
           },
           "relationships": {
@@ -1078,10 +625,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Bad Version: Prefix",
-            "filename": "Product.zip",
             "version": "v1.2.34",
-            "platform": "win32",
-            "filetype": "zip",
             "channel": "stable"
           },
           "relationships": {
@@ -1126,10 +670,7 @@ Feature: Create release
           "type": "release",
           "attributes": {
             "name": "Product Version 2 (Beta)",
-            "filename": "Product-2.0.0-alpha1.dmg",
             "version": "2.0.0-alpha1",
-            "platform": "darwin",
-            "filetype": "dmg",
             "channel": "alpha"
           },
           "relationships": {
@@ -1184,10 +725,7 @@ Feature: Create release
           "type": "releases",
           "attributes": {
             "name": "Bad Version: Prefix",
-            "filename": "Product.zip",
             "version": "1.2.34",
-            "platform": "win32",
-            "filetype": "zip",
             "channel": "latest"
           },
           "relationships": {
@@ -1239,10 +777,7 @@ Feature: Create release
           "type": "release",
           "attributes": {
             "name": "Product Version 2 (Beta)",
-            "filename": "Product-2.0.0-alpha1.dmg",
             "version": "2.0.0-alpha1",
-            "platform": "darwin",
-            "filetype": "dmg",
             "channel": "alpha"
           },
           "relationships": {
@@ -1297,209 +832,6 @@ Feature: Create release
         "code": "CONSTRAINTS_ENTITLEMENT_NOT_FOUND",
         "source": {
           "pointer": "/data/relationships/constraints/data/1/relationships/entitlement"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a release with a null filetype
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "release",
-          "attributes": {
-            "name": "Rubygem Manifest: Spec",
-            "filename": "gems/specs.4.8",
-            "filetype": null,
-            "version": "1.0.0",
-            "platform": null,
-            "channel": "stable"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "product",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
-      """
-      {
-        "name": "Rubygem Manifest: Spec",
-        "filename": "gems/specs.4.8",
-        "filetype": null,
-        "version": "1.0.0",
-        "platform": null,
-        "channel": "stable"
-      }
-      """
-    And the current account should have 0 "release-platforms"
-    And the current account should have 0 "release-filetypes"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a release with a null platform
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "release",
-          "attributes": {
-            "name": "Rubygem Manifest: Latest",
-            "filename": "gems/latest_specs.4.8.gz",
-            "filetype": "gz",
-            "version": "1.0.0",
-            "platform": null,
-            "channel": "stable"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "product",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "201"
-    And the JSON response should be a "release" with the following attributes:
-      """
-      {
-        "name": "Rubygem Manifest: Latest",
-        "filename": "gems/latest_specs.4.8.gz",
-        "filetype": "gz",
-        "version": "1.0.0",
-        "platform": null,
-        "channel": "stable"
-      }
-      """
-    And the current account should have 0 "release-platforms"
-    And sidekiq should have 1 "webhook" job
-    And sidekiq should have 1 "metric" job
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a duplicate release with a null platform
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
-      """
-      {
-        "filename": "gems/latest_specs.4.8.gz",
-        "platform": null
-      }
-      """
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "release",
-          "attributes": {
-            "name": "Rubygem Manifest: Latest",
-            "filename": "gems/latest_specs.4.8.gz",
-            "filetype": "gz",
-            "version": "1.0.0",
-            "platform": null,
-            "channel": "stable"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "product",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
-        }
-      }
-      """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: Admin creates a duplicate release with a null filetype
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
-      """
-      {
-        "filename": "gems/specs.4.8",
-        "filetype": null,
-        "platform": null
-      }
-      """
-    And I use an authentication token
-    When I send a POST request to "/accounts/test1/releases" with the following:
-      """
-      {
-        "data": {
-          "type": "release",
-          "attributes": {
-            "name": "Rubygem Manifest: Spec",
-            "filename": "gems/specs.4.8",
-            "filetype": null,
-            "version": "1.0.0",
-            "channel": "stable"
-          },
-          "relationships": {
-            "product": {
-              "data": {
-                "type": "product",
-                "id": "$products[0]"
-              }
-            }
-          }
-        }
-      }
-      """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "already exists",
-        "code": "FILENAME_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/filename"
         }
       }
       """
