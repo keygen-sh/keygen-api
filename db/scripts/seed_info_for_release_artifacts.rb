@@ -1,22 +1,22 @@
-# heroku run -e BATCH_SIZE=1000000 rails runner db/scripts/seed_info_for_release_artifacts.rb
-
-BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 1_000 }.to_i
+# heroku run rails runner db/scripts/seed_info_for_release_artifacts.rb
 
 Keygen.logger.info { "[scripts.seed_info_for_release_artifacts] Starting" }
 
-Release.with_artifacts.find_each do |release|
-  count = ReleaseArtifact.where(release:).update_all(
-    release_platform_id: release.release_platform_id,
-    release_filetype_id: release.release_filetype_id,
-    filename: release.filename,
-    filesize: release.filesize,
-    signature: release.signature,
-    checksum: release.checksum,
-  )
+count = ReleaseArtifact.connection.update(<<~SQL.squish)
+  UPDATE
+    release_artifacts a
+  SET
+    release_platform_id = r.release_platform_id,
+    release_filetype_id = r.release_filetype_id,
+    filename            = r.filename,
+    filesize            = r.filesize,
+    signature           = r.signature,
+    checksum            = r.checksum
+  FROM
+    releases r
+  WHERE
+    a.release_id = r.id
+SQL
 
-  Keygen.logger.info { "[scripts.seed_info_for_release_artifacts] Seeded #{count} artifact row(s) for release #{release.id}" }
-
-  sleep 0.1
-end
-
+Keygen.logger.info { "[scripts.seed_info_for_release_artifacts] Seeded data for #{count} artifact rows" }
 Keygen.logger.info { "[scripts.seed_info_for_release_artifacts] Done" }
