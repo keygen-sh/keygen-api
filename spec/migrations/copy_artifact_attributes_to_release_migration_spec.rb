@@ -7,10 +7,10 @@ require 'sidekiq/testing'
 
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
-describe ArtifactAttributesToReleaseMigration do
+describe CopyArtifactAttributesToReleaseMigration do
   let(:account)                  { create(:account) }
   let(:product)                  { create(:product, account:) }
-  let(:release_without_artifact) { create(:release, :unpublished, account:, product:) }
+  let(:release_without_artifact) { create(:release, :draft, account:, product:) }
   let(:release_with_artifact)    { create(:release, :published, account:, product:) }
 
   before do
@@ -27,7 +27,7 @@ describe ArtifactAttributesToReleaseMigration do
     Versionist.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
-        '1.0' => [ArtifactAttributesToReleaseMigration],
+        '1.0' => [CopyArtifactAttributesToReleaseMigration],
       }
     end
   end
@@ -35,7 +35,7 @@ describe ArtifactAttributesToReleaseMigration do
   context 'the release does not have an artifact' do
     subject { release_without_artifact }
 
-    it 'should migrate a release artifact relationship' do
+    it "should migrate a release's attributes with nil values" do
       migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
       data     = Keygen::JSONAPI.render(subject)
 
@@ -72,7 +72,7 @@ describe ArtifactAttributesToReleaseMigration do
   context 'the release has an artifact' do
     subject { release_with_artifact }
 
-    it 'should migrate a release artifact relationship' do
+    it "should migrate a release's attributes with its artifact's values" do
       migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
       data     = Keygen::JSONAPI.render(subject)
 
