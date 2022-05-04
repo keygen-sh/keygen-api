@@ -11,6 +11,13 @@ class WebhookEvent < ApplicationRecord
 
   validates :endpoint, url: true, presence: true
 
+  validates :api_version,
+    allow_nil: true,
+    inclusion: {
+      message: 'unsupported version',
+      in: Versionist.supported_versions,
+    }
+
   scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }
 
   # FIXME(ezekg) Products should only be able to read events that are

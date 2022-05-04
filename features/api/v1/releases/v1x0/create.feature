@@ -382,21 +382,22 @@ Feature: Create release
         }
       }
       """
-    Then the response status should be "422"
-    And the JSON response should be an array of 1 error
-    And the first error should have the following properties:
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
       """
       {
-        "title": "Unprocessable resource",
-        "detail": "version already exists",
-        "code": "VERSION_TAKEN",
-        "source": {
-          "pointer": "/data/attributes/version"
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" job
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin creates a duplicate release (by filename)
@@ -437,6 +438,13 @@ Feature: Create release
       }
       """
     Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "filename": "Product-1.0.0.dmg",
+        "filetype": "dmg"
+      }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

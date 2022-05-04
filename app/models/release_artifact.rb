@@ -176,7 +176,7 @@ class ReleaseArtifact < ApplicationRecord
                       .delete_prefix('.')
                       .strip
 
-    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{key})") if
+    return errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{key})") if
       filename.include?('.') && !filename.downcase.ends_with?(".#{key}")
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
