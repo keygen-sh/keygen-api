@@ -1,10 +1,11 @@
 class FindByAliasService < BaseService
-  def initialize(scope:, identifier:, aliases:)
+  def initialize(scope:, identifier:, aliases:, order: { created_at: :asc })
     @table_name = scope.respond_to?(:table_name) ? scope.table_name : scope.class.table_name
     @model_name = scope.model_name.name
     @scope = scope
     @identifier = identifier&.squish
     @aliases = aliases
+    @order = order
   end
 
   def call
@@ -18,6 +19,7 @@ class FindByAliasService < BaseService
   attr_reader :scope
   attr_reader :identifier
   attr_reader :aliases
+  attr_reader :order
 
   def find_by_alias!
     raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier) if identifier.nil?
@@ -38,8 +40,6 @@ class FindByAliasService < BaseService
     #   WHERE
     #     "accounts"."id"   = :identifier OR
     #     "accounts"."slug" = :identifier
-    #   ORDER BY
-    #     "accounts"."created_at" ASC
     #   LIMIT
     #     1
     record = scope
@@ -47,9 +47,9 @@ class FindByAliasService < BaseService
         columns.map { |c| "#{Arel.sql("\"#{table_name}\".\"#{c}\"")} = :identifier" }.join(" OR "),
         identifier: identifier
       )
-      .reorder(created_at: :asc)
+      .order(order)
       .limit(1)
-      .first
+      .take
 
     if record.nil?
       raise Keygen::Error::NotFoundError.new(model: model_name, id: identifier)

@@ -158,6 +158,17 @@ Given /^the current account has (\d+) "([^\"]*)" for(?: an)? existing "([^\"]*)"
   end
 end
 
+Given /^the current account has (\d+) "([^\"]*)" for all "([^\"]*)"$/ do |count, resource, association|
+  associated_records = @account.send(association.pluralize.underscore).all
+  association_name = association.singularize.underscore.to_sym
+
+  associated_records.each do |record|
+    count.to_i.times do
+      create resource.singularize.underscore, account: @account, association_name => record
+    end
+  end
+end
+
 Given /^the current account has (\d+) "([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
@@ -482,37 +493,37 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
-Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out|nil)$/ do |named_index, named_scenario|
-  res = case named_scenario
-        when 'uploaded'
-          []
-        when 'not uploaded'
-          ['NotFound']
-        when 'timing out'
-          [Timeout::Error]
-        when 'nil'
-          next # bail without doing anything
-        end
+# Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out|nil)$/ do |named_index, named_scenario|
+#   res = case named_scenario
+#         when 'uploaded'
+#           []
+#         when 'not uploaded'
+#           ['NotFound']
+#         when 'timing out'
+#           [Timeout::Error]
+#         when 'nil'
+#           next # bail without doing anything
+#         end
 
-  Aws.config[:s3] = {
-    stub_responses: {
-      delete_object: [],
-      head_object: res,
-    }
-  }
+#   Aws.config[:s3] = {
+#     stub_responses: {
+#       delete_object: [],
+#       head_object: res,
+#     }
+#   }
 
-  if named_index == 'all'
-    releases = @account.releases.all
+#   if named_index == 'all'
+#     releases = @account.releases.all
 
-    releases.each do |release|
-      release.artifacts.create!(key: release.filename, account: release.account, product: release.product)
-    end
-  else
-    release = @account.releases.send(named_index)
+#     releases.each do |release|
+#       release.artifacts << build(:artifact, release:)
+#     end
+#   else
+#     release = @account.releases.send(named_index)
 
-    release.artifacts.create!(key: release.filename, account: release.account, product: release.product)
-  end
-end
+#     release.artifacts << build(:artifact, release:)
+#   end
+# end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)

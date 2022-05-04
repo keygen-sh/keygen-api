@@ -15,7 +15,13 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      artifact = FindByAliasService.call(scope: product.release_artifacts, identifier: params[:id], aliases: :key)
+      artifact = FindByAliasService.call(scope: product.release_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
+        releases.semver_major        DESC,
+        releases.semver_minor        DESC,
+        releases.semver_patch        DESC,
+        releases.semver_prerelease   DESC NULLS FIRST,
+        releases.semver_build        DESC NULLS FIRST
+      SQL
       authorize artifact
 
       download = DownloadArtifactService.call(
