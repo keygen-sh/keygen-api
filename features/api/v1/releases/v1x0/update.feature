@@ -23,6 +23,7 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -62,7 +63,7 @@ Feature: Update release
       {
         "artifact": {
           "links": { "related": "/v1/accounts/$account/releases/$releases[0]/artifact" },
-          "data": null
+          "data": { "type": "artifacts", "id": "$artifacts[0]" }
         }
       }
       """
@@ -75,6 +76,10 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the last "release" has the following attributes:
+      """
+      { "name": "Named Release" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -91,9 +96,70 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
+      { "name": "Renamed Release" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes the name of release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And the last "release" has the following attributes:
+      """
+      { "name": "Named Release" }
+      """
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
       {
-        "name": "Renamed Release"
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null
+          }
+        }
       }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "name": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates the filesize of release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "filesize": null }
+      """
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "filesize": 20971520
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "filesize": 20971520 }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -104,6 +170,11 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "filesize": 20971520 }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -120,9 +191,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "filesize": null
-      }
+      { "filesize": null }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -133,6 +202,10 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the last "release" has the following attributes:
+      """
+      { "description": "a note" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -141,7 +214,7 @@ Feature: Update release
         "data": {
           "type": "releases",
           "attributes": {
-            "description": "a note"
+            "description": "a different note"
           }
         }
       }
@@ -149,9 +222,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "description": "a note"
-      }
+      { "description": "a different note" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -162,6 +233,10 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the last "release" has the following attributes:
+      """
+      { "description": "a note" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -178,9 +253,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "description": null
-      }
+      { "description": null }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -191,6 +264,11 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "signature": "..." }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -207,9 +285,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA=="
-      }
+      { "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -220,6 +296,11 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "signature": "NTeMGMRIT5PxqVNiYujUygX2nX+qXeDvVPjccT+5lFF2IFS6i08PNCnZ03XZD7on9bg7VGCx4KM3JuSfC6sUCA==" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -236,9 +317,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "signature": null
-      }
+      { "signature": null }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -249,6 +328,11 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "..." }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -265,9 +349,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "checksum": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-      }
+      { "checksum": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -278,6 +360,11 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "checksum": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
@@ -294,9 +381,7 @@ Feature: Update release
     Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
-      {
-        "checksum": null
-      }
+      { "checksum": null }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
