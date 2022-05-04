@@ -290,18 +290,14 @@ class Release < ApplicationRecord
     when pre_release?
       errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.z-#{channel.key}.n got #{semver})") if
         semver&.pre_release.nil? || !semver&.pre_release.starts_with?(channel.key)
-
-      return
     when stable?
       errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.z got #{semver})") if
         semver&.pre_release.present?
-
-      return
     end
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id:, key: channel.key.downcase.strip }]
+    rows = ReleaseChannel.find_by_sql [<<~SQL.squish, { account_id:, key: channel.key.downcase.strip.presence }]
       WITH ins AS (
         INSERT INTO "release_channels"
           (

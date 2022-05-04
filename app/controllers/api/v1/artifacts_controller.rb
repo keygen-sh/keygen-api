@@ -87,9 +87,19 @@ module Api::V1
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = policy_scope(current_account.release_artifacts)
+      scoped_artifacts = policy_scope(current_account.release_artifacts).for_channel(
+        artifact_query.fetch(:channel) { 'stable' },
+      )
 
-      @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :key)
+      # NOTE(ezekg) Fetch the latest version of the artifact since we have no
+      #             other qualifiers outside of a :filename.
+      @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
+        releases.semver_major        DESC,
+        releases.semver_minor        DESC,
+        releases.semver_patch        DESC,
+        releases.semver_prerelease   DESC NULLS FIRST,
+        releases.semver_build        DESC NULLS FIRST
+      SQL
 
       Current.resource = artifact
     end
@@ -103,14 +113,14 @@ module Api::V1
           param :attributes, type: :hash do
             param :filename, type: :string
             param :filesize, type: :integer, optional: true
-            param :filetype, type: :string, optional: true, transform: -> (k, v) {
-              [:filetype_attributes, { key: v.downcase.presence }]
+            param :filetype, type: :string, optional: true, transform: -> (_, key) {
+              [:filetype_attributes, { key: }]
             }
-            param :platform, type: :string, optional: true, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase.presence }]
+            param :platform, type: :string, optional: true, transform: -> (_, key) {
+              [:platform_attributes, { key: }]
             }
-            param :arch, type: :string, optional: true, transform: -> (k, v) {
-              [:platform_attributes, { key: v.downcase.presence }]
+            param :arch, type: :string, optional: true, transform: -> (_, key) {
+              [:platform_attributes, { key: }]
             }
             param :signature, type: :string, optional: true
             param :checksum, type: :string, optional: true
@@ -149,6 +159,7 @@ module Api::V1
 
     typed_query do
       on :show do
+        query :channel, type: :string, inclusion: %w[stable rc beta alpha dev], optional: true
         if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
           query :ttl, type: :integer, coerce: true, optional: true
         end

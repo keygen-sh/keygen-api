@@ -20,7 +20,7 @@ FactoryBot.define do
 
       # Add dependant attributes after associations are set in stone
       artifact.filename ||=
-        "#{artifact.release.name}-#{artifact.release.version}.#{artifact.filetype.key}"
+        "#{artifact.release.name}-#{artifact.release.version}+#{SecureRandom.hex}.#{artifact.filetype.key}"
     end
   end
 end
