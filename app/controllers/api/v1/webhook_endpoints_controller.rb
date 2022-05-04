@@ -24,7 +24,7 @@ module Api::V1
 
     # POST /webhook-endpoints
     def create
-      @endpoint = current_account.webhook_endpoints.new(api_version: current_api_versionm, **webhook_endpoint_params)
+      @endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, **webhook_endpoint_params)
       authorize @endpoint
 
       if @endpoint.save

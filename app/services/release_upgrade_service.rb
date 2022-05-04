@@ -81,8 +81,7 @@ class ReleaseUpgradeService < BaseService
 
   def available_upgrades
     @available_upgrades ||= available_releases.for_channel(channel)
-                                              .with_artifacts
-                                              .unyanked
+                                              .published
   end
 
   def upgrade_versions
