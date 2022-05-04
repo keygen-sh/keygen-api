@@ -61,6 +61,13 @@ class Account < ApplicationRecord
 
   validates :slug, uniqueness: { case_sensitive: false }, format: { with: /\A[-a-z0-9]+\z/, message: "can only contain lowercase letters, numbers and dashes" }, length: { maximum: 255 }, exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" }, unless: -> { slug.nil? }
 
+  validates :api_version,
+    allow_nil: true,
+    inclusion: {
+      message: 'unsupported version',
+      in: Versionist.supported_versions,
+    }
+
   validate on: [:create, :update] do
     clean_slug = "#{slug}".tr "-", ""
     errors.add :slug, :not_allowed, message: "cannot resemble a UUID" if clean_slug =~ UUID_RE

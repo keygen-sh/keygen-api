@@ -69,11 +69,20 @@ class Release < ApplicationRecord
     dependent: :delete
 
   accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_associated_records_for_constraints
-  accepts_nested_attributes_for :artifact, update_only: true, reject_if: :persisted?
+  accepts_nested_attributes_for :artifact, update_only: true
   accepts_nested_attributes_for :channel
 
   before_validation -> { self.status ||= 'DRAFT' }
+
+  before_create -> { self.api_version ||= account.api_version }
   before_create :enforce_release_limit_on_account!
+  before_create -> {
+    self.semver_major      = semver.major
+    self.semver_minor      = semver.minor
+    self.semver_patch      = semver.patch
+    self.semver_prerelease = semver.pre_release
+    self.semver_build      = semver.build
+  }
 
   validates :product,
     scope: { by: :account_id }
@@ -81,9 +90,22 @@ class Release < ApplicationRecord
   validates :channel,
     scope: { by: :account_id }
 
+  validates :api_version,
+    allow_nil: true,
+    inclusion: {
+      message: 'unsupported version',
+      in: Versionist.supported_versions,
+    }
+
   validates :version,
     presence: true,
-    semver: true
+    semver: true,
+    uniqueness: {
+      scope: %i[version product_id account_id],
+      message: 'version already exists',
+      # We only want to enforce uniqueness for >= v1.1
+      if: -> { api_version != '1.0' },
+    }
 
   validates :status,
     presence: true,
@@ -268,9 +290,13 @@ class Release < ApplicationRecord
     when pre_release?
       errors.add(:version, :channel_invalid, message: "version does not match prerelease channel (expected x.y.z-#{channel.key}.n got #{semver})") if
         semver&.pre_release.nil? || !semver&.pre_release.starts_with?(channel.key)
+
+      return
     when stable?
       errors.add(:version, :channel_invalid, message: "version does not match stable channel (expected x.y.z got #{semver})") if
         semver&.pre_release.present?
+
+      return
     end
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison

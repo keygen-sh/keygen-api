@@ -34,7 +34,7 @@ module Api::V1
     end
 
     def create
-      release = current_account.releases.new release_params
+      release = current_account.releases.new(api_version: current_api_version, **release_params)
       authorize release
 
       if release.save
@@ -148,9 +148,9 @@ module Api::V1
             param :description, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_api_version == '1.0'
-              param :filesize, type: :integer, optional: true
-              param :signature, type: :string, optional: true
-              param :checksum, type: :string, optional: true
+              param :filesize, type: :integer, optional: true, allow_nil: true
+              param :signature, type: :string, optional: true, allow_nil: true
+              param :checksum, type: :string, optional: true, allow_nil: true
             end
           end
         end

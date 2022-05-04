@@ -16,6 +16,13 @@ class WebhookEndpoint < ApplicationRecord
     inclusion: { in: %w[ed25519 rsa-pss-sha256 rsa-sha256], message: 'unsupported signature algorithm' },
     allow_nil: true
 
+  validates :api_version,
+    allow_nil: true,
+    inclusion: {
+      message: 'unsupported version',
+      in: Versionist.supported_versions,
+    }
+
   validate do
     next if
       subscriptions == %w[*]

@@ -110,6 +110,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true
             param :slug, type: :string, optional: true
+            param :api_version, type: :string, inclusion: %w[1.0 1.1], optional: true
             param :protected, type: :boolean, optional: true
           end
         end
