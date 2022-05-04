@@ -10,8 +10,8 @@ DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 describe RenameDraftStatusToNotPublishedForReleasesMigration do
   let(:account)                  { create(:account) }
   let(:product)                  { create(:product, account:) }
+  let(:release_with_artifact)    { create(:release, :published, account:, product:, artifacts: [build(:artifact)]) }
   let(:release_without_artifact) { create(:release, :draft, account:, product:) }
-  let(:release_with_artifact)    { create(:release, :published, account:, product:) }
 
   before do
     Sidekiq::Testing.fake!

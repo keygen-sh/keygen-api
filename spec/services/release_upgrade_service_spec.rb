@@ -178,30 +178,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :draft,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :draft,
         channel: channel,
         version: '1.0.1',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -227,30 +231,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.1',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -312,30 +320,34 @@ describe ReleaseUpgradeService do
     let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: stable_channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: rc_channel,
         version: '1.1.0-rc.3+build.1337',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -431,30 +443,34 @@ describe ReleaseUpgradeService do
     let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: stable_channel,
         version: '2.1.9',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: beta_channel,
         version: '2.2.0-beta.1',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -550,30 +566,34 @@ describe ReleaseUpgradeService do
     let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: stable_channel,
         version: '2.13.37',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: alpha_channel,
         version: '3.0.0-alpha.1',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -669,30 +689,34 @@ describe ReleaseUpgradeService do
     let!(:dev_channel) { create(:release_channel, key: 'dev', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: stable_channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: dev_channel,
         version: '1.1.0-dev.93+build.1624032445',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -783,31 +807,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        yanked_at: Time.current,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :yanked,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '2.0.0+build.1624035574',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -833,31 +860,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        yanked_at: Time.current,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :yanked,
         channel: channel,
         version: '2.0.0+build.1624035574',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -883,30 +913,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0+build.1624288707',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.1+build.1624288716',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -953,30 +987,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: macos_platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: macos_platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: win32_platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '2.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: win32_platform,
+          ),
+        ],
       )
     }
 
@@ -1004,30 +1042,34 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{exe_filetype.key}",
-        filetype: exe_filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{exe_filetype.key}",
+            filetype: exe_filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{msi_filetype.key}",
-        filetype: msi_filetype,
+      create(:release, :published,
         channel: channel,
         version: '2.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{msi_filetype.key}",
+            filetype: msi_filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
@@ -1054,58 +1096,66 @@ describe ReleaseUpgradeService do
     let(:channel) { create(:release_channel, key: 'stable', account: account) }
 
     let!(:current_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_patch_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.0.83+build.1624289491',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_minor_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '1.5.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
     let!(:next_major_release) {
-      create(
-        :release,
-        :published,
-        platform: platform,
-        filename: "#{SecureRandom.hex}.#{filetype.key}",
-        filetype: filetype,
+      create(:release, :published,
         channel: channel,
         version: '2.0.0',
         account: account,
         product: product,
+        artifacts: [
+          build(:artifact,
+            filename: "#{SecureRandom.hex}.#{filetype.key}",
+            filetype: filetype,
+            platform: platform,
+          ),
+        ],
       )
     }
 
