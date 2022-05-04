@@ -2,6 +2,7 @@
 
 module Billings
   class CreateSubscriptionService < BaseService
+    TRIAL_DURATION = 1.month
 
     def initialize(customer:, plan:, trial_end: nil)
       @customer  = customer
@@ -11,9 +12,9 @@ module Billings
 
     def call
       Billings::Subscription.create(
-        customer: customer,
-        trial_end: trial_end,
-        plan: plan,
+        trial_end: trial_end || TRIAL_DURATION.from_now.to_i,
+        customer:,
+        plan:,
       )
     rescue Billings::Error => e
       Keygen.logger.exception(e)
@@ -23,6 +24,8 @@ module Billings
 
     private
 
-    attr_reader :customer, :plan, :trial_end
+    attr_reader :customer,
+                :plan,
+                :trial_end
   end
 end
