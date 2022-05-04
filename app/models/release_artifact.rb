@@ -25,6 +25,8 @@ class ReleaseArtifact < ApplicationRecord
     inverse_of: :artifacts,
     autosave: true,
     optional: true
+  has_one :channel,
+    through: :release
   has_one :product,
     through: :release
   has_many :users,
@@ -36,7 +38,7 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :platform
   accepts_nested_attributes_for :arch
 
-  before_validation -> { self.account_id ||= release.account_id }
+  before_validation -> { self.account_id ||= release&.account_id }
 
   validates :product,
     scope: { by: :account_id }
@@ -70,8 +72,51 @@ class ReleaseArtifact < ApplicationRecord
   delegate :version, :semver, :channel,
     to: :release
 
+  scope :published, -> {
+    joins(:release).where(release: { status: 'PUBLISHED' })
+  }
+
+  scope :for_channel, -> channel {
+    key =
+      case channel
+      when UUID_RE
+        # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
+        #             also show artifacts for stable, rc and beta channels.
+        joins(:channel).select('release_channels.key')
+                       .where(channel: channel)
+                       .first
+                       .try(:key)
+      when ReleaseChannel
+        channel.key
+      else
+        channel.to_s
+      end
+
+    case key
+    when 'stable'
+      self.stable
+    when 'rc'
+      self.rc
+    when 'beta'
+      self.beta
+    when 'alpha'
+      self.alpha
+    when 'dev'
+      self.dev
+    else
+      self.none
+    end
+  }
+
+  scope :for_channel_key, -> key { joins(:channel).where(channel: { key: key }) }
+  scope :stable, -> { for_channel_key(%i(stable)) }
+  scope :rc, -> { for_channel_key(%i(stable rc)) }
+  scope :beta, -> { for_channel_key(%i(stable rc beta)) }
+  scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
+  scope :dev, -> { for_channel_key(%i(dev)) }
+
   scope :for_product, -> product {
-    where(product: product)
+    joins(:product).where(product: { id: product })
   }
 
   scope :for_user, -> user {
@@ -104,7 +149,7 @@ class ReleaseArtifact < ApplicationRecord
     to: :release
 
   def s3_object_key
-    "artifacts/#{account_id}/#{release_id}/#{key}"
+    "artifacts/#{account_id}/#{release_id}/#{filename}"
   end
 
   def filetype_id=(id)
@@ -176,7 +221,7 @@ class ReleaseArtifact < ApplicationRecord
                       .delete_prefix('.')
                       .strip
 
-    return errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{key})") if
+    errors.add(:filename, :extension_invalid, message: "filename extension does not match filetype (expected #{key})") if
       filename.include?('.') && !filename.downcase.ends_with?(".#{key}")
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
@@ -231,7 +276,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key.downcase.strip }]
+    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key.downcase.strip.presence }]
       WITH ins AS (
         INSERT INTO "release_platforms"
           (
@@ -281,7 +326,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key.downcase.strip }]
+    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key.downcase.strip.presence }]
       WITH ins AS (
         INSERT INTO "release_arches"
           (

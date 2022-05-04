@@ -674,23 +674,11 @@ Then /^the JSON response should (?:contain|be) an array of errors?$/ do
   expect(json["errors"].size).to be >= 1
 end
 
-Given /^the (\w+) error should have the following properties:$/ do |i, body|
+Given /^the (\w+) error should have the following properties:$/ do |named_idx, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  err  = json["errors"].send(named_idx)
 
-  json = JSON.parse last_response.body
-  numbers = {
-    "first"   => 0,
-    "second"  => 1,
-    "third"   => 2,
-    "fourth"  => 3,
-    "fifth"   => 4,
-    "sixth"   => 5,
-    "seventh" => 6,
-    "eigth"   => 7,
-    "ninth"   => 8
-  }
-
-  err = json["errors"].send :[], numbers[i]
   expect(err).to include JSON.parse(body)
 end
 
