@@ -493,37 +493,25 @@ Given /^the (first|second|third|fourth|fifth) "license" has the following licens
   end
 end
 
-# Given /^(?:the )?(\w+) "releases?" (?:has an?|have) artifacts? that (?:is|are) (uploaded|not uploaded|timing out|nil)$/ do |named_index, named_scenario|
-#   res = case named_scenario
-#         when 'uploaded'
-#           []
-#         when 'not uploaded'
-#           ['NotFound']
-#         when 'timing out'
-#           [Timeout::Error]
-#         when 'nil'
-#           next # bail without doing anything
-#         end
+Given /^AWS S3 is (responding with a 200 status|responding with a 404 status|timing out)$/ do |scenario|
+  res = case scenario
+        when 'responding with a 200 status'
+          []
+        when 'responding with a 404 status'
+          ['NotFound']
+        when 'timing out'
+          [Timeout::Error]
+        when 'nil'
+          next # bail without doing anything
+        end
 
-#   Aws.config[:s3] = {
-#     stub_responses: {
-#       delete_object: [],
-#       head_object: res,
-#     }
-#   }
-
-#   if named_index == 'all'
-#     releases = @account.releases.all
-
-#     releases.each do |release|
-#       release.artifacts << build(:artifact, release:)
-#     end
-#   else
-#     release = @account.releases.send(named_index)
-
-#     release.artifacts << build(:artifact, release:)
-#   end
-# end
+  Aws.config[:s3] = {
+    stub_responses: {
+      delete_object: [],
+      head_object: res,
+    }
+  }
+end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)

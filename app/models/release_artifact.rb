@@ -72,6 +72,16 @@ class ReleaseArtifact < ApplicationRecord
   delegate :version, :semver, :channel,
     to: :release
 
+  scope :order_by_version, -> {
+    joins(:release).order(<<~SQL.squish)
+      releases.semver_major        DESC,
+      releases.semver_minor        DESC,
+      releases.semver_patch        DESC,
+      releases.semver_prerelease   DESC NULLS FIRST,
+      releases.semver_build        DESC NULLS FIRST
+    SQL
+  }
+
   scope :published, -> {
     joins(:release).where(release: { status: 'PUBLISHED' })
   }

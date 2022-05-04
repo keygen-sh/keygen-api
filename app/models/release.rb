@@ -222,17 +222,20 @@ class Release < ApplicationRecord
   scope :without_artifacts, -> { where.missing(:artifacts) }
   scope :with_status, -> status {
     case status.to_s.upcase
-    when 'YANKED'
-      self.yanked
     when 'NOT_PUBLISHED',
          'DRAFT'
-      self.unyanked.without_artifacts
+      where(status: :DRAFT)
     when 'PUBLISHED'
-      self.unyanked.with_artifacts
+      where(status: :PUBLISHED)
+    when 'YANKED'
+      where(status: :YANKED)
     else
-      self.none
+      none
     end
   }
+
+  scope :published, -> { with_status(:PUBLISHED) }
+  scope :drafts, -> { with_status(:DRAFT) }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel

@@ -38,9 +38,9 @@ module Api::V1::Releases::Actions::V1x0
       kwargs = upgrade_query.to_h.symbolize_keys
         .slice(:constraint, :channel)
         .merge(
+          filetype: release.artifact.filetype_id,
+          platform: release.artifact.platform_id,
           product: release.product_id,
-          platform: release.platform_id,
-          filetype: release.filetype_id,
           version: release.version,
         )
 
