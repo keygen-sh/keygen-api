@@ -13,11 +13,11 @@ Feature: Short bin URLs
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has the following attributes:
+    And the current account has 1 "artifact" for the first "release"
+    And the first "artifact" has the following attributes:
       """
       { "filename": "cli/install.sh" }
       """
-    And the first "release" has an artifact that is uploaded
 
   Scenario: Subdomain 'bin' should redirect to an artifact
     When I send a GET request to "//bin.keygen.sh/keygen/cli/install.sh"

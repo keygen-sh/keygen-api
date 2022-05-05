@@ -49,7 +49,8 @@ module Api::V1::Releases::Relationships::V1x0
       )
 
       render jsonapi: upload.artifact, status: :temporary_redirect, location: upload.redirect_url
-    rescue ReleaseUploadService::YankedReleaseError => e
+    rescue ReleaseUploadService::InvalidArtifactError,
+           ReleaseUploadService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 
@@ -63,7 +64,8 @@ module Api::V1::Releases::Relationships::V1x0
         account: current_account,
         resource: release
       )
-    rescue ReleaseYankService::YankedReleaseError => e
+    rescue ReleaseYankService::InvalidArtifactError,
+           ReleaseYankService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 
