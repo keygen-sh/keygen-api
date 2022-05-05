@@ -58,6 +58,10 @@ class License < ApplicationRecord
     auto_release_lock: false,
     unless: :expiry?
 
+  on_exclusive_event 'artifact.downloaded', :set_expiry_on_first_download!,
+    auto_release_lock: true,
+    unless: :expiry?
+
   on_exclusive_event 'release.downloaded', :set_expiry_on_first_download!,
     auto_release_lock: true,
     unless: :expiry?
