@@ -4,13 +4,12 @@ FactoryBot.define do
   factory :release do
     name { Faker::App.name }
     version { nil }
+    status { 'PUBLISHED' }
 
     account { nil }
     product { nil }
     artifacts { [] }
     channel { nil }
-
-    published
 
     after :build do |release, evaluator|
       release.account  ||= evaluator.account.presence

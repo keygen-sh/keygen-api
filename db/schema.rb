@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_04_130127) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_05_151926) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -388,11 +388,13 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_04_130127) do
     t.string "signature"
     t.string "checksum"
     t.uuid "release_arch_id"
+    t.string "status"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["filename", "release_id", "account_id"], name: "release_artifacts_uniq_filename_idx", unique: true, where: "(filename IS NOT NULL)"
     t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"
     t.index ["release_filetype_id"], name: "index_release_artifacts_on_release_filetype_id"
     t.index ["release_platform_id"], name: "index_release_artifacts_on_release_platform_id"
+    t.index ["status"], name: "index_release_artifacts_on_status"
   end
 
   create_table "release_channels", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

@@ -764,10 +764,10 @@ Feature: Show release artifact
       | id                                   | product_id                           | version | channel |
       | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0   | stable  |
     And the current account has the following "artifact" rows:
-      | release_id                           | filename                  | filetype | platform |
-      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.dmg    | dmg      | macos    |
-      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.zip    | zip      | win32    |
-      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App.1.0.0.tar.gz | tar.gz   | linux    |
+      | release_id                           | filename                  | filetype | platform | status   |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.dmg    | dmg      | macos    | UPLOADED |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.zip    | zip      | win32    | UPLOADED |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App.1.0.0.tar.gz | tar.gz   | linux    | UPLOADED |
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And I am a license of account "test1"
@@ -784,14 +784,14 @@ Feature: Show release artifact
       | id                                   | product_id                           | version | channel |
       | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0   | stable  |
     And the current account has the following "artifact" rows:
-      | release_id                           | filename                  | filetype | platform |
-      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.zip    | zip      | win32    |
+      | release_id                           | filename                  | filetype | platform | status  |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | dir/Test-App-1.0.0.zip    | zip      | win32    | WAITING |
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/dir/Test-App-1.0.0.zip"
-    Then the response status should be "404"
+    Then the response status should be "200"
 
   Scenario: License retrieves an artifact by filename that does not exist
     Given the current account is "test1"

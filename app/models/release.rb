@@ -210,9 +210,6 @@ class Release < ApplicationRecord
   scope :alpha, -> { for_channel_key(%i(stable rc beta alpha)) }
   scope :dev, -> { for_channel_key(%i(dev)) }
 
-  scope :unyanked, -> { where(yanked_at: nil) }
-  scope :yanked, -> { where.not(yanked_at: nil) }
-
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
@@ -235,7 +232,9 @@ class Release < ApplicationRecord
   }
 
   scope :published, -> { with_status(:PUBLISHED) }
-  scope :drafts, -> { with_status(:DRAFT) }
+  scope :drafts,    -> { with_status(:DRAFT) }
+  scope :yanked,    -> { with_status(:YANKED) }
+  scope :unyanked,  -> { where.not(yanked) }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
@@ -269,8 +268,16 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { checksum: })
   end
 
+  def draft?
+    status == 'DRAFT'
+  end
+
+  def published?
+    status == 'PUBLISHED'
+  end
+
   def yanked?
-    yanked_at.present?
+    status == 'YANKED'
   end
 
   def semver

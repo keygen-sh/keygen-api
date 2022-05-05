@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :release_artifact, aliases: %i[artifact] do
     filename { nil }
     filesize { Faker::Number.between(from: 0, to: 1.gigabyte.to_i) }
+    status { 'UPLOADED' }
 
     account  { nil }
     release  { nil }
@@ -21,6 +22,24 @@ FactoryBot.define do
       # Add dependant attributes after associations are set in stone
       artifact.filename ||=
         "#{artifact.release.name}-#{artifact.release.version}+#{SecureRandom.hex}.#{artifact.filetype.key}"
+    end
+
+    trait :waiting do
+      after :build do |artifact, evaluator|
+        artifact.status = 'WAITING'
+      end
+    end
+
+    trait :uploaded do
+      after :build do |artifact, evaluator|
+        artifact.status = 'UPLOADED'
+      end
+    end
+
+    trait :failed do
+      after :build do |artifact, evaluator|
+        artifact.status = 'FAILED'
+      end
     end
   end
 end

@@ -5,6 +5,12 @@ class ReleaseArtifact < ApplicationRecord
   include Orderable
   include Pageable
 
+  STATUSES = %w[
+    WAITING
+    UPLOADED
+    FAILED
+  ]
+
   belongs_to :account
   belongs_to :release
   belongs_to :platform,
@@ -39,6 +45,7 @@ class ReleaseArtifact < ApplicationRecord
   accepts_nested_attributes_for :arch
 
   before_validation -> { self.account_id ||= release&.account_id }
+  before_validation -> { self.status ||= 'WAITING' }
 
   validates :product,
     scope: { by: :account_id }
@@ -68,6 +75,13 @@ class ReleaseArtifact < ApplicationRecord
   validates :filesize,
     allow_blank: true,
     numericality: { greater_than_or_equal_to: 0 }
+
+  validates :status,
+    presence: true,
+    inclusion: {
+      message: 'unsupported status',
+      in: STATUSES,
+    }
 
   delegate :version, :semver, :channel,
     to: :release
@@ -155,7 +169,14 @@ class ReleaseArtifact < ApplicationRecord
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  delegate :yanked?,
+  scope :with_statuses, -> statuses { where(status: statuses.map { _1.to_s.upcase }) }
+  scope :with_status, -> status { where(status: status.to_s.upcase) }
+
+  scope :waiting,  -> { with_status(:WAITING) }
+  scope :uploaded, -> { with_status(:UPLOADED) }
+  scope :failed,   -> { with_status(:FAILED) }
+
+  delegate :draft?, :published?, :yanked?,
     to: :release
 
   def s3_object_key
@@ -214,6 +235,26 @@ class ReleaseArtifact < ApplicationRecord
   def yank!
     s3 = Aws::S3::Client.new
     s3.delete_object(bucket: 'keygen-dist', key: s3_object_key)
+  end
+
+  def waiting?
+    status == 'WAITING'
+  end
+
+  def uploaded?
+    # NOTE(ezekg) Backwards compat
+    return true if
+      status.nil?
+
+    status == 'UPLOADED'
+  end
+
+  def failed?
+    status == 'FAILED'
+  end
+
+  def downloadable?
+    uploaded? && published?
   end
 
   private
