@@ -217,24 +217,14 @@ class Release < ApplicationRecord
   scope :with_version, -> version { where(version: version) }
   scope :with_artifacts, -> { where.associated(:artifacts) }
   scope :without_artifacts, -> { where.missing(:artifacts) }
-  scope :with_status, -> status {
-    case status.to_s.upcase
-    when 'NOT_PUBLISHED',
-         'DRAFT'
-      where(status: :DRAFT)
-    when 'PUBLISHED'
-      where(status: :PUBLISHED)
-    when 'YANKED'
-      where(status: :YANKED)
-    else
-      none
-    end
-  }
+
+  scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
+  scope :with_status,   -> status { where(status: status.to_s.upcase) }
 
   scope :published, -> { with_status(:PUBLISHED) }
   scope :drafts,    -> { with_status(:DRAFT) }
   scope :yanked,    -> { with_status(:YANKED) }
-  scope :unyanked,  -> { where.not(yanked) }
+  scope :unyanked,  -> { with_statuses(:DRAFT, :PUBLISHED) }
 
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel

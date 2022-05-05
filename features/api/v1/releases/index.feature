@@ -547,13 +547,13 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | channel | yanked_at                |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
+      | product_id                           | version       | channel | status    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | YANKED    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=false"
     Then the response status should be "200"
@@ -566,13 +566,13 @@ Feature: List releases
       | id                                   | name     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
     And the current account has the following "release" rows:
-      | product_id                           | version       | channel | yanked_at                |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
+      | product_id                           | version       | channel | status    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | YANKED    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=true"
     Then the response status should be "200"
@@ -666,36 +666,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=DRAFT"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
-
-  Scenario: License attempts to retrieve all draft releases
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the first "product" has the following attributes:
-      """
-      { "distributionStrategy": "LICENSED" }
-      """
-    And the current account has 3 "releases" for the first "product"
-    And the current account has 1 "artifact" for the last "release"
-    And the first "release" has the following attributes:
-      """
-      { "status": "DRAFT" }
-      """
-    And the second "release" has the following attributes:
-      """
-      { "status": "YANKED" }
-      """
-    And the third "release" has the following attributes:
-      """
-      { "status": "PUBLISHED" }
-      """
-    And the current account has 1 "policy" for the first "product"
-    And the current account has 1 "license" for the first "policy"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?status=DRAFT"
-    Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the JSON response should be an array with 0 "releases"
 
   Scenario: License attempts to retrieve all published releases
     Given the current account is "test1"
@@ -757,7 +728,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?status=YANKED"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the JSON response should be an array with 0 "release"
 
   Scenario: License attempts to retrieve all accessible releases
     Given the current account is "test1"

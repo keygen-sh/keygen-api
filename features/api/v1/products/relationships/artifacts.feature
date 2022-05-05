@@ -48,7 +48,7 @@ Feature: Product artifacts relationship
     Then the response status should be "200"
     And the JSON response should be an array with 6 "artifacts"
 
-  Scenario: Admin retrieves the artifacts for a product (some artifacts are uploaded)
+  Scenario: Admin retrieves all artifacts for a product
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -104,7 +104,7 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?statuses[]=failed"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=failed"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "artifact"
 
@@ -134,7 +134,7 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?statuses[]=WAITING"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=WAITING"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
@@ -164,39 +164,9 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?statuses[]=uPlOaDeD"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=uPlOaDeD"
     Then the response status should be "200"
     And the JSON response should be an array with 2 "artifacts"
-
-  Scenario: Admin retrieves all artifacts for a product
-    Given the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version      | channel |
-      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
-      | 591227c1-c448-4586-b5e6-41978a80040a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
-      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
-      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta    |
-      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta    |
-      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta    |
-      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable  |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                  | filetype | platform | status   |
-      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | Test-App-1.0.0.dmg        | dmg      | macos    | UPLOADED |
-      | 591227c1-c448-4586-b5e6-41978a80040a | Test-App-1.0.1.dmg        | dmg      | macos    | UPLOADED |
-      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | Test-App-1.1.0.dmg        | dmg      | macos    | WAITING  |
-      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | FAILED   |
-      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | Test-App.1.0.0-beta.1.exe | exe      | win32    | WAITING  |
-      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | Test-App.1.0.0-beta.2.exe | exe      | win32    | WAITING  |
-      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
-    And I am an admin of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?statuses[]=waiting&statuses[]=uploaded&statuses[]=failed"
-    Then the response status should be "200"
-    And the JSON response should be an array with 6 "artifacts"
 
   Scenario: Product retrieves the artifacts for their product
     Given the current account is "test1"

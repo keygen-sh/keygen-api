@@ -151,7 +151,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "YANKED" }
       """
     And the current account has 1 "artifact" for each "release"
     And I use an authentication token
@@ -1260,7 +1260,7 @@ Feature: Release artifact relationship
     And the current account has 1 "artifact" for the first "release"
     And the first "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "YANKED" }
       """
     And I use an authentication token
     And I use API version "1.0"
@@ -1386,7 +1386,7 @@ Feature: Release artifact relationship
     And the current account has 3 "releases"
     And the first "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "YANKED" }
       """
     And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
