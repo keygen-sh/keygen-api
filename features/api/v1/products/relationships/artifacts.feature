@@ -25,15 +25,23 @@ Feature: Product artifacts relationship
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename                  | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | stable   |
-    And all "releases" have artifacts that are uploaded
+      | id                                   | product_id                           | version      | channel |
+      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | 591227c1-c448-4586-b5e6-41978a80040a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta    |
+      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta    |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta    |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | Test-App-1.0.0.dmg        | dmg      | macos    |
+      | 591227c1-c448-4586-b5e6-41978a80040a | Test-App-1.0.1.dmg        | dmg      | macos    |
+      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | Test-App-1.1.0.dmg        | dmg      | macos    |
+      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    |
+      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | Test-App.1.0.0-beta.2.exe | exe      | win32    |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    |
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -47,16 +55,23 @@ Feature: Product artifacts relationship
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename                  | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | Test-App-1.0.1.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | Test-App-1.1.0.dmg        | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | Test-App.1.0.0-beta.1.exe | exe      | win32    | beta     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | Test-App.1.0.0-beta.2.exe | exe      | win32    | beta     |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | stable   |
-    And the first "release" has an artifacts that is uploaded
-    And the second "release" has an artifacts that is uploaded
+      | id                                   | product_id                           | version      | channel |
+      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | 591227c1-c448-4586-b5e6-41978a80040a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta    |
+      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta    |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta    |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | d2fa75e4-6ed6-4a13-b0de-3888276a6a17 | Test-App-1.0.0.dmg        | dmg      | macos    |
+      | 591227c1-c448-4586-b5e6-41978a80040a | Test-App-1.0.1.dmg        | dmg      | macos    |
+      | 19d24546-57d3-4c91-bb02-e8bffefe3380 | Test-App-1.1.0.dmg        | dmg      | macos    |
+      | 094016fa-8112-4b91-9fa6-17a7d59bb6e4 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    |
+      | 06807d5b-e38e-4db0-bbd7-eb2bdc499979 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | a8b9a69c-5260-441d-9c32-179a0bdbcefe | Test-App.1.0.0-beta.2.exe | exe      | win32    |
+      | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    |
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -69,11 +84,13 @@ Feature: Product artifacts relationship
       | id                                   | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename              | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
-    And all "releases" have artifacts that are uploaded
+      | id                                   | product_id                           | version | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename              | filetype | platform |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -87,11 +104,13 @@ Feature: Product artifacts relationship
       | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 2 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename              | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
-    And all "releases" have artifacts that are uploaded
+      | id                                   | product_id                           | version | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename              | filetype | platform |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts"
@@ -104,7 +123,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for an existing "release"
     And I am a user of account "test1"
     And the current user has 1 "license"
     And I use an authentication token
@@ -118,7 +137,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for an existing "release"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -130,7 +149,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -141,7 +160,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "releases" for the first "product"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
@@ -153,10 +172,13 @@ Feature: Product artifacts relationship
       | id                                   | name   |
       | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename              | filetype | platform | channel  |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
+      | id                                   | product_id                           | version | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename              | filetype | platform |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
     And all "releases" have artifacts that are uploaded
     And I am an admin of account "test2"
     And I use an authentication token
@@ -169,7 +191,7 @@ Feature: Product artifacts relationship
     And the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
@@ -180,7 +202,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "developer"
     And I am a developer of account "test1"
     And the current account has 3 "releases"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
@@ -190,7 +212,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "sales-agent"
     And I am a sales agent of account "test1"
     And the current account has 3 "releases"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
@@ -200,7 +222,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "support-agent"
     And I am a support agent of account "test1"
     And the current account has 3 "releases"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
@@ -210,7 +232,7 @@ Feature: Product artifacts relationship
     And the current account has 1 "read-only"
     And I am a read only of account "test1"
     And the current account has 3 "releases"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "303"
@@ -235,7 +257,7 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And the current product has 1 "release"
@@ -247,7 +269,7 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts/$0"
@@ -257,7 +279,7 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
@@ -267,15 +289,17 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 1 |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
     And the current account has the following "release" rows:
-      | product_id                           | version      | filename              | filetype | platform | channel  |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App-1.0.0.dmg    | dmg      | macos    | stable   |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App-1.0.0.zip    | zip      | win32    | stable   |
-      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0        | Test-App.1.0.0.tar.gz | tar.gz   | linux    | stable   |
+      | id                                   | product_id                           | version | channel |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename              | filetype | platform |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
+      | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
-    And the first "release" has an artifact that is uploaded
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
@@ -286,7 +310,7 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
@@ -296,9 +320,9 @@ Feature: Product artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
-    And the first "release" has an artifact that is uploaded
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
@@ -307,7 +331,7 @@ Feature: Product artifacts relationship
   Scenario: Anonymous retrieves an artifact
     Given the current account is "test1"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "401"
 
@@ -315,7 +339,7 @@ Feature: Product artifacts relationship
     Given I am an admin of account "test2"
     But the current account is "test1"
     And the account "test1" has 3 "releases"
-    And all "releases" have artifacts that are uploaded
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
     Then the response status should be "401"

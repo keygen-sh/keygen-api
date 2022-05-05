@@ -64,8 +64,6 @@ module Api::V1
       )
 
       render jsonapi: artifact, status: :temporary_redirect, location: upload.url
-    rescue ReleaseUploadService::YankedReleaseError => e
-      render_unprocessable_entity detail: e.message
     end
 
     def destroy
