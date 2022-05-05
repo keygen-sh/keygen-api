@@ -12,7 +12,8 @@ class ReleaseArtifact < ApplicationRecord
   ]
 
   belongs_to :account
-  belongs_to :release
+  belongs_to :release,
+    inverse_of: :artifacts
   belongs_to :platform,
     class_name: 'ReleasePlatform',
     foreign_key: :release_platform_id,
@@ -87,12 +88,12 @@ class ReleaseArtifact < ApplicationRecord
     to: :release
 
   scope :order_by_version, -> {
-    joins(:release).order(<<~SQL.squish)
-      releases.semver_major        DESC,
-      releases.semver_minor        DESC,
-      releases.semver_patch        DESC,
-      releases.semver_prerelease   DESC NULLS FIRST,
-      releases.semver_build        DESC NULLS FIRST
+    joins('INNER JOIN releases ON releases.id = release_artifacts.release_id').order(<<~SQL.squish)
+      releases.semver_major      DESC,
+      releases.semver_minor      DESC,
+      releases.semver_patch      DESC,
+      releases.semver_prerelease DESC NULLS FIRST,
+      releases.semver_build      DESC NULLS FIRST
     SQL
   }
 
@@ -165,16 +166,16 @@ class ReleaseArtifact < ApplicationRecord
   scope :open, -> { joins(release: :product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(release: :product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  scope :with_statuses, -> statuses { where(status: statuses.map { _1.to_s.upcase }) }
-  scope :with_status, -> status { where(status: status.to_s.upcase) }
+  scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
+  scope :with_status,   -> status { where(status: status.to_s.upcase) }
 
   scope :waiting,  -> { with_status(:WAITING) }
   scope :uploaded, -> { with_status(:UPLOADED) }
   scope :failed,   -> { with_status(:FAILED) }
 
-  scope :draft,     -> { joins(:release).where(release: { status: 'DRAFT' })}
-  scope :published, -> { joins(:release).where(release: { status: 'PUBLISHED' })}
-  scope :yanked,    -> { joins(:release).where(release: { status: 'YANKED' })}
+  scope :draft,     -> { joins(:release).where(release: { status: 'DRAFT' }) }
+  scope :published, -> { joins(:release).where(release: { status: 'PUBLISHED' }) }
+  scope :yanked,    -> { joins(:release).where(release: { status: 'YANKED' }) }
 
   delegate :draft?, :published?, :yanked?,
     to: :release

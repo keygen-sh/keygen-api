@@ -3,6 +3,7 @@
 module Api::V1
   class ArtifactsController < Api::V1::BaseController
     has_scope(:product) { |c, s, v| s.for_product(v) }
+    has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
@@ -96,18 +97,22 @@ module Api::V1
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = policy_scope(current_account.release_artifacts).for_channel(
-        artifact_query.fetch(:channel) { 'stable' },
-      )
+      scoped_artifacts = policy_scope(current_account.release_artifacts)
+        # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
+        #              differs depends on prior scopes.
+        .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
+        .for_channel(
+          artifact_query.fetch(:channel) { 'stable' },
+        )
 
       # NOTE(ezekg) Fetch the latest version of the artifact since we have no
       #             other qualifiers outside of a :filename.
-      @artifact = FindByAliasService.call(scope: scoped_artifacts.joins(:release), identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        semver_major      DESC,
-        semver_minor      DESC,
-        semver_patch      DESC,
-        semver_prerelease DESC NULLS FIRST,
-        semver_build      DESC NULLS FIRST
+      @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
+        releases.semver_major      DESC,
+        releases.semver_minor      DESC,
+        releases.semver_patch      DESC,
+        releases.semver_prerelease DESC NULLS FIRST,
+        releases.semver_build      DESC NULLS FIRST
       SQL
 
       Current.resource = artifact
