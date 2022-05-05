@@ -14,7 +14,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def index
-      releases = apply_pagination(policy_scope(apply_scopes(product.releases)).preload(:artifacts, :platform, :filetype, :channel))
+      releases = apply_pagination(policy_scope(apply_scopes(product.releases)).preload(:channel))
       authorize releases
 
       render jsonapi: releases

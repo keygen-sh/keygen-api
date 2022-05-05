@@ -93,6 +93,10 @@ Feature: Show release
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
+    And the first "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
@@ -119,7 +123,6 @@ Feature: Show release
       """
       { "status": "YANKED" }
       """
-    And the first "release" has an artifact that is nil
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"

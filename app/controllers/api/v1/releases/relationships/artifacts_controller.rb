@@ -16,7 +16,7 @@ module Api::V1::Releases::Relationships
     end
 
     def show
-      artifact = FindByAliasService.call(scope: release.artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
+      artifact = FindByAliasService.call(scope: release.artifacts.joins(:release), identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
         releases.semver_major        DESC,
         releases.semver_minor        DESC,
         releases.semver_patch        DESC,
