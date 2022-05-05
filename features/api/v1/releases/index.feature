@@ -372,19 +372,18 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the JSON response should be an array with 1 "release"
 
   Scenario: Admin retrieves all tar.gz releases for their account
     Given I am an admin of account "test1"
@@ -399,15 +398,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
     Then the response status should be "200"
@@ -426,15 +424,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=exe"
     Then the response status should be "200"
@@ -453,15 +450,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=dmg"
     Then the response status should be "200"
@@ -480,15 +476,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?platform=macos"
     Then the response status should be "200"
@@ -507,15 +502,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?platform=win32"
     Then the response status should be "200"
@@ -534,15 +528,14 @@ Feature: List releases
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
     And the current account has the following "artifact" rows:
       | release_id                           | filename                   | filetype | platform |
       | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
       | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
       | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0.exe         | exe      | win32    |
     When I send a GET request to "/accounts/test1/releases?platform=linux"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
@@ -558,7 +551,7 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
     And I use an authentication token
@@ -577,7 +570,7 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | 2021-06-21T22:05:01.221Z |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  |                          |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   |                          |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    |                          |
     And I use an authentication token
@@ -654,13 +647,19 @@ Feature: List releases
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is nil
-    And the second "release" has an artifact that is nil
+    And the first "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
     And the second "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "YANKED" }
       """
-    And the third "release" has an artifact that is uploaded
+    And the third "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the current account has 1 "artifact" for the third "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -677,13 +676,19 @@ Feature: List releases
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is nil
-    And the second "release" has an artifact that is nil
+    And the current account has 1 "artifact" for the last "release"
+    And the first "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
     And the second "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "YANKED" }
       """
-    And the third "release" has an artifact that is uploaded
+    And the third "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -699,10 +704,25 @@ Feature: List releases
       """
       { "distributionStrategy": "LICENSED" }
       """
-    And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is nil
+    And the current account has 4 "releases" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the third "release"
+    And the first "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
+    And the fourth "release" has the following attributes:
+      """
+      { "status": "YANKED" }
+      """
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -721,12 +741,17 @@ Feature: List releases
     And the current account has 3 "releases" for the first "product"
     And the first "release" has the following attributes:
       """
-      { "yankedAt": "$time.now" }
+      { "status": "DRAFT" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "status": "YANKED" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "status": "PUBLISHED" }
       """
     And the current account has 1 "policy" for the first "product"
-    And the first "release" has an artifact that is nil
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is uploaded
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
