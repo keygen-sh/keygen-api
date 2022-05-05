@@ -99,7 +99,8 @@ module Api::V1
     def set_artifact
       scoped_artifacts = policy_scope(current_account.release_artifacts)
         # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
-        #              differs depends on prior scopes.
+        #              differs depends on prior scopes and we need it for
+        #              ordering by semver (below).
         .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
         .for_channel(
           artifact_query.fetch(:channel) { 'stable' },

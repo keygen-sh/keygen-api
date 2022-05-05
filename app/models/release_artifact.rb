@@ -103,10 +103,10 @@ class ReleaseArtifact < ApplicationRecord
       when UUID_RE
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show artifacts for stable, rc and beta channels.
-        joins(release: :channel).select('release_channels.key')
-                                .where(channel: channel)
-                                .first
-                                .try(:key)
+        joins(:channel).select('release_channels.key')
+                       .where(channel: channel)
+                       .first
+                       .try(:key)
       when ReleaseChannel
         channel.key
       else
@@ -129,7 +129,7 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :for_channel_key, -> key { joins(release: :channel).where(channel: { key: key }) }
+  scope :for_channel_key, -> key { joins(:channel).where(channel: { key: key }) }
   scope :stable, -> { for_channel_key(%i(stable)) }
   scope :rc, -> { for_channel_key(%i(stable rc)) }
   scope :beta, -> { for_channel_key(%i(stable rc beta)) }
@@ -137,11 +137,11 @@ class ReleaseArtifact < ApplicationRecord
   scope :dev, -> { for_channel_key(%i(dev)) }
 
   scope :for_product, -> product {
-    joins(release: :product).where(product: { id: product })
+    joins(:product).where(product: { id: product })
   }
 
   scope :for_user, -> user {
-    joins(release: { product: %i[users] })
+    joins(product: %i[users])
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: user },
@@ -152,7 +152,7 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_license, -> license {
-    joins(release: { product: %i[licenses] })
+    joins(product: %i[licenses])
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: license },
@@ -162,9 +162,9 @@ class ReleaseArtifact < ApplicationRecord
       )
   }
 
-  scope :licensed, -> { joins(release: :product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
-  scope :open, -> { joins(release: :product).where(product: { distribution_strategy: 'OPEN' }) }
-  scope :closed, -> { joins(release: :product).where(product: { distribution_strategy: 'CLOSED' }) }
+  scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
+  scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
