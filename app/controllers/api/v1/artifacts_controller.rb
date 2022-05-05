@@ -85,7 +85,7 @@ module Api::V1
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = policy_scope(current_account.release_artifacts).for_channel(
+      scoped_artifacts = policy_scope(current_account.release_artifacts).joins(:release).for_channel(
         artifact_query.fetch(:channel) { 'stable' },
       )
 

@@ -1260,7 +1260,8 @@ Feature: Create release
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
+    And the current account has 1 "artifact" for the first "release"
+    And the first "artifact" has the following attributes:
       """
       {
         "filename": "gems/latest_specs.4.8.gz",
@@ -1311,7 +1312,8 @@ Feature: Create release
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has the following attributes:
+    And the current account has 1 "artifact" for the first "release"
+    And the first "artifact" has the following attributes:
       """
       {
         "filename": "gems/specs.4.8",

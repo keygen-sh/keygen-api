@@ -33,9 +33,7 @@ Feature: Release artifacts relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
@@ -55,14 +53,12 @@ Feature: Release artifacts relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
+    And the current account has 3 "artifacts" for each "release"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "artifact"
+    And the JSON response should be an array with 3 "artifacts"
 
   Scenario: Product retrieves the artifacts for a release of another product
     Given the current account is "test1"
@@ -77,8 +73,6 @@ Feature: Release artifacts relationship
     Given the current account is "test1"
     And the current account has 3 "releases"
     And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -92,8 +86,6 @@ Feature: Release artifacts relationship
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts"
@@ -104,8 +96,6 @@ Feature: Release artifacts relationship
     Given the current account is "test1"
     And the current account has 3 "releases"
     And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
@@ -120,8 +110,6 @@ Feature: Release artifacts relationship
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "artifact" for the first "release"
-    And the second "release" has an artifact that is uploaded
-    And the third "release" has an artifact that is nil
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"

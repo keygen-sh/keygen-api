@@ -179,7 +179,6 @@ Feature: Product artifacts relationship
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
-    And all "releases" have artifacts that are uploaded
     And I am an admin of account "test2"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
