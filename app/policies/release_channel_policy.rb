@@ -13,5 +13,12 @@ class ReleaseChannelPolicy < ApplicationPolicy
     true
   end
 
-  class Scope < ReleasePolicy::Scope; end
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      return scope.open if
+        bearer.nil?
+
+      super
+    end
+  end
 end

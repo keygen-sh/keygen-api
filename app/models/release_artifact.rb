@@ -96,20 +96,16 @@ class ReleaseArtifact < ApplicationRecord
     SQL
   }
 
-  scope :published, -> {
-    joins(:release).where(release: { status: 'PUBLISHED' })
-  }
-
   scope :for_channel, -> channel {
     key =
       case channel
       when UUID_RE
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show artifacts for stable, rc and beta channels.
-        joins(:channel).select('release_channels.key')
-                       .where(channel: channel)
-                       .first
-                       .try(:key)
+        joins(release: :channel).select('release_channels.key')
+                                .where(channel: channel)
+                                .first
+                                .try(:key)
       when ReleaseChannel
         channel.key
       else
@@ -132,7 +128,7 @@ class ReleaseArtifact < ApplicationRecord
     end
   }
 
-  scope :for_channel_key, -> key { joins(:channel).where(channel: { key: key }) }
+  scope :for_channel_key, -> key { joins(release: :channel).where(channel: { key: key }) }
   scope :stable, -> { for_channel_key(%i(stable)) }
   scope :rc, -> { for_channel_key(%i(stable rc)) }
   scope :beta, -> { for_channel_key(%i(stable rc beta)) }
@@ -140,11 +136,11 @@ class ReleaseArtifact < ApplicationRecord
   scope :dev, -> { for_channel_key(%i(dev)) }
 
   scope :for_product, -> product {
-    joins(:product).where(product: { id: product })
+    joins(release: :product).where(product: { id: product })
   }
 
   scope :for_user, -> user {
-    joins(product: %i[users])
+    joins(release: { product: %i[users] })
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         users: { id: user },
@@ -155,7 +151,7 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :for_license, -> license {
-    joins(product: %i[licenses])
+    joins(release: { product: %i[licenses] })
       .where(
         product: { distribution_strategy: ['LICENSED', nil] },
         licenses: { id: license },
@@ -165,9 +161,9 @@ class ReleaseArtifact < ApplicationRecord
       )
   }
 
-  scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
-  scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
-  scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
+  scope :licensed, -> { joins(release: :product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
+  scope :open, -> { joins(release: :product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed, -> { joins(release: :product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_statuses, -> statuses { where(status: statuses.map { _1.to_s.upcase }) }
   scope :with_status, -> status { where(status: status.to_s.upcase) }
@@ -175,6 +171,10 @@ class ReleaseArtifact < ApplicationRecord
   scope :waiting,  -> { with_status(:WAITING) }
   scope :uploaded, -> { with_status(:UPLOADED) }
   scope :failed,   -> { with_status(:FAILED) }
+
+  scope :draft,     -> { joins(:release).where(release: { status: 'DRAFT' })}
+  scope :published, -> { joins(:release).where(release: { status: 'PUBLISHED' })}
+  scope :yanked,    -> { joins(:release).where(release: { status: 'YANKED' })}
 
   delegate :draft?, :published?, :yanked?,
     to: :release

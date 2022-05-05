@@ -148,7 +148,8 @@ class ReleasePolicy < ApplicationPolicy
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      return scope.open.published if bearer.nil?
+      return scope.open.published if
+        bearer.nil?
 
       @scope = case
                when bearer.has_role?(:admin, :developer, :product)

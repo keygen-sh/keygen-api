@@ -21,6 +21,13 @@ module Api::V1::Products::Relationships
       if artifact.downloadable?
         download = artifact.download!(ttl: artifact_query[:ttl])
 
+        # FIXME(ezekg) Add support for broadcasting multiple events
+        BroadcastEventService.call(
+          event: 'release.downloaded',
+          account: current_account,
+          resource: artifact,
+        )
+
         BroadcastEventService.call(
           event: 'artifact.downloaded',
           account: current_account,
@@ -50,11 +57,11 @@ module Api::V1::Products::Relationships
       scoped_artifacts = policy_scope(release.artifacts).joins(:release)
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        releases.semver_major        DESC,
-        releases.semver_minor        DESC,
-        releases.semver_patch        DESC,
-        releases.semver_prerelease   DESC NULLS FIRST,
-        releases.semver_build        DESC NULLS FIRST
+        semver_major      DESC,
+        semver_minor      DESC,
+        semver_patch      DESC,
+        semver_prerelease DESC NULLS FIRST,
+        semver_build      DESC NULLS FIRST
       SQL
     end
 
