@@ -22,6 +22,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def trial_ending_soon_without_payment_method(account:)
+    return if
+      account.free_tier?
+
     admin = account.admins.last
 
     mail(
@@ -42,6 +45,9 @@ class PlaintextMailer < ApplicationMailer
   end
 
   def trial_ending_soon_with_payment_method(account:)
+    return if
+      account.free_tier?
+
     admin = account.admins.last
 
     mail(

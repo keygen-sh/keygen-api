@@ -220,6 +220,12 @@ class Account < ApplicationRecord
             plan.free?
   end
 
+  def free_tier?
+    return false if billing.nil?
+
+    plan.free?
+  end
+
   def paid_tier?
     return false if billing.nil?
 
