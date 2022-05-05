@@ -40,5 +40,18 @@ class ReleaseArtifactPolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  class Scope < ReleasePolicy::Scope; end
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      return scope.open.uploaded if bearer.nil?
+
+      @scope = case
+               when bearer.has_role?(:admin, :developer, :product)
+                 scope
+               else
+                 scope.uploaded
+               end
+
+      super
+    end
+  end
 end

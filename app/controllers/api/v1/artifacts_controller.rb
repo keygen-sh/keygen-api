@@ -22,16 +22,20 @@ module Api::V1
     def show
       authorize artifact
 
-      download = artifact.download!(ttl: artifact_query[:ttl])
+      if artifact.downloadable?
+        download = artifact.download!(ttl: artifact_query[:ttl])
 
-      BroadcastEventService.call(
-        event: 'artifact.downloaded',
-        account: current_account,
-        resource: artifact,
-      )
+        BroadcastEventService.call(
+          event: 'artifact.downloaded',
+          account: current_account,
+          resource: artifact,
+        )
 
-      # Show we support `Prefer: no-redirect` for browser clients?
-      render jsonapi: artifact, status: :see_other, location: download.url
+        # Show we support `Prefer: no-redirect` for browser clients?
+        render jsonapi: artifact, status: :see_other, location: download.url
+      else
+        render jsonapi: artifact
+      end
     end
 
     def create

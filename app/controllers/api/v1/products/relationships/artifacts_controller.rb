@@ -5,7 +5,8 @@ module Api::V1::Products::Relationships
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_product
+    before_action :set_product, only: %i[index show]
+    before_action :set_artifact, only: %i[show]
 
     def index
       artifacts = apply_pagination(policy_scope(apply_scopes(product.release_artifacts)).preload(:platform, :arch, :filetype))
@@ -15,45 +16,46 @@ module Api::V1::Products::Relationships
     end
 
     def show
-      artifact = FindByAliasService.call(scope: product.release_artifacts.joins(:release), identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
+      authorize artifact
+
+      if artifact.downloadable?
+        download = artifact.download!(ttl: artifact_query[:ttl])
+
+        BroadcastEventService.call(
+          event: 'artifact.downloaded',
+          account: current_account,
+          resource: artifact,
+        )
+
+        # Show we support `Prefer: no-redirect` for browser clients?
+        render jsonapi: artifact, status: :see_other, location: download.url
+      else
+        render jsonapi: artifact
+      end
+    end
+
+    private
+
+    attr_reader :product,
+                :artifact
+
+    def set_product
+      @product = current_account.products.find(params[:product_id])
+      authorize product, :show?
+
+      Current.resource = product
+    end
+
+    def set_artifact
+      scoped_artifacts = policy_scope(release.artifacts).joins(:release)
+
+      @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
         releases.semver_major        DESC,
         releases.semver_minor        DESC,
         releases.semver_patch        DESC,
         releases.semver_prerelease   DESC NULLS FIRST,
         releases.semver_build        DESC NULLS FIRST
       SQL
-      authorize artifact
-
-      download = DownloadArtifactService.call(
-        account: current_account,
-        ttl: artifact_query[:ttl],
-        artifact:,
-      )
-
-      BroadcastEventService.call(
-        event: 'release.downloaded',
-        account: current_account,
-        resource: artifact,
-      )
-
-      render jsonapi: artifact, status: :see_other, location: download.redirect_url
-    rescue DownloadArtifactService::InvalidTTLError => e
-      render_bad_request detail: e.message, source: { parameter: :ttl }
-    rescue DownloadArtifactService::InvalidArtifactError => e
-      render_not_found detail: e.message
-    rescue DownloadArtifactService::YankedReleaseError => e
-      render_unprocessable_entity detail: e.message
-    end
-
-    private
-
-    attr_reader :product
-
-    def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize product, :show?
-
-      Current.resource = product
     end
 
     typed_query do

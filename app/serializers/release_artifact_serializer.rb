@@ -16,6 +16,7 @@ class ReleaseArtifactSerializer < BaseSerializer
   end
   attribute :signature
   attribute :checksum
+  attribute :status
   attribute :created do
     @object.created_at
   end

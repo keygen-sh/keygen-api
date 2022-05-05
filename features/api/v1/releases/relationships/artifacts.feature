@@ -165,44 +165,27 @@ Feature: Release artifacts relationship
   Scenario: Admin retrieves the artifact for a release that has not been uploaded
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "releases"
+    And the current account has 3 published "releases"
+    And the current account has 1 waiting "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "404"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Not found",
-        "detail": "artifact is unavailable (ensure it has been fully uploaded)",
-        "code": "NOT_FOUND"
-      }
-      """
+    Then the response status should be "200"
 
   Scenario: Admin retrieves the artifact for a release that has been yanked
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "releases"
-    And the first "release" has the following attributes:
-      """
-      { "yankedAt": "$time.now" }
-      """
+    And the current account has 3 yanked "releases"
+    And the current account has 1 uploaded "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable entity",
-        "detail": "has been yanked"
-      }
-      """
+    Then the response status should be "200"
 
   Scenario: Product retrieves the artifact for a release of their product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    Given I am a product of account "test1"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
@@ -213,7 +196,7 @@ Feature: Release artifacts relationship
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
     And the current account has 1 "artifact" for the first "release"
-    Given I am a product of account "test1"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0?ttl=604800"
     Then the response status should be "303"
@@ -229,6 +212,26 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "404"
 
+  Scenario: Product retrieves the artifact for a release that has not been uploaded
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Admin retrieves the artifact for a release that has been yanked
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 uploaded "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "200"
+
   Scenario: License retrieves the artifact for a release of their product
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -241,6 +244,30 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
+
+  Scenario: License retrieves the artifact for a release that has not been uploaded
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 published "releases" for the first "product"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves the artifact for a release that has been yanked
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 yanked "releases" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "404"
 
   Scenario: License retrieves the artifact for a release of their product (1 day TTL)
     Given the current account is "test1"
@@ -574,6 +601,34 @@ Feature: Release artifacts relationship
     When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
+
+  Scenario: License retrieves the artifact for a release that has not been uploaded
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 published "releases" for the first "product"
+    And the current account has 1 waiting "artifact" for the first "release"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retrieves the artifact for a release that has been yanked
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 yanked "releases" for the first "product"
+    And the current account has 1 "artifact" for the first "release"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/artifacts/$0"
+    Then the response status should be "404"
 
   Scenario: User retrieves a release artifact with a license for it (2 minute TTL)
     Given the current account is "test1"
