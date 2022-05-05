@@ -2,6 +2,8 @@
 
 module Api::V1::Products::Relationships
   class ArtifactsController < Api::V1::BaseController
+    has_scope(:status) { |c, s, v| s.with_status(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
@@ -54,19 +56,22 @@ module Api::V1::Products::Relationships
     end
 
     def set_artifact
-      scoped_artifacts = policy_scope(release.artifacts).joins(:release)
+      scoped_artifacts = policy_scope(product.release_artifacts).for_channel(
+        artifact_query.fetch(:channel) { 'stable' },
+      )
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        semver_major      DESC,
-        semver_minor      DESC,
-        semver_patch      DESC,
-        semver_prerelease DESC NULLS FIRST,
-        semver_build      DESC NULLS FIRST
+        releases.semver_major      DESC,
+        releases.semver_minor      DESC,
+        releases.semver_patch      DESC,
+        releases.semver_prerelease DESC NULLS FIRST,
+        releases.semver_build      DESC NULLS FIRST
       SQL
     end
 
     typed_query do
       on :show do
+        query :channel, type: :string, inclusion: %w[stable rc beta alpha dev], optional: true
         if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
           query :ttl, type: :integer, coerce: true, optional: true
         end
