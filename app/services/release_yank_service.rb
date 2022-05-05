@@ -3,6 +3,7 @@
 class ReleaseYankService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidReleaseError < StandardError; end
+  class InvalidArtifactError < StandardError; end
   class YankedReleaseError < StandardError; end
 
   def initialize(account:, release:)
@@ -12,11 +13,15 @@ class ReleaseYankService < BaseService
     raise InvalidReleaseError.new('release must be present') unless
       release.present?
 
+    raise InvalidArtifactError.new('artifact must be present') unless
+      release.artifact.present?
+
     raise YankedReleaseError.new('has been yanked') if
       release.yanked?
 
     @account  = account
     @release  = release
+    @artifact = release.artifact
   end
 
   def call
@@ -24,10 +29,7 @@ class ReleaseYankService < BaseService
     s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
 
     release.touch(:yanked_at)
-
-    artifact = release.artifacts.first
-    artifact.destroy unless
-      artifact.nil?
+    artifact.destroy
 
     nil
   rescue ActiveRecord::RecordNotFound
@@ -37,5 +39,6 @@ class ReleaseYankService < BaseService
   private
 
   attr_reader :account,
-              :release
+              :release,
+              :artifact
 end

@@ -12,7 +12,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
@@ -23,7 +23,7 @@ Feature: Release artifact relationship
     And I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
@@ -34,7 +34,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
@@ -62,7 +62,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=3600"
@@ -73,7 +73,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=10"
@@ -93,7 +93,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact?ttl=1209600"
@@ -109,11 +109,29 @@ Feature: Release artifact relationship
       }
       """
 
+  Scenario: Admin retrieves the non-existent artifact for a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "404"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Not found",
+        "detail": "artifact does not exist (ensure it has been uploaded)",
+        "code": "NOT_FOUND"
+      }
+      """
+
   Scenario: Admin retrieves the artifact for a release that has not been uploaded
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
+    And AWS S3 is responding with a 404 status
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
@@ -131,11 +149,11 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
     And the first "release" has the following attributes:
       """
       { "yankedAt": "$time.now" }
       """
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
@@ -152,7 +170,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -164,7 +182,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -176,7 +194,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 2 "releases" for the second "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -189,7 +207,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -203,7 +221,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -221,7 +239,7 @@ Feature: Release artifact relationship
       { "expiry": "$time.2.minutes.ago" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -246,7 +264,7 @@ Feature: Release artifact relationship
       """
       { "createdAt": "$time.3.months.ago" }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -272,7 +290,7 @@ Feature: Release artifact relationship
       """
       { "createdAt": "$time.3.months.ago" }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -289,7 +307,7 @@ Feature: Release artifact relationship
       { "suspended": true }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -313,7 +331,7 @@ Feature: Release artifact relationship
       { "expiry": "$time.2.minutes.ago" }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I authenticate with my license key
     And I use API version "1.0"
@@ -341,7 +359,7 @@ Feature: Release artifact relationship
       """
       { "createdAt": "$time.3.months.ago" }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I authenticate with my license key
     And I use API version "1.0"
@@ -370,7 +388,7 @@ Feature: Release artifact relationship
       """
       { "createdAt": "$time.3.months.ago" }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I authenticate with my license key
     And I use API version "1.0"
@@ -391,7 +409,7 @@ Feature: Release artifact relationship
       { "suspended": true }
       """
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I authenticate with my license key
     And I use API version "1.0"
@@ -403,7 +421,7 @@ Feature: Release artifact relationship
     And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -431,7 +449,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -473,7 +491,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -508,7 +526,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -522,7 +540,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
     And the current account has 1 "release-entitlement-constraint" for an existing "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -536,7 +554,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -552,7 +570,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -572,7 +590,7 @@ Feature: Release artifact relationship
       { "expiry": "$time.2.days.ago" }
       """
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -595,7 +613,7 @@ Feature: Release artifact relationship
       """
       { "createdAt": "$time.1.months.ago" }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -615,7 +633,7 @@ Feature: Release artifact relationship
       { "suspended": true }
       """
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -634,7 +652,7 @@ Feature: Release artifact relationship
       { "expiry": "$time.2.days.ago" }
       """
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -657,7 +675,7 @@ Feature: Release artifact relationship
       { "suspended": true }
       """
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -687,7 +705,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -731,7 +749,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -768,7 +786,7 @@ Feature: Release artifact relationship
         "releaseId": "$releases[0]"
       }
       """
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -784,7 +802,7 @@ Feature: Release artifact relationship
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
     And the current account has 1 "release-entitlement-constraint" for an existing "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -796,7 +814,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -812,7 +830,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
@@ -825,7 +843,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -841,7 +859,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -858,7 +876,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -876,7 +894,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
@@ -895,7 +913,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -910,7 +928,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the second "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -925,7 +943,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "LICENSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am an admin of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -941,7 +959,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
@@ -954,7 +972,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
@@ -967,7 +985,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -983,7 +1001,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -1000,7 +1018,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -1018,7 +1036,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
@@ -1037,7 +1055,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1052,7 +1070,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the second "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1067,7 +1085,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "OPEN" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am an admin of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1083,7 +1101,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "404"
@@ -1096,7 +1114,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
@@ -1112,7 +1130,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
@@ -1129,7 +1147,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -1147,7 +1165,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
@@ -1166,7 +1184,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1181,7 +1199,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the second "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1196,7 +1214,7 @@ Feature: Release artifact relationship
       { "distributionStrategy": "CLOSED" }
       """
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am an admin of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1204,11 +1222,20 @@ Feature: Release artifact relationship
     Then the response status should be "303"
 
   # Artifact upload links
+  Scenario: Admin uploads an artifact for a release (no artifact)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PUT request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "422"
+
   Scenario: Admin uploads an artifact for a release (not uploaded)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
@@ -1219,7 +1246,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
@@ -1230,7 +1257,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the first "release" has the following attributes:
       """
       { "yankedAt": "$time.now" }
@@ -1251,7 +1278,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1263,7 +1290,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 2 "releases" for the second "product"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1276,7 +1303,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1288,7 +1315,7 @@ Feature: Release artifact relationship
     And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1302,7 +1329,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1314,7 +1341,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1322,11 +1349,20 @@ Feature: Release artifact relationship
     Then the response status should be "404"
 
   # Artifact yank
+  Scenario: Admin yanks an artifact for a release (no artifact)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "422"
+
   Scenario: Admin yanks an artifact for a release (not uploaded)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
@@ -1337,7 +1373,7 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
@@ -1348,11 +1384,11 @@ Feature: Release artifact relationship
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the first "release" has an artifact that is not uploaded
     And the first "release" has the following attributes:
       """
       { "yankedAt": "$time.now" }
       """
+    And the current account has 1 "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a DELETE request to "/accounts/test1/releases/$0/artifact"
@@ -1369,7 +1405,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1381,7 +1417,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 2 "releases" for the second "product"
-    And the first "release" has an artifact that is not uploaded
+    And the current account has 1 "artifact" for the first "release"
     Given I am a product of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1395,7 +1431,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1408,7 +1444,7 @@ Feature: Release artifact relationship
     And the current account has 1 "product"
     And the current account has 1 "license"
     And the current account has 3 "releases" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a license of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1423,7 +1459,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for an existing "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1436,7 +1472,7 @@ Feature: Release artifact relationship
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "release"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And I am a user of account "test1"
     And I use an authentication token
     And I use API version "1.0"
@@ -1451,7 +1487,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the first "policy" has the following attributes:
       """
       {
@@ -1481,7 +1517,7 @@ Feature: Release artifact relationship
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "release" for the first "product"
-    And the first "release" has an artifact that is uploaded
+    And the current account has 1 "artifact" for the first "release"
     And the first "policy" has the following attributes:
       """
       {

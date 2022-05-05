@@ -22,7 +22,7 @@ Feature: Show release artifact
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
@@ -33,7 +33,7 @@ Feature: Show release artifact
     And the current account has 1 "developer"
     And I am a developer of account "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
@@ -43,7 +43,7 @@ Feature: Show release artifact
     And the current account has 1 "sales-agent"
     And I am a sales agent of account "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
@@ -53,7 +53,7 @@ Feature: Show release artifact
     And the current account has 1 "support-agent"
     And I am a support agent of account "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
@@ -63,7 +63,7 @@ Feature: Show release artifact
     And the current account has 1 "read-only"
     And I am a read only of account "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
@@ -1200,7 +1200,7 @@ Feature: Show release artifact
     Given I am an admin of account "test2"
     But the current account is "test1"
     And the current account has 3 "releases"
-    And the current account has 1 "artifact" for all "releases"
+    And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "401"
