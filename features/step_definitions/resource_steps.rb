@@ -94,19 +94,19 @@ Given /^the current account has the following attributes:$/ do |body|
   @account.update!(attributes)
 end
 
-Given /^the current account has (\d+) "([^\"]*)"$/ do |count, resource|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)"$/ do |count, trait, resource|
   count.to_i.times do
-    create resource.singularize.underscore, account: @account
+    create resource.singularize.underscore, trait, account: @account
   end
 end
 
-Given /^the current account has (\d+) "([^\"]*)" with the following:$/ do |count, resource, body|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" with the following:$/ do |count, trait, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
 
   count.to_i.times do
-    create resource.singularize.underscore, **attrs, account: @account
+    create resource.singularize.underscore, trait, **attrs, account: @account
   end
 end
 
@@ -149,27 +149,27 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   end
 end
 
-Given /^the current account has (\d+) "([^\"]*)" for(?: an)? existing "([^\"]*)"$/ do |count, resource, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for(?: an)? existing "([^\"]*)"$/ do |count, trait, resource, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).all.sample
     association_name = association.singularize.underscore.to_sym
 
-    create resource.singularize.underscore, account: @account, association_name => associated_record
+    create resource.singularize.underscore, trait, account: @account, association_name => associated_record
   end
 end
 
-Given /^the current account has (\d+) "([^\"]*)" for (?:all|each) "([^\"]*)"$/ do |count, resource, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for (?:all|each) "([^\"]*)"$/ do |count, trait, resource, association|
   associated_records = @account.send(association.pluralize.underscore).all
   association_name = association.singularize.underscore.to_sym
 
   associated_records.each do |record|
     count.to_i.times do
-      create resource.singularize.underscore, account: @account, association_name => record
+      create resource.singularize.underscore, trait, account: @account, association_name => record
     end
   end
 end
 
-Given /^the current account has (\d+) "([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, resource, index, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, trait, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
     association_name =
@@ -180,21 +180,21 @@ Given /^the current account has (\d+) "([^\"]*)" for the (\w+) "([^\"]*)"$/ do |
         association.singularize.underscore.to_sym
       end
 
-    create resource.singularize.underscore, account: @account, association_name => associated_record
+    create resource.singularize.underscore, trait, account: @account, association_name => associated_record
   end
 end
 
-Given /^the current account has (\d+) userless "([^\"]*)"$/ do |count, resource|
-  count.to_i.times do
-    create resource.singularize.underscore, :userless, account: @account
-  end
-end
+# Given /^the current account has (\d+) userless "([^\"]*)"$/ do |count, resource|
+#   count.to_i.times do
+#     create resource.singularize.underscore, :userless, account: @account
+#   end
+# end
 
-Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, resource|
-  count.to_i.times do
-    @crypt << create(resource.singularize.underscore, :legacy_encrypt, account: @account)
-  end
-end
+# Given /^the current account has (\d+) legacy encrypted "([^\"]*)"$/ do |count, resource|
+#   count.to_i.times do
+#     @crypt << create(resource.singularize.underscore, :legacy_encrypt, account: @account)
+#   end
+# end
 
 Given /^the current account has (\d+) "([^\"]*)" using "([^\"]*)"$/ do |count, resource, scheme|
   count.to_i.times do
