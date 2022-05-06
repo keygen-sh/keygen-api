@@ -107,11 +107,12 @@ module Api::V1
       # NOTE(ezekg) Fetch the latest version of the artifact since we have no
       #             other qualifiers outside of a :filename.
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        releases.semver_major      DESC,
-        releases.semver_minor      DESC,
-        releases.semver_patch      DESC,
-        releases.semver_prerelease DESC NULLS FIRST,
-        releases.semver_build      DESC NULLS FIRST
+        release_artifacts.created_at DESC,
+        releases.semver_major        DESC,
+        releases.semver_minor        DESC,
+        releases.semver_patch        DESC,
+        releases.semver_prerelease   DESC NULLS FIRST,
+        releases.semver_build        DESC NULLS FIRST
       SQL
 
       Current.resource = artifact

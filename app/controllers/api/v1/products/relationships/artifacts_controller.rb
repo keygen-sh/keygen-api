@@ -60,11 +60,12 @@ module Api::V1::Products::Relationships
       scoped_artifacts = apply_scopes(policy_scope(product.release_artifacts))
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        releases.semver_major      DESC,
-        releases.semver_minor      DESC,
-        releases.semver_patch      DESC,
-        releases.semver_prerelease DESC NULLS FIRST,
-        releases.semver_build      DESC NULLS FIRST
+        release_artifacts.created_at DESC,
+        releases.semver_major        DESC,
+        releases.semver_minor        DESC,
+        releases.semver_patch        DESC,
+        releases.semver_prerelease   DESC NULLS FIRST,
+        releases.semver_build        DESC NULLS FIRST
       SQL
     end
 
