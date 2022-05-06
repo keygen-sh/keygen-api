@@ -89,8 +89,6 @@ module Api::V1
         account: current_account,
         resource: artifact,
       )
-    rescue ReleaseYankService::YankedReleaseError => e
-      render_unprocessable_entity detail: e.message
     end
 
     private
@@ -158,14 +156,6 @@ module Api::V1
             param :signature, type: :string, optional: true
             param :checksum, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
-          end
-          param :relationships, type: :hash do
-            param :release, type: :hash do
-              param :data, type: :hash do
-                param :type, type: :string, inclusion: %w[release releases]
-                param :id, type: :string
-              end
-            end
           end
         end
       end

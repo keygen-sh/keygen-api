@@ -1234,13 +1234,20 @@ Feature: Release artifact relationship
   Scenario: Admin uploads an artifact for a release (not uploaded)
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "releases"
-    And the current account has 1 "artifact" for the first "release"
+    And the current account has 3 draft "releases"
+    And the current account has 1 waiting "artifact" for the first "release"
     And I use an authentication token
     And I use API version "1.0"
     When I send a PUT request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "307"
-    And the JSON response should be an "artifact"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "status": "UPLOADED" }
+      """
+    And the first "release" should have the following attributes:
+      """
+      { "status": "PUBLISHED" }
+      """
 
   Scenario: Admin uploads an artifact for a release (already uploaded)
     Given I am an admin of account "test1"

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ReleaseUpgradeService < BaseService
+class V1x0::ReleaseUpgradeService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidProductError < StandardError; end
   class InvalidPlatformError < StandardError; end

@@ -1,21 +1,26 @@
 # frozen_string_literal: true
 
-class DownloadArtifactService < BaseService
+class V1x0::ReleaseDownloadService < BaseService
   class InvalidAccountError < StandardError; end
+  class InvalidReleaseError < StandardError; end
   class InvalidArtifactError < StandardError; end
+  class TooManyArtifactsError < StandardError; end
   class YankedReleaseError < StandardError; end
   class InvalidTTLError < StandardError; end
   class DownloadResult < OpenStruct; end
 
-  def initialize(account:, artifact:, ttl: 1.hour, upgrade: false)
+  def initialize(account:, release:, ttl: 1.hour, upgrade: false)
     raise InvalidAccountError.new('account must be present') unless
       account.present?
 
-    raise InvalidArtifactError.new('artifact must be present') unless
-      artifact.present?
+    raise InvalidReleaseError.new('release must be present') unless
+      release.present?
+
+    raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)') unless
+      release.artifacts.any?
 
     raise YankedReleaseError.new('has been yanked') if
-      artifact.yanked?
+      release.yanked?
 
     raise InvalidTTLError.new('must be greater than or equal to 60 (1 minute)') if
       ttl.present? && ttl < 1.minute
@@ -24,19 +29,19 @@ class DownloadArtifactService < BaseService
       ttl.present? && ttl > 1.week
 
     @account  = account
-    @artifact = artifact
-    @release  = artifact.release
+    @release  = release
     @ttl      = ttl
     @upgrade  = upgrade
   end
 
   def call
-    if !artifact.etag?
-      # Assert artifact exists before redirecting to S3
-      s3  = Aws::S3::Client.new
-      obj = s3.head_object(bucket: 'keygen-dist', key: artifact.s3_object_key)
+    artifact = release.artifacts.sole
 
-      # Cache object metadata
+    # Assert artifact exists before redirecting to S3
+    if !artifact.etag?
+      s3  = Aws::S3::Client.new
+      obj = s3.head_object(bucket: 'keygen-dist', key: release.s3_object_key)
+
       artifact.update!(
         content_length: obj.content_length,
         content_type: obj.content_type,
@@ -47,7 +52,7 @@ class DownloadArtifactService < BaseService
     # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
     # NOTE(ezekg) Check obj.replication_status for EU
     signer   = Aws::S3::Presigner.new
-    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: artifact.s3_object_key, expires_in: ttl&.to_i)
+    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl&.to_i)
     link     =
       if upgrade?
         release.upgrade_links.create!(account: account, url: url, ttl: ttl)
@@ -55,23 +60,29 @@ class DownloadArtifactService < BaseService
         release.download_links.create!(account: account, url: url, ttl: ttl)
       end
 
-    DownloadResult.new(redirect_url: link.url)
-  rescue Aws::S3::Errors::NotFound,
+    DownloadResult.new(
+      redirect_url: link.url,
+      artifact: artifact,
+    )
+  rescue ActiveRecord::RecordNotFound,
+         Aws::S3::Errors::NotFound,
          Timeout::Error => e
-    Keygen.logger.warn "[download_artifact_service] No artifact found: account=#{account.id} artifact=#{artifact.id} release=#{release.id} reason=#{e.class.name}"
+    Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
     raise InvalidArtifactError.new('artifact is unavailable (ensure it has been fully uploaded)')
+  rescue ActiveRecord::SoleRecordExceeded
+    raise TooManyArtifactsError.new('too many artifacts for release')
   end
 
   private
 
   attr_reader :account,
-              :artifact,
               :release,
+              :artifact,
               :upgrade,
               :ttl
 
   def upgrade?
-    !!upgrade
+    upgrade
   end
 end
