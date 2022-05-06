@@ -27,7 +27,7 @@ describe WaitForArtifactUploadWorker do
     let(:event)    { 'artifact.uploaded' }
 
     before do
-      Aws.config[:s3] = { stub_responses: { head_object: [] } }
+      Aws.config[:s3] = { stub_responses: { head_object: [{ content_length: 420, content_type: 'application/octet-stream', etag: '"14bfa6bb14875e45bba028a21ed38046"' }] } }
     end
 
     it 'should enqueue and run the worker' do
@@ -56,6 +56,17 @@ describe WaitForArtifactUploadWorker do
         worker.drain
 
         expect(artifact.reload.status).to eq 'UPLOADED'
+      end
+
+      it 'should store object metadata' do
+        worker.perform_async(artifact.id)
+        worker.drain
+
+        artifact.reload
+
+        expect(artifact.content_length).to eq 420
+        expect(artifact.content_type).to eq 'application/octet-stream'
+        expect(artifact.etag).to eq '14bfa6bb14875e45bba028a21ed38046'
       end
     end
 
