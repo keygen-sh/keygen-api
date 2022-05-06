@@ -50,12 +50,12 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the JSON response should be an array with 6 "releases"
     And the first "release" should have the following relationships:
       """
       {
         "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/028a38a2-0d17-4871-acb8-c5e6f040fc12/artifacts" }
+          "links": { "related": "/v1/accounts/$account/releases/70c40946-4b23-408c-aa1c-fa35421ff46a/artifacts" }
         }
       }
       """
@@ -63,7 +63,7 @@ Feature: List releases
       """
       {
         "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/3ff04fc6-9f10-4b84-b548-eb40f92ea331/artifacts" }
+          "links": { "related": "/v1/accounts/$account/releases/28a6e16d-c2a6-4be7-8578-e236182ee5c3/artifacts" }
         }
       }
       """
@@ -71,7 +71,7 @@ Feature: List releases
       """
       {
         "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/757e0a41-835e-42ad-bad8-84cabd29c72a/artifacts" }
+          "links": { "related": "/v1/accounts/$account/releases/972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2/artifacts" }
         }
       }
       """
@@ -475,7 +475,7 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
 
-  Scenario: Admin retrieves all stable exe releases for their account
+  Scenario: Admin retrieves all exe releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -499,7 +499,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=exe"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the JSON response should be an array with 3 "releases"
 
   Scenario: Admin retrieves all dmg releases for their account
     Given I am an admin of account "test1"
@@ -619,11 +619,11 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?yanked=false"
+    When I send a GET request to "/accounts/test1/releases?yanked=false&channel=stable"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "releases"
 
-  Scenario: Admin retrieves all non-yanked alpha releases for their account
+  Scenario: Admin retrieves all non-yanked releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -638,7 +638,7 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?yanked=false&channel=alpha"
+    When I send a GET request to "/accounts/test1/releases?yanked=false"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "releases"
 
@@ -657,11 +657,11 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?yanked=true"
+    When I send a GET request to "/accounts/test1/releases?yanked=true&channel=stable"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
 
-  Scenario: Admin retrieves all yanked beta releases for their account
+  Scenario: Admin retrieves all yanked releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -676,7 +676,7 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?yanked=true&channel=beta"
+    When I send a GET request to "/accounts/test1/releases?yanked=true"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 

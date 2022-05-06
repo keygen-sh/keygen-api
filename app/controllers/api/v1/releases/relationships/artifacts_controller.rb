@@ -2,7 +2,7 @@
 
 module Api::V1::Releases::Relationships
   class ArtifactsController < Api::V1::BaseController
-    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
+    has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
@@ -60,6 +60,10 @@ module Api::V1::Releases::Relationships
 
     def set_artifact
       scoped_artifacts = apply_scopes(policy_scope(release.artifacts))
+        # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
+        #              differs depends on prior scopes and we need it for
+        #              ordering by semver (below).
+        .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
         releases.semver_major      DESC,
