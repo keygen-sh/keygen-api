@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-class ReleaseUploadService < BaseService
+class V1x0::ReleaseYankService < BaseService
   class InvalidAccountError < StandardError; end
   class InvalidReleaseError < StandardError; end
   class InvalidArtifactError < StandardError; end
   class YankedReleaseError < StandardError; end
-  class UploadResult < OpenStruct; end
 
   def initialize(account:, release:)
     raise InvalidAccountError.new('account must be present') unless
@@ -26,15 +25,15 @@ class ReleaseUploadService < BaseService
   end
 
   def call
-    signer = Aws::S3::Presigner.new
-    ttl    = 1.hour # High TTL for slow upload connections: keygen => redirect => aws
-    url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl.to_i)
-    link   = release.upload_links.create!(account: account, url: url, ttl: ttl)
+    s3 = Aws::S3::Client.new
+    s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
 
-    UploadResult.new(
-      redirect_url: link.url,
-      artifact:,
-    )
+    release.touch(:yanked_at)
+    artifact.destroy
+
+    nil
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   private
