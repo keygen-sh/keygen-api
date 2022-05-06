@@ -50,12 +50,12 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "releases"
+    And the JSON response should be an array with 3 "releases"
     And the first "release" should have the following relationships:
       """
       {
         "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[5]/artifacts" }
+          "links": { "related": "/v1/accounts/$account/releases/028a38a2-0d17-4871-acb8-c5e6f040fc12/artifacts" }
         }
       }
       """
@@ -63,7 +63,15 @@ Feature: List releases
       """
       {
         "artifacts": {
-          "links": { "related": "/v1/accounts/$account/releases/$releases[4]/artifacts" }
+          "links": { "related": "/v1/accounts/$account/releases/3ff04fc6-9f10-4b84-b548-eb40f92ea331/artifacts" }
+        }
+      }
+      """
+    And the third "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/757e0a41-835e-42ad-bad8-84cabd29c72a/artifacts" }
         }
       }
       """
@@ -175,7 +183,7 @@ Feature: List releases
       | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
       | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-beta.2.exe | exe      | win32    |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?product=121f9da8-dbe6-4d51-ac6c-dbbb024725ec"
+    When I send a GET request to "/accounts/test1/releases?product=121f9da8-dbe6-4d51-ac6c-dbbb024725ec&channel=alpha"
     Then the response status should be "200"
     And the JSON response should be an array with 2 "releases"
 
@@ -214,6 +222,18 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?channel=stable"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "releases"
+    And the first "release" should have the following data:
+      """
+      { "id": "028a38a2-0d17-4871-acb8-c5e6f040fc12" }
+      """
+    And the second "release" should have the following data:
+      """
+      { "id": "3ff04fc6-9f10-4b84-b548-eb40f92ea331" }
+      """
+    And the third "release" should have the following data:
+      """
+      { "id": "757e0a41-835e-42ad-bad8-84cabd29c72a" }
+      """
 
   Scenario: Admin retrieves all beta releases for their account
     Given I am an admin of account "test1"
@@ -250,6 +270,26 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 7 "releases"
+    And the first "release" should have the following data:
+      """
+      { "id": "2d2e4756-0ff8-4142-8132-762f836a0c76" }
+      """
+    And the second "release" should have the following data:
+      """
+      { "id": "ab9a4dcd-9ef8-48f7-985e-53534540f73f" }
+      """
+    And the third "release" should have the following data:
+      """
+      { "id": "972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2" }
+      """
+    And the fourth "release" should have the following data:
+      """
+      { "id": "571114ac-af22-4d4b-99ce-f0e3d921c192" }
+      """
+    And the fifth "release" should have the following data:
+      """
+      { "id": "028a38a2-0d17-4871-acb8-c5e6f040fc12" }
+      """
 
   Scenario: Admin retrieves all rc releases for their account
     Given I am an admin of account "test1"
@@ -286,6 +326,22 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?channel=rc"
     Then the response status should be "200"
     And the JSON response should be an array with 4 "releases"
+    And the first "release" should have the following data:
+      """
+      { "id": "571114ac-af22-4d4b-99ce-f0e3d921c192" }
+      """
+    And the second "release" should have the following data:
+      """
+      { "id": "028a38a2-0d17-4871-acb8-c5e6f040fc12" }
+      """
+    And the third "release" should have the following data:
+      """
+      { "id": "3ff04fc6-9f10-4b84-b548-eb40f92ea331" }
+      """
+    And the fourth "release" should have the following data:
+      """
+      { "id": "757e0a41-835e-42ad-bad8-84cabd29c72a" }
+      """
 
   Scenario: Admin retrieves all alpha releases for their account
     Given I am an admin of account "test1"
@@ -358,6 +414,14 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?channel=dev"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
+    And the first "release" should have the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/7cad471e-cc3c-4378-847e-8a5b821d0ca1/artifacts" }
+        }
+      }
+      """
 
   Scenario: Admin retrieves all v1.0.0 releases for their account
     Given I am an admin of account "test1"
@@ -411,7 +475,7 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
 
-  Scenario: Admin retrieves all exe releases for their account
+  Scenario: Admin retrieves all stable exe releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -435,7 +499,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=exe"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the JSON response should be an array with 1 "release"
 
   Scenario: Admin retrieves all dmg releases for their account
     Given I am an admin of account "test1"
@@ -459,7 +523,7 @@ Feature: List releases
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?filetype=dmg"
+    When I send a GET request to "/accounts/test1/releases?filetype=dmg&channel=alpha"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "releases"
 
@@ -485,7 +549,7 @@ Feature: List releases
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?platform=macos"
+    When I send a GET request to "/accounts/test1/releases?platform=macos&channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "releases"
 
@@ -511,9 +575,9 @@ Feature: List releases
       | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
       | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?platform=win32"
+    When I send a GET request to "/accounts/test1/releases?platform=win32&channel=stable"
     Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
+    And the JSON response should be an array with 1 "release"
 
   Scenario: Admin retrieves all linux releases for their account
     Given I am an admin of account "test1"
@@ -540,7 +604,7 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 0 "releases"
 
-  Scenario: Admin retrieves all non-yanked releases for their account
+  Scenario: Admin retrieves all non-yanked stable releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -557,9 +621,28 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=false"
     Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Admin retrieves all non-yanked alpha releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version       | channel | status    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | YANKED    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?yanked=false&channel=alpha"
+    Then the response status should be "200"
     And the JSON response should be an array with 5 "releases"
 
-  Scenario: Admin retrieves all yanked releases for their account
+  Scenario: Admin retrieves all yanked stable releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -575,6 +658,25 @@ Feature: List releases
       | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?yanked=true"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Admin retrieves all yanked beta releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
+    And the current account has the following "release" rows:
+      | product_id                           | version       | channel | status    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta    | YANKED    |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0         | stable  | PUBLISHED |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha   | DRAFT     |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta    | DRAFT     |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?yanked=true&channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "release"
 
