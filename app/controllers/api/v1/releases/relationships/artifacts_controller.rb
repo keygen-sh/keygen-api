@@ -66,11 +66,12 @@ module Api::V1::Releases::Relationships
         .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        releases.semver_major      DESC,
-        releases.semver_minor      DESC,
-        releases.semver_patch      DESC,
-        releases.semver_prerelease DESC NULLS FIRST,
-        releases.semver_build      DESC NULLS FIRST
+        release_artifacts.created_at DESC,
+        releases.semver_major        DESC,
+        releases.semver_minor        DESC,
+        releases.semver_patch        DESC,
+        releases.semver_prerelease   DESC NULLS FIRST,
+        releases.semver_build        DESC NULLS FIRST
       SQL
     end
 
