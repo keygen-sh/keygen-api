@@ -31,6 +31,9 @@ class V1x0::ReleaseUploadService < BaseService
     url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl.to_i)
     link   = release.upload_links.create!(account: account, url: url, ttl: ttl)
 
+    # Wait for the artifact to be uploaded
+    WaitForArtifactUploadWorker.perform_async(artifact.id)
+
     # NOTE(ezekg) For v1.0 backwards compatibility
     release.update!(status: 'PUBLISHED')
 
