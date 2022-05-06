@@ -2,6 +2,7 @@
 
 module Api::V1::Releases::Relationships
   class ArtifactsController < Api::V1::BaseController
+    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
     before_action :scope_to_current_account!
@@ -58,9 +59,7 @@ module Api::V1::Releases::Relationships
     end
 
     def set_artifact
-      scoped_artifacts = policy_scope(release.artifacts).for_channel(
-        artifact_query.fetch(:channel) { 'stable' },
-      )
+      scoped_artifacts = apply_scopes(policy_scope(release.artifacts))
 
       @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
         releases.semver_major      DESC,
@@ -73,7 +72,6 @@ module Api::V1::Releases::Relationships
 
     typed_query do
       on :show do
-        query :channel, type: :string, inclusion: %w[stable rc beta alpha dev], optional: true
         if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
           query :ttl, type: :integer, coerce: true, optional: true
         end
