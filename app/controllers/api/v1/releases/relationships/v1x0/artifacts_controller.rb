@@ -11,7 +11,7 @@ module Api::V1::Releases::Relationships::V1x0
     def show
       authorize release, :download?
 
-      download = ReleaseDownloadService.call(
+      download = ::V1x0::ReleaseDownloadService.call(
         account: current_account,
         release: release,
         ttl: artifact_query[:ttl],
@@ -24,20 +24,20 @@ module Api::V1::Releases::Relationships::V1x0
       )
 
       render jsonapi: download.artifact, status: :see_other, location: download.redirect_url
-    rescue ReleaseDownloadService::TooManyArtifactsError
+    rescue ::V1x0::ReleaseDownloadService::TooManyArtifactsError
       render_unprocessable_entity detail: 'multiple artifacts are not supported by this endpoint'
-    rescue ReleaseDownloadService::InvalidTTLError => e
+    rescue ::V1x0::ReleaseDownloadService::InvalidTTLError => e
       render_bad_request detail: e.message, source: { parameter: :ttl }
-    rescue ReleaseDownloadService::InvalidArtifactError => e
+    rescue ::V1x0::ReleaseDownloadService::InvalidArtifactError => e
       render_not_found detail: e.message
-    rescue ReleaseDownloadService::YankedReleaseError => e
+    rescue ::V1x0::ReleaseDownloadService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 
     def create
       authorize release, :upload?
 
-      upload = ReleaseUploadService.call(
+      upload = ::V1x0::ReleaseUploadService.call(
         account: current_account,
         release: release,
       )
@@ -49,23 +49,23 @@ module Api::V1::Releases::Relationships::V1x0
       )
 
       render jsonapi: upload.artifact, status: :temporary_redirect, location: upload.redirect_url
-    rescue ReleaseUploadService::InvalidArtifactError,
-           ReleaseUploadService::YankedReleaseError => e
+    rescue ::V1x0::ReleaseUploadService::InvalidArtifactError,
+           ::V1x0::ReleaseUploadService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 
     def destroy
       authorize release, :yank?
 
-      ReleaseYankService.call(account: current_account, release: release)
+      ::V1x0::ReleaseYankService.call(account: current_account, release: release)
 
       BroadcastEventService.call(
         event: 'release.yanked',
         account: current_account,
         resource: release
       )
-    rescue ReleaseYankService::InvalidArtifactError,
-           ReleaseYankService::YankedReleaseError => e
+    rescue ::V1x0::ReleaseYankService::InvalidArtifactError,
+           ::V1x0::ReleaseYankService::YankedReleaseError => e
       render_unprocessable_entity detail: e.message
     end
 

@@ -18,17 +18,17 @@ module Api::V1::Releases::Actions::V1x0
       )
 
       check_for_upgrade(**kwargs)
-    rescue ReleaseUpgradeService::InvalidProductError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidProductError => e
       render_bad_request detail: e.message, code: :UPGRADE_PRODUCT_INVALID, source: { parameter: :product }
-    rescue ReleaseUpgradeService::InvalidPlatformError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidPlatformError => e
       render_bad_request detail: e.message, code: :UPGRADE_PLATFORM_INVALID, source: { parameter: :platform }
-    rescue ReleaseUpgradeService::InvalidFiletypeError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidFiletypeError => e
       render_bad_request detail: e.message, code: :UPGRADE_FILETYPE_INVALID, source: { parameter: :filetype }
-    rescue ReleaseUpgradeService::InvalidVersionError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidVersionError => e
       render_bad_request detail: e.message, code: :UPGRADE_VERSION_INVALID, source: { parameter: :version }
-    rescue ReleaseUpgradeService::InvalidConstraintError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidConstraintError => e
       render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
-    rescue ReleaseUpgradeService::InvalidChannelError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidChannelError => e
       render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
     rescue Pundit::NotAuthorizedError
       render status: :no_content
@@ -45,14 +45,14 @@ module Api::V1::Releases::Actions::V1x0
         )
 
       check_for_upgrade(**kwargs)
-    rescue ReleaseUpgradeService::InvalidConstraintError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidConstraintError => e
       render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
-    rescue ReleaseUpgradeService::InvalidChannelError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidChannelError => e
       render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
-    rescue ReleaseUpgradeService::InvalidProductError,
-           ReleaseUpgradeService::InvalidPlatformError,
-           ReleaseUpgradeService::InvalidFiletypeError,
-           ReleaseUpgradeService::InvalidVersionError => e
+    rescue ::V1x0::ReleaseUpgradeService::InvalidProductError,
+           ::V1x0::ReleaseUpgradeService::InvalidPlatformError,
+           ::V1x0::ReleaseUpgradeService::InvalidFiletypeError,
+           ::V1x0::ReleaseUpgradeService::InvalidVersionError => e
       render_unprocessable_entity detail: e.message
     rescue Pundit::NotAuthorizedError
       render status: :no_content
@@ -71,7 +71,7 @@ module Api::V1::Releases::Actions::V1x0
     end
 
     def check_for_upgrade(**kwargs)
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = ::V1x0::ReleaseUpgradeService.call(
         account: current_account,
         **kwargs,
       )
@@ -81,7 +81,7 @@ module Api::V1::Releases::Actions::V1x0
       if upgrade.next_release.present?
         authorize upgrade.next_release, :download?
 
-        download = ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, ttl: 1.hour, upgrade: true)
+        download = ::V1x0::ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, ttl: 1.hour, upgrade: true)
         meta     = {
           current: upgrade.current_version,
           next: upgrade.next_version,
@@ -106,7 +106,7 @@ module Api::V1::Releases::Actions::V1x0
 
         render status: :no_content
       end
-    rescue ReleaseDownloadService::InvalidArtifactError => e
+    rescue ::V1x0::ReleaseDownloadService::InvalidArtifactError => e
       Keygen.logger.warn "[releases.check_for_upgrade] No artifact found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
 
       # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release

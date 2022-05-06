@@ -7,7 +7,7 @@ require 'sidekiq/testing'
 
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
-describe ReleaseUpgradeService do
+describe V1x0::ReleaseUpgradeService do
   let(:account) { create(:account) }
   let(:product) { create(:product, account: account) }
 
@@ -25,7 +25,7 @@ describe ReleaseUpgradeService do
   context 'when invalid parameters are supplied to the service' do
     it 'should raise an error when account is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: nil,
           product: product,
           platform: 'win32',
@@ -34,12 +34,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidAccountError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidAccountError
     end
 
     it 'should raise an error when account is not a model' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account.id,
           product: product,
           platform: 'win32',
@@ -48,12 +48,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidAccountError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidAccountError
     end
 
     it 'should raise an error when product is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: nil,
           platform: 'win32',
@@ -62,12 +62,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidProductError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidProductError
     end
 
     it 'should raise an error when platform is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: account,
           platform: nil,
@@ -76,12 +76,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidPlatformError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidPlatformError
     end
 
     it 'should raise an error when filetype is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: account,
           platform: 'win32',
@@ -90,12 +90,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidFiletypeError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidFiletypeError
     end
 
     it 'should raise an error when version is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: account,
           platform: 'win32',
@@ -104,12 +104,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidVersionError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidVersionError
     end
 
     it 'should raise an error when channel is nil' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: account,
           platform: 'win32',
@@ -119,12 +119,12 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidChannelError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidChannelError
     end
 
     it 'should raise an error when constraint is not a valid semver' do
       upgrade = -> {
-        ReleaseUpgradeService.call(
+        V1x0::ReleaseUpgradeService.call(
           account: account,
           product: account,
           platform: 'win32',
@@ -134,13 +134,13 @@ describe ReleaseUpgradeService do
         )
       }
 
-      expect { upgrade.call }.to raise_error ReleaseUpgradeService::InvalidConstraintError
+      expect { upgrade.call }.to raise_error V1x0::ReleaseUpgradeService::InvalidConstraintError
     end
   end
 
   context 'when there are no products' do
     it 'should not return an upgrade when product does not exist' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: SecureRandom.uuid,
         platform: 'win32',
@@ -157,7 +157,7 @@ describe ReleaseUpgradeService do
 
   context 'when there are no releases' do
     it 'should not return an upgrade' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'macos',
@@ -210,7 +210,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -263,7 +263,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should return an upgrade when current version is not up-to-date' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'macos',
@@ -279,7 +279,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when current version does not exist' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -294,7 +294,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when current version is up-to-date' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -352,7 +352,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade when upgrade channel is stable' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -368,7 +368,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is rc' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -384,7 +384,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is beta' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -400,7 +400,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is alpha' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -416,7 +416,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is dev' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -475,7 +475,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade when upgrade channel is stable' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -491,7 +491,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is rc' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -507,7 +507,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is beta' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -523,7 +523,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is alpha' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -539,7 +539,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is dev' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -598,7 +598,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade when upgrade channel is stable' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -614,7 +614,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is rc' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -630,7 +630,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is beta' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -646,7 +646,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is alpha' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -662,7 +662,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is dev' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: platform,
@@ -721,7 +721,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade when upgrade channel is stable' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product.id,
         platform: platform.id,
@@ -737,7 +737,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is rc' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product.id,
         platform: platform.id,
@@ -753,7 +753,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is beta' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product.id,
         platform: platform.id,
@@ -769,7 +769,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should not return an upgrade when upgrade channel is alpha' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product.id,
         platform: platform.id,
@@ -785,7 +785,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade when upgrade channel is dev' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product.id,
         platform: platform.id,
@@ -839,7 +839,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should return the current version that is yanked' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'linux',
@@ -892,7 +892,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return the next version that is yanked' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'win32',
@@ -945,7 +945,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should return an upgrade result with a nil current release when version is not exact' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'macos',
@@ -962,7 +962,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return an upgrade result with the current release when the version is exact' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'macos',
@@ -1019,7 +1019,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade for the other platform' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'macos',
@@ -1074,7 +1074,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should not return an upgrade for the other filetype' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'win32',
@@ -1160,7 +1160,7 @@ describe ReleaseUpgradeService do
     }
 
     it 'should return a patch upgrade when version is constrained to 1.0.0' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'win32',
@@ -1177,7 +1177,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return a minor upgrade when version is constrained to 1.0' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'win32',
@@ -1194,7 +1194,7 @@ describe ReleaseUpgradeService do
     end
 
     it 'should return major upgrade when version is constrained to 2.0' do
-      upgrade = ReleaseUpgradeService.call(
+      upgrade = V1x0::ReleaseUpgradeService.call(
         account: account,
         product: product,
         platform: 'win32',
