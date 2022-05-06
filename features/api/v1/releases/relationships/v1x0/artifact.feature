@@ -1242,7 +1242,7 @@ Feature: Release artifact relationship
     Then the response status should be "307"
     And the JSON response should be an "artifact" with the following attributes:
       """
-      { "status": "UPLOADED" }
+      { "status": "WAITING" }
       """
     And the first "release" should have the following attributes:
       """

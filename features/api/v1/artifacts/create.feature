@@ -19,7 +19,7 @@ Feature: Create artifact
   Scenario: Admin creates an artifact for a release
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "release"
+    And the current account has 1 draft "release"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/artifacts" with the following:
@@ -46,8 +46,15 @@ Feature: Create artifact
       """
     Then the response status should be "307"
     And the response should contain a valid signature header for "test1"
-    And the JSON response should be a "artifact"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "status": "WAITING" }
+      """
     And the current account should have 1 "artifact"
+    And the first "release" should have the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
