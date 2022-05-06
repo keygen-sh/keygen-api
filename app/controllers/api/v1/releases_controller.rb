@@ -3,7 +3,7 @@
 module Api::V1
   class ReleasesController < Api::V1::BaseController
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
-    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
+    has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
     has_scope(:arch) { |c, s, v| s.for_arch(v) }

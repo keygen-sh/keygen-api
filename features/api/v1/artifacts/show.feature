@@ -251,10 +251,10 @@ Feature: Show release artifact
         "release": {
           "data": {
             "type": "releases",
-            "id": "165d5389-e535-4f36-9232-ed59c67375d1"
+            "id": "0a027f00-0860-4fa7-bd37-5900c8866818"
           },
           "links": {
-            "related": "/v1/accounts/$account/releases/165d5389-e535-4f36-9232-ed59c67375d1"
+            "related": "/v1/accounts/$account/releases/0a027f00-0860-4fa7-bd37-5900c8866818"
           }
         }
       }
