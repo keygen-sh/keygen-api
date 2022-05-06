@@ -2,6 +2,7 @@
 
 module Api::V1
   class ArtifactsController < Api::V1::BaseController
+    has_scope(:channel, default: 'stable') { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
 
@@ -97,14 +98,11 @@ module Api::V1
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = policy_scope(current_account.release_artifacts)
+      scoped_artifacts = apply_scopes(policy_scope(current_account.release_artifacts))
         # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
         #              differs depends on prior scopes and we need it for
         #              ordering by semver (below).
         .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
-        .for_channel(
-          artifact_query.fetch(:channel) { 'stable' },
-        )
 
       # NOTE(ezekg) Fetch the latest version of the artifact since we have no
       #             other qualifiers outside of a :filename.
@@ -174,7 +172,6 @@ module Api::V1
 
     typed_query do
       on :show do
-        query :channel, type: :string, inclusion: %w[stable rc beta alpha dev], optional: true
         if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
           query :ttl, type: :integer, coerce: true, optional: true
         end

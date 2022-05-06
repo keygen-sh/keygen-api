@@ -18,7 +18,7 @@ Feature: Product artifacts relationship
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves the artifacts for a product (all artifacts are uploaded)
+  Scenario: Admin retrieves the stable artifacts for a product
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -46,7 +46,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 6 "artifacts"
+    And the JSON response should be an array with 3 "artifacts"
 
   Scenario: Admin retrieves all artifacts for a product
     Given the current account is "test1"
@@ -74,7 +74,7 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "artifacts"
 
@@ -104,7 +104,7 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=failed"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=failed&channel=beta"
     Then the response status should be "200"
     And the JSON response should be an array with 1 "artifact"
 
@@ -134,7 +134,7 @@ Feature: Product artifacts relationship
       | 674bba69-ae0a-41ab-94df-5c4ea65d507e | Test-App.1.0.0.tar.gz     | tar.gz   | linux    | UPLOADED |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=WAITING"
+    When I send a GET request to "/accounts/test1/products/$0/artifacts?status=WAITING&channel=alpha"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 

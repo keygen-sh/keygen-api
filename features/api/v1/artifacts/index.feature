@@ -17,7 +17,7 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "403"
 
-  Scenario: Admin retrieves their release artifacts (all releases have artifacts)
+  Scenario: Admin retrieves all stable release artifacts
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -45,9 +45,9 @@ Feature: List release artifacts
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array with 7 "artifacts"
+    And the JSON response should be an array with 4 "artifacts"
 
-  Scenario: Admin retrieves their release artifacts (some releases have artifacts)
+  Scenario: Admin retrieves all beta release artifacts
     Given the current account is "test1"
     And the current account has the following "product" rows:
       | id                                   | name   |
@@ -65,11 +65,41 @@ Feature: List release artifacts
     And the current account has the following "artifact" rows:
       | release_id                           | filename                  | filetype | platform |
       | fffa0764-3a19-48ea-beb3-8950563c7357 | Test-App-1.0.0.zip        | zip      | macos    |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | Test-App-1.0.1.zip        | zip      | macos    |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | Test-App-1.1.0.zip        | zip      | macos    |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | Test-App-1.2.0-beta.1.zip | zip      | macos    |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | Test-App.1.0.0-beta.2.exe | exe      | win32    |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | Test-App.1.0.0.tar.gz     | tar.gz   | linux    |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts?channel=beta"
+    Then the response status should be "200"
+    And the JSON response should be an array with 7 "artifacts"
+
+  Scenario: Admin retrieves all alpha release artifacts
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name   |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test 1 |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Test 2 |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1  | beta     |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1  | beta     |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha    |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0         | stable   |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | Test-App-1.0.0.zip        | zip      | macos    |
       | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | Test-App.1.0.0-beta.1.exe | exe      | win32    |
       | 0a027f00-0860-4fa7-bd37-5900c8866818 | Test-App.1.0.0.tar.gz     | tar.gz   | linux    |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/artifacts"
+    When I send a GET request to "/accounts/test1/artifacts?channel=alpha"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
@@ -129,7 +159,7 @@ Feature: List release artifacts
       | a7fad100-04eb-418f-8af9-e5eac497ad5a | Test-App-Android.apk            | apk      | android  |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/artifacts"
+    When I send a GET request to "/accounts/test1/artifacts?channel=alpha"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "artifacts"
 

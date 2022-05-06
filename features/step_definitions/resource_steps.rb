@@ -705,25 +705,41 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]
   expect(model.attributes).to include attrs
 end
 
-Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
-  model   = @account.send(model_name.pluralize).send(index_in_words)
-  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |word_index, model_name, body|
+  body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  model = @account.send(model_name.pluralize).send(word_index)
+  attrs = JSON.parse(body).deep_transform_keys(&:underscore)
 
   expect(model.attributes.as_json).to include attrs
 end
 
-Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the following attributes:$/ do |index_in_words, model_name, body|
-  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-
-  model   = @account.send(model_name.pluralize).send(index_in_words)
-  attrs   = JSON.parse(body).deep_transform_keys(&:underscore)
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should not have the following attributes:$/ do |word_index, model_name, body|
+  body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  model = @account.send(model_name.pluralize).send(word_index)
+  attrs = JSON.parse(body).deep_transform_keys(&:underscore)
 
   expect(model.attributes.as_json).to_not include attrs
 end
 
-Given /^the (\w+) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following relationships:$/ do |word_index, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  data = json['data'].select { _1['type'] == resource.pluralize }
+                     .send(word_index)
+
+  expect(data['relationships']).to include JSON.parse(body)
+end
+
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following data:$/ do |word_index, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+  json = JSON.parse(last_response.body)
+  data = json['data'].select { _1['type'] == resource.pluralize }
+                     .send(word_index)
+
+  expect(data).to include JSON.parse(body)
+end
+
+Given /^the (first|second|third|fourth|fifth|last) "release" should (be|not be) yanked$/ do |named_index, named_scenario|
   release  = @account.releases.send(named_index)
   expected = named_scenario == 'be'
 
