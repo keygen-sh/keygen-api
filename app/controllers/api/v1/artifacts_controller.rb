@@ -76,7 +76,7 @@ module Api::V1
         resource: artifact,
       )
 
-      render jsonapi: artifact, status: :temporary_redirect, location: upload.url
+      render jsonapi: artifact
     end
 
     def destroy
