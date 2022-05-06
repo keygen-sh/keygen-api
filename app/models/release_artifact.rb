@@ -211,31 +211,27 @@ class ReleaseArtifact < ApplicationRecord
   # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
   # NOTE(ezekg) Check obj.replication_status for EU
   def download!(ttl: 1.hour)
-    signer = Aws::S3::Presigner.new
-    url    = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
 
     release.download_links.create!(account:, url:, ttl:)
   end
 
   def upgrade!(ttl: 1.hour)
-    signer = Aws::S3::Presigner.new
-    url    = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
 
     release.upgrade_links.create!(account:, url:, ttl:)
   end
 
   def upload!(ttl: 1.hour)
-    signer = Aws::S3::Presigner.new
-    url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl.to_i)
+    url = Aws::S3::Presigner.new.presigned_url(:put_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl.to_i)
 
-    # TODO(ezekg) Add waiter job and then send artifact.uploaded event
+    WaitForArtifactUploadWorker.perform_async(id)
 
     release.upload_links.create!(account:, url:, ttl:)
   end
 
   def yank!
-    s3 = Aws::S3::Client.new
-    s3.delete_object(bucket: 'keygen-dist', key: s3_object_key)
+    Aws::S3::Client.new.delete_object(bucket: 'keygen-dist', key: s3_object_key)
   end
 
   def waiting?

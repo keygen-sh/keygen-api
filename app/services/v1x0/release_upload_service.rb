@@ -33,7 +33,6 @@ class V1x0::ReleaseUploadService < BaseService
 
     # NOTE(ezekg) For v1.0 backwards compatibility
     release.update!(status: 'PUBLISHED')
-    artifact.update!(status: 'UPLOADED')
 
     UploadResult.new(
       redirect_url: link.url,
