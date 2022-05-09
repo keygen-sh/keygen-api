@@ -88,12 +88,18 @@ class ReleaseArtifact < ApplicationRecord
     to: :release
 
   scope :order_by_version, -> {
-    joins('INNER JOIN releases ON releases.id = release_artifacts.release_id').order(<<~SQL.squish)
-      releases.semver_major      DESC,
-      releases.semver_minor      DESC,
-      releases.semver_patch      DESC,
-      releases.semver_prerelease DESC NULLS FIRST,
-      releases.semver_build      DESC NULLS FIRST
+    # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
+    #              differs depends on prior scopes and we need it for
+    #              reordering by SQL string.
+    joins('INNER JOIN releases ON releases.id = release_artifacts.release_id').reorder(<<~SQL.squish)
+      releases.semver_major        DESC,
+      releases.semver_minor        DESC NULLS LAST,
+      releases.semver_patch        DESC NULLS LAST,
+      releases.semver_pre_word     DESC NULLS FIRST,
+      releases.semver_pre_num      DESC NULLS LAST,
+      releases.semver_build_word   DESC NULLS LAST,
+      releases.semver_build_num    DESC NULLS LAST,
+      release_artifacts.created_at DESC
     SQL
   }
 
@@ -103,10 +109,8 @@ class ReleaseArtifact < ApplicationRecord
       when UUID_RE
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show artifacts for stable, rc and beta channels.
-        joins(:channel).select('release_channels.key')
-                       .where(channel: channel)
-                       .first
-                       .try(:key)
+        account.release_channels.where(channel: channel)
+                                .take
       when ReleaseChannel
         channel.key
       else
