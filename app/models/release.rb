@@ -76,6 +76,7 @@ class Release < ApplicationRecord
 
   before_create -> { self.api_version ||= account.api_version }
   before_create :enforce_release_limit_on_account!
+  before_create -> { self.version = semver.to_s }
   before_create -> {
     self.semver_major      = semver.major
     self.semver_minor      = semver.minor
