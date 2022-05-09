@@ -83,7 +83,7 @@ describe WaitForArtifactUploadWorker do
         worker.drain
       end
 
-      it 'should have an uploaded status' do
+      it 'should have an failed status' do
         worker.perform_async(artifact.id)
         worker.drain
 
