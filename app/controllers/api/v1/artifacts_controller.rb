@@ -82,8 +82,6 @@ module Api::V1
         account: current_account,
         resource: artifact,
       )
-
-      artifact.destroy
     end
 
     private

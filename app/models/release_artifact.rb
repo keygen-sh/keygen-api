@@ -9,6 +9,7 @@ class ReleaseArtifact < ApplicationRecord
     WAITING
     UPLOADED
     FAILED
+    YANKED
   ]
 
   belongs_to :account
@@ -180,9 +181,6 @@ class ReleaseArtifact < ApplicationRecord
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
 
-  delegate :draft?, :published?, :yanked?,
-    to: :release
-
   def s3_object_key
     "artifacts/#{account_id}/#{release_id}/#{filename}"
   end
@@ -234,7 +232,9 @@ class ReleaseArtifact < ApplicationRecord
   end
 
   def yank!
-    Aws::S3::Client.new.delete_object(bucket: 'keygen-dist', key: s3_object_key)
+    YankArtifactWorker.perform_async(id)
+
+    update!(status: 'YANKED')
   end
 
   def waiting?
@@ -253,8 +253,12 @@ class ReleaseArtifact < ApplicationRecord
     status == 'FAILED'
   end
 
+  def yanked?
+    status == 'YANKED' || release.yanked?
+  end
+
   def downloadable?
-    uploaded? && published?
+    uploaded? && release.published?
   end
 
   private
