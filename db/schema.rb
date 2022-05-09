@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_05_151926) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_09_154324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -497,15 +497,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_05_151926) do
     t.integer "semver_major"
     t.integer "semver_minor"
     t.integer "semver_patch"
-    t.string "semver_prerelease"
-    t.string "semver_build"
+    t.string "semver_pre_word"
+    t.bigint "semver_pre_num"
+    t.string "semver_build_word"
+    t.bigint "semver_build_num"
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
     t.index ["product_id"], name: "index_releases_on_product_id"
     t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
     t.index ["release_filetype_id"], name: "index_releases_on_release_filetype_id"
     t.index ["release_platform_id"], name: "index_releases_on_release_platform_id"
-    t.index ["semver_major", "semver_minor", "semver_patch", "semver_prerelease", "semver_build", "product_id", "account_id"], name: "releases_uniq_semver_components_idx", unique: true, where: "((api_version)::text <> '1.0'::text)"
+    t.index ["semver_major", "semver_minor", "semver_patch", "semver_pre_word", "semver_pre_num", "semver_build_word", "semver_build_num", "product_id", "account_id"], name: "releases_uniq_semver_components_idx", unique: true, where: "((api_version)::text <> '1.0'::text)"
     t.index ["status"], name: "index_releases_on_status"
     t.index ["version", "product_id", "account_id"], name: "index_releases_on_version_and_product_id_and_account_id", unique: true, where: "((api_version)::text <> '1.0'::text)"
   end
