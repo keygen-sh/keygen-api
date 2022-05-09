@@ -49,7 +49,7 @@ module Api::V1
       upload = artifact.upload!
 
       BroadcastEventService.call(
-        events: %w[artifact.created],
+        event: 'artifact.created',
         account: current_account,
         resource: artifact,
       )
@@ -64,7 +64,7 @@ module Api::V1
       artifact.update!(artifact_params)
 
       BroadcastEventService.call(
-        events: %w[artifact.updated],
+        event: 'artifact.updated',
         account: current_account,
         resource: artifact,
       )
@@ -78,7 +78,7 @@ module Api::V1
       artifact.yank!
 
       BroadcastEventService.call(
-        events: %w[artifact.deleted],
+        event: 'artifact.deleted',
         account: current_account,
         resource: artifact,
       )
