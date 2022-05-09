@@ -53,19 +53,13 @@ module Api::V1::Releases::Relationships
 
     def set_artifact
       scoped_artifacts = apply_scopes(policy_scope(release.artifacts))
-        # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
-        #              differs depends on prior scopes and we need it for
-        #              ordering by semver (below).
-        .joins('INNER JOIN releases ON releases.id = release_artifacts.release_id')
 
-      @artifact = FindByAliasService.call(scope: scoped_artifacts, identifier: params[:id], aliases: :filename, order: <<~SQL.squish)
-        release_artifacts.created_at DESC,
-        releases.semver_major        DESC,
-        releases.semver_minor        DESC,
-        releases.semver_patch        DESC,
-        releases.semver_prerelease   DESC NULLS FIRST,
-        releases.semver_build        DESC NULLS FIRST
-      SQL
+      @artifact = FindByAliasService.call(
+        scope: scoped_artifacts.order_by_version,
+        identifier: params[:id],
+        aliases: :filename,
+        reorder: false,
+      )
     end
 
     typed_query do

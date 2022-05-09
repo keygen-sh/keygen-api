@@ -23,6 +23,18 @@ FactoryBot.define do
         else
           "#{Faker::App.semantic_version}+build.#{Time.current.to_f}"
         end
+
+      # Make sure channel matches semver prerelease channel
+      semver = Semverse::Version.coerce(release.version)
+
+      if semver.pre_release?
+        key = semver.pre_release[/([^\.]+)/, 1]
+
+        release.channel.assign_attributes(
+          name: key.capitalize,
+          key:,
+        )
+      end
     end
 
     trait :draft do

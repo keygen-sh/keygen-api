@@ -9,6 +9,23 @@ class Release < ApplicationRecord
   include Pageable
   include Diffable
 
+  SEMVER_TAG_RE =
+    %r{
+      (?:
+        # Match from start of word
+        \A |
+        # Or from last match
+        \G
+      )
+      (?:
+        # Match full numeric tags
+        (?<num>\d+$)|
+        # Or match words
+        (?<word>\w+)
+      )
+      \K
+    }xi.freeze
+
   STATUSES = %w[
     DRAFT
     PUBLISHED
@@ -76,14 +93,7 @@ class Release < ApplicationRecord
 
   before_create -> { self.api_version ||= account.api_version }
   before_create :enforce_release_limit_on_account!
-  before_create -> { self.version = semver.to_s }
-  before_create -> {
-    self.semver_major      = semver.major
-    self.semver_minor      = semver.minor
-    self.semver_patch      = semver.patch
-    self.semver_prerelease = semver.pre_release
-    self.semver_build      = semver.build
-  }
+  before_create :set_semver_version
 
   validates :product,
     scope: { by: :account_id }
@@ -377,6 +387,50 @@ class Release < ApplicationRecord
       errors.add :account, :release_limit_exceeded, message: "Your tier's release limit of #{release_limit.to_fs(:delimited)} has been reached for your account. Please upgrade to a paid tier and add a payment method at https://app.keygen.sh/billing."
 
       throw :abort
+    end
+  end
+
+  def set_semver_version
+    v = semver
+
+    # Clean up version
+    self.version = v.to_s
+
+    # Store individual components for sorting purposes
+    self.semver_major = v.major
+    self.semver_minor = v.minor
+    self.semver_patch = v.patch
+
+    if v.pre_release.present?
+      pre_tags = v.pre_release.scan(SEMVER_TAG_RE)
+
+      # Collect non-nil pre words and rejoin with delimiter
+      self.semver_pre_word = pre_tags.map { _1[1] }
+                                     .compact
+                                     .join('.')
+                                     .presence
+
+      # Collect first numeric pre tag
+      self.semver_pre_num  = pre_tags.map { _1[0] }
+                                     .compact
+                                     .first
+                                     .presence
+    end
+
+    if v.build.present?
+      build_tags = v.build.scan(SEMVER_TAG_RE)
+
+      # Collect non-nil build words and rejoin with delimiter
+      self.semver_build_word = build_tags.map { _1[1] }
+                                         .compact
+                                         .join('.')
+                                         .presence
+
+      # Collect first numeric build tag
+      self.semver_build_num  = build_tags.map { _1[0] }
+                                         .compact
+                                         .first
+                                         .presence
     end
   end
 end
