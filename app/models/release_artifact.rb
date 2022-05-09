@@ -88,10 +88,7 @@ class ReleaseArtifact < ApplicationRecord
     to: :release
 
   scope :order_by_version, -> {
-    # FIXME(ezekg) This is needed because ActiveRecord's table aliasing
-    #              differs depends on prior scopes and we need it for
-    #              reordering by SQL string.
-    joins('INNER JOIN releases ON releases.id = release_artifacts.release_id').reorder(<<~SQL.squish)
+    joins(:release).reorder(<<~SQL.squish)
       releases.semver_major        DESC,
       releases.semver_minor        DESC NULLS LAST,
       releases.semver_patch        DESC NULLS LAST,
@@ -109,8 +106,10 @@ class ReleaseArtifact < ApplicationRecord
       when UUID_RE
         # NOTE(ezekg) We need to obtain the key because e.g. alpha channel should
         #             also show artifacts for stable, rc and beta channels.
-        account.release_channels.where(channel: channel)
-                                .take
+        joins(:channel).select('release_channels.key')
+                       .where(channel: channel)
+                       .first
+                       .try(:key)
       when ReleaseChannel
         channel.key
       else
@@ -177,9 +176,9 @@ class ReleaseArtifact < ApplicationRecord
   scope :uploaded, -> { with_status(:UPLOADED) }
   scope :failed,   -> { with_status(:FAILED) }
 
-  scope :draft,     -> { joins(:release).where(release: { status: 'DRAFT' }) }
-  scope :published, -> { joins(:release).where(release: { status: 'PUBLISHED' }) }
-  scope :yanked,    -> { joins(:release).where(release: { status: 'YANKED' }) }
+  scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
+  scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
+  scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
 
   delegate :draft?, :published?, :yanked?,
     to: :release
