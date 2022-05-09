@@ -36,12 +36,35 @@ class LicenseValidationService < BaseService
       else
         return [false, "product scope is required", :PRODUCT_SCOPE_REQUIRED] if license.policy.require_product_scope?
       end
+
       # Check against policy scope requirements
       if scope.present? && scope.key?(:policy)
         return [false, "policy scope does not match", :POLICY_SCOPE_MISMATCH] if license.policy.id != scope[:policy]
       else
         return [false, "policy scope is required", :POLICY_SCOPE_REQUIRED] if license.policy.require_policy_scope?
       end
+
+      # Check against :user scope requirements
+      if scope.present? && scope.key?(:user)
+        return [false, "user scope does not match", :USER_SCOPE_MISMATCH] unless
+          license.user&.email == scope[:user] ||
+          license.user&.id == scope[:user]
+      else
+        return [false, "user scope is required", :USER_SCOPE_REQUIRED] if
+          license.policy.require_user_scope?
+      end
+
+      # Check against entitlement scope requirements
+      if scope.present? && scope.key?(:entitlements)
+        entitlements = scope[:entitlements].uniq
+
+        return [false, "entitlements scope is empty", :ENTITLEMENTS_SCOPE_EMPTY] if
+          entitlements.empty?
+
+        return [false, "is missing one or more required entitlements", :ENTITLEMENTS_MISSING] if
+          license.entitlements.where(code: entitlements).count != entitlements.size
+      end
+
       # Check against machine scope requirements
       if scope.present? && scope.key?(:machine)
         case
@@ -104,24 +127,6 @@ class LicenseValidationService < BaseService
         end
       else
         return [false, "fingerprint scope is required", :FINGERPRINT_SCOPE_REQUIRED] if license.policy.require_fingerprint_scope?
-      end
-      # Check against entitlement scope requirements
-      if scope.present? && scope.key?(:entitlements)
-        entitlements = scope[:entitlements].uniq
-
-        return [false, "entitlements scope is empty", :ENTITLEMENTS_SCOPE_EMPTY] if entitlements.empty?
-
-        return [false, "is missing one or more required entitlements", :ENTITLEMENTS_MISSING] if license.entitlements.where(code: entitlements).count != entitlements.size
-      end
-
-      # Check against :user scope requirements
-      if scope.present? && scope.key?(:user)
-        return [false, "user scope does not match", :USER_SCOPE_MISMATCH] unless
-          license.user&.email == scope[:user] ||
-          license.user&.id == scope[:user]
-      else
-        return [false, "user scope is required", :USER_SCOPE_REQUIRED] if
-          license.policy.require_user_scope?
       end
     end
 
