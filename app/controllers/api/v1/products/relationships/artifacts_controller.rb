@@ -24,15 +24,8 @@ module Api::V1::Products::Relationships
       if artifact.downloadable?
         download = artifact.download!(ttl: artifact_query[:ttl])
 
-        # FIXME(ezekg) Add support for broadcasting multiple events
         BroadcastEventService.call(
-          event: 'release.downloaded',
-          account: current_account,
-          resource: artifact,
-        )
-
-        BroadcastEventService.call(
-          event: 'artifact.downloaded',
+          event: %w[artifact.downloaded release.downloaded],
           account: current_account,
           resource: artifact,
         )
