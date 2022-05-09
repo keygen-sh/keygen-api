@@ -27,15 +27,8 @@ module Api::V1
       if artifact.downloadable?
         download = artifact.download!(ttl: artifact_query[:ttl])
 
-        # FIXME(ezekg) Add support for broadcasting multiple events
         BroadcastEventService.call(
-          event: 'release.downloaded',
-          account: current_account,
-          resource: artifact,
-        )
-
-        BroadcastEventService.call(
-          event: 'artifact.downloaded',
+          event: %w[artifact.downloaded release.downloaded],
           account: current_account,
           resource: artifact,
         )
@@ -56,7 +49,7 @@ module Api::V1
       upload = artifact.upload!
 
       BroadcastEventService.call(
-        event: 'artifact.created',
+        events: %w[artifact.created],
         account: current_account,
         resource: artifact,
       )
@@ -71,7 +64,7 @@ module Api::V1
       artifact.update!(artifact_params)
 
       BroadcastEventService.call(
-        event: 'artifact.updated',
+        events: %w[artifact.updated],
         account: current_account,
         resource: artifact,
       )
@@ -85,7 +78,7 @@ module Api::V1
       artifact.yank!
 
       BroadcastEventService.call(
-        event: 'artifact.deleted',
+        events: %w[artifact.deleted],
         account: current_account,
         resource: artifact,
       )
