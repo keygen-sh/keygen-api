@@ -22,7 +22,7 @@ describe ReleaseArtifact, type: :model do
     StripeHelper.stop
   end
 
-  context 'when sorting by version' do
+  describe '.order_by_version' do
     before do
       versions = %w[
         1.0.0-beta
@@ -44,12 +44,12 @@ describe ReleaseArtifact, type: :model do
         2.0.0
       ]
 
-      releases  = versions.map { create(:release, :published, version: _1.to_s, product:, account:) }
+      releases  = versions.map { create(:release, :published, version: _1, product:, account:) }
       artifacts = releases.map { create(:artifact, :uploaded, release: _1, account:) }
     end
 
     it 'should sort by semver' do
-      versions = ReleaseArtifact.order_by_version.pluck(:version)
+      versions = described_class.order_by_version.pluck(:version)
 
       expect(versions).to eq %w[
         2.0.0

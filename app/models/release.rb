@@ -125,6 +125,18 @@ class Release < ApplicationRecord
       in: STATUSES,
     }
 
+  scope :order_by_version, -> {
+    reorder(<<~SQL.squish)
+      semver_major      DESC,
+      semver_minor      DESC NULLS LAST,
+      semver_patch      DESC NULLS LAST,
+      semver_pre_word   DESC NULLS FIRST,
+      semver_pre_num    DESC NULLS LAST,
+      semver_build_word DESC NULLS LAST,
+      semver_build_num  DESC NULLS LAST
+    SQL
+  }
+
   scope :for_product, -> product {
     where(product: product)
   }
@@ -267,6 +279,46 @@ class Release < ApplicationRecord
 
   def checksum=(checksum)
     assign_attributes(artifact_attributes: { checksum: })
+  end
+
+  def upgrade!
+    product.releases.for_channel(channel)
+                    .order_by_version
+                    .then { |scope|
+                      base = scope.where.not(id:)
+
+                      scope = if semver_build_num.present?
+                                base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:, semver_build_num: semver_build_num..)
+                              else
+                                base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:).where.not(semver_build_num: nil)
+                              end
+
+                      scope = if semver_build_word.present?
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word: semver_build_word..))
+                              else
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:).where.not(semver_build_word: nil))
+                              end
+
+                      scope = if semver_pre_num.present?
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num: semver_pre_num..))
+                              else
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:).where.not(semver_pre_num: nil))
+                              end
+
+                      scope = if semver_pre_word.present?
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word: semver_pre_word..))
+                              else
+                                scope.or(base.where(semver_major:, semver_minor:, semver_patch:).where.not(semver_pre_word: nil))
+                              end
+
+                      scope = scope.or(base.where(semver_major:, semver_minor:, semver_patch: semver_patch..))
+                      scope = scope.or(base.where(semver_major:, semver_minor: semver_minor..))
+
+                      scope.or(base.where(semver_major: semver_major..))
+                    }
+                    .published
+                    .limit(1)
+                    .take
   end
 
   def draft?
