@@ -95,6 +95,8 @@ When /^I send a DELETE request to "([^\"]*)"$/ do |path|
 
   # Wait for all async deletion workers to finish
   DestroyModelWorker.drain
+  YankArtifactWorker.drain
+rescue Timeout::Error
 end
 
 Then /^the response status should (?:contain|be) "([^\"]*)"$/ do |status|
