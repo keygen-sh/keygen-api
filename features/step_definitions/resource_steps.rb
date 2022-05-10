@@ -501,7 +501,7 @@ Given /^AWS S3 is (responding with a 200 status|responding with a 404 status|tim
 
   Aws.config[:s3] = {
     stub_responses: {
-      delete_object: [],
+      delete_object: res,
       head_object: res,
     }
   }
@@ -705,9 +705,21 @@ Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]
   expect(model.attributes).to include attrs
 end
 
-Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |word_index, model_name, body|
+Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, body|
   body  = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
-  model = @account.send(model_name.pluralize).send(word_index)
+  model =
+    case model_name.pluralize
+    when 'processes'
+      @account.machine_processes.send(index_in_words)
+    when 'artifacts'
+      @account.release_artifacts.send(index_in_words)
+    else
+      @account.send(model_name.pluralize).send(index_in_words)
+    end
+
+  # FIXME(ezekg) Why do we need this?
+  model.reload
+
   attrs = JSON.parse(body).deep_transform_keys(&:underscore)
 
   expect(model.attributes.as_json).to include attrs
