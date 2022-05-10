@@ -90,13 +90,13 @@ class ReleaseArtifact < ApplicationRecord
 
   scope :order_by_version, -> {
     joins(:release).reorder(<<~SQL.squish)
-      semver_major                 DESC,
-      semver_minor                 DESC NULLS LAST,
-      semver_patch                 DESC NULLS LAST,
-      semver_pre_word              DESC NULLS FIRST,
-      semver_pre_num               DESC NULLS LAST,
-      semver_build_word            DESC NULLS LAST,
-      semver_build_num             DESC NULLS LAST,
+      releases.semver_major        DESC,
+      releases.semver_minor        DESC NULLS LAST,
+      releases.semver_patch        DESC NULLS LAST,
+      releases.semver_pre_word     DESC NULLS FIRST,
+      releases.semver_pre_num      DESC NULLS LAST,
+      releases.semver_build_word   DESC NULLS LAST,
+      releases.semver_build_num    DESC NULLS LAST,
       release_artifacts.created_at DESC
     SQL
   }
@@ -177,9 +177,9 @@ class ReleaseArtifact < ApplicationRecord
   scope :uploaded, -> { with_status(:UPLOADED) }
   scope :failed,   -> { with_status(:FAILED) }
 
-  scope :draft,     -> { joins(:release).where(release: { status: 'DRAFT' }) }
-  scope :published, -> { joins(:release).where(release: { status: 'PUBLISHED' }) }
-  scope :yanked,    -> { joins(:release).where(release: { status: 'YANKED' }) }
+  scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
+  scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
+  scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
 
   def s3_object_key
     "artifacts/#{account_id}/#{release_id}/#{filename}"

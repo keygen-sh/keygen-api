@@ -127,13 +127,13 @@ class Release < ApplicationRecord
 
   scope :order_by_version, -> {
     reorder(<<~SQL.squish)
-      semver_major      DESC,
-      semver_minor      DESC NULLS LAST,
-      semver_patch      DESC NULLS LAST,
-      semver_pre_word   DESC NULLS FIRST,
-      semver_pre_num    DESC NULLS LAST,
-      semver_build_word DESC NULLS LAST,
-      semver_build_num  DESC NULLS LAST
+      releases.semver_major      DESC,
+      releases.semver_minor      DESC NULLS LAST,
+      releases.semver_patch      DESC NULLS LAST,
+      releases.semver_pre_word   DESC NULLS FIRST,
+      releases.semver_pre_num    DESC NULLS LAST,
+      releases.semver_build_word DESC NULLS LAST,
+      releases.semver_build_num  DESC NULLS LAST
     SQL
   }
 
