@@ -117,7 +117,11 @@ describe Release, type: :model do
           1.0.1
           1.1.3
           1.1.21
+          2.0.1
+          2.0.2
           2.1.0
+          2.1.2
+          2.1.9
           2.9.0
           2.11.0
           3.0.0
@@ -126,11 +130,38 @@ describe Release, type: :model do
         versions.each { create(:release, :published, version: _1, product:, account:) }
       end
 
-      it 'should upgrade' do
+      it 'should upgrade to the latest version' do
         upgrade = subject.upgrade!
         assert upgrade
 
         expect(upgrade.version).to eq '3.0.0'
+      end
+
+      context 'when using a constraint' do
+        it 'should raise for an invalid constraint' do
+          expect { subject.upgrade!(constraint: 'invalid') }.to raise_error Semverse::InvalidConstraintFormat
+        end
+
+        it 'should upgrade to the latest v2 version' do
+          upgrade = subject.upgrade!(constraint: '2')
+          assert upgrade
+
+          expect(upgrade.version).to eq '2.11.0'
+        end
+
+        it 'should upgrade to the latest v2.x version' do
+          upgrade = subject.upgrade!(constraint: '2.0')
+          assert upgrade
+
+          expect(upgrade.version).to eq '2.11.0'
+        end
+
+        it 'should upgrade to the latest v2.0.x version' do
+          upgrade = subject.upgrade!(constraint: '2.1.0')
+          assert upgrade
+
+          expect(upgrade.version).to eq '2.1.9'
+        end
       end
     end
   end

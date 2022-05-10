@@ -281,9 +281,10 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { checksum: })
   end
 
-  def upgrade!
+  def upgrade!(constraint: nil)
     product.releases.for_channel(channel)
                     .order_by_version
+                    .published
                     .then { |scope|
                       base = scope.where.not(id:)
 
@@ -316,7 +317,21 @@ class Release < ApplicationRecord
 
                       scope.or(base.where(semver_major: semver_major..))
                     }
-                    .published
+                    .then { |scope|
+                      next scope if
+                        constraint.nil?
+
+                      _, major, minor, patch, * = Semverse::Constraint.split(constraint)
+
+                      case
+                      when patch.present?
+                        scope.where(semver_major: major, semver_minor: minor, semver_patch: patch..)
+                      when minor.present?
+                        scope.where(semver_major: major, semver_minor: minor..)
+                      when major.present?
+                        scope.where(semver_major: major)
+                      end
+                    }
                     .limit(1)
                     .take
   end
