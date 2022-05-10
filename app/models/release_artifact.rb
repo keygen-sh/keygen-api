@@ -331,7 +331,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key.downcase.strip.presence }]
+    rows = ReleasePlatform.find_by_sql [<<~SQL.squish, { account_id:, key: platform.key.downcase.strip.presence }]
       WITH ins AS (
         INSERT INTO "release_platforms"
           (
@@ -381,7 +381,7 @@ class ReleaseArtifact < ApplicationRecord
 
     # FIXME(ezekg) Performing a safe create_or_find_by so we don't poison
     #              our current transaction by using DB exceptions
-    rows =  ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key.downcase.strip.presence }]
+    rows = ReleaseArch.find_by_sql [<<~SQL.squish, { account_id:, key: arch.key.downcase.strip.presence }]
       WITH ins AS (
         INSERT INTO "release_arches"
           (

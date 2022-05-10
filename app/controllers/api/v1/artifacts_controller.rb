@@ -119,7 +119,7 @@ module Api::V1
               [:platform_attributes, { key: }]
             }
             param :arch, type: :string, optional: true, transform: -> (_, key) {
-              [:platform_attributes, { key: }]
+              [:arch_attributes, { key: }]
             }
             param :signature, type: :string, optional: true
             param :checksum, type: :string, optional: true
