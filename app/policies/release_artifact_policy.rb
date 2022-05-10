@@ -33,7 +33,7 @@ class ReleaseArtifactPolicy < ApplicationPolicy
       resource.product == bearer
   end
 
-  def delete?
+  def destroy?
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer) ||
