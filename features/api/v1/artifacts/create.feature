@@ -31,7 +31,8 @@ Feature: Create artifact
             "filename": "latest-mac.yml",
             "filetype": "yml",
             "filesize": 512,
-            "platform": "darwin"
+            "platform": "darwin",
+            "arch": "x86"
           },
           "relationships": {
             "release": {
@@ -48,7 +49,14 @@ Feature: Create artifact
     And the response should contain a valid signature header for "test1"
     And the JSON response should be an "artifact" with the following attributes:
       """
-      { "status": "WAITING" }
+      {
+        "filename": "latest-mac.yml",
+        "filetype": "yml",
+        "filesize": 512,
+        "platform": "darwin",
+        "arch": "x86",
+        "status": "WAITING"
+      }
       """
     And the current account should have 1 "artifact"
     And the first "release" should have the following attributes:
@@ -57,4 +65,729 @@ Feature: Create artifact
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a duplicate artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "latest-mac.yml" }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "latest-mac.yml",
+            "filetype": "yml",
+            "filesize": 512,
+            "platform": "darwin",
+            "arch": "x86"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "already exists",
+          "code": "FILENAME_TAKEN",
+          "source": {
+            "pointer": "/data/attributes/filename"
+          }
+        }
+      """
+    And the current account should have 1 "artifact"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a non-lowercase filename
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "Product-1.0.0.AppImage",
+            "filetype": ".AppImage",
+            "filesize": 209715200,
+            "platform": "linux"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "Product-1.0.0.AppImage" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null filename
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "is missing",
+        "source": {
+          "pointer": "/data/attributes/filename"
+        }
+      }
+      """
+    And the current account should have 0 "artifacts"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a non-lowercase filetype
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "Product-1.0.0.AppImage",
+            "filetype": ".AppImage",
+            "filesize": 209715200,
+            "platform": "linux"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filetype": "appimage" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null filetype
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "@keygen/node",
+            "filetype": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filetype": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty filetype
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "@keygen/node",
+            "filetype": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filetype": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null filesize
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "Setup.exe",
+            "filetype": "exe",
+            "filesize": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filesize": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty filesize
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "Setup.exe",
+            "filetype": "exe",
+            "filesize": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected integer)",
+        "source": {
+          "pointer": "/data/attributes/filesize"
+        }
+      }
+      """
+    And the current account should have 0 "artifacts"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a non-lowercase platform
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-1.0.0.dmg",
+            "filetype": "dmg",
+            "platform": "macOS",
+            "arch": "M1"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "platform": "macos" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null platform
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "install.sh",
+            "filetype": "sh",
+            "platform": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "platform": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty platform
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "install.sh",
+            "filetype": "sh",
+            "platform": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "platform": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a non-lowercase arch
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-1.0.0.dmg",
+            "filetype": "dmg",
+            "platform": "macOS",
+            "arch": "M1"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "arch": "m1" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null arch
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-1.0.0.dmg",
+            "filetype": "dmg",
+            "platform": "darwin",
+            "arch": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "arch": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty arch
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-1.0.0.dmg",
+            "filetype": "dmg",
+            "platform": "darwin",
+            "arch": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "arch": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "filename": "App-Setup-1-0-0.exe",
+        "filetype": "exe",
+        "filesize": 512,
+        "platform": "win32",
+        "arch": "amd64",
+        "status": "WAITING"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates an artifact for a release of another product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "products"
+    And the current account has 1 draft "release" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe",
+            "filetype": "exe",
+            "filesize": 512,
+            "platform": "win32",
+            "arch": "amd64"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License creates an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.exe"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.zip"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous creates an artifact for a release
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "App-Setup-1-0-0.zip"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "401"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
