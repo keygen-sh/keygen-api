@@ -42,14 +42,14 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   class Scope < ReleasePolicy::Scope
     def resolve
-      return scope.open.uploaded if
+      return scope.open.published.uploaded if
         bearer.nil?
 
       @scope = case
                when bearer.has_role?(:admin, :developer, :product)
                  scope
                else
-                 scope.uploaded
+                 scope.published.uploaded
                end
 
       super

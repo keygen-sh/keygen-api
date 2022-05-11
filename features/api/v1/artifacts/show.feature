@@ -1354,3 +1354,448 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  # Draft releases
+  Scenario: Anonymous retreives an artifact for a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a draft release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a draft release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a draft release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a draft release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives an artifact for a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives an artifact for a draft release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 draft "release" for the second "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives an artifact for a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  # Yanked releases
+  Scenario: Anonymous retreives an artifact for a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a yanked release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives an artifact for a yanked release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a yanked release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives an artifact for a yanked release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives an artifact for a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives an artifact for a yanked release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 yanked "release" for the second "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives an artifact for a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  # Waiting artifacts
+  Scenario: Anonymous retreives a waiting artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a waiting artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a waiting artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a waiting artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a waiting artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives a waiting artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives a waiting artifact of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives a waiting artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  # Failed artifacts
+  Scenario: Anonymous retreives a failed artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a failed artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a failed artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a failed artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a failed artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives a failed artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives a failed artifact of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives a failed artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  # Yanked artifacts
+  Scenario: Anonymous retreives a yanked artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a yanked artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a yanked artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a yanked artifact without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a yanked artifact with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives a yanked artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives a yanked artifact of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 "release" for the second "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives a yanked artifact
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"

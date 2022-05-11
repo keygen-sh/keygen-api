@@ -420,3 +420,483 @@ Feature: List release artifacts
     When I send a GET request to "/accounts/test1/artifacts?product=$products[0]"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
+
+  # Draft releases
+  Scenario: Anonymous retreives artifacts for draft releases
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives artifacts for draft releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives artifacts for draft releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives artifacts for draft releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives artifacts for draft releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Product retreives artifacts for draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: Product retreives artifacts for draft releases of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 draft "releases" for the second "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Admin retreives artifacts for draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  # Yanked releases
+  Scenario: Anonymous retreives artifacts for yanked releases
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives artifacts for yanked releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives artifacts for yanked releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives artifacts for yanked releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives artifacts for yanked releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Product retreives artifacts for yanked releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: Product retreives artifacts for yanked releases of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 yanked "releases" for the second "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Admin retreives artifacts for yanked releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  # Waiting artifacts
+  Scenario: Anonymous retreives waiting artifacts
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives waiting artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives waiting artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives waiting artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives waiting artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Product retreives waiting artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: Product retreives waiting artifacts of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the second "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Admin retreives waiting artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 waiting "artifact" for each "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  # Failed artifacts
+  Scenario: Anonymous retreives failed artifacts
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives failed artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives failed artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives failed artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives failed artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Product retreives failed artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: Product retreives failed artifacts of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the second "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Admin retreives failed artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 failed "artifact" for each "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  # Yanked artifacts
+  Scenario: Anonymous retreives yanked artifacts
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives yanked artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: License retreives yanked artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives yanked artifacts without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: User retreives yanked artifacts with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Product retreives yanked artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: Product retreives yanked artifacts of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 "releases" for the second "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "artifacts"
+
+  Scenario: Admin retreives yanked artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "releases" for the last "product"
+    And the current account has 1 yanked "artifact" for each "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
