@@ -85,7 +85,11 @@ module Api::V1
     def set_release
       scoped_releases = policy_scope(current_account.releases)
 
-      @release = scoped_releases.find(params[:id])
+      @release = FindByAliasService.call(
+        scope: scoped_releases,
+        identifier: params[:id],
+        aliases: %i[version tag],
+      )
 
       Current.resource = release
     end
@@ -103,6 +107,7 @@ module Api::V1
               [:channel_attributes, { key: }]
             }
             param :version, type: :string
+            param :tag, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_api_version == '1.0'
               param :filename, type: :string, optional: true
@@ -146,6 +151,7 @@ module Api::V1
           param :attributes, type: :hash do
             param :name, type: :string, optional: true, allow_nil: true
             param :description, type: :string, optional: true, allow_nil: true
+            param :tag, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
             if current_api_version == '1.0'
               param :filesize, type: :integer, optional: true, allow_nil: true

@@ -14,10 +14,9 @@ Feature: Upgrade release
     And the current account is "test1"
     And the current account has 1 "release"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
-  # Upgrade by ID
   Scenario: Admin retrieves an upgrade for a product release (upgrade available)
     Given the current account is "test1"
     And the current account has the following "product" rows:
@@ -42,8 +41,8 @@ Feature: Upgrade release
       | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1   | stable   |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "2.0.1" }
@@ -66,8 +65,8 @@ Feature: Upgrade release
       | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "204"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "404"
 
   # Products
   Scenario: Product retrieves an upgrade for a release (upgrade available)
@@ -84,8 +83,8 @@ Feature: Upgrade release
       | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable  |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
@@ -110,8 +109,8 @@ Feature: Upgrade release
       | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
-    Then the response status should be "204"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
+    Then the response status should be "404"
 
   Scenario: Product retrieves an upgrade for a release of a different product
     Given the current account is "test1"
@@ -125,7 +124,7 @@ Feature: Upgrade release
       | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$1/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   # Licenses
@@ -146,8 +145,8 @@ Feature: Upgrade release
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.3.0" }
@@ -185,7 +184,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of their product (expired, but access revoked)
@@ -213,7 +212,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of their product (suspended)
@@ -237,7 +236,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of their product (key auth, expired, but access restricted)
@@ -268,7 +267,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of their product (key auth, expired, but access revoked)
@@ -299,7 +298,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
     And the first error should have the following properties:
       """
@@ -335,7 +334,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I authenticate with my key
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "403"
     And the first error should have the following properties:
       """
@@ -362,7 +361,7 @@ Feature: Upgrade release
     And the current account has 1 "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
     Then the response status should be "404"
 
   Scenario: License retrieves an upgrade for a release of their product (has single entitlement)
@@ -401,8 +400,8 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.2.0" }
@@ -465,8 +464,8 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.0.1-alpha.1" }
@@ -521,7 +520,7 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of their product (missing all entitlements)
@@ -539,23 +538,40 @@ Feature: Upgrade release
     And the current account has 2 "release-entitlement-constraints" for the second "release"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   # Upgrade by version
-  Scenario: Admin retrieves an upgrade for a product release (upgrade available)
+  Scenario: Admin retrieves an upgrade by version
     Given the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+      | id                                   | name       |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | version       | channel |
-      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
-      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0-alpha.1 | alpha   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0         | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/1.0.0-alpha.1/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/1.0.0-alpha.1/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/dde54ea8-731d-4375-9d57-186ef01f3fcb/product"
+          }
+        }
+      }
+      """
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
@@ -565,6 +581,52 @@ Feature: Upgrade release
       {
         "current": "1.0.0-alpha.1",
         "next": "1.0.0"
+      }
+      """
+
+  # Upgrade by tag
+  Scenario: Admin retrieves an upgrade by tag
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | tag       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0   | cli@1.0.0 | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 2.0.0   | cli@2.0.0 | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | app@1.0.0 | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | app@2.0.0 | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/app@1.0.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/a7fad100-04eb-418f-8af9-e5eac497ad5a/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "tag": "app@2.0.0",
+        "version": "2.0.0"
+      }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "2.0.0"
       }
       """
 
@@ -588,8 +650,8 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$1/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$1/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "2.0.0-beta.1" }
@@ -622,7 +684,7 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   Scenario: User retrieves an upgrade for a release of their product (suspended)
@@ -644,7 +706,7 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a release of a different product
@@ -661,7 +723,7 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   Scenario: User retrieves an upgrade for a release of their product (has single entitlement)
@@ -702,8 +764,8 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.2.0" }
@@ -767,8 +829,8 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.0.0" }
@@ -825,7 +887,7 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   Scenario: User retrieves an upgrade for a release of their product (missing all entitlements)
@@ -845,7 +907,7 @@ Feature: Upgrade release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   # Open distribution strategy
@@ -860,13 +922,13 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -893,12 +955,12 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | TEST_ENTL    |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  | TEST_ENTL    |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  | TEST_ENTL    |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "403"
 
   Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy, has entitlement)
@@ -915,7 +977,7 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | TEST_ENTL    |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  | TEST_ENTL    |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  | TEST_ENTL    |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And the current account has 1 "license-entitlement" with the following:
@@ -927,8 +989,8 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$1/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$1/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -952,15 +1014,15 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -984,9 +1046,9 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -1011,8 +1073,8 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   Scenario: License retrieves an upgrade for a product release (CLOSED distribution strategy)
@@ -1026,12 +1088,12 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   Scenario: User retrieves an upgrade for a product release (CLOSED distribution strategy)
@@ -1045,13 +1107,13 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   Scenario: Admin retrieves an upgrade for a product release (CLOSED distribution strategy)
@@ -1065,11 +1127,11 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And I am an admin of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$2/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -1093,18 +1155,18 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has the following "artifact" rows:
       | release_id                           | filename           | filetype | platform |
       | f53f57cb-dc3f-4b18-9d90-534038214b49 | Test-App-1.0.0.dmg | dmg      | darwin   |
       | 80e20324-c578-4763-bbef-c9698bf0023a | Test-App-1.0.1.dmg | dmg      | darwin   |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | Test-App-1.0.2.dmg | dmg      | darwin   |
       | f517903b-5126-4405-9793-bf95a287b1f9 | Test-App-1.0.3.dmg | dmg      | darwin   |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -1129,10 +1191,10 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And I am a product of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
     Then the response status should be "404"
 
   # Expiration basis
@@ -1147,7 +1209,7 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for an existing "product"
     And the first "policy" has the following attributes:
       """
@@ -1166,8 +1228,8 @@ Feature: Upgrade release
       """
     And I am a license of account "test1"
     And I use an authentication token
-     When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+     When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -1194,7 +1256,7 @@ Feature: Upgrade release
       | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
       | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
       | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
-      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | 21088509-2dfc-4459-a8a2-3404136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
     And the current account has 1 "policy" for an existing "product"
     And the first "policy" has the following attributes:
       """
@@ -1208,13 +1270,13 @@ Feature: Upgrade release
       """
       {
         "policyId": "$policies[0]",
-        "expiry": "2042-01-03T14:18:02.743Z"
+        "expiry": "4042-01-03T14:18:02.743Z"
       }
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.1.0" }
@@ -1228,7 +1290,7 @@ Feature: Upgrade release
       """
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
-    And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
+    And the first "license" should have the expiry "4042-01-03T14:18:02.743Z"
 
   # Constraints
   Scenario: License retrieves an upgrade for a product release using a constraint
@@ -1257,8 +1319,8 @@ Feature: Upgrade release
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$10/actions/upgrade?constraint=1.0"
-    Then the response status should be "303"
+    When I send a GET request to "/accounts/test1/releases/$10/upgrade?constraint=1.0"
+    Then the response status should be "200"
     And the JSON response should be a "release" with the following attributes:
       """
       { "version": "1.7.0" }
@@ -1297,7 +1359,7 @@ Feature: Upgrade release
     And the current account has 1 "license" for the first "policy"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/products/$0/releases/$10/actions/upgrade?constraint=A"
+    When I send a GET request to "/accounts/test1/releases/$10/upgrade?constraint=A"
     Then the response status should be "400"
     And the JSON response should be an array of 1 error
     And the first error should have the following properties:

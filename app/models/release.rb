@@ -92,6 +92,7 @@ class Release < ApplicationRecord
   before_validation -> { self.status ||= 'DRAFT' }
 
   before_create -> { self.api_version ||= account.api_version }
+  before_create -> { self.version = semver.to_s }
   before_create :enforce_release_limit_on_account!
   before_create :set_semver_version
 
@@ -123,6 +124,13 @@ class Release < ApplicationRecord
     inclusion: {
       message: 'unsupported status',
       in: STATUSES,
+    }
+
+  validates :tag,
+    uniqueness: {
+      scope: %i[tag account_id],
+      message: 'tag already exists',
+      if: :tag?,
     }
 
   scope :order_by_version, -> {
@@ -467,9 +475,6 @@ class Release < ApplicationRecord
 
   def set_semver_version
     v = semver
-
-    # Clean up version
-    self.version = v.to_s
 
     # Store individual components for sorting purposes
     self.semver_major = v.major
