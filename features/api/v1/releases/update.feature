@@ -89,6 +89,38 @@ Feature: Update release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin removes the name of release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And the first "release" has the following attributes:
+      """
+      { "description": "a-name" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin updates the description of a release
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -122,6 +154,10 @@ Feature: Update release
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "release"
+    And the first "release" has the following attributes:
+      """
+      { "description": "a-desc" }
+      """
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
       """
@@ -143,6 +179,104 @@ Feature: Update release
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates the tag of a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "tag": "some-tag"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "tag": "some-tag"
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin removes the tag of a release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "release"
+    And the first "release" has the following attributes:
+      """
+      { "tag": "a-tag" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "tag": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "tag": null
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates the tag of a release with an existing tag
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "releases"
+    And the last "release" has the following attributes:
+      """
+      { "tag": "taken-tag" }
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/releases/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "tag": "taken-tag"
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "tag already exists",
+        "code": "TAG_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/tag"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to change the version of a release

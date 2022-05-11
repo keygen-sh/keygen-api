@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
-module Api::V1::Products::Relationships::Releases::Actions
+module Api::V1::Releases::Relationships
   class UpgradesController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_product
     before_action :set_release
 
-    def upgrade
-      authorize release
+    def show
+      authorize release, :download?
 
       upgrade = release.upgrade!(constraint: upgrade_query[:constraint])
-      authorize upgrade
+      authorize upgrade, :download?
 
       meta = {
         current: release.version,
@@ -26,36 +25,33 @@ module Api::V1::Products::Relationships::Releases::Actions
         meta:,
       )
 
-      render jsonapi: upgrade, meta:, status: :see_other, location: v1_account_release_path(upgrade.account_id, upgrade)
+      render jsonapi: upgrade, meta:
     rescue Semverse::InvalidConstraintFormat => e
-      render_bad_request detail: 'invalid constraint format', code: :CONSTRAINT_INVALID, source: { parameter: :constraint }
-    rescue Pundit::NotDefinedError
-      render_no_content
+      render_bad_request detail: 'invalid constraint format',
+                         code: :CONSTRAINT_INVALID,
+                         source: {
+                           parameter: :constraint,
+                         }
     end
 
     private
 
-    attr_reader :product,
-                :release
-
-    def set_product
-      @product = current_account.products.find params[:product_id]
-    end
+    attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(product.releases)
+      scoped_releases = policy_scope(current_account.releases)
 
       @release = FindByAliasService.call(
         scope: scoped_releases,
-        identifier: params[:id],
-        aliases: :version,
+        identifier: params[:release_id],
+        aliases: %i[version tag],
       )
 
       Current.resource = release
     end
 
     typed_query do
-      on :upgrade do
+      on :show do
         query :constraint, type: :string, optional: true
       end
     end
