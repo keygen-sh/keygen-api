@@ -16,7 +16,7 @@ Feature: Create artifact
     When I send a POST request to "/accounts/test1/artifacts"
     Then the response status should be "403"
 
-  Scenario: Admin creates an artifact for a release
+  Scenario: Admin creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 draft "release"
@@ -67,7 +67,7 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin creates a duplicate artifact for a release
+  Scenario: Admin creates a duplicate artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 draft "release"
@@ -616,7 +616,331 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product creates an artifact for a release
+  Scenario: Admin creates an artifact with a signature
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "signature": "HIvRe+dldchKP30eOAzL7KKdJ12Pqsv87ToM4gMAYmtMe0ffHg89StT07jH+oNE3j/9+zqkrsJrKYFbeFIWABw" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null signature
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "signature": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "signature": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty signature
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "signature": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "signature": "" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a checksum
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "checksum": "5m4Mzb9VnYdml5yu5DsF72NIGqo+gCHmoVEs56uBnTPlfUDIuj/IDvPwEeAO+gbijHKGaX6Co85New023rF3XA" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with a null checksum
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "checksum": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "checksum": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with an empty checksum
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "checksum": ""
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "checksum": "" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with metadata
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "metadata": { "foo": "bar" }
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "metadata": { "foo": "bar" } }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with null metadata
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "metadata": null
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "metadata": {} }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates an artifact with empty metadata
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "keygen_darwin_amd64",
+            "metadata": {}
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "307"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "metadata": {} }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -663,7 +987,7 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product creates an artifact for a release of another product
+  Scenario: Product creates an artifact  of another product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "products"
@@ -698,7 +1022,7 @@ Feature: Create artifact
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License creates an artifact for a release
+  Scenario: License creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -731,7 +1055,7 @@ Feature: Create artifact
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User creates an artifact for a release
+  Scenario: User creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -763,7 +1087,7 @@ Feature: Create artifact
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous creates an artifact for a release
+  Scenario: Anonymous creates an artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"

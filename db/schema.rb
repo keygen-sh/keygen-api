@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_09_154324) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_11_130657) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -389,6 +389,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_09_154324) do
     t.string "checksum"
     t.uuid "release_arch_id"
     t.string "status"
+    t.jsonb "metadata"
     t.index ["created_at"], name: "index_release_artifacts_on_created_at", order: :desc
     t.index ["filename", "release_id", "account_id"], name: "release_artifacts_uniq_filename_idx", unique: true, where: "(filename IS NOT NULL)"
     t.index ["release_arch_id"], name: "index_release_artifacts_on_release_arch_id"

@@ -141,8 +141,8 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[artifact artifacts]
           param :attributes, type: :hash do
-            param :signature, type: :string, optional: true
-            param :checksum, type: :string, optional: true
+            param :signature, type: :string, optional: true, allow_nil: true
+            param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
           end
         end
