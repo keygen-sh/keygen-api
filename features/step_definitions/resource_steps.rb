@@ -577,6 +577,14 @@ Then /^the current account should have (\d+) "([^\"]*)"$/ do |count, resource|
     expect(@account.machine_processes.count).to eq count.to_i
   when /^artifacts?$/
     expect(@account.release_artifacts.count).to eq count.to_i
+  when /^filetypes?$/
+    expect(@account.release_filetypes.count).to eq count.to_i
+  when /^channels?$/
+    expect(@account.release_channels.count).to eq count.to_i
+  when /^platforms?$/
+    expect(@account.release_platforms.count).to eq count.to_i
+  when /^arch(es)?$/
+    expect(@account.release_arches.count).to eq count.to_i
   else
     expect(@account.send(resource.pluralize.underscore).count).to eq count.to_i
   end

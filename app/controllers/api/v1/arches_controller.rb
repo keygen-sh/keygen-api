@@ -25,7 +25,7 @@ module Api::V1
     attr_reader :arch
 
     def set_arch
-      scoped_arches = policy_scope(current_account.release_archs)
+      scoped_arches = policy_scope(current_account.release_arches)
 
       @arch = scoped_arches.find(params[:id])
 
