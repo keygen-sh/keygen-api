@@ -9,6 +9,7 @@ class ReleaseSerializer < BaseSerializer
     @object.channel&.key
   end
   attribute :status
+  attribute :tag
   attribute :version
   attribute :semver do
     semver = @object.semver
@@ -63,6 +64,11 @@ class ReleaseSerializer < BaseSerializer
   relationship :artifacts do
     link :related do
       @url_helpers.v1_account_release_artifacts_path @object.account_id, @object
+    end
+  end
+  relationship :upgrade do
+    link :related do
+      @url_helpers.v1_account_release_upgrade_path @object.account_id, @object
     end
   end
 

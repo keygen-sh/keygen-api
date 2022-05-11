@@ -184,20 +184,14 @@ Rails.application.routes.draw do
         resources "platforms", only: [:index, :show]
         resources "arches", only: [:index, :show]
         resources "channels", only: [:index, :show]
-        resources "releases", constraints: { id: /[^\/]*/ }, only: [:index, :show] do
-          member do
-            scope "actions", module: "releases/actions" do
-              post "upgrade", to: "upgrades#upgrade"
-            end
-          end
-        end
+        resources "releases", constraints: { id: /.*/ }, only: [:index, :show]
         member do
           post "tokens", to: "tokens#generate"
         end
       end
     end
 
-    resources "releases", constraints: { id: /.*/ } do
+    resources "releases", constraints: { id: /[^\/]*/ } do
       scope module: "releases/relationships" do
         resources "entitlements", only: [:index, :show]
         resources "constraints", only: [:index, :show] do
@@ -207,6 +201,7 @@ Rails.application.routes.draw do
           end
         end
         resources "artifacts", only: [:index, :show]
+        resource "upgrade", only: %i[show]
         resource "product", only: [:show]
 
         version_constraint "<=1.0" do

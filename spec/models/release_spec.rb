@@ -342,16 +342,16 @@ describe Release, type: :model do
       end
 
       context 'when upgrading from the alpha channel' do
-        subject { create(:release, :published, version: '3.0.1-alpha.1', product:, account:) }
+        subject { create(:release, :published, version: '3.0.3-alpha.1', product:, account:) }
 
         context 'when the upgrade is for the stable channel' do
-          before { create(:release, :published, version: '3.1.0', product:, account:) }
+          before { create(:release, :published, version: '3.0.3', product:, account:) }
 
           it 'should upgrade to the latest version' do
             upgrade = subject.upgrade!
             assert upgrade
 
-            expect(upgrade.version).to eq '3.1.0'
+            expect(upgrade.version).to eq '3.0.3'
           end
         end
 
@@ -389,13 +389,16 @@ describe Release, type: :model do
         end
 
         context 'when the upgrade is for the dev channel' do
-          before { create(:release, :published, version: '3.1.0-dev.1', product:, account:) }
+          before do
+            create(:release, :published, version: '3.1.0-dev.1', product:, account:)
+            create(:release, :published, version: '3.0.3', product:, account:)
+          end
 
           it 'should not upgrade to the dev release' do
             upgrade = subject.upgrade!
             assert upgrade
 
-            expect(upgrade.version).to eq '3.0.2'
+            expect(upgrade.version).to eq '3.0.3'
           end
         end
       end

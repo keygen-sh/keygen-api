@@ -16,7 +16,7 @@ Feature: Release upgrade actions
     And I use an authentication token
     And I use API version "1.1"
     When I send a GET request to "/accounts/test1/releases/$0/actions/upgrade"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
