@@ -1200,8 +1200,8 @@ Feature: Create release
         "channel": "stable"
       }
       """
-    And the current account should have 0 "release-platforms"
-    And the current account should have 0 "release-filetypes"
+    And the current account should have 0 "platforms"
+    And the current account should have 0 "filetypes"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1249,7 +1249,7 @@ Feature: Create release
         "channel": "stable"
       }
       """
-    And the current account should have 0 "release-platforms"
+    And the current account should have 0 "platforms"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

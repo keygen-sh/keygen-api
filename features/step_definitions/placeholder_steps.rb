@@ -29,6 +29,8 @@ PLACEHOLDERS = %w[
   release
   release_platform
   platform
+  release_arch
+  arch
   release_filetype
   filetype
   release_channel
@@ -191,6 +193,8 @@ def parse_path_placeholders(str, account:, bearer:, crypt:)
             account.release_entitlement_constraints.send(:[], index.to_i).id
           when "platforms"
             account.release_platforms.send(:[], index.to_i).id
+          when "arches"
+            account.release_arches.send(:[], index.to_i).id
           when "channels"
             account.release_channels.send(:[], index.to_i).id
           when "filetypes"
