@@ -212,6 +212,13 @@ Rails.application.routes.draw do
         end
       end
 
+      member do
+        scope "actions", module: "releases/actions" do
+          post "publish", to: "publishings#publish"
+          post "yank", to: "publishings#yank"
+        end
+      end
+
       version_constraint "<=1.0" do
         member do
           scope "actions", module: "releases/actions" do

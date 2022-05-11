@@ -67,6 +67,13 @@ class ReleasePolicy < ApplicationPolicy
       resource.product == bearer
   end
 
+  def publish?
+    assert_account_scoped!
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.product == bearer
+  end
+
   def yank?
     assert_account_scoped!
 
