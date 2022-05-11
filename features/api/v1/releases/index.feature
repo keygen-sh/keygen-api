@@ -159,6 +159,33 @@ Feature: List releases
     Then the response status should be "200"
     And the JSON response should be an array with 2 "releases"
 
+  Scenario: Admin retrieves all x86 releases for their account
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel  |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable   |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable   |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable   |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0-beta.1 | beta     |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.1 | beta     |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-beta.2 | beta     |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                  | filetype | platform | arch |
+      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg        | dmg      | macos    | x86  |
+      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.0.1.dmg        | dmg      | macos    | x86  |
+      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.1.0.dmg        | dmg      | macos    | x86  |
+      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App-1.2.0-beta.1.dmg | dmg      | macos    | x86  |
+      | 28a6e16d-c2a6-4be7-8578-e236182ee5c3 | Test-App.1.0.0-beta.1.exe | exe      | win32    | x64  |
+      | 70c40946-4b23-408c-aa1c-fa35421ff46a | Test-App.1.0.0-beta.2.exe | exe      | win32    | x86  |
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases?arch=x64"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "release"
+
   Scenario: Admin retrieves all win32 product releases for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
