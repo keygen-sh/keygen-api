@@ -626,3 +626,165 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  # Draft releases
+  Scenario: Anonymous retreives a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a draft release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a draft release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a draft release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a draft release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives a draft release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 draft "release" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives a draft release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  # Yanked releases
+  Scenario: Anonymous retreives a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a yanked release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: License retreives a yanked release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a yanked release without a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: User retreives a yanked release with a license for it
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Product retreives a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: Product retreives a yanked release of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 1 yanked "release" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "404"
+
+  Scenario: Admin retreives a yanked release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
