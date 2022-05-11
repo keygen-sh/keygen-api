@@ -21,5 +21,23 @@ FactoryBot.define do
       product.role = create :role, :product, resource: product
       create :token, bearer: product
     end
+
+    trait :licensed do
+      after :build do |release, evaluator|
+        release.distribution_strategy = 'LICENSED'
+      end
+    end
+
+    trait :open do
+      after :build do |release, evaluator|
+        release.distribution_strategy = 'OPEN'
+      end
+    end
+
+    trait :closed do
+      after :build do |release, evaluator|
+        release.distribution_strategy = 'CLOSED'
+      end
+    end
   end
 end

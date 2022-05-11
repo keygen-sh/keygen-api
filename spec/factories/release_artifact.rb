@@ -41,5 +41,11 @@ FactoryBot.define do
         artifact.status = 'FAILED'
       end
     end
+
+    trait :yanked do
+      after :build do |artifact, evaluator|
+        artifact.status = 'YANKED'
+      end
+    end
   end
 end

@@ -976,3 +976,179 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  # Draft releases
+  Scenario: Anonymous retreives draft releases
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 draft "releases" for the last "product"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: License retreives draft releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: License retreives draft releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: User retreives draft releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: User retreives draft releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 draft "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Product retreives draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Product retreives draft releases of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 draft "releases" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Admin retreives draft releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 draft "releases" for the last "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  # Yanked releases
+  Scenario: Anonymous retreives yanked releases
+    Given the current account is "test1"
+    And the current account has 1 open "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: License retreives yanked releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: License retreives yanked releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: User retreives yanked releases without a license for any
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: User retreives yanked releases with a license for them
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 yanked "release" for the last "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Product retreives yanked releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
+
+  Scenario: Product retreives yanked releases of another product
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 3 yanked "releases" for the second "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "releases"
+
+  Scenario: Admin retreives yanked releases
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 yanked "releases" for the last "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "releases"
