@@ -183,8 +183,14 @@ Rails.application.routes.draw do
         resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
         resources "platforms", only: [:index, :show]
         resources "arches", only: [:index, :show]
-        resources "releases", only: [:index, :show]
         resources "channels", only: [:index, :show]
+        resources "releases", constraints: { id: /[^\/]*/ }, only: [:index, :show] do
+          member do
+            scope "actions", module: "releases/actions" do
+              post "upgrade", to: "upgrades#upgrade"
+            end
+          end
+        end
         member do
           post "tokens", to: "tokens#generate"
         end

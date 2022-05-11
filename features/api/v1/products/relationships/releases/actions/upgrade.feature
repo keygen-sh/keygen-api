@@ -1,0 +1,1312 @@
+@api/v1
+Feature: Upgrade release
+
+  Background:
+    Given the following "accounts" exist:
+      | name    | slug  |
+      | Test 1  | test1 |
+      | Test 2  | test2 |
+    And I send and accept JSON
+
+  Scenario: Endpoint should be inaccessible when account is disabled
+    Given the account "test1" is canceled
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  # Upgrade by ID
+  Scenario: Admin retrieves an upgrade for a product release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1   | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2   | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0   | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0   | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0   | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1   | stable   |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "2.0.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "2.0.1"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a product release (no upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "204"
+
+  # Products
+  Scenario: Product retrieves an upgrade for a release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable  |
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.3.0"
+      }
+      """
+
+  Scenario: Product retrieves an upgrade for a release (no upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 0.1.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "204"
+
+  Scenario: Product retrieves an upgrade for a release of a different product
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$1/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  # Licenses
+  Scenario: License retrieves an upgrade for a release of their product (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.3.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1",
+        "next": "1.3.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of their product (expired, but access restricted)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "RESTRICT_ACCESS" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of their product (expired, but access revoked)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "expirationStrategy": "REVOKE_ACCESS" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.6.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of their product (suspended)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of their product (key auth, expired, but access restricted)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationStrategy": "RESTRICT_ACCESS",
+        "authenticationStrategy": "LICENSE"
+      }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of their product (key auth, expired, but access revoked)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationStrategy": "REVOKE_ACCESS",
+        "authenticationStrategy": "LICENSE"
+      }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.6.months.ago" }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "License is expired",
+        "code": "LICENSE_EXPIRED"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of their product (key auth, suspended)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the first "policy" has the following attributes:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And I am a license of account "test1"
+    And I authenticate with my key
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "License is suspended",
+        "code": "LICENSE_SUSPENDED"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of a different product
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0        | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "404"
+
+  Scenario: License retrieves an upgrade for a release of their product (has single entitlement)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+    And the current account has 1 "entitlement"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.2.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.2.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of their product (has multiple entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1-alpha.1 | stable  |
+    And the current account has 2 "entitlements"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1-alpha.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-alpha.1",
+        "next": "1.0.1-alpha.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release of their product (missing some entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And the current account has 2 "entitlements"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of their product (missing all entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 2 "release-entitlement-constraints" for the first "release"
+    And the current account has 2 "release-entitlement-constraints" for the second "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  # Upgrade by version
+  Scenario: Admin retrieves an upgrade for a product release (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/1.0.0-alpha.1/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-alpha.1",
+        "next": "1.0.0"
+      }
+      """
+
+  # Users
+  Scenario: User retrieves an upgrade for a release of their product (upgrade available)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1-beta.1 | beta  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-beta.1 | beta    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$1/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "2.0.0-beta.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1-beta.1",
+        "next": "2.0.0-beta.1"
+      }
+      """
+
+  Scenario: User retrieves an upgrade for a release of their product (expired)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.2.months.ago" }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: User retrieves an upgrade for a release of their product (suspended)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a release of a different product
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "license"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  Scenario: User retrieves an upgrade for a release of their product (has single entitlement)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  |
+    And the current account has 1 "entitlement"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.2.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.2.0"
+      }
+      """
+
+  Scenario: User retrieves an upgrade for a release of their product (has multiple entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And the current account has 2 "entitlements"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-alpha.1",
+        "next": "1.0.0"
+      }
+      """
+
+  Scenario: User retrieves an upgrade for a release of their product (missing some entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And the current account has 2 "entitlements"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[0]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[0]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "release-entitlement-constraint" with the following:
+      """
+      {
+        "entitlementId": "$entitlements[1]",
+        "releaseId": "$releases[1]"
+      }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: User retrieves an upgrade for a release of their product (missing all entitlements)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 2 "release-entitlement-constraints" for the first "release"
+    And the current account has 2 "release-entitlement-constraints" for the second "release"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  # Open distribution strategy
+  Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy, missing entitlement)
+    Given the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code      |
+      | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | TEST_ENTL |
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel | entitlements |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | TEST_ENTL    |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | TEST_ENTL    |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  | TEST_ENTL    |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  | TEST_ENTL    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "403"
+
+  Scenario: License retrieves an upgrade for a product release (OPEN distribution strategy, has entitlement)
+    Given the current account is "test1"
+    And the current account has the following "entitlement" rows:
+      | id                                   | code      |
+      | 8cdf47c8-9cdc-44c9-a752-1e137355ecaf | TEST_ENTL |
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel | entitlements |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | TEST_ENTL    |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | TEST_ENTL    |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  | TEST_ENTL    |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  | TEST_ENTL    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | TEST_ENTL    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the current account has 1 "license-entitlement" with the following:
+      """
+      {
+        "entitlementId": "8cdf47c8-9cdc-44c9-a752-1e137355ecaf",
+        "licenseId": "$licenses[0]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$1/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.1",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: User retrieves an upgrade for a product release (OPEN distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.2",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: Anonymous retrieves an upgrade for a product release (OPEN distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+
+  # Closed distribution strategy
+  Scenario: Anonymous retrieves an upgrade for a product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  Scenario: License retrieves an upgrade for a product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  Scenario: User retrieves an upgrade for a product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  Scenario: Admin retrieves an upgrade for a product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$2/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.2",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: Product retrieves an upgrade for their release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     | distribution_strategy |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename           | filetype | platform |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | Test-App-1.0.0.dmg | dmg      | darwin   |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | Test-App-1.0.1.dmg | dmg      | darwin   |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | Test-App-1.0.2.dmg | dmg      | darwin   |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | Test-App-1.0.3.dmg | dmg      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.1.0.dmg | dmg      | darwin   |
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+
+  Scenario: Product retrieves an upgrade for another product release (CLOSED distribution strategy)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "404"
+
+  # Expiration basis
+  Scenario: License upgrades a release with a download expiration basis (not set)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App A |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": null
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+     When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should have a 1 year expiry
+
+  Scenario: License upgrades a release with a download expiration basis (set)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App A |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+      | d34846b1-fdfe-46aa-9194-7d1a08e2d0cb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable  |
+      | f517903b-5126-4405-9793-bf95a287b1f9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable  |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  |
+    And the current account has 1 "policy" for an existing "product"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "expirationBasis": "FROM_FIRST_DOWNLOAD",
+        "duration": $time.1.year
+      }
+      """
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2042-01-03T14:18:02.743Z"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$0/actions/upgrade"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.1.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.1.0"
+      }
+      """
+    And sidekiq should process 1 "event-log" job
+    And sidekiq should process 1 "event-notification" job
+    And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
+
+  # Constraints
+  Scenario: License retrieves an upgrade for a product release using a constraint
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1   | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2   | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0   | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0   | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0   | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1   | stable   |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$10/actions/upgrade?constraint=1.0"
+    Then the response status should be "303"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.7.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.5.0",
+        "next": "1.7.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release using an invalid constraint
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1   | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2   | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0   | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0   | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0   | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1   | stable   |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/releases/$10/actions/upgrade?constraint=A"
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "invalid constraint format",
+        "source": {
+          "parameter": "constraint"
+        }
+      }
+      """

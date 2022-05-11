@@ -59,6 +59,7 @@ class ReleasePolicy < ApplicationPolicy
         )
       )
   end
+  alias_method :upgrade?, :download?
 
   def upload?
     assert_account_scoped!
