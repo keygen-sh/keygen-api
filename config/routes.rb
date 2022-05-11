@@ -184,7 +184,7 @@ Rails.application.routes.draw do
         resources "platforms", only: [:index, :show]
         resources "arches", only: [:index, :show]
         resources "channels", only: [:index, :show]
-        resources "releases", constraints: { id: /.*/ }, only: [:index, :show]
+        resources "releases", constraints: { id: /[^\/]*/ }, only: [:index, :show]
         member do
           post "tokens", to: "tokens#generate"
         end
@@ -192,6 +192,28 @@ Rails.application.routes.draw do
     end
 
     resources "releases", constraints: { id: /[^\/]*/ } do
+      version_constraint "<=1.0" do
+        member do
+          scope "actions", module: "releases/actions" do
+            scope module: :v1x0 do
+              get "upgrade", to: "upgrades#check_for_upgrade_by_id"
+            end
+          end
+        end
+        collection do
+          put "/", to: "releases#create", as: "upsert"
+
+          scope "actions", module: "releases/actions" do
+            scope module: :v1x0 do
+              # FIXME(ezekg) This needs to take precedence over the upgrade relationship,
+              #              otherwise the relationship tries to match "actions" as a
+              #              release ID when hitting the root /actions/upgrade.
+              get "upgrade", to: "upgrades#check_for_upgrade_by_query"
+            end
+          end
+        end
+      end
+
       scope module: "releases/relationships" do
         resources "entitlements", only: [:index, :show]
         resources "constraints", only: [:index, :show] do
@@ -217,25 +239,6 @@ Rails.application.routes.draw do
         scope "actions", module: "releases/actions" do
           post "publish", to: "publishings#publish"
           post "yank", to: "publishings#yank"
-        end
-      end
-
-      version_constraint "<=1.0" do
-        member do
-          scope "actions", module: "releases/actions" do
-            scope module: :v1x0 do
-              get "upgrade", to: "upgrades#check_for_upgrade_by_id"
-            end
-          end
-        end
-        collection do
-          put "/", to: "releases#create", as: "upsert"
-
-          scope "actions", module: "releases/actions" do
-            scope module: :v1x0 do
-              get "upgrade", to: "upgrades#check_for_upgrade_by_query"
-            end
-          end
         end
       end
     end
