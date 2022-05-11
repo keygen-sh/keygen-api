@@ -45,6 +45,10 @@ class ApplicationController < ActionController::API
     render json: { meta: meta.transform_keys! { |k| k.to_s.camelize :lower } }
   end
 
+  def render_no_content(opts = {})
+    render status: :no_content
+  end
+
   def render_forbidden(opts = {})
     skip_authorization
 
