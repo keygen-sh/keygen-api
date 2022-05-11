@@ -336,6 +336,14 @@ class Release < ApplicationRecord
                     .take
   end
 
+  def publish!
+    update!(status: 'PUBLISHED')
+  end
+
+  def yank!
+    update!(status: 'YANKED')
+  end
+
   def draft?
     status == 'DRAFT'
   end
