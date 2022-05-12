@@ -101,6 +101,7 @@ Feature: Create release
             "name": "Launch Release",
             "channel": "stable",
             "version": "1.0.0",
+            "tag": "latest",
             "metadata": {
               "shasums": [
                 "36022a3f0b4bb6f3cdf57276867a210dc81f5c5b2215abf8a93c81ad18fa6bf0b1e36ee24ab7517c9474a1ad445a403d4612899687cabf591f938004df105011"
