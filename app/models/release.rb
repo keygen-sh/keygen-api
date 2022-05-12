@@ -94,7 +94,9 @@ class Release < ApplicationRecord
   before_create -> { self.api_version ||= account.api_version }
   before_create -> { self.version = semver.to_s }
   before_create :enforce_release_limit_on_account!
-  before_create :set_semver_version
+
+  before_save :set_semver_version,
+    if: :version_changed?
 
   validates :product,
     scope: { by: :account_id }
