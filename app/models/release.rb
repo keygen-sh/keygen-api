@@ -291,8 +291,8 @@ class Release < ApplicationRecord
     assign_attributes(artifact_attributes: { checksum: })
   end
 
-  def upgrade!(constraint: nil)
-    product.releases.for_channel(channel)
+  def upgrade!(channel: nil, constraint: nil)
+    product.releases.for_channel(channel.presence || self.channel)
                     .order_by_version
                     .published
                     .then { |scope|

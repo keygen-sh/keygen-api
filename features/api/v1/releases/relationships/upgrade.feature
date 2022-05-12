@@ -1292,6 +1292,198 @@ Feature: Upgrade release
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "4042-01-03T14:18:02.743Z"
 
+  # Channels
+  Scenario: License retrieves an upgrade for a product release with a explicit channel (no match)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2         | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3         | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1         | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2         | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0         | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0         | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0         | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0         | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0         | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0         | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1 | alpha    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade?channel=beta"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.7.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.7.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release with a explicit channel (rc)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2         | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3         | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1         | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2         | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0         | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0         | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0         | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0         | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0         | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0         | stable   |
+      | 4a744db3-e9af-45b2-b5b1-7baf33656747 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-alpha.1 | alpha    |
+      | b913d283-f1a0-44cf-95c9-b32b992ca451 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-alpha.2 | alpha    |
+      | 5a7207c2-8ca5-4abe-8046-8061431ec6a8 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-beta.1  | beta     |
+      | 432a3978-bbce-4a42-b928-f973b554fd60 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1 | alpha    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$3/upgrade?channel=rc"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.7.0" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.3",
+        "next": "1.7.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release with a explicit channel (beta)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2         | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3         | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1         | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2         | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0         | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0         | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0         | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0         | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0         | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0         | stable   |
+      | 4a744db3-e9af-45b2-b5b1-7baf33656747 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-alpha.1 | alpha    |
+      | b913d283-f1a0-44cf-95c9-b32b992ca451 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-alpha.2 | alpha    |
+      | 5a7207c2-8ca5-4abe-8046-8061431ec6a8 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.8.0-beta.1  | beta     |
+      | 432a3978-bbce-4a42-b928-f973b554fd60 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1 | alpha    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$14/upgrade?channel=beta"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.8.0-beta.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.8.0-alpha.2",
+        "next": "1.8.0-beta.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release with a explicit channel (alpha)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1         | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2         | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3         | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0         | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1         | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2         | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0         | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0         | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0         | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0         | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0         | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0         | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0-alpha.1 | alpha    |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade?channel=alpha"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "2.0.0-alpha.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "2.0.0-alpha.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release using an invalid channel
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel  |
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable   |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable   |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.2   | stable   |
+      | fd10ab0c-c52a-412f-b34f-180eebd7325d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.3   | stable   |
+      | f98d8c17-5fad-4361-ad89-43b0c6f6fa00 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable   |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.1   | stable   |
+      | 0a027f00-0860-4fa7-bd37-5900c8866818 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.2   | stable   |
+      | 6344460b-b43c-4aa8-a76c-2086f9f526cc | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable   |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable   |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.5.0   | stable   |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.6.0   | stable   |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.7.0   | stable   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0   | stable   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.1   | stable   |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$10/upgrade?channel=edge"
+    Then the response status should be "404"
+
   # Constraints
   Scenario: License retrieves an upgrade for a product release using a constraint
     Given the current account is "test1"
