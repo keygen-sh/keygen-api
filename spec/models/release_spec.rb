@@ -187,6 +187,13 @@ describe Release, type: :model do
 
             expect(upgrade.version).to eq '3.0.2'
           end
+
+          it 'should upgrade with explicit rc channel' do
+            upgrade = subject.upgrade!(channel: 'rc')
+            assert upgrade
+
+            expect(upgrade.version).to eq '3.1.0-rc.1'
+          end
         end
 
         context 'when the upgrade is for the beta channel' do
@@ -197,6 +204,13 @@ describe Release, type: :model do
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
+          end
+
+          it 'should upgrade with explicit beta channel' do
+            upgrade = subject.upgrade!(channel: 'beta')
+            assert upgrade
+
+            expect(upgrade.version).to eq '3.1.0-beta.1'
           end
         end
 
@@ -209,6 +223,13 @@ describe Release, type: :model do
 
             expect(upgrade.version).to eq '3.0.2'
           end
+
+          it 'should upgrade with explicit alpha channel' do
+            upgrade = subject.upgrade!(channel: 'alpha')
+            assert upgrade
+
+            expect(upgrade.version).to eq '3.1.0-alpha.1'
+          end
         end
 
         context 'when the upgrade is for the dev channel' do
@@ -219,6 +240,13 @@ describe Release, type: :model do
             assert upgrade
 
             expect(upgrade.version).to eq '3.0.2'
+          end
+
+          it 'should upgrade with explicit dev channel' do
+            upgrade = subject.upgrade!(channel: 'dev')
+            assert upgrade
+
+            expect(upgrade.version).to eq '3.1.0-dev.1'
           end
         end
       end

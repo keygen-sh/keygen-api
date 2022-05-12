@@ -10,7 +10,8 @@ module Api::V1::Releases::Relationships
     def show
       authorize release, :download?
 
-      upgrade = release.upgrade!(constraint: upgrade_query[:constraint])
+      kwargs  = upgrade_query.symbolize_keys.slice(:constraint, :channel)
+      upgrade = release.upgrade!(**kwargs)
       authorize upgrade, :download?
 
       meta = {
@@ -26,7 +27,7 @@ module Api::V1::Releases::Relationships
       )
 
       render jsonapi: upgrade, meta:
-    rescue Semverse::InvalidConstraintFormat => e
+    rescue Semverse::InvalidConstraintFormat
       render_bad_request detail: 'invalid constraint format',
                          code: :CONSTRAINT_INVALID,
                          source: {
@@ -53,6 +54,7 @@ module Api::V1::Releases::Relationships
     typed_query do
       on :show do
         query :constraint, type: :string, optional: true
+        query :channel, type: :string, optional: true
       end
     end
   end
