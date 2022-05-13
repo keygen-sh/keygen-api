@@ -35,11 +35,18 @@ Feature: Release artifact relationship
     And the current account is "test1"
     And the current account has 3 "releases"
     And the current account has 1 "artifact" for the first "release"
+    And the first "artifact" has the following attributes:
+      """
+      { "filename": "App.dmg" }
+      """
     And I use an authentication token
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/$0/artifact"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "key": "App.dmg" }
+      """
 
   Scenario: Admin downloads an artifact for a release that has more than 1 artifact
     Given I am an admin of account "test1"
