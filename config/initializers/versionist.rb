@@ -21,6 +21,8 @@ Versionist.configure do |config|
       rename_draft_status_to_not_published_for_releases_migration
       rename_draft_status_to_not_published_for_release_migration
       rename_filename_ext_error_code_for_release_migration
+      add_key_attribute_to_artifacts_migration
+      add_key_attribute_to_artifact_migration
     ],
   }
 end

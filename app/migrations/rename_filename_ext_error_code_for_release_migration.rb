@@ -21,8 +21,8 @@ class RenameFilenameExtErrorCodeForReleaseMigration < BaseMigration
     end
   end
 
-  response if: -> res { !res.successful? && res.request.params in controller: 'api/v1/releases',
-                                                                  action: 'create' } do |res|
+  response if: -> res { res.status == 422 && res.request.params in controller: 'api/v1/releases',
+                                                                   action: 'create' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 
     migrate!(body)
