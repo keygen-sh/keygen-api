@@ -509,8 +509,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_11_195423) do
     t.index ["release_channel_id"], name: "index_releases_on_release_channel_id"
     t.index ["release_filetype_id"], name: "index_releases_on_release_filetype_id"
     t.index ["release_platform_id"], name: "index_releases_on_release_platform_id"
-    t.index ["semver_major", "semver_minor", "semver_patch", "semver_pre_word", "semver_pre_num", "semver_build_word", "semver_build_num", "product_id", "account_id"], name: "releases_uniq_semver_components_idx", unique: true, where: "((api_version)::text <> '1.0'::text)"
-    t.index ["semver_major", "semver_minor", "semver_patch", "semver_pre_word", "semver_pre_num", "semver_build_word", "semver_build_num", "product_id", "account_id"], name: "releases_v1_0_semver_components_idx", where: "((api_version)::text = '1.0'::text)"
+    t.index ["semver_major", "semver_minor", "semver_patch", "semver_pre_word", "semver_pre_num", "semver_build_word", "semver_build_num"], name: "releases_sort_semver_components_idx", order: { semver_major: :desc, semver_minor: "DESC NULLS LAST", semver_patch: "DESC NULLS LAST", semver_pre_word: :desc, semver_pre_num: "DESC NULLS LAST", semver_build_word: "DESC NULLS LAST", semver_build_num: "DESC NULLS LAST" }
     t.index ["status"], name: "index_releases_on_status"
     t.index ["tag", "account_id"], name: "index_releases_on_tag_and_account_id", unique: true, where: "(tag IS NOT NULL)"
     t.index ["version", "product_id", "account_id"], name: "index_releases_on_version_and_product_id_and_account_id", unique: true, where: "((api_version)::text <> '1.0'::text)"

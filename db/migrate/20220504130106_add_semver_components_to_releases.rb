@@ -8,13 +8,15 @@ class AddSemverComponentsToReleases < ActiveRecord::Migration[7.0]
     add_column :releases, :semver_build_word, :string
     add_column :releases, :semver_build_num,  :bigint
 
-    add_index :releases, %i[semver_major semver_minor semver_patch semver_pre_word semver_pre_num semver_build_word semver_build_num product_id account_id],
-      name: :releases_uniq_semver_components_idx,
-      where: %(api_version != '1.0'),
-      unique: true
-
-    add_index :releases, %i[semver_major semver_minor semver_patch semver_pre_word semver_pre_num semver_build_word semver_build_num product_id account_id],
-      name: :releases_v1_0_semver_components_idx,
-      where: %(api_version = '1.0')
+    # Sorting index
+    add_index :releases, <<~SQL.squish, name: :releases_sort_semver_components_idx
+      semver_major      DESC,
+      semver_minor      DESC NULLS LAST,
+      semver_patch      DESC NULLS LAST,
+      semver_pre_word   DESC NULLS FIRST,
+      semver_pre_num    DESC NULLS LAST,
+      semver_build_word DESC NULLS LAST,
+      semver_build_num  DESC NULLS LAST
+    SQL
   end
 end
