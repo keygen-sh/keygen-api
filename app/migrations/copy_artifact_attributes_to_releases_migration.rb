@@ -36,8 +36,8 @@ class CopyArtifactAttributesToReleasesMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
-                                                                 action: 'index' } do |res|
+  response if: -> res { res.status < 400 && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
+                                                                  action: 'index' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 
     migrate!(body)

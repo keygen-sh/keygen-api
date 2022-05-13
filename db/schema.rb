@@ -495,7 +495,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_11_195423) do
     t.string "checksum"
     t.string "status"
     t.string "api_version"
-    t.string "tag"
     t.bigint "semver_major"
     t.bigint "semver_minor"
     t.bigint "semver_patch"
@@ -503,6 +502,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_11_195423) do
     t.bigint "semver_pre_num"
     t.string "semver_build_word"
     t.bigint "semver_build_num"
+    t.string "tag"
     t.index ["account_id", "created_at", "yanked_at"], name: "index_releases_on_account_id_and_created_at_and_yanked_at", order: { created_at: :desc }
     t.index ["account_id", "product_id", "filename"], name: "index_releases_on_account_id_and_product_id_and_filename", unique: true
     t.index ["product_id"], name: "index_releases_on_product_id"

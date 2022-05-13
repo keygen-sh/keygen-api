@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class RenameDraftStatusToNotPublishedForReleasesMigration < BaseMigration
-  description %(renames the DRAFT statuses to NOT_PUBLISHED for a collection Releases)
+  description %(renames the DRAFT statuses to NOT_PUBLISHED for a collection of Releases)
 
   migrate if: -> body { body in data: [*] } do |body|
     case body
@@ -17,8 +17,8 @@ class RenameDraftStatusToNotPublishedForReleasesMigration < BaseMigration
     end
   end
 
-  response if: -> res { res.successful? && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
-                                                                 action: 'index' } do |res|
+  response if: -> res { res.status < 400 && res.request.params in controller: 'api/v1/releases' | 'api/v1/products/relationships/releases',
+                                                                  action: 'index' } do |res|
     body = JSON.parse(res.body, symbolize_names: true)
 
     migrate!(body)
