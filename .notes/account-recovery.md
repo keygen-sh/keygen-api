@@ -11,16 +11,15 @@ puts "Database: #{ActiveRecord::Base.connection.current_database}"
 
 def to_insert_sql_for(record)
   values = record.send(:attributes_with_values, record.class.column_names)
-  model = record.class
-  substitutes_and_binds = model.send(:_substitute_values, values)
+  model  = record.class
 
-  insert_manager = model.arel_table.create_insert
+  substitutes_and_binds = values.transform_keys { model.arel_table[_1] }
+  insert_manager        = Arel::InsertManager.new(model.arel_table)
+
   insert_manager.insert substitutes_and_binds
 
-  conn = model.connection
-
-  conn.unprepared_statement do
-    sql = conn.to_sql(insert_manager)
+  model.connection.unprepared_statement do
+    model.connection.to_sql(insert_manager)
   end
 end
 
@@ -78,9 +77,9 @@ puts 'Done'
 ```
 
 ```bash
-heroku addons:create heroku-postgresql:standard-0 --rollback HEROKU_POSTGRESQL_MAUVE_URL --to '2021-06-03 07:27 UTC'
+heroku addons:create heroku-postgresql:standard-0 --rollback HEROKU_POSTGRESQL_TEAL_URL --to '2021-06-03 07:27 UTC'
 heroku pg:wait
 spring stop
-DATABASE_URL=$(heroku config:get HEROKU_POSTGRESQL_CHARCOAL_URL) ACCOUNT_ID={} PRODUCT_ID={} rails runner .scripts/recover.rb
+DATABASE_URL=$(heroku config:get HEROKU_POSTGRESQL_TEAL_URL) ACCOUNT_ID={} PRODUCT_ID={} rails runner .scripts/recover.rb
 cat .scripts/recover.sql | heroku pg:psql >> .scripts/recover.log
 ```
