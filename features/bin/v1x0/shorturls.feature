@@ -1,4 +1,4 @@
-@api/v1
+@api/v1.0 @deprecated
 Feature: Short bin URLs
 
   Background:
@@ -19,10 +19,17 @@ Feature: Short bin URLs
       { "filename": "cli/install.sh" }
       """
 
+  Scenario: Endpoint should be inaccessible when account is using >= v1.1
+    And I use API version "1.1"
+    When I send a GET request to "//get.keygen.sh/keygen/cli/install.sh"
+    Then the response status should be "404"
+
   Scenario: Subdomain 'bin' should redirect to an artifact
+    And I use API version "1.0"
     When I send a GET request to "//bin.keygen.sh/keygen/cli/install.sh"
     Then the response status should be "303"
 
   Scenario: Subdomain 'get' should redirect to an artifact
+    And I use API version "1.0"
     When I send a GET request to "//get.keygen.sh/keygen/cli/install.sh"
     Then the response status should be "303"
