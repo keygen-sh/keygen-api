@@ -28,8 +28,19 @@ Rails.application.routes.draw do
   end
 
   scope module: "bin", constraints: { subdomain: %w[bin get], **domain_constraints, format: "jsonapi" } do
-    get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
-    get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
+    get "1/:account_id/:release_id/:id",
+      constraints: { account_id: /[^\/]+/, release_id: /.*/, id: /.*/ },
+      to: "artifacts#show"
+    get "1/:account_id/:release_id",
+      constraints: { account_id: /[^\/]+/, release_id: /.*/ },
+      to: "artifacts#index"
+
+    version_constraint "<=1.0" do
+      scope module: :v1x0 do
+        get ":account_id",     constraints: { account_id: /[^\/]*/ },           to: "artifacts#index", as: "bin_artifacts"
+        get ":account_id/:id", constraints: { account_id: /[^\/]*/, id: /.*/ }, to: "artifacts#show",  as: "bin_artifact"
+      end
+    end
   end
 
   scope module: "stdout", constraints: { subdomain: %w[stdout], **domain_constraints, format: "jsonapi" } do
