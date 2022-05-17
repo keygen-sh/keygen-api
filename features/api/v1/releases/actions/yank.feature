@@ -33,10 +33,10 @@ Feature: Yank release
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin yanks a yanked release for their account
+  Scenario: Admin yanks a published release for their account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 yanked "release"
+    And the current account has 1 published "release"
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/releases/$0/actions/yank"
