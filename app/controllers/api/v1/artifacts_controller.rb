@@ -29,6 +29,7 @@ module Api::V1
         download = artifact.download!(ttl: artifact_query[:ttl])
 
         BroadcastEventService.call(
+          # NOTE(ezekg) The `release.downloaded` event is for backwards compat
           event: %w[artifact.downloaded release.downloaded],
           account: current_account,
           resource: artifact,
@@ -141,6 +142,7 @@ module Api::V1
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[artifact artifacts]
           param :attributes, type: :hash do
+            param :filesize, type: :integer, optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true
             param :checksum, type: :string, optional: true, allow_nil: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true
