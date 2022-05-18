@@ -106,13 +106,13 @@ Feature: Create artifact
     And the first error should have the following properties:
       """
       {
-          "title": "Unprocessable resource",
-          "detail": "already exists",
-          "code": "FILENAME_TAKEN",
-          "source": {
-            "pointer": "/data/attributes/filename"
-          }
+        "title": "Unprocessable resource",
+        "detail": "already exists",
+        "code": "FILENAME_TAKEN",
+        "source": {
+          "pointer": "/data/attributes/filename"
         }
+      }
       """
     And the current account should have 1 "artifact"
     And sidekiq should have 0 "webhook" jobs
