@@ -18,6 +18,100 @@ Feature: Update artifact
     When I send a PATCH request to "/accounts/test1/artifacts/$0"
     Then the response status should be "403"
 
+    Scenario: Admin updates an artifact's filesize
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filesize": 123456789
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filesize": 123456789 }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates an artifact's null filesize
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And the current account has 1 "artifact" for the last "release"
+    And the last "artifact" has the following attributes:
+      """
+      { "filesize": 1 }
+      """
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filesize": null
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filesize": null }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates an artifact with an empty filesize
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And the current account has 1 "artifact" for the last "release"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/artifacts/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filesize": ""
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "type mismatch (received string expected integer)",
+        "source": {
+          "pointer": "/data/attributes/filesize"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin updates an artifact's signature
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
