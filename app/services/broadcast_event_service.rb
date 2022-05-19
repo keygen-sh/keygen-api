@@ -24,7 +24,8 @@ class BroadcastEventService < BaseService
           case event
           when /^release\.upgraded$/
             { prev: meta[:current], next: meta[:next] }
-          when /^release\.downloaded$/
+          when /^artifact\.downloaded$/,
+               /^release\.downloaded$/
             { version: resource.version }
           when /^license\.validation\./
             { code: meta[:constant] }
@@ -61,8 +62,8 @@ class BroadcastEventService < BaseService
           meta.nil?
 
         payload = Keygen::JSONAPI::Renderer.new(context: :webhook)
-                                          .render(resource, options)
-                                          .to_json
+                                           .render(resource, options)
+                                           .to_json
 
         CreateWebhookEventsWorker.perform_async(
           event,
