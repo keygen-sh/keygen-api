@@ -28,10 +28,10 @@ Rails.application.routes.draw do
   end
 
   scope module: "bin", constraints: { subdomain: %w[bin get], **domain_constraints, format: "jsonapi" } do
-    get "1/:account_id/:release_id/:id",
+    get "a/:account_id/:release_id/:id",
       constraints: { account_id: /[^\/]+/, release_id: /.*/, id: /.*/ },
       to: "artifacts#show"
-    get "1/:account_id/:release_id",
+    get "a/:account_id/:release_id",
       constraints: { account_id: /[^\/]+/, release_id: /.*/ },
       to: "artifacts#index"
 
