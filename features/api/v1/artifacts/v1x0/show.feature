@@ -19,7 +19,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "403"
 
-  # NOTE(ezekg) Since we no longer have a uniquness index, and we've removed the upsert
+  # NOTE(ezekg) Since we no longer have a uniqueness index, and we've removed the upsert
   #             release method, we need to assert that multiple artifacts with the same
   #             version are correctly handled, i.e. that the latest version is fetched,
   #             sorted by created_at and semver_* columns.
