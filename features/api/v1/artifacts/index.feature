@@ -213,7 +213,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: User attempts to retrieve the artifacts for the last product (licensed)
+  Scenario: User attempts to retrieve the artifacts for a product (licensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -228,7 +228,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array of 2 "artifacts"
 
-  Scenario: User attempts to retrieve the artifacts for the last product (unlicensed)
+  Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -255,7 +255,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array of 3 "artifacts"
 
-  Scenario: License attempts to retrieve the artifacts for the last different product
+  Scenario: License attempts to retrieve the artifacts for a different product
    Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "license"
@@ -267,7 +267,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: Admin attempts to retrieve the artifacts for the last product of another account
+  Scenario: Admin attempts to retrieve the artifacts for a product of another account
     Given the current account is "test1"
      And the current account has the following "product" rows:
       | id                                   | name   |
