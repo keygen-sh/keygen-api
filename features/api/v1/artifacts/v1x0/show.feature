@@ -55,11 +55,21 @@ Feature: Show release artifact
     And the current account has 1 "artifact" for the last "release"
     And I am a license of account "test1"
     And I use an authentication token
+    And I use API version "1.0"
     When I send a GET request to "/accounts/test1/artifacts/latest-mac.yml"
     Then the response status should be "303"
     And the JSON response should be an "artifact" with the following relationships:
       """
       {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/products/6198261a-48b5-4445-a045-9fed4afc7735"
+          }
+        },
         "release": {
           "data": {
             "type": "releases",
@@ -73,5 +83,5 @@ Feature: Show release artifact
       """
     And the JSON response should be an "artifact" with the following attributes:
       """
-      { "filename": "latest-mac.yml" }
+      { "key": "latest-mac.yml" }
       """
