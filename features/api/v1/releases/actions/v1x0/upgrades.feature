@@ -76,6 +76,15 @@ Feature: Release upgrade actions
     And the JSON response should be an "artifact" with the following relationships:
       """
       {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/products/6198261a-48b5-4445-a045-9fed4afc7735"
+          }
+        },
         "release": {
           "data": {
             "type": "releases",
