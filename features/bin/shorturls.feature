@@ -19,20 +19,20 @@ Feature: Short URLs
 
   Scenario: Endpoint should be accessible when account is using v1.1
     And I use API version "1.1"
-    When I send a GET request to "//get.keygen.sh/1/keygen/cli@latest/install.sh"
+    When I send a GET request to "//get.keygen.sh/a/keygen/cli@latest/install.sh"
     Then the response status should be "303"
 
   Scenario: Endpoint should be accessible when account is using v1.0
     And I use API version "1.0"
-    When I send a GET request to "//get.keygen.sh/1/keygen/cli@latest/install.sh"
+    When I send a GET request to "//get.keygen.sh/a/keygen/cli@latest/install.sh"
     Then the response status should be "303"
 
   Scenario: Subdomain 'get' should redirect to an artifact
     And I use API version "1.0"
-    When I send a GET request to "//get.keygen.sh/1/keygen/cli@latest/install.sh"
+    When I send a GET request to "//get.keygen.sh/a/keygen/cli@latest/install.sh"
     Then the response status should be "303"
 
   Scenario: Subdomain 'bin' should redirect to an artifact
     And I use API version "1.0"
-    When I send a GET request to "//bin.keygen.sh/1/keygen/cli@latest/install.sh"
+    When I send a GET request to "//bin.keygen.sh/a/keygen/cli@latest/install.sh"
     Then the response status should be "303"
