@@ -23,6 +23,8 @@ Versionist.configure do |config|
       rename_filename_ext_error_code_for_release_migration
       add_key_attribute_to_artifacts_migration
       add_key_attribute_to_artifact_migration
+      add_product_relationship_to_artifacts_migration
+      add_product_relationship_to_artifact_migration
     ],
   }
 end

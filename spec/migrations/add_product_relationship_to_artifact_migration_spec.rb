@@ -7,7 +7,7 @@ require 'sidekiq/testing'
 
 DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
 
-describe AddKeyAttributeToArtifactsMigration do
+describe AddProductRelationshipToArtifactMigration do
   let(:account) { create(:account) }
   let(:product) { create(:product, account:) }
   let(:release) { create(:release, account:, product:) }
@@ -26,48 +26,36 @@ describe AddKeyAttributeToArtifactsMigration do
     Versionist.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
-        '1.0' => [AddKeyAttributeToArtifactsMigration],
+        '1.0' => [AddProductRelationshipToArtifactMigration],
       }
     end
   end
 
-  it 'should migrate artifact attributes' do
+  it 'should migrate artifact relationship' do
     migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
-    data     = Keygen::JSONAPI.render([
-      create(:artifact, filename: '1', account:, release:),
-      create(:artifact, filename: '2', account:, release:),
-    ])
+    data     = Keygen::JSONAPI.render(
+      create(:artifact, account:, release:),
+    )
 
     expect(data).to_not include(
-      data: [
-        include(
-          attributes: include(
-            key: anything,
-          ),
+      data: include(
+        relationships: include(
+          product: anything,
         ),
-        include(
-          attributes: include(
-            key: anything,
-          ),
-        ),
-      ],
+      ),
     )
 
     migrator.migrate!(data:)
 
     expect(data).to include(
-      data: [
-        include(
-          attributes: include(
-            key: '1',
+      data: include(
+        relationships: include(
+          product: include(
+            links: include(related: v1_account_product_path(account, product)),
+            data: include(type: :products, id: product.id),
           ),
         ),
-        include(
-          attributes: include(
-            key: '2',
-          ),
-        ),
-      ],
+      ),
     )
   end
 end

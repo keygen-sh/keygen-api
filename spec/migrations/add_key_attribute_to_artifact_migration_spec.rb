@@ -31,7 +31,7 @@ describe AddKeyAttributeToArtifactMigration do
     end
   end
 
-  it 'should migrate releases statuses' do
+  it 'should migrate artifact attributes' do
     migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
     data     = Keygen::JSONAPI.render(
       create(:artifact, filename: '1', account:, release:),
