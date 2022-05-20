@@ -1092,10 +1092,10 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
   end
 end
 
-Given /^the JSON data should be ordered by "(\w+)"$/ do |sort_column|
+Given /^the JSON data should be sorted by "([^"]+)"$/ do |key|
   data = JSON.parse(last_response.body)
              .fetch('data')
 
-  expect(data).to eq data.sort_by { _1['attributes']['created'] }
+  expect(data).to eq data.sort_by { _1.dig(*key.split('.')) }
                          .reverse
 end
