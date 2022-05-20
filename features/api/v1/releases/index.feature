@@ -134,7 +134,7 @@ Feature: List releases
       }
       """
 
-  Scenario: Admin retrieves all win32 beta releases for their account
+  Scenario: Admin retrieves all beta releases filtered by platform
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -159,9 +159,9 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?channel=beta&platform=win32"
     Then the response status should be "200"
-    And the JSON response should be an array with 2 "releases"
+    And the JSON response should be an array with 6 "releases"
 
-  Scenario: Admin retrieves all x86 releases for their account
+  Scenario: Admin retrieves all releases filtered by arch
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -186,7 +186,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?arch=x64"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the JSON response should be an array with 6 "releases"
 
   Scenario: Admin retrieves all win32 product releases for their account
     Given I am an admin of account "test1"
@@ -452,7 +452,7 @@ Feature: List releases
       }
       """
 
-  Scenario: Admin retrieves all v1.0.0 releases for their account
+  Scenario: Admin retrieves all releases filtered by version
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -476,9 +476,9 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?version=1.0.0"
     Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
+    And the JSON response should be an array with 5 "releases"
 
-  Scenario: Admin retrieves all tar.gz releases for their account
+  Scenario: Admin retrieves all releases filtered by filetype
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
@@ -502,136 +502,7 @@ Feature: List releases
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases?filetype=tar.gz"
     Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
-
-  Scenario: Admin retrieves all exe releases for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version       | channel  |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                   | filetype | platform |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?filetype=exe"
-    Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
-
-  Scenario: Admin retrieves all dmg releases for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version       | channel  |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                   | filetype | platform |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?filetype=dmg&channel=alpha"
-    Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
-
-  Scenario: Admin retrieves all macos releases for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version       | channel  |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                   | filetype | platform |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?platform=macos&channel=beta"
-    Then the response status should be "200"
-    And the JSON response should be an array with 3 "releases"
-
-  Scenario: Admin retrieves all win32 releases for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version       | channel  |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                   | filetype | platform |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases?platform=win32&channel=stable"
-    Then the response status should be "200"
-    And the JSON response should be an array with 1 "release"
-
-  Scenario: Admin retrieves all linux releases for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
-    And the current account has the following "product" rows:
-      | id                                   | name     |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App |
-    And the current account has the following "release" rows:
-      | id                                   | product_id                           | version       | channel  |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0         | stable   |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.1.0         | stable   |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.2.0-beta.1  | beta     |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-alpha.2 | alpha    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.0-beta.1  | beta     |
-    And the current account has the following "artifact" rows:
-      | release_id                           | filename                   | filetype | platform |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App-1.0.0.dmg         | dmg      | macos    |
-      | 757e0a41-835e-42ad-bad8-84cabd29c72a | Test-App.1.0.0.exe         | exe      | win32    |
-      | 3ff04fc6-9f10-4b84-b548-eb40f92ea331 | Test-App-1.1.0.dmg         | dmg      | macos    |
-      | 028a38a2-0d17-4871-acb8-c5e6f040fc12 | Test-App-1.2.0-beta.1.dmg  | dmg      | macos    |
-      | 571114ac-af22-4d4b-99ce-f0e3d921c192 | Test-App.1.0.0-alpha.2.exe | exe      | win32    |
-      | 972aa5b8-b12c-49f4-8ba4-7c9ae053dfa2 | Test-App.1.0.0-beta.1.exe  | exe      | win32    |
-    When I send a GET request to "/accounts/test1/releases?platform=linux"
-    Then the response status should be "200"
-    And the JSON response should be an array with 0 "releases"
+    And the JSON response should be an array with 5 "releases"
 
   Scenario: Admin retrieves all non-yanked stable releases for their account
     Given I am an admin of account "test1"

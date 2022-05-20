@@ -1091,3 +1091,11 @@ Then /^the JSON response should be a "([^"]+)" with the following encrypted cert
     expect(actual_incl).to be_nil
   end
 end
+
+Given /^the JSON data should be ordered by "(\w+)"$/ do |sort_column|
+  data = JSON.parse(last_response.body)
+             .fetch('data')
+
+  expect(data).to eq data.sort_by { _1['attributes']['created'] }
+                         .reverse
+end

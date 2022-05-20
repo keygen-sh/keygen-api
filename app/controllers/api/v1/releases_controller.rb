@@ -5,11 +5,14 @@ module Api::V1
     has_scope(:yanked, type: :boolean, allow_blank: true) { |c, s, v| !!v ? s.yanked : s.unyanked }
     has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:product) { |c, s, v| s.for_product(v) }
-    has_scope(:platform) { |c, s, v| s.for_platform(v) }
-    has_scope(:arch) { |c, s, v| s.for_arch(v) }
-    has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
-    has_scope(:version) { |c, s, v| s.with_version(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
+
+    # FIXME(ezekg) Eventually remove these once we can confirm they're
+    #              no longer being used
+    has_scope(:filetype, if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_filetype(v) }
+    has_scope(:platform, if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_platform(v) }
+    has_scope(:arch,     if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.for_arch(v) }
+    has_scope(:version,  if: -> c { c.current_api_version == '1.0' }) { |c, s, v| s.with_version(v) }
 
     before_action :scope_to_current_account!
     before_action :require_active_subscription!

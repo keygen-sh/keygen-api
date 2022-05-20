@@ -247,9 +247,41 @@ class Release < ApplicationRecord
   scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
   scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
-  scope :with_version, -> version { where(version: version) }
   scope :with_artifacts, -> { where.associated(:artifacts) }
   scope :without_artifacts, -> { where.missing(:artifacts) }
+
+  # FIXME(ezekg) This is very ... dirty, but we need to maintain backwards compatibility
+  #              for users that are listing releases by version. Previously, duplicate
+  #              versions were not allowed and were instead upserted, but we removed
+  #              the upsert functionality in v1.1, so this is a quick workaround.
+  #
+  #              This filter has been deprecated and is no longer available in v1.1.
+  scope :with_version, -> version {
+    from(
+      select('r.*')
+        .from(
+          # Virtual table of lastest releases by version and artifact filename
+          select(<<~SQL.squish).joins(:artifacts).group('releases.account_id, releases.product_id, releases.version, releases.status, release_artifacts.filename').where(version:).reorder(nil),
+            max(releases.created_at) AS created_at,
+            release_artifacts.filename,
+            releases.account_id,
+            releases.product_id,
+            releases.status,
+            releases.version
+          SQL
+          :releases,
+        )
+        # Join onto releases to get all columns
+        .joins(<<~SQL.squish),
+          INNER JOIN releases r
+            ON (
+              r.version    = releases.version AND
+              r.created_at = releases.created_at
+            )
+        SQL
+      :releases,
+    )
+  }
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }
