@@ -515,5 +515,19 @@ describe Release, type: :model do
         end
       end
     end
+
+    context 'when using API version v1.0' do
+      subject { create(:release, :published, version: '1.0.0', api_version: '1.0', product:, account:) }
+
+      before do
+        5.times { create(:release, :published, version: '1.0.0', api_version: '1.0', product:, account:) }
+      end
+
+      it 'should not upgrade to the same version' do
+        upgrade = subject.upgrade!
+
+        expect(upgrade).to be_nil
+      end
+    end
   end
 end
