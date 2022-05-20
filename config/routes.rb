@@ -82,8 +82,10 @@ Rails.application.routes.draw do
       member do
         scope "actions", module: "machines/actions" do
           post "generate-offline-proof", to: "proofs#generate_offline_proof"
-          post "reset-heartbeat", to: "heartbeats#reset_heartbeat"
-          post "ping-heartbeat", to: "heartbeats#ping_heartbeat"
+          post "reset-heartbeat", to: "heartbeats#reset"
+          post "ping-heartbeat", to: "heartbeats#ping"
+          post "reset", to: "heartbeats#reset"
+          post "ping", to: "heartbeats#ping"
           post "check-out", to: "checkouts#create"
           get "check-out", to: "checkouts#show"
         end

@@ -112,7 +112,7 @@ Feature: Machine heartbeat actions
       { "lastHeartbeatAt": null }
       """
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/ping-heartbeat"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/ping"
     Then the response status should be "200"
     And the JSON response should be a "machine" that does requireHeartbeat
     And the JSON response should be a "machine" with the heartbeatStatus "ALIVE"
@@ -503,7 +503,7 @@ Feature: Machine heartbeat actions
       { "lastHeartbeatAt": "$time.1.hour.ago" }
       """
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/reset-heartbeat"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/reset"
     Then the response status should be "200"
     And the JSON response should be a "machine" that does not requireHeartbeat
     And the JSON response should be a "machine" with the heartbeatStatus "NOT_STARTED"
