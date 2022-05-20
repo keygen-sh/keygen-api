@@ -26,8 +26,8 @@ class RequestLog < ApplicationRecord
   }
 
   scope :for_event_type, -> event {
-    joins(event_log: :event_type).where(
-      event_logs: { event_types: { event: event } }
+    joins(:event_log).where(
+      event_logs: { event_type_id: EventType.where(event:) }
     )
   }
 
