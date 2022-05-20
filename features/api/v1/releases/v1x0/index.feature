@@ -1,5 +1,5 @@
 @api/v1.0 @deprecated
-Feature: Create release
+Feature: List releases
 
   Background:
     Given the following "accounts" exist:
