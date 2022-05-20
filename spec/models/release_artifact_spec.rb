@@ -31,16 +31,21 @@ describe ReleaseArtifact, type: :model do
         1.0.0-alpha.beta
         1.0.0+20130313144700
         1.0.0-alpha
+        1.0.11
         1.0.0-beta.11
         1.0.0-alpha.1
         1.0.0
+        1.11.0
         1.0.0+21AF26D3
         1.0.0-beta+exp.sha.5114f85
         1.0.0-rc.1
         1.0.0-alpha+001
-        1.0.1
+        1.0.2
         1.1.3
+        11.0.0
         1.1.21
+        1.2.0
+        1.0.1
         2.0.0
       ]
 
@@ -52,9 +57,14 @@ describe ReleaseArtifact, type: :model do
       versions = described_class.order_by_version.pluck(:version)
 
       expect(versions).to eq %w[
+        11.0.0
         2.0.0
+        1.11.0
+        1.2.0
         1.1.21
         1.1.3
+        1.0.11
+        1.0.2
         1.0.1
         1.0.0+21AF26D3
         1.0.0+20130313144700
