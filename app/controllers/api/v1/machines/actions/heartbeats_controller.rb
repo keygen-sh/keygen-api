@@ -7,8 +7,7 @@ module Api::V1::Machines::Actions
     before_action :authenticate_with_token!
     before_action :set_machine
 
-    # POST /machines/1/reset-heartbeat
-    def reset_heartbeat
+    def reset
       authorize machine
 
       machine.update!(last_heartbeat_at: nil)
@@ -22,8 +21,7 @@ module Api::V1::Machines::Actions
       render jsonapi: machine
     end
 
-    # POST /machines/1/ping-heartbeat
-    def ping_heartbeat
+    def ping
       authorize machine
 
       if machine.dead?

@@ -64,7 +64,7 @@ class MachinePolicy < ApplicationPolicy
       resource.license == bearer
   end
 
-  def ping_heartbeat?
+  def ping?
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer) ||
@@ -72,13 +72,15 @@ class MachinePolicy < ApplicationPolicy
       resource.product == bearer ||
       resource.license == bearer
   end
+  alias_method :ping_heartbeat?, :ping?
 
-  def reset_heartbeat?
+  def reset?
     assert_account_scoped!
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
   end
+  alias_method :reset_heartbeat?, :reset?
 
   def generate_offline_proof?
     assert_account_scoped!
