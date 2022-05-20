@@ -48,8 +48,8 @@ Feature: List releases
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has the following "product" rows:
-      | id                                   | name     | distribution_strategy |
-      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Test App | OPEN                  |
+      | id                                   | name       | distribution_strategy |
+      | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | Keygen CLI | OPEN                  |
     And the current account has the following "release" rows:
       | id                                   | product_id                           | version | channel  | api_version |
       | 936dbd12-fe27-4ee6-8c83-c3693b52f5b4 | 850b55ca-f0a1-4a66-9d29-aa199d62db0c | 1.0.1   | stable   | 1.0         |
@@ -190,7 +190,7 @@ Feature: List releases
     When I send a GET request to "/accounts/test1/releases?version=1.0.1&limit=100"
     Then the response status should be "200"
     And the JSON response should be an array with 33 "releases"
-    And the JSON data should be ordered by "created_at"
+    And the JSON data should be sorted by "attributes.created"
 
   Scenario: Admin retrieves all tar.gz releases for their account
     Given I am an admin of account "test1"
