@@ -262,7 +262,7 @@ class Release < ApplicationRecord
         .from(
           # Virtual table of lastest releases by version and artifact filename
           select(<<~SQL.squish).joins(:artifacts).group('releases.account_id, releases.product_id, releases.version, releases.status, release_artifacts.filename').where(version:).reorder(nil),
-            max(releases.created_at) AS created_at,
+            max(releases.created_at)   AS created_at,
             release_artifacts.filename,
             releases.account_id,
             releases.product_id,
@@ -275,7 +275,9 @@ class Release < ApplicationRecord
         .joins(<<~SQL.squish),
           INNER JOIN releases r
             ON (
-              r.version    = releases.version AND
+              r.account_id = releases.account_id AND
+              r.product_id = releases.product_id AND
+              r.version    = releases.version    AND
               r.created_at = releases.created_at
             )
         SQL
