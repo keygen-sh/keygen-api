@@ -296,7 +296,8 @@ class Release < ApplicationRecord
                     .order_by_version
                     .published
                     .then { |scope|
-                      base = scope.where.not(id:)
+                      base = scope.where.not(version:)
+                                  .where.not(id:)
 
                       scope = if semver_build_num.present?
                                 base.where(semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:, semver_build_num: semver_build_num..)

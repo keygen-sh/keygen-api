@@ -55,6 +55,21 @@ Feature: Upgrade release
       }
       """
 
+  Scenario: Admin retrieves an upgrade for a product release (duplicate versions)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel | api_version|
+      | fffa0764-3a19-48ea-beb3-8950563c7357 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | 1.0        |
+      | 165d5389-e535-4f36-9232-ed59c67375d1 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | 1.0        |
+      | e4fa628e-593d-48bc-8e3e-5e4dda1f2c3a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | 1.0        |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/upgrade"
+    Then the response status should be "404"
+
   Scenario: Admin retrieves an upgrade for a product release (no upgrade available)
     Given the current account is "test1"
     And the current account has the following "product" rows:
