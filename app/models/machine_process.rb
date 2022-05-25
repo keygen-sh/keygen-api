@@ -43,7 +43,7 @@ class MachineProcess < ApplicationRecord
       MachineProcess.exists?(id)
   end
 
-  validate on: %i[create update] do
+  validate on: :create do
     next unless
       machine.present? && machine.max_processes.present?
 

@@ -41,6 +41,32 @@ Feature: Process heartbeat actions
     And sidekiq should have 1 "request-log" job
     And time is unfrozen
 
+  Scenario: Admin pings a process's heartbeat that has met their process limit
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 5 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes/$0/actions/ping"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be a "process"
+    And sidekiq should have 1 "process-heartbeat" job
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+    And time is unfrozen
+
   Scenario: Admin pings a dead process's heartbeat
     Given time is frozen at "2022-04-15T14:52:48.000Z"
     And I am an admin of account "test1"
