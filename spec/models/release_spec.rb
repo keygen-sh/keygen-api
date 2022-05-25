@@ -64,7 +64,7 @@ describe Release, type: :model do
     end
 
     context 'when there is no upgrade available' do
-      subject { create(:release, :published, version: '2.0.0', product:, account:) }
+      subject { create(:release, :published, version: '2.0.1', product:, account:) }
 
       before do
         versions = %w[
@@ -84,11 +84,13 @@ describe Release, type: :model do
           1.0.1
           1.1.3
           1.9.42
+          2.0.0
           2.0.0-alpha.1
           2.0.0-alpha.2
           2.0.0-alpha.3
           2.0.0-beta.1
           2.0.0-rc.1
+          2.1.0-beta.1
           2.1.0-rc.1
         ]
 
