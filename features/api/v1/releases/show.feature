@@ -19,6 +19,27 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "403"
 
+  Scenario: Admin retrieves a release for their account by version
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "releases"
+    And the last "release" has the following attributes:
+      """
+      { "version": "1.0.0-beta.1" }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0-beta.1"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "artifacts": {
+          "links": { "related": "/v1/accounts/$account/releases/$releases[2]/artifacts" }
+        }
+      }
+      """
+
   Scenario: Admin retrieves a release for their account by ID
     Given I am an admin of account "test1"
     And the current account is "test1"

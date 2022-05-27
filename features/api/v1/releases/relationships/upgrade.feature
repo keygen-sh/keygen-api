@@ -626,6 +626,24 @@ Feature: Upgrade release
       }
       """
 
+  Scenario: Admin retrieves an upgrade by an invalid version
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version       | channel |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0-alpha.1 | alpha   |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0         | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0-alpha.1 | alpha   |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0         | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/%3Cnot%20set%3E/upgrade"
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "404"
+
   # Upgrade by tag
   Scenario: Admin retrieves an upgrade by tag
     Given the current account is "test1"
