@@ -14,14 +14,14 @@ class RecordMetricService < BaseService
     # FIXME(ezekg) Entitlement attach/detach events can be an array of resources. Need to
     #              handle this better, but this is a quick workaround in the interim.
     normalized_resource = Array.wrap(resource).first
-    resource_name = normalized_resource&.class.name
+    resource_name = normalized_resource&.class&.name
     resource_id = normalized_resource&.id
 
     RecordMetricWorker.perform_async(
       metric,
       account.id,
       resource_name,
-      resource_id
+      resource_id,
     )
   end
 
