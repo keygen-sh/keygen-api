@@ -144,6 +144,10 @@ class ReleaseArtifact < ApplicationRecord
     joins(:product).where(product: { id: product })
   }
 
+  scope :for_release, -> product {
+    joins(:release).where(release: { id: product })
+  }
+
   scope :for_user, -> user {
     joins(product: %i[users])
       .where(
@@ -164,6 +168,36 @@ class ReleaseArtifact < ApplicationRecord
       .union(
         self.open
       )
+  }
+
+  scope :for_platform, -> platform {
+    case platform
+    when ReleasePlatform,
+         UUID_RE
+      joins(:platform).where(platform: { id: platform })
+    else
+      joins(:platform).where(platform: { key: platform.to_s })
+    end
+  }
+
+  scope :for_arch, -> arch {
+    case arch
+    when ReleaseArch,
+         UUID_RE
+      joins(:arch).where(arch: { id: arch })
+    else
+      joins(:arch).where(arch: { key: arch.to_s })
+    end
+  }
+
+  scope :for_filetype, -> filetype {
+    case filetype
+    when ReleaseFiletype,
+         UUID_RE
+      joins(:filetype).where(filetype: { id: filetype })
+    else
+      joins(:filetype).where(filetype: { key: filetype.to_s })
+    end
   }
 
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
