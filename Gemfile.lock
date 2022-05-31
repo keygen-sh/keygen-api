@@ -291,7 +291,7 @@ GEM
       net-protocol
       timeout
     nio4r (2.5.8)
-    nokogiri (1.13.4)
+    nokogiri (1.13.6)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     numerizer (0.1.1)
@@ -482,6 +482,7 @@ DEPENDENCIES
   kaminari (~> 1.2.0)
   listen (~> 3.0.5)
   lograge
+  nokogiri (~> 1.13.6)
   oj
   openssl (~> 2.2.1)
   parallel_tests (~> 3.8)
