@@ -129,6 +129,7 @@ class Release < ApplicationRecord
     }
 
   validates :tag,
+    exclusion: { in: EXCLUDED_ALIASES, message: "is reserved" },
     uniqueness: {
       scope: %i[tag account_id],
       message: 'tag already exists',
