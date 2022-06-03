@@ -25,20 +25,24 @@ module Api::V1::Releases::Relationships
     def show
       authorize artifact
 
-      if artifact.downloadable?
-        download = artifact.download!(ttl: artifact_query[:ttl])
+      # Respond early if the artifact has not been uploaded or if the
+      # client prefers no-download
+      return render jsonapi: artifact if
+        !artifact.downloadable? || prefers?('no-download')
 
-        BroadcastEventService.call(
-          event: %w[artifact.downloaded release.downloaded],
-          account: current_account,
-          resource: artifact,
-        )
+      download = artifact.download!(ttl: artifact_query[:ttl])
 
-        # Show we support `Prefer: no-redirect` for browser clients?
-        render jsonapi: artifact, status: :see_other, location: download.url
-      else
-        render jsonapi: artifact
-      end
+      BroadcastEventService.call(
+        event: %w[artifact.downloaded release.downloaded],
+        account: current_account,
+        resource: artifact,
+      )
+
+      # Respond without a redirect if that's what the client prefers
+      render jsonapi: artifact, location: download.url if
+        prefers?('no-redirect')
+
+      render jsonapi: artifact, status: :see_other, location: download.url
     end
 
     private
