@@ -15,6 +15,7 @@ module Api::V1
       License.name,
       Machine.name,
       User.name,
+      Release.name,
     ].freeze
 
     before_action :scope_to_current_account!
