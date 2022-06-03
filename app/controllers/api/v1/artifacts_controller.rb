@@ -149,6 +149,7 @@ module Api::V1
       on :update do
         param :data, type: :hash do
           param :type, type: :string, inclusion: %w[artifact artifacts]
+          param :id, type: :string, inclusion: [controller.params[:id]], optional: true, transform: -> (k, v) { [] }
           param :attributes, type: :hash do
             param :filesize, type: :integer, optional: true, allow_nil: true
             param :signature, type: :string, optional: true, allow_nil: true

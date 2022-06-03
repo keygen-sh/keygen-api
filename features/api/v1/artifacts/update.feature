@@ -62,6 +62,7 @@ Feature: Update artifact
       {
         "data": {
           "type": "artifacts",
+          "id": "$artifacts[0]",
           "attributes": {
             "filesize": null
           }
