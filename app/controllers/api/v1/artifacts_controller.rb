@@ -64,7 +64,10 @@ module Api::V1
         resource: artifact,
       )
 
-      # Should we support `Prefer: no-redirect` for browser clients?
+      # Respond without a redirect if that's what the client prefers
+      render jsonapi: artifact, location: upload.url if
+        prefers?('no-redirect')
+
       render jsonapi: artifact, status: :temporary_redirect, location: upload.url
     end
 

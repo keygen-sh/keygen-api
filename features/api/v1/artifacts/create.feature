@@ -67,6 +67,61 @@ Feature: Create artifact
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates an artifact (prefers no-redirect)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 draft "release"
+    And I am an admin of account "test1"
+    And I send the following raw headers:
+      """
+      Prefer: no-redirect
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/artifacts" with the following:
+      """
+      {
+        "data": {
+          "type": "artifacts",
+          "attributes": {
+            "filename": "latest-mac.yml",
+            "filetype": "yml",
+            "filesize": 512,
+            "platform": "darwin",
+            "arch": "x86"
+          },
+          "relationships": {
+            "release": {
+              "data": {
+                "type": "releases",
+                "id": "$releases[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      {
+        "filename": "latest-mac.yml",
+        "filetype": "yml",
+        "filesize": 512,
+        "platform": "darwin",
+        "arch": "x86",
+        "status": "WAITING"
+      }
+      """
+    And the current account should have 1 "artifact"
+    And the first "release" should have the following attributes:
+      """
+      { "status": "DRAFT" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate artifact
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
