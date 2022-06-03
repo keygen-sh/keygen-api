@@ -21,12 +21,52 @@ Feature: Show release artifact
   Scenario: Admin retrieves an artifact for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
     And the current account has 3 "releases"
     And the current account has 1 "artifact" for each "release"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
     And the JSON response should be an "artifact"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact for their account (prefers no-download)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I send the following raw headers:
+      """
+      Prefer: no-download
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "artifact"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin retrieves an artifact for their account (prefers no-redirect)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "releases"
+    And the current account has 1 "artifact" for each "release"
+    And I send the following raw headers:
+      """
+      Prefer: no-redirect
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/$0"
+    Then the response status should be "200"
+    And the JSON response should be an "artifact"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 2 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Developer retrieves an artifact for their account
     Given the current account is "test1"

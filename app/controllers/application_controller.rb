@@ -408,5 +408,16 @@ class ApplicationController < ActionController::API
     )
   end
 
+  def prefers?(preference)
+    preferences = request.headers.fetch('Prefer', '')
+                                 .split(',')
+                                 .map(&:strip)
+
+    return false if
+      preferences.empty?
+
+    preferences.include?(preference.to_s)
+  end
+
   class AuthorizationContext < OpenStruct; end
 end
