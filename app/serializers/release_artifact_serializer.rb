@@ -44,6 +44,10 @@ class ReleaseArtifactSerializer < BaseSerializer
     end
   end
 
+  link :redirect, if: -> { @object.redirect_url? } do
+    @object.redirect_url
+  end
+
   link :related do
     @url_helpers.v1_account_release_artifact_path @object.account_id, @object.release_id, @object
   end

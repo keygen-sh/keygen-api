@@ -12,6 +12,8 @@ class ReleaseArtifact < ApplicationRecord
     YANKED
   ]
 
+  attr_accessor :redirect_url
+
   belongs_to :account
   belongs_to :release,
     inverse_of: :artifacts
@@ -243,26 +245,30 @@ class ReleaseArtifact < ApplicationRecord
     release_arch_id
   end
 
+  def redirect_url?
+    redirect_url.present?
+  end
+
   # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
   # NOTE(ezekg) Check obj.replication_status for EU
   def download!(ttl: 1.hour)
-    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
 
-    release.download_links.create!(account:, url:, ttl:)
+    release.download_links.create!(url: redirect_url, ttl:, account:)
   end
 
   def upgrade!(ttl: 1.hour)
-    url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
+    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:get_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl&.to_i)
 
-    release.upgrade_links.create!(account:, url:, ttl:)
+    release.upgrade_links.create!(url: redirect_url, ttl:, account:)
   end
 
   def upload!(ttl: 1.hour)
-    url = Aws::S3::Presigner.new.presigned_url(:put_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl.to_i)
+    self.redirect_url = Aws::S3::Presigner.new.presigned_url(:put_object, bucket: 'keygen-dist', key: s3_object_key, expires_in: ttl.to_i)
 
     WaitForArtifactUploadWorker.perform_async(id)
 
-    release.upload_links.create!(account:, url:, ttl:)
+    release.upload_links.create!(url: redirect_url, ttl:, account:)
   end
 
   def yank!

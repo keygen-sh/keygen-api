@@ -39,7 +39,7 @@ module Api::V1::Releases::Relationships
       )
 
       # Respond without a redirect if that's what the client prefers
-      render jsonapi: artifact, meta: { url: download.url }, location: download.url if
+      render jsonapi: artifact, location: download.url if
         prefers?('no-redirect')
 
       render jsonapi: artifact, status: :see_other, location: download.url
