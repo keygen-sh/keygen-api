@@ -136,6 +136,87 @@ class Release < ApplicationRecord
       if: :tag?,
     }
 
+  scope :search_id, -> (term) {
+    identifier = term.to_s
+    return none if
+      identifier.empty?
+
+    return where(id: identifier) if
+      UUID_RE.match?(identifier)
+
+    where('releases.id::text ILIKE ?', "%#{identifier}%")
+  }
+
+  scope :search_version, -> (term) {
+    where('releases.version ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_tag, -> (term) {
+    where('releases.tag ILIKE ?', "%#{term}%")
+  }
+
+  scope :search_metadata, -> (terms) {
+    # FIXME(ezekg) Need to figure out a better way to do this. We need to be able
+    #              to search for the original string values and type cast, since
+    #              HTTP querystring parameters are strings.
+    #
+    #              Example we need to be able to search for:
+    #
+    #                { metadata: { external_id: "1624214616", internal_id: 1 } }
+    #
+    terms.reduce(self) do |scope, (key, value)|
+      search_key       = key.to_s.underscore.parameterize(separator: '_')
+      before_type_cast = { search_key => value }
+      after_type_cast  =
+        case value
+        when 'true'
+          { search_key => true }
+        when 'false'
+          { search_key => false }
+        when 'null'
+          { search_key => nil }
+        when /^\d+$/
+          { search_key => value.to_i }
+        when /^\d+\.\d+$/
+          { search_key => value.to_f }
+        else
+          { search_key => value }
+        end
+
+      scope.where('releases.metadata @> ?', before_type_cast.to_json)
+        .or(
+          scope.where('releases.metadata @> ?', after_type_cast.to_json)
+        )
+    end
+  }
+
+  scope :search_product, -> (term) {
+    product_identifier = term.to_s
+    return none if
+      product_identifier.empty?
+
+    return where(product_id: product_identifier) if
+      UUID_RE.match?(product_identifier)
+
+    scope = joins(:product).where('products.name ILIKE ?', "%#{product_identifier}%")
+    return scope unless
+      UUID_CHAR_RE.match?(product_identifier)
+
+    scope.or(
+      joins(:product).where(<<~SQL.squish, product_identifier.gsub(SANITIZE_TSV_RE, ' '))
+        to_tsvector('simple', products.id::text)
+        @@
+        to_tsquery(
+          'simple',
+          ''' ' ||
+          ?     ||
+          ' ''' ||
+          ':*'
+        )
+      SQL
+    )
+  }
+
   scope :order_by_version, -> {
     reorder(<<~SQL.squish)
       releases.semver_major      DESC,

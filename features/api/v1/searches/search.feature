@@ -1293,6 +1293,53 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin performs a search by release type on the product relationship by name
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "products"
+    And the first "product" has the following attributes:
+      """
+      { "name": "Apex Legends" }
+      """
+    And the second "product" has the following attributes:
+      """
+      { "name": "Titanfall 2" }
+      """
+    And the third "product" has the following attributes:
+      """
+      { "name": "Titanfall" }
+      """
+    And the current account has 5 "releases"
+    And the first "release" has the following attributes:
+      """
+      { "productId": "$products[0]" }
+      """
+    And the second "release" has the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
+    And the third "release" has the following attributes:
+      """
+      { "productId": "$products[1]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/search" with the following:
+      """
+      {
+        "meta": {
+          "type": "releases",
+          "query": {
+            "product": "Titanfall"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "releases"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin performs a search by machine type on the license relationship by ID
     Given I am an admin of account "test1"
     And the current account is "test1"
