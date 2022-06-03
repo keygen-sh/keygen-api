@@ -44,7 +44,7 @@ module Api::V1
       )
 
       # Respond without a redirect if that's what the client prefers
-      render jsonapi: artifact, location: download.url if
+      render jsonapi: artifact, meta: { url: download.url }, location: download.url if
         prefers?('no-redirect')
 
       render jsonapi: artifact, status: :see_other, location: download.url
@@ -65,7 +65,7 @@ module Api::V1
       )
 
       # Respond without a redirect if that's what the client prefers
-      render jsonapi: artifact, location: upload.url if
+      render jsonapi: artifact, meta: { url: upload.url }, location: upload.url if
         prefers?('no-redirect')
 
       render jsonapi: artifact, status: :temporary_redirect, location: upload.url
