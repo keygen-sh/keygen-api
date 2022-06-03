@@ -128,7 +128,7 @@ module RequestLogger
         response.content_type.include?('json')
 
       params   = JSON.parse(body)
-      filterer = ActiveSupport::ParameterFilter.new(%i[password digest token])
+      filterer = ActiveSupport::ParameterFilter.new(%i[password digest token redirect])
       filtered = filterer.filter(params)
 
       filtered.to_json
