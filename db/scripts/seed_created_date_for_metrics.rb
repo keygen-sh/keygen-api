@@ -1,13 +1,15 @@
 # heroku run:detached -e BATCH_SIZE=100000 rails runner db/scripts/seed_created_date_for_metrics.rb --tail
 
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 10_000 }.to_i
+
+conn  = Metric.connection
 batch = 0
 
-puts "[scripts.seed_created_date_for_metrics] Starting"
+Rails.logger.info "[scripts.seed_created_date_for_metrics] Starting"
 
 loop do
   batch += 1
-  count = Metric.connection.update("
+  count = conn.update("
     UPDATE
       metrics m
     SET
@@ -25,7 +27,7 @@ loop do
       )
   ")
 
-  puts "[scripts.seed_created_date_for_metrics] Updated #{count} metric rows (batch ##{batch})"
+  Rails.logger.info "[scripts.seed_created_date_for_metrics] Updated #{count} metric rows (batch ##{batch})"
 
   break if
     count == 0
@@ -33,4 +35,4 @@ loop do
   sleep 1
 end
 
-puts "[scripts.seed_created_date_for_metrics] Done"
+Rails.logger.info "[scripts.seed_created_date_for_metrics] Done"
