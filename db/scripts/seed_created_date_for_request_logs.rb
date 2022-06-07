@@ -1,4 +1,4 @@
-# heroku run -e BATCH_SIZE=100000 rails runner db/scripts/seed_created_date_for_request_logs.rb
+# heroku run:detached -e BATCH_SIZE=100000 rails runner db/scripts/seed_created_date_for_request_logs.rb --tail
 
 BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 10_000 }.to_i
 batch = 0
@@ -28,6 +28,8 @@ loop do
   puts "[scripts.seed_created_date_for_request_logs] Updated #{count} request log rows (batch ##{batch})"
 
   break if count == 0
+
+  sleep 0.1
 end
 
 puts "[scripts.seed_created_date_for_request_logs] Done"
