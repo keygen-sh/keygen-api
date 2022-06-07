@@ -24,9 +24,7 @@ Feature: Request log counts
     And the current account has 52 "request-logs"
     And the first 10 "request-logs" have the following attributes:
       """
-      {
-        "createdAt": "$time.8.days.ago"
-      }
+      { "createdDate": "$time.8.days.ago" }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/request-logs/actions/count"
