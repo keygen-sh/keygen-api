@@ -27,9 +27,10 @@ loop do
 
   puts "[scripts.seed_created_date_for_request_logs] Updated #{count} request log rows (batch ##{batch})"
 
-  break if count == 0
+  break if
+    count == 0
 
-  sleep 0.1
+  sleep 1
 end
 
 puts "[scripts.seed_created_date_for_request_logs] Done"
