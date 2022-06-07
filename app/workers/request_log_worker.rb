@@ -36,6 +36,7 @@ class RequestLogWorker
       requestor_id: requestor_id,
       resource_type: resource_type,
       resource_id: resource_id,
+      created_date: request_time,
       created_at: request_time,
       updated_at: Time.current,
       user_agent: request_user_agent,
