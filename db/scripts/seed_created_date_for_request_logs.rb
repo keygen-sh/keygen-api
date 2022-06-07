@@ -9,7 +9,7 @@ Rails.logger.info "[scripts.seed_created_date_for_request_logs] Starting"
 
 loop do
   batch += 1
-  count = conn.update("
+  count  = conn.update(<<~SQL.squish)
     UPDATE
       request_logs l
     SET
@@ -25,7 +25,7 @@ loop do
         LIMIT
           #{BATCH_SIZE}
       )
-  ")
+  SQL
 
   Rails.logger.info "[scripts.seed_created_date_for_request_logs] Updated #{count} request log rows (batch ##{batch})"
 
