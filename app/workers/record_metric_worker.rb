@@ -34,6 +34,7 @@ class RecordMetricWorker
 
     account.metrics.insert!({
       event_type_id: event_type.id,
+      created_date: recorded_at,
       created_at: recorded_at,
       updated_at: recorded_at,
       data: data,
