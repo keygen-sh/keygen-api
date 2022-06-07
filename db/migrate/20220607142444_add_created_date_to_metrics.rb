@@ -21,6 +21,10 @@ class AddCreatedDateToMetrics < ActiveRecord::Migration[7.0]
   def change
     add_column :metrics, :created_date, :date, null: true
 
+    add_index :metrics, %i[account_id created_date],
+      order: { created_date: :desc },
+      algorithm: :concurrently
+
     add_index :metrics, %i[account_id created_date event_type_id],
       name: :metrics_lo_vol_acct_created_date_event_type_idx,
       where: "event_type_id NOT IN (#{HIGH_VOLUME_EVENT_TYPE_IDS.map { |id| Arel.sql(%('#{id}')) }.join(', ')})",
