@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_07_161233) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_07_162853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -246,7 +246,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_07_161233) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.uuid "event_type_id", null: false
-    t.date "created_date"
+    t.date "created_date", null: false
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id <> ALL (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid, '6f75f2c4-6451-405a-a389-fa029137f6f0'::uuid]))"
     t.index ["account_id", "created_at", "event_type_id"], name: "metrics_high_vol_account_created_event_type_idx", order: { created_at: :desc }, where: "(event_type_id = ANY (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, '7b14b995-2a2b-4f1f-9628-16a3bc9e8d76'::uuid, 'cbd8b04c-1fd7-41b9-b11d-74c9deb60c77'::uuid, 'b4e5d6f2-25ff-46fb-9e1e-91ead72c0ccc'::uuid, 'ebb19f81-ca0f-4af4-bdbe-7476b22778ba'::uuid]))"
     t.index ["account_id", "created_date", "event_type_id"], name: "metrics_hi_vol_acct_created_date_event_type_idx", order: { created_date: :desc }, where: "(event_type_id = ANY (ARRAY['b4d4a9ff-1a63-4d5f-b95f-617788fb50dc'::uuid, 'a0a302c6-2872-4983-b815-391a5022d469'::uuid, '918f5d37-7369-454e-a5e5-9385a46f184a'::uuid, 'ac3e4f4b-712c-4cce-aa33-81788d4c4fbf'::uuid, 'e84ab2b7-efd8-42f9-87be-1f3aa34b3e42'::uuid, '2634100c-40aa-4879-a84d-8d9878573efc'::uuid]))"

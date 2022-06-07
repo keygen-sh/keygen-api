@@ -35,23 +35,23 @@ module Api::V1::Metrics::Actions
       end
 
       json = Rails.cache.fetch(cache_key, expires_in: 10.minutes, race_condition_ttl: 1.minute) do
-        conn = ActiveRecord::Base.connection
+        conn       = ActiveRecord::Base.connection
+        start_date = Date.current - 13.days
+        end_date   = Date.current
 
-        start_date = 13.days.ago.beginning_of_day
-        end_date = Time.current
         sql =
           if event_type_ids.any?
             <<~SQL
               SELECT
-                "metrics"."created_at"::date AS metrics_date,
-                COUNT(*)                     AS metrics_count
+                "metrics"."created_date" AS metrics_date,
+                COUNT(*)                 AS metrics_count
               FROM
                 "metrics"
               WHERE
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
-                  "metrics"."created_at" >= #{conn.quote start_date} AND
-                  "metrics"."created_at" <= #{conn.quote end_date}
+                  "metrics"."created_date" >= #{conn.quote start_date} AND
+                  "metrics"."created_date" <= #{conn.quote end_date}
                 ) AND
                 "metrics"."event_type_id" IN (#{event_type_ids.map { |m| conn.quote(m) }.join(", ")})
               GROUP BY
@@ -62,15 +62,15 @@ module Api::V1::Metrics::Actions
           else
             <<~SQL
               SELECT
-                "metrics"."created_at"::date AS metrics_date,
-                COUNT(*)                     AS metrics_count
+                "metrics"."created_date" AS metrics_date,
+                COUNT(*)                 AS metrics_count
               FROM
                 "metrics"
               WHERE
                 "metrics"."account_id" = #{conn.quote current_account.id} AND
                 (
-                  "metrics"."created_at" >= #{conn.quote start_date} AND
-                  "metrics"."created_at" <= #{conn.quote end_date}
+                  "metrics"."created_date" >= #{conn.quote start_date} AND
+                  "metrics"."created_date" <= #{conn.quote end_date}
                 )
               GROUP BY
                 metrics_date
