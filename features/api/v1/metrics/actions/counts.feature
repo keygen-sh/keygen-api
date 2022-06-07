@@ -24,9 +24,7 @@ Feature: Metric counts
     And the current account has 52 "metrics"
     And the first 19 "metrics" have the following attributes:
       """
-      {
-        "createdAt": "$time.4.days.ago"
-      }
+      { "createdDate": "$time.4.days.ago" }
       """
     And I use an authentication token
     When I send a GET request to "/accounts/test1/metrics/actions/count"
