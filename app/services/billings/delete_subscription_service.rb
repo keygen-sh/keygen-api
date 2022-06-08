@@ -9,8 +9,16 @@ module Billings
     end
 
     def call
-      c = Billings::Subscription.retrieve(subscription)
-      c.delete(at_period_end: at_period_end)
+      s = Billings::Subscription.retrieve(subscription)
+
+      # FIXME(ezekg) Release any schedules currently on the subscription,
+      #              which can prevent cancelation.
+      if s.respond_to?(:schedule) && s.schedule.present?
+        sch = Billings::Schedule.retrieve(s.schedule)
+        sch.release
+      end
+
+      s.delete(at_period_end: at_period_end)
     rescue Billings::Error => e
       error_code = e.json_body.dig(:error, :code) rescue nil
 

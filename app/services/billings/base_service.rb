@@ -6,6 +6,7 @@ module Billings
   Event         = ::Stripe::Event
   BillingPortal = ::Stripe::BillingPortal
   Subscription  = ::Stripe::Subscription
+  Schedule      = ::Stripe::SubscriptionSchedule
   Customer      = ::Stripe::Customer
   Error         = ::Stripe::StripeError
 
