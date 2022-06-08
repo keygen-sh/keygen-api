@@ -12,6 +12,8 @@ class RequestLog < ApplicationRecord
   has_one :event_log,
     inverse_of: :request_log
 
+  # NOTE(ezekg) Would love to add a default instead of this, but alas,
+  #             the table is too big and it would break everything.
   before_create -> { self.created_date ||= (created_at || Date.current) }
 
   # NOTE(ezekg) A lot of the time, we don't need to load the request

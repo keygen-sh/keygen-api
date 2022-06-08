@@ -79,6 +79,8 @@ class Metric < ApplicationRecord
   belongs_to :account
   belongs_to :event_type
 
+  # NOTE(ezekg) Would love to add a default instead of this, but alas,
+  #             the table is too big and it would break everything.
   before_create -> { self.created_date ||= (created_at || Date.current) }
 
   validates :data, presence: true
