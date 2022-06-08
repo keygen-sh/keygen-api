@@ -1,6 +1,7 @@
 # heroku run:detached -e BATCH_SIZE=100000 rails runner db/scripts/seed_response_body_for_request_logs.rb --tail
 
-BATCH_SIZE = ENV.fetch('BATCH_SIZE') { 10_000 }.to_i
+BATCH_SIZE     = ENV.fetch('BATCH_SIZE')     { 10_000 }.to_i
+SLEEP_DURATION = ENV.fetch('SLEEP_DURATION') { 1 }.to_i
 
 conn  = RequestLog.connection
 batch = 0
@@ -42,7 +43,7 @@ loop do
   break if
     count == 0
 
-  sleep 1
+  sleep SLEEP_DURATION
 end
 
 Rails.logger.info "[scripts.seed_response_body_for_request_logs] Done"
