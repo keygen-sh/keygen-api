@@ -4,13 +4,15 @@ class CreateRequestLogBlobs < ActiveRecord::Migration[7.0]
 
     create_table :request_log_blobs, id: :uuid, default: -> { "uuid_generate_v4()" } do |t|
       t.uuid :request_log_id, null: false
+      t.uuid :account_id,     null: false
 
       t.enum :blob_type, enum_type: :blob_type, null: false
       t.text :blob
 
       t.timestamps
 
-      t.index %i[request_log_id blob_type]
+      t.index %i[account_id request_log_id blob_type],
+        name: :request_log_blobs_acct_log_type_idx
     end
   end
 

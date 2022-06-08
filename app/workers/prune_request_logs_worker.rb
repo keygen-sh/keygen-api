@@ -21,14 +21,20 @@ class PruneRequestLogsWorker
       loop do
         logs = account.request_logs
                       .where('created_at < ?', 30.days.ago.beginning_of_day)
+                      .limit(1_000)
 
+        # Delete blobs
+        account.request_log_blobs.where(request_log_id: logs.ids)
+                                 .delete_all
+
+        # Delete logs
         batch += 1
-        count = logs.limit(1_000)
-                    .delete_all
+        count = logs.delete_all
 
         Keygen.logger.info "[workers.prune-request-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
 
-        break if count == 0
+        break if
+          count == 0
       end
     end
 

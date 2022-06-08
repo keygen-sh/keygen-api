@@ -30,24 +30,36 @@ class RequestLogWorker
     return if
       account.nil?
 
-    account.request_logs.create!({
-      id: request_id,
-      requestor_type: requestor_type,
-      requestor_id: requestor_id,
-      resource_type: resource_type,
-      resource_id: resource_id,
-      created_date: request_time,
-      created_at: request_time,
-      updated_at: Time.current,
-      user_agent: request_user_agent,
-      method: request_method,
-      url: request_url,
-      request_body_attributes: { blob_type: :request_body, blob: request_body },
-      ip: request_ip,
-      response_signature_attributes: { blob_type: :response_signature, blob: response_signature },
-      response_body_attributes: { blob_type: :response_body, blob: response_body },
-      status: response_status,
-    })
+    # Inserting with a transaction to ensure all data is recorded
+    account.request_logs.transaction do
+      rows = account.request_logs.insert!(
+        {
+          id: request_id,
+          requestor_type: requestor_type,
+          requestor_id: requestor_id,
+          resource_type: resource_type,
+          resource_id: resource_id,
+          created_date: request_time,
+          created_at: request_time,
+          updated_at: Time.current,
+          user_agent: request_user_agent,
+          method: request_method,
+          url: request_url,
+          ip: request_ip,
+          status: response_status,
+        },
+        returning: :id,
+      )
+
+      # Insert blobs in the same transaction
+      log_id = rows.to_a.first['id']
+
+      account.request_log_blobs.insert_all!([
+        { blob_type: :request_body,       blob: request_body,       request_log_id: log_id },
+        { blob_type: :response_signature, blob: response_signature, request_log_id: log_id },
+        { blob_type: :response_body,      blob: response_body,      request_log_id: log_id },
+      ])
+    end
   rescue PG::UniqueViolation
     # NOTE(ezekg) Don't log duplicates
   end

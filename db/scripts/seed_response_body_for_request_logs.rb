@@ -16,14 +16,16 @@ loop do
         blob,
         created_at,
         updated_at,
-        request_log_id
+        request_log_id,
+        account_id
       )
     SELECT
       'response_body' AS blob_type,
       l.response_body AS blob,
       l.created_at    AS created_at,
       l.updated_at    AS updated_at,
-      l.id            AS request_log_id
+      l.id            AS request_log_id,
+      l.account_id    AS account_id
     FROM
       request_logs l
     LEFT OUTER JOIN

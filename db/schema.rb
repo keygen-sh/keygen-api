@@ -525,11 +525,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_08_141612) do
 
   create_table "request_log_blobs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "request_log_id", null: false
+    t.uuid "account_id", null: false
     t.enum "blob_type", null: false, enum_type: "blob_type"
     t.text "blob"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["request_log_id", "blob_type"], name: "index_request_log_blobs_on_request_log_id_and_blob_type"
+    t.index ["account_id", "request_log_id", "blob_type"], name: "request_log_blobs_acct_log_type_idx"
   end
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

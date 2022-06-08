@@ -13,6 +13,7 @@ class Account < ApplicationRecord
   has_many :webhook_endpoints
   has_many :webhook_events
   has_many :request_logs
+  has_many :request_log_blobs
   has_many :metrics
   has_many :tokens
   has_many :users, index_errors: true

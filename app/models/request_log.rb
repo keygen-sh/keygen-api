@@ -16,24 +16,20 @@ class RequestLog < ApplicationRecord
   has_one :event_log,
     inverse_of: :request_log
 
-  has_one :request_body, -> { where(blob_type: :request_body) },
+  has_one :request_body, -> log { where(blob_type: :request_body, account_id: log.account_id) },
     class_name: 'RequestLogBlob',
     inverse_of: :request_log,
-    strict_loading: true
+    dependent: :delete
 
-  has_one :response_body, -> { where(blob_type: :response_body) },
+  has_one :response_body, -> log { where(blob_type: :response_body, account_id: log.account_id) },
     class_name: 'RequestLogBlob',
     inverse_of: :request_log,
-    strict_loading: true
+    dependent: :delete
 
-  has_one :response_signature, -> { where(blob_type: :response_signature) },
+  has_one :response_signature, -> log { where(blob_type: :response_signature, account_id: log.account_id) },
     class_name: 'RequestLogBlob',
     inverse_of: :request_log,
-    strict_loading: true
-
-  accepts_nested_attributes_for :request_body
-  accepts_nested_attributes_for :response_body
-  accepts_nested_attributes_for :response_signature
+    dependent: :delete
 
   scope :for_event_type, -> event {
     joins(:event_log).where(
