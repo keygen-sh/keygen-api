@@ -79,7 +79,7 @@ class Metric < ApplicationRecord
   belongs_to :account
   belongs_to :event_type
 
-  before_create -> { self.created_date = Date.current }
+  before_create -> { self.created_date ||= (created_at || Date.current) }
 
   validates :data, presence: true
 
