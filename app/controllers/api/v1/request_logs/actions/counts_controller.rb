@@ -16,9 +16,9 @@ module Api::V1::RequestLogs::Actions
         rows = conn.execute(<<~SQL.squish)
           SELECT
             coalesce(logs.count, 0) AS count,
-            period
+            series.date             AS period
           FROM
-            generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS period (date)
+            generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS series (date)
           LEFT JOIN LATERAL
             (
               SELECT
@@ -29,7 +29,7 @@ module Api::V1::RequestLogs::Actions
                 request_logs
               WHERE
                 account_id   = #{conn.quote current_account.id} AND
-                created_date = period.date
+                created_date = series.date
               GROUP BY
                 account_id,
                 date
