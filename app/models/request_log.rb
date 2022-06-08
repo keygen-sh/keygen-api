@@ -12,7 +12,7 @@ class RequestLog < ApplicationRecord
   has_one :event_log,
     inverse_of: :request_log
 
-  before_create -> { self.created_date = Date.current }
+  before_create -> { self.created_date ||= (created_at || Date.current) }
 
   # NOTE(ezekg) A lot of the time, we don't need to load the request
   #             or response body, e.g. when listing logs.
