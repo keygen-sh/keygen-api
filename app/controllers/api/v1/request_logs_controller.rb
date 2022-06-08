@@ -22,7 +22,7 @@ module Api::V1
       authorize RequestLog
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = apply_pagination(policy_scope(apply_scopes(current_account.request_logs)).without_blobs)
+        request_logs = apply_pagination(policy_scope(apply_scopes(current_account.request_logs)))
         data = Keygen::JSONAPI::Renderer.new.render(request_logs)
 
         data.tap do |d|
@@ -43,7 +43,8 @@ module Api::V1
     private
 
     def set_request_log
-      @request_log = current_account.request_logs.find params[:id]
+      @request_log = current_account.request_logs.includes(:request_body, :response_body, :response_signature)
+                                                 .find(params[:id])
     end
 
     def cache_key

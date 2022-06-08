@@ -30,7 +30,7 @@ class RequestLogWorker
     return if
       account.nil?
 
-    account.request_logs.insert!({
+    account.request_logs.create!({
       id: request_id,
       requestor_type: requestor_type,
       requestor_id: requestor_id,
@@ -42,10 +42,10 @@ class RequestLogWorker
       user_agent: request_user_agent,
       method: request_method,
       url: request_url,
-      request_body: request_body,
+      request_body_attributes: { blob_type: :request_body, blob: request_body },
       ip: request_ip,
-      response_signature: response_signature,
-      response_body: response_body,
+      response_signature_attributes: { blob_type: :response_signature, blob: response_signature },
+      response_body_attributes: { blob_type: :response_body, blob: response_body },
       status: response_status,
     })
   rescue PG::UniqueViolation

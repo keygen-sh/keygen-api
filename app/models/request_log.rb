@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class RequestLog < ApplicationRecord
+  # FIXME(ezekg) Drop user_agent column after moving to header blobs
+  # FIXME(ezekg) Drop these columns after they're moved to blobs
+  self.ignored_columns = %w[request_body response_body response_signature]
+
   include DateRangeable
   include Limitable
   include Orderable
@@ -12,18 +16,24 @@ class RequestLog < ApplicationRecord
   has_one :event_log,
     inverse_of: :request_log
 
-  # NOTE(ezekg) A lot of the time, we don't need to load the request
-  #             or response body, e.g. when listing logs.
-  scope :without_blobs, -> {
-    select(self.attribute_names - %w[request_body response_body response_signature])
-  }
+  has_one :request_body, -> { where(blob_type: :request_body) },
+    class_name: 'RequestLogBlob',
+    inverse_of: :request_log,
+    strict_loading: true
 
-  scope :for_current_period, -> {
-    date_start = 2.weeks.ago.beginning_of_day
-    date_end = Time.current
+  has_one :response_body, -> { where(blob_type: :response_body) },
+    class_name: 'RequestLogBlob',
+    inverse_of: :request_log,
+    strict_loading: true
 
-    where created_at: (date_start..date_end)
-  }
+  has_one :response_signature, -> { where(blob_type: :response_signature) },
+    class_name: 'RequestLogBlob',
+    inverse_of: :request_log,
+    strict_loading: true
+
+  accepts_nested_attributes_for :request_body
+  accepts_nested_attributes_for :response_body
+  accepts_nested_attributes_for :response_signature
 
   scope :for_event_type, -> event {
     joins(:event_log).where(

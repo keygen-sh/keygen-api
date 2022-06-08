@@ -10,12 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_07_142444) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_08_141612) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
+
+  # Custom types defined in this database.
+  # Note that some types may not work with other database engines. Be careful if changing database.
+  create_enum "blob_type", ["request_headers", "request_body", "response_headers", "response_body", "response_signature"]
 
   create_table "accounts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
@@ -517,6 +521,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_07_142444) do
     t.index ["status"], name: "index_releases_on_status"
     t.index ["tag", "account_id"], name: "index_releases_on_tag_and_account_id", unique: true, where: "(tag IS NOT NULL)"
     t.index ["version", "product_id", "account_id"], name: "index_releases_on_version_and_product_id_and_account_id", unique: true, where: "((api_version)::text <> '1.0'::text)"
+  end
+
+  create_table "request_log_blobs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "request_log_id", null: false
+    t.enum "blob_type", null: false, enum_type: "blob_type"
+    t.text "blob"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["request_log_id", "blob_type"], name: "index_request_log_blobs_on_request_log_id_and_blob_type"
   end
 
   create_table "request_logs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

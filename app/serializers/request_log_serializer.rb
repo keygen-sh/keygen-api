@@ -9,25 +9,19 @@ class RequestLogSerializer < BaseSerializer
   attribute :user_agent
   attribute :ip
   attribute :request_body do
-    if @object.respond_to?(:request_body)
-      @object.request_body
-    else
-      '[OMITTED]'
-    end
+    @object.request_body&.blob
+  rescue ActiveRecord::StrictLoadingViolationError
+    '[OMITTED]'
   end
   attribute :response_signature do
-    if @object.respond_to?(:response_signature)
-      @object.response_signature
-    else
-      '[OMITTED]'
-    end
+    @object.response_signature&.blob
+  rescue ActiveRecord::StrictLoadingViolationError
+    '[OMITTED]'
   end
   attribute :response_body do
-    if @object.respond_to?(:response_body)
-      @object.response_body
-    else
-      '[OMITTED]'
-    end
+    @object.response_body&.blob
+  rescue ActiveRecord::StrictLoadingViolationError
+    '[OMITTED]'
   end
   attribute :created do
     @object.created_at
