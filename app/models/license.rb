@@ -364,7 +364,9 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
-  scope :expires, -> (within: nil, before: nil, after: nil) {
+  scope :expires, -> (within: nil, in: nil, before: nil, after: nil) {
+    within ||= binding.local_variable_get(:in)
+
     begin
       case
       when within.present?

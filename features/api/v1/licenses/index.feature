@@ -396,6 +396,99 @@ Feature: List license
     And the JSON response should be an array with 1 "license"
     And time is unfrozen
 
+  Scenario: Admin retrieves all licenses expiring in the next 30 days (seconds)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T12:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-08-10T12:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-07-10T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-07-01T12:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expires[in]=2629746"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves all licenses expiring in the next 2 weeks (simple ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T10:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-07-10T13:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-06-11T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-06-24T13:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expires[in]=2w"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "licenses"
+    And time is unfrozen
+
+  Scenario: Admin retrieves all licenses expiring in the next 13 days, 59 minutes and 59 seconds (complex ISO)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 5 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "2022-06-10T10:00:00.000Z" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": null }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "expiry": "2022-07-10T13:00:00.000Z" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "expiry": "2022-06-11T13:00:00.000Z" }
+      """
+    And the fifth "license" has the following attributes:
+      """
+      { "expiry": "2022-06-24T13:00:00.000Z" }
+      """
+    And time is frozen at "2022-06-10T13:00:00.000Z"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses?expires[in]=P13DT59M59S"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "license"
+    And time is unfrozen
+
   Scenario: Admin retrieves all licenses expiring within some invalid duration
     Given I am an admin of account "test1"
     And the current account is "test1"
