@@ -43,52 +43,63 @@ module Api::V1::Metrics::Actions
           if event_type_ids.any?
             <<~SQL
               SELECT
-                "metrics"."created_date" AS metrics_date,
-                COUNT(*)                 AS metrics_count
+                sum(m.count) AS count,
+                series.date  AS period
               FROM
-                "metrics"
-              WHERE
-                "metrics"."account_id" = #{conn.quote current_account.id} AND
+                generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS series (date)
+              LEFT JOIN LATERAL
                 (
-                  "metrics"."created_date" >= #{conn.quote start_date} AND
-                  "metrics"."created_date" <= #{conn.quote end_date}
-                ) AND
-                "metrics"."event_type_id" IN (#{event_type_ids.map { |m| conn.quote(m) }.join(", ")})
+                  SELECT
+                    count(*)     AS count,
+                    created_date AS date,
+                    event_type_id,
+                    account_id
+                  FROM
+                    metrics
+                  WHERE
+                    account_id     = #{conn.quote current_account.id} AND
+                    created_date   = series.date                      AND
+                    event_type_id IN (
+                      #{event_type_ids.map { conn.quote(_1) }.join(', ')}
+                    )
+                  GROUP BY
+                    event_type_id,
+                    account_id,
+                    date
+                ) AS m USING (date)
               GROUP BY
-                metrics_date
-              ORDER BY
-                metrics_count ASC
+                series.date;
             SQL
           else
             <<~SQL
               SELECT
-                "metrics"."created_date" AS metrics_date,
-                COUNT(*)                 AS metrics_count
+                coalesce(m.count, 0) AS count,
+                series.date          AS period
               FROM
-                "metrics"
-              WHERE
-                "metrics"."account_id" = #{conn.quote current_account.id} AND
+                generate_series(date #{conn.quote start_date}, date #{conn.quote end_date}, interval '1 day') AS series (date)
+              LEFT JOIN LATERAL
                 (
-                  "metrics"."created_date" >= #{conn.quote start_date} AND
-                  "metrics"."created_date" <= #{conn.quote end_date}
-                )
-              GROUP BY
-                metrics_date
-              ORDER BY
-                metrics_count ASC
+                  SELECT
+                    count(*)     AS count,
+                    created_date AS date,
+                    account_id
+                  FROM
+                    metrics
+                  WHERE
+                    account_id   = #{conn.quote current_account.id} AND
+                    created_date = series.date
+                  GROUP BY
+                    account_id,
+                    date
+                ) AS m USING (date);
             SQL
           end
 
-        rows = conn.execute sql.squish
-
-        # Create zeroed out hash of dates then merge real counts (so we include dates with no data)
-        dates = start_date.to_date..end_date.to_date
+        rows = conn.execute(sql.squish)
 
         {
-          meta: dates.map { |d| [d.strftime('%Y-%m-%d'), 0] }.to_h
-            .merge(
-              rows.map { |r| r.fetch_values('metrics_date', 'metrics_count') }.to_h
-            )
+          meta: rows.map { [_1['period'].strftime('%Y-%m-%d'), _1['count'].to_i] }
+                    .to_h,
         }
       end
 
