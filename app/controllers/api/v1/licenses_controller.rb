@@ -9,6 +9,9 @@ module Api::V1
     has_scope(:machine) { |c, s, v| s.for_machine(v) }
     has_scope(:group) { |c, s, v| s.for_group(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
+    has_scope(:expires, type: :hash, only: :index) { |c, s, v|
+      s.expires(**v.symbolize_keys.slice(:within, :before, :after))
+    }
     has_scope :suspended
     has_scope :expiring
     has_scope :expired
