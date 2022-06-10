@@ -364,6 +364,29 @@ class License < ApplicationRecord
       where 'expiry IS NULL OR expiry >= ?', Time.current
     end
   }
+  scope :expires, -> (within: nil, before: nil, after: nil) {
+    begin
+      case
+      when within.present?
+        s = within.to_s.match?(/\A\d+\z/) ? "PT#{within.to_s}S".upcase : "P#{within.to_s.delete_prefix('P').upcase}"
+        d = ActiveSupport::Duration.parse(s)
+
+        where 'expiry IS NOT NULL AND expiry >= ? AND expiry <= ?', Time.current, d.from_now
+      when before.present?
+        t = before.to_s.match?(/\A\d+\z/) ? Time.at(before.to_i) : before.to_time
+
+        where 'expiry IS NOT NULL AND expiry >= ? AND expiry <= ?', Time.current, t
+      when after.present?
+        t = after.to_s.match?(/\A\d+\z/) ? Time.at(after.to_i) : after.to_time
+
+        where 'expiry IS NOT NULL AND expiry >= ? AND expiry >= ?', Time.current, t
+      else
+        none
+      end
+    rescue ActiveSupport::Duration::ISO8601Parser::ParsingError
+      none
+    end
+  }
   scope :banned, -> {
     joins(:user).where.not(user: { banned_at: nil })
   }
