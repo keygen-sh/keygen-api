@@ -37,7 +37,7 @@ module Api::V1::RequestLogs::Actions
         SQL
 
         {
-          meta: rows.map { [_1['period'].strftime('%Y-%m-%d'), _1['count']] }
+          meta: rows.map { [_1['period'].strftime('%Y-%m-%d'), _1['count'].to_i] }
                     .to_h,
         }
       end
