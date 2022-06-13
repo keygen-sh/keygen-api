@@ -104,6 +104,10 @@ Feature: List releases
         }
       }
       """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.1" }
+      """
 
   Scenario: Admin retrieves all releases for their account (v1.0)
     Given I am an admin of account "test1"
@@ -132,6 +136,10 @@ Feature: List releases
           "data": { "type": "artifacts", "id": "$artifacts[0]" }
         }
       }
+      """
+    Then the response should contain the following headers:
+      """
+      { "Keygen-Version": "1.0" }
       """
 
   Scenario: Admin retrieves all beta releases filtered by platform
