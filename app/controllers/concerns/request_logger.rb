@@ -59,7 +59,7 @@ module RequestLogger
         Current.resource&.class&.name,
         Current.resource&.id,
         Current.request_id,
-        request_log_date,
+        request_log_time,
         request_log_user_agent,
         request_log_method,
         request_log_url,
@@ -73,14 +73,8 @@ module RequestLogger
       Keygen.logger.exception(e)
     end
 
-    def request_log_date
-      t = if response.headers.key?('Date')
-            Time.httpdate(response.headers['Date'])
-          else
-            Time.current
-          end
-
-      t.iso8601(6)
+    def request_log_time
+      Time.current.iso8601(6)
     end
 
     def request_log_user_agent
