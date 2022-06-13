@@ -109,6 +109,7 @@ module Api::V1
             param :channel, type: :string, inclusion: %w[stable rc beta alpha dev], transform: -> (_, key) {
               [:channel_attributes, { key: }]
             }
+            param :status, type: :string, inclusion: %w[DRAFT PUBLISHED], optional: true
             param :version, type: :string
             param :tag, type: :string, optional: true
             param :metadata, type: :hash, allow_non_scalars: true, optional: true

@@ -239,6 +239,153 @@ Feature: Create release
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a draft release for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "channel": "stable",
+            "status": "DRAFT",
+            "tag": "application@v1.0.0",
+            "version": "1.0.0"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Launch Release",
+        "channel": "stable",
+        "status": "DRAFT",
+        "tag": "application@v1.0.0",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a published release for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "channel": "stable",
+            "status": "PUBLISHED",
+            "tag": "application@v1.0.0",
+            "version": "1.0.0"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "release" with the following attributes:
+      """
+      {
+        "name": "Launch Release",
+        "channel": "stable",
+        "status": "PUBLISHED",
+        "tag": "application@v1.0.0",
+        "version": "1.0.0",
+        "semver": {
+          "major": 1,
+          "minor": 0,
+          "patch": 0,
+          "prerelease": null,
+          "build": null
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a yanked release for their account
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Launch Release",
+            "channel": "stable",
+            "status": "YANKED",
+            "tag": "application@v1.0.0",
+            "version": "1.0.0"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: DRAFT, PUBLISHED (received YANKED)",
+        "source": {
+          "pointer": "/data/attributes/status"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a duplicate release (by tag)
     Given I am an admin of account "test1"
     And the current account is "test1"
