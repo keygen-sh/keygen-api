@@ -111,7 +111,7 @@ module DefaultHeaders
   end
 
   def add_version_header
-    response.headers['Keygen-Version'] = '1.0'
+    response.headers['Keygen-Version'] = current_api_version
   end
 
   def add_powered_by_header
