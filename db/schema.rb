@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_07_162853) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_14_121605) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -550,6 +550,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_07_162853) do
     t.index ["id", "created_at"], name: "index_roles_on_id_and_created_at", unique: true
     t.index ["name", "created_at"], name: "index_roles_on_name_and_created_at"
     t.index ["resource_id", "resource_type", "created_at"], name: "index_roles_on_resource_id_and_resource_type_and_created_at"
+    t.index ["resource_type", "resource_id", "name"], name: "index_roles_on_resource_type_and_resource_id_and_name"
   end
 
   create_table "second_factors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
