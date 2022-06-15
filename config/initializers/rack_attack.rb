@@ -103,8 +103,8 @@ ip_limit_proc = lambda do |rack_req|
 
   token = case auth_scheme
           when 'license',
-                'bearer',
-                'token'
+               'bearer',
+               'token'
             auth_parts.second
           when 'basic'
             basic_auth = Base64.decode64(auth_parts.second.to_s)
