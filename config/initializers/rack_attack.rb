@@ -37,21 +37,34 @@ end
 
 req_limit_proc = lambda do |base_req_limit|
   lambda do |rack_req|
-    req  = ActionDispatch::Request.new rack_req.env
-    auth = req.headers.fetch('authorization') { '' }
+    req = ActionDispatch::Request.new rack_req.env
 
-    return base_req_limit if
-      auth.blank?
+    # Parse authentication scheme
+    auth_parts  = req.authorization.to_s.split(' ', 2)
+    auth_scheme = auth_parts.first&.downcase
 
-    token =
-      case
-      when auth.starts_with?('Basic ')
-        Base64.decode64(auth.remove('Basic ')).split(':').first
-      when auth.starts_with?('Bearer ')
-        auth.remove('Bearer ')
-      else
-        nil
-      end
+    token = case auth_scheme
+            when 'license',
+                 'bearer',
+                 'token'
+              auth_parts.second
+            when 'basic'
+              basic_auth = Base64.decode64(auth_parts.second.to_s)
+              user, pass = basic_auth.to_s.split(':', 2)
+              case user
+              when 'license' then pass
+              when 'token'   then pass
+              else                user.presence
+              end
+            else
+              query_auth = req.query_parameters['token'] || req.query_parameters['auth']
+              user, pass = query_auth.to_s.split(':', 2)
+              case user
+              when 'license' then pass
+              when 'token'   then pass
+              else                user.presence
+              end
+            end
 
     return base_req_limit if
       token.blank?
@@ -81,12 +94,42 @@ ip_limit_proc = lambda do |rack_req|
   ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
 
   matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
-  account = matches[1] unless matches.nil?
+  account = matches[1] unless
+    matches.nil?
+
+  # Parse authentication scheme
+  auth_parts  = req.authorization.to_s.split(' ', 2)
+  auth_scheme = auth_parts.first&.downcase
+
+  token = case auth_scheme
+          when 'license',
+                'bearer',
+                'token'
+            auth_parts.second
+          when 'basic'
+            basic_auth = Base64.decode64(auth_parts.second.to_s)
+            user, pass = basic_auth.to_s.split(':', 2)
+            case user
+            when 'license' then pass
+            when 'token'   then pass
+            else                user.presence
+            end
+          else
+            query_auth = req.query_parameters['token'] || req.query_parameters['auth']
+            user, pass = query_auth.to_s.split(':', 2)
+            case user
+            when 'license' then pass
+            when 'token'   then pass
+            else                user.presence
+            end
+          end
+
+  hash = Digest::SHA2.hexdigest(token.to_s)
 
   if account.present?
-    "#{account}/#{ip}"
+    "#{account}/#{ip}/#{hash}"
   else
-    ip
+    "#{ip}/#{hash}"
   end
 rescue => e
   Keygen.logger.exception(e)
@@ -120,7 +163,7 @@ Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
     auth.present? && auth.starts_with?('Basic ')
 
   dec   = Base64.decode64(auth.remove('Basic '))
-  email = dec.split(':').first
+  email = dec.split(':', 2).first
   next unless
     email.present? && email.include?('@')
 
