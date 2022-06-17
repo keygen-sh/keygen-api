@@ -171,7 +171,7 @@ class User < ApplicationRecord
     end
   }
   scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
-  scope :for_license, -> (id) { joins(:license).where licenses: id }
+  scope :for_license, -> (id) { joins(:licenses).where licenses: id }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_user, -> (id) { where(id: id).union(for_owner(id)).distinct }
   scope :for_group, -> id { where(group: id) }

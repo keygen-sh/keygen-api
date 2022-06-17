@@ -634,6 +634,16 @@ Feature: List users
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
+  Scenario: License attempts to retrieve all users for their account
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 5 "users"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+
   Scenario: User attempts to retrieve all users for their account
     Given the current account is "test1"
     And the current account has 5 "user"
