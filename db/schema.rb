@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_14_121605) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_17_142030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -91,7 +91,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_14_121605) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_event_logs_on_account_id"
+    t.index ["account_id", "created_at"], name: "index_event_logs_on_account_id_and_created_at", order: { created_at: :desc }
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
     t.index ["request_log_id"], name: "index_event_logs_on_request_log_id"
