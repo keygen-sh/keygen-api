@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_17_142030) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_17_181242) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -95,8 +95,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_17_142030) do
     t.index ["event_type_id"], name: "index_event_logs_on_event_type_id"
     t.index ["idempotency_key"], name: "index_event_logs_on_idempotency_key", unique: true
     t.index ["request_log_id"], name: "index_event_logs_on_request_log_id"
-    t.index ["resource_type", "resource_id"], name: "index_event_logs_on_resource"
-    t.index ["whodunnit_type", "whodunnit_id"], name: "index_event_logs_on_whodunnit"
+    t.index ["resource_type", "resource_id", "created_at"], name: "event_logs_resource_crt_idx", order: { created_at: :desc }
+    t.index ["whodunnit_type", "whodunnit_id", "created_at"], name: "event_logs_whodunnit_crt_idx", order: { created_at: :desc }
   end
 
   create_table "event_types", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
