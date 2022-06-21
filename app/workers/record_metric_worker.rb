@@ -16,10 +16,15 @@ class RecordMetricWorker
     end
 
     # Skip metric recording for non-existent accounts
-    return if account.nil?
+    return if
+      account.nil?
 
-    # TODO(ezekg) Should probably scope this to the account
-    resource = resource_type.classify.constantize.find_by id: resource_id
+    resource = if resource_type.present?
+                 resource_type.classify.constantize.find_by(account_id: account.id, id: resource_id)
+               else
+                 nil
+               end
+
     recorded_at = Time.current
     data =
       if resource.present?
