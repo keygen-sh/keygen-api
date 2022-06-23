@@ -65,7 +65,7 @@ class Account < ApplicationRecord
     allow_nil: true,
     inclusion: {
       message: 'unsupported version',
-      in: Versionist.supported_versions,
+      in: RequestMigrations.supported_versions,
     }
 
   validate on: [:create, :update] do

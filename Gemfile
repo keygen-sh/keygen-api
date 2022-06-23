@@ -15,6 +15,9 @@ gem 'rack-cors'
 # Redis for caching and background jobs
 gem 'redis'
 
+# API migrations
+gem 'request_migrations', '~> 1.0'
+
 # JSON API serializers
 gem 'json', '~> 2.3.0'
 gem 'jsonapi-rails', '0.4.0'

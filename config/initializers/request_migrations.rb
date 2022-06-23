@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_dependency Rails.root.join('lib', 'versionist')
-
-Versionist.configure do |config|
+RequestMigrations.configure do |config|
   config.request_version_resolver = -> request {
     Current.account ||= ResolveAccountService.call(request:)
 
@@ -27,4 +25,6 @@ Versionist.configure do |config|
       add_product_relationship_to_artifact_migration
     ],
   }
+
+  config.logger = Rails.logger
 end

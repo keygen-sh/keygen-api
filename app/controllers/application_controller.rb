@@ -17,7 +17,7 @@ class ApplicationController < ActionController::API
 
   # NOTE(ezekg) This is after the rescues have been hooked so that we
   #             can rescue from invalid version errors.
-  include Versionist::Controller::Migrations
+  include RequestMigrations::Controller::Migrations
 
   after_action :verify_authorized
 
@@ -28,7 +28,7 @@ class ApplicationController < ActionController::API
   attr_accessor :current_token
 
   def current_api_version
-    Versionist.config.request_version_resolver.call(request)
+    RequestMigrations.config.request_version_resolver.call(request)
   end
 
   def pundit_user
@@ -398,7 +398,7 @@ class ApplicationController < ActionController::API
           end
 
     render_forbidden detail: msg
-  rescue Versionist::UnsupportedVersionError
+  rescue RequestMigrations::UnsupportedVersionError
     render_bad_request(
       detail: 'unsupported API version requested',
       code: 'INVALID_API_VERSION',

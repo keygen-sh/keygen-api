@@ -5,7 +5,7 @@ require 'spec_helper'
 
 describe RenameFilenameExtErrorCodeForReleaseMigration do
   before do
-    Versionist.configure do |config|
+    RequestMigrations.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
         '1.0' => [RenameFilenameExtErrorCodeForReleaseMigration],
@@ -15,7 +15,7 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
 
   context 'the errors contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
     it 'should migrate the error' do
-      migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
+      migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data    = {
         errors: [
           {
@@ -63,7 +63,7 @@ describe RenameFilenameExtErrorCodeForReleaseMigration do
 
   context 'the errors do not contain an ARTIFACT_FILENAME_EXTENSION_INVALID error code' do
     it 'should migrate the error' do
-      migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
+      migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
       data    = {
         errors: [
           {

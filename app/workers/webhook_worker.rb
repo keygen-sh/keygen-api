@@ -46,7 +46,7 @@ class WebhookWorker
     # Migrate event payload
     current_version = event.api_version || KEYGEN_API_VERSION
     target_version  = endpoint.api_version || account.api_version
-    migrator        = Versionist::Migrator.new(
+    migrator        = RequestMigrations::Migrator.new(
       from: current_version,
       to: target_version,
     )

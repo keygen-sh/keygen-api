@@ -23,7 +23,7 @@ describe AddKeyAttributeToArtifactsMigration do
   end
 
   before do
-    Versionist.configure do |config|
+    RequestMigrations.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
         '1.0' => [AddKeyAttributeToArtifactsMigration],
@@ -32,7 +32,7 @@ describe AddKeyAttributeToArtifactsMigration do
   end
 
   it 'should migrate artifact attributes' do
-    migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
+    migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
     data     = Keygen::JSONAPI.render([
       create(:artifact, filename: '1', account:, release:),
       create(:artifact, filename: '2', account:, release:),
