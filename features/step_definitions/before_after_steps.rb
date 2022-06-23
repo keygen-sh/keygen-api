@@ -6,7 +6,7 @@ World Rack::Test::Methods
 #   DatabaseCleaner.cleaning(&block)
 # end
 
-Versionist.supported_versions.each do |version|
+RequestMigrations.supported_versions.each do |version|
   semver = Semverse::Version.new(version)
 
   Before "@api/v#{semver.major}.#{semver.minor}" do

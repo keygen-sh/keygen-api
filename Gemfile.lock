@@ -358,6 +358,9 @@ GEM
     redis (4.6.0)
     redis-prescription (1.0.0)
     regexp_parser (2.2.1)
+    request_migrations (1.0.0)
+      rails (>= 6.0)
+      semverse (~> 3.0)
     request_store (1.5.1)
       rack (>= 1.4)
     rexml (3.2.5)
@@ -497,6 +500,7 @@ DEPENDENCIES
   rails (~> 7.0.3)
   rails_autoscale_agent
   redis
+  request_migrations (~> 1.0)
   rotp (~> 6.2)
   rspec-expectations (~> 3.11)
   rspec-rails (~> 5.1.1)

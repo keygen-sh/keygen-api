@@ -15,7 +15,7 @@ class WebhookEvent < ApplicationRecord
     allow_nil: true,
     inclusion: {
       message: 'unsupported version',
-      in: Versionist.supported_versions,
+      in: RequestMigrations.supported_versions,
     }
 
   scope :with_events, -> (*events) { where(event_type_id: EventType.where(event: events).pluck(:id)) }

@@ -24,7 +24,7 @@ describe RenameDraftStatusToNotPublishedForReleasesMigration do
   end
 
   before do
-    Versionist.configure do |config|
+    RequestMigrations.configure do |config|
       config.current_version = '1.0'
       config.versions        = {
         '1.0' => [RenameDraftStatusToNotPublishedForReleasesMigration],
@@ -33,7 +33,7 @@ describe RenameDraftStatusToNotPublishedForReleasesMigration do
   end
 
   it 'should migrate releases statuses' do
-    migrator = Versionist::Migrator.new(from: '1.0', to: '1.0')
+    migrator = RequestMigrations::Migrator.new(from: '1.0', to: '1.0')
     data     = Keygen::JSONAPI.render([
       release_without_artifact,
       release_with_artifact,
