@@ -33,6 +33,9 @@ class UserPolicy < ApplicationPolicy
     assert_account_scoped!
     assert_role_ok!
 
+    return false if
+      bearer.has_role?(:read_only)
+
     bearer.has_role?(:admin, :developer, :sales_agent, :product) ||
       resource == bearer
   end
