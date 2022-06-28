@@ -35,6 +35,17 @@ rescue => e
   false
 end
 
+Rack::Attack.blocklist("req/block/bots") do |req|
+  Rack::Attack::Fail2Ban.filter("req/block/bots/#{req.ip}", maxretry: 3, findtime: 10.minutes, bantime: 30.minutes) do
+    CGI.unescape(req.query_string) =~ %r{/etc/(passwd|profile)} ||
+      req.path.include?("/etc/profile") ||
+      req.path.include?("/etc/passwd") ||
+      req.path.include?("wp-admin") ||
+      req.path.include?("wp-login") ||
+      req.path.match?(/\S+\.php/)
+  end
+end
+
 req_limit_proc = lambda do |base_req_limit|
   lambda do |rack_req|
     req = ActionDispatch::Request.new rack_req.env
