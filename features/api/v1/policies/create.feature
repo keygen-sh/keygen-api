@@ -420,6 +420,39 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy that has an allow access expiration strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Expiration Strategy",
+            "expirationStrategy": "ALLOW_ACCESS"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Allow Expiration Strategy"
+    And the JSON response should be a "policy" with the expirationStrategy "ALLOW_ACCESS"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a policy that has an invalid expiration strategy
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -433,7 +466,7 @@ Feature: Create policy
           "type": "policies",
           "attributes": {
             "name": "Bad Expiration Strategy",
-            "expirationStrategy": "ALLOW_ACCESS"
+            "expirationStrategy": "CONSIDER_ALL_VALID"
           },
           "relationships": {
             "product": {

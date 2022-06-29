@@ -143,6 +143,9 @@ class ReleasePolicy < ApplicationPolicy
     return true if
       license.expiry.nil?
 
+    return true if
+      license.allow_access?
+
     return false if
       license.revoke_access? &&
       license.expired?
