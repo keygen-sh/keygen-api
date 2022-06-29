@@ -21,7 +21,7 @@ class LicenseValidationService < BaseService
     # Check if license is suspended
     return [false, "is suspended", :SUSPENDED] if license.suspended?
 
-    # When revoking access, check if license is expired (move along if it has no expiry)
+    # When revoking access, first check if license is expired (i.e. higher precedence)
     return [false, "is expired", :EXPIRED] if
       license.revoke_access? &&
       license.expired?
@@ -132,9 +132,8 @@ class LicenseValidationService < BaseService
 
     # Check if license policy is strict, e.g. enforces reporting of machine usage (and exit early if not strict).
     if !license.policy.strict?
-      # When restricting access, check if license is expired after checking machine requirements.
-      return [false, "is expired", :EXPIRED] if
-        license.restrict_access? &&
+      # Check if license is expired after checking machine requirements.
+      return [license.allow_access?, "is expired", :EXPIRED] if
         license.expired?
 
       return [true, "is valid", :VALID]
@@ -151,10 +150,9 @@ class LicenseValidationService < BaseService
     # Check if license has exceeded its CPU core limit
     return [false, "has too many associated machine cores", :TOO_MANY_CORES] if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
 
-    # When restricting access, check if license is expired after checking machine requirements.
-    return [false, "is expired", :EXPIRED] if
-        license.restrict_access? &&
-        license.expired?
+    # Check if license is expired after checking machine requirements.
+    return [license.allow_access?, "is expired", :EXPIRED] if
+      license.expired?
 
     # All good
     return [true, "is valid", :VALID]
