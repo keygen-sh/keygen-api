@@ -105,6 +105,6 @@ class RequestLog < ApplicationRecord
   }
 
   scope :search_ip, -> (term) {
-    where('request_logs.ip ILIKE ?', "%#{term}%")
+    where('request_logs.ip ILIKE ?', "#{term}%")
   }
 end
