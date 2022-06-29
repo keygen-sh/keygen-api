@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_17_181242) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_29_153506) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -538,6 +538,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_17_181242) do
     t.date "created_date", null: false
     t.index ["account_id", "created_at"], name: "index_request_logs_on_account_id_and_created_at"
     t.index ["account_id", "created_date"], name: "index_request_logs_on_account_id_and_created_date", order: { created_date: :desc }
+    t.index ["method"], name: "request_logs_method_idx"
+    t.index ["status"], name: "request_logs_status_idx"
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
