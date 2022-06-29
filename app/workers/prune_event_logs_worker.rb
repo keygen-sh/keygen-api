@@ -22,8 +22,8 @@ class PruneEventLogsWorker
     Keygen.logger.info "[workers.prune-event-logs] Starting: accounts=#{accounts.count}"
 
     # We only want to prune certain high-volume event logs
-    event_ids = Event.where(event: HIGH_VOLUME_EVENTS)
-                     .pluck(:id)
+    event_type_ids = EventType.where(event: HIGH_VOLUME_EVENTS)
+                              .pluck(:id)
 
     accounts.find_each do |account|
       account_id = account.id
@@ -34,7 +34,7 @@ class PruneEventLogsWorker
       loop do
         event_logs = account.event_logs
                             .where('created_at < ?', 90.days.ago.beginning_of_day)
-                            .where(event: event_ids)
+                            .where(event_type_id: event_type_ids)
 
         batch += 1
         count = event_logs.limit(1_000)
