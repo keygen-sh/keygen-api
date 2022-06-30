@@ -5,7 +5,7 @@ module CurrentRequestAttributes
     before_action do
       Current.request_id = request.request_id = SecureRandom.uuid
       Current.host       = request.host
-      Current.ip         = request.ip
+      Current.ip         = request.remote_ip
     end
   end
 end

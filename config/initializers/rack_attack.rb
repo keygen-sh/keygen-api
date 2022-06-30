@@ -3,8 +3,8 @@
 Rack::Attack.safelist("req/allow/localhost") do |rack_req|
   next unless Rails.env.development?
 
-  req = ActionDispatch::Request.new rack_req.env
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.remote_ip
 
   "127.0.0.1" == ip || "::1" == ip
 rescue => e
@@ -15,7 +15,7 @@ end
 
 Rack::Attack.safelist("req/allow/ip") do |rack_req|
   req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.remote_ip
 
   Rack::Attack.cache.read("req/allow/ip:#{ip}").present?
 rescue => e
@@ -25,8 +25,8 @@ rescue => e
 end
 
 Rack::Attack.blocklist("req/block/ip") do |rack_req|
-  req = ActionDispatch::Request.new rack_req.env
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.remote_ip
 
   Rack::Attack.cache.read("req/block/ip:#{ip}").present?
 rescue => e
@@ -35,8 +35,11 @@ rescue => e
   false
 end
 
-Rack::Attack.blocklist("req/block/bots") do |req|
-  Rack::Attack::Fail2Ban.filter("req/block/bots/#{req.ip}", maxretry: 3, findtime: 10.minutes, bantime: 30.minutes) do
+Rack::Attack.blocklist("req/block/bots") do |rack_req|
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.remote_ip
+
+  Rack::Attack::Fail2Ban.filter("req/block/bots/#{ip}", maxretry: 3, findtime: 10.minutes, bantime: 30.minutes) do
     CGI.unescape(req.query_string) =~ %r{/etc/(passwd|profile)} ||
       req.path.include?("/etc/profile") ||
       req.path.include?("/etc/passwd") ||
@@ -48,7 +51,7 @@ end
 
 req_limit_proc = lambda do |base_req_limit|
   lambda do |rack_req|
-    req = ActionDispatch::Request.new rack_req.env
+    req = ActionDispatch::Request.new(rack_req.env)
 
     # Parse authentication scheme
     auth_parts  = req.authorization.to_s.split(' ', 2)
@@ -101,8 +104,8 @@ req_limit_proc = lambda do |base_req_limit|
 end
 
 ip_limit_proc = lambda do |rack_req|
-  req = ActionDispatch::Request.new rack_req.env
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  req = ActionDispatch::Request.new(rack_req.env)
+  ip  = req.remote_ip
 
   matches = req.path.match /^\/v\d+\/accounts\/([^\/]+)\//
   account = matches[1] unless
@@ -159,7 +162,7 @@ Rack::Attack.throttle("req/ip/auth", limit: 5, period: 1.minute) do |rack_req|
     rack_req.post? && rack_req.path.ends_with?('/tokens')
 
   req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.remote_ip
 
   matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\//)
   next if
@@ -193,7 +196,7 @@ Rack::Attack.throttle("req/ip/rstpwd", limit: 5, period: 1.hour) do |rack_req|
     rack_req.post? && rack_req.path.ends_with?('/passwords')
 
   req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.remote_ip
 
   matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\//)
   next if
@@ -225,7 +228,7 @@ Rack::Attack.throttle("req/ip/mutpwd", limit: 5, period: 10.minutes) do |rack_re
     )
 
   req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.remote_ip
 
   matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\/users\/([^\/]+)\//)
   next if
@@ -257,7 +260,7 @@ Rack::Attack.throttle("req/ip/mutmfa", limit: 5, period: 10.minutes) do |rack_re
     (rack_req.put? && rack_req.path.include?('/second-factors/'))
 
   req = ActionDispatch::Request.new(rack_req.env)
-  ip  = req.headers.fetch('cf-connecting-ip') { req.ip }
+  ip  = req.remote_ip
 
   matches = req.path.match(/^\/v\d+\/accounts\/([^\/]+)\/users\/([^\/]+)\//)
   next if
