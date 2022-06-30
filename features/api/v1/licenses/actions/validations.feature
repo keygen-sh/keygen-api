@@ -11,13 +11,80 @@ Feature: License validation actions
   # Quick validation
   Scenario: Quick validation endpoint should be inaccessible when account is disabled
     Given the account "test1" is canceled
-    Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "license"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin validates a license (default version)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.2)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.2"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.1)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.0)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous quick validates a check-in license that is valid
     Given the current account is "test1"
@@ -81,7 +148,7 @@ Feature: License validation actions
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
@@ -123,7 +190,7 @@ Feature: License validation actions
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
+      { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -169,7 +236,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -216,7 +283,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is suspended", "constant": "SUSPENDED" }
+      { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -247,7 +314,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is banned", "constant": "BANNED" }
+      { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -294,7 +361,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -334,7 +401,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -374,7 +441,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -417,7 +484,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -460,7 +527,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machine cores", "constant": "TOO_MANY_CORES" }
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -492,7 +559,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -525,7 +592,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "must have at least 1 associated machine", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -558,7 +625,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "must have exactly 1 associated machine", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -594,7 +661,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
+      { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -630,7 +697,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
+      { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -666,7 +733,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is expired", "constant": "EXPIRED" }
+      { "valid": true, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -701,7 +768,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -736,7 +803,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -770,7 +837,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -804,7 +871,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -838,7 +905,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -872,7 +939,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -888,6 +955,73 @@ Feature: License validation actions
     When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
+
+  Scenario: Admin validates a license (default version)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.2)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.2"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.1)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a license (v1.0)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Anonymous validates a check-in license that is valid
     Given the current account is "test1"
@@ -945,7 +1079,7 @@ Feature: License validation actions
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -980,7 +1114,7 @@ Feature: License validation actions
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is overdue for check in", "constant": "OVERDUE" }
+      { "valid": false, "detail": "is overdue for check in", "code": "OVERDUE" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1020,7 +1154,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1061,7 +1195,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is suspended", "constant": "SUSPENDED" }
+      { "valid": false, "detail": "is suspended", "code": "SUSPENDED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1088,7 +1222,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is banned", "constant": "BANNED" }
+      { "valid": false, "detail": "is banned", "code": "BANNED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1129,7 +1263,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1171,7 +1305,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1213,7 +1347,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1253,7 +1387,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machines", "constant": "TOO_MANY_MACHINES" }
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1295,7 +1429,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1345,7 +1479,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "has too many associated machine cores", "constant": "TOO_MANY_CORES" }
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1385,7 +1519,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1417,7 +1551,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1450,7 +1584,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "must have at least 1 associated machine", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "must have at least 1 associated machine", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1487,7 +1621,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "must have exactly 1 associated machine", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "must have exactly 1 associated machine", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1513,7 +1647,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "is expired", "constant": "EXPIRED" }
+      { "valid": false, "detail": "is expired", "code": "EXPIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1555,7 +1689,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1597,7 +1731,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -1632,7 +1766,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1667,7 +1801,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1702,7 +1836,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "user scope does not match", "constant": "USER_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -1751,7 +1885,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -1800,7 +1934,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "constant": "MACHINE_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -1852,7 +1986,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID",
+        "code": "VALID",
         "scope": {
           "fingerprint": "$machines[0].fingerprint"
         }
@@ -1908,7 +2042,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "fingerprint is not activated (does not match any associated machines)",
-        "constant": "FINGERPRINT_SCOPE_MISMATCH",
+        "code": "FINGERPRINT_SCOPE_MISMATCH",
         "scope": {
           "fingerprint": "$machines[1].fingerprint"
         }
@@ -1965,7 +2099,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "is expired",
-        "constant": "EXPIRED",
+        "code": "EXPIRED",
         "scope": {
           "fingerprint": "$machines[1].fingerprint"
         }
@@ -2022,7 +2156,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "fingerprint is not activated (does not match any associated machines)",
-        "constant": "FINGERPRINT_SCOPE_MISMATCH",
+        "code": "FINGERPRINT_SCOPE_MISMATCH",
         "scope": {
           "fingerprint": "$machines[1].fingerprint"
         }
@@ -2079,7 +2213,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "fingerprint is not activated (does not match any associated machines)",
-        "constant": "FINGERPRINT_SCOPE_MISMATCH",
+        "code": "FINGERPRINT_SCOPE_MISMATCH",
         "scope": {
           "fingerprint": "$machines[1].fingerprint"
         }
@@ -2127,7 +2261,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2171,7 +2305,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "fingerprint is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2213,7 +2347,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2256,7 +2390,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "policy scope does not match", "constant": "POLICY_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2306,7 +2440,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2356,7 +2490,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -2389,7 +2523,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2423,7 +2557,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope is required", "constant": "PRODUCT_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2457,7 +2591,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "user scope is required", "constant": "USER_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2491,7 +2625,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "policy scope is required", "constant": "POLICY_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2525,7 +2659,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine scope is required", "constant": "MACHINE_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2559,7 +2693,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope is required", "constant": "FINGERPRINT_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2591,7 +2725,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2610,7 +2744,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2629,7 +2763,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2647,7 +2781,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2666,7 +2800,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2685,7 +2819,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2703,7 +2837,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2721,7 +2855,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2756,7 +2890,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2791,7 +2925,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2832,6 +2966,94 @@ Feature: License validation actions
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
 
+  # Versions
+  Scenario: Anonymous validates a license (default version)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license (v1.2)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I use API version "1.2"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license (v1.1)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous validates a license (v1.0)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I use API version "1.0"
+    When I send a POST request to "/accounts/test1/licenses/actions/validate-key" with the following:
+      """
+      {
+        "meta": {
+          "key": "$licenses[0].key"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      """
+    And the response should contain a valid signature header for "test1"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Anonymous validates a valid license by key
     Given the current account is "test1"
     And the current account has 1 "policies"
@@ -2858,7 +3080,7 @@ Feature: License validation actions
     And the JSON response should be a "license" with a lastValidated within seconds of "$time.now.iso"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2889,7 +3111,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -2921,7 +3143,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -2953,7 +3175,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -2985,7 +3207,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3009,7 +3231,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3033,7 +3255,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3057,7 +3279,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3081,7 +3303,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3105,7 +3327,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3129,7 +3351,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3153,7 +3375,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3177,7 +3399,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3201,7 +3423,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3225,7 +3447,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3249,7 +3471,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3273,7 +3495,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3297,7 +3519,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3321,7 +3543,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3358,7 +3580,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3390,7 +3612,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3459,7 +3681,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3501,7 +3723,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3543,7 +3765,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3592,7 +3814,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3641,7 +3863,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "constant": "MACHINE_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "machine is not activated (does not match any associated machines)", "code": "MACHINE_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3685,7 +3907,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine is not activated (has no associated machine)", "constant": "NO_MACHINE" }
+      { "valid": false, "detail": "machine is not activated (has no associated machine)", "code": "NO_MACHINE" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3729,7 +3951,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine is not activated (has no associated machines)", "constant": "NO_MACHINES" }
+      { "valid": false, "detail": "machine is not activated (has no associated machines)", "code": "NO_MACHINES" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3778,7 +4000,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3827,7 +4049,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -3870,7 +4092,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -3923,7 +4145,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -3977,7 +4199,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4033,7 +4255,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4088,7 +4310,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4142,7 +4364,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4194,7 +4416,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match enough associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4246,7 +4468,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4301,7 +4523,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match all associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match all associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4355,7 +4577,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4410,7 +4632,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4462,7 +4684,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope is empty", "constant": "FINGERPRINT_SCOPE_EMPTY" }
+      { "valid": false, "detail": "fingerprint scope is empty", "code": "FINGERPRINT_SCOPE_EMPTY" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -4515,7 +4737,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "constant": "FINGERPRINT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "fingerprint is not activated (does not match any associated machines)", "code": "FINGERPRINT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -4557,7 +4779,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4599,7 +4821,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "policy scope does not match", "constant": "POLICY_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "policy scope does not match", "code": "POLICY_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -4641,7 +4863,7 @@ Feature: License validation actions
     And the JSON response should not contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "does not exist", "constant": "NOT_FOUND" }
+      { "valid": false, "detail": "does not exist", "code": "NOT_FOUND" }
       """
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -4691,7 +4913,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4741,7 +4963,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope does not match", "constant": "PRODUCT_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "product scope does not match", "code": "PRODUCT_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -4781,7 +5003,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4821,7 +5043,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "product scope is required", "constant": "PRODUCT_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "product scope is required", "code": "PRODUCT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4861,7 +5083,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "policy scope is required", "constant": "POLICY_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "policy scope is required", "code": "POLICY_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4901,7 +5123,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "machine scope is required", "constant": "MACHINE_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "machine scope is required", "code": "MACHINE_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4941,7 +5163,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "fingerprint scope is required", "constant": "FINGERPRINT_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "fingerprint scope is required", "code": "FINGERPRINT_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -4983,7 +5205,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "user scope is required", "constant": "USER_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5026,7 +5248,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5069,7 +5291,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "user scope is required", "constant": "USER_SCOPE_REQUIRED" }
+      { "valid": false, "detail": "user scope is required", "code": "USER_SCOPE_REQUIRED" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5112,7 +5334,7 @@ Feature: License validation actions
     And the JSON response should contain a "license"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": false, "detail": "user scope does not match", "constant": "USER_SCOPE_MISMATCH" }
+      { "valid": false, "detail": "user scope does not match", "code": "USER_SCOPE_MISMATCH" }
       """
     And sidekiq should have 1 "webhook" jobs
     And sidekiq should have 1 "metric" job
@@ -5182,7 +5404,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID",
+        "code": "VALID",
         "nonce": 1574265636
       }
       """
@@ -5219,7 +5441,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "is expired",
-        "constant": "EXPIRED",
+        "code": "EXPIRED",
         "nonce": 9048238457
       }
       """
@@ -5254,7 +5476,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID",
+        "code": "VALID",
         "nonce": 1574265297
       }
       """
@@ -5291,7 +5513,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "is missing one or more required entitlements",
-        "constant": "ENTITLEMENTS_MISSING",
+        "code": "ENTITLEMENTS_MISSING",
         "scope": {
           "entitlements": ["FEATURE_A", "FEATURE_B"]
         }
@@ -5334,7 +5556,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "is missing one or more required entitlements",
-        "constant": "ENTITLEMENTS_MISSING",
+        "code": "ENTITLEMENTS_MISSING",
         "scope": {
           "entitlements": ["ENTITLEMENT_A", "ENTITLEMENT_B", "ENTITLEMENT_C"]
         }
@@ -5381,7 +5603,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID",
+        "code": "VALID",
         "scope": {
           "entitlements": ["LICENSE_ENTITLEMENT", "POLICY_ENTITLEMENT"]
         }
@@ -5424,7 +5646,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID",
+        "code": "VALID",
         "scope": {
           "entitlements": ["LICENSE_ENTITLEMENT", "LICENSE_ENTITLEMENT"]
         }
@@ -5463,7 +5685,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "entitlements scope is empty",
-        "constant": "ENTITLEMENTS_SCOPE_EMPTY",
+        "code": "ENTITLEMENTS_SCOPE_EMPTY",
         "scope": {
           "entitlements": []
         }
@@ -5672,7 +5894,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID"
+        "code": "VALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5719,7 +5941,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "machine heartbeat is dead",
-        "constant": "HEARTBEAT_DEAD"
+        "code": "HEARTBEAT_DEAD"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5766,7 +5988,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID"
+        "code": "VALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5813,7 +6035,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "machine heartbeat is dead",
-        "constant": "HEARTBEAT_DEAD"
+        "code": "HEARTBEAT_DEAD"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5863,7 +6085,7 @@ Feature: License validation actions
       {
         "valid": true,
         "detail": "is valid",
-        "constant": "VALID"
+        "code": "VALID"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5913,7 +6135,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "machine heartbeat is dead",
-        "constant": "HEARTBEAT_DEAD"
+        "code": "HEARTBEAT_DEAD"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -5962,7 +6184,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "machine heartbeat is required",
-        "constant": "HEARTBEAT_NOT_STARTED"
+        "code": "HEARTBEAT_NOT_STARTED"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -6011,7 +6233,7 @@ Feature: License validation actions
       {
         "valid": false,
         "detail": "machine heartbeat is required",
-        "constant": "HEARTBEAT_NOT_STARTED"
+        "code": "HEARTBEAT_NOT_STARTED"
       }
       """
     And sidekiq should have 0 "webhook" jobs
@@ -6047,7 +6269,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
 
   Scenario: A user validates a license key scoped to their own email
@@ -6078,7 +6300,7 @@ Feature: License validation actions
     Then the response status should be "200"
     And the JSON response should contain meta which includes the following:
       """
-      { "valid": true, "detail": "is valid", "constant": "VALID" }
+      { "valid": true, "detail": "is valid", "code": "VALID" }
       """
 
   Scenario: A user validates a license key scoped to a different user

@@ -12,15 +12,15 @@ module Api::V1::Licenses::Actions
     def quick_validate_by_id
       authorize license
 
-      valid, detail, constant = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
+      valid, detail, code = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
-        valid: valid,
-        detail: detail,
-        constant: constant,
+        valid:,
+        detail:,
+        code:,
       }
 
-      Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant}"
+      Keygen.logger.info "[license.quick-validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{code}"
 
       Current.resource = license if
         license.present?
@@ -32,12 +32,12 @@ module Api::V1::Licenses::Actions
     def validate_by_id
       authorize license
 
-      valid, detail, constant = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
+      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
       meta = {
         ts: Time.current,
-        valid: valid,
-        detail: detail,
-        constant: constant,
+        valid:,
+        detail:,
+        code:,
       }
 
       if nonce = validation_params.dig(:meta, :nonce)
@@ -48,7 +48,7 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Keygen.logger.info "[license.validate] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{code} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if license.present?
         Current.resource = license
@@ -82,12 +82,12 @@ module Api::V1::Licenses::Actions
         skip_authorization
       end
 
-      valid, detail, constant = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])
+      valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])
       meta = {
         ts: Time.current,
-        valid: valid,
-        detail: detail,
-        constant: constant,
+        valid:,
+        detail:,
+        code:,
       }
 
       if nonce = validation_params[:meta][:nonce]
@@ -98,7 +98,7 @@ module Api::V1::Licenses::Actions
         meta[:scope] = scope
       end
 
-      Keygen.logger.info "[license.validate-key] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{constant} validation_scope=#{scope} validation_nonce=#{nonce}"
+      Keygen.logger.info "[license.validate-key] account_id=#{current_account.id} license_id=#{license&.id} validation_valid=#{valid} validation_detail=#{detail} validation_code=#{code} validation_scope=#{scope} validation_nonce=#{nonce}"
 
       if license.present?
         Current.resource = license
