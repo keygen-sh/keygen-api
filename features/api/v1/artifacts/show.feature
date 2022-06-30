@@ -982,6 +982,154 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/dir/Test-App-2.0.0.zip"
     Then the response status should be "404"
 
+  Scenario: License retrieves an artifact with a conflicting filename (open/licensed)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name         | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Freemium App | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Premium App  | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename   | filetype | platform |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
+      | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/stable.yml"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "data": {
+            "type": "releases",
+            "id": "f14ef993-f821-44c9-b2af-62e27f37f8db"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/f14ef993-f821-44c9-b2af-62e27f37f8db"
+          }
+        }
+      }
+      """
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "stable.yml" }
+      """
+
+  Scenario: License retrieves an artifact with a conflicting filename (open/licensed, with product qualifier)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name         | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Freemium App | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Premium App  | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename   | filetype | platform |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
+      | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/artifacts/stable.yml?product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "data": {
+            "type": "releases",
+            "id": "aa067117-948f-46e8-977f-6998ad366a97"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/aa067117-948f-46e8-977f-6998ad366a97"
+          }
+        }
+      }
+      """
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "stable.yml" }
+      """
+
+  Scenario: Anonymous retrieves an artifact with a conflicting filename (open/open)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name  | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | App 1 | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | App 2 | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename   | filetype | platform |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
+      | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
+    When I send a GET request to "/accounts/test1/artifacts/stable.yml"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "data": {
+            "type": "releases",
+            "id": "f14ef993-f821-44c9-b2af-62e27f37f8db"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/f14ef993-f821-44c9-b2af-62e27f37f8db"
+          }
+        }
+      }
+      """
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "stable.yml" }
+      """
+
+  Scenario: Anonymous retrieves an artifact with a conflicting filename (open/open, with product qualifier)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name  | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | App 1 | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | App 2 | OPEN                  |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 2.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename   | filetype | platform |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
+      | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
+    When I send a GET request to "/accounts/test1/artifacts/stable.yml?product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact" with the following relationships:
+      """
+      {
+        "release": {
+          "data": {
+            "type": "releases",
+            "id": "aa067117-948f-46e8-977f-6998ad366a97"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/aa067117-948f-46e8-977f-6998ad366a97"
+          }
+        }
+      }
+      """
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "stable.yml" }
+      """
+
   # Licensed distribution strategy
   Scenario: Anonymous retreives an artifact for a LICENSED release
     Given the current account is "test1"
