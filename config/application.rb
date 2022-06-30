@@ -64,6 +64,12 @@ module Keygen
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries           = true
 
+    # Add support for trusted proxies
+    config.action_dispatch.trusted_proxies =
+      ActionDispatch::RemoteIp::TRUSTED_PROXIES + ENV.fetch('TRUSTED_PROXIES') { '' }
+                                                     .split(',')
+                                                     .map { IPAddr.new(_1.strip) }
+
     # Use mailers queue
     config.action_mailer.deliver_later_queue_name = :mailers
 
