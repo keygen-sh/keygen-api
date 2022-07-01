@@ -335,10 +335,10 @@ class License < ApplicationRecord
     )
   }
 
-  scope :active, -> (start_date = 90.days.ago) { where 'created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
+  scope :active, -> (start_date = 90.days.ago) { where 'licenses.created_at >= :start_date OR last_validated_at >= :start_date', start_date: start_date }
   scope :inactive, -> (start_date = 90.days.ago) {
     where(
-      'created_at < :start_date AND (last_validated_at IS NULL OR last_validated_at < :start_date)',
+      'licenses.created_at < :start_date AND (last_validated_at IS NULL OR last_validated_at < :start_date)',
       start_date: start_date,
     )
   }
