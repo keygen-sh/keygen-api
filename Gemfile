@@ -33,7 +33,7 @@ gem 'stripe', '~> 5.43'
 gem 'pundit'
 
 # Cryptography
-gem 'openssl', '~> 2.2.1'
+gem 'openssl', '~> 3.0.0'
 gem 'ed25519'
 gem 'jwt'
 
