@@ -13,7 +13,7 @@ gem 'rack-attack', '~> 6.6'
 gem 'rack-cors'
 
 # Redis for caching and background jobs
-gem 'redis'
+gem 'redis', '~> 4.7.1'
 
 # API migrations
 gem 'request_migrations', '~> 1.0'
