@@ -996,8 +996,8 @@ Feature: Show release artifact
       | release_id                           | filename   | filetype | platform |
       | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
       | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/stable.yml"
@@ -1035,8 +1035,8 @@ Feature: Show release artifact
       | release_id                           | filename   | filetype | platform |
       | f14ef993-f821-44c9-b2af-62e27f37f8db | stable.yml | yml      | darwin   |
       | aa067117-948f-46e8-977f-6998ad366a97 | stable.yml | yml      | darwin   |
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts/stable.yml?product=6198261a-48b5-4445-a045-9fed4afc7735"
