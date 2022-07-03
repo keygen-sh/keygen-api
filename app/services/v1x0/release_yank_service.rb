@@ -26,7 +26,7 @@ class V1x0::ReleaseYankService < BaseService
 
   def call
     s3 = Aws::S3::Client.new
-    s3.delete_object(bucket: 'keygen-dist', key: release.s3_object_key)
+    s3.delete_object(bucket: 'keygen-dist', key: artifact.s3_object_key)
 
     release.touch(:yanked_at)
     artifact.destroy

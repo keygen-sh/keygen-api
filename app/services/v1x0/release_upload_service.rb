@@ -28,7 +28,7 @@ class V1x0::ReleaseUploadService < BaseService
   def call
     signer = Aws::S3::Presigner.new
     ttl    = 1.hour # High TTL for slow upload connections: keygen => redirect => aws
-    url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl.to_i)
+    url    = signer.presigned_url(:put_object, bucket: 'keygen-dist', key: artifact.s3_object_key, expires_in: ttl.to_i)
     link   = release.upload_links.create!(account: account, url: url, ttl: ttl)
 
     # Wait for the artifact to be uploaded
