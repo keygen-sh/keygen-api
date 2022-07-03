@@ -34,10 +34,15 @@ class V1x0::ReleaseDownloadService < BaseService
   end
 
   def call
+    artifacts = release.artifacts
+    artifacts = artifacts.for_platform(platform) if platform.present?
+    artifacts = artifacts.for_filetype(filetype) if filetype.present?
+    artifact  = artifacts.sole
+
     # Assert artifact exists before redirecting to S3
     if !artifact.etag?
       s3  = Aws::S3::Client.new
-      obj = s3.head_object(bucket: 'keygen-dist', key: release.s3_object_key)
+      obj = s3.head_object(bucket: 'keygen-dist', key: artifact.s3_object_key)
 
       artifact.update!(
         content_length: obj.content_length,
@@ -49,7 +54,7 @@ class V1x0::ReleaseDownloadService < BaseService
     # TODO(ezekg) Check if IP address is from EU and use: bucket=keygen-dist-eu region=eu-west-2
     # NOTE(ezekg) Check obj.replication_status for EU
     signer   = Aws::S3::Presigner.new
-    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: release.s3_object_key, expires_in: ttl&.to_i)
+    url      = signer.presigned_url(:get_object, bucket: 'keygen-dist', key: artifact.s3_object_key, expires_in: ttl&.to_i)
     link     =
       if upgrade?
         release.upgrade_links.create!(account: account, url: url, ttl: ttl)
@@ -61,6 +66,10 @@ class V1x0::ReleaseDownloadService < BaseService
       redirect_url: link.url,
       artifact: artifact,
     )
+  rescue ActiveRecord::SoleRecordExceeded
+    raise TooManyArtifactsError.new('multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)')
+  rescue ActiveRecord::RecordNotFound
+    raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)')
   rescue Aws::S3::Errors::NotFound,
          Timeout::Error => e
     Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
@@ -79,21 +88,5 @@ class V1x0::ReleaseDownloadService < BaseService
 
   def upgrade?
     upgrade
-  end
-
-  def artifact
-    artifacts = release.artifacts
-
-    artifacts = artifacts.for_platform(platform) if
-      platform.present?
-
-    artifacts = artifacts.for_filetype(filetype) if
-      filetype.present?
-
-    artifacts.sole
-  rescue ActiveRecord::SoleRecordExceeded
-    raise TooManyArtifactsError.new('multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)')
-  rescue ActiveRecord::RecordNotFound
-    raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)')
   end
 end

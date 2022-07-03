@@ -344,10 +344,6 @@ class Release < ApplicationRecord
   delegate :stable?, :pre_release?, :rc?, :beta?, :alpha?,
     to: :channel
 
-  # FIXME(ezekg) For v1.0 backwards compatibility
-  delegate :s3_object_key,
-    to: :artifact
-
   # FIXME(ezekg) Setters for v1.0 backwards compatibility
   def platform=(key)
     assign_attributes(artifact_attributes: { platform_attributes: { key: } })
