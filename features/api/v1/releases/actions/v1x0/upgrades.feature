@@ -2571,7 +2571,10 @@ Feature: Release upgrade actions
     And I use API version "1.0"
     When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "303"
-    And the JSON response should be an "artifact"
+    And the JSON response should be an "artifact" with the following attributes:
+      """
+      { "filename": "Test-App-1.4.0.dmg" }
+      """
     And the JSON response should contain meta which includes the following:
       """
       {
