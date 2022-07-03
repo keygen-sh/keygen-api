@@ -14,7 +14,6 @@ module Api::V1::Releases::Relationships::V1x0
       download = ::V1x0::ReleaseDownloadService.call(
         account: current_account,
         release: release,
-        artifact: release.artifacts.sole,
         ttl: artifact_query[:ttl],
       )
 
@@ -27,8 +26,6 @@ module Api::V1::Releases::Relationships::V1x0
       render jsonapi: download.artifact, status: :see_other, location: download.redirect_url
     rescue ActiveRecord::SoleRecordExceeded
       render_unprocessable_entity detail: 'multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)'
-    rescue ActiveRecord::RecordNotFound
-      render_not_found detail: 'artifact does not exist (ensure it has been uploaded)'
     rescue ::V1x0::ReleaseDownloadService::InvalidTTLError => e
       render_bad_request detail: e.message, source: { parameter: :ttl }
     rescue ::V1x0::ReleaseDownloadService::InvalidArtifactError => e
