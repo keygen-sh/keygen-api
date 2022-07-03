@@ -61,7 +61,7 @@ Feature: Release artifact relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)"
+        "detail": "multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)"
       }
       """
 
@@ -1579,6 +1579,6 @@ Feature: Release artifact relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)"
+        "detail": "multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)"
       }
       """

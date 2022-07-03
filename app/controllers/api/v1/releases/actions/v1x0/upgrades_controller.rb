@@ -116,8 +116,8 @@ module Api::V1::Releases::Actions::V1x0
 
         render status: :no_content
       end
-    rescue ActiveRecord::SoleRecordExceeded
-      render_unprocessable_entity detail: 'multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)'
+    rescue ::V1x0::ReleaseDownloadService::TooManyArtifactsError => e
+      render_unprocessable_entity detail: e.message
     rescue ::V1x0::ReleaseDownloadService::InvalidArtifactError => e
       Keygen.logger.warn "[releases.check_for_upgrade] No artifact found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
 

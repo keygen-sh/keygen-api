@@ -91,6 +91,8 @@ class V1x0::ReleaseDownloadService < BaseService
       filetype.present?
 
     artifacts.sole
+  rescue ActiveRecord::SoleRecordExceeded
+    raise TooManyArtifactsError.new('multiple artifacts are not supported by this release (see upgrading from v1.0 to v1.1)')
   rescue ActiveRecord::RecordNotFound
     raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)')
   end
