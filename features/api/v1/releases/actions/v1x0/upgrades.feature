@@ -2538,3 +2538,86 @@ Feature: Release upgrade actions
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
+
+  Scenario: License retrieves an upgrade for a release that has multiple artifacts
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel | api_version |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | 1.0         |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  | 1.0         |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | 1.0         |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | 1.0         |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable  | 1.0         |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable  | 1.1         |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                | filetype | platform |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0.dmg      | dmg      | macos    |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.2.0.dmg      | dmg      | macos    |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | Test-App-1.0.1.zip      | zip      | macos    |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | Test-App-1.1.0.zip      | zip      | macos    |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | Test-App-1.3.0.zip      | zip      | macos    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.dmg      | dmg      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.exe      | exe      | win32    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.zip      | zip      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.appimage | appimage | linux    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | stable.yml              | yml      |          |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "303"
+    And the JSON response should be an "artifact"
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.4.0"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a release that has multiple artifacts (same platform/filetype)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name     |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel | api_version |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  | 1.0         |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0   | stable  | 1.0         |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  | 1.0         |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0   | stable  | 1.0         |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.3.0   | stable  | 1.0         |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.4.0   | stable  | 1.1         |
+    And the current account has the following "artifact" rows:
+      | release_id                           | filename                | filetype | platform |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | Test-App-1.0.0.dmg      | dmg      | macos    |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | Test-App-1.2.0.dmg      | dmg      | macos    |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | Test-App-1.0.1.zip      | zip      | macos    |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | Test-App-1.1.0.zip      | zip      | macos    |
+      | dde54ea8-731d-4375-9d57-186ef01f3fcb | Test-App-1.3.0.zip      | zip      | macos    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.dmg      | dmg      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-Installer.dmg  | dmg      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.exe      | exe      | win32    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.zip      | zip      | darwin   |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | Test-App-1.4.0.appimage | appimage | linux    |
+      | 21088509-2dfc-4459-a8a2-3204136ad1df | stable.yml              | yml      |          |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/actions/upgrade?version=1.0.0&channel=stable&platform=darwin&filetype=dmg&product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)"
+      }
+      """

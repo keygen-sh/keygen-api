@@ -9,15 +9,15 @@ class V1x0::ReleaseDownloadService < BaseService
   class InvalidTTLError < StandardError; end
   class DownloadResult < OpenStruct; end
 
-  def initialize(account:, release:, ttl: 1.hour, upgrade: false)
+  def initialize(account:, release:, artifact:, ttl: 1.hour, upgrade: false)
     raise InvalidAccountError.new('account must be present') unless
       account.present?
 
     raise InvalidReleaseError.new('release must be present') unless
       release.present?
 
-    raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)') unless
-      release.artifacts.any?
+    raise InvalidArtifactError.new('artifact must be present') unless
+      artifact.present? && artifact.release == release
 
     raise YankedReleaseError.new('has been yanked') if
       release.yanked?
@@ -30,13 +30,12 @@ class V1x0::ReleaseDownloadService < BaseService
 
     @account  = account
     @release  = release
+    @artifact = artifact
     @ttl      = ttl
     @upgrade  = upgrade
   end
 
   def call
-    artifact = release.artifacts.sole
-
     # Assert artifact exists before redirecting to S3
     if !artifact.etag?
       s3  = Aws::S3::Client.new
@@ -64,14 +63,11 @@ class V1x0::ReleaseDownloadService < BaseService
       redirect_url: link.url,
       artifact: artifact,
     )
-  rescue ActiveRecord::RecordNotFound,
-         Aws::S3::Errors::NotFound,
+  rescue Aws::S3::Errors::NotFound,
          Timeout::Error => e
     Keygen.logger.warn "[release_download_service] No artifact found: account=#{account.id} release=#{release.id} version=#{release.version} reason=#{e.class.name}"
 
     raise InvalidArtifactError.new('artifact is unavailable (ensure it has been fully uploaded)')
-  rescue ActiveRecord::SoleRecordExceeded
-    raise TooManyArtifactsError.new('too many artifacts for release')
   end
 
   private
