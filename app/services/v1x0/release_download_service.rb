@@ -9,15 +9,12 @@ class V1x0::ReleaseDownloadService < BaseService
   class InvalidTTLError < StandardError; end
   class DownloadResult < OpenStruct; end
 
-  def initialize(account:, release:, artifact:, ttl: 1.hour, upgrade: false)
+  def initialize(account:, release:, platform: nil, filetype: nil, ttl: 1.hour, upgrade: false)
     raise InvalidAccountError.new('account must be present') unless
       account.present?
 
     raise InvalidReleaseError.new('release must be present') unless
       release.present?
-
-    raise InvalidArtifactError.new('artifact must be present') unless
-      artifact.present? && artifact.release == release
 
     raise YankedReleaseError.new('has been yanked') if
       release.yanked?
@@ -30,7 +27,8 @@ class V1x0::ReleaseDownloadService < BaseService
 
     @account  = account
     @release  = release
-    @artifact = artifact
+    @platform = platform
+    @filetype = filetype
     @ttl      = ttl
     @upgrade  = upgrade
   end
@@ -74,11 +72,26 @@ class V1x0::ReleaseDownloadService < BaseService
 
   attr_reader :account,
               :release,
-              :artifact,
+              :platform,
+              :filetype,
               :upgrade,
               :ttl
 
   def upgrade?
     upgrade
+  end
+
+  def artifact
+    artifacts = release.artifacts
+
+    artifacts = artifacts.for_platform(platform) if
+      platform.present?
+
+    artifacts = artifacts.for_filetype(filetype) if
+      filetype.present?
+
+    artifacts.sole
+  rescue ActiveRecord::RecordNotFound
+    raise InvalidArtifactError.new('artifact does not exist (ensure it has been uploaded)')
   end
 end
