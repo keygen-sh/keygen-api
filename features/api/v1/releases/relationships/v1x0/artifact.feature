@@ -61,7 +61,7 @@ Feature: Release artifact relationship
       """
       {
         "title": "Unprocessable entity",
-        "detail": "multiple artifacts are not supported by this endpoint"
+        "detail": "multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)"
       }
       """
 
@@ -1561,3 +1561,24 @@ Feature: Release artifact relationship
     And sidekiq should process 1 "event-log" job
     And sidekiq should process 1 "event-notification" job
     And the first "license" should have the expiry "2042-01-03T14:18:02.743Z"
+
+  Scenario: License downloads an artifact for a release with multiple artifacts
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the current account has 1 "release" for the first "product"
+    And the current account has 2 "artifacts" for the first "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a GET request to "/accounts/test1/releases/$0/artifact"
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable entity",
+        "detail": "multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)"
+      }
+      """

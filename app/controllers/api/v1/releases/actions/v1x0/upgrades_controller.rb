@@ -70,9 +70,11 @@ module Api::V1::Releases::Actions::V1x0
       Current.resource = release
     end
 
-    def check_for_upgrade(**kwargs)
+    def check_for_upgrade(platform:, filetype:, **kwargs)
       upgrade = ::V1x0::ReleaseUpgradeService.call(
         account: current_account,
+        platform:,
+        filetype:,
         **kwargs,
       )
 
@@ -81,7 +83,12 @@ module Api::V1::Releases::Actions::V1x0
       if upgrade.next_release.present?
         authorize upgrade.next_release, :download?
 
-        download = ::V1x0::ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, ttl: 1.hour, upgrade: true)
+        artifact = upgrade.next_release.artifacts
+                                       .for_platform(platform)
+                                       .for_filetype(filetype)
+                                       .sole
+
+        download = ::V1x0::ReleaseDownloadService.call(account: current_account, release: upgrade.next_release, artifact:, ttl: 1.hour, upgrade: true)
         meta     = {
           current: upgrade.current_version,
           next: upgrade.next_version,
@@ -106,11 +113,9 @@ module Api::V1::Releases::Actions::V1x0
 
         render status: :no_content
       end
-    rescue ::V1x0::ReleaseDownloadService::InvalidArtifactError => e
-      Keygen.logger.warn "[releases.check_for_upgrade] No artifact found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version} reason=#{e.class.name}"
-
-      # NOTE(ezekg) This scenario will likely only happen when we're in-between creating a new release
-      #             and uploading it. In the interim, we'll act as if the release doesn't exist yet.
+    rescue ActiveRecord::SoleRecordExceeded
+      render_unprocessable_entity detail: 'multiple artifacts per-release is not supported by this endpoint (see upgrading from v1.0 to v1.1)'
+    rescue ActiveRecord::RecordNotFound
       render status: :no_content
     end
 
