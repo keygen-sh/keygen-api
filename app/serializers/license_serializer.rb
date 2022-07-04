@@ -25,10 +25,6 @@ class LicenseSerializer < BaseSerializer
   attribute :floating do
     @object.floating?
   end
-  # FIXME(ezekg) Remove this attribute
-  attribute :concurrent do
-    @object.allow_overage?
-  end
   attribute :protected do
     @object.protected?
   end
