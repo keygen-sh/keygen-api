@@ -125,6 +125,7 @@ Feature: Create policy
           "attributes": {
             "name": "Premium Add-On",
             "fingerprintUniquenessStrategy": "UNIQUE_PER_PRODUCT",
+            "overageStrategy": "NO_OVERAGE",
             "maxMachines": 3,
             "floating": true,
             "strict": false,
@@ -144,6 +145,7 @@ Feature: Create policy
     Then the response status should be "201"
     And the JSON response should be a "policy" with the maxMachines "3"
     And the JSON response should be a "policy" with the fingerprintUniquenessStrategy "UNIQUE_PER_PRODUCT"
+    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
     And the JSON response should be a "policy" with a nil maxUses
     And the JSON response should be a "policy" that is not strict
     And the JSON response should be a "policy" with a nil scheme
@@ -204,9 +206,9 @@ Feature: Create policy
         "heartbeatCullStrategy": "KEEP_DEAD",
         "heartbeatResurrectionStrategy": "5_MINUTE_REVIVE",
         "leasingStrategy": "PER_LICENSE",
+        "overageStrategy": "NO_OVERAGE",
         "maxUses": 5,
-        "protected": true,
-        "concurrent": true
+        "protected": true
       }
       """
     And sidekiq should have 2 "webhook" jobs
@@ -755,6 +757,435 @@ Feature: Create policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a policy that has an always allow overage strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALWAYS_ALLOW_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
+    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even machine limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 2
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
+    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd machine limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 3
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max machines value)",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (even core limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 2,
+            "maxCores": 16
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
+    And the JSON response should be a "policy" with the overageStrategy "ALLOW_1_5X_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 1.5x overage strategy (odd core limit)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": true,
+            "maxMachines": 2,
+            "maxCores": 69
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max cores value)",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a node-locked policy that has an allow 1.5x overage strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_1_5X_OVERAGE",
+            "floating": false,
+            "maxMachines": 1
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE for node-locked policy)",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an allow 2x overage strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALLOW_2X_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Allow Overage Strategy"
+    And the JSON response should be a "policy" with the overageStrategy "ALLOW_2X_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a no overage strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Disallow Overage Strategy",
+            "overageStrategy": "NO_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the name "Disallow Overage Strategy"
+    And the JSON response should be a "policy" with the overageStrategy "NO_OVERAGE"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an invalid overage strategy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Invalid Overage Strategy",
+            "overageStrategy": "INVALID_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "unsupported overage strategy",
+        "code": "OVERAGE_STRATEGY_NOT_ALLOWED",
+        "source": {
+          "pointer": "/data/attributes/overageStrategy"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has an always allow overage strategy (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Allow Overage Strategy",
+            "overageStrategy": "ALWAYS_ALLOW_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Allow Overage Strategy",
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "concurrent": true
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a policy that has a no overage strategy (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Disallow Overage Strategy",
+            "overageStrategy": "NO_OVERAGE"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the following attributes:
+      """
+      {
+        "name": "Disallow Overage Strategy",
+        "overageStrategy": "NO_OVERAGE",
+        "concurrent": false
+      }
+      """
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a policy that has a custom heartbeat duration
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -938,8 +1369,7 @@ Feature: Create policy
         "data": {
           "type": "policies",
           "attributes": {
-            "name": "Actionsack Map Pack 2",
-            "concurrent": false
+            "name": "Actionsack Map Pack 2"
           },
           "relationships": {
             "product": {
@@ -954,7 +1384,6 @@ Feature: Create policy
       """
     Then the response status should be "201"
     And the JSON response should be a "policy" that is not protected
-    And the JSON response should be a "policy" that is not concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2154,6 +2583,106 @@ Feature: Create policy
     And the JSON response should be a "policy" with the scheme "LEGACY_ENCRYPT"
     And the JSON response should be a "policy" that is encrypted
     And the JSON response should be a "policy" with the name "Default Scheme"
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a concurrent policy (v1.2)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.2"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Concurrent Policy",
+            "concurrent": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a concurrent policy (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Concurrent Policy",
+            "concurrent": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the JSON response should be a "policy" that is concurrent
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a concurrent policy (v1.0)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a POST request to "/accounts/test1/policies" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "attributes": {
+            "name": "Concurrent Policy",
+            "concurrent": true
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "policy" with the overageStrategy "ALWAYS_ALLOW_OVERAGE"
+    And the JSON response should be a "policy" that is concurrent
     And sidekiq should have 2 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

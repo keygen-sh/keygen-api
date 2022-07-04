@@ -95,7 +95,9 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            param :concurrent, type: :boolean, optional: true
+            if current_api_version <= '1.1'
+              param :concurrent, type: :boolean, optional: true
+            end
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :max_processes, type: :integer, optional: true, allow_nil: true
             param :max_cores, type: :integer, optional: true, allow_nil: true
@@ -107,6 +109,7 @@ module Api::V1
             param :transfer_strategy, type: :string, optional: true
             param :authentication_strategy, type: :string, optional: true
             param :leasing_strategy, type: :string, optional: true
+            param :overage_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true
@@ -142,7 +145,9 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            param :concurrent, type: :boolean, optional: true
+            if current_api_version <= '1.1'
+              param :concurrent, type: :boolean, optional: true
+            end
             param :max_machines, type: :integer, optional: true, allow_nil: true
             param :max_processes, type: :integer, optional: true, allow_nil: true
             param :max_cores, type: :integer, optional: true, allow_nil: true
@@ -154,6 +159,7 @@ module Api::V1
             param :transfer_strategy, type: :string, optional: true
             param :authentication_strategy, type: :string, optional: true
             param :leasing_strategy, type: :string, optional: true
+            param :overage_strategy, type: :string, optional: true
             param :require_product_scope, type: :boolean, optional: true
             param :require_policy_scope, type: :boolean, optional: true
             param :require_machine_scope, type: :boolean, optional: true

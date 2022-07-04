@@ -31,6 +31,7 @@ Feature: Update policy
       }
       """
     And I use an authentication token
+    And I use API version "1.1"
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
       {
@@ -39,7 +40,6 @@ Feature: Update policy
           "id": "$policies[0].id",
           "attributes": {
             "requireFingerprintScope": true,
-            "concurrent": false,
             "name": "Trial",
             "maxCores": 32,
             "maxUses": 3
@@ -50,7 +50,6 @@ Feature: Update policy
     Then the response status should be "200"
     And the JSON response should be a "policy" with a duration that is not nil
     And the JSON response should be a "policy" with a requireFingerprintScope
-    And the JSON response should be a "policy" that is not concurrent
     And the JSON response should be a "policy" with the name "Trial"
     And the JSON response should be a "policy" with the maxCores "32"
     And the JSON response should be a "policy" with the maxUses "3"
@@ -80,6 +79,7 @@ Feature: Update policy
             "heartbeatCullStrategy": "KEEP_DEAD",
             "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
             "leasingStrategy": "PER_LICENSE",
+            "overageStrategy": "NO_OVERAGE",
             "requireHeartbeat": true,
             "name": "Test"
           }
@@ -99,6 +99,7 @@ Feature: Update policy
         "heartbeatCullStrategy": "KEEP_DEAD",
         "heartbeatResurrectionStrategy": "ALWAYS_REVIVE",
         "leasingStrategy": "PER_LICENSE",
+        "overageStrategy": "NO_OVERAGE",
         "requireHeartbeat": true,
         "name": "Test"
       }
@@ -340,4 +341,80 @@ Feature: Update policy
     Then the response status should be "400"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a policy to be concurrent (v1.2)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    And I use API version "1.2"
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "concurrent": false
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a policy to be concurrent (v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "concurrent": false
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with an overageStrategy "NO_OVERAGE"
+    And the JSON response should be a "policy" that is not concurrent
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin updates a policy to be concurrent (v1.0)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "policy"
+    And I use an authentication token
+    And I use API version "1.0"
+    When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "policies",
+          "id": "$policies[0].id",
+          "attributes": {
+            "concurrent": false
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "policy" with an overageStrategy "NO_OVERAGE"
+    And the JSON response should be a "policy" that is not concurrent
+    And sidekiq should have 2 "webhook" jobs
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job

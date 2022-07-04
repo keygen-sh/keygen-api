@@ -455,6 +455,7 @@ Feature: License validation actions
     And all "policies" have the following attributes:
       """
       {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
         "maxMachines": 5,
         "maxCores": 16,
         "floating": true,
@@ -498,6 +499,7 @@ Feature: License validation actions
     And all "policies" have the following attributes:
       """
       {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
         "maxMachines": 5,
         "maxCores": 16,
         "floating": true,
@@ -2052,7 +2054,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration stategy: revoke)
+  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: revoke)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -2109,7 +2111,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration stategy: restrict)
+  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: restrict)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -2166,7 +2168,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration stategy: allow)
+  Scenario: An admin validates an expired license scoped to a mismatched machine fingerprint (expiration strategy: allow)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
