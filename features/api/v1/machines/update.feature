@@ -164,9 +164,9 @@ Feature: Update machine
     And the first "policy" has the following attributes:
       """
       {
+        "overageStrategy": "NO_OVERAGE",
         "maxMachines": 1,
         "maxCores": 12,
-        "concurrent": false,
         "floating": false,
         "strict": true
       }
@@ -206,7 +206,7 @@ Feature: Update machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a non-concurrent machine's core count to an amount that exceeds their maximum core limit
+  Scenario: Admin updates a machine's core count to an amount that exceeds their maximum core limit (no overages)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -214,9 +214,9 @@ Feature: Update machine
     And the first "policy" has the following attributes:
       """
       {
+        "overageStrategy": "NO_OVERAGE",
         "maxMachines": 2,
         "maxCores": 12,
-        "concurrent": false,
         "floating": true,
         "strict": true
       }
@@ -265,7 +265,7 @@ Feature: Update machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin updates a concurrent-capable machine's core count to an amount that exceeds their maximum core limit
+  Scenario: Admin updates a machine's core count to an amount that exceeds their maximum core limit (allows overages)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 2 "webhook-endpoints"
@@ -273,9 +273,9 @@ Feature: Update machine
     And the first "policy" has the following attributes:
       """
       {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
         "maxMachines": 5,
         "maxCores": 12,
-        "concurrent": true,
         "floating": true,
         "strict": false
       }

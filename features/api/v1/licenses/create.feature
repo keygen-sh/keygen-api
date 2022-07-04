@@ -1270,8 +1270,6 @@ Feature: Create license
     And the current account should have 1 "license"
     And the JSON response should be a "license" with the scheme "LEGACY_ENCRYPT"
     And the JSON response should be a "license" that is encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1428,8 +1426,6 @@ Feature: Create license
     And the JSON response should be a "license" with the encrypted key "some-encrypted-payload-here" using "RSA_2048_PKCS1_ENCRYPT"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_ENCRYPT"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1597,8 +1593,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_SIGN"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1700,8 +1694,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -1976,8 +1968,6 @@ Feature: Create license
     And the JSON response should be a "license" with the JWT key '{ "exp": 4691671952 }' using "RSA_2048_JWT_RS256"
     And the JSON response should be a "license" with the scheme "RSA_2048_JWT_RS256"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2088,8 +2078,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_SIGN_V2"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_SIGN_V2"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2191,8 +2179,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "some-signed-payload-here" using "RSA_2048_PKCS1_PSS_SIGN_V2"
     And the JSON response should be a "license" with the scheme "RSA_2048_PKCS1_PSS_SIGN_V2"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2496,8 +2482,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "ed25519-signed-payload" using "ED25519_SIGN"
     And the JSON response should be a "license" with the scheme "ED25519_SIGN"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -2545,8 +2529,6 @@ Feature: Create license
     And the JSON response should be a "license" with the signed key of "short" using "ED25519_SIGN"
     And the JSON response should be a "license" with the scheme "ED25519_SIGN"
     And the JSON response should be a "license" that is not encrypted
-    And the JSON response should be a "license" that is not strict
-    And the JSON response should be a "license" that is not floating
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -3110,7 +3092,6 @@ Feature: Create license
     Then the response status should be "201"
     And the current account should have 1 "license"
     And the current account should have 3 "keys"
-    And the JSON response should be a "license" that is not floating
     And the JSON response should be a "license" that is strict
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job

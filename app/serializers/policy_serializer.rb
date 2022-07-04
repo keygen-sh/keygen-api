@@ -12,7 +12,6 @@ class PolicySerializer < BaseSerializer
   attribute :max_processes
   attribute :max_cores
   attribute :max_uses
-  attribute :concurrent
   attribute :fingerprint_uniqueness_strategy
   attribute :fingerprint_matching_strategy
   attribute :expiration_strategy
@@ -20,6 +19,7 @@ class PolicySerializer < BaseSerializer
   attribute :transfer_strategy
   attribute :authentication_strategy
   attribute :leasing_strategy
+  attribute :overage_strategy
   attribute :scheme
   attribute :encrypted
   attribute :protected

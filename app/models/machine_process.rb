@@ -47,15 +47,32 @@ class MachineProcess < ApplicationRecord
     next unless
       machine.present? && machine.max_processes.present?
 
+    next if
+      license.present? && license.always_allow_overage?
+
     case
     when lease_per_machine?
+      next_process_count = machine.processes.count + 1
       next unless
-        machine.processes.count >= machine.max_processes
+        next_process_count > machine.max_processes
+
+      next if
+        license.allow_1_5x_overage? && next_process_count <= machine.max_processes * 1.5
+
+      next if
+        license.allow_2x_overage? && next_process_count <= machine.max_processes * 2
 
       errors.add :base, :limit_exceeded, message: "process count has exceeded maximum allowed for machine (#{machine.max_processes})"
     when lease_per_license?
+      next_process_count = license.processes.count + 1
       next unless
-        license.processes.count >= license.max_processes
+        next_process_count > license.max_processes
+
+      next if
+        license.allow_1_5x_overage? && next_process_count <= license.max_processes * 1.5
+
+      next if
+        license.allow_2x_overage? && next_process_count <= license.max_processes * 2
 
       errors.add :base, :limit_exceeded, message: "process count has exceeded maximum allowed for license (#{license.max_processes})"
     end

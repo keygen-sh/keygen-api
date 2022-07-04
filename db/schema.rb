@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_29_153506) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_04_153453) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -316,6 +316,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_29_153506) do
     t.boolean "require_user_scope", default: false, null: false
     t.string "leasing_strategy"
     t.integer "max_processes"
+    t.string "overage_strategy"
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "policies_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "policies_tsv_metadata_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "policies_tsv_name_idx", using: :gist

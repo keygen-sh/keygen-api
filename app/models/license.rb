@@ -438,7 +438,8 @@ class License < ApplicationRecord
 
   delegate :requires_check_in?, :check_in_interval, :check_in_interval_count,
     :duration, :encrypted?, :legacy_encrypted?, :scheme?, :scheme,
-    :strict?, :concurrent?, :pool?, :node_locked?, :floating?,
+    :strict?, :pool?, :node_locked?, :floating?,
+    :always_allow_overage?, :allow_overage?, :allow_1_5x_overage?, :allow_2x_overage?, :no_overage?,
     :revoke_access?, :restrict_access?, :allow_access?,
     :expire_from_creation?,
     :expire_from_first_validation?,
