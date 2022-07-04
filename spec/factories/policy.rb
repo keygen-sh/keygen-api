@@ -6,7 +6,7 @@ FactoryBot.define do
     max_machines { nil }
     duration { 2.weeks }
     strict { false }
-    floating { false }
+    floating { true }
     use_pool { false }
     encrypted { false }
     protected { false }
@@ -105,6 +105,16 @@ FactoryBot.define do
 
     trait :pooled do
       use_pool { true }
+    end
+
+    trait :floating do
+      max_machines { nil }
+      floating { true }
+    end
+
+    trait :node_locked do
+      max_machines { 1 }
+      floating { false }
     end
   end
 end

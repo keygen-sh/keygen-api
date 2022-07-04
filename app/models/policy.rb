@@ -84,6 +84,13 @@ class Policy < ApplicationRecord
     PER_MACHINE
   ]
 
+  OVERAGE_STATEGIES = %w[
+    ALWAYS_ALLOW_OVERAGE
+    ALLOW_1_5X_OVERAGE
+    ALLOW_2X_OVERAGE
+    NO_OVERAGE
+  ]
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -106,6 +113,7 @@ class Policy < ApplicationRecord
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
   before_create -> { self.leasing_strategy = 'PER_MACHINE' }, if: -> { leasing_strategy.nil? }
+  before_create -> { self.overage_strategy = 'NO_OVERAGE' }, if: -> { overage_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
 
@@ -157,6 +165,22 @@ class Policy < ApplicationRecord
   validates :max_processes,
     numericality: { greater_than: 0, less_than_or_equal_to: 2_147_483_647 },
     allow_nil: true
+
+  validates :overage_strategy,
+    inclusion: { in: OVERAGE_STATEGIES, message: 'unsupported overage strategy' },
+    allow_nil: true
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max machines value)' },
+    if: -> { floating? && max_machines&.odd? }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max cores value)' },
+    if: -> { max_cores&.odd? }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max processes value)' },
+    if: -> { max_processes&.odd? }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE for node-locked policy)' },
+    if: :node_locked?
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -441,6 +465,31 @@ class Policy < ApplicationRecord
 
   def lease_per_machine?
     leasing_strategy == 'PER_MACHINE'
+  end
+
+  def always_allow_overage?
+    overage_strategy == 'ALWAYS_ALLOW_OVERAGE'
+  end
+
+  def allow_1_5x_overage?
+    overage_strategy == 'ALLOW_1_5X_OVERAGE'
+  end
+
+  def allow_2x_overage?
+    overage_strategy == 'ALLOW_2X_OVERAGE'
+  end
+
+  def allow_overage?
+    overage_strategy != 'NO_OVERAGE'
+  end
+
+  def no_overage?
+    overage_strategy == 'NO_OVERAGE'
+  end
+
+  # NOTE(ezekg) For backwards compat
+  def concurrent=(v)
+    self.overage_strategy = v ? 'ALWAYS_ALLOW_OVERAGE' : 'NO_OVERAGE'
   end
 
   def pop!

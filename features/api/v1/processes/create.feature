@@ -398,7 +398,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -440,7 +440,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -482,7 +482,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -523,7 +523,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -565,7 +565,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -607,7 +607,7 @@ Feature: Spawn machine process
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
@@ -646,15 +646,16 @@ Feature: Spawn machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin spawns a process for a machine that has reached its limit (PER_MACHINE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has reached its limit (PER_MACHINE leasing strategy, NO_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
         "leasingStrategy": "PER_MACHINE",
+        "overageStrategy": "NO_OVERAGE",
         "maxProcesses": 5
       }
       """
@@ -697,15 +698,16 @@ Feature: Spawn machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin spawns a process for a machine that has reached its limit (PER_LICENSE leasing strategy)
+  Scenario: Admin spawns a process for a machine that has reached its limit (PER_LICENSE leasing strategy, NO_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "webhook-endpoint"
-    And the current account has 1 "policies"
+    And the current account has 1 floating "policy"
     And the first "policy" has the following attributes:
       """
       {
         "leasingStrategy": "PER_LICENSE",
+        "overageStrategy": "NO_OVERAGE",
         "maxProcesses": 5
       }
       """
@@ -713,6 +715,284 @@ Feature: Spawn machine process
     And the current account has 3 "machines" for the last "license"
     And the current account has 2 "processes" for the first "machine"
     And the current account has 2 "processes" for the second "machine"
+    And the current account has 1 "processes" for the third "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "process count has exceeded maximum allowed for license (5)",
+        "code": "MACHINE_PROCESS_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the pid "1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_LICENSE leasing strategy, ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 3 "processes" for the first "machine"
+    And the current account has 2 "processes" for the second "machine"
+    And the current account has 1 "processes" for the third "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the pid "1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALLOW_1_5X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 6
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 8 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the pid "1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_MACHINE leasing strategy, ALLOW_1_5X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 6
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 9 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "process count has exceeded maximum allowed for machine (6)",
+        "code": "MACHINE_PROCESS_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_LICENSE leasing strategy, ALLOW_2X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 4 "processes" for the first "machine"
+    And the current account has 3 "processes" for the second "machine"
+    And the current account has 2 "processes" for the third "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the pid "1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_LICENSE leasing strategy, ALLOW_2X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 5 "processes" for the first "machine"
+    And the current account has 4 "processes" for the second "machine"
     And the current account has 1 "processes" for the third "machine"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/processes" with the following:
@@ -869,7 +1149,8 @@ Feature: Spawn machine process
   Scenario: License spawns a process for their machine
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
-    And the current account has 1 "license"
+    And the current account has 1 floating "policy"
+    And the current account has 1 "license" for the last "policy"
     And the current account has 3 "machines" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token

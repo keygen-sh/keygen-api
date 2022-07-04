@@ -16,6 +16,8 @@ RequestMigrations.configure do |config|
   config.versions        = {
     '1.1' => %i[
       rename_code_to_constant_for_validation_migration
+      add_concurrent_attribute_to_policies_migration
+      add_concurrent_attribute_to_policy_migration
     ],
     '1.0' => %i[
       artifact_has_many_to_has_one_for_releases_migration
