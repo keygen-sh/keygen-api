@@ -5,4 +5,4 @@ require_dependency Rails.root.join('lib', 'keygen', 'error')
 require_dependency Rails.root.join('lib', 'keygen', 'logger')
 require_dependency Rails.root.join('lib', 'keygen', 'jsonapi')
 
-KEYGEN_API_VERSION = '1.1'
+KEYGEN_API_VERSION = '1.2'
