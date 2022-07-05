@@ -91,6 +91,9 @@ class Policy < ApplicationRecord
     NO_OVERAGE
   ]
 
+  # Virtual attribute that we'll use to change defaults
+  attr_accessor :api_version
+
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
@@ -113,9 +116,9 @@ class Policy < ApplicationRecord
   before_create -> { self.heartbeat_cull_strategy = 'DEACTIVATE_DEAD' }, if: -> { heartbeat_cull_strategy.nil? }
   before_create -> { self.heartbeat_resurrection_strategy = 'NO_REVIVE' }, if: -> { heartbeat_resurrection_strategy.nil? }
   before_create -> { self.leasing_strategy = 'PER_MACHINE' }, if: -> { leasing_strategy.nil? }
-  before_create -> { self.overage_strategy = 'NO_OVERAGE' }, if: -> { overage_strategy.nil? }
   before_create -> { self.protected = account.protected? }, if: -> { protected.nil? }
   before_create -> { self.max_machines = 1 }, if: :node_locked?
+  before_create :set_default_overage_strategy, unless: :overage_strategy?
 
   validates :product,
     scope: { by: :account_id }
@@ -499,5 +502,15 @@ class Policy < ApplicationRecord
   rescue ActiveRecord::StaleObjectError
     reload
     retry
+  end
+
+  private
+
+  def set_default_overage_strategy
+    self.overage_strategy = if api_version.present? && api_version <= '1.1'
+                              'ALWAYS_ALLOW_OVERAGE'
+                            else
+                              'NO_OVERAGE'
+                            end
   end
 end
