@@ -368,7 +368,10 @@ Given /^all "([^\"]*)" have the following attributes:$/ do |resource, body|
       @account.send(resource.pluralize.underscore)
     end
 
-  resources.each { |r| r.update!(attrs) }
+  resources.each {
+    _1.assign_attributes(attrs)
+    _1.save!(validate: false)
+  }
 end
 
 Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, resource, body|
@@ -377,7 +380,10 @@ Given /^the first (\d+) "([^\"]*)" have the following attributes:$/ do |count, r
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources = @account.send(resource.pluralize.underscore).limit(count)
 
-  resources.each { |r| r.update!(attrs) }
+  resources.each {
+    _1.assign_attributes(attrs)
+    _1.save!(validate: false)
+  }
 end
 
 Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, resource, body|
@@ -386,7 +392,10 @@ Given /^(\d+) "([^\"]*)" (?:have|has) the following attributes:$/ do |count, res
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
   resources = @account.send(resource.pluralize.underscore).limit(count)
 
-  resources.each { |r| r.update!(attrs) }
+  resources.each {
+    _1.assign_attributes(attrs)
+    _1.save!(validate: false)
+  }
 end
 
 Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/ do |resource, start_index, end_index, body|
@@ -405,7 +414,10 @@ Given /^(?:the )?"([^\"]*)" (\d+)-(\d+) (?:have|has) the following attributes:$/
       resources[(start_idx - 1)..(end_idx - 1)]
     end
 
-  slice.each { |r| r.update!(attrs) }
+  slice.each {
+    _1.assign_attributes(attrs)
+    _1.save!(validate: false)
+  }
 end
 
 Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, body|

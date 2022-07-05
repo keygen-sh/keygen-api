@@ -140,15 +140,71 @@ class LicenseValidationService < BaseService
     end
 
     # Check if license policy allows floating and if not, should have single activation
-    return [false, "must have exactly 1 associated machine", :NO_MACHINE] if !license.policy.floating? && license.machines_count == 0
+    return [false, "must have exactly 1 associated machine", :NO_MACHINE] if
+      !license.policy.floating? && license.machines_count == 0
+
     # When not floating, license's machine count should not surpass 1
-    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if !license.policy.floating? && license.machines_count > 1
+    if !license.policy.floating? && license.machines_count > 1
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_2x_overage? && license.machines_count == 2)
+
+      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES]
+    end
+
     # When floating, license should have at least 1 activation
-    return [false, "must have at least 1 associated machine", :NO_MACHINES] if license.policy.floating? && license.machines_count == 0
+    return [false, "must have at least 1 associated machine", :NO_MACHINES] if
+      license.policy.floating? && license.machines_count == 0
+
     # When floating, license's machine count should not surpass what policy allows
-    return [false, "has too many associated machines", :TOO_MANY_MACHINES] if license.floating? && !license.max_machines.nil? && license.machines_count > license.max_machines
+    if license.floating? && !license.max_machines.nil? && license.machines_count > license.max_machines
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_5x_overage? && license.machines_count <= license.max_machines * 1.5) ||
+                      (license.allow_2x_overage? && license.machines_count <= license.max_machines * 2)
+
+      return [allow_overage, "has too many associated machines", :TOO_MANY_MACHINES]
+    end
+
     # Check if license has exceeded its CPU core limit
-    return [false, "has too many associated machine cores", :TOO_MANY_CORES] if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
+    if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_5x_overage? && license.machines_core_count <= license.max_cores * 1.5) ||
+                      (license.allow_2x_overage? && license.machines_core_count <= license.max_cores * 2)
+
+      return [allow_overage, "has too many associated machine cores", :TOO_MANY_CORES]
+    end
+
+    # Check if license has exceeded its process limit
+    if license.max_processes.present?
+      process_count = 0
+      process_limit = 0
+
+      case
+      when license.lease_per_machine? && (scope&.key?(:fingerprint) || scope&.key?(:fingerprints))
+        machine = license.machines.alive.find_by(
+          fingerprint: Array(scope[:fingerprint] || scope[:fingerprints])
+                         .compact
+                         .uniq,
+        )
+
+        process_count = machine.processes.count
+        process_limit = machine.max_processes
+      when license.lease_per_machine? && scope&.key?(:machine)
+        machine = license.machines.alive.find_by(id: scope[:machine])
+
+        process_count = machine.processes.count
+        process_limit = machine.max_processes
+      when license.lease_per_license?
+        process_count = license.processes.count
+        process_limit = license.max_processes
+      end
+
+      allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_5x_overage? && process_count <= process_limit * 1.5) ||
+                      (license.allow_2x_overage? && process_count <= process_limit * 2)
+
+      return [allow_overage, "has too many associated processes", :TOO_MANY_PROCESSES] if
+        process_count > process_limit
+    end
 
     # Check if license is expired after checking machine requirements.
     return [license.allow_access?, "is expired", :EXPIRED] if
