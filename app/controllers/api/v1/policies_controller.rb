@@ -26,7 +26,7 @@ module Api::V1
 
     # POST /policies
     def create
-      @policy = current_account.policies.new policy_params
+      @policy = current_account.policies.new(api_version: current_api_version, **policy_params)
       authorize @policy
 
       if @policy.save
