@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
+CURRENT_API_VERSION = '1.2'
+DEFAULT_API_VERSION = '1.1'
+
 RequestMigrations.configure do |config|
   config.request_version_resolver = -> request {
     Current.account ||= ResolveAccountService.call(request:)
 
     request.headers['Keygen-Version']&.delete_prefix('v') ||
       Current.account&.api_version ||
-      KEYGEN_API_VERSION
+      CURRENT_API_VERSION
   }
 
-  config.current_version = KEYGEN_API_VERSION
+  config.current_version = CURRENT_API_VERSION
   config.versions        = {
     '1.1' => %i[
       rename_code_to_constant_for_validation_migration
