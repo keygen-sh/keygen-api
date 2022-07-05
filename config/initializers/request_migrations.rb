@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 CURRENT_API_VERSION = '1.2'
-DEFAULT_API_VERSION = '1.1'
+DEFAULT_API_VERSION = CURRENT_API_VERSION
 
 RequestMigrations.configure do |config|
   config.request_version_resolver = -> request {
