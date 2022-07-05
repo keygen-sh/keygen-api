@@ -3672,6 +3672,50 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, v1.1)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    And I use API version "1.1"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "constant": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_MACHINE leasing strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
