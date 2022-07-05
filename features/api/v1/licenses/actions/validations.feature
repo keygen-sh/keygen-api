@@ -491,7 +491,7 @@ Feature: License validation actions
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin quick validates a strict license that has too many machine cores
+  Scenario: Admin quick validates a strict license that has too many machine cores (ALWAYS_ALLOW_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"
@@ -514,7 +514,227 @@ Feature: License validation actions
         "expiry": "$time.1.day.from_now"
       }
       """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 4,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
     And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 24
+      }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin quick validates a strict license that has too many machine cores (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxCores": 8,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
     And all "machines" have the following attributes:
       """
       {
@@ -2958,6 +3178,1225 @@ Feature: License validation actions
       }
       """
     Then the response status should be "403"
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 6 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 4,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 6 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 4 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 4 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 5 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict floating license that has too many machines (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 2,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict node-locked license that has too many machines (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      { "licenseId": "$licenses[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machines", "code": "TOO_MANY_MACHINES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_MACHINE leasing strategy, no scope)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "is valid", "code": "VALID" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, fingerprint scope)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, fingerprints scope)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprints": ["$machines[0].fingerprint"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, machine scope)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALWAYS_ALLOW_OVERAGE overage strategy, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 5 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 5 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 4,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, within overage allowance, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 7 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 11 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 11 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_MACHINE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 11 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate" with the following:
+      """
+      {
+        "meta": {
+          "scope": {
+            "fingerprint": "$machines[0].fingerprint"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many processes (NO_OVERAGE overage strategy, PER_LICENSE leasing strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And the last "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "leasingStrategy": "PER_LICENSE",
+        "maxProcesses": 5,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 11 "processes"
+    And all "processes" have the following attributes:
+      """
+      { "machineId": "$machines[0]" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated processes", "code": "TOO_MANY_PROCESSES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (ALWAYS_ALLOW_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALWAYS_ALLOW_OVERAGE",
+        "maxMachines": 5,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 4,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 3 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 8
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (ALLOW_1_5X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_5X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, within overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": true, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (ALLOW_2X_OVERAGE overage strategy, exceeded overage allowance)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_2X_OVERAGE",
+        "maxMachines": 2,
+        "maxCores": 16,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 2 "machines"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 24
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin validates a strict license that has too many machine cores (NO_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "webhook-endpoint"
+    And all "policies" have the following attributes:
+      """
+      {
+        "overageStrategy": "NO_OVERAGE",
+        "maxMachines": 1,
+        "maxCores": 8,
+        "floating": false,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license"
+    And all "licenses" have the following attributes:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "$time.1.day.from_now"
+      }
+      """
+    And the current account has 1 "machine"
+    And all "machines" have the following attributes:
+      """
+      {
+        "licenseId": "$licenses[0]",
+        "cores": 16
+      }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should contain a "license"
+    And the JSON response should contain meta which includes the following:
+      """
+      { "valid": false, "detail": "has too many associated machine cores", "code": "TOO_MANY_CORES" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   # Key validation
   Scenario: Key validation endpoint should be inaccessible when account is disabled
