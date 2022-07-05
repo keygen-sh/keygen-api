@@ -37,11 +37,14 @@ describe RenameCodeToConstantForValidationMigration do
       },
     }
 
-    expect(data).to include(meta: include(code: 'VALID'))
-
     migrator.migrate!(data:)
 
-    expect(data).to include(meta: include(constant: 'VALID'))
-    expect(data).to_not include(meta: include(code: 'VALID'))
+    expect(data).to include(
+      meta: {
+        detail: 'is valid',
+        constant: 'VALID',
+        valid: true,
+      },
+    )
   end
 end
