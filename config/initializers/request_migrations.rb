@@ -15,6 +15,7 @@ RequestMigrations.configure do |config|
   config.current_version = CURRENT_API_VERSION
   config.versions        = {
     '1.1' => %i[
+      adjust_validity_for_validation_codes_migration
       rename_code_to_constant_for_validation_migration
       add_concurrent_attribute_to_policies_migration
       add_concurrent_attribute_to_policy_migration
