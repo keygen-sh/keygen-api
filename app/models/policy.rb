@@ -507,7 +507,7 @@ class Policy < ApplicationRecord
   private
 
   def set_default_overage_strategy
-    self.overage_strategy = if api_version.present? && api_version <= '1.1'
+    self.overage_strategy = if api_version == '1.0' || api_version == '1.1'
                               'ALWAYS_ALLOW_OVERAGE'
                             else
                               'NO_OVERAGE'

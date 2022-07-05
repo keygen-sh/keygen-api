@@ -95,7 +95,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            if current_api_version <= '1.1'
+            if current_api_version == '1.0' || current_api_version == '1.1'
               param :concurrent, type: :boolean, optional: true
             end
             param :max_machines, type: :integer, optional: true, allow_nil: true
@@ -145,7 +145,7 @@ module Api::V1
             param :strict, type: :boolean, optional: true
             param :floating, type: :boolean, optional: true
             param :protected, type: :boolean, optional: true
-            if current_api_version <= '1.1'
+            if current_api_version == '1.0' || current_api_version == '1.1'
               param :concurrent, type: :boolean, optional: true
             end
             param :max_machines, type: :integer, optional: true, allow_nil: true
