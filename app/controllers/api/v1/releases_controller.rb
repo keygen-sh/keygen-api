@@ -86,7 +86,7 @@ module Api::V1
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = apply_scopes(policy_scope(current_account.releases))
 
       @release = FindByAliasService.call(
         scope: scoped_releases,
