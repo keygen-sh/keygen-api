@@ -66,6 +66,109 @@ Feature: Update account
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
+  Scenario: Admin updates their account's API version to v1.0
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "apiVersion": "1.0"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an "account" with the following attributes:
+      """
+      { "apiVersion": "1.0" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin updates their account's API version to v1.1
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "apiVersion": "1.1"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an "account" with the following attributes:
+      """
+      { "apiVersion": "1.1" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin updates their account's API version to v1.2
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "apiVersion": "1.2"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be an "account" with the following attributes:
+      """
+      { "apiVersion": "1.2" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin updates their account's API version an an invalid version
+    Given I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1" with the following:
+      """
+      {
+        "data": {
+          "type": "accounts",
+          "attributes": {
+            "apiVersion": "0.0"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: 1.2, 1.1, 1.0 (received 0.0)",
+        "source": {
+          "pointer": "/data/attributes/apiVersion"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
   Scenario: Admin attempts to update another account
     Given I am an admin of account "test2"
     And the account "test1" has 1 "webhook-endpoint"
