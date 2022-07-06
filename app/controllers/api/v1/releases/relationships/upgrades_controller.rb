@@ -2,6 +2,8 @@
 
 module Api::V1::Releases::Relationships
   class UpgradesController < Api::V1::BaseController
+    has_scope(:product) { |c, s, v| s.for_product(v) }
+
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
@@ -40,7 +42,7 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = apply_scopes(policy_scope(current_account.releases))
 
       @release = FindByAliasService.call(
         scope: scoped_releases,
