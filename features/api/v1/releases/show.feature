@@ -151,6 +151,76 @@ Feature: Show release
     Then the response status should be "200"
     And the JSON response should be a "release" with the status "YANKED"
 
+  Scenario: License retrieves a release with a conflicting version (open/licensed)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name         | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Freemium App | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Premium App  | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "54a44eaf-6a83-4bb4-b3c1-17600dfdd77c"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/f14ef993-f821-44c9-b2af-62e27f37f8db/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.0" }
+      """
+
+  Scenario: License retrieves a release with a conflicting version (open/licensed, with product qualifier)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name         | distribution_strategy |
+      | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | Freemium App | OPEN                  |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Premium App  | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f14ef993-f821-44c9-b2af-62e27f37f8db | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 1.0.0   | stable  |
+      | aa067117-948f-46e8-977f-6998ad366a97 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0?product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/aa067117-948f-46e8-977f-6998ad366a97/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.0" }
+      """
+
   Scenario: Developer retrieves a release for their account
     Given the current account is "test1"
     And the current account has 1 "developer"
