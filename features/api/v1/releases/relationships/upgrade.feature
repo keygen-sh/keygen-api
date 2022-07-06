@@ -1697,3 +1697,150 @@ Feature: Upgrade release
         }
       }
       """
+
+  Scenario: Admin retrieves an upgrade for a product release conflicting with another product release (without scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/e26e9fef-d1ce-43d3-a15c-c8fc94429709/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+
+  Scenario: Admin retrieves an upgrade for a product release conflicting with another product release (with scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | CLOSED                |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | CLOSED                |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6198261a-48b5-4445-a045-9fed4afc7735"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/ff04d1c4-cc04-4d19-985a-cb113827b821/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release conflicting with another product release (without scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | LICENSED              |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/e26e9fef-d1ce-43d3-a15c-c8fc94429709/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0",
+        "next": "1.0.1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release conflicting with another product release (with scope)
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | LICENSED              |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0   | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.1   | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0   | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1   | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?product=6198261a-48b5-4445-a045-9fed4afc7735"
+    Then the response status should be "404"
