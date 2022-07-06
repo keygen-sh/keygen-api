@@ -2,7 +2,6 @@
 
 module Api::V1::Releases::Relationships
   class ArtifactsController < Api::V1::BaseController
-    has_scope(:channel) { |c, s, v| s.for_channel(v) }
     has_scope(:status) { |c, s, v| s.with_status(v) }
     has_scope(:filetype) { |c, s, v| s.for_filetype(v) }
     has_scope(:platform) { |c, s, v| s.for_platform(v) }
