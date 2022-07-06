@@ -485,6 +485,40 @@ Feature: Create release
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a somewhat duplicate release
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the first "release" has the following attributes:
+      """
+      { "version": "1.0.0-beta" }
+      """
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/releases" with the following:
+      """
+      {
+        "data": {
+          "type": "releases",
+          "attributes": {
+            "name": "Duplicate Release",
+            "channel": "beta",
+            "version": "1.0.0-beta.1"
+          },
+          "relationships": {
+            "product": {
+              "data": {
+                "type": "products",
+                "id": "$products[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
   Scenario: Admin creates an rc release
     Given I am an admin of account "test1"
     And the current account is "test1"

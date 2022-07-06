@@ -6,6 +6,7 @@ class WebhookEndpointSerializer < BaseSerializer
   attribute :url
   attribute :subscriptions
   attribute :signature_algorithm
+  attribute :api_version
   attribute :created do
     @object.created_at
   end

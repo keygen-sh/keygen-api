@@ -83,7 +83,7 @@ module Api::V1
             param :subscriptions, type: :array, optional: true do
               items type: :string
             end
-            param :api_version, type: :string, inclusion: %w[1.0 1.1], optional: true
+            param :api_version, type: :string, inclusion: RequestMigrations.supported_versions, optional: true
             param :signature_algorithm, type: :string, optional: true
           end
         end

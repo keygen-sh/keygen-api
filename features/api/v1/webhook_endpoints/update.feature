@@ -68,6 +68,101 @@ Feature: Update webhook endpoint
       }
       """
 
+  Scenario: Admin updates a webhook endpoint's API version to v1.0
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "apiVersion": "1.0"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "webhook-endpoint" with the following attributes:
+      """
+      { "apiVersion": "1.0" }
+      """
+
+  Scenario: Admin updates a webhook endpoint's API version to v1.1
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "apiVersion": "1.1"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "webhook-endpoint" with the following attributes:
+      """
+      { "apiVersion": "1.1" }
+      """
+
+  Scenario: Admin updates a webhook endpoint's API version to v1.2
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "apiVersion": "1.2"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "webhook-endpoint" with the following attributes:
+      """
+      { "apiVersion": "1.2" }
+      """
+
+  Scenario: Admin updates a webhook endpoint's API version an an invalid version
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "apiVersion": "0.0"
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "must be one of: 1.2, 1.1, 1.0 (received 0.0)",
+        "source": {
+          "pointer": "/data/attributes/apiVersion"
+        }
+      }
+      """
+
   Scenario: User attempts to update a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
