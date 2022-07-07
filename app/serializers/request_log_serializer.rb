@@ -12,21 +12,21 @@ class RequestLogSerializer < BaseSerializer
     if @object.respond_to?(:request_body)
       @object.request_body
     else
-      '[OMITTED]'
+      '[REDACTED]'
     end
   end
   attribute :response_signature do
     if @object.respond_to?(:response_signature)
       @object.response_signature
     else
-      '[OMITTED]'
+      '[REDACTED]'
     end
   end
   attribute :response_body do
     if @object.respond_to?(:response_body)
       @object.response_body
     else
-      '[OMITTED]'
+      '[REDACTED]'
     end
   end
   attribute :created do
