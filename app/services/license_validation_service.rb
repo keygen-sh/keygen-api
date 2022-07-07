@@ -179,7 +179,7 @@ class LicenseValidationService < BaseService
       process_limit = 0
 
       case
-      when license.lease_per_machine? && (scope&.key?(:fingerprint) || scope&.key?(:fingerprints))
+      when license.lease_per_machine? && scope.present? && (scope.key?(:fingerprint) || scope.key?(:fingerprints))
         machine = license.machines.alive.find_by(
           fingerprint: Array(scope[:fingerprint] || scope[:fingerprints])
                          .compact
@@ -188,7 +188,7 @@ class LicenseValidationService < BaseService
 
         process_count = machine.processes.count
         process_limit = machine.max_processes
-      when license.lease_per_machine? && scope&.key?(:machine)
+      when license.lease_per_machine? && scope.present? && scope.key?(:machine)
         machine = license.machines.alive.find_by(id: scope[:machine])
 
         process_count = machine.processes.count
