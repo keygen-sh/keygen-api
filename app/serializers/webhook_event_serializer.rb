@@ -8,7 +8,7 @@ class WebhookEventSerializer < BaseSerializer
     if @object.respond_to?(:payload)
       @object.payload
     else
-      '[OMITTED]'
+      '[REDACTED]'
     end
   end
   attribute :event do
@@ -20,7 +20,7 @@ class WebhookEventSerializer < BaseSerializer
     if @object.respond_to?(:last_response_body)
       @object.last_response_body
     else
-      '[OMITTED]'
+      '[REDACTED]'
     end
   end
   attribute :created do
