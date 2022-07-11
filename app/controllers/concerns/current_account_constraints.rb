@@ -35,4 +35,16 @@ module CurrentAccountConstraints
       return false
     end
   end
+
+  def require_ent_subscription!
+    case
+    when !current_account.ent_tier?
+      render_forbidden(
+        title: "Account does not have an Ent subscription",
+        detail: "must have a paid subscription on an Ent tier to access this resource"
+      )
+
+      return false
+    end
+  end
 end
