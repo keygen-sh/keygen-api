@@ -1,111 +1,123 @@
 @api/v1
 Feature: List event_logs
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name     | slug     | plan_id                              |
+      | Standard | standard | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent      | ent      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
-  Scenario: Endpoint should be inaccessible when account is disabled
-    Given the account "test1" is canceled
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+  Scenario: Endpoint should be inaccessible when account is not on Ent tier
+    Given the account "standard" is canceled
+    Given I am an admin of account "standard"
+    And the current account is "standard"
     And the current account has 2 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/standard/event-logs"
+    Then the response status should be "403"
+
+  Scenario: Endpoint should be inaccessible when account is disabled
+    Given the account "ent" is canceled
+    Given I am an admin of account "ent"
+    And the current account is "ent"
+    And the current account has 2 "event-logs"
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
 
   Scenario: Admin retrieves all logs for their account
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 3 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "event-logs"
 
   Scenario: Admin retrieves a list of logs that is automatically limited
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 250 "event-logs"
     And 50 "event-logs" have the following attributes:
       """
       { "createdAt": "$time.1.year.ago" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow"
     Then the response status should be "200"
     And the JSON response should be an array with 10 "event-logs"
 
   Scenario: Admin retrieves a list of logs with a limit
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 250 "event-logs"
     And 50 "event-logs" have the following attributes:
       """
       { "createdAt": "$time.1.year.ago" }
       """
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=75"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=75"
     Then the response status should be "200"
     And the JSON response should be an array with 75 "event-logs"
 
   Scenario: Admin retrieves an unsupported paginated list of logs
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 20 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?page[number]=2&page[size]=5"
+    When I send a GET request to "/accounts/ent/event-logs?page[number]=2&page[size]=5"
     Then the response status should be "200"
     And the JSON response should be an array with 5 "event-logs"
     And the JSON response should contain the following links:
       """
       {
-        "self": "/v1/accounts/test1/event-logs?page[number]=2&page[size]=5",
-        "prev": "/v1/accounts/test1/event-logs?page[number]=1&page[size]=5",
-        "next": "/v1/accounts/test1/event-logs?page[number]=3&page[size]=5"
+        "self": "/v1/accounts/ent/event-logs?page[number]=2&page[size]=5",
+        "prev": "/v1/accounts/ent/event-logs?page[number]=1&page[size]=5",
+        "next": "/v1/accounts/ent/event-logs?page[number]=3&page[size]=5"
       }
       """
 
   Scenario: Admin retrieves a list of logs within a date range that's full
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 20 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=$date.yesterday&date[end]=$date.tomorrow&limit=100"
     Then the response status should be "200"
     And the JSON response should be an array with 20 "event-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's empty
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 20 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=2017-1-2&date[end]=2017-01-03"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=2017-1-2&date[end]=2017-01-03"
     Then the response status should be "200"
     And the JSON response should be an array with 0 "event-logs"
 
   Scenario: Admin retrieves a list of logs within a date range that's too far
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 20 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=2017-1-1&date[end]=2017-02-02"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=2017-1-1&date[end]=2017-02-02"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a list of logs within a date range that's invalid
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the current account has 20 "event-logs"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?date[start]=foo&date[end]=bar"
+    When I send a GET request to "/accounts/ent/event-logs?date[start]=foo&date[end]=bar"
     Then the response status should be "400"
 
   Scenario: Admin retrieves a list of logs filtered by whodunnit
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the following "event-type" rows exist:
       | id                                   | event                             |
       | c257ce16-4f38-490e-8e4e-1be9ba1e8830 | test.license.created              |
@@ -125,13 +137,13 @@ Feature: List event_logs
       |                |                                      | 204590ba-b02e-4efd-ac32-5d1588932efa | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |
       | User           | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 8c312434-f8e9-402f-8169-49fc1409198e | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?whodunnit[type]=license&whodunnit[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
+    When I send a GET request to "/accounts/ent/event-logs?whodunnit[type]=license&whodunnit[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
     Then the response status should be "200"
     And the JSON response should be an array with 3 "event-logs"
 
   Scenario: Admin retrieves a list of logs filtered by resource
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the following "event-type" rows exist:
       | id                                   | event                             |
       | c257ce16-4f38-490e-8e4e-1be9ba1e8830 | test.license.created              |
@@ -152,13 +164,13 @@ Feature: List event_logs
       |                |                                      | 204590ba-b02e-4efd-ac32-5d1588932efa | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |
       | User           | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 8c312434-f8e9-402f-8169-49fc1409198e | Machine       | 19ac6439-5576-4ba8-92cd-f4c17573159e |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?resource[type]=license&resource[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
+    When I send a GET request to "/accounts/ent/event-logs?resource[type]=license&resource[id]=19c0e512-d08a-408d-8d1a-6400baaf5a40"
     Then the response status should be "200"
     And the JSON response should be an array with 6 "event-logs"
 
   Scenario: Admin retrieves a list of logs filtered by event
-    Given I am an admin of account "test1"
-    And the current account is "test1"
+    Given I am an admin of account "ent"
+    And the current account is "ent"
     And the following "event-type" rows exist:
       | id                                   | event                             |
       | c257ce16-4f38-490e-8e4e-1be9ba1e8830 | test.license.created              |
@@ -180,44 +192,44 @@ Feature: List event_logs
       |                |                                      | 204590ba-b02e-4efd-ac32-5d1588932efa | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |
       | User           | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 8c312434-f8e9-402f-8169-49fc1409198e | Machine       | 19ac6439-5576-4ba8-92cd-f4c17573159e |
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs?event=test.license.validation.failed"
+    When I send a GET request to "/accounts/ent/event-logs?event=test.license.validation.failed"
     Then the response status should be "200"
     And the JSON response should be an array with 2 "event-logs"
 
   Scenario: Admin attempts to retrieve all logs for another account
-    Given I am an admin of account "test2"
-    But the current account is "test1"
+    Given I am an admin of account "standard"
+    But the current account is "ent"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
   Scenario: Product attempts to retrieve all logs for their account
-    Given the current account is "test1"
+    Given the current account is "ent"
     And the current account has 1 "product"
-    And I am a product of account "test1"
+    And I am a product of account "ent"
     And I use an authentication token
     And the current account has 3 "event-logs"
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
 
   Scenario: License attempts to retrieve all logs for their account
-    Given the current account is "test1"
+    Given the current account is "ent"
     And the current account has 1 "license"
-    And I am a license of account "test1"
+    And I am a license of account "ent"
     And I use an authentication token
     And the current account has 3 "event-logs"
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
 
   Scenario: User attempts to retrieve all logs for their account
-    Given the current account is "test1"
+    Given the current account is "ent"
     And the current account has 1 "user"
-    And I am a user of account "test1"
+    And I am a user of account "ent"
     And I use an authentication token
     And the current account has 3 "event-logs"
-    When I send a GET request to "/accounts/test1/event-logs"
+    When I send a GET request to "/accounts/ent/event-logs"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
