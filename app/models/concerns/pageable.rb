@@ -9,6 +9,7 @@ module Pageable
   WITHOUT_COUNT_MODELS = %w[
     WebhookEvent
     RequestLog
+    EventLog
     Metric
   ]
 
