@@ -280,6 +280,31 @@ Feature: User password actions
     Then the response status should be "403"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: Admin resets their password (protected, no password set)
+    Given the current account is "test1"
+    And the account "test1" has the following attributes:
+      """
+      { "protected": true }
+      """
+    And I am an admin of account "test1"
+    And I have the following attributes:
+      """
+      { "passwordDigest": null }
+      """
+    And I use an authentication token
+    And I have a password reset token
+    When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
+      """
+      {
+        "meta": {
+          "passwordResetToken": "$token",
+          "newPassword": "bd2e5b3410e5"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+
   Scenario: User resets their password (too short)
     Given the current account is "test1"
     And the current account has 3 "users"
