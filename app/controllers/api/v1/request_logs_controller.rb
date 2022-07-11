@@ -2,7 +2,7 @@
 
 module Api::V1
   class RequestLogsController < Api::V1::BaseController
-    has_scope :date, type: :hash, using: [:start, :end], only: :index
+    has_scope(:date, type: :hash, using: [:start, :end], only: :index)
     has_scope(:requestor, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_requestor(t, id) }
     has_scope(:resource, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.search_resource(t, id) }
     has_scope(:request) { |c, s, v| s.search_request_id(v) }
@@ -47,7 +47,7 @@ module Api::V1
     end
 
     def cache_key
-      [:logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
+      [:request_logs, current_account.id, Digest::SHA2.hexdigest(request.query_string), CACHE_KEY_VERSION].join ":"
     end
   end
 end
