@@ -13,21 +13,22 @@ class EventLogWorker
     resource_id,
     whodunnit_type,
     whodunnit_id,
-    request_id,
+    request_log_id,
     idempotency_key,
     metadata
   )
+    metadata   = JSON.parse(metadata) if metadata.present?
     event_type = fetch_event_type_by_event(event)
     event_log  = EventLog.create!(
-      idempotency_key: idempotency_key,
       event_type_id: event_type.id,
-      account_id: account_id,
-      resource_type: resource_type,
-      resource_id: resource_id,
-      whodunnit_type: whodunnit_type,
-      whodunnit_id: whodunnit_id,
-      request_log_id: request_id,
-      metadata: metadata,
+      idempotency_key:,
+      account_id:,
+      resource_type:,
+      resource_id:,
+      whodunnit_type:,
+      whodunnit_id:,
+      request_log_id:,
+      metadata:,
     )
 
     EventNotificationWorker.perform_async(event_log.id)
