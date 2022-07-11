@@ -196,6 +196,37 @@ Feature: List event_logs
     Then the response status should be "200"
     And the JSON response should be an array with 2 "event-logs"
 
+  Scenario: Admin retrieves a list of logs filtered by request
+    Given I am an admin of account "ent"
+    And the current account is "ent"
+    And the following "event-type" rows exist:
+      | id                                   | event                             |
+      | c257ce16-4f38-490e-8e4e-1be9ba1e8830 | test.license.created              |
+      | 8c312434-f8e9-402f-8169-49fc1409198e | test.license.updated              |
+      | 1e7c4ec0-127f-4691-b400-427333362176 | test.license.validation.succeeded |
+      | 204590ba-b02e-4efd-ac32-5d1588932efa | test.license.validation.failed    |
+      | caf802b2-9ddc-498b-8061-36309a05ca42 | test.machine.deleted              |
+    And the current account has the following "license" rows:
+      | id                                   |
+      | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |
+    And the current account has the following "request-log" rows:
+      | id                                   | method | url          |
+      | 97708dc6-9dd2-4de1-84be-24f50287296c | POST   | /v1/licenses |
+    And the current account has the following "event-log" rows:
+      | whodunnit_type | whodunnit_id                         | event_type_id                        | resource_type | resource_id                          | request_log_id                       |
+      | User           | 97e58005-11ab-4186-aa78-c21550f6d0ce | c257ce16-4f38-490e-8e4e-1be9ba1e8830 | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 | 97708dc6-9dd2-4de1-84be-24f50287296c |
+      | License        | 19c0e512-d08a-408d-8d1a-6400baaf5a40 | 1e7c4ec0-127f-4691-b400-427333362176 | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      | Product        | e37fa95d-7771-4e30-84be-acabdedc81ce | 8c312434-f8e9-402f-8169-49fc1409198e | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      | License        | 19c0e512-d08a-408d-8d1a-6400baaf5a40 | 1e7c4ec0-127f-4691-b400-427333362176 | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      | License        | 19c0e512-d08a-408d-8d1a-6400baaf5a40 | 1e7c4ec0-127f-4691-b400-427333362176 | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      |                |                                      | 204590ba-b02e-4efd-ac32-5d1588932efa | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      |                |                                      | 204590ba-b02e-4efd-ac32-5d1588932efa | License       | 19c0e512-d08a-408d-8d1a-6400baaf5a40 |                                      |
+      | User           | 54a44eaf-6a83-4bb4-b3c1-17600dfdd77c | 8c312434-f8e9-402f-8169-49fc1409198e | Machine       | 19ac6439-5576-4ba8-92cd-f4c17573159e |                                      |
+    And I use an authentication token
+    When I send a GET request to "/accounts/ent/event-logs?request=97708dc6-9dd2-4de1-84be-24f50287296c"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "event-log"
+
   Scenario: Admin attempts to retrieve all logs for another account
     Given I am an admin of account "standard"
     But the current account is "ent"
