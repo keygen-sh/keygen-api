@@ -22,14 +22,14 @@ class EventLog < ApplicationRecord
   }
 
   scope :search_request_id, -> (term) {
-    request_id = term.to_s
+    request_log_id = term.to_s
     return none if
-      request_id.empty?
+      request_log_id.empty?
 
-    return where(request_id:) if
-      UUID_RE.match?(request_id)
+    return where(request_log_id:) if
+      UUID_RE.match?(request_log_id)
 
-    where('event_logs.request_id::text ILIKE ?', "%#{request_id}%")
+    where('event_logs.request_log_id::text ILIKE ?', "%#{request_log_id}%")
   }
 
   scope :search_whodunnit, -> (type, id) {
