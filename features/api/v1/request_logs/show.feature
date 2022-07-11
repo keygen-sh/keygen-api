@@ -49,3 +49,33 @@ Feature: Show request logs
     When I send a GET request to "/accounts/test1/request-logs/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: Product attempts to retrieve a log for their account
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    And the current account has 3 "request-logs"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+
+  Scenario: License attempts to retrieve a log for their account
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    And the current account has 3 "request-logs"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+
+  Scenario: User attempts to retrieve a log for their account
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current account has 3 "request-logs"
+    When I send a GET request to "/accounts/test1/request-logs/$0"
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
