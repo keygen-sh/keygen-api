@@ -2,7 +2,7 @@
 
 World Rack::Test::Methods
 
-Given /^the following "([^\"]*)" exist:$/ do |resource, table|
+Given /^the following "([^\"]*)"(?: rows)? exist:$/ do |resource, table|
   data = table.hashes.map { |h| h.deep_transform_keys! &:underscore }
   data.each do |attributes|
     create(resource.singularize.underscore, attributes.transform_values(&:presence))
