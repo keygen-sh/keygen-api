@@ -385,6 +385,76 @@ Feature: Update machine
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License updates a machine's name that belongs to a unprotected license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 unprotected "license"
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Office Mac"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the name "Office Mac"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License updates a machine's name that belongs to a protected license
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 protected "license"
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "name": "Office Mac"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License updates a machine's cores that belongs to a unprotected license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 unprotected "license"
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/machines/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "cores": null
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User updates a machine's name that belongs to a unprotected license
     Given the current account is "test1"
     And the current account has 2 "webhook-endpoints"
