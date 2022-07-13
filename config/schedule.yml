@@ -49,3 +49,7 @@ vacuum_analyze_metrics:
 vacuum_analyze_request_logs:
   cron: "0 9 * * *" # Every day at 9am (3am CST)
   class: "VacuumAnalyzeRequestLogsWorker"
+
+vacuum_analyze_event_logs:
+  cron: "0 10 * * *" # Every day at 10am (4am CST)
+  class: "VacuumAnalyzeEventLogsWorker"
