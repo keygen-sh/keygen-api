@@ -108,5 +108,13 @@ FactoryBot.define do
       #              in the factory's create hook (above)
       user { false }
     end
+
+    trait :protected do |license|
+      protected { true }
+    end
+
+    trait :unprotected do |license|
+      protected { false }
+    end
   end
 end
