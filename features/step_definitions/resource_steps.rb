@@ -279,7 +279,7 @@ Given /^the current license has (\d+) "([^\"]*)"$/ do |count, resource|
   end
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) product has (\d+) "([^\"]*)"$/ do |i, count, resource|
   resource = resource.pluralize.underscore
   numbers = {
     "first"   => 1,
@@ -289,7 +289,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) product 
     "fifth"   => 5,
     "sixth"   => 6,
     "seventh" => 7,
-    "eigth"   => 8,
+    "eighth"   => 8,
     "ninth"   => 9
   }
 
@@ -342,7 +342,7 @@ Given /^the (\w+) "([^\"]*)" is associated (?:with|to) the (\w+) "([^\"]*)"$/ do
     "fifth"   => 5,
     "sixth"   => 6,
     "seventh" => 7,
-    "eigth"   => 8,
+    "eighth"   => 8,
     "ninth"   => 9
   }
 
@@ -431,7 +431,7 @@ Given /^"([^\"]*)" (\d+) has the following attributes:$/ do |resource, index, bo
   resource.update!(attrs)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([^\"]*)" has the following attributes:$/ do |named_idx, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" has the following attributes:$/ do |named_idx, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   attrs = JSON.parse(body).deep_transform_keys!(&:underscore)
@@ -452,7 +452,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth|last) "([
   model.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" has the following metadata:$/ do |named_idx, resource, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   metadata = JSON.parse(body).deep_transform_keys!(&:underscore)
@@ -519,7 +519,7 @@ Given /^AWS S3 is (responding with a 200 status|responding with a 404 status|tim
   }
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following attributes:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
@@ -531,7 +531,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eigth"   => 7,
+    "eighth"   => 7,
     "ninth"   => 8
   }
 
@@ -544,7 +544,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
   m.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]*)" of account "([^\"]*)" has the following metadata:$/ do |i, resource, id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
@@ -556,7 +556,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "([^\"]*
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eigth"   => 7,
+    "eighth"   => 7,
     "ninth"   => 8
   }
 
@@ -662,7 +662,7 @@ Then /^the current token should have the following attributes:$/ do |body|
   expect(@token.reload.attributes.as_json).to include attributes
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have a correct machine core count$/ do |word_index|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should have a correct machine core count$/ do |word_index|
   numbers = {
     "first"   => 0,
     "second"  => 1,
@@ -671,7 +671,7 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
     "fifth"   => 4,
     "sixth"   => 5,
     "seventh" => 6,
-    "eigth"   => 7,
+    "eighth"   => 7,
     "ninth"   => 8
   }
   index = numbers[word_index]
@@ -680,7 +680,7 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(model.machines_core_count).to eq model.machines.sum(:cores)
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should have an? (\d+) (\w+) expiry$/ do |index_in_words, duration_count, duration_interval|
   license  = @account.licenses.send(index_in_words)
   duration = duration_count.to_i.send(duration_interval)
   expiry   = duration.from_now
@@ -688,7 +688,7 @@ Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license"
   expect(license.expiry).to be_within(30.seconds).of(expiry)
 end
 
-Then /^the (first|second|third|fourth|fifth|sixth|seventh|eigth|ninth) "license" should not have an expiry$/ do |index_in_words|
+Then /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "license" should not have an expiry$/ do |index_in_words|
   license = @account.licenses.send(index_in_words)
 
   expect(license.expiry).to be nil

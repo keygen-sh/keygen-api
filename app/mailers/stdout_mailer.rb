@@ -102,7 +102,7 @@ class StdoutMailer < ApplicationMailer
 
             curl -sSL https://get.keygen.sh/keygen/cli/install.sh | sh
 
-        The install script will auto-detect your platform and install the approriate binary. You can, of
+        The install script will auto-detect your platform and install the appropriate binary. You can, of
         course, install manually by visiting the docs, linked below.
 
         Source: https://github.com/keygen-sh/keygen-cli
@@ -334,7 +334,7 @@ class StdoutMailer < ApplicationMailer
 
         Last but not least --
 
-        We've added support for template variables in signed license keys. Previously, creating a signed license key that contained the license's "expiry" required you to manually calculate the expiry, and then set it in the license's signed dataset, in addtion to the license's expiry attribute during creation. Well, we heard your cries and we've simplified things. Moving forward, you can use the `{{expiry}}` template variable for this. It's precalculated by us, and guaranteed to match the license's value at time of creation.
+        We've added support for template variables in signed license keys. Previously, creating a signed license key that contained the license's "expiry" required you to manually calculate the expiry, and then set it in the license's signed dataset, in addition to the license's expiry attribute during creation. Well, we heard your cries and we've simplified things. Moving forward, you can use the `{{expiry}}` template variable for this. It's precalculated by us, and guaranteed to match the license's value at time of creation.
 
         There are other variables as well, for example `{{id}}` and `{{created}}`. As needs arise, we'll continue to expand upon the available template variables for signed keys.
 
@@ -346,7 +346,7 @@ class StdoutMailer < ApplicationMailer
 
         That's it for the third installment of Stdout. We're looking forward to what's coming up. Let me know if you have any feedback for me -- would love to hear it.
 
-        (And yes -- the new UI is coming! Soon. Lots of behind-the-scenes API work has been happening, like all of the above, to accomodate the new UI's features.)
+        (And yes -- the new UI is coming! Soon. Lots of behind-the-scenes API work has been happening, like all of the above, to accommodate the new UI's features.)
 
         Until next time.
 

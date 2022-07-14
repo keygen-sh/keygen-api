@@ -1525,7 +1525,7 @@ Feature: License validation actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin validates a strict floating license that would have too many machines but has overriden max machines
+  Scenario: Admin validates a strict floating license that would have too many machines but has overridden max machines
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "policies"

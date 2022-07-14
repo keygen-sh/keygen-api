@@ -1131,7 +1131,7 @@ Feature: Show release artifact
       """
 
   # Licensed distribution strategy
-  Scenario: Anonymous retreives an artifact for a LICENSED release
+  Scenario: Anonymous retrieves an artifact for a LICENSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1143,7 +1143,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a LICENSED release without a license for it
+  Scenario: License retrieves an artifact for a LICENSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1158,7 +1158,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a LICENSED release with a license for it
+  Scenario: License retrieves an artifact for a LICENSED release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1174,7 +1174,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: License retreives an artifact for an LICENSED release with an expired license for it
+  Scenario: License retrieves an artifact for an LICENSED release with an expired license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1194,7 +1194,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "403"
 
-  Scenario: User retreives an artifact for a LICENSED release without a license for it
+  Scenario: User retrieves an artifact for a LICENSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1211,7 +1211,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a LICENSED release with a license for it
+  Scenario: User retrieves an artifact for a LICENSED release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1229,7 +1229,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Product retreives an artifact for a LICENSED release
+  Scenario: Product retrieves an artifact for a LICENSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1243,7 +1243,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Product retreives an artifact for a LICENSED release of another product
+  Scenario: Product retrieves an artifact for a LICENSED release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the second "product" has the following attributes:
@@ -1257,7 +1257,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives an artifact for a LICENSED release
+  Scenario: Admin retrieves an artifact for a LICENSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1272,7 +1272,7 @@ Feature: Show release artifact
     Then the response status should be "303"
 
   # Open distribution strategy
-  Scenario: Anonymous retreives an artifact for an OPEN release
+  Scenario: Anonymous retrieves an artifact for an OPEN release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1284,7 +1284,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: License retreives an artifact for an OPEN release without a license for it
+  Scenario: License retrieves an artifact for an OPEN release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1299,7 +1299,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: License retreives an artifact for an OPEN release with a license for it
+  Scenario: License retrieves an artifact for an OPEN release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1315,7 +1315,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: License retreives an artifact for an OPEN release with an expired license for it
+  Scenario: License retrieves an artifact for an OPEN release with an expired license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1335,7 +1335,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: User retreives an artifact for an OPEN release without a license for it
+  Scenario: User retrieves an artifact for an OPEN release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1352,7 +1352,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: User retreives an artifact for an OPEN release with a license for it
+  Scenario: User retrieves an artifact for an OPEN release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1370,7 +1370,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Product retreives an artifact for an OPEN release
+  Scenario: Product retrieves an artifact for an OPEN release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1384,7 +1384,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Product retreives an artifact for an OPEN release of another product
+  Scenario: Product retrieves an artifact for an OPEN release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the second "product" has the following attributes:
@@ -1398,7 +1398,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives an artifact for an OPEN release
+  Scenario: Admin retrieves an artifact for an OPEN release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1413,7 +1413,7 @@ Feature: Show release artifact
     Then the response status should be "303"
 
   # Closed distribution strategy
-  Scenario: Anonymous retreives an artifact for a CLOSED release
+  Scenario: Anonymous retrieves an artifact for a CLOSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1425,7 +1425,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a CLOSED release without a license for it
+  Scenario: License retrieves an artifact for a CLOSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1440,7 +1440,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a CLOSED release with a license for it
+  Scenario: License retrieves an artifact for a CLOSED release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1456,7 +1456,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a CLOSED release without a license for it
+  Scenario: User retrieves an artifact for a CLOSED release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1473,7 +1473,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a CLOSED release with a license for it
+  Scenario: User retrieves an artifact for a CLOSED release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1491,7 +1491,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives an artifact for a CLOSED release
+  Scenario: Product retrieves an artifact for a CLOSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1505,7 +1505,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "303"
 
-  Scenario: Product retreives an artifact for a CLOSED release of another product
+  Scenario: Product retrieves an artifact for a CLOSED release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the second "product" has the following attributes:
@@ -1519,7 +1519,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives an artifact for a CLOSED release
+  Scenario: Admin retrieves an artifact for a CLOSED release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the last "product" has the following attributes:
@@ -1544,7 +1544,7 @@ Feature: Show release artifact
     And the JSON response should be an array of 1 error
 
   # Draft releases
-  Scenario: Anonymous retreives an artifact for a draft release
+  Scenario: Anonymous retrieves an artifact for a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1552,7 +1552,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a draft release without a license for it
+  Scenario: License retrieves an artifact for a draft release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1563,7 +1563,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a draft release with a license for it
+  Scenario: License retrieves an artifact for a draft release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1575,7 +1575,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a draft release without a license for it
+  Scenario: User retrieves an artifact for a draft release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1588,7 +1588,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a draft release with a license for it
+  Scenario: User retrieves an artifact for a draft release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1602,7 +1602,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives an artifact for a draft release
+  Scenario: Product retrieves an artifact for a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1612,7 +1612,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives an artifact for a draft release of another product
+  Scenario: Product retrieves an artifact for a draft release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 draft "release" for the second "product"
@@ -1622,7 +1622,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives an artifact for a draft release
+  Scenario: Admin retrieves an artifact for a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -1633,7 +1633,7 @@ Feature: Show release artifact
     Then the response status should be "200"
 
   # Yanked releases
-  Scenario: Anonymous retreives an artifact for a yanked release
+  Scenario: Anonymous retrieves an artifact for a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1641,7 +1641,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a yanked release without a license for it
+  Scenario: License retrieves an artifact for a yanked release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1652,7 +1652,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives an artifact for a yanked release with a license for it
+  Scenario: License retrieves an artifact for a yanked release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1664,7 +1664,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a yanked release without a license for it
+  Scenario: User retrieves an artifact for a yanked release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1677,7 +1677,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives an artifact for a yanked release with a license for it
+  Scenario: User retrieves an artifact for a yanked release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1691,7 +1691,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives an artifact for a yanked release
+  Scenario: Product retrieves an artifact for a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1701,7 +1701,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives an artifact for a yanked release of another product
+  Scenario: Product retrieves an artifact for a yanked release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 yanked "release" for the second "product"
@@ -1711,7 +1711,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives an artifact for a yanked release
+  Scenario: Admin retrieves an artifact for a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -1722,7 +1722,7 @@ Feature: Show release artifact
     Then the response status should be "200"
 
   # Waiting artifacts
-  Scenario: Anonymous retreives a waiting artifact
+  Scenario: Anonymous retrieves a waiting artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1730,7 +1730,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a waiting artifact without a license for it
+  Scenario: License retrieves a waiting artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1741,7 +1741,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a waiting artifact with a license for it
+  Scenario: License retrieves a waiting artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1753,7 +1753,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a waiting artifact without a license for it
+  Scenario: User retrieves a waiting artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1766,7 +1766,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a waiting artifact with a license for it
+  Scenario: User retrieves a waiting artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1780,7 +1780,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives a waiting artifact
+  Scenario: Product retrieves a waiting artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1790,7 +1790,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives a waiting artifact of another product
+  Scenario: Product retrieves a waiting artifact of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 "release" for the second "product"
@@ -1800,7 +1800,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives a waiting artifact
+  Scenario: Admin retrieves a waiting artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1811,7 +1811,7 @@ Feature: Show release artifact
     Then the response status should be "200"
 
   # Failed artifacts
-  Scenario: Anonymous retreives a failed artifact
+  Scenario: Anonymous retrieves a failed artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1819,7 +1819,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a failed artifact without a license for it
+  Scenario: License retrieves a failed artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1830,7 +1830,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a failed artifact with a license for it
+  Scenario: License retrieves a failed artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1842,7 +1842,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a failed artifact without a license for it
+  Scenario: User retrieves a failed artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1855,7 +1855,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a failed artifact with a license for it
+  Scenario: User retrieves a failed artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1869,7 +1869,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives a failed artifact
+  Scenario: Product retrieves a failed artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1879,7 +1879,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives a failed artifact of another product
+  Scenario: Product retrieves a failed artifact of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 "release" for the second "product"
@@ -1889,7 +1889,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives a failed artifact
+  Scenario: Admin retrieves a failed artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1900,7 +1900,7 @@ Feature: Show release artifact
     Then the response status should be "200"
 
   # Yanked artifacts
-  Scenario: Anonymous retreives a yanked artifact
+  Scenario: Anonymous retrieves a yanked artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1908,7 +1908,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a yanked artifact without a license for it
+  Scenario: License retrieves a yanked artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1919,7 +1919,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a yanked artifact with a license for it
+  Scenario: License retrieves a yanked artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1931,7 +1931,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a yanked artifact without a license for it
+  Scenario: User retrieves a yanked artifact without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1944,7 +1944,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a yanked artifact with a license for it
+  Scenario: User retrieves a yanked artifact with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1958,7 +1958,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives a yanked artifact
+  Scenario: Product retrieves a yanked artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1968,7 +1968,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives a yanked artifact of another product
+  Scenario: Product retrieves a yanked artifact of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 "release" for the second "product"
@@ -1978,7 +1978,7 @@ Feature: Show release artifact
     When I send a GET request to "/accounts/test1/artifacts/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives a yanked artifact
+  Scenario: Admin retrieves a yanked artifact
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"

@@ -1733,7 +1733,7 @@ Feature: Search
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin performs a search by request log type on resource ID (parial)
+  Scenario: Admin performs a search by request log type on resource ID (partial)
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "user"
