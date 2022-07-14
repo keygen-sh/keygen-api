@@ -3,7 +3,7 @@
 class User < ApplicationRecord
   MINIMUM_ADMIN_COUNT = 1
 
-  include PasswordResetable
+  include PasswordResettable
   include Limitable
   include Orderable
   include Pageable

@@ -53,7 +53,7 @@ class ReleasePolicy < ApplicationPolicy
         !resource.product.closed_distribution? && (
           # Assert current bearer is a user of the product that has a non-expired/suspended
           # license or that the bearer is itself a license for the product that is valid,
-          # and then assert that the license satifies all entitlement constraints.
+          # and then assert that the license satisfies all entitlement constraints.
           (bearer.has_role?(:user) && has_valid_license?(bearer)) ||
           (bearer.has_role?(:license) && valid_license?(bearer))
         )

@@ -603,7 +603,7 @@ Feature: List release artifacts
     And the JSON response should be an array with 3 "artifacts"
 
   # Draft releases
-  Scenario: Anonymous retreives artifacts for draft releases
+  Scenario: Anonymous retrieves artifacts for draft releases
     Given the current account is "test1"
     And the current account has 1 open "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -612,7 +612,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives artifacts for draft releases without a license for any
+  Scenario: License retrieves artifacts for draft releases without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -624,7 +624,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives artifacts for draft releases with a license for them
+  Scenario: License retrieves artifacts for draft releases with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -637,7 +637,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives artifacts for draft releases without a license for any
+  Scenario: User retrieves artifacts for draft releases without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -650,7 +650,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives artifacts for draft releases with a license for them
+  Scenario: User retrieves artifacts for draft releases with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -665,7 +665,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Product retreives artifacts for draft releases
+  Scenario: Product retrieves artifacts for draft releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -676,7 +676,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
-  Scenario: Product retreives artifacts for draft releases of another product
+  Scenario: Product retrieves artifacts for draft releases of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 3 draft "releases" for the second "product"
@@ -687,7 +687,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Admin retreives artifacts for draft releases
+  Scenario: Admin retrieves artifacts for draft releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 draft "releases" for the last "product"
@@ -699,7 +699,7 @@ Feature: List release artifacts
     And the JSON response should be an array with 3 "artifacts"
 
   # Yanked releases
-  Scenario: Anonymous retreives artifacts for yanked releases
+  Scenario: Anonymous retrieves artifacts for yanked releases
     Given the current account is "test1"
     And the current account has 1 open "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -708,7 +708,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives artifacts for yanked releases without a license for any
+  Scenario: License retrieves artifacts for yanked releases without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -720,7 +720,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives artifacts for yanked releases with a license for them
+  Scenario: License retrieves artifacts for yanked releases with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -733,7 +733,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives artifacts for yanked releases without a license for any
+  Scenario: User retrieves artifacts for yanked releases without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -746,7 +746,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives artifacts for yanked releases with a license for them
+  Scenario: User retrieves artifacts for yanked releases with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -761,7 +761,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Product retreives artifacts for yanked releases
+  Scenario: Product retrieves artifacts for yanked releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -772,7 +772,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
-  Scenario: Product retreives artifacts for yanked releases of another product
+  Scenario: Product retrieves artifacts for yanked releases of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 3 yanked "releases" for the second "product"
@@ -783,7 +783,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Admin retreives artifacts for yanked releases
+  Scenario: Admin retrieves artifacts for yanked releases
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 yanked "releases" for the last "product"
@@ -795,7 +795,7 @@ Feature: List release artifacts
     And the JSON response should be an array with 3 "artifacts"
 
   # Waiting artifacts
-  Scenario: Anonymous retreives waiting artifacts
+  Scenario: Anonymous retrieves waiting artifacts
     Given the current account is "test1"
     And the current account has 1 open "product"
     And the current account has 3 "releases" for the last "product"
@@ -804,7 +804,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives waiting artifacts without a license for any
+  Scenario: License retrieves waiting artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -816,7 +816,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives waiting artifacts with a license for them
+  Scenario: License retrieves waiting artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -829,7 +829,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives waiting artifacts without a license for any
+  Scenario: User retrieves waiting artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -842,7 +842,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives waiting artifacts with a license for them
+  Scenario: User retrieves waiting artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -857,7 +857,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Product retreives waiting artifacts
+  Scenario: Product retrieves waiting artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -868,7 +868,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
-  Scenario: Product retreives waiting artifacts of another product
+  Scenario: Product retrieves waiting artifacts of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 3 "releases" for the second "product"
@@ -879,7 +879,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Admin retreives waiting artifacts
+  Scenario: Admin retrieves waiting artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -891,7 +891,7 @@ Feature: List release artifacts
     And the JSON response should be an array with 3 "artifacts"
 
   # Failed artifacts
-  Scenario: Anonymous retreives failed artifacts
+  Scenario: Anonymous retrieves failed artifacts
     Given the current account is "test1"
     And the current account has 1 open "product"
     And the current account has 3 "releases" for the last "product"
@@ -900,7 +900,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives failed artifacts without a license for any
+  Scenario: License retrieves failed artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -912,7 +912,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives failed artifacts with a license for them
+  Scenario: License retrieves failed artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -925,7 +925,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives failed artifacts without a license for any
+  Scenario: User retrieves failed artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -938,7 +938,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives failed artifacts with a license for them
+  Scenario: User retrieves failed artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -953,7 +953,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Product retreives failed artifacts
+  Scenario: Product retrieves failed artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -964,7 +964,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
-  Scenario: Product retreives failed artifacts of another product
+  Scenario: Product retrieves failed artifacts of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 3 "releases" for the second "product"
@@ -975,7 +975,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Admin retreives failed artifacts
+  Scenario: Admin retrieves failed artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -987,7 +987,7 @@ Feature: List release artifacts
     And the JSON response should be an array with 3 "artifacts"
 
   # Yanked artifacts
-  Scenario: Anonymous retreives yanked artifacts
+  Scenario: Anonymous retrieves yanked artifacts
     Given the current account is "test1"
     And the current account has 1 open "product"
     And the current account has 3 "releases" for the last "product"
@@ -996,7 +996,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives yanked artifacts without a license for any
+  Scenario: License retrieves yanked artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -1008,7 +1008,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: License retreives yanked artifacts with a license for them
+  Scenario: License retrieves yanked artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -1021,7 +1021,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives yanked artifacts without a license for any
+  Scenario: User retrieves yanked artifacts without a license for any
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -1034,7 +1034,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: User retreives yanked artifacts with a license for them
+  Scenario: User retrieves yanked artifacts with a license for them
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for the last "product"
@@ -1049,7 +1049,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Product retreives yanked artifacts
+  Scenario: Product retrieves yanked artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"
@@ -1060,7 +1060,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 3 "artifacts"
 
-  Scenario: Product retreives yanked artifacts of another product
+  Scenario: Product retrieves yanked artifacts of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 3 "releases" for the second "product"
@@ -1071,7 +1071,7 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array with 0 "artifacts"
 
-  Scenario: Admin retreives yanked artifacts
+  Scenario: Admin retrieves yanked artifacts
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "releases" for the last "product"

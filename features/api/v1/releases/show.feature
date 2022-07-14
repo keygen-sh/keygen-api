@@ -721,14 +721,14 @@ Feature: Show release
     And the JSON response should be an array of 1 error
 
   # Draft releases
-  Scenario: Anonymous retreives a draft release
+  Scenario: Anonymous retrieves a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a draft release without a license for it
+  Scenario: License retrieves a draft release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -738,7 +738,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a draft release with a license for it
+  Scenario: License retrieves a draft release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -749,7 +749,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a draft release without a license for it
+  Scenario: User retrieves a draft release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -761,7 +761,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a draft release with a license for it
+  Scenario: User retrieves a draft release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -774,7 +774,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives a draft release
+  Scenario: Product retrieves a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -783,7 +783,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives a draft release of another product
+  Scenario: Product retrieves a draft release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 draft "release" for the second "product"
@@ -792,7 +792,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives a draft release
+  Scenario: Admin retrieves a draft release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 draft "release" for the last "product"
@@ -802,14 +802,14 @@ Feature: Show release
     Then the response status should be "200"
 
   # Yanked releases
-  Scenario: Anonymous retreives a yanked release
+  Scenario: Anonymous retrieves a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a yanked release without a license for it
+  Scenario: License retrieves a yanked release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -819,7 +819,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: License retreives a yanked release with a license for it
+  Scenario: License retrieves a yanked release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -830,7 +830,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a yanked release without a license for it
+  Scenario: User retrieves a yanked release without a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -842,7 +842,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: User retreives a yanked release with a license for it
+  Scenario: User retrieves a yanked release with a license for it
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -855,7 +855,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: Product retreives a yanked release
+  Scenario: Product retrieves a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"
@@ -864,7 +864,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 
-  Scenario: Product retreives a yanked release of another product
+  Scenario: Product retrieves a yanked release of another product
     Given the current account is "test1"
     And the current account has 2 "products"
     And the current account has 1 yanked "release" for the second "product"
@@ -873,7 +873,7 @@ Feature: Show release
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "404"
 
-  Scenario: Admin retreives a yanked release
+  Scenario: Admin retrieves a yanked release
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 yanked "release" for the last "product"

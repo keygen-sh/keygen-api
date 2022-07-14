@@ -47,7 +47,7 @@ class TypedParameters
     :time,
   )
 
-  COERCABLE_TYPES = {
+  COERCIBLE_TYPES = {
     fixnum: lambda { |v| v.to_i },
     number: lambda { |v| v.to_i },
     integer: lambda { |v| v.to_i },
@@ -243,7 +243,7 @@ class TypedParameters
       keys      = stack.dup << key.to_s.camelize(:lower)
 
       if value.nil? && optional && !allow_nil
-        # Delete the keys to avoid unneccessary unpermitted param errors
+        # Delete the keys to avoid unnecessary unpermitted param errors
         context.params.delete(key)
 
         # Special case where nil is not allowed for top-level hash keys, e.g. data, meta, etc.
@@ -254,9 +254,9 @@ class TypedParameters
       end
 
       if coerce && value
-        if COERCABLE_TYPES.key?(type.to_sym)
+        if COERCIBLE_TYPES.key?(type.to_sym)
           begin
-            value = COERCABLE_TYPES[type.to_sym].call value
+            value = COERCIBLE_TYPES[type.to_sym].call value
           rescue
             raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced"
           end
