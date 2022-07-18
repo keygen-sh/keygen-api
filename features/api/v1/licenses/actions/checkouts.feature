@@ -367,7 +367,12 @@ Feature: License checkout actions
     Then the response status should be "200"
     And the JSON response should be a "license-file" with the following encoded certificate data:
       """
-      { "meta": { "ttl": 2629746 } }
+      {
+        "meta": {
+          "expiry": null,
+          "ttl": null
+        }
+      }
       """
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
@@ -380,20 +385,18 @@ Feature: License checkout actions
     And I am an admin of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?ttl="
-    Then the response status should be "400"
-    And the first error should have the following properties:
+    Then the response status should be "200"
+    And the response should be a "LICENSE" certificate with the following encoded data:
       """
       {
-        "title": "Bad request",
-        "detail": "must be greater than or equal to 3600 (1 hour)",
-        "code": "CHECKOUT_TTL_INVALID",
-        "source": {
-          "parameter": "ttl"
+        "meta": {
+          "expiry": null,
+          "ttl": null
         }
       }
       """
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin performs a license checkout with a TTL that is too short (POST)

@@ -17,8 +17,6 @@ class MachineFile
   validates :machine_id,  presence: true
   validates :certificate, presence: true
   validates :issued_at,   presence: true
-  validates :expires_at,  presence: true
-  validates :ttl,         presence: true
 
   validates_format_of :certificate,
     with: /\A-----BEGIN MACHINE FILE-----\n/,
@@ -29,7 +27,8 @@ class MachineFile
 
   validates_numericality_of :ttl,
     greater_than_or_equal_to: 1.hour,
-    less_than_or_equal_to: 1.year
+    less_than_or_equal_to: 1.year,
+    allow_nil: true
 
   def persisted?
     false
