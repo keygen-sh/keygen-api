@@ -256,7 +256,11 @@ class TypedParameters
       if coerce && value
         if COERCIBLE_TYPES.key?(type.to_sym)
           begin
-            value = COERCIBLE_TYPES[type.to_sym].call value
+            value = if allow_nil && value.blank? && type.to_sym != :boolean
+                      nil
+                    else
+                      COERCIBLE_TYPES[type.to_sym].call(value)
+                    end
           rescue
             raise InvalidParameterError.new(type: source, param: keys.join("/")), "could not be coerced"
           end

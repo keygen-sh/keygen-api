@@ -88,7 +88,7 @@ module Api::V1::Licenses::Actions
         param :meta, type: :hash, optional: true do
           param :include, type: :array, optional: true
           param :encrypt, type: :boolean, optional: true
-          param :ttl, type: :integer, coerce: true, optional: true
+          param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
         end
       end
     end
@@ -97,13 +97,13 @@ module Api::V1::Licenses::Actions
       on :show do
         param :include, type: :array, coerce: true, optional: true
         param :encrypt, type: :boolean, coerce: true, optional: true
-        param :ttl, type: :integer, coerce: true, optional: true
+        param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
       end
 
       on :create do
         param :include, type: :array, coerce: true, optional: true
         param :encrypt, type: :boolean, coerce: true, optional: true
-        param :ttl, type: :integer, coerce: true, optional: true
+        param :ttl, type: :integer, coerce: true, allow_nil: true, optional: true
       end
     end
   end
