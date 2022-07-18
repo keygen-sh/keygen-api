@@ -7,9 +7,13 @@ class Token < ApplicationRecord
   include Limitable
   include Orderable
   include Pageable
+  include Permissible
 
   belongs_to :account
   belongs_to :bearer, polymorphic: true
+  has_many :token_permissions
+  has_many :permissions,
+    through: :token_permissions
 
   attr_reader :raw
 

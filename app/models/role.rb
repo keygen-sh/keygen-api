@@ -18,6 +18,9 @@ class Role < ApplicationRecord
 
   belongs_to :resource,
     polymorphic: true
+  has_many :role_permissions
+  has_many :permissions,
+    through: :role_permissions
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,
