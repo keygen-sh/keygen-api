@@ -7,10 +7,10 @@ module Api::V1
     def recover
       skip_authorization
 
-      case recovery_params[:meta][:type]
-      when 'account'
-        mailer = RecoveryMailer.recover_accounts_for_email email: recovery_params[:meta][:email]
-        mailer.deliver_now
+      case recovery_params
+      in meta: { type: 'account', email: }
+        mailer = RecoveryMailer.recover_accounts_for_email(email:)
+        mailer.deliver_later
       end
     end
 
