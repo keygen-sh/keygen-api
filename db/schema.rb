@@ -120,6 +120,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.index ["user_id"], name: "index_group_owners_on_user_id"
   end
 
+  create_table "group_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "permission_id", null: false
+    t.uuid "group_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_group_permissions_on_group_id"
+    t.index ["permission_id"], name: "index_group_permissions_on_permission_id"
+  end
+
   create_table "groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "account_id", null: false
     t.string "name"
@@ -256,6 +265,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.index ["account_id"], name: "index_metrics_on_account_id"
     t.index ["created_at"], name: "index_metrics_on_created_at", order: :desc
     t.index ["event_type_id"], name: "index_metrics_on_event_type_id"
+  end
+
+  create_table "permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -544,6 +559,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.index ["status"], name: "request_logs_status_idx"
   end
 
+  create_table "role_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "permission_id", null: false
+    t.uuid "role_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["permission_id"], name: "index_role_permissions_on_permission_id"
+    t.index ["role_id"], name: "index_role_permissions_on_role_id"
+  end
+
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
@@ -569,6 +593,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.index ["id", "created_at"], name: "index_second_factors_on_id_and_created_at", unique: true
     t.index ["secret"], name: "index_second_factors_on_secret", unique: true
     t.index ["user_id"], name: "index_second_factors_on_user_id", unique: true
+  end
+
+  create_table "token_permissions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "permission_id", null: false
+    t.uuid "token_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["permission_id"], name: "index_token_permissions_on_permission_id"
+    t.index ["token_id"], name: "index_token_permissions_on_token_id"
   end
 
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

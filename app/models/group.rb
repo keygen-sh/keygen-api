@@ -4,6 +4,9 @@ class Group < ApplicationRecord
   include Pageable
 
   belongs_to :account
+  has_many :group_permissions
+  has_many :permissions,
+    through: :group_permissions
 
   has_many :users,
     dependent: :nullify
