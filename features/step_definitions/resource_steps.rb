@@ -160,7 +160,13 @@ end
 
 Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for (?:all|each) "([^\"]*)"$/ do |count, trait, resource, association|
   associated_records = @account.send(association.pluralize.underscore).all
-  association_name = association.singularize.underscore.to_sym
+  association_name =
+      case resource.singularize
+      when "token"
+        :bearer
+      else
+        association.singularize.underscore.to_sym
+      end
 
   associated_records.each do |record|
     count.to_i.times do

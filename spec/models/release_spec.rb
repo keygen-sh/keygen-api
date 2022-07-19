@@ -5,7 +5,7 @@ require 'spec_helper'
 require 'database_cleaner'
 require 'sidekiq/testing'
 
-DatabaseCleaner.strategy = :truncation, { except: ['event_types'] }
+DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe Release, type: :model do
   let(:account) { create(:account) }

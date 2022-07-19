@@ -28,10 +28,11 @@ class Product < ApplicationRecord
   has_many :release_arches, through: :release_artifacts, source: :arch
   has_many :event_logs,
     as: :resource
-
-  after_create :set_role
+  has_many :permissions,
+    through: :role
 
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
+  before_create -> { grant!(:product) }
 
   validates :name, presence: true
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
@@ -103,11 +104,5 @@ class Product < ApplicationRecord
 
   def closed_distribution?
     distribution_strategy == 'CLOSED'
-  end
-
-  private
-
-  def set_role
-    grant! :product
   end
 end

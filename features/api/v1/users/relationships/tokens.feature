@@ -174,7 +174,9 @@ Feature: User tokens relationship
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$3/tokens"
     Then the response status should be "200"
@@ -184,9 +186,11 @@ Feature: User tokens relationship
   Scenario: Product requests tokens for one of their users
     Given the current account is "test1"
     And the current account has 5 "products"
+    And the current account has 1 "token" for each "product"
     And I am a product of account "test1"
     And the current account has 5 "users"
     And the current product has 2 "users"
+    And the current account has 1 "token" for each "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "200"
@@ -194,9 +198,11 @@ Feature: User tokens relationship
   Scenario: Product requests tokens for another product's user
     Given the current account is "test1"
     And the current account has 5 "products"
+    And the current account has 1 "token" for each "product"
     And I am a product of account "test1"
     And the current account has 5 "users"
     And the current product has 2 "users"
+    And the current account has 1 "token" for each "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$5/tokens"
     Then the response status should be "200"
@@ -204,7 +210,9 @@ Feature: User tokens relationship
   Scenario: User requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1/tokens"
@@ -214,15 +222,18 @@ Feature: User tokens relationship
   Scenario: User requests tokens for another user
     Given the current account is "test1"
     And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/tokens"
     Then the response status should be "403"
 
-  Scenario: User requests their tokens without authentication
+  Scenario: Anonymous requests a user's tokens
     Given the current account is "test1"
     And the current account has 1 "user"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     When I send a GET request to "/accounts/test1/users/$1/tokens"
     Then the response status should be "401"
