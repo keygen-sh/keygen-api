@@ -4,6 +4,8 @@ class CreatePermissions < ActiveRecord::Migration[7.0]
       t.string :action, null: false
 
       t.timestamps
+
+      t.index :action, unique: true
     end
   end
 end

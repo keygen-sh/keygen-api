@@ -125,7 +125,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.uuid "group_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["group_id"], name: "index_group_permissions_on_group_id"
+    t.index ["group_id", "permission_id"], name: "index_group_permissions_on_group_id_and_permission_id", unique: true
     t.index ["permission_id"], name: "index_group_permissions_on_permission_id"
   end
 
@@ -271,6 +271,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.string "action", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_permissions_on_action", unique: true
   end
 
   create_table "plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -565,7 +566,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["permission_id"], name: "index_role_permissions_on_permission_id"
-    t.index ["role_id"], name: "index_role_permissions_on_role_id"
+    t.index ["role_id", "permission_id"], name: "index_role_permissions_on_role_id_and_permission_id", unique: true
   end
 
   create_table "roles", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -601,7 +602,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["permission_id"], name: "index_token_permissions_on_permission_id"
-    t.index ["token_id"], name: "index_token_permissions_on_token_id"
+    t.index ["token_id", "permission_id"], name: "index_token_permissions_on_token_id_and_permission_id", unique: true
   end
 
   create_table "tokens", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
