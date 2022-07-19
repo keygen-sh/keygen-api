@@ -9,11 +9,11 @@ module Api::V1::Products::Relationships
 
     # POST /products/1/tokens
     def generate
-      authorize @product
+      authorize product, :generate_token?
 
       token = TokenGeneratorService.call(
         account: current_account,
-        bearer: @product,
+        bearer: product,
         expiry: nil
       )
 
@@ -28,30 +28,33 @@ module Api::V1::Products::Relationships
 
     # GET /products/1/tokens
     def index
-      authorize @product, :show?
+      authorize product, :list_tokens?
 
-      @tokens = apply_pagination(policy_scope(apply_scopes(@product.tokens)))
-      authorize @tokens
+      tokens = apply_pagination(policy_scope(apply_scopes(product.tokens)))
+      authorize tokens
 
-      render jsonapi: @tokens
+      render jsonapi: tokens
     end
 
     # GET /products/1/tokens/1
     def show
-      authorize @product
+      authorize product, :show_token?
 
-      @token = @product.tokens.find params[:id]
-      authorize @token
+      token = product.tokens.find params[:id]
+      authorize token
 
-      render jsonapi: @token
+      render jsonapi: token
     end
 
     private
 
+    attr_reader :product
+
     def set_product
       @product = current_account.products.find params[:product_id] || params[:id]
+      authorize product, :show?
 
-      Current.resource = @product
+      Current.resource = product
     end
   end
 end

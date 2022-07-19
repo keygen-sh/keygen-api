@@ -1,77 +1,288 @@
 # frozen_string_literal: true
 
-EVENT_TYPES = %w[
-  account.updated
-  account.subscription.paused
-  account.subscription.resumed
-  account.subscription.canceled
-  account.subscription.renewed
-  account.plan.updated
-  account.billing.updated
-  user.created
-  user.updated
-  user.deleted
-  user.password-reset
-  product.created
-  product.updated
-  product.deleted
-  policy.created
-  policy.updated
-  policy.deleted
-  policy.pool.popped
-  policy.entitlements.attached
-  policy.entitlements.detached
-  license.created
-  license.updated
-  license.deleted
-  license.expiring-soon
-  license.expired
-  license.checked-in
-  license.check-in-required-soon
-  license.check-in-overdue
-  license.validated
-  license.validation.succeeded
-  license.validation.failed
-  license.usage.incremented
-  license.usage.decremented
+permissions = %w[
+  account.billing.read
+  account.billing.update
+  account.plan.read
+  account.plan.update
+  account.read
+  account.subscription.read
+  account.subscription.cancel
+  account.subscription.pause
+  account.subscription.renew
+  account.subscription.resume
+  account.update
+
+  arch.read
+
+  artifact.create
+  artifact.delete
+  artifact.download
+  artifact.read
+  artifact.update
+  artifact.upload
+
+  channel.read
+
+  entitlement.create
+  entitlement.delete
+  entitlement.read
+  entitlement.update
+
+  event-log.read
+
+  group.create
+  group.delete
+  group.read
+  group.update
+  group.owner.attach
+  group.owner.detach
+  group.owner.read
+
+  key.create
+  key.delete
+  key.read
+  key.update
+
+  license.check-in
+  license.check-out
+  license.create
+  license.delete
+  license.entitlements.attach
+  license.entitlements.detach
+  license.entitlements.read
+  license.group.update
+  license.permissions.attach
+  license.permissions.detach
+  license.permissions.read
+  license.policy.update
+  license.read
+  license.reinstate
+  license.renew
+  license.revoke
+  license.suspend
+  license.tokens.generate
+  license.tokens.read
+  license.update
+  license.usage.decrement
+  license.usage.increment
   license.usage.reset
+  license.user.update
+  license.validate
+
+  machine.check-out
+  machine.create
+  machine.delete
+  machine.group.update
+  machine.heartbeat.ping
+  machine.heartbeat.reset
+  machine.proofs.generate
+  machine.update
+  machine.read
+
+  policy.create
+  policy.delete
+  policy.entitlements.attach
+  policy.entitlements.detach
+  policy.entitlements.read
+  policy.permissions.attach
+  policy.permissions.detach
+  policy.permissions.read
+  policy.pool.pop
+  policy.read
+  policy.update
+
+  process.create
+  process.delete
+  process.heartbeat.ping
+  process.read
+
+  product.create
+  product.delete
+  product.read
+  product.permissions.attach
+  product.permissions.detach
+  product.tokens.generate
+  product.tokens.read
+  product.update
+
+  platform.read
+
+  release.constraints.attach
+  release.constraints.detach
+  release.constraints.read
+  release.create
+  release.delete
+  release.download
+  release.publish
+  release.read
+  release.update
+  release.upgrade
+  release.upload
+  release.yank
+
+  request-log.read
+
+  second-factor.create
+  second-factor.delete
+  second-factor.disable
+  second-factor.enable
+  second-factor.read
+
+  token.generate
+  token.regenerate
+  token.read
+  token.revoke
+
+  user.ban
+  user.create
+  user.delete
+  user.group.update
+  user.password.reset
+  user.permissions.attach
+  user.permissions.detach
+  user.permissions.read
+  user.read
+  user.tokens.generate
+  user.tokens.read
+  user.unban
+  user.update
+
+  webhook-endpoint.create
+  webhook-endpoint.delete
+  webhook-endpoint.read
+  webhook-endpoint.update
+
+  webhook-event.delete
+  webhook-event.read
+  webhook-event.retry
+]
+
+events = %w[
+  *
+
+  account.billing.updated
+  account.plan.updated
+  account.subscription.canceled
+  account.subscription.paused
+  account.subscription.renewed
+  account.subscription.resumed
+  account.updated
+
+  artifact.created
+  artifact.deleted
+  artifact.downloaded
+  artifact.updated
+  artifact.uploaded
+
+  entitlement.created
+  entitlement.deleted
+  entitlement.updated
+
+  group.created
+  group.deleted
+  group.updated
+
+  key.created
+  key.deleted
+  key.updated
+
+  license.check-in-overdue
+  license.check-in-required-soon
+  license.checked-in
+  license.checked-out
+  license.created
+  license.deleted
+  license.entitlements.attached
+  license.entitlements.detached
+  license.expired
+  license.expiring-soon
+  license.group.updated
+  license.permissions.attached
+  license.permissions.detached
+  license.policy.updated
+  license.reinstated
   license.renewed
   license.revoked
   license.suspended
-  license.reinstated
-  license.policy.updated
+  license.updated
+  license.usage.decremented
+  license.usage.incremented
+  license.usage.reset
   license.user.updated
-  license.entitlements.attached
-  license.entitlements.detached
+  license.validated
+  license.validation.failed
+  license.validation.succeeded
+
+  machine.checked-out
   machine.created
-  machine.updated
   machine.deleted
+  machine.group.updated
+  machine.heartbeat.dead
   machine.heartbeat.ping
   machine.heartbeat.pong
-  machine.heartbeat.dead
   machine.heartbeat.reset
+  machine.heartbeat.resurrected
   machine.proofs.generated
-  key.created
-  key.updated
-  key.deleted
-  token.generated
-  token.regenerated
-  token.revoked
-  entitlement.created
-  entitlement.updated
-  entitlement.deleted
+  machine.updated
+
+  policy.created
+  policy.deleted
+  policy.entitlements.attached
+  policy.entitlements.detached
+  policy.pool.popped
+  policy.updated
+
+  process.created
+  process.deleted
+  process.heartbeat.dead
+  process.heartbeat.ping
+  process.heartbeat.pong
+
+  product.created
+  product.deleted
+  product.permissions.attached
+  product.permissions.detached
+  product.updated
+
+  release.constraints.attached
+  release.constraints.detached
   release.created
-  release.updated
   release.deleted
   release.downloaded
+  release.published
+  release.replaced
+  release.updated
   release.upgraded
   release.uploaded
   release.yanked
-  release.constraints.attached
-  release.constraints.detached
-  *
-].freeze
 
-EVENT_TYPES.each do |event|
-  EventType.find_or_create_by!(event: event)
-end
+  second-factor.created
+  second-factor.deleted
+  second-factor.disabled
+  second-factor.enabled
+
+  token.generated
+  token.regenerated
+  token.revoked
+
+  user.banned
+  user.created
+  user.deleted
+  user.group.updated
+  user.password-reset
+  user.permissions.attached
+  user.permissions.detached
+  user.unbanned
+  user.updated
+]
+
+Permission.upsert_all(
+  permissions.map { |action| { action: } },
+  on_duplicate: :skip,
+)
+
+EventType.upsert_all(
+  events.map { |event| { event: } },
+  on_duplicate: :skip,
+)

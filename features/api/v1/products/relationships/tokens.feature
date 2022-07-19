@@ -73,7 +73,9 @@ Feature: Generate authentication token for product
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
@@ -82,9 +84,11 @@ Feature: Generate authentication token for product
   Scenario: Product requests their tokens
     Given the current account is "test1"
     And the current account has 5 "products"
-    And I am a product of account "test1"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
     And the current product has 2 "users"
+    And the current account has 1 "token" for each "user"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "200"
@@ -93,9 +97,11 @@ Feature: Generate authentication token for product
   Scenario: Product requests tokens for another product
     Given the current account is "test1"
     And the current account has 5 "products"
-    And I am a product of account "test1"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
     And the current product has 2 "users"
+    And the current account has 1 "token" for each "user"
+    And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$2/tokens"
     Then the response status should be "403"
@@ -103,7 +109,9 @@ Feature: Generate authentication token for product
   Scenario: User requests tokens for a product
     Given the current account is "test1"
     And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/tokens"

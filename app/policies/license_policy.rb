@@ -4,6 +4,9 @@ class LicensePolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -18,6 +21,9 @@ class LicensePolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -29,6 +35,9 @@ class LicensePolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.create
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((resource.policy.nil? || !resource.policy.protected?) && resource.user == bearer) ||
@@ -37,6 +46,9 @@ class LicensePolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -44,6 +56,9 @@ class LicensePolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.delete
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -52,6 +67,9 @@ class LicensePolicy < ApplicationPolicy
 
   def check_in?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.check-in
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -61,6 +79,9 @@ class LicensePolicy < ApplicationPolicy
 
   def revoke?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.revoke
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -69,6 +90,9 @@ class LicensePolicy < ApplicationPolicy
 
   def renew?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.renew
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -84,6 +108,9 @@ class LicensePolicy < ApplicationPolicy
 
   def reinstate?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.reinstate
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -91,6 +118,9 @@ class LicensePolicy < ApplicationPolicy
 
   def quick_validate_by_id?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.validate
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -100,6 +130,9 @@ class LicensePolicy < ApplicationPolicy
 
   def validate_by_id?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.validate
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -109,6 +142,9 @@ class LicensePolicy < ApplicationPolicy
 
   def validate_by_key?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.validate
+    ]
 
     # NOTE(ezekg) We have optional authn
     return true unless
@@ -122,6 +158,9 @@ class LicensePolicy < ApplicationPolicy
 
   def checkout?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.check-out
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -131,6 +170,9 @@ class LicensePolicy < ApplicationPolicy
 
   def increment?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.usage.increment
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -140,6 +182,9 @@ class LicensePolicy < ApplicationPolicy
 
   def decrement?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.usage.decrement
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -147,6 +192,9 @@ class LicensePolicy < ApplicationPolicy
 
   def reset?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.usage.reset
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -154,6 +202,9 @@ class LicensePolicy < ApplicationPolicy
 
   def change_policy?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.policy.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.policy.protected? && resource.user == bearer) ||
@@ -162,6 +213,9 @@ class LicensePolicy < ApplicationPolicy
 
   def change_user?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.user.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -169,6 +223,9 @@ class LicensePolicy < ApplicationPolicy
 
   def change_group?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.group.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -176,6 +233,9 @@ class LicensePolicy < ApplicationPolicy
 
   def generate_token?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.tokens.generate
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -183,18 +243,29 @@ class LicensePolicy < ApplicationPolicy
 
   def list_tokens?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.tokens.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
   def show_token?
+    assert_account_scoped!
+    assert_permissions! %w[
+      license.tokens.read
+    ]
+
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
   end
 
   def attach_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.entitlements.attach
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -202,6 +273,9 @@ class LicensePolicy < ApplicationPolicy
 
   def detach_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.entitlements.detach
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -209,6 +283,9 @@ class LicensePolicy < ApplicationPolicy
 
   def list_entitlements?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -218,6 +295,9 @@ class LicensePolicy < ApplicationPolicy
 
   def show_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -227,6 +307,9 @@ class LicensePolicy < ApplicationPolicy
 
   def me?
     assert_account_scoped!
+    assert_permissions! %w[
+      license.read
+    ]
 
     resource == bearer
   end

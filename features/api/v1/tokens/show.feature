@@ -57,9 +57,10 @@ Feature: Show authentication token
     Then the response status should be "200"
     And the JSON response should be a "token"
 
-  Scenario: User requests a token without authentication
+  Scenario: Anonymous requests a user's token
     Given the current account is "test1"
     And the current account has 1 "user"
+    And the current account has 1 "token" for the last "user"
     And I am a user of account "test1"
     When I send a GET request to "/accounts/test1/tokens/$0"
     Then the response status should be "401"

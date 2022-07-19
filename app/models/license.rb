@@ -26,6 +26,8 @@ class License < ApplicationRecord
     through: :product
   has_many :event_logs,
     as: :resource
+  has_many :permissions,
+    through: :role
 
   # Used for legacy encrypted licenses
   attr_reader :raw
@@ -36,7 +38,7 @@ class License < ApplicationRecord
   before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
-  after_create :set_role
+  before_create -> { grant!(:license) }
 
   # Licenses automatically inherit their user's group ID. We're using before_validation
   # instead of before_create so that this can be run when the user is changed as well,
@@ -645,10 +647,6 @@ class License < ApplicationRecord
         }
       )
     end
-  end
-
-  def set_role
-    grant! :license
   end
 
   def set_first_check_in

@@ -50,6 +50,7 @@ Feature: Revoke authentication token
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$2"
     Then the response status should be "204"
@@ -57,6 +58,7 @@ Feature: Revoke authentication token
   Scenario: User attempts to revoke another user's token
     Given the current account is "test1"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$3"
@@ -65,6 +67,7 @@ Feature: Revoke authentication token
   Scenario: Product attempts to revoke a user's token
     Given the current account is "test1"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$4"

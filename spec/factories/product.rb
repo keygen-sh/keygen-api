@@ -19,7 +19,6 @@ FactoryBot.define do
 
     after :create do |product|
       product.role = create :role, :product, resource: product
-      create :token, bearer: product
     end
 
     trait :licensed do
