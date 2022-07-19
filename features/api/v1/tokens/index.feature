@@ -18,20 +18,27 @@ Feature: List authentication tokens
 
   Scenario: Admin requests all tokens while authenticated
     Given the current account is "test1"
-    And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am an admin of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/tokens"
+    When I send a GET request to "/accounts/test1/tokens?limit=100"
     Then the response status should be "200"
-    # NOTE(ezekg) 1 admin token, 3 product tokens, 5 user tokens
-    And the JSON response should be an array of 9 "tokens"
+    And the JSON response should be an array of 11 "tokens"
 
   Scenario: Admin requests all tokens for a specific user
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[3]"
     Then the response status should be "200"
@@ -41,7 +48,11 @@ Feature: List authentication tokens
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=product&bearer[id]=$products[1]"
     Then the response status should be "200"
@@ -51,8 +62,11 @@ Feature: List authentication tokens
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
-    And the current account has 1 "license"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[0]"
     Then the response status should be "200"
@@ -60,19 +74,55 @@ Feature: List authentication tokens
 
   Scenario: Product requests their tokens while authenticated
     Given the current account is "test1"
-    And the current account has 5 "products"
-    And I am a product of account "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
     And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a product of account "test1"
     And the current product has 2 "users"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
+  Scenario: License requests their tokens while authenticated
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens"
+    Then the response status should be "200"
+    And the JSON response should be an array of 1 "token"
+
+  Scenario: License requests tokens for another license
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[1]"
+    Then the response status should be "200"
+    And the JSON response should be an array of 0 "tokens"
+
   Scenario: User requests their tokens while authenticated
     Given the current account is "test1"
-    And the current account has 4 "products"
-    And the current account has 6 "users"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens"
@@ -81,8 +131,12 @@ Feature: List authentication tokens
 
   Scenario: User requests another user's tokens
     Given the current account is "test1"
-    And the current account has 4 "products"
-    And the current account has 6 "users"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[0]"
@@ -90,8 +144,12 @@ Feature: List authentication tokens
 
   Scenario: User requests a product's tokens
     Given the current account is "test1"
-    And the current account has 4 "products"
-    And the current account has 6 "users"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=product&bearer[id]=$products[0]"
@@ -99,17 +157,25 @@ Feature: List authentication tokens
 
   Scenario: User requests a license's tokens
     Given the current account is "test1"
-    And the current account has 4 "products"
-    And the current account has 6 "users"
-    And the current account has 3 "licenses"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[1]"
     And the JSON response should be an array of 0 "tokens"
 
-  Scenario: User requests their tokens without authentication
+  Scenario: Anonymous requests a user's tokens
     Given the current account is "test1"
-    And the current account has 1 "user"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 5 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     When I send a GET request to "/accounts/test1/tokens"
     Then the response status should be "401"

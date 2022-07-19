@@ -30,12 +30,16 @@ class User < ApplicationRecord
   has_many :group_owners
   has_many :groups,
     through: :group_owners
+  has_many :permissions,
+    through: :role
 
-  accepts_nested_attributes_for :role, update_only: true
+  accepts_nested_attributes_for :role,
+    update_only: true
 
   before_destroy :enforce_admin_minimum_on_account!
   before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }
-  before_create :set_user_role!, if: -> { role.nil? }
+  before_create -> { grant!(:user) },
+    if: -> { role.nil? }
 
   before_save -> { self.email = email.downcase.strip }
 
@@ -314,12 +318,6 @@ class User < ApplicationRecord
     end
 
     super
-  end
-
-  private
-
-  def set_user_role!
-    grant! :user
   end
 
   def enforce_admin_minimum_on_account!

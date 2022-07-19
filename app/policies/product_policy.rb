@@ -4,12 +4,18 @@ class ProductPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource == bearer
@@ -17,12 +23,18 @@ class ProductPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.create
+    ]
 
     bearer.has_role?(:admin, :developer)
   end
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.update
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource == bearer
@@ -30,18 +42,47 @@ class ProductPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.delete
+    ]
 
     bearer.has_role?(:admin, :developer)
   end
 
-  def generate?
+  def generate_token?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.tokens.generate
+    ]
 
     bearer.has_role?(:admin, :developer)
+  end
+
+  def list_tokens?
+    assert_account_scoped!
+    assert_permissions! %w[
+      product.tokens.read
+    ]
+
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
+      resource == bearer
+  end
+
+  def show_token?
+    assert_account_scoped!
+    assert_permissions! %w[
+      product.tokens.read
+    ]
+
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
+      resource == bearer
   end
 
   def me?
     assert_account_scoped!
+    assert_permissions! %w[
+      product.read
+    ]
 
     resource == bearer
   end

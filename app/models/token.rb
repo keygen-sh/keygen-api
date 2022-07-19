@@ -15,6 +15,14 @@ class Token < ApplicationRecord
   has_many :permissions,
     through: :token_permissions
 
+  before_create :set_permissions!,
+    if: -> { permissions.empty? }
+
+  # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
+  #              store the raw token value.
+  after_commit :clear_cache!,
+    on: %i[update destroy]
+
   attr_reader :raw
 
   validates :account, presence: true
@@ -60,10 +68,6 @@ class Token < ApplicationRecord
 
     where(bearer_id: bearer_id)
   }
-
-  # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
-  #              store the raw token value.
-  after_commit :clear_cache!, on: [:update, :destroy]
 
   def self.cache_key(digest)
     hash = Digest::SHA256.hexdigest digest
@@ -225,5 +229,15 @@ class Token < ApplicationRecord
     else
       :token
     end
+  end
+
+  private
+
+  def set_permissions!
+    self.id = SecureRandom.uuid
+
+    TokenPermission.insert_all!(
+      bearer.permission_ids.map { { permission_id: _1, token_id: id } },
+    )
   end
 end

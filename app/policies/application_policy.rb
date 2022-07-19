@@ -87,6 +87,24 @@ class ApplicationPolicy
     end
   end
 
+  def assert_permissions!(*actions)
+    actions.flatten.each do |action|
+      next if
+        bearer.nil?
+
+      raise Pundit::NotAuthorizedError, reason: 'bearer lacks permissions' unless
+        bearer.permissions.any? { _1.action == action.to_s }
+
+      next if
+        token.nil?
+
+      raise Pundit::NotAuthorizedError, reason: 'token lacks permissions' unless
+        (token.permissions & bearer.permissions).any? {
+          _1.action == action.to_s
+        }
+    end
+  end
+
   private
 
   class Scope

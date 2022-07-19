@@ -210,9 +210,9 @@ Feature: Generate authentication token for license
   Scenario: Product generates a license token
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "licenses"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 3 "licenses"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
@@ -248,6 +248,7 @@ Feature: Generate authentication token for license
     Given the current account is "test1"
     And I am an admin of account "test1"
     And the current account has 5 "licenses"
+    And the current account has 1 "token" for each "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
@@ -256,9 +257,10 @@ Feature: Generate authentication token for license
   Scenario: Product requests a license's tokens
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "licenses"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And the current account has 1 "token" for each "license"
     And I am a product of account "test1"
-    And the current product has 3 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "200"
@@ -267,9 +269,9 @@ Feature: Generate authentication token for license
   Scenario: Product requests a license's token
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 3 "licenses"
-    And I am a product of account "test1"
-    And the current product has 3 "licenses"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And the current account has 2 "tokens" for each "license"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens/$1"
@@ -280,6 +282,7 @@ Feature: Generate authentication token for license
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 3 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
@@ -288,6 +291,7 @@ Feature: Generate authentication token for license
   Scenario: License requests their tokens
     Given the current account is "test1"
     And the current account has 3 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
@@ -296,6 +300,7 @@ Feature: Generate authentication token for license
   Scenario: License requests another license's tokens
     Given the current account is "test1"
     And the current account has 3 "licenses"
+    And the current account has 1 "token" for each "license"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
@@ -304,24 +309,20 @@ Feature: Generate authentication token for license
   Scenario: User requests all tokens for their license
     Given the current account is "test1"
     And the current account has 1 "user"
-    And I am a user of account "test1"
-    And I use an authentication token
     And the current account has 3 "licenses"
     And the current user has 3 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a user of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "403"
 
   Scenario: User requests all tokens for another user's license
     Given the current account is "test1"
     And the current account has 2 "users"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      {
-        "userId": "$users[2]"
-      }
-      """
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "403"
