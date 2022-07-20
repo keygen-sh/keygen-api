@@ -554,7 +554,7 @@ class Role < ApplicationRecord
       end
 
     RolePermission.insert_all!(
-      perms.ids.map { { permission_id: _1, role_id: id } },
+      perms.ids.map {{ permission_id: _1, role_id: id }},
     )
   end
 
