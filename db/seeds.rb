@@ -32,9 +32,9 @@ permissions = %w[
   group.delete
   group.read
   group.update
-  group.owner.attach
-  group.owner.detach
-  group.owner.read
+  group.owners.attach
+  group.owners.detach
+  group.owners.read
 
   key.create
   key.delete

@@ -57,7 +57,7 @@ class GroupPolicy < ApplicationPolicy
   def attach?
     assert_account_scoped!
     assert_permissions! %w[
-      group.owner.attach
+      group.owners.attach
     ]
 
     bearer.has_role?(:admin, :developer, :product)
@@ -66,7 +66,7 @@ class GroupPolicy < ApplicationPolicy
   def detach?
     assert_account_scoped!
     assert_permissions! %w[
-      group.owner.detach
+      group.owners.detach
     ]
 
     bearer.has_role?(:admin, :developer, :product)
