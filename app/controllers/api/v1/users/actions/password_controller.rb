@@ -12,7 +12,7 @@ module Api::V1::Users::Actions
 
       if user.password? && user.authenticate(password_meta[:old_password])
         if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
-          user.revoke_tokens(except: current_token)
+          user.revoke_tokens!(except: current_token)
 
           render jsonapi: user
         else
@@ -33,7 +33,7 @@ module Api::V1::Users::Actions
           user.password_reset_sent_at < 24.hours.ago
 
         if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
-          user.revoke_tokens
+          user.revoke_tokens!
 
           render jsonapi: user
         else

@@ -44,7 +44,7 @@ class User < ApplicationRecord
   before_save -> { self.email = email.downcase.strip }
 
   # Tokens should be revoked when role is changed
-  after_update :revoke_tokens!,
+  before_update :revoke_tokens!,
     if: -> { role.present? && role.changed? }
 
   validates :group,
