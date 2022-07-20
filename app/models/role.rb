@@ -553,8 +553,9 @@ class Role < ApplicationRecord
         Permission.where(action: DEFAULT_LICENSE_PERMISSIONS)
       end
 
-    RolePermission.insert_all!(
+    RolePermission.upsert_all(
       perms.ids.map {{ permission_id: _1, role_id: id }},
+      on_duplicate: :skip,
     )
   end
 
