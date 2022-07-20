@@ -3,18 +3,27 @@
 class ReleasePolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.read
+    ]
 
     true
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.read
+    ]
 
     true
   end
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.create
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -22,6 +31,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.update
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -29,6 +41,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.delete
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -36,6 +51,10 @@ class ReleasePolicy < ApplicationPolicy
 
   def download?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.download
+      release.read
+    ]
 
     # We don't need to authenticate if product is open distribution, as long as the
     # release doesn't have any entitlement constraints.
@@ -59,10 +78,22 @@ class ReleasePolicy < ApplicationPolicy
         )
       )
   end
-  alias_method :upgrade?, :download?
+
+  def upgrade?
+    assert_account_scoped!
+    assert_permissions! %w[
+      release.upgrade
+      release.read
+    ]
+
+    download?
+  end
 
   def upload?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.upload
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -70,6 +101,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def publish?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.publish
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -77,6 +111,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def yank?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.yank
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -84,6 +121,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def list_entitlements?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
@@ -91,6 +131,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def show_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
@@ -98,6 +141,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def list_constraints?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.constraints.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
@@ -105,6 +151,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def show_constraint?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.constraints.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only) ||
       resource.product == bearer
@@ -112,6 +161,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def attach_constraints?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.constraints.attach
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -119,6 +171,9 @@ class ReleasePolicy < ApplicationPolicy
 
   def detach_constraints?
     assert_account_scoped!
+    assert_permissions! %w[
+      release.constraints.detach
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer

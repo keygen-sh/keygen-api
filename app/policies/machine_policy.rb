@@ -4,6 +4,9 @@ class MachinePolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -20,6 +23,9 @@ class MachinePolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -31,6 +37,9 @@ class MachinePolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.create
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((resource.license.nil? || !resource.license.protected?) && resource.user == bearer) ||
@@ -40,6 +49,9 @@ class MachinePolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.license.protected? && resource.license == bearer) ||
@@ -49,6 +61,9 @@ class MachinePolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.delete
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
@@ -58,6 +73,9 @@ class MachinePolicy < ApplicationPolicy
 
   def checkout?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.check-out
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
@@ -67,6 +85,9 @@ class MachinePolicy < ApplicationPolicy
 
   def ping?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.heartbeat.ping
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       (!resource.license.protected? && resource.user == bearer) ||
@@ -77,6 +98,9 @@ class MachinePolicy < ApplicationPolicy
 
   def reset?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.heartbeat.reset
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -85,6 +109,9 @@ class MachinePolicy < ApplicationPolicy
 
   def generate_offline_proof?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.proofs.generate
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
@@ -94,6 +121,9 @@ class MachinePolicy < ApplicationPolicy
 
   def change_group?
     assert_account_scoped!
+    assert_permissions! %w[
+      machine.group.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer

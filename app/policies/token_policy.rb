@@ -4,6 +4,9 @@ class TokenPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      token.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -15,13 +18,30 @@ class TokenPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      token.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.bearer == bearer
   end
 
+  # FIXME(ezekg) This is currently unused but should be
+  def generate?
+    assert_account_scoped!
+    assert_permissions! %w[
+      token.generate
+    ]
+
+    bearer.has_role?(:admin, :developer) ||
+      resource.bearer == bearer
+  end
+
   def regenerate?
     assert_account_scoped!
+    assert_permissions! %w[
+      token.regenerate
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.bearer == bearer
@@ -29,6 +49,9 @@ class TokenPolicy < ApplicationPolicy
 
   def revoke?
     assert_account_scoped!
+    assert_permissions! %w[
+      token.revoke
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.bearer == bearer

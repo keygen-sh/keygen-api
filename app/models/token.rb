@@ -15,7 +15,7 @@ class Token < ApplicationRecord
   has_many :permissions,
     through: :token_permissions
 
-  before_create :set_permissions!,
+  before_create :set_default_permissions!,
     if: -> { permissions.empty? }
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
@@ -114,7 +114,7 @@ class Token < ApplicationRecord
     end
 
     self.digest = enc
-    save
+    save!
 
     raw
   end
@@ -233,7 +233,7 @@ class Token < ApplicationRecord
 
   private
 
-  def set_permissions!
+  def set_default_permissions!
     self.id = SecureRandom.uuid
 
     TokenPermission.insert_all!(

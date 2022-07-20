@@ -7,10 +7,7 @@ permissions = %w[
   account.plan.update
   account.read
   account.subscription.read
-  account.subscription.cancel
-  account.subscription.pause
-  account.subscription.renew
-  account.subscription.resume
+  account.subscription.update
   account.update
 
   arch.read
@@ -80,6 +77,8 @@ permissions = %w[
   machine.update
   machine.read
 
+  metric.read
+
   policy.create
   policy.delete
   policy.entitlements.attach
@@ -96,12 +95,14 @@ permissions = %w[
   process.delete
   process.heartbeat.ping
   process.read
+  process.update
 
   product.create
   product.delete
   product.read
   product.permissions.attach
   product.permissions.detach
+  product.permissions.read
   product.tokens.generate
   product.tokens.read
   product.update
@@ -111,6 +112,7 @@ permissions = %w[
   release.constraints.attach
   release.constraints.detach
   release.constraints.read
+  release.entitlements.read
   release.create
   release.delete
   release.download
@@ -125,9 +127,8 @@ permissions = %w[
 
   second-factor.create
   second-factor.delete
-  second-factor.disable
-  second-factor.enable
   second-factor.read
+  second-factor.update
 
   token.generate
   token.regenerate
@@ -138,6 +139,8 @@ permissions = %w[
   user.create
   user.delete
   user.group.update
+  user.invite
+  user.password.update
   user.password.reset
   user.permissions.attach
   user.permissions.detach

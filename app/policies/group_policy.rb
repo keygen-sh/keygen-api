@@ -3,6 +3,9 @@
 class GroupPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
@@ -13,6 +16,9 @@ class GroupPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
@@ -23,30 +29,45 @@ class GroupPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.create
+    ]
 
     bearer.has_role?(:admin, :developer, :product)
   end
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.update
+    ]
 
     bearer.has_role?(:admin, :developer, :product)
   end
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.delete
+    ]
 
     bearer.has_role?(:admin, :developer, :product)
   end
 
   def attach?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.owner.attach
+    ]
 
     bearer.has_role?(:admin, :developer, :product)
   end
 
   def detach?
     assert_account_scoped!
+    assert_permissions! %w[
+      group.owner.detach
+    ]
 
     bearer.has_role?(:admin, :developer, :product)
   end
