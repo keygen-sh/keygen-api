@@ -559,7 +559,7 @@ class Role < ApplicationRecord
   end
 
   def set_default_permissions!
-    self.id = SecureRandom.uuid
+    self.id ||= SecureRandom.uuid
 
     set_permissions!
   end
