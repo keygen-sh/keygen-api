@@ -48,9 +48,9 @@ class Role < ApplicationRecord
     group.delete
     group.read
     group.update
-    group.owner.attach
-    group.owner.detach
-    group.owner.read
+    group.owners.attach
+    group.owners.detach
+    group.owners.read
 
     key.create
     key.delete
@@ -195,7 +195,7 @@ class Role < ApplicationRecord
     event-log.read
 
     group.read
-    group.owner.read
+    group.owners.read
 
     key.read
 
@@ -267,9 +267,9 @@ class Role < ApplicationRecord
     group.delete
     group.read
     group.update
-    group.owner.attach
-    group.owner.detach
-    group.owner.read
+    group.owners.attach
+    group.owners.detach
+    group.owners.read
 
     key.create
     key.delete
@@ -379,7 +379,7 @@ class Role < ApplicationRecord
     channel.read
 
     group.read
-    group.owner.read
+    group.owners.read
 
     license.check-in
     license.check-out
