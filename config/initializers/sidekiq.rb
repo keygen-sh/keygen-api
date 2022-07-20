@@ -82,6 +82,9 @@ end
 # Configure Sidekiq unique jobs
 SidekiqUniqueJobs.configure do |config|
   config.enabled = !Rails.env.test?
+
+  # FIXME(ezekg) Wordaround for https://github.com/mhenrixon/sidekiq-unique-jobs/issues/630
+  config.lock_timeout = ENV.fetch('REDIS_LOCK_TIMEOUT') { 1 }.to_i
 end
 
 # Configure Sidekiq throttled
