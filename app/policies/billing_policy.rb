@@ -8,6 +8,9 @@ class BillingPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      account.billing.read
+    ]
 
     bearer.has_role?(:admin)
   end
@@ -18,13 +21,14 @@ class BillingPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      account.billing.read
+    ]
 
     bearer.has_role?(:admin)
   end
 
   def destroy?
-    assert_account_scoped!
-
-    bearer.has_role?(:admin)
+    false
   end
 end

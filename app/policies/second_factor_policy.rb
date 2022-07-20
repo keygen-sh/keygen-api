@@ -4,6 +4,9 @@ class SecondFactorPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      second-factor.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:user) &&
@@ -12,6 +15,9 @@ class SecondFactorPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      second-factor.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :user) &&
       resource.user == bearer
@@ -19,6 +25,9 @@ class SecondFactorPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      second-factor.create
+    ]
 
     return false if
       bearer.has_role?(:read_only)
@@ -28,6 +37,9 @@ class SecondFactorPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      second-factor.update
+    ]
 
     return false if
       bearer.has_role?(:read_only)
@@ -37,6 +49,9 @@ class SecondFactorPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      second-factor.delete
+    ]
 
     return false if
       bearer.has_role?(:read_only)

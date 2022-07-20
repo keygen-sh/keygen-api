@@ -3,6 +3,9 @@
 class MachineProcessPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -19,6 +22,9 @@ class MachineProcessPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.user == bearer ||
@@ -30,6 +36,9 @@ class MachineProcessPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.create
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((resource.license.nil? || !resource.license.protected?) && resource.user == bearer) ||
@@ -39,6 +48,9 @@ class MachineProcessPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -46,6 +58,9 @@ class MachineProcessPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.delete
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!resource.license.protected? && resource.user == bearer) ||
@@ -55,6 +70,9 @@ class MachineProcessPolicy < ApplicationPolicy
 
   def ping?
     assert_account_scoped!
+    assert_permissions! %w[
+      process.heartbeat.ping
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       (!resource.license.protected? && resource.user == bearer) ||

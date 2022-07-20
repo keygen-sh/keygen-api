@@ -3,12 +3,19 @@
 class ReleaseArtifactPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      artifact.read
+    ]
 
     true
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      artifact.download
+      artifact.read
+    ]
 
     # FIXME(ezekg) Authorization should be moved from release policy to here
     # Delegate to release policy
@@ -21,6 +28,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      artifact.create
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -28,6 +38,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      artifact.update
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -35,6 +48,9 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      artifact.delete
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer

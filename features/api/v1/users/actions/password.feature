@@ -10,8 +10,8 @@ Feature: User password actions
 
   Scenario: Endpoint should be accessible when account is disabled
     Given the account "test1" is canceled
-    Given I am an admin of account "test1"
     And the current account is "test1"
+    And I am an admin of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$current/actions/update-password"
     Then the response status should not be "403"
@@ -32,8 +32,8 @@ Feature: User password actions
       }
       """
     And the response should contain a valid signature header for "test1"
-    And the current user should have 1 "token"
     Then the response status should be "200"
+    And the current user should have 1 "token"
 
   Scenario: User updates their password (no password set)
     Given the current account is "test1"
