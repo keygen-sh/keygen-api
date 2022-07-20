@@ -43,6 +43,10 @@ class User < ApplicationRecord
 
   before_save -> { self.email = email.downcase.strip }
 
+  # Tokens should be revoked when role is changed
+  after_update :revoke_tokens!,
+    if: -> { role.present? && role.changed? }
+
   validates :group,
     presence: { message: 'must exist' },
     scope: { by: :account_id },
@@ -290,6 +294,16 @@ class User < ApplicationRecord
     second_factor = second_factors.enabled.last
 
     second_factor.verify(otp)
+  end
+
+  def revoke_tokens!(except: nil)
+    s = if except.present?
+          tokens.where.not(id: except)
+        else
+          tokens
+        end
+
+    s.destroy_all!
   end
 
   def revoke_tokens(except: nil)
