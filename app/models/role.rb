@@ -23,10 +23,7 @@ class Role < ApplicationRecord
     account.plan.update
     account.read
     account.subscription.read
-    account.subscription.cancel
-    account.subscription.pause
-    account.subscription.renew
-    account.subscription.resume
+    account.subscription.update
     account.update
 
     arch.read
@@ -96,6 +93,8 @@ class Role < ApplicationRecord
     machine.update
     machine.read
 
+    metric.read
+
     policy.create
     policy.delete
     policy.entitlements.attach
@@ -112,12 +111,14 @@ class Role < ApplicationRecord
     process.delete
     process.heartbeat.ping
     process.read
+    process.update
 
     product.create
     product.delete
     product.read
     product.permissions.attach
     product.permissions.detach
+    product.permissions.read
     product.tokens.generate
     product.tokens.read
     product.update
@@ -127,6 +128,7 @@ class Role < ApplicationRecord
     release.constraints.attach
     release.constraints.detach
     release.constraints.read
+    release.entitlements.read
     release.create
     release.delete
     release.download
@@ -141,9 +143,8 @@ class Role < ApplicationRecord
 
     second-factor.create
     second-factor.delete
-    second-factor.disable
-    second-factor.enable
     second-factor.read
+    second-factor.update
 
     token.generate
     token.regenerate
@@ -154,6 +155,8 @@ class Role < ApplicationRecord
     user.create
     user.delete
     user.group.update
+    user.invite
+    user.password.update
     user.password.reset
     user.permissions.attach
     user.permissions.detach
@@ -174,41 +177,75 @@ class Role < ApplicationRecord
     webhook-event.retry
   ].freeze
 
-  DEFAULT_READ_ONLY_PERMISSIONS = %w[
+  DEFAULT_READ_ONLY_PERMISSIONS =%w[
     account.billing.read
     account.plan.read
     account.read
     account.subscription.read
+
     arch.read
+
+    artifact.download
     artifact.read
+
     channel.read
+
     entitlement.read
+
     event-log.read
+
     group.read
     group.owner.read
+
     key.read
+
     license.entitlements.read
     license.permissions.read
     license.read
     license.tokens.read
+
     machine.read
+
+    metric.read
+
     policy.entitlements.read
     policy.permissions.read
     policy.read
+
     process.read
+
     product.read
+    product.permissions.read
     product.tokens.read
+
     platform.read
+
     release.constraints.read
+    release.entitlements.read
+    release.download
     release.read
+    release.upgrade
+
     request-log.read
+
+    second-factor.create
+    second-factor.delete
     second-factor.read
+    second-factor.update
+
+    token.generate
     token.read
+
+    user.password.update
+    user.password.reset
     user.permissions.read
     user.read
+    user.tokens.read
+
     webhook-endpoint.read
+
     webhook-event.read
-  ].freeze
+  ]
 
   DEFAULT_PRODUCT_PERMISSIONS = %w[
     account.read
@@ -288,6 +325,7 @@ class Role < ApplicationRecord
     process.delete
     process.heartbeat.ping
     process.read
+    process.update
 
     product.read
     product.update
@@ -298,6 +336,7 @@ class Role < ApplicationRecord
     release.constraints.attach
     release.constraints.detach
     release.constraints.read
+    release.entitlements.read
     release.create
     release.delete
     release.download
@@ -317,9 +356,12 @@ class Role < ApplicationRecord
     user.create
     user.delete
     user.group.update
-    user.password.reset
+    user.permissions.attach
+    user.permissions.detach
     user.permissions.read
     user.read
+    user.tokens.generate
+    user.tokens.read
     user.unban
     user.update
 
@@ -365,6 +407,7 @@ class Role < ApplicationRecord
     process.delete
     process.heartbeat.ping
     process.read
+    process.update
 
     product.read
 
@@ -375,11 +418,17 @@ class Role < ApplicationRecord
     release.read
     release.upgrade
 
+    second-factor.create
+    second-factor.delete
+    second-factor.read
+    second-factor.update
+
     token.generate
     token.regenerate
     token.revoke
     token.read
 
+    user.password.update
     user.password.reset
     user.read
     user.update
@@ -419,6 +468,7 @@ class Role < ApplicationRecord
     process.delete
     process.heartbeat.ping
     process.read
+    process.update
 
     product.read
 
@@ -429,6 +479,10 @@ class Role < ApplicationRecord
     release.read
     release.upgrade
 
+    token.regenerate
+    token.revoke
+    token.read
+
     user.read
   ].freeze
 
@@ -438,7 +492,7 @@ class Role < ApplicationRecord
   has_many :permissions,
     through: :role_permissions
 
-  before_create :set_permissions!
+  before_create :set_default_permissions!
   before_update :reset_permissions!
 
   # NOTE(ezekg) Sanity check
@@ -478,8 +532,6 @@ class Role < ApplicationRecord
   private
 
   def set_permissions!
-    self.id = SecureRandom.uuid
-
     perms =
       case name.to_sym
       in :admin
@@ -503,6 +555,12 @@ class Role < ApplicationRecord
     RolePermission.insert_all!(
       perms.ids.map { { permission_id: _1, role_id: id } },
     )
+  end
+
+  def set_default_permissions!
+    self.id = SecureRandom.uuid
+
+    set_permissions!
   end
 
   def reset_permissions!

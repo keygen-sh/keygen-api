@@ -49,6 +49,19 @@ module Api::V1
           raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
             user.banned?
 
+          # FIXME(ezekg) Can't find a better way to do this since both the token
+          #              and proper authn context does not exist yet
+          Pundit.policy!(
+            AuthorizationContext.new(
+              account: current_account,
+              bearer: user,
+              token: nil,
+            ),
+            user.tokens.new(
+              account: current_account,
+            ),
+          ).generate?
+
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default

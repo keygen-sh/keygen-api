@@ -4,6 +4,9 @@ class KeyPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      key.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -12,6 +15,9 @@ class KeyPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      key.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -19,6 +25,9 @@ class KeyPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      key.create
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -26,6 +35,9 @@ class KeyPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      key.update
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -33,6 +45,9 @@ class KeyPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      key.delete
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer

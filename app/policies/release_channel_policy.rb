@@ -3,12 +3,18 @@
 class ReleaseChannelPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      channel.read
+    ]
 
     true
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      channel.read
+    ]
 
     true
   end

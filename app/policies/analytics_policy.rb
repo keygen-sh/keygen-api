@@ -5,7 +5,7 @@ class AnalyticsPolicy < Struct.new(:context, :resource)
 
   private
 
-  def bearer
-    context.bearer
-  end
+  def account = context.bearer
+  def bearer  = context.bearer
+  def token   = context.token
 end

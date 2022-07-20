@@ -4,18 +4,27 @@ class MetricPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      metric.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only)
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      metric.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only)
   end
 
   def count?
     assert_account_scoped!
+    assert_permissions! %w[
+      metric.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
   end

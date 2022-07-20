@@ -4,6 +4,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -12,6 +15,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -19,6 +25,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.create
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -26,6 +35,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.update
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -33,6 +45,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.delete
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -40,6 +55,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def pop?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.pool.pop
+    ]
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
@@ -47,6 +65,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def attach_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.entitlements.attach
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -54,6 +75,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def detach_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.entitlements.detach
+    ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       resource.product == bearer
@@ -61,6 +85,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def list_entitlements?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer
@@ -68,6 +95,9 @@ class PolicyPolicy < ApplicationPolicy
 
   def show_entitlement?
     assert_account_scoped!
+    assert_permissions! %w[
+      policy.entitlements.read
+    ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       resource.product == bearer

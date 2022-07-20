@@ -3,12 +3,18 @@
 class ReleasePlatformPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_permissions! %w[
+      platform.read
+    ]
 
     true
   end
 
   def show?
     assert_account_scoped!
+    assert_permissions! %w[
+      platform.read
+    ]
 
     true
   end
