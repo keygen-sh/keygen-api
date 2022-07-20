@@ -602,6 +602,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
+    And the current user should have 0 "tokens"
 
   Scenario: Admin attempts to demote themself to user when they're the only admin
     Given I am an admin of account "test1"
@@ -630,6 +631,7 @@ Feature: Update user
           "code": "ACCOUNT_ADMINS_REQUIRED"
         }
       """
+    And the current user should have 1 "token"
 
   Scenario: Admin updates a users metadata
     Given I am an admin of account "test1"
