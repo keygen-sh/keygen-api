@@ -12,13 +12,9 @@ class Token < ApplicationRecord
   belongs_to :account
   belongs_to :bearer, polymorphic: true
   has_many :token_permissions
-  has_many :permissions,
-    through: :token_permissions
 
-  accepts_nested_attributes_for :permissions
-
-  before_create :set_default_permissions!,
-    if: -> { permissions.empty? }
+  accepts_nested_attributes_for :token_permissions,
+    reject_if: :reject_duplicate_token_permissions
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
@@ -70,6 +66,29 @@ class Token < ApplicationRecord
 
     where(bearer_id: bearer_id)
   }
+
+  delegate :role,
+    to: :bearer
+
+  def permissions=(*ids)
+    assign_attributes(
+      token_permissions_attributes: ids.flatten.map {{ permission_id: _1 }},
+    )
+  end
+
+  def permissions
+    return role.permissions unless
+      token_permissions.exists?
+
+    # A token's permission set is the intersection of its bearer's role
+    # permissions and its own token permissions.
+    Permission.distinct
+              .joins(:role_permissions, :token_permissions)
+              .where(
+                role_permissions: { role_id: role.id },
+                token_permissions: { token_id: id },
+              )
+  end
 
   def self.cache_key(digest)
     hash = Digest::SHA256.hexdigest digest
@@ -235,11 +254,10 @@ class Token < ApplicationRecord
 
   private
 
-  def set_default_permissions!
-    self.id = SecureRandom.uuid
+  def reject_duplicate_token_permissions(attrs)
+    return if
+      new_record?
 
-    TokenPermission.insert_all!(
-      bearer.permission_ids.map { { permission_id: _1, token_id: id } },
-    )
+    token_permissions.exists?(attrs)
   end
 end
