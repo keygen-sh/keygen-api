@@ -7,6 +7,7 @@ begin
 
   desc 'run test suite'
   task 'test': %i[
+    log:clear
     parallel:spec
     parallel:features
   ]

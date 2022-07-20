@@ -93,15 +93,13 @@ class ApplicationPolicy
         bearer.nil?
 
       raise Pundit::NotAuthorizedError, reason: 'bearer lacks permissions' unless
-        bearer.permissions.any? { _1.action == action.to_s }
+        bearer.permissions.exists?(action:)
 
       next if
         token.nil?
 
       raise Pundit::NotAuthorizedError, reason: 'token lacks permissions' unless
-        (token.permissions & bearer.permissions).any? {
-          _1.action == action.to_s
-        }
+        token.permissions.exists?(action:)
     end
   end
 

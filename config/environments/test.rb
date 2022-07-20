@@ -58,6 +58,11 @@ Rails.application.configure do
   # Route exceptions to error controller.
   config.exceptions_app = self.routes
 
+  # Enable query logs.
+  config.active_record.query_log_tags = %i[application pid controller action job]
+  config.active_record.query_log_tags_enabled = true
+  config.active_record.verbose_query_logs = true
+
   # Raise errors on unpermitted params.
   config.action_controller.action_on_unpermitted_parameters = :raise
 
