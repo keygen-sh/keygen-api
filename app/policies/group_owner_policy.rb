@@ -4,7 +4,7 @@ class GroupOwnerPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
     assert_permissions! %w[
-      group.owner.read
+      group.owners.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product)
@@ -13,7 +13,7 @@ class GroupOwnerPolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
     assert_permissions! %w[
-      group.owner.read
+      group.owners.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product)
