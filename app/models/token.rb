@@ -15,6 +15,8 @@ class Token < ApplicationRecord
   has_many :permissions,
     through: :token_permissions
 
+  accepts_nested_attributes_for :permissions
+
   before_create :set_default_permissions!,
     if: -> { permissions.empty? }
 

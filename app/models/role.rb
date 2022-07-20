@@ -493,7 +493,8 @@ class Role < ApplicationRecord
     through: :role_permissions
 
   before_create :set_default_permissions!
-  before_update :reset_permissions!
+  before_update :reset_permissions!,
+    if: -> { resource.role.changed? }
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,

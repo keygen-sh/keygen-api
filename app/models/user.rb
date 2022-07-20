@@ -250,11 +250,11 @@ class User < ApplicationRecord
   end
 
   def active?(t = 90.days.ago)
-    created_at >= t || licenses.active.any?
+    created_at >= t || licenses.active.exists?
   end
 
   def inactive?(t = 90.days.ago)
-    created_at < t && licenses.active.empty?
+    created_at < t && !licenses.active.exists?
   end
 
   def banned?
@@ -281,13 +281,7 @@ class User < ApplicationRecord
   end
 
   def second_factor_enabled?
-    return false if second_factors.enabled.empty?
-
-    # We only allow a single 2FA key right now, but we may allow more later,
-    # e.g. multiple 2FA keys, or U2F.
-    second_factor = second_factors.enabled.last
-
-    second_factor.enabled?
+    second_factors.enabled.exists?
   end
 
   def verify_second_factor(otp)
