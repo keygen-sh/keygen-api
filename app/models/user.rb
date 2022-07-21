@@ -222,6 +222,9 @@ class User < ApplicationRecord
     end
   }
 
+  delegate :can?,
+    to: :role
+
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 
