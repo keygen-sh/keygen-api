@@ -11,6 +11,9 @@ class UserSerializer < BaseSerializer
   attribute :role do
     @object.role&.name&.dasherize
   end
+  attribute :permissions do
+    @object.permissions.pluck(:action)
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
