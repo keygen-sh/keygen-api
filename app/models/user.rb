@@ -30,8 +30,6 @@ class User < ApplicationRecord
   has_many :group_owners
   has_many :groups,
     through: :group_owners
-  has_many :permissions,
-    through: :role
 
   accepts_nested_attributes_for :role,
     update_only: true
@@ -223,7 +221,15 @@ class User < ApplicationRecord
   }
 
   delegate :can?,
+    :permissions,
     to: :role
+
+  def permissions=(*actions)
+    ids = Permission.where(action: actions.flatten)
+                    .pluck(:id)
+
+    role.permissions = ids
+  end
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
