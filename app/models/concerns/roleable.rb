@@ -46,6 +46,7 @@ module Roleable
 
       names.any? { _1.to_s == role.name }
     end
+    alias_method :has_roles?, :has_role?
 
     def was_role?(name)
       return false if
@@ -54,8 +55,6 @@ module Roleable
       name.to_s == role.name_was
     end
 
-    def role?
-      role.present?
-    end
+    def role? = role.present?
   end
 end
