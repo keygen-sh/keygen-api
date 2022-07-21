@@ -17,7 +17,8 @@ class Token < ApplicationRecord
   accepts_nested_attributes_for :token_permissions,
     reject_if: :reject_duplicate_token_permissions
 
-  before_create :set_default_permissions!
+  before_create :set_default_permissions!,
+    if: -> { token_permissions.empty? }
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.

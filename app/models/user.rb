@@ -34,10 +34,11 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :role,
     update_only: true
 
+  after_initialize -> { grant_role!(:user) },
+    unless: :role?
+
   before_destroy :enforce_admin_minimum_on_account!
   before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }
-  before_create -> { grant!(:user) },
-    if: -> { role.nil? }
 
   before_save -> { self.email = email.downcase.strip }
 
@@ -219,17 +220,6 @@ class User < ApplicationRecord
       where.not(sub_query)
     end
   }
-
-  delegate :can?,
-    :permissions,
-    to: :role
-
-  def permissions=(*actions)
-    ids = Permission.where(action: actions.flatten)
-                    .pluck(:id)
-
-    role.permissions = ids
-  end
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
