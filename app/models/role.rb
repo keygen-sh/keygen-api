@@ -112,21 +112,21 @@ class Role < ApplicationRecord
   def set_default_permissions!
     actions = case name.to_sym
               in :admin
-                ADMIN_PERMISSIONS
+                Permission::ADMIN_PERMISSIONS
               in :developer
-                ADMIN_PERMISSIONS
+                Permission::ADMIN_PERMISSIONS
               in :sales_agent
-                ADMIN_PERMISSIONS
+                Permission::ADMIN_PERMISSIONS
               in :support_agent
-                ADMIN_PERMISSIONS
+                Permission::ADMIN_PERMISSIONS
               in :read_only
-                READ_ONLY_PERMISSIONS
+                Permission::READ_ONLY_PERMISSIONS
               in :product
-                PRODUCT_PERMISSIONS
+                Permission::PRODUCT_PERMISSIONS
               in :user
-                USER_PERMISSIONS
+                Permission::USER_PERMISSIONS
               in :license
-                LICENSE_PERMISSIONS
+                Permission::LICENSE_PERMISSIONS
               end
 
     role_permissions.insert_all!(

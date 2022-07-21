@@ -72,6 +72,7 @@ class Token < ApplicationRecord
   }
 
   delegate :role,
+    allow_nil: true,
     to: :bearer
 
   # Instead of doing a has_many(through:), we're doing this so that we can
@@ -87,8 +88,18 @@ class Token < ApplicationRecord
                 )
                 .pluck(:id)
 
-    if permission_ids.size != identifiers.size
+    case
+    # Invalid permissions would be ignored by default, but that doesn't
+    # really provide a nice DX. We'll error instead of ignoring.
+    when permission_ids.size != identifiers.size
       errors.add :permissions, :not_allowed, message: 'unsupported permissions'
+
+      raise ActiveRecord::RecordInvalid, self
+    # Make sure we also offer a good DX for privilege escalation attempts.
+    # Would be denied by Pundit, regardless, but DX is important.
+    when (permission_ids - bearer.permissions.ids).any? &&
+         !Permission.wildcard?(permission_ids)
+      errors.add :permissions, :not_allowed, message: "token bearer's permissions cannot be exceeded"
 
       raise ActiveRecord::RecordInvalid, self
     end
@@ -113,7 +124,7 @@ class Token < ApplicationRecord
     return role.permissions if
       token_permissions.joins(:permission)
                        .exists?(permission: {
-                         action: WILDCARD_PERMISSION,
+                         action: Permission::WILDCARD_PERMISSION,
                        })
 
     # A token's permission set is the intersection of its bearer's role
@@ -124,6 +135,7 @@ class Token < ApplicationRecord
                 role_permissions: { role_id: role.id },
                 token_permissions: { token_id: id },
               )
+              .reorder(nil)
   end
 
   def self.cache_key(digest)
@@ -298,7 +310,7 @@ class Token < ApplicationRecord
   end
 
   def set_default_permissions!
-    permission_id = Permission.where(action: WILDCARD_PERMISSION)
+    permission_id = Permission.where(action: Permission::WILDCARD_PERMISSION)
                               .pick(:id)
 
     # By default, a token inherits its role's permissions using a wildcard.

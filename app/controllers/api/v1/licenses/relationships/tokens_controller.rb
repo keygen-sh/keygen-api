@@ -14,7 +14,8 @@ module Api::V1::Licenses::Relationships
       kwargs = token_params.to_h.symbolize_keys.slice(
         :max_activations,
         :max_deactivations,
-        :expiry
+        :permissions,
+        :expiry,
       )
 
       token = TokenGeneratorService.call(
@@ -77,6 +78,9 @@ module Api::V1::Licenses::Relationships
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
             param :max_activations, type: :integer, optional: true
             param :max_deactivations, type: :integer, optional: true
+            param :permissions, type: :array, optional: true do
+              items type: :string
+            end
           end
         end
       end
