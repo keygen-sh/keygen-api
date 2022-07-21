@@ -94,6 +94,12 @@ class ApplicationPolicy
     return if
       bearer.nil?
 
+    raise Pundit::NotAuthorizedError, message: "bearer is suspended" if
+      bearer.license? && bearer.suspended?
+
+    raise Pundit::NotAuthorizedError, message: "bearer is banned" if
+      bearer.user? && bearer.banned?
+
     raise Pundit::NotAuthorizedError, message: "bearer lacks permission to perform action" unless
       bearer.can?(actions)
 
