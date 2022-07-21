@@ -78,12 +78,20 @@ class Token < ApplicationRecord
   # allow permissions to be attached by action, rather than just ID. This
   # also allows us to insert in bulk, rather than serially.
   def permissions=(*identifiers)
+    identifiers.flatten!
+
     permission_ids =
-      Permission.where(action: identifiers.flatten)
+      Permission.where(action: identifiers)
                 .or(
-                  Permission.where(id: identifiers.flatten)
+                  Permission.where(id: identifiers)
                 )
                 .pluck(:id)
+
+    if permission_ids.size != identifiers.size
+      errors.add :permissions, :not_allowed, message: 'unsupported permissions'
+
+      raise ActiveRecord::RecordInvalid, self
+    end
 
     token_permissions_attributes =
       permission_ids.map {{ permission_id: _1 }}

@@ -6,11 +6,22 @@ module Roleable
   included do
     delegate :can?,
       :permissions,
+      allow_nil: true,
       to: :role
 
     def permissions=(*actions)
-      ids = Permission.where(action: actions.flatten)
+      actions.flatten!
+
+      ids = Permission.where(action: actions)
                       .pluck(:id)
+
+      # These would be ignored by default, but that doesn't really
+      # provide a nice DX. We'll error instead of ignoring.
+      if ids.size != actions.size
+        errors.add :permissions, :not_allowed, message: 'unsupported permissions'
+
+        raise ActiveRecord::RecordInvalid, self
+      end
 
       if new_record?
         role_permissions_attributes = ids.map {{ permission_id: _1 }}
