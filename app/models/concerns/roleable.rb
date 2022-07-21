@@ -12,10 +12,12 @@ module Roleable
     def permissions=(*actions)
       actions.flatten!
 
-      ids = Permission.where(action: actions)
+      ids = Permission.distinct
+                      .where(action: actions)
+                      .reorder(nil)
                       .pluck(:id)
 
-      # These would be ignored by default, but that doesn't really
+      # Invalid actions would be ignored by default, but that doesn't really
       # provide a nice DX. We'll error instead of ignoring.
       if ids.size != actions.size
         errors.add :permissions, :not_allowed, message: 'unsupported permissions'
@@ -66,6 +68,10 @@ module Roleable
       name.to_s == role.name_was
     end
 
-    def role? = role.present?
+    def role?    = role.present?
+    def user?    = role.user?
+    def admin?   = role.admin?
+    def product? = role.product?
+    def license? = role.license?
   end
 end
