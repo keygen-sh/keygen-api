@@ -8,7 +8,6 @@ class MachineHeartbeatWorker
   sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
     lock: :until_and_while_executing,
-    lock_timeout: 0,
     on_conflict: {
       client: :replace,
       server: :raise,
