@@ -121,6 +121,11 @@ module Api::V1
                 [:role_attributes, { name: v.underscore }]
               }
             end
+            if current_bearer&.has_role?(:admin, :product)
+              param :permissions, type: :array, optional: true do
+                items type: :string
+              end
+            end
           end
           param :relationships, type: :hash, optional: true do
             if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
@@ -145,6 +150,11 @@ module Api::V1
             param :email, type: :string, optional: true
             if current_bearer&.has_role?(:admin, :product)
               param :password, type: :string, optional: true, allow_nil: true
+            end
+            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+              param :permissions, type: :array, optional: true do
+                items type: :string
+              end
             end
             if current_bearer&.has_role?(:admin, :developer, :sales_agent, :product)
               param :metadata, type: :hash, allow_non_scalars: true, optional: true

@@ -29,8 +29,12 @@ class Product < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  accepts_nested_attributes_for :role,
+    update_only: true
+
+  after_initialize -> { grant_role!(:product) }
+
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
-  before_create -> { grant!(:product) }
 
   validates :name, presence: true
   validates :url, url: { protocols: %w[https http] }, allow_nil: true
@@ -87,17 +91,6 @@ class Product < ApplicationRecord
         )
     end
   }
-
-  delegate :can?,
-    :permissions,
-    to: :role
-
-  def permissions=(*actions)
-    ids = Permission.where(action: actions.flatten)
-                    .pluck(:id)
-
-    role.permissions = ids
-  end
 
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat
