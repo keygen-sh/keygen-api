@@ -26,8 +26,6 @@ class License < ApplicationRecord
     through: :product
   has_many :event_logs,
     as: :resource
-  has_many :permissions,
-    through: :role
 
   # Used for legacy encrypted licenses
   attr_reader :raw
@@ -458,7 +456,15 @@ class License < ApplicationRecord
     allow_nil: true
 
   delegate :can?,
+    :permissions,
     to: :role
+
+  def permissions=(*actions)
+    ids = Permission.where(action: actions.flatten)
+                    .pluck(:id)
+
+    role.permissions = ids
+  end
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
