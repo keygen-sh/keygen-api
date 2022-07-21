@@ -49,9 +49,6 @@ permissions = %w[
   license.entitlements.detach
   license.entitlements.read
   license.group.update
-  license.permissions.attach
-  license.permissions.detach
-  license.permissions.read
   license.policy.update
   license.read
   license.reinstate
@@ -84,9 +81,6 @@ permissions = %w[
   policy.entitlements.attach
   policy.entitlements.detach
   policy.entitlements.read
-  policy.permissions.attach
-  policy.permissions.detach
-  policy.permissions.read
   policy.pool.pop
   policy.read
   policy.update
@@ -100,9 +94,6 @@ permissions = %w[
   product.create
   product.delete
   product.read
-  product.permissions.attach
-  product.permissions.detach
-  product.permissions.read
   product.tokens.generate
   product.tokens.read
   product.update
@@ -142,9 +133,6 @@ permissions = %w[
   user.invite
   user.password.update
   user.password.reset
-  user.permissions.attach
-  user.permissions.detach
-  user.permissions.read
   user.read
   user.tokens.generate
   user.tokens.read

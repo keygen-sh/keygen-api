@@ -90,6 +90,9 @@ class Product < ApplicationRecord
     end
   }
 
+  delegate :can?,
+    to: :role
+
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat
     return true if
