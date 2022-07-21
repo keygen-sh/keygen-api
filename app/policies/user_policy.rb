@@ -173,19 +173,19 @@ class UserPolicy < ApplicationPolicy
       resource.role.nil?
 
     # Assert that privilege escalation is not occurring by anonymous (sanity check)
-    raise Pundit::NotAuthorizedError, reason: 'anonymous is escalating privileges for the resource' if
+    raise Pundit::NotAuthorizedError, message: 'anonymous is escalating privileges for the resource' if
       bearer.nil? && resource.role.changed? && !resource.role.user?
 
     return if
       bearer.nil?
 
     # Assert that privilege escalation is not occurring by a bearer (sanity check)
-    raise Pundit::NotAuthorizedError, reason: 'bearer is escalating privileges for the resource' if
+    raise Pundit::NotAuthorizedError, message: 'bearer is escalating privileges for the resource' if
       (bearer.role.changed? || resource.role.changed?) &&
       bearer.role < resource.role
 
     # Assert bearer can perform this action on the resource
-    raise Pundit::NotAuthorizedError, reason: 'bearer lacks privileges to the resource' if
+    raise Pundit::NotAuthorizedError, message: 'bearer lacks privileges to the resource' if
       bearer.role < resource.role
   end
 end
