@@ -16,6 +16,8 @@ class Token < ApplicationRecord
   accepts_nested_attributes_for :token_permissions,
     reject_if: :reject_duplicate_token_permissions
 
+  before_create :set_default_permissions!
+
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
   after_commit :clear_cache!,
@@ -77,8 +79,11 @@ class Token < ApplicationRecord
   end
 
   def permissions
-    return role.permissions unless
-      token_permissions.exists?
+    return role.permissions if
+      token_permissions.joins(:permission)
+                       .exists?(permission: {
+                         action: WILDCARD_PERMISSION,
+                       })
 
     # A token's permission set is the intersection of its bearer's role
     # permissions and its own token permissions.
@@ -259,5 +264,13 @@ class Token < ApplicationRecord
       new_record?
 
     token_permissions.exists?(attrs)
+  end
+
+  def set_default_permissions!
+    permission_id = Permission.where(action: WILDCARD_PERMISSION)
+                              .pick(:id)
+
+    # By default, a token inherits its role's permissions using a wildcard.
+    assign_attributes(token_permissions_attributes: [{ permission_id: }])
   end
 end
