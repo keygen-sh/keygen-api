@@ -21,8 +21,9 @@ class Role < ApplicationRecord
   belongs_to :resource,
     polymorphic: true
   has_many :role_permissions
-  has_many :permissions,
-    through: :role_permissions
+
+  accepts_nested_attributes_for :role_permissions,
+    reject_if: :reject_duplicate_role_permissions
 
   before_create :set_default_permissions!
   before_update :reset_permissions!,
@@ -41,6 +42,22 @@ class Role < ApplicationRecord
   validates :name,
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
     if: -> { resource.is_a?(License) }
+
+  # Instead of doing a has_many(through:), we're doing this so that we can
+  # allow permissions to be attached by action, rather than by ID. We
+  # don't expose permission IDs to the world.
+  def permissions=(*ids)
+    assign_attributes(
+      role_permissions_attributes: ids.flatten.map {{ permission_id: _1 }},
+    )
+  end
+
+  def permissions
+    Permission.joins(:role_permissions)
+              .where(
+                role_permissions: { role_id: id },
+              )
+  end
 
   def rank
     ROLE_RANK.fetch(name) { -1 }
@@ -64,42 +81,62 @@ class Role < ApplicationRecord
 
   private
 
-  def set_permissions!
-    perms =
-      case name.to_sym
-      in :admin
-        Permission.where(action: ADMIN_PERMISSIONS)
-      in :developer
-        Permission.where(action: ADMIN_PERMISSIONS)
-      in :sales_agent
-        Permission.where(action: ADMIN_PERMISSIONS)
-      in :support_agent
-        Permission.where(action: ADMIN_PERMISSIONS)
-      in :read_only
-        Permission.where(action: READ_ONLY_PERMISSIONS)
-      in :product
-        Permission.where(action: PRODUCT_PERMISSIONS)
-      in :user
-        Permission.where(action: USER_PERMISSIONS)
-      in :license
-        Permission.where(action: LICENSE_PERMISSIONS)
-      end
+  def reject_duplicate_role_permissions(attrs)
+    return if
+      new_record?
 
-    RolePermission.upsert_all(
-      perms.ids.map {{ permission_id: _1, role_id: id }},
-      on_duplicate: :skip,
-    )
+    role_permissions.exists?(attrs)
   end
 
   def set_default_permissions!
-    self.id ||= SecureRandom.uuid
+    perms = case name.to_sym
+            in :admin
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :developer
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :sales_agent
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :support_agent
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :read_only
+              Permission.where(action: READ_ONLY_PERMISSIONS)
+            in :product
+              Permission.where(action: PRODUCT_PERMISSIONS)
+            in :user
+              Permission.where(action: USER_PERMISSIONS)
+            in :license
+              Permission.where(action: LICENSE_PERMISSIONS)
+            end
 
-    set_permissions!
+    assign_attributes(
+      role_permissions_attributes: perms.ids.map {{ permission_id: _1 }},
+    )
   end
 
   def reset_permissions!
-    self.permissions = []
+    self.role_permissions = []
 
-    set_permissions!
+    perms = case name.to_sym
+            in :admin
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :developer
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :sales_agent
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :support_agent
+              Permission.where(action: ADMIN_PERMISSIONS)
+            in :read_only
+              Permission.where(action: READ_ONLY_PERMISSIONS)
+            in :product
+              Permission.where(action: PRODUCT_PERMISSIONS)
+            in :user
+              Permission.where(action: USER_PERMISSIONS)
+            in :license
+              Permission.where(action: LICENSE_PERMISSIONS)
+            end
+
+    role_permissions.insert_all!(
+      perms.ids.map {{ permission_id: _1 }},
+    )
   end
 end
