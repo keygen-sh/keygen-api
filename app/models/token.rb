@@ -85,7 +85,10 @@ class Token < ApplicationRecord
                 )
                 .pluck(:id)
 
-    return assign_attributes(token_permissions_attributes: permission_ids.map {{ permission_id: _1 }}) if
+    token_permissions_attributes =
+      permission_ids.map {{ permission_id: _1 }}
+
+    return assign_attributes(token_permissions_attributes:) if
       new_record?
 
     transaction do
@@ -94,9 +97,7 @@ class Token < ApplicationRecord
       return if
         permission_ids.empty?
 
-      token_permissions.insert_all!(
-        permission_ids.map {{ permission_id: _1 }},
-      )
+      token_permissions.insert_all!(token_permissions_attributes)
     end
   end
 
