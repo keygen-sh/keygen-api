@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_04_153453) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_21_134635) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -184,7 +184,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_04_153453) do
     t.index "account_id, md5((key)::text)", name: "licenses_account_id_key_unique_idx", unique: true
     t.index "to_tsvector('simple'::regconfig, COALESCE((id)::text, ''::text))", name: "licenses_tsv_id_idx", using: :gist
     t.index "to_tsvector('simple'::regconfig, COALESCE((metadata)::text, ''::text))", name: "licenses_tsv_metadata_idx", using: :gist
-    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gin
+    t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "licenses_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_licenses_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_licenses_on_created_at", order: :desc
     t.index ["group_id"], name: "index_licenses_on_group_id"
