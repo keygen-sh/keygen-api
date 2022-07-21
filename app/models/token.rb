@@ -11,7 +11,8 @@ class Token < ApplicationRecord
 
   belongs_to :account
   belongs_to :bearer, polymorphic: true
-  has_many :token_permissions
+  has_many :token_permissions,
+    dependent: :delete_all
 
   accepts_nested_attributes_for :token_permissions,
     reject_if: :reject_duplicate_token_permissions
