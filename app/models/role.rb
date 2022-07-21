@@ -48,12 +48,13 @@ class Role < ApplicationRecord
     if: -> { resource.is_a?(License) }
 
   # Instead of doing a has_many(through:), we're doing this so that we can
-  # allow permissions to be attached by action, rather than by ID. We
-  # don't expose permission IDs to the world.
+  # allow permissions to be attached by action via the resource, rather than
+  # by ID. We don't expose permission IDs to the world. This also allows
+  # us to insert in bulk, rather than serially.
   def permissions=(*ids)
-    perms = ids.flatten.map {{ permission_id: _1 }}
+    permission_attrs = ids.flatten.map {{ permission_id: _1 }}
 
-    return assign_attributes(role_permissions_attributes: perms) if
+    return assign_attributes(role_permissions_attributes: permission_attrs) if
       new_record?
 
     transaction do
@@ -62,7 +63,7 @@ class Role < ApplicationRecord
       return if
         perms.empty?
 
-      role_permissions.insert_all!(perms)
+      role_permissions.insert_all!(permission_attrs)
     end
   end
 
