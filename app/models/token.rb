@@ -74,12 +74,29 @@ class Token < ApplicationRecord
     to: :bearer
 
   # Instead of doing a has_many(through:), we're doing this so that we can
-  # allow permissions to be attached by action, rather than by ID. We
-  # don't expose permission IDs to the world.
-  def permissions=(*ids)
-    assign_attributes(
-      token_permissions_attributes: ids.flatten.map {{ permission_id: _1 }},
-    )
+  # allow permissions to be attached by action, rather than just ID. This
+  # also allows us to insert in bulk, rather than serially.
+  def permissions=(*identifiers)
+    permission_ids =
+      Permission.where(action: identifiers.flatten)
+                .or(
+                  Permission.where(id: identifiers.flatten)
+                )
+                .pluck(:id)
+
+    return assign_attributes(token_permissions_attributes: permission_ids.map {{ permission_id: _1 }}) if
+      new_record?
+
+    transaction do
+      token_permissions.delete_all
+
+      return if
+        permission_ids.empty?
+
+      token_permissions.insert_all!(
+        permission_ids.map {{ permission_id: _1 }},
+      )
+    end
   end
 
   def permissions
