@@ -390,7 +390,9 @@ class ApplicationController < ActionController::API
     end
   rescue Pundit::NotDefinedError => e
     render_not_found
-  rescue Pundit::NotAuthorizedError
+  rescue Pundit::NotAuthorizedError => e
+    Keygen.logger.warn { "[pundit] policy=#{e.policy.class.name.underscore} query=#{e.query} message=#{e.message}" }
+
     msg = if current_bearer.present?
             'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'
           else

@@ -71,15 +71,15 @@ class ApplicationPolicy
   end
 
   def assert_account_scoped!
-    raise Pundit::NotAuthorizedError, reason: 'account mismatch for bearer' unless
+    raise Pundit::NotAuthorizedError, message: 'account mismatch for bearer' unless
       bearer.nil? || bearer.account_id == account.id
 
     case
     when resource.respond_to?(:all?)
-      raise Pundit::NotAuthorizedError, reason: 'account mismatch for resources' unless
+      raise Pundit::NotAuthorizedError, message: 'account mismatch for resources' unless
         resource.all? { |r| r.account_id == account.id }
     when resource.respond_to?(:account_id)
-      raise Pundit::NotAuthorizedError, reason: 'account mismatch for resource' unless
+      raise Pundit::NotAuthorizedError, message: 'account mismatch for resource' unless
         resource.account_id == account.id
     else
       # NOTE(ezekg) We likely passed in the model class directly, e.g. `authorize(RequestLog)`,
@@ -88,22 +88,22 @@ class ApplicationPolicy
   end
 
   def assert_permissions!(*actions)
-    # raise Pundit::NotAuthorizedError, reason: "resource's group lacks permission to perform action" unless
+    # raise Pundit::NotAuthorizedError, message: "resource's group lacks permission to perform action" unless
     #   resource.group.nil? || resource.group.can?(actions)
 
     return if
       bearer.nil?
 
-    raise Pundit::NotAuthorizedError, reason: "bearer lacks permission to perform action" unless
+    raise Pundit::NotAuthorizedError, message: "bearer lacks permission to perform action" unless
       bearer.can?(actions)
 
-    # raise Pundit::NotAuthorizedError, reason: "bearer's group lacks permission to perform action" unless
+    # raise Pundit::NotAuthorizedError, message: "bearer's group lacks permission to perform action" unless
     #   bearer.group.nil? || bearer.group.can?(actions)
 
     return if
       token.nil?
 
-    raise Pundit::NotAuthorizedError, reason: "token lacks permission to perform action" unless
+    raise Pundit::NotAuthorizedError, message: "token lacks permission to perform action" unless
       token.can?(actions)
   end
 
