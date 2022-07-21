@@ -27,8 +27,13 @@ class License < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
+  accepts_nested_attributes_for :role,
+    update_only: true
+
   # Used for legacy encrypted licenses
   attr_reader :raw
+
+  after_initialize -> { grant_role!(:license) }
 
   before_create :enforce_license_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
@@ -36,7 +41,6 @@ class License < ApplicationRecord
   before_create :set_expiry_on_creation, if: -> { expiry.nil? && policy.present? }
   before_create :autogenerate_key, if: -> { key.nil? && policy.present? }
   before_create :crypt_key, if: -> { scheme? && !legacy_encrypted? }
-  before_create -> { grant!(:license) }
 
   # Licenses automatically inherit their user's group ID. We're using before_validation
   # instead of before_create so that this can be run when the user is changed as well,
@@ -454,17 +458,6 @@ class License < ApplicationRecord
     :require_heartbeat?,
     to: :policy,
     allow_nil: true
-
-  delegate :can?,
-    :permissions,
-    to: :role
-
-  def permissions=(*actions)
-    ids = Permission.where(action: actions.flatten)
-                    .pluck(:id)
-
-    role.permissions = ids
-  end
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct

@@ -28,7 +28,8 @@ class Role < ApplicationRecord
 
   # We're doing this in an after create commit so we can use a bulk insert,
   # which is more performant than inserting tens of permissions.
-  after_create_commit :set_default_permissions!
+  after_create_commit :set_default_permissions!,
+    if: -> { role_permissions.empty? }
 
   before_update :reset_permissions!,
     if: :name_changed?
