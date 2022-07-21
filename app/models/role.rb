@@ -95,6 +95,11 @@ class Role < ApplicationRecord
     rank > comparison_role.rank
   end
 
+  def user?    = name.to_sym == :user
+  def admin?   = name.to_sym == :admin
+  def product? = name.to_sym == :product
+  def license? = name.to_sym == :license
+
   private
 
   def reject_duplicate_role_permissions(attrs)
