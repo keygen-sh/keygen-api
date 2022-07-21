@@ -72,6 +72,9 @@ class Token < ApplicationRecord
   delegate :role,
     to: :bearer
 
+  # Instead of doing a has_many(through:), we're doing this so that we can
+  # allow permissions to be attached by action, rather than by ID. We
+  # don't expose permission IDs to the world.
   def permissions=(*ids)
     assign_attributes(
       token_permissions_attributes: ids.flatten.map {{ permission_id: _1 }},
