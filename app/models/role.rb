@@ -20,14 +20,18 @@ class Role < ApplicationRecord
 
   belongs_to :resource,
     polymorphic: true
-  has_many :role_permissions
+  has_many :role_permissions,
+    dependent: :delete_all
 
   accepts_nested_attributes_for :role_permissions,
     reject_if: :reject_duplicate_role_permissions
 
-  before_create :set_default_permissions!
+  # We're doing this in an after create commit so we can use a bulk insert,
+  # which is more performant than inserting tens of permissions.
+  after_create_commit :set_default_permissions!
+
   before_update :reset_permissions!,
-    if: -> { resource.role.changed? }
+    if: :name_changed?
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,
@@ -89,54 +93,37 @@ class Role < ApplicationRecord
   end
 
   def set_default_permissions!
-    perms = case name.to_sym
-            in :admin
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :developer
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :sales_agent
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :support_agent
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :read_only
-              Permission.where(action: READ_ONLY_PERMISSIONS)
-            in :product
-              Permission.where(action: PRODUCT_PERMISSIONS)
-            in :user
-              Permission.where(action: USER_PERMISSIONS)
-            in :license
-              Permission.where(action: LICENSE_PERMISSIONS)
-            end
+    actions = case name.to_sym
+              in :admin
+                ADMIN_PERMISSIONS
+              in :developer
+                ADMIN_PERMISSIONS
+              in :sales_agent
+                ADMIN_PERMISSIONS
+              in :support_agent
+                ADMIN_PERMISSIONS
+              in :read_only
+                READ_ONLY_PERMISSIONS
+              in :product
+                PRODUCT_PERMISSIONS
+              in :user
+                USER_PERMISSIONS
+              in :license
+                LICENSE_PERMISSIONS
+              end
 
-    assign_attributes(
-      role_permissions_attributes: perms.ids.map {{ permission_id: _1 }},
+    role_permissions.insert_all!(
+      Permission.where(action: actions)
+                .pluck(:id)
+                .map {{ permission_id: _1 }},
     )
   end
 
   def reset_permissions!
-    self.role_permissions = []
+    transaction do
+      role_permissions.delete_all
 
-    perms = case name.to_sym
-            in :admin
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :developer
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :sales_agent
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :support_agent
-              Permission.where(action: ADMIN_PERMISSIONS)
-            in :read_only
-              Permission.where(action: READ_ONLY_PERMISSIONS)
-            in :product
-              Permission.where(action: PRODUCT_PERMISSIONS)
-            in :user
-              Permission.where(action: USER_PERMISSIONS)
-            in :license
-              Permission.where(action: LICENSE_PERMISSIONS)
-            end
-
-    role_permissions.insert_all!(
-      perms.ids.map {{ permission_id: _1 }},
-    )
+      set_default_permissions!
+    end
   end
 end
