@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 permissions = %w[
+  *
+
   account.billing.read
   account.billing.update
   account.plan.read
