@@ -7,6 +7,9 @@ class ProductSerializer < BaseSerializer
   attribute :distribution_strategy
   attribute :url
   attribute :platforms
+  attribute :permissions do
+    @object.permissions.pluck(:action)
+  end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
   end
