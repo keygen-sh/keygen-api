@@ -51,9 +51,19 @@ class Role < ApplicationRecord
   # allow permissions to be attached by action, rather than by ID. We
   # don't expose permission IDs to the world.
   def permissions=(*ids)
-    assign_attributes(
-      role_permissions_attributes: ids.flatten.map {{ permission_id: _1 }},
-    )
+    perms = ids.flatten.map {{ permission_id: _1 }}
+
+    return assign_attributes(role_permissions_attributes: perms) if
+      new_record?
+
+    transaction do
+      role_permissions.delete_all
+
+      return if
+        perms.empty?
+
+      role_permissions.insert_all!(perms)
+    end
   end
 
   def permissions

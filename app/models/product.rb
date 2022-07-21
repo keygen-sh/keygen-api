@@ -28,8 +28,6 @@ class Product < ApplicationRecord
   has_many :release_arches, through: :release_artifacts, source: :arch
   has_many :event_logs,
     as: :resource
-  has_many :permissions,
-    through: :role
 
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
   before_create -> { grant!(:product) }
@@ -91,7 +89,15 @@ class Product < ApplicationRecord
   }
 
   delegate :can?,
+    :permissions,
     to: :role
+
+  def permissions=(*actions)
+    ids = Permission.where(action: actions.flatten)
+                    .pluck(:id)
+
+    role.permissions = ids
+  end
 
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat
