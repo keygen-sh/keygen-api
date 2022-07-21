@@ -11,10 +11,15 @@ module Api::V1::Products::Relationships
     def generate
       authorize product, :generate_token?
 
+      kwargs = token_params.to_h.symbolize_keys.slice(
+        :permissions,
+        :expiry,
+      )
+
       token = TokenGeneratorService.call(
         account: current_account,
         bearer: product,
-        expiry: nil
+        **kwargs,
       )
 
       BroadcastEventService.call(
@@ -55,6 +60,22 @@ module Api::V1::Products::Relationships
       authorize product, :show?
 
       Current.resource = product
+    end
+
+    typed_parameters format: :jsonapi do
+      options strict: true
+
+      on :generate do
+        param :data, type: :hash, optional: true do
+          param :type, type: :string, inclusion: %w[token tokens]
+          param :attributes, type: :hash do
+            param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+            param :permissions, type: :array, optional: true do
+              items type: :string
+            end
+          end
+        end
+      end
     end
   end
 end

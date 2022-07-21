@@ -28,12 +28,18 @@ module Api::V1::Users::Relationships
     def create
       authorize user, :generate_token?
 
-      kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
-      if !kwargs.key?(:expiry)
-        kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
-      end
+      kwargs = token_params.to_h.symbolize_keys.slice(
+        :permissions,
+        :expiry,
+      )
 
-      token = TokenGeneratorService.call(account: current_account, bearer: user, **kwargs)
+      token = TokenGeneratorService.call(
+        account: current_account,
+        bearer: user,
+        # NOTE(ezekg) This is a default (may be overridden by kwargs)
+        expiry: user.user? ? Time.current + Token::TOKEN_DURATION : nil,
+        **kwargs,
+      )
 
       return render_unprocessable_resource(token) unless
         token.valid?
@@ -66,6 +72,9 @@ module Api::V1::Users::Relationships
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+            param :permissions, type: :array, optional: true do
+              items type: :string
+            end
           end
         end
       end
