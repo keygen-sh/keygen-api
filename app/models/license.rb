@@ -457,6 +457,9 @@ class License < ApplicationRecord
     to: :policy,
     allow_nil: true
 
+  delegate :can?,
+    to: :role
+
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 
