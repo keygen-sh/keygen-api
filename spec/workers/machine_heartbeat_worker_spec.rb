@@ -13,11 +13,13 @@ describe MachineHeartbeatWorker do
 
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
+    SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
     Sidekiq::Testing.fake!
     StripeHelper.start
   end
 
   after do
+    SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
     DatabaseCleaner.clean
     StripeHelper.stop
   end
@@ -25,6 +27,18 @@ describe MachineHeartbeatWorker do
   it 'should enqueue and run the worker' do
     machine = create :machine, last_heartbeat_at: nil, account: account
 
+    worker.perform_async machine.id
+    expect(worker.jobs.size).to eq 1
+
+    worker.drain
+    expect(worker.jobs.size).to eq 0
+  end
+
+  it 'should replace the worker on conflict' do
+    machine = create :machine, last_heartbeat_at: nil, account: account
+
+    worker.perform_async machine.id
+    worker.perform_async machine.id
     worker.perform_async machine.id
     expect(worker.jobs.size).to eq 1
 
