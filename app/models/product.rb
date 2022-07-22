@@ -13,8 +13,9 @@ class Product < ApplicationRecord
     CLOSED
   ]
 
+  has_role :product
+
   belongs_to :account
-  has_one :role, as: :resource, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
@@ -28,11 +29,6 @@ class Product < ApplicationRecord
   has_many :release_arches, through: :release_artifacts, source: :arch
   has_many :event_logs,
     as: :resource
-
-  accepts_nested_attributes_for :role,
-    update_only: true
-
-  after_initialize -> { grant_role!(:product) }
 
   before_create -> { self.distribution_strategy = 'LICENSED' }, if: -> { distribution_strategy.nil? }
 

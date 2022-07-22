@@ -28,8 +28,8 @@ class Role < ApplicationRecord
 
   # We're doing this in an after create commit so we can use a bulk insert,
   # which is more performant than inserting tens of permissions.
-  after_create_commit :set_default_permissions!,
-    if: -> { role_permissions.empty? }
+  after_create :set_default_permissions!,
+    unless: -> { role_permissions_attributes? }
 
   before_update :reset_permissions!,
     if: :name_changed?
@@ -47,6 +47,19 @@ class Role < ApplicationRecord
   validates :name,
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
     if: -> { resource.is_a?(License) }
+
+  # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
+  #              have been provided. This adds a flag we can check. Will be nil
+  #              when nested attributes have not been provided.
+  alias :_role_permissions_attributes= :role_permissions_attributes=
+  attr_reader :role_permissions_attributes_before_type_cast
+
+  def role_permissions_attributes? = !role_permissions_attributes_before_type_cast.nil?
+  def role_permissions_attributes=(attributes)
+    @role_permissions_attributes_before_type_cast ||= attributes.dup
+
+    self._role_permissions_attributes = attributes
+  end
 
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action via the resource, rather than
