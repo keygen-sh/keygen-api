@@ -7,7 +7,7 @@ class ProcessHeartbeatWorker
   sidekiq_throttle concurrency: { limit: 25 }
   sidekiq_retry_in { 1.minute.to_i }
   sidekiq_options queue: :critical,
-    lock: :until_executed,
+    lock: :until_executing,
     on_conflict: {
       client: :replace,
       server: :raise,
