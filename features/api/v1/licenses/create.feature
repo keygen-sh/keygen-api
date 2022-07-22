@@ -2754,6 +2754,87 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User creates a license for themself (user lacks permission)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a license for themself (token lacks permission)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["license.create", "license.validate"] }
+      """
+    And the current account has 1 "token" for the last "user"
+    And the last "token" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the current account should have 0 "licenses"
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User creates an unprotected license for themself
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

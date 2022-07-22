@@ -4,10 +4,31 @@ module Roleable
   extend ActiveSupport::Concern
 
   included do
-    delegate :can?,
-      :permissions,
+    # FIXME(ezekg) Move all this to Roleable.has_role
+    has_one :role,
+      inverse_of: :resource,
+      dependent: :destroy,
+      as: :resource
+
+    accepts_nested_attributes_for :role,
+      update_only: true
+
+    delegate :can?, :permissions,
       allow_nil: true,
       to: :role
+
+    # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
+    #              have been provided. This adds a flag we can check. Will be nil
+    #              when nested attributes have not been provided.
+    alias :_role_attributes= :role_attributes=
+    attr_reader :role_attributes_before_type_cast
+
+    def role_attributes? = !role_attributes_before_type_cast.nil?
+    def role_attributes=(attributes)
+      @role_attributes_before_type_cast = attributes.dup
+
+      self._role_attributes = attributes
+    end
 
     def permissions=(*actions)
       actions.flatten!
@@ -36,28 +57,27 @@ module Roleable
 
     def grant_role!(name)
       if persisted?
-        if role.nil?
-          create_role!(name:)
-        else
-          role.update!(name:)
-        end
+        role.update!(name:)
       else
         assign_attributes(role_attributes: { name: })
       end
     end
 
     def revoke_role!(name)
-      return false if
-        role.nil? || name.to_s != role.name
+      raise RoleInvalid, 'role is missing' unless
+        role.present?
 
-      role.destroy
+      raise RoleInvalid, 'role is invalid' unless
+        name.to_s == role.name.to_s
+
+      role.destroy!
     end
 
     def has_role?(*names)
       return false if
         role.nil?
 
-      names.any? { _1.to_s == role.name }
+      names.any? { _1.to_s == role.name.to_s }
     end
     alias_method :has_roles?, :has_role?
 
@@ -65,13 +85,24 @@ module Roleable
       return false if
         role.nil? || !role.name_changed?
 
-      name.to_s == role.name_was
+      name.to_s == role.name_was.to_s
     end
 
-    def role?    = role.present?
-    def user?    = role.user?
-    def admin?   = role.admin?
-    def product? = role.product?
-    def license? = role.license?
+    def role?    = role.present? && role.name?
+    def user?    = role? && role.user?
+    def admin?   = role? && role.admin?
+    def product? = role? && role.product?
+    def license? = role? && role.license?
   end
+
+  class_methods do
+    def has_role(name, overridable: false)
+      after_initialize -> { grant_role!(name) },
+        unless: -> { overridable && role? }
+    end
+  end
+
+  private
+
+  class RoleInvalid < StandardError; end
 end

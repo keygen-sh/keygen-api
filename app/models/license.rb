@@ -9,6 +9,8 @@ class License < ApplicationRecord
   include Roleable
   include Diffable
 
+  has_role :license
+
   belongs_to :account
   belongs_to :user,
     optional: true
@@ -16,7 +18,6 @@ class License < ApplicationRecord
   belongs_to :group,
     optional: true
   has_one :product, through: :policy
-  has_one :role, as: :resource, dependent: :destroy
   has_many :license_entitlements, dependent: :delete_all
   has_many :policy_entitlements, through: :policy
   has_many :tokens, as: :bearer, dependent: :destroy
@@ -27,13 +28,8 @@ class License < ApplicationRecord
   has_many :event_logs,
     as: :resource
 
-  accepts_nested_attributes_for :role,
-    update_only: true
-
   # Used for legacy encrypted licenses
   attr_reader :raw
-
-  after_initialize -> { grant_role!(:license) }
 
   before_create :enforce_license_limit_on_account!
   before_create -> { self.protected = policy.protected? }, if: -> { policy.present? && protected.nil? }
