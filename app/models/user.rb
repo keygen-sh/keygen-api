@@ -11,11 +11,12 @@ class User < ApplicationRecord
   include Diffable
 
   has_secure_password :password, validations: false
+  has_role :user,
+    overridable: true
 
   belongs_to :account
   belongs_to :group,
     optional: true
-  has_one :role, as: :resource, dependent: :destroy
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
   has_many :products, -> { select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').reorder(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
@@ -30,12 +31,6 @@ class User < ApplicationRecord
   has_many :group_owners
   has_many :groups,
     through: :group_owners
-
-  accepts_nested_attributes_for :role,
-    update_only: true
-
-  after_initialize -> { grant_role!(:user) },
-    unless: :role?
 
   before_destroy :enforce_admin_minimum_on_account!
   before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }

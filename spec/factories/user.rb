@@ -13,37 +13,33 @@ FactoryBot.define do
       user.account ||= evaluator.account.presence
     end
 
-    after :create do |user|
-      user.role = create :role, :user, resource: user
-    end
-
     factory :admin do
-      after :create do |admin|
-        admin.role = create :role, :admin, resource: admin
+      after :create do |user|
+        user.grant_role!(:admin)
       end
     end
 
     factory :developer do
-      after :create do |dev|
-        dev.role = create :role, :developer, resource: dev
+      after :create do |user|
+        user.grant_role!(:developer)
       end
     end
 
     factory :support_agent do
-      after :create do |agent|
-        agent.role = create :role, :support_agent, resource: agent
+      after :create do |user|
+        user.grant_role!(:support_agent)
       end
     end
 
     factory :sales_agent do
-      after :create do |agent|
-        agent.role = create :role, :sales_agent, resource: agent
+      after :create do |user|
+        user.grant_role!(:sales_agent)
       end
     end
 
     factory :read_only do
       after :create do |user|
-        user.role = create :role, :read_only, resource: user
+        user.grant_role!(:read_only)
       end
     end
   end
