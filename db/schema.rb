@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_21_134635) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_23_044910) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -232,7 +232,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_21_134635) do
     t.index "to_tsvector('simple'::regconfig, COALESCE((name)::text, ''::text))", name: "machines_tsv_name_idx", using: :gist
     t.index ["account_id", "created_at"], name: "index_machines_on_account_id_and_created_at"
     t.index ["created_at"], name: "index_machines_on_created_at", order: :desc
-    t.index ["fingerprint"], name: "index_machines_on_fingerprint", using: :gin
     t.index ["fingerprint"], name: "machines_hash_fingerprint_idx", using: :hash
     t.index ["group_id"], name: "index_machines_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_machines_on_id_and_created_at_and_account_id", unique: true
@@ -612,7 +611,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_21_134635) do
     t.index ["banned_at"], name: "index_users_on_banned_at"
     t.index ["created_at"], name: "index_users_on_created_at", order: :desc
     t.index ["email", "account_id"], name: "index_users_on_email_and_account_id", unique: true
-    t.index ["email"], name: "index_users_on_email", using: :gin
     t.index ["group_id"], name: "index_users_on_group_id"
     t.index ["id", "created_at", "account_id"], name: "index_users_on_id_and_created_at_and_account_id", unique: true
   end
