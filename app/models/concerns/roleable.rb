@@ -98,7 +98,7 @@ module Roleable
       accepts_nested_attributes_for :role,
         update_only: true
 
-      delegate :can?, :permissions,
+      delegate :can?, :cannot?, :permissions,
         allow_nil: true,
         to: :role
     end
