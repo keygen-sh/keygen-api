@@ -296,17 +296,13 @@ class User < ApplicationRecord
           tokens
         end
 
-    s.destroy_all!
+    s.destroy_all
   end
 
-  def revoke_tokens(except: nil)
-    s = if except.present?
-          tokens.where.not(id: except)
-        else
-          tokens
-        end
-
-    s.destroy_all
+  def revoke_tokens(...)
+    revoke_tokens!(...)
+  rescue ActiveRecord::RecordInvalid
+    nil
   end
 
   # Our async destroy logic needs to be a bit different to prevent accounts
