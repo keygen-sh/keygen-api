@@ -18,7 +18,7 @@ class Token < ApplicationRecord
     reject_if: :reject_duplicate_token_permissions
 
   before_create :set_default_permissions!,
-    unless: :token_permissions_attributes?
+    unless: :token_permissions_attributes_changed?
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
@@ -79,9 +79,8 @@ class Token < ApplicationRecord
   #              have been provided. This adds a flag we can check. Will be nil
   #              when nested attributes have not been provided.
   alias :_token_permissions_attributes= :token_permissions_attributes=
-  attr_reader :token_permissions_attributes_before_type_cast
 
-  def token_permissions_attributes? = !token_permissions_attributes_before_type_cast.nil?
+  def token_permissions_attributes_changed? = !@token_permissions_attributes_before_type_cast.nil?
   def token_permissions_attributes=(attributes)
     @token_permissions_attributes_before_type_cast ||= attributes.dup
 
