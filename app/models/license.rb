@@ -455,6 +455,36 @@ class License < ApplicationRecord
     to: :policy,
     allow_nil: true
 
+  def permissions
+    return role.permissions unless
+      user.present?
+
+    return user.permissions if
+      role.role_permissions.joins(:permission)
+                           .exists?(permission: {
+                             action: Permission::WILDCARD_PERMISSION,
+                           })
+
+    # A license's permission set is the intersection of its user's role
+    # permissions and its own permissions.
+    conn = Permission.connection
+
+    # NOTE(ezekg) Rails doesn't support multiple joins on the same table,
+    #             so we have to jump down and do this.
+    Permission.distinct
+              .joins(<<~SQL.squish)
+                INNER JOIN role_permissions license_role_permissions ON
+                  license_role_permissions.role_id       = #{conn.quote role.id} AND
+                  license_role_permissions.permission_id = permissions.id
+              SQL
+              .joins(<<~SQL.squish)
+                INNER JOIN role_permissions user_role_permissions ON
+                  user_role_permissions.role_id       = #{conn.quote user.role.id} AND
+                  user_role_permissions.permission_id = permissions.id
+              SQL
+              .reorder(nil)
+  end
+
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 

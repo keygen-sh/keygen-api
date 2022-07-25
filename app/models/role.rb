@@ -74,7 +74,7 @@ class Role < ApplicationRecord
       role_permissions.delete_all
 
       return if
-        perms.empty?
+        permission_attrs.empty?
 
       role_permissions.insert_all!(permission_attrs)
     end
