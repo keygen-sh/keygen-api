@@ -462,7 +462,10 @@ class Permission < ApplicationRecord
   ].freeze
 
   # Checks if any of the given IDs are the wildcard permission.
-  def self.wildcard?(*ids)
-    exists?(id: ids, action: WILDCARD_PERMISSION)
+  def self.wildcard?(*identifiers)
+    return true if
+      identifiers.include?(WILDCARD_PERMISSION)
+
+    exists?(id: identifiers, action: WILDCARD_PERMISSION)
   end
 end
