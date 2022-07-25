@@ -9,5 +9,7 @@ module Permissible
         action: actions.flatten << Permission::WILDCARD_PERMISSION,
       )
     end
+
+    def cannot?(...) = !can?(...)
   end
 end
