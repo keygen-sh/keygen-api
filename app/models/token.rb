@@ -100,18 +100,10 @@ class Token < ApplicationRecord
                 )
                 .pluck(:id)
 
-    case
     # Invalid permissions would be ignored by default, but that doesn't
     # really provide a nice DX. We'll error instead of ignoring.
-    when permission_ids.size != identifiers.size
+    if permission_ids.size != identifiers.size
       errors.add :permissions, :not_allowed, message: 'unsupported permissions'
-
-      raise ActiveRecord::RecordInvalid, self
-    # Make sure we also offer a good DX for privilege escalation attempts.
-    # Would be denied by Pundit, regardless, but DX is important.
-    when (permission_ids - bearer.permissions.ids).any? &&
-         !Permission.wildcard?(permission_ids)
-      errors.add :permissions, :not_allowed, message: "token bearer's permissions cannot be exceeded"
 
       raise ActiveRecord::RecordInvalid, self
     end
