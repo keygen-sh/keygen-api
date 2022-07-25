@@ -22,7 +22,7 @@ class User < ApplicationRecord
   has_many :license_entitlements, through: :licenses
   has_many :policy_entitlements, through: :licenses
   has_many :machines, through: :licenses
-  has_many :tokens, as: :bearer, dependent: :destroy
+  has_many :tokens, as: :bearer, dependent: :destroy_async
   has_many :releases, -> u { for_user(u.id) },
     through: :products
   has_many :event_logs,
@@ -301,7 +301,7 @@ class User < ApplicationRecord
           tokens
         end
 
-    s.delete_all
+    s.destroy_all
   end
 
   # Our async destroy logic needs to be a bit different to prevent accounts
