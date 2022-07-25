@@ -65,18 +65,18 @@ class Role < ApplicationRecord
   # by ID. We don't expose permission IDs to the world. This also allows
   # us to insert in bulk, rather than serially.
   def permissions=(*ids)
-    permission_attrs = ids.flatten.map {{ permission_id: _1 }}
+    role_permissions_attributes = ids.flatten.map {{ permission_id: _1 }}
 
-    return assign_attributes(role_permissions_attributes: permission_attrs) if
+    return assign_attributes(role_permissions_attributes:) if
       new_record?
 
     transaction do
       role_permissions.delete_all
 
       return if
-        permission_attrs.empty?
+        role_permissions_attributes.empty?
 
-      role_permissions.insert_all!(permission_attrs)
+      role_permissions.insert_all!(role_permissions_attributes)
     end
   end
 

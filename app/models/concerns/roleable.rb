@@ -4,28 +4,30 @@ module Roleable
   extend ActiveSupport::Concern
 
   included do
-    def permissions=(*actions)
-      actions.flatten!
+    def permissions=(*identifiers)
+      identifiers.flatten!
 
-      ids = Permission.distinct
-                      .where(action: actions)
-                      .reorder(nil)
-                      .pluck(:id)
+      permission_ids =
+        Permission.where(action: identifiers)
+                  .or(
+                    Permission.where(id: identifiers)
+                  )
+                  .pluck(:id)
 
-      # Invalid actions would be ignored by default, but that doesn't really
-      # provide a nice DX. We'll error instead of ignoring.
-      if ids.size != actions.size
+      # Invalid permissions would be ignored by default, but that doesn't
+      # really provide a nice DX. We'll error instead of ignoring.
+      if permission_ids.size != identifiers.size
         errors.add :permissions, :not_allowed, message: 'unsupported permissions'
 
         raise ActiveRecord::RecordInvalid, self
       end
 
       if new_record?
-        role_permissions_attributes = ids.map {{ permission_id: _1 }}
+        role_permissions_attributes = permission_ids.map {{ permission_id: _1 }}
 
         assign_attributes(role_attributes: { role_permissions_attributes: })
       else
-        role.permissions = ids
+        role.permissions = permission_ids
       end
     end
 
@@ -76,7 +78,7 @@ module Roleable
       after_initialize -> { grant_role!(name) },
         unless: :role?
 
-      define_roleable_role_dirty_tracker
+      define_roleable_dirty_tracker
     end
 
     def has_role(name)
@@ -84,7 +86,7 @@ module Roleable
 
       after_initialize -> { grant_role!(name) }
 
-      define_roleable_role_dirty_tracker
+      define_roleable_dirty_tracker
     end
 
     private
@@ -103,7 +105,7 @@ module Roleable
         to: :role
     end
 
-    def define_roleable_role_dirty_tracker
+    def define_roleable_dirty_tracker
       # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
       #              have been provided. This adds a flag we can check. Will be nil
       #              when nested attributes have not been provided.
