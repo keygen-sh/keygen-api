@@ -11,8 +11,7 @@ class User < ApplicationRecord
   include Diffable
 
   has_secure_password :password, validations: false
-  has_role :user,
-    overridable: true
+  has_default_role :user
 
   belongs_to :account
   belongs_to :group,
