@@ -53,7 +53,7 @@ class Role < ApplicationRecord
   #              when nested attributes have not been provided.
   alias :_role_permissions_attributes= :role_permissions_attributes=
 
-  def role_permissions_attributes_changed? = !@role_permissions_attributes_before_type_cast.nil?
+  def role_permissions_attributes_changed? = instance_variable_defined?(:@role_permissions_attributes_before_type_cast)
   def role_permissions_attributes=(attributes)
     @role_permissions_attributes_before_type_cast ||= attributes.dup
 
@@ -65,7 +65,9 @@ class Role < ApplicationRecord
   # by ID. We don't expose permission IDs to the world. This also allows
   # us to insert in bulk, rather than serially.
   def permissions=(*ids)
-    role_permissions_attributes = ids.flatten.map {{ permission_id: _1 }}
+    role_permissions_attributes = ids.flatten
+                                     .compact
+                                     .map {{ permission_id: _1 }}
 
     return assign_attributes(role_permissions_attributes:) if
       new_record?
