@@ -115,7 +115,7 @@ module Roleable
 
         def role_attributes_changed? = instance_variable_defined?(:@role_attributes_before_type_cast)
         def role_attributes=(attributes)
-          @role_attributes_before_type_cast ||= attributes.dup
+          @role_attributes_before_type_cast = attributes.dup
 
           self._role_attributes = attributes
         end
