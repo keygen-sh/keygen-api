@@ -32,8 +32,7 @@ class TokenPolicy < ApplicationPolicy
       token.generate
     ]
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.bearer == bearer
+    true
   end
 
   def regenerate?
