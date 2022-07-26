@@ -71,15 +71,15 @@ class ApplicationPolicy
   end
 
   def assert_account_scoped!
-    raise Pundit::NotAuthorizedError, message: 'account mismatch for bearer' unless
+    raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for bearer' unless
       bearer.nil? || bearer.account_id == account.id
 
     case
     when resource.respond_to?(:all?)
-      raise Pundit::NotAuthorizedError, message: 'account mismatch for resources' unless
+      raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for resources' unless
         resource.all? { |r| r.account_id == account.id }
     when resource.respond_to?(:account_id)
-      raise Pundit::NotAuthorizedError, message: 'account mismatch for resource' unless
+      raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for resource' unless
         resource.account_id == account.id
     else
       # NOTE(ezekg) We likely passed in the model class directly, e.g. `authorize(RequestLog)`,
@@ -91,19 +91,21 @@ class ApplicationPolicy
     return if
       bearer.nil?
 
-    raise Pundit::NotAuthorizedError, message: "bearer is suspended" if
+    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is suspended" if
       bearer.license? && bearer.suspended?
 
-    raise Pundit::NotAuthorizedError, message: "bearer is banned" if
+    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is banned" if
       bearer.user? && bearer.banned?
 
-    raise Pundit::NotAuthorizedError, message: "bearer lacks permission to perform action" unless
+    raise Pundit::NotAuthorizedError, policy: self, message: "bearer lacks permission to perform action" unless
       bearer.can?(actions)
 
     return if
       token.nil?
 
-    raise Pundit::NotAuthorizedError, message: "token lacks permission to perform action" unless
+    puts(bearer:bearer.permissions.collect(&:action),token:token.permissions.collect(&:action))
+
+    raise Pundit::NotAuthorizedError, policy: self, message: "token lacks permission to perform action" unless
       token.can?(actions)
   end
 

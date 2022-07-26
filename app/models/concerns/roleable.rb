@@ -5,7 +5,8 @@ module Roleable
 
   included do
     def permissions=(*identifiers)
-      identifiers.flatten!
+      identifiers = identifiers.flatten
+                               .compact
 
       permission_ids =
         Permission.where(action: identifiers)
@@ -112,7 +113,7 @@ module Roleable
       module_eval <<-RUBY, __FILE__, __LINE__ + 1
         alias :_role_attributes= :role_attributes=
 
-        def role_attributes_changed? = !@role_attributes_before_type_cast.nil?
+        def role_attributes_changed? = instance_variable_defined?(:@role_attributes_before_type_cast)
         def role_attributes=(attributes)
           @role_attributes_before_type_cast ||= attributes.dup
 
