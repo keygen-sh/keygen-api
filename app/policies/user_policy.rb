@@ -101,7 +101,7 @@ class UserPolicy < ApplicationPolicy
     assert_account_scoped!
 
     return false if
-      resource.has_role?(:user) && account.protected? && resource.password.nil?
+      resource.has_role?(:user) && account.protected? && !resource.password?
 
     return false if
       resource.has_role?(:read_only)
