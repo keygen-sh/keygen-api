@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ProductPolicy < ApplicationPolicy
-
   def index?
     assert_account_scoped!
     assert_permissions! %w[
@@ -47,35 +46,6 @@ class ProductPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer)
-  end
-
-  def generate_token?
-    assert_account_scoped!
-    assert_permissions! %w[
-      product.tokens.generate
-    ]
-
-    bearer.has_role?(:admin, :developer)
-  end
-
-  def list_tokens?
-    assert_account_scoped!
-    assert_permissions! %w[
-      product.tokens.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource == bearer
-  end
-
-  def show_token?
-    assert_account_scoped!
-    assert_permissions! %w[
-      product.tokens.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource == bearer
   end
 
   def me?

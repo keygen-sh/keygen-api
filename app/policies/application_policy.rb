@@ -103,8 +103,6 @@ class ApplicationPolicy
     return if
       token.nil?
 
-    puts(bearer:bearer.permissions.collect(&:action),token:token.permissions.collect(&:action))
-
     raise Pundit::NotAuthorizedError, policy: self, message: "token lacks permission to perform action" unless
       token.can?(actions)
   end

@@ -389,6 +389,8 @@ class ApplicationController < ActionController::API
       render_internal_server_error
     end
   rescue Pundit::NotDefinedError => e
+    Keygen.logger.warn { "[pundit] message=#{e.message}" }
+
     render_not_found
   rescue Pundit::NotAuthorizedError => e
     Keygen.logger.warn { "[pundit] policy=#{e.policy.class.name.underscore} query=#{e.query} message=#{e.message}" }
