@@ -48,7 +48,8 @@ class LicenseSerializer < BaseSerializer
     @object.next_check_in_at
   end
   attribute :permissions do
-    @object.permissions.pluck(:action)
+    @object.permissions.collect(&:action)
+                       .sort
   end
   attribute :metadata do
     @object.metadata&.transform_keys { |k| k.to_s.camelize :lower } or {}
