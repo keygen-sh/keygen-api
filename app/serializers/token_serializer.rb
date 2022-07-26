@@ -13,7 +13,8 @@ class TokenSerializer < BaseSerializer
   attribute :max_deactivations, if: -> { @object.activation_token? }
   attribute :deactivations, if: -> { @object.activation_token? }
   attribute :permissions do
-    @object.permissions.pluck(:action)
+    @object.permissions.collect(&:action)
+                       .sort
   end
   attribute :created do
     @object.created_at
