@@ -589,6 +589,7 @@ Feature: Update user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And the current account has 1 "admin"
+    And the current account has 3 "tokens" for the last "user"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/users/$0" with the following:
       """
@@ -602,7 +603,7 @@ Feature: Update user
       }
       """
     Then the response status should be "200"
-    And the current user should have 0 "tokens"
+    And the current user should have 1 "token"
 
   Scenario: Admin attempts to demote themself to user when they're the only admin
     Given I am an admin of account "test1"
