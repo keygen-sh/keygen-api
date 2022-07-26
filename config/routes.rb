@@ -189,16 +189,13 @@ Rails.application.routes.draw do
         resources "policies", only: [:index, :show]
         resources "licenses", only: [:index, :show]
         resources "machines", only: [:index, :show]
-        resources "tokens", only: [:index, :show]
+        resources "tokens", only: [:index, :show, :create]
         resources "users", only: [:index, :show]
         resources "artifacts", constraints: { id: /.*/ }, only: [:index, :show]
         resources "platforms", only: [:index, :show]
         resources "arches", only: [:index, :show]
         resources "channels", only: [:index, :show]
         resources "releases", constraints: { id: /[^\/]*/ }, only: [:index, :show]
-        member do
-          post "tokens", to: "tokens#generate"
-        end
       end
     end
 
