@@ -721,6 +721,20 @@ Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words
   expect(actual).to eq expected
 end
 
+Then /^the (\w+) "([^\"]*)" should have (\w+) "([^"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
+  model =
+    case model_name.pluralize
+    when 'processes'
+      @account.machine_processes.send(index_in_words)
+    else
+      @account.send(model_name.pluralize).send(index_in_words)
+    end
+
+  count = model.send(association_name.pluralize.underscore).count
+
+  expect(count).to eq(expected_count.to_i)
+end
+
 Then /^the (first|second|third|fourth|fifth|last) "([^\"]*)" for account "([^\"]*)" should have the following attributes:$/ do |index_in_words, model_name, account_id, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 
