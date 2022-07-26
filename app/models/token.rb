@@ -80,7 +80,7 @@ class Token < ApplicationRecord
   #              when nested attributes have not been provided.
   alias :_token_permissions_attributes= :token_permissions_attributes=
 
-  def token_permissions_attributes_changed? = !@token_permissions_attributes_before_type_cast.nil?
+  def token_permissions_attributes_changed? = instance_variable_defined?(:@token_permissions_attributes_before_type_cast)
   def token_permissions_attributes=(attributes)
     @token_permissions_attributes_before_type_cast ||= attributes.dup
 
@@ -91,7 +91,8 @@ class Token < ApplicationRecord
   # allow permissions to be attached by action, rather than just ID. This
   # also allows us to insert in bulk, rather than serially.
   def permissions=(*identifiers)
-    identifiers.flatten!
+    identifiers = identifiers.flatten
+                             .compact
 
     permission_ids =
       Permission.where(action: identifiers)
