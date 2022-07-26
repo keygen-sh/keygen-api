@@ -57,9 +57,7 @@ module Api::V1
               bearer: user,
               token: nil,
             ),
-            user.tokens.new(
-              account: current_account,
-            ),
+            Token,
           ).generate?
 
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
