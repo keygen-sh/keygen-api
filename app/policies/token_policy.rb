@@ -26,7 +26,6 @@ class TokenPolicy < ApplicationPolicy
       resource.bearer == bearer
   end
 
-  # FIXME(ezekg) This is currently unused but should be
   def generate?
     assert_account_scoped!
     assert_permissions! %w[
