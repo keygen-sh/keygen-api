@@ -55,7 +55,7 @@ class Role < ApplicationRecord
 
   def role_permissions_attributes_changed? = instance_variable_defined?(:@role_permissions_attributes_before_type_cast)
   def role_permissions_attributes=(attributes)
-    @role_permissions_attributes_before_type_cast ||= attributes.dup
+    @role_permissions_attributes_before_type_cast = attributes.dup
 
     self._role_permissions_attributes = attributes
   end

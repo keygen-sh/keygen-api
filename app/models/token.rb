@@ -82,7 +82,7 @@ class Token < ApplicationRecord
 
   def token_permissions_attributes_changed? = instance_variable_defined?(:@token_permissions_attributes_before_type_cast)
   def token_permissions_attributes=(attributes)
-    @token_permissions_attributes_before_type_cast ||= attributes.dup
+    @token_permissions_attributes_before_type_cast = attributes.dup
 
     self._token_permissions_attributes = attributes
   end
