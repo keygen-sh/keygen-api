@@ -585,6 +585,26 @@ Feature: Update user
     And sidekiq should have 1 "request-log" job
     And the account "test1" should have 1 "admin"
 
+  Scenario: Admin attempts to demote another admin to user
+    Given the current account is "test1"
+    And the current account has 2 "admins"
+    And the current account has 3 "tokens" for each "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$2" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "role": "user"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the last "user" should have 0 "tokens"
+
   Scenario: Admin attempts to demote themself to user when they're not the only admin
     Given I am an admin of account "test1"
     And the current account is "test1"
