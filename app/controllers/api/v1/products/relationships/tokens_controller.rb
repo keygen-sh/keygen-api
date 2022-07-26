@@ -7,9 +7,8 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
-    # POST /products/1/tokens
-    def generate
-      authorize product, :generate_token?
+    def create
+      authorize [product, Token]
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :permissions,
@@ -31,22 +30,16 @@ module Api::V1::Products::Relationships
       render jsonapi: token
     end
 
-    # GET /products/1/tokens
     def index
-      authorize product, :list_tokens?
-
       tokens = apply_pagination(policy_scope(apply_scopes(product.tokens)))
-      authorize tokens
+      authorize [product, tokens]
 
       render jsonapi: tokens
     end
 
-    # GET /products/1/tokens/1
     def show
-      authorize product, :show_token?
-
       token = product.tokens.find params[:id]
-      authorize token
+      authorize [product, token]
 
       render jsonapi: token
     end
@@ -65,7 +58,7 @@ module Api::V1::Products::Relationships
     typed_parameters format: :jsonapi do
       options strict: true
 
-      on :generate do
+      on :create do
         param :data, type: :hash, optional: true do
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
