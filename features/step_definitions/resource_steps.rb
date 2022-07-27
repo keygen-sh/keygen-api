@@ -721,7 +721,7 @@ Then /^the (\w+) "([^\"]*)" should have the (\w+) "([^"]+)"$/ do |index_in_words
   expect(actual).to eq expected
 end
 
-Then /^the (?!account(\w+)) "([^\"]*)" should have (\w+) "([^"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
+Then /^the (?!account)(\w+) "([^\"]*)" should have (\w+) "([^"]+)"$/ do |index_in_words, model_name, expected_count, association_name|
   model =
     case model_name.pluralize
     when 'processes'
