@@ -17,10 +17,6 @@ FactoryBot.define do
       product.account ||= evaluator.account.presence
     end
 
-    after :create do |product|
-      product.role = create :role, :product, resource: product
-    end
-
     trait :licensed do
       after :build do |release, evaluator|
         release.distribution_strategy = 'LICENSED'
