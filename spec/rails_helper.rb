@@ -10,7 +10,6 @@ require 'rspec/rails'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'support/factory_bot'
-require 'pundit/rspec'
 require 'database_cleaner'
 require 'sidekiq/testing'
 require 'request_migrations/testing'
