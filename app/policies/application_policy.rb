@@ -87,6 +87,11 @@ class ApplicationPolicy
     end
   end
 
+  def assert_authenticated!
+    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is missing" if
+      bearer.nil?
+  end
+
   def assert_permissions!(*actions)
     return if
       bearer.nil?
