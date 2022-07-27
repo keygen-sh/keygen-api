@@ -3,6 +3,7 @@
 class ProductPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.read
     ]
@@ -12,6 +13,7 @@ class ProductPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.read
     ]
@@ -22,6 +24,7 @@ class ProductPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.create
     ]
@@ -31,6 +34,7 @@ class ProductPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.update
     ]
@@ -41,6 +45,7 @@ class ProductPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.delete
     ]
@@ -50,6 +55,7 @@ class ProductPolicy < ApplicationPolicy
 
   def me?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.read
     ]
