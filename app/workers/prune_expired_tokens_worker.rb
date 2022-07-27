@@ -2,6 +2,9 @@ class PruneExpiredTokensWorker
   include Sidekiq::Worker
   include Sidekiq::Cronitor
 
+  BATCH_SIZE     = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
+  SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
+
   sidekiq_options queue: :cron, lock: :until_executed
 
   def perform
@@ -14,10 +17,12 @@ class PruneExpiredTokensWorker
                     .reorder(created_at: :asc)
 
       batch += 1
-      count = tokens.limit(10_000)
+      count = tokens.limit(BATCH_SIZE)
                     .delete_all
 
       Keygen.logger.info "[workers.prune-expired-tokens] Pruned #{count} rows: batch=#{batch}"
+
+      sleep SLEEP_DURATION
 
       break if count == 0
     end
