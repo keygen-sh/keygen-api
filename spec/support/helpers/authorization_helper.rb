@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module AuthorizationHelper
+  ##
+  # SCENARIOS contains predefined scenarios to keep spec files clean and
+  # easy to write, for security's sake.
   SCENARIOS = {
     as_admin_accessing_product: -> {
       let(:account)  { create(:account) }
@@ -70,6 +73,8 @@ module AuthorizationHelper
     },
   }.freeze
 
+  ##
+  # with_role_authorization starts an authorization test for a given role.
   def with_role_authorization(role, &block)
     context "with #{role} authorization" do
       let(:role)        { role.to_sym }
@@ -80,6 +85,8 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # without_authorization starts an authorization test for an anon.
   def without_authorization(&block)
     context 'without authorization' do
       let(:context) { authorization_context(account:, bearer:, token:) }
@@ -90,6 +97,8 @@ module AuthorizationHelper
 
   private
 
+  ##
+  # with_scenario applies a scenario to a new context.
   def with_scenario(scenario, &block)
     env = SCENARIOS.fetch(scenario)
 
@@ -99,12 +108,16 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # with_scenario applies a scenario to the current context.
   def using_scenario(scenario)
     env = SCENARIOS.fetch(scenario)
 
     instance_exec(&env)
   end
 
+  ##
+  # with_token_authentication defines a context using token authentication.
   def with_token_authentication(&block)
     context 'with token authentication' do
       let(:token) { create(:token, account:, bearer:) }
@@ -113,6 +126,8 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # with_license_authentication defines a context using license authentication.
   def with_license_authentication(&block)
     context 'with license authentication' do
       let(:token) { nil }
@@ -125,6 +140,8 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # without_authentication defines a context using no authentication.
   def without_authentication(&block)
     context 'without authentication' do
       let(:bearer) { nil }
@@ -134,6 +151,9 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # permits asserts the current bearer and token are permitted to perform
+  # the given action.
   def permits(action, assert_permissions: [])
     context 'with default permissions' do
       let(:permissions) { default_permissions_for(role:) }
@@ -170,6 +190,9 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # forbids asserts the current bearer and token are not permitted to perform
+  # the given action.
   def forbids(action, assert_permissions: [])
     context 'with default permissions' do
       let(:permissions) { default_permissions_for(role:) }
@@ -206,10 +229,14 @@ module AuthorizationHelper
     end
   end
 
+  ##
+  # authorization_context creates a new authorization context.
   def authorization_context(account:, bearer: nil, token: nil)
     AuthorizationContext.new(account:, bearer:, token:)
   end
 
+  ##
+  # default_permissions_for returns a role's default permissions.
   def default_permissions_for(role:)
     case role.to_sym
     when :product
