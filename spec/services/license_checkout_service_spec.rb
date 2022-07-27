@@ -2,25 +2,10 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe LicenseCheckoutService do
   let(:account) { create(:account) }
   let(:license) { create(:license, account: account) }
-
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   it 'should return a valid license file certificate' do
     license_file = LicenseCheckoutService.call(

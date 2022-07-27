@@ -2,10 +2,6 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe AddProductRelationshipToArtifactsMigration do
   let(:account)     { create(:account) }
@@ -13,16 +9,6 @@ describe AddProductRelationshipToArtifactsMigration do
   let(:cli)         { create(:product, account:) }
   let(:app_release) { create(:release, account:, product: app) }
   let(:cli_release) { create(:release, account:, product: cli) }
-
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   before do
     RequestMigrations.configure do |config|
