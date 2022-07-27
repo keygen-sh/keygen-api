@@ -2,6 +2,8 @@ class PruneEventLogsWorker
   include Sidekiq::Worker
   include Sidekiq::Cronitor
 
+  BATCH_SIZE         = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
+  SLEEP_DURATION     = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
   HIGH_VOLUME_EVENTS = %w[
     license.validation.succeeded
     license.validation.failed
@@ -37,10 +39,12 @@ class PruneEventLogsWorker
                             .where(event_type_id: event_type_ids)
 
         batch += 1
-        count = event_logs.limit(1_000)
+        count = event_logs.limit(BATCH_SIZE)
                           .delete_all
 
         Keygen.logger.info "[workers.prune-event-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+
+        sleep SLEEP_DURATION
 
         break if count == 0
       end

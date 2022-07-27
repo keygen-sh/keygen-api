@@ -2,6 +2,9 @@ class PruneRequestLogsWorker
   include Sidekiq::Worker
   include Sidekiq::Cronitor
 
+  BATCH_SIZE     = ENV.fetch('PRUNE_BATCH_SIZE')     { 1_000 }.to_i
+  SLEEP_DURATION = ENV.fetch('PRUNE_SLEEP_DURATION') { 1 }.to_f
+
   sidekiq_options queue: :cron, lock: :until_executed
 
   def perform
@@ -23,10 +26,12 @@ class PruneRequestLogsWorker
                       .where('created_at < ?', 30.days.ago.beginning_of_day)
 
         batch += 1
-        count = logs.limit(1_000)
+        count = logs.limit(BATCH_SIZE)
                     .delete_all
 
         Keygen.logger.info "[workers.prune-request-logs] Pruned #{count} rows: account_id=#{account_id} batch=#{batch}"
+
+        sleep SLEEP_DURATION
 
         break if count == 0
       end
