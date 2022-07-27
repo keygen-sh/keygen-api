@@ -7,9 +7,7 @@ describe ProductPolicy, type: :policy do
   subject { described_class.new(context, resource) }
 
   with_role_authorization :admin do
-    let(:account)  { create(:account) }
-    let(:bearer)   { create(:admin, account:, permissions:) }
-    let(:resource) { create(:product, account:) }
+    with_scenario :as_admin_accessing_product
 
     with_token_authentication do
       permits :index,   assert_permissions: %w[product.read]
@@ -22,9 +20,7 @@ describe ProductPolicy, type: :policy do
 
   with_role_authorization :product do
     context 'as current product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:product, account:, permissions:) }
-      let(:resource) { bearer }
+      with_scenario :as_product_accessing_itself
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -36,9 +32,7 @@ describe ProductPolicy, type: :policy do
     end
 
     context 'as another product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:product, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
+      with_scenario :as_product_accessing_another_product
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -52,11 +46,7 @@ describe ProductPolicy, type: :policy do
 
   with_role_authorization :license do
     context 'for current product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:license, account:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
+      with_scenario :as_license_accessing_product
 
       with_license_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -76,11 +66,7 @@ describe ProductPolicy, type: :policy do
     end
 
     context 'for another product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:license, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
+      with_scenario :as_license_accessing_another_product
 
       with_license_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -102,12 +88,7 @@ describe ProductPolicy, type: :policy do
 
   with_role_authorization :user do
     context 'with license for current product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-      let(:licenses) { [create(:license, account:, policy:)] }
+      with_scenario :as_licensed_user_accessing_product
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -119,10 +100,7 @@ describe ProductPolicy, type: :policy do
     end
 
     context 'with license for another product' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { create(:product, account:) }
-      let(:licenses) { [create(:license, account:)] }
+      with_scenario :as_licensed_user_accessing_another_product
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -134,18 +112,7 @@ describe ProductPolicy, type: :policy do
     end
 
     context 'with licenses for multiple products' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-      let(:licenses) {
-        [
-          create(:license, account:, policy:),
-          create(:license, account:),
-          create(:license, account:),
-        ]
-      }
+      with_scenario :as_licensed_user_with_multiple_licenses_accessing_product
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -157,9 +124,7 @@ describe ProductPolicy, type: :policy do
     end
 
     context 'with no licenses' do
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
+      with_scenario :as_unlicensed_user_accessing_product
 
       with_token_authentication do
         forbids :index,   assert_permissions: %w[product.read]
@@ -172,8 +137,7 @@ describe ProductPolicy, type: :policy do
   end
 
   without_authorization do
-    let(:account)  { create(:account) }
-    let(:resource) { create(:product, account:) }
+    with_scenario :as_anonymous_accessing_product
 
     without_authentication do
       forbids :index,   assert_permissions: %w[product.read]

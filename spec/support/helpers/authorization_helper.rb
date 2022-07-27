@@ -1,9 +1,74 @@
 # frozen_string_literal: true
 
 module AuthorizationHelper
-  def authorization_context(account:, bearer: nil, token: nil)
-    AuthorizationContext.new(account:, bearer:, token:)
-  end
+  SCENARIOS = {
+    as_admin_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:admin, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
+    },
+    as_product_accessing_itself: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:product, account:, permissions:) }
+      let(:resource) { bearer }
+    },
+    as_product_accessing_another_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:product, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
+    },
+    as_license_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:license, account:, permissions:) }
+      let(:resource) { product }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+    },
+    as_license_accessing_another_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:license, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+    },
+    as_licensed_user_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { product }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+      let(:licenses) { [create(:license, account:, policy:)] }
+    },
+    as_licensed_user_accessing_another_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { create(:product, account:) }
+      let(:licenses) { [create(:license, account:)] }
+    },
+    as_licensed_user_with_multiple_licenses_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { product }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+      let(:licenses) {
+        [
+          create(:license, account:, policy:),
+          create(:license, account:),
+          create(:license, account:),
+        ]
+      }
+    },
+    as_unlicensed_user_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
+    },
+    as_anonymous_accessing_product: -> {
+      let(:account)  { create(:account) }
+      let(:resource) { create(:product, account:) }
+    },
+  }.freeze
 
   def with_role_authorization(role, &block)
     context "with #{role} authorization" do
@@ -24,6 +89,12 @@ module AuthorizationHelper
   end
 
   private
+
+  def with_scenario(scenario)
+    fn = SCENARIOS.fetch(scenario)
+
+    instance_exec(&fn)
+  end
 
   def with_token_authentication(&block)
     context 'with token authentication' do
@@ -124,6 +195,10 @@ module AuthorizationHelper
         expect(subject).to_not permit(action)
       end
     end
+  end
+
+  def authorization_context(account:, bearer: nil, token: nil)
+    AuthorizationContext.new(account:, bearer:, token:)
   end
 
   def default_permissions_for(role:)
