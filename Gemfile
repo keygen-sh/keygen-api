@@ -16,7 +16,7 @@ gem 'rack-cors'
 gem 'redis', '~> 4.7.1'
 
 # API migrations
-gem 'request_migrations', '~> 1.0'
+gem 'request_migrations', '~> 1.1'
 
 # JSON API serializers
 gem 'json', '~> 2.3.0'

@@ -2,22 +2,8 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe RenameCodeToConstantForValidationMigration do
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
-
   before do
     RequestMigrations.configure do |config|
       config.current_version = '1.1'

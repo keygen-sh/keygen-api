@@ -422,6 +422,4 @@ class ApplicationController < ActionController::API
 
     preferences.include?(preference.to_s)
   end
-
-  class AuthorizationContext < OpenStruct; end
 end

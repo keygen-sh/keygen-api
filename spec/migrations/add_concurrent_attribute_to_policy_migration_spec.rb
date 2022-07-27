@@ -2,24 +2,10 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe AddConcurrentAttributeToPolicyMigration do
   let(:account) { create(:account) }
   let(:product) { create(:product, account:) }
-
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   before do
     RequestMigrations.configure do |config|

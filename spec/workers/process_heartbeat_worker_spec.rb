@@ -2,10 +2,6 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe ProcessHeartbeatWorker do
   let(:worker) { ProcessHeartbeatWorker }
@@ -14,14 +10,10 @@ describe ProcessHeartbeatWorker do
   # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
   before do
     SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
-    Sidekiq::Testing.fake!
-    StripeHelper.start
   end
 
   after do
     SidekiqUniqueJobs.configure { _1.enabled = !_1.enabled }
-    DatabaseCleaner.clean
-    StripeHelper.stop
   end
 
   it 'should enqueue and run the worker' do

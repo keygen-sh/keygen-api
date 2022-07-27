@@ -2,25 +2,10 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe WaitForArtifactUploadWorker do
   let(:worker)  { WaitForArtifactUploadWorker }
   let(:account) { create(:account) }
-
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   context 'when an artifact is waiting' do
     let(:artifact) { create(:release_artifact, :waiting, account:) }
