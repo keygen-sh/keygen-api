@@ -108,6 +108,9 @@ class ApplicationPolicy
     return if
       token.nil?
 
+    raise Pundit::NotAuthorizedError, policy: self, message: "token is expired" if
+      token.expired?
+
     raise Pundit::NotAuthorizedError, policy: self, message: "token lacks permission to perform action" unless
       token.can?(actions)
   end
