@@ -7,8 +7,16 @@ require File.expand_path('../../config/environment', __FILE__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'spec_helper'
 require 'rspec/rails'
-require 'support/factory_bot'
+
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'support/factory_bot'
+require 'pundit/rspec'
+require 'database_cleaner'
+require 'sidekiq/testing'
+require 'request_migrations/testing'
+
+# Truncate database tables after each test.
+DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -33,6 +41,7 @@ RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
+  config.include AuthorizationContextHelper
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -59,6 +68,18 @@ RSpec.configure do |config|
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
-  # arbitrary gems may also be filtered via:
-  # config.filter_gems_from_backtrace("gem name")
+
+  # Setup Sidekiq, Stripe, etc.
+  config.before :each do
+    RequestMigrations::Testing.setup!
+    Sidekiq::Testing.fake!
+    StripeHelper.start
+  end
+
+  # Teardown Stripe, clean database, etc.
+  config.after :each do
+    RequestMigrations::Testing.teardown!
+    DatabaseCleaner.clean
+    StripeHelper.stop
+  end
 end

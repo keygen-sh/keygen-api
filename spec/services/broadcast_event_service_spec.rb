@@ -2,26 +2,11 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe BroadcastEventService do
   let(:account) { create(:account) }
   let(:endpoint) { create(:webhook_endpoint, account: account) }
   let(:resource) { create(:license, account: account) }
-
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   def create_webhook_event!(account, resource)
     throw if endpoint.nil?
@@ -81,7 +66,6 @@ describe BroadcastEventService do
 
   after do
     Sidekiq::Worker.clear_all
-    DatabaseCleaner.clean
   end
 
   it 'should create a new webhook event' do

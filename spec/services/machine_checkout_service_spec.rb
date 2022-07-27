@@ -2,26 +2,11 @@
 
 require 'rails_helper'
 require 'spec_helper'
-require 'database_cleaner'
-require 'sidekiq/testing'
-
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
 
 describe MachineCheckoutService do
   let(:account) { create(:account) }
   let(:license) { create(:license, account: account) }
   let(:machine) { create(:machine, license: license, account: account) }
-
-  # See: https://github.com/mhenrixon/sidekiq-unique-jobs#testing
-  before do
-    Sidekiq::Testing.fake!
-    StripeHelper.start
-  end
-
-  after do
-    DatabaseCleaner.clean
-    StripeHelper.stop
-  end
 
   it 'should return valid a machine file certificate' do
     machine_file = MachineCheckoutService.call(
