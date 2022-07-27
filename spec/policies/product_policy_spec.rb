@@ -4,304 +4,183 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe ProductPolicy, type: :policy do
-  subject { described_class.new(context, product) }
+  subject { described_class.new(context, resource) }
 
-  let(:account) { create(:account) }
-  let(:product) { create(:product, account:) }
+  with_role_authorization :admin do
+    let(:account)  { create(:account) }
+    let(:bearer)   { create(:admin, account:, permissions:) }
+    let(:resource) { create(:product, account:) }
 
-  context 'for admin' do
-    let(:context) { authorization_context(account:, bearer:, token:) }
-    let(:token)  { create(:token, account:, bearer:) }
+    with_token_authentication do
+      permits :index,   assert_permissions: %w[product.read]
+      permits :show,    assert_permissions: %w[product.read]
+      permits :create,  assert_permissions: %w[product.create]
+      permits :update,  assert_permissions: %w[product.update]
+      permits :destroy, assert_permissions: %w[product.delete]
+    end
+  end
 
-    context 'without permission' do
-      let(:bearer) { create(:admin, account:, permissions: []) }
+  with_role_authorization :product do
+    context 'as current product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:product, account:, permissions:) }
+      let(:resource) { bearer }
 
-      it 'permits index access' do
-        expect(subject).to permit(:index)
-      end
-
-      it 'permits show access' do
-        expect(subject).to permit(:show)
-      end
-
-      it 'permits create access' do
-        expect(subject).to permit(:create)
-      end
-
-      it 'permits update access' do
-        expect(subject).to permit(:update)
-      end
-
-      it 'permits destroy access' do
-        expect(subject).to permit(:destroy)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        permits :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        permits :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
       end
     end
 
-    context 'with permission' do
-      let(:bearer) { create(:admin, account:) }
+    context 'as another product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:product, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
 
-      it 'permits index access' do
-        expect(subject).to permit(:index)
-      end
-
-      it 'permits show access' do
-        expect(subject).to permit(:show)
-      end
-
-      it 'permits create access' do
-        expect(subject).to permit(:create)
-      end
-
-      it 'permits update access' do
-        expect(subject).to permit(:update)
-      end
-
-      it 'permits destroy access' do
-        expect(subject).to permit(:destroy)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
       end
     end
   end
 
-  context 'for product' do
-    let(:context) { authorization_context(account:, bearer:, token:) }
-
-    context 'other product' do
-      let(:bearer) { create(:product, account:) }
-      let(:token)  { create(:token, account:, bearer:) }
-
-      it 'denies index access' do
-        expect(subject).to_not permit(:index)
-      end
-
-      it 'denies show access' do
-        expect(subject).to_not permit(:show)
-      end
-
-      it 'denies create access' do
-        expect(subject).to_not permit(:create)
-      end
-
-      it 'denies update access' do
-        expect(subject).to_not permit(:update)
-      end
-
-      it 'denies destroy access' do
-        expect(subject).to_not permit(:destroy)
-      end
-    end
-
-    context 'this product' do
-      let(:bearer) { product }
-      let(:token)  { create(:token, account:, bearer:) }
-
-      it 'permits index access' do
-        expect(subject).to_not permit(:index)
-      end
-
-      it 'permits show access' do
-        expect(subject).to permit(:show)
-      end
-
-      it 'permits create access' do
-        expect(subject).to_not permit(:create)
-      end
-
-      it 'denies update access' do
-        expect(subject).to permit(:update)
-      end
-
-      it 'denies destroy access' do
-        expect(subject).to_not permit(:destroy)
-      end
-    end
-  end
-
-  context 'for license' do
-    context 'for other product' do
-      let(:bearer) { create(:license, account:) }
-
-      context 'with token' do
-        let(:token)   { create(:token, account:, bearer:) }
-        let(:context) { authorization_context(account:, bearer:, token:) }
-
-        it 'denies index access' do
-          expect(subject).to_not permit(:index)
-        end
-
-        it 'denies show access' do
-          expect(subject).to_not permit(:show)
-        end
-
-        it 'denies create access' do
-          expect(subject).to_not permit(:create)
-        end
-
-        it 'denies update access' do
-          expect(subject).to_not permit(:update)
-        end
-
-        it 'denies destroy access' do
-          expect(subject).to_not permit(:destroy)
-        end
-      end
-
-      context 'with key' do
-        let(:context) { authorization_context(account:, bearer:) }
-
-        it 'denies index access' do
-          expect(subject).to_not permit(:index)
-        end
-
-        it 'denies show access' do
-          expect(subject).to_not permit(:show)
-        end
-
-        it 'denies create access' do
-          expect(subject).to_not permit(:create)
-        end
-
-        it 'denies update access' do
-          expect(subject).to_not permit(:update)
-        end
-
-        it 'denies destroy access' do
-          expect(subject).to_not permit(:destroy)
-        end
-      end
-    end
-
-    context 'for product' do
-      let(:policy) { create(:policy, account:, product:) }
-      let(:bearer) { create(:license, account:, policy:) }
-
-      context 'with token' do
-        let(:token)   { create(:token, account:, bearer:) }
-        let(:context) { authorization_context(account:, bearer:, token:) }
-
-        it 'denies index access' do
-          expect(subject).to_not permit(:index)
-        end
-
-        it 'denies show access' do
-          expect(subject).to_not permit(:show)
-        end
-
-        it 'denies create access' do
-          expect(subject).to_not permit(:create)
-        end
-
-        it 'denies update access' do
-          expect(subject).to_not permit(:update)
-        end
-
-        it 'denies destroy access' do
-          expect(subject).to_not permit(:destroy)
-        end
-      end
-
-      context 'with key' do
-        let(:context) { authorization_context(account:, bearer:) }
-
-        it 'denies index access' do
-          expect(subject).to_not permit(:index)
-        end
-
-        it 'denies show access' do
-          expect(subject).to_not permit(:show)
-        end
-
-        it 'denies create access' do
-          expect(subject).to_not permit(:create)
-        end
-
-        it 'denies update access' do
-          expect(subject).to_not permit(:update)
-        end
-
-        it 'denies destroy access' do
-          expect(subject).to_not permit(:destroy)
-        end
-      end
-    end
-  end
-
-  context 'for user' do
-    let(:context) { authorization_context(account:, bearer:, token:) }
-
-    context 'without product license' do
-      let(:bearer) { create(:user, account:) }
-      let(:token)  { create(:token, account:, bearer:) }
-
-      it 'denies index access' do
-        expect(subject).to_not permit(:index)
-      end
-
-      it 'denies show access' do
-        expect(subject).to_not permit(:show)
-      end
-
-      it 'denies create access' do
-        expect(subject).to_not permit(:create)
-      end
-
-      it 'denies update access' do
-        expect(subject).to_not permit(:update)
-      end
-
-      it 'denies destroy access' do
-        expect(subject).to_not permit(:destroy)
-      end
-    end
-
-    context 'with product license' do
+  with_role_authorization :license do
+    context 'for current product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:license, account:, permissions:) }
+      let(:resource) { product }
       let(:policy)   { create(:policy, account:, product:) }
-      let(:licenses) { [create(:license, account:, policy:)] }
-      let(:bearer)   { create(:user, account:, licenses:) }
-      let(:token)    { create(:token, account:, bearer:) }
+      let(:product)  { create(:product, account:) }
 
-      it 'denies index access' do
-        expect(subject).to_not permit(:index)
+      with_license_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
       end
 
-      it 'denies show access' do
-        expect(subject).to_not permit(:show)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
+      end
+    end
+
+    context 'for another product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:license, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+
+      with_license_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
       end
 
-      it 'denies create access' do
-        expect(subject).to_not permit(:create)
-      end
-
-      it 'denies update access' do
-        expect(subject).to_not permit(:update)
-      end
-
-      it 'denies destroy access' do
-        expect(subject).to_not permit(:destroy)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
       end
     end
   end
 
-  context 'for anonymous' do
-    let(:context) { authorization_context(account:) }
+  with_role_authorization :user do
+    context 'with license for current product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { product }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+      let(:licenses) { [create(:license, account:, policy:)] }
 
-    it 'denies index access' do
-      expect(subject).to_not permit(:index)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
+      end
     end
 
-    it 'denies show access' do
-      expect(subject).to_not permit(:show)
+    context 'with license for another product' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { create(:product, account:) }
+      let(:licenses) { [create(:license, account:)] }
+
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
+      end
     end
 
-    it 'denies create access' do
-      expect(subject).to_not permit(:create)
+    context 'with licenses for multiple products' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
+      let(:resource) { product }
+      let(:policy)   { create(:policy, account:, product:) }
+      let(:product)  { create(:product, account:) }
+      let(:licenses) {
+        [
+          create(:license, account:, policy:),
+          create(:license, account:),
+          create(:license, account:),
+        ]
+      }
+
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
+      end
     end
 
-    it 'denies update access' do
-      expect(subject).to_not permit(:update)
-    end
+    context 'with no licenses' do
+      let(:account)  { create(:account) }
+      let(:bearer)   { create(:user, account:, permissions:) }
+      let(:resource) { create(:product, account:) }
 
-    it 'denies destroy access' do
-      expect(subject).to_not permit(:destroy)
+      with_token_authentication do
+        forbids :index,   assert_permissions: %w[product.read]
+        forbids :show,    assert_permissions: %w[product.read]
+        forbids :create,  assert_permissions: %w[product.create]
+        forbids :update,  assert_permissions: %w[product.update]
+        forbids :destroy, assert_permissions: %w[product.delete]
+      end
+    end
+  end
+
+  without_authorization do
+    let(:account)  { create(:account) }
+    let(:resource) { create(:product, account:) }
+
+    without_authentication do
+      forbids :index,   assert_permissions: %w[product.read]
+      forbids :show,    assert_permissions: %w[product.read]
+      forbids :create,  assert_permissions: %w[product.create]
+      forbids :update,  assert_permissions: %w[product.update]
+      forbids :destroy, assert_permissions: %w[product.delete]
     end
   end
 end
