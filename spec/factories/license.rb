@@ -26,10 +26,6 @@ FactoryBot.define do
       )
     end
 
-    after :create do |license|
-      license.role = create :role, :license, resource: license
-    end
-
     trait :legacy_encrypt do
       after :build do |license, evaluator|
         license.policy = build(:policy, :legacy_encrypt, account: license.account)

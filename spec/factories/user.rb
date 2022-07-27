@@ -14,33 +14,23 @@ FactoryBot.define do
     end
 
     factory :admin do
-      after :create do |user|
-        user.grant_role!(:admin)
-      end
+      role { build(:role, :admin) }
     end
 
     factory :developer do
-      after :create do |user|
-        user.grant_role!(:developer)
-      end
+      role { build(:role, :developer) }
     end
 
     factory :support_agent do
-      after :create do |user|
-        user.grant_role!(:support_agent)
-      end
+      role { build(:role, :support_agent) }
     end
 
     factory :sales_agent do
-      after :create do |user|
-        user.grant_role!(:sales_agent)
-      end
+      role { build(:role, :sales_agent) }
     end
 
     factory :read_only do
-      after :create do |user|
-        user.grant_role!(:read_only)
-      end
+      role { build(:role, :read_only) }
     end
   end
 end
