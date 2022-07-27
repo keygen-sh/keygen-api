@@ -90,10 +90,19 @@ module AuthorizationHelper
 
   private
 
-  def with_scenario(scenario)
-    fn = SCENARIOS.fetch(scenario)
+  def with_scenario(scenario, &block)
+    env = SCENARIOS.fetch(scenario)
 
-    instance_exec(&fn)
+    context "using #{scenario} scenario" do
+      instance_exec(&env)
+      instance_exec(&block)
+    end
+  end
+
+  def using_scenario(scenario)
+    env = SCENARIOS.fetch(scenario)
+
+    instance_exec(&env)
   end
 
   def with_token_authentication(&block)
