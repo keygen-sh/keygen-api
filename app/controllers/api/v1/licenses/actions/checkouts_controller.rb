@@ -69,6 +69,7 @@ module Api::V1::Licenses::Actions
         license: license,
         **kwargs,
       )
+      authorize license_file, :show?
 
       license_file.validate!
 
