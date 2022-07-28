@@ -10,6 +10,7 @@ class LicenseFile
   attribute :issued_at,   :datetime
   attribute :expires_at,  :datetime
   attribute :ttl,         :integer
+  attribute :includes,    :array
 
   validates :account_id,  presence: true
   validates :license_id,  presence: true
