@@ -120,6 +120,7 @@ class LicensePolicy < ApplicationPolicy
     assert_account_scoped!
     assert_permissions! %w[
       license.validate
+      license.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
@@ -132,6 +133,7 @@ class LicensePolicy < ApplicationPolicy
     assert_account_scoped!
     assert_permissions! %w[
       license.validate
+      license.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
@@ -144,6 +146,7 @@ class LicensePolicy < ApplicationPolicy
     assert_account_scoped!
     assert_permissions! %w[
       license.validate
+      license.read
     ]
 
     # NOTE(ezekg) We have optional authn
