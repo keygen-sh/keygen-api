@@ -40,10 +40,7 @@ RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
-  config.include AuthorizationHelper
-
-  # Also including it here so we get top-level helpers
-  include AuthorizationHelper
+  config.include AuthorizationHelper, type: :policy
 
   # # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"

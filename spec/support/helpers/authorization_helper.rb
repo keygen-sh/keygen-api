@@ -73,160 +73,8 @@ module AuthorizationHelper
     },
   }.freeze
 
-  ##
-  # with_role_authorization starts an authorization test for a given role.
-  def with_role_authorization(role, &block)
-    context "with #{role} authorization" do
-      let(:role)        { role.to_sym }
-      let(:permissions) { default_permissions_for(role:) }
-      let(:context)     { authorization_context(account:, bearer:, token:) }
-
-      instance_exec(&block)
-    end
-  end
-
-  ##
-  # without_authorization starts an authorization test for an anon.
-  def without_authorization(&block)
-    context 'without authorization' do
-      let(:context) { authorization_context(account:, bearer:, token:) }
-
-      instance_exec(&block)
-    end
-  end
-
-  private
-
-  ##
-  # with_scenario applies a scenario to a new context.
-  def with_scenario(scenario, &block)
-    env = SCENARIOS.fetch(scenario)
-
-    context "using #{scenario} scenario" do
-      instance_exec(&env)
-      instance_exec(&block)
-    end
-  end
-
-  ##
-  # with_scenario applies a scenario to the current context.
-  def using_scenario(scenario)
-    env = SCENARIOS.fetch(scenario)
-
-    instance_exec(&env)
-  end
-
-  ##
-  # with_token_authentication defines a context using token authentication.
-  def with_token_authentication(&block)
-    context 'with token authentication' do
-      let(:token) { create(:token, account:, bearer:) }
-
-      instance_exec(&block)
-    end
-  end
-
-  ##
-  # with_license_authentication defines a context using license authentication.
-  def with_license_authentication(&block)
-    context 'with license authentication' do
-      let(:token) { nil }
-
-      it 'bearer is a license' do
-        expect(bearer).to be_a License
-      end
-
-      instance_exec(&block)
-    end
-  end
-
-  ##
-  # without_authentication defines a context using no authentication.
-  def without_authentication(&block)
-    context 'without authentication' do
-      let(:bearer) { nil }
-      let(:token)  { nil }
-
-      instance_exec(&block)
-    end
-  end
-
-  ##
-  # permits asserts the current bearer and token are permitted to perform
-  # the given action.
-  def permits(action, assert_permissions: [])
-    context 'with default permissions' do
-      let(:permissions) { default_permissions_for(role:) }
-
-      it "should permit #{action}" do
-        expect(subject).to permit(action)
-      end
-    end
-
-    context 'with wildcard permissions' do
-      let(:permissions) { [Permission::WILDCARD_PERMISSION] }
-
-      it "should permit #{action}" do
-        expect(subject).to permit(action)
-      end
-    end
-
-    if assert_permissions.any?
-      context 'with explicit permissions' do
-        let(:permissions) { assert_permissions }
-
-        it "should permit #{action}" do
-          expect(subject).to permit(action)
-        end
-      end
-    end
-
-    context 'without permissions' do
-      let(:permissions) { [] }
-
-      it "should deny #{action}" do
-        expect(subject).to_not permit(action)
-      end
-    end
-  end
-
-  ##
-  # forbids asserts the current bearer and token are not permitted to perform
-  # the given action.
-  def forbids(action, assert_permissions: [])
-    context 'with default permissions' do
-      let(:permissions) { default_permissions_for(role:) }
-
-      it "should forbid #{action}" do
-        expect(subject).to_not permit(action)
-      end
-    end
-
-    context 'with wildcard permissions' do
-      let(:permissions) { [Permission::WILDCARD_PERMISSION] }
-
-      it "should forbid #{action}" do
-        expect(subject).to_not permit(action)
-      end
-    end
-
-    if assert_permissions.any?
-      context 'with explicit permissions' do
-        let(:permissions) { assert_permissions }
-
-        it "should forbid #{action}" do
-          expect(subject).to_not permit(action)
-        end
-      end
-    end
-
-    context 'without permissions' do
-      let(:permissions) { [] }
-
-      it "should forbid #{action}" do
-        expect(subject).to_not permit(action)
-      end
-    end
+  def self.included(klass)
+    klass.extend ClassMethods
   end
 
   ##
@@ -236,8 +84,8 @@ module AuthorizationHelper
   end
 
   ##
-  # default_permissions_for returns a role's default permissions.
-  def default_permissions_for(role:)
+  # default_permissions returns a role's default permissions.
+  def default_permissions(role:)
     case role.to_sym
     when :product
       Permission::PRODUCT_PERMISSIONS
@@ -247,6 +95,164 @@ module AuthorizationHelper
       Permission::ADMIN_PERMISSIONS
     when :user
       Permission::USER_PERMISSIONS
+    end
+  end
+
+  module ClassMethods
+    ##
+    # with_role_authorization starts an authorization test for a given role.
+    def with_role_authorization(role, &block)
+      context "with #{role} authorization" do
+        let(:role)        { role.to_sym }
+        let(:permissions) { default_permissions(role:) }
+        let(:context)     { authorization_context(account:, bearer:, token:) }
+
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # without_authorization starts an authorization test for an anon.
+    def without_authorization(&block)
+      context 'without authorization' do
+        let(:context) { authorization_context(account:, bearer:, token:) }
+
+        instance_exec(&block)
+      end
+    end
+
+    private
+
+    ##
+    # with_scenario applies a scenario to a new context.
+    def with_scenario(scenario, &block)
+      env = SCENARIOS.fetch(scenario)
+
+      context "using #{scenario} scenario" do
+        instance_exec(&env)
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # with_scenario applies a scenario to the current context.
+    def using_scenario(scenario)
+      env = SCENARIOS.fetch(scenario)
+
+      instance_exec(&env)
+    end
+
+    ##
+    # with_token_authentication defines a context using token authentication.
+    def with_token_authentication(&block)
+      context 'with token authentication' do
+        let(:token) { create(:token, account:, bearer:) }
+
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # with_license_authentication defines a context using license authentication.
+    def with_license_authentication(&block)
+      context 'with license authentication' do
+        let(:token) { nil }
+
+        it 'bearer is a license' do
+          expect(bearer).to be_a License
+        end
+
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # without_authentication defines a context using no authentication.
+    def without_authentication(&block)
+      context 'without authentication' do
+        let(:bearer) { nil }
+        let(:token)  { nil }
+
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # permits asserts the current bearer and token are permitted to perform
+    # the given action.
+    def permits(action, assert_permissions: [])
+      context 'with default permissions' do
+        let(:permissions) { default_permissions(role:) }
+
+        it "should permit #{action}" do
+          expect(subject).to permit(action)
+        end
+      end
+
+      context 'with wildcard permissions' do
+        let(:permissions) { [Permission::WILDCARD_PERMISSION] }
+
+        it "should permit #{action}" do
+          expect(subject).to permit(action)
+        end
+      end
+
+      if assert_permissions.any?
+        context 'with explicit permissions' do
+          let(:permissions) { assert_permissions }
+
+          it "should permit #{action}" do
+            expect(subject).to permit(action)
+          end
+        end
+      end
+
+      context 'without permissions' do
+        let(:permissions) { [] }
+
+        it "should deny #{action}" do
+          expect(subject).to_not permit(action)
+        end
+      end
+    end
+
+    ##
+    # forbids asserts the current bearer and token are not permitted to perform
+    # the given action.
+    def forbids(action, assert_permissions: [])
+      context 'with default permissions' do
+        let(:permissions) { default_permissions(role:) }
+
+        it "should forbid #{action}" do
+          expect(subject).to_not permit(action)
+        end
+      end
+
+      context 'with wildcard permissions' do
+        let(:permissions) { [Permission::WILDCARD_PERMISSION] }
+
+        it "should forbid #{action}" do
+          expect(subject).to_not permit(action)
+        end
+      end
+
+      if assert_permissions.any?
+        context 'with explicit permissions' do
+          let(:permissions) { assert_permissions }
+
+          it "should forbid #{action}" do
+            expect(subject).to_not permit(action)
+          end
+        end
+      end
+
+      context 'without permissions' do
+        let(:permissions) { [] }
+
+        it "should forbid #{action}" do
+          expect(subject).to_not permit(action)
+        end
+      end
     end
   end
 end
