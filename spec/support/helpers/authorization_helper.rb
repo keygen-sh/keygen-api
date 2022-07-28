@@ -2,53 +2,60 @@
 
 module AuthorizationHelper
   ##
-  # SCENARIOS contains predefined scenarios to keep spec files clean and
+  # Scenarios contains predefined scenarios to keep spec files clean and
   # easy to write, for security's sake.
-  SCENARIOS = {
-    as_admin_accessing_product: -> {
+  module Scenarios
+    def as_admin_accessing_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:admin, account:, permissions:) }
       let(:resource) { create(:product, account:) }
-    },
-    as_product_accessing_itself: -> {
+    end
+
+    def as_product_accessing_itself
       let(:account)  { create(:account) }
       let(:bearer)   { create(:product, account:, permissions:) }
       let(:resource) { bearer }
-    },
-    as_product_accessing_another_product: -> {
+    end
+
+    def as_product_accessing_another_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:product, account:, permissions:) }
       let(:resource) { create(:product, account:) }
-    },
-    as_license_accessing_product: -> {
+    end
+
+    def as_license_accessing_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:license, account:, permissions:) }
       let(:resource) { product }
       let(:policy)   { create(:policy, account:, product:) }
       let(:product)  { create(:product, account:) }
-    },
-    as_license_accessing_another_product: -> {
+    end
+
+    def as_license_accessing_another_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:license, account:, permissions:) }
       let(:resource) { create(:product, account:) }
       let(:policy)   { create(:policy, account:, product:) }
       let(:product)  { create(:product, account:) }
-    },
-    as_licensed_user_accessing_product: -> {
+    end
+
+    def as_licensed_user_accessing_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:user, account:, licenses:, permissions:) }
       let(:resource) { product }
       let(:policy)   { create(:policy, account:, product:) }
       let(:product)  { create(:product, account:) }
       let(:licenses) { [create(:license, account:, policy:)] }
-    },
-    as_licensed_user_accessing_another_product: -> {
+    end
+
+    def as_licensed_user_accessing_another_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:user, account:, licenses:, permissions:) }
       let(:resource) { create(:product, account:) }
       let(:licenses) { [create(:license, account:)] }
-    },
-    as_licensed_user_with_multiple_licenses_accessing_product: -> {
+    end
+
+    def as_licensed_user_with_multiple_licenses_accessing_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:user, account:, licenses:, permissions:) }
       let(:resource) { product }
@@ -61,43 +68,23 @@ module AuthorizationHelper
           create(:license, account:),
         ]
       }
-    },
-    as_unlicensed_user_accessing_product: -> {
+    end
+
+    def as_unlicensed_user_accessing_product
       let(:account)  { create(:account) }
       let(:bearer)   { create(:user, account:, permissions:) }
       let(:resource) { create(:product, account:) }
-    },
-    as_anonymous_accessing_product: -> {
+    end
+
+    def as_anonymous_accessing_product
       let(:account)  { create(:account) }
       let(:resource) { create(:product, account:) }
-    },
-  }.freeze
-
-  def self.included(klass)
-    klass.extend ClassMethods
-  end
-
-  ##
-  # authorization_context creates a new authorization context.
-  def authorization_context(account:, bearer: nil, token: nil)
-    AuthorizationContext.new(account:, bearer:, token:)
-  end
-
-  ##
-  # default_permissions returns a role's default permissions.
-  def default_permissions(role:)
-    case role.to_sym
-    when :product
-      Permission::PRODUCT_PERMISSIONS
-    when :license
-      Permission::LICENSE_PERMISSIONS
-    when :admin
-      Permission::ADMIN_PERMISSIONS
-    when :user
-      Permission::USER_PERMISSIONS
     end
   end
 
+  ##
+  # ClassMethods contains class methods that are mixed in when
+  # the AuthorizationHelper is included.
   module ClassMethods
     ##
     # with_role_authorization starts an authorization test for a given role.
@@ -126,10 +113,11 @@ module AuthorizationHelper
     ##
     # with_scenario applies a scenario to a new context.
     def with_scenario(scenario, &block)
-      env = SCENARIOS.fetch(scenario)
-
       context "using #{scenario} scenario" do
-        instance_exec(&env)
+        method = Scenarios.instance_method(scenario)
+                          .bind(self)
+
+        instance_exec(&method)
         instance_exec(&block)
       end
     end
@@ -137,9 +125,10 @@ module AuthorizationHelper
     ##
     # with_scenario applies a scenario to the current context.
     def using_scenario(scenario)
-      env = SCENARIOS.fetch(scenario)
+      method = Scenarios.instance_method(scenario)
+                        .bind(self)
 
-      instance_exec(&env)
+      instance_exec(&method)
     end
 
     ##
@@ -180,7 +169,7 @@ module AuthorizationHelper
     ##
     # permits asserts the current bearer and token are permitted to perform
     # the given action.
-    def permits(action, assert_permissions: [])
+    def permits(action, permissions: [])
       context 'with default permissions' do
         let(:permissions) { default_permissions(role:) }
 
@@ -197,9 +186,9 @@ module AuthorizationHelper
         end
       end
 
-      if assert_permissions.any?
+      if permissions.any?
         context 'with explicit permissions' do
-          let(:permissions) { assert_permissions }
+          let(:permissions) { permissions.to_a }
 
           it "should permit #{action}" do
             expect(subject).to permit(action)
@@ -219,7 +208,7 @@ module AuthorizationHelper
     ##
     # forbids asserts the current bearer and token are not permitted to perform
     # the given action.
-    def forbids(action, assert_permissions: [])
+    def forbids(action, permissions: [])
       context 'with default permissions' do
         let(:permissions) { default_permissions(role:) }
 
@@ -236,9 +225,9 @@ module AuthorizationHelper
         end
       end
 
-      if assert_permissions.any?
+      if permissions.any?
         context 'with explicit permissions' do
-          let(:permissions) { assert_permissions }
+          let(:permissions) { permissions.to_a }
 
           it "should forbid #{action}" do
             expect(subject).to_not permit(action)
@@ -253,6 +242,33 @@ module AuthorizationHelper
           expect(subject).to_not permit(action)
         end
       end
+    end
+  end
+
+  ##
+  # included mixes in ClassMethods on include.
+  def self.included(klass)
+    klass.extend ClassMethods
+  end
+
+  ##
+  # authorization_context creates a new authorization context.
+  def authorization_context(account:, bearer: nil, token: nil)
+    AuthorizationContext.new(account:, bearer:, token:)
+  end
+
+  ##
+  # default_permissions returns a role's default permissions.
+  def default_permissions(role:)
+    case role.to_sym
+    when :product
+      Permission::PRODUCT_PERMISSIONS
+    when :license
+      Permission::LICENSE_PERMISSIONS
+    when :admin
+      Permission::ADMIN_PERMISSIONS
+    when :user
+      Permission::USER_PERMISSIONS
     end
   end
 end
