@@ -69,6 +69,7 @@ module Api::V1::Machines::Actions
         machine: machine,
         **kwargs,
       )
+      authorize machine_file, :show?
 
       machine_file.validate!
 

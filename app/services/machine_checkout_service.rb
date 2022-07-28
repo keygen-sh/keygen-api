@@ -77,6 +77,7 @@ class MachineCheckoutService < AbstractCheckoutService
       issued_at: issued_at,
       expires_at: expires_at,
       ttl: ttl,
+      includes: incl,
     )
   end
 
