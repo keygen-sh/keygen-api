@@ -23,7 +23,7 @@ class License < ApplicationRecord
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :machines, dependent: :destroy
   has_many :processes, through: :machines
-  has_many :releases, -> l { for_license(l.id) },
+  has_many :releases, -> l { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :product
   has_many :event_logs,
     as: :resource

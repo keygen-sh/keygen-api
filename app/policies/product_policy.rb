@@ -8,7 +8,10 @@ class ProductPolicy < ApplicationPolicy
       product.read
     ]
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
+    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
+      (bearer.license? && resource == [bearer.product]) ||
+      (bearer.user? &&
+        resource_ids & bearer.product_ids == resource_ids)
   end
 
   def show?
@@ -19,7 +22,9 @@ class ProductPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource == bearer
+      (bearer.product? && resource == bearer) ||
+      (bearer.license? && resource == bearer.product) ||
+      (bearer.user? && bearer.products.exists?(resource.id))
   end
 
   def create?
