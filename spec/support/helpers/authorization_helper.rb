@@ -80,6 +80,30 @@ module AuthorizationHelper
       let(:account)  { create(:account) }
       let(:resource) { create(:product, account:) }
     end
+
+    def as_admin(scenarios)
+      case scenarios
+      in []
+        let(:account) { create(:account) }
+        let(:bearer)  { create(:admin, account:, permissions:) }
+      end
+    end
+
+    def accessing_another_account(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user, *]
+        let(:other_account) { create(:account) }
+      end
+    end
+
+    def accessing_a_product(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:resource) { create(:product, account: other_account) }
+      else
+        let(:resource) { create(:product, account:) }
+      end
+    end
   end
 
   ##
@@ -111,24 +135,47 @@ module AuthorizationHelper
     private
 
     ##
-    # with_scenario applies a scenario to a new context.
-    def with_scenario(scenario, &block)
-      context "using #{scenario} scenario" do
+    # using_scenarios applies a set of scenarios to the current context.
+    def using_scenarios(scenarios)
+      scenarios.reduce [] do |accum, scenario|
         method = Scenarios.instance_method(scenario)
                           .bind(self)
 
-        instance_exec(&method)
-        instance_exec(&block)
+        if method.arity > 0
+          instance_exec(accum, &method)
+        else
+          instance_exec(&method)
+        end
+
+        accum << scenario
       end
     end
 
     ##
-    # with_scenario applies a scenario to the current context.
+    # using_scenario applies a scenario to the current context.
     def using_scenario(scenario)
       method = Scenarios.instance_method(scenario)
                         .bind(self)
 
       instance_exec(&method)
+    end
+
+    ##
+    # with_scenarios applies a set of scenarios to a new context.
+    def with_scenarios(scenarios, &block)
+      context "using #{scenarios} scenarios" do
+        using_scenarios(scenarios)
+        instance_exec(&block)
+      end
+    end
+
+    ##
+    # with_scenario applies a scenario to a new context.
+    def with_scenario(scenario, &block)
+      context "using #{scenario} scenario" do
+        using_scenario(scenario)
+        instance_exec(&block)
+      end
     end
 
     ##
