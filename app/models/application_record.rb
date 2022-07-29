@@ -3,18 +3,26 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  # FIXME(ezekg) More intuitive to test things in ASC order
+  DEFAULT_SORT_ORDER = if Rails.env.test?
+                         :asc
+                       else
+                         :desc
+                       end
+
   EXCLUDED_ALIASES = %w[actions action].freeze
   SANITIZE_TSV_RE  = /['?\\:‘’|&!*]/.freeze
-  TEST_ENV         = 'test'.freeze
 
   default_scope -> {
-    # FIXME(ezekg) It's easier to test things when sort order to ASC
-    case Rails.env
-    when TEST_ENV
-      order created_at: :asc
-    else
-      order created_at: :desc
-    end
+    order(created_at: DEFAULT_SORT_ORDER)
+  }
+
+  scope :without_order, -> {
+    reorder(nil)
+  }
+
+  scope :without_limit, -> {
+    limit(nil)
   }
 
   # This is a preventative measure to assert we never accidentally serialize

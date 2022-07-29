@@ -13,7 +13,7 @@ module Api::V1::Policies::Relationships
 
     # GET /policies/1/licenses
     def index
-      @licenses = apply_pagination(policy_scope(apply_scopes(@policy.licenses)).preload(:policy, :user))
+      @licenses = apply_pagination(policy_scope(apply_scopes(@policy.licenses)).preload(:role, :policy, :user))
       authorize @licenses
 
       render jsonapi: @licenses

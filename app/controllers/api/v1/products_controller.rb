@@ -9,7 +9,7 @@ module Api::V1
 
     # GET /products
     def index
-      @products = apply_pagination(policy_scope(apply_scopes(current_account.products)))
+      @products = apply_pagination(policy_scope(apply_scopes(current_account.products)).preload(:role))
       authorize @products
 
       render jsonapi: @products

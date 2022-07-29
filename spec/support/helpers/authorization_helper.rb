@@ -5,87 +5,55 @@ module AuthorizationHelper
   # Scenarios contains predefined scenarios to keep spec files clean and
   # easy to write, for security's sake.
   module Scenarios
-    def as_admin_accessing_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:admin, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
-    end
-
-    def as_product_accessing_itself
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:product, account:, permissions:) }
-      let(:resource) { bearer }
-    end
-
-    def as_product_accessing_another_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:product, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
-    end
-
-    def as_license_accessing_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:license, account:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-    end
-
-    def as_license_accessing_another_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:license, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-    end
-
-    def as_licensed_user_accessing_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-      let(:licenses) { [create(:license, account:, policy:)] }
-    end
-
-    def as_licensed_user_accessing_another_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { create(:product, account:) }
-      let(:licenses) { [create(:license, account:)] }
-    end
-
-    def as_licensed_user_with_multiple_licenses_accessing_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, licenses:, permissions:) }
-      let(:resource) { product }
-      let(:policy)   { create(:policy, account:, product:) }
-      let(:product)  { create(:product, account:) }
-      let(:licenses) {
-        [
-          create(:license, account:, policy:),
-          create(:license, account:),
-          create(:license, account:),
-        ]
-      }
-    end
-
-    def as_unlicensed_user_accessing_product
-      let(:account)  { create(:account) }
-      let(:bearer)   { create(:user, account:, permissions:) }
-      let(:resource) { create(:product, account:) }
-    end
-
-    def as_anonymous_accessing_product
-      let(:account)  { create(:account) }
-      let(:resource) { create(:product, account:) }
-    end
-
     def as_admin(scenarios)
       case scenarios
       in []
         let(:account) { create(:account) }
         let(:bearer)  { create(:admin, account:, permissions:) }
+      end
+    end
+
+    def as_product(scenarios)
+      case scenarios
+      in []
+        let(:account) { create(:account) }
+        let(:bearer)  { create(:product, account:, permissions:) }
+      end
+    end
+
+    def as_license(scenarios)
+      case scenarios
+      in []
+        let(:account) { create(:account) }
+        let(:bearer)  { create(:license, account:, permissions:) }
+      end
+    end
+
+    def as_user(scenarios)
+      case scenarios
+      in []
+        let(:account) { create(:account) }
+        let(:bearer)  { create(:user, account:, permissions:) }
+      end
+    end
+
+    def as_anonymous(scenarios)
+      let(:account) { create(:account) }
+      let(:bearer)  { nil }
+    end
+
+    def with_licenses(scenarios)
+      case scenarios
+      in [:as_user, *]
+        let(:licenses) { create_list(:license, 2, account:, user: bearer) }
+      end
+    end
+    alias :with_license :with_licenses
+
+    def accessing_itself(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user, *]
+        let(:resource) { bearer }
       end
     end
 
@@ -104,6 +72,37 @@ module AuthorizationHelper
         let(:resource) { create(:product, account:) }
       end
     end
+    alias :accessing_another_product :accessing_a_product
+
+    def accessing_its_product(scenarios)
+      case scenarios
+      in [:as_license, *]
+        let(:resource) { bearer.product }
+      in [:as_user, *]
+        let(:resource) { licenses.first.product }
+      end
+    end
+    alias :accessing_their_product :accessing_its_product
+
+    def accessing_products(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:resource) { [create(:product, account: other_account)] }
+      else
+        let(:resource) { [create(:product, account:)] }
+      end
+    end
+    alias :accessing_other_products :accessing_products
+
+    def accessing_its_products(scenarios)
+      case scenarios
+      in [:as_license, *]
+        let(:resource) { [bearer.product] }
+      in [:as_user, *]
+        let(:resource) { licenses.collect(&:product) }
+      end
+    end
+    alias :accessing_their_products :accessing_its_products
   end
 
   ##

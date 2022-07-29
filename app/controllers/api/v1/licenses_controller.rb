@@ -24,7 +24,7 @@ module Api::V1
 
     # GET /licenses
     def index
-      @licenses = apply_pagination(policy_scope(apply_scopes(current_account.licenses)).preload(:user, :policy))
+      @licenses = apply_pagination(policy_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy))
       authorize @licenses
 
       render jsonapi: @licenses
