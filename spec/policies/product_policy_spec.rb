@@ -7,14 +7,24 @@ describe ProductPolicy, type: :policy do
   subject { described_class.new(context, resource) }
 
   with_role_authorization :admin do
-    using_scenario :as_admin_accessing_product
+    with_scenarios %i[as_admin accessing_a_product] do
+      with_token_authentication do
+        permits :index,   permissions: %w[product.read]
+        permits :show,    permissions: %w[product.read]
+        permits :create,  permissions: %w[product.create]
+        permits :update,  permissions: %w[product.update]
+        permits :destroy, permissions: %w[product.delete]
+      end
+    end
 
-    with_token_authentication do
-      permits :index,   permissions: %w[product.read]
-      permits :show,    permissions: %w[product.read]
-      permits :create,  permissions: %w[product.create]
-      permits :update,  permissions: %w[product.update]
-      permits :destroy, permissions: %w[product.delete]
+    with_scenarios %i[as_admin accessing_another_account accessing_a_product] do
+      with_token_authentication do
+        forbids :index,   permissions: %w[product.read]
+        forbids :show,    permissions: %w[product.read]
+        forbids :create,  permissions: %w[product.create]
+        forbids :update,  permissions: %w[product.update]
+        forbids :destroy, permissions: %w[product.delete]
+      end
     end
   end
 
