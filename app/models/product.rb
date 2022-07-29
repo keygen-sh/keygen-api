@@ -19,8 +19,8 @@ class Product < ApplicationRecord
   has_many :policies, dependent: :destroy
   has_many :keys, through: :policies, source: :pool
   has_many :licenses, through: :policies
-  has_many :machines, -> { select('"machines".*, "machines"."id", "machines"."created_at"').distinct('"machines"."id"').reorder(Arel.sql('"machines"."created_at" ASC')) }, through: :licenses
-  has_many :users, -> { select('"users".*, "users"."id", "users"."created_at"').distinct('"users"."id"').reorder(Arel.sql('"users"."created_at" ASC')) }, through: :licenses
+  has_many :machines, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
+  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy
   has_many :releases, inverse_of: :product, dependent: :destroy
   has_many :release_channels, through: :releases, source: :channel
@@ -86,6 +86,16 @@ class Product < ApplicationRecord
           scope.where('products.metadata @> ?', after_type_cast.to_json)
         )
     end
+  }
+
+  scope :for_license, -> id {
+    joins(:licenses).where(licenses: { id: })
+                    .distinct
+  }
+
+  scope :for_user, -> id {
+    joins(:users).where(users: { id: })
+                 .distinct
   }
 
   def licensed_distribution?

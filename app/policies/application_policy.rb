@@ -66,6 +66,10 @@ class ApplicationPolicy
     context.token
   end
 
+  def resource_ids
+    resource.collect(&:id)
+  end
+
   def scope
     Pundit.policy_scope! bearer, resource.class
   end

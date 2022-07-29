@@ -18,12 +18,12 @@ class User < ApplicationRecord
     optional: true
   has_many :second_factors, dependent: :destroy
   has_many :licenses, dependent: :destroy
-  has_many :products, -> { select('"products".*, "products"."id", "products"."created_at"').distinct('"products"."id"').reorder(Arel.sql('"products"."created_at" ASC')) }, through: :licenses
+  has_many :products, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :license_entitlements, through: :licenses
   has_many :policy_entitlements, through: :licenses
   has_many :machines, through: :licenses
   has_many :tokens, as: :bearer, dependent: :destroy_async
-  has_many :releases, -> u { for_user(u.id) },
+  has_many :releases, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) },
     through: :products
   has_many :event_logs,
     as: :resource
@@ -214,6 +214,10 @@ class User < ApplicationRecord
       where.not(sub_query)
     end
   }
+
+  def product_ids
+    products.reorder(nil).ids
+  end
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
