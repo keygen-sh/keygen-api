@@ -77,7 +77,7 @@ module Roleable
       define_roleable_association_and_delgate
 
       after_initialize -> { grant_role!(name) },
-        unless: :role?
+        unless: -> { persisted? || role? }
 
       define_roleable_dirty_tracker
     end
@@ -85,7 +85,8 @@ module Roleable
     def has_role(name)
       define_roleable_association_and_delgate
 
-      after_initialize -> { grant_role!(name) }
+      after_initialize -> { grant_role!(name) },
+        unless: :persisted?
 
       define_roleable_dirty_tracker
     end
