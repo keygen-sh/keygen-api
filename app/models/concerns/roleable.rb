@@ -4,40 +4,18 @@ module Roleable
   extend ActiveSupport::Concern
 
   included do
-    def permissions=(*identifiers)
-      identifiers = identifiers.flatten
-                               .compact
+    def grant_role!(name)
+      errors.add :role, :not_allowed, message: 'role already exists' if
+        persisted?
 
-      permission_ids =
-        Permission.where(action: identifiers)
-                  .or(
-                    Permission.where(id: identifiers)
-                  )
-                  .pluck(:id)
-
-      # Invalid permissions would be ignored by default, but that doesn't
-      # really provide a nice DX. We'll error instead of ignoring.
-      if permission_ids.size != identifiers.size
-        errors.add :permissions, :not_allowed, message: 'unsupported permissions'
-
-        raise ActiveRecord::RecordInvalid, self
-      end
-
-      if new_record?
-        role_permissions_attributes = permission_ids.map {{ permission_id: _1 }}
-
-        assign_attributes(role_attributes: { role_permissions_attributes: })
-      else
-        role.permissions = permission_ids
-      end
+      assign_attributes(role_attributes: { name: })
     end
 
-    def grant_role!(name)
-      if persisted?
-        role.update!(name:)
-      else
-        assign_attributes(role_attributes: { name: })
-      end
+    def replace_role!(name)
+      errors.add :role, :not_allowed, message: 'role is missing' unless
+        persisted?
+
+      role.update!(name:)
     end
 
     def revoke_role!(name)
@@ -94,6 +72,8 @@ module Roleable
     private
 
     def define_roleable_association_and_delgate
+      include Permissible
+
       has_one :role,
         inverse_of: :resource,
         dependent: :destroy,
@@ -102,7 +82,7 @@ module Roleable
       accepts_nested_attributes_for :role,
         update_only: true
 
-      delegate :can?, :cannot?, :permissions,
+      delegate :permissions,
         allow_nil: true,
         to: :role
     end

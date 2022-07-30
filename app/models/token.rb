@@ -15,7 +15,7 @@ class Token < ApplicationRecord
     dependent: :delete_all
 
   accepts_nested_attributes_for :token_permissions,
-    reject_if: :reject_duplicate_token_permissions
+    reject_if: :reject_associated_records_for_token_permissions
 
   before_create :set_default_permissions!,
     unless: :token_permissions_attributes_changed?
@@ -91,6 +91,9 @@ class Token < ApplicationRecord
   # allow permissions to be attached by action, rather than just ID. This
   # also allows us to insert in bulk, rather than serially.
   def permissions=(*identifiers)
+    return if
+      identifiers == [nil]
+
     identifiers = identifiers.flatten
                              .compact
 
@@ -106,14 +109,14 @@ class Token < ApplicationRecord
     if permission_ids.size != identifiers.size
       errors.add :permissions, :not_allowed, message: 'unsupported permissions'
 
-      raise ActiveRecord::RecordInvalid, self
+      return
     end
 
     token_permissions_attributes =
       permission_ids.map {{ permission_id: _1 }}
 
-    return assign_attributes(token_permissions_attributes:) if
-      new_record?
+    return assign_attributes(token_permissions_attributes:) unless
+      persisted?
 
     transaction do
       token_permissions.delete_all
@@ -126,6 +129,9 @@ class Token < ApplicationRecord
   end
 
   def permissions
+    return [] unless
+      role.present?
+
     return role.permissions if
       token_permissions.joins(:permission)
                        .exists?(permission: {
@@ -307,7 +313,7 @@ class Token < ApplicationRecord
 
   private
 
-  def reject_duplicate_token_permissions(attrs)
+  def reject_associated_records_for_token_permissions(attrs)
     return if
       new_record?
 

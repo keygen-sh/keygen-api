@@ -10,6 +10,13 @@ class License < ApplicationRecord
   include Diffable
 
   has_role :license
+  has_permissions Permission::LICENSE_PERMISSIONS,
+    # NOTE(ezekg) Removing these from defaults for backwards compatibility
+    default: Permission::LICENSE_PERMISSIONS - %w[
+      account.read
+      product.read
+      policy.read
+    ]
 
   belongs_to :account
   belongs_to :user,
@@ -456,14 +463,14 @@ class License < ApplicationRecord
     allow_nil: true
 
   def permissions
+    return [] unless
+      role.present?
+
     return role.permissions unless
       user.present?
 
     return user.permissions if
-      role.role_permissions.joins(:permission)
-                           .exists?(permission: {
-                             action: Permission::WILDCARD_PERMISSION,
-                           })
+      role.permissions.exists?(action: Permission::WILDCARD_PERMISSION)
 
     # A license's permission set is the intersection of its user's role
     # permissions and its own permissions.
