@@ -11,12 +11,10 @@ FactoryBot.define do
       policy  = evaluator.policy.presence || build(:policy, account: account)
       user    =
         case
-        when evaluator.user == false
-          nil
         when evaluator.user.present?
           evaluator.user
         else
-          build(:user, account: account)
+          nil
         end
 
       license.assign_attributes(

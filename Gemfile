@@ -44,7 +44,7 @@ gem 'rotp', '~> 6.2'
 gem 'has_scope'
 gem 'kaminari', '~> 1.2.0'
 
-# Postgres extensions
+# Postgres/DB extensions
 gem 'active_record_union'
 gem 'active_record_distinct_on'
 

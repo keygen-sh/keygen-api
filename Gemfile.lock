@@ -347,7 +347,7 @@ GEM
     redis (4.7.1)
     redis-prescription (1.0.0)
     regexp_parser (2.2.1)
-    request_migrations (1.1.0)
+    request_migrations (1.1.1)
       rails (>= 6.0)
       semverse (~> 3.0)
     request_store (1.5.1)

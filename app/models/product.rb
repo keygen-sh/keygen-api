@@ -14,6 +14,7 @@ class Product < ApplicationRecord
   ]
 
   has_role :product
+  has_permissions Permission::PRODUCT_PERMISSIONS
 
   belongs_to :account
   has_many :policies, dependent: :destroy
