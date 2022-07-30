@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Role < ApplicationRecord
-  include Permissible
-
   USER_ROLES    = %w[user admin developer read_only sales_agent support_agent].freeze
   PRODUCT_ROLES = %w[product].freeze
   LICENSE_ROLES = %w[license].freeze
@@ -24,7 +22,7 @@ class Role < ApplicationRecord
     dependent: :delete_all
 
   accepts_nested_attributes_for :role_permissions,
-    reject_if: :reject_duplicate_role_permissions
+    reject_if: :reject_associated_records_for_role_permissions
 
   # We're doing this in an after create commit so we can use a bulk insert,
   # which is more performant than inserting tens of permissions.
@@ -65,12 +63,15 @@ class Role < ApplicationRecord
   # by ID. We don't expose permission IDs to the world. This also allows
   # us to insert in bulk, rather than serially.
   def permissions=(*ids)
+    return if
+      ids == [nil]
+
     role_permissions_attributes = ids.flatten
                                      .compact
                                      .map {{ permission_id: _1 }}
 
-    return assign_attributes(role_permissions_attributes:) if
-      new_record?
+    return assign_attributes(role_permissions_attributes:) unless
+      persisted?
 
     transaction do
       role_permissions.delete_all
@@ -114,15 +115,47 @@ class Role < ApplicationRecord
   def product? = name.to_sym == :product
   def license? = name.to_sym == :license
 
+  def deconstruct_keys(keys) = attributes.symbolize_keys.except(keys)
+  def deconstruct            = attributes.values
+
   private
 
-  def reject_duplicate_role_permissions(attrs)
+  ##
+  # reject_associated_records_for_role_permissions rejects duplicate role permissions.
+  def reject_associated_records_for_role_permissions(attrs)
     return if
       new_record?
 
     role_permissions.exists?(attrs)
   end
 
+  ##
+  # autosave_associated_records_for_role_permissions bulk inserts role permissions instead
+  # of saving them sequentially, which is incredibly slow.
+  def autosave_associated_records_for_role_permissions
+    return if
+      role_permissions.empty?
+
+    to_delete = role_permissions.select(&:marked_for_destruction?)
+                                .map(&:id)
+
+    to_upsert = role_permissions.reject(&:marked_for_destruction?)
+                                .map {{
+                                  permission_id: _1.permission_id,
+                                  role_id: id,
+                                }}
+
+    transaction do
+      RolePermission.where(id: to_delete).delete_all if
+        to_delete.any?
+
+      RolePermission.upsert_all(to_upsert, on_duplicate: :skip) if
+        to_upsert.any?
+    end
+  end
+
+  # FIXME(ezekg) Replace with before_create setting role_permissions_attributes
+  #              so our bulk insert logic is all handled above.
   def set_default_permissions!
     actions = case name.to_sym
               in :admin
@@ -143,10 +176,10 @@ class Role < ApplicationRecord
                 Permission::LICENSE_PERMISSIONS
               end
 
-    role_permissions.insert_all!(
+    RolePermission.insert_all!(
       Permission.where(action: actions)
                 .pluck(:id)
-                .map {{ permission_id: _1 }},
+                .map {{ role_id: id, permission_id: _1 }},
     )
   end
 

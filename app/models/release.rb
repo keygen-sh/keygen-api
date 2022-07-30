@@ -85,7 +85,7 @@ class Release < ApplicationRecord
     inverse_of: :release,
     dependent: :delete
 
-  accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_duplicate_constraints
+  accepts_nested_attributes_for :constraints, limit: 20, reject_if: :reject_associated_records_for_constraints
   accepts_nested_attributes_for :artifact, update_only: true
   accepts_nested_attributes_for :channel
 
@@ -650,7 +650,7 @@ class Release < ApplicationRecord
     end
   end
 
-  def reject_duplicate_constraints(attrs)
+  def reject_associated_records_for_constraints(attrs)
     return if
       new_record?
 
