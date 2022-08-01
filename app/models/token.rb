@@ -324,7 +324,10 @@ class Token < ApplicationRecord
     return if
       new_record?
 
-    token_permissions.exists?(attrs)
+    token_permissions.exists?(
+      # Make sure we only select real columns, not e.g. _destroy.
+      attrs.slice(attributes.keys),
+    )
   end
 
   ##

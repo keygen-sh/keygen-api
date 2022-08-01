@@ -123,7 +123,10 @@ class Role < ApplicationRecord
     return if
       new_record?
 
-    role_permissions.exists?(attrs)
+    role_permissions.exists?(
+      # Make sure we only select real columns, not e.g. _destroy.
+      attrs.slice(attributes.keys),
+    )
   end
 
   ##
