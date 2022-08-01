@@ -20,7 +20,8 @@ Feature: License user relationship
   Scenario: Admin retrieves the user for a license
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And the current account has 3 "licenses" for the last "user"
      And the first "license" has the following attributes:
       """
       { "key": "test-key" }

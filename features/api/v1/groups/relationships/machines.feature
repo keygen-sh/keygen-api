@@ -178,6 +178,7 @@ Feature: Group machines relationship
   Scenario: User retrieves all machines for a group
     Given the current account is "test1"
     And the current account has 2 "groups"
+    And the current account has 1 "user"
     And the current account has 7 "machines"
     And the first "machine" has the following attributes:
       """

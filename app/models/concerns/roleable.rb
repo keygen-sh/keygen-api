@@ -60,11 +60,11 @@ module Roleable
 
       # Set default permissions unless already set
       before_create -> { self.permissions = default_permissions },
-        unless: -> { role.role_permissions_attributes_changed? }
+        unless: -> { role&.role_permissions_attributes_changed? }
 
       # Reset permissions on role change
       before_update -> { self.permissions = default_permissions },
-        if: -> { role.name_changed? }
+        if: -> { role&.changed? }
 
       define_roleable_dirty_tracker
     end
@@ -78,11 +78,11 @@ module Roleable
 
       # Set default permissions unless already set
       before_create -> { self.permissions = default_permissions },
-        unless: -> { role.role_permissions_attributes_changed? }
+        unless: -> { role&.role_permissions_attributes_changed? }
 
       # Reset permissions on role change
       before_update -> { self.permissions = default_permissions },
-        if: -> { role.name_changed? }
+        if: -> { role&.changed? }
 
       define_roleable_dirty_tracker
     end
