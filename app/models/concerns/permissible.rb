@@ -61,7 +61,11 @@ module Permissible
         define_singleton_method :default_permissions do
           case default
           when Proc
-            instance_exec(&default)
+            if default.arity > 0
+              instance_exec(self, &default)
+            else
+              instance_exec(&default)
+            end
           when Array
             [*default]
           else
@@ -76,7 +80,11 @@ module Permissible
         define_method :default_permissions do
           case default
           when Proc
-            instance_exec(&default)
+            if default.arity > 0
+              instance_exec(self, &default)
+            else
+              instance_exec(&default)
+            end
           when Array
             [*default]
           else
@@ -89,8 +97,8 @@ module Permissible
         def self.allowed_permission_ids = Permission.where(action: allowed_permissions).pluck(:id)
         def self.default_permission_ids = Permission.where(action: default_permissions).pluck(:id)
 
-        def allowed_permission_ids = self.class.allowed_permission_ids
-        def default_permission_ids = self.class.default_permission_ids
+        def allowed_permission_ids = Permission.where(action: allowed_permissions).pluck(:id)
+        def default_permission_ids = Permission.where(action: default_permissions).pluck(:id)
       RUBY
     end
   end

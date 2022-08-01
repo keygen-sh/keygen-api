@@ -26,10 +26,9 @@ class Role < ApplicationRecord
   accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
   tracks_dirty_attributes_for :role_permissions
 
-  # We're doing this in an after create commit so we can use a bulk insert,
-  # which is more performant than inserting tens of permissions.
-  after_create :set_default_permissions!,
-    unless: :role_permissions_attributes_changed?
+  # Reset permissions on role change.
+  before_update -> { self.permissions = default_permission_ids },
+    if: :name_changed?
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,
@@ -44,6 +43,11 @@ class Role < ApplicationRecord
   validates :name,
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
     if: -> { resource.is_a?(License) }
+
+  delegate :default_permissions, :default_permission_ids,
+    :allowed_permissions, :allowed_permission_ids,
+    allow_nil: true,
+    to: :resource
 
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action via the resource, rather than
