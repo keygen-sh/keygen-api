@@ -387,8 +387,10 @@ Feature: Product artifacts relationship
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.dmg    | dmg      | macos    |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App-1.0.0.zip    | zip      | win32    |
       | e7ac958a-7828-4d8e-8ac3-ef56021ea3c6 | Test-App.1.0.0.tar.gz | tar.gz   | linux    |
+    And the current account has 1 "user"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
+    And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"

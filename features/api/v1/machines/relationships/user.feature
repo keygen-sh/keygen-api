@@ -20,7 +20,9 @@ Feature: Machine user relationship
   Scenario: Admin retrieves the user for a machine
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 3 "machines"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 3 "machines" for the last "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "200"
