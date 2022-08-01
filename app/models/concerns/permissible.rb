@@ -91,14 +91,6 @@ module Permissible
 
         def allowed_permission_ids = self.class.allowed_permission_ids
         def default_permission_ids = self.class.default_permission_ids
-
-        # Set default permissions unless already set
-        before_create -> { self.permissions = default_permissions },
-          unless: -> { role.role_permissions_attributes_changed? }
-
-        # Reset permissions on role change
-        before_update -> { self.permissions = default_permissions },
-          if: -> { role.name_changed? }
       RUBY
     end
   end

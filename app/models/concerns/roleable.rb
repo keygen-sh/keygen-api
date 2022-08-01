@@ -54,8 +54,17 @@ module Roleable
     def has_default_role(name)
       define_roleable_association_and_delgate
 
+      # Set default role for new objects unless already set
       after_initialize -> { grant_role!(name) },
         unless: -> { persisted? || role? }
+
+      # Set default permissions unless already set
+      before_create -> { self.permissions = default_permissions },
+        unless: -> { role.role_permissions_attributes_changed? }
+
+      # Reset permissions on role change
+      before_update -> { self.permissions = default_permissions },
+        if: -> { role.name_changed? }
 
       define_roleable_dirty_tracker
     end
@@ -63,8 +72,17 @@ module Roleable
     def has_role(name)
       define_roleable_association_and_delgate
 
+      # Set role for new objects
       after_initialize -> { grant_role!(name) },
         unless: :persisted?
+
+      # Set default permissions unless already set
+      before_create -> { self.permissions = default_permissions },
+        unless: -> { role.role_permissions_attributes_changed? }
+
+      # Reset permissions on role change
+      before_update -> { self.permissions = default_permissions },
+        if: -> { role.name_changed? }
 
       define_roleable_dirty_tracker
     end
