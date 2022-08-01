@@ -13,8 +13,11 @@ class User < ApplicationRecord
   has_secure_password :password, validations: false
   has_default_role :user
   has_permissions Permission::ADMIN_PERMISSIONS,
-    default: -> {
-      case role
+    default: -> user {
+      return [] unless
+        user.respond_to?(:role)
+
+      case user.role
       # FIXME(ezekg) Should these be separate permissions? All but admin are being
       #              deprecated, but still may be a good idea.
       in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
