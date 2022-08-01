@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Role < ApplicationRecord
+  include Dirtyable
+
   USER_ROLES    = %w[user admin developer read_only sales_agent support_agent].freeze
   PRODUCT_ROLES = %w[product].freeze
   LICENSE_ROLES = %w[license].freeze
@@ -21,8 +23,8 @@ class Role < ApplicationRecord
   has_many :role_permissions,
     dependent: :delete_all
 
-  accepts_nested_attributes_for :role_permissions,
-    reject_if: :reject_associated_records_for_role_permissions
+  accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
+  tracks_dirty_attributes_for :role_permissions
 
   # We're doing this in an after create commit so we can use a bulk insert,
   # which is more performant than inserting tens of permissions.
@@ -42,18 +44,6 @@ class Role < ApplicationRecord
   validates :name,
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
     if: -> { resource.is_a?(License) }
-
-  # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
-  #              have been provided. This adds a flag we can check. Will be nil
-  #              when nested attributes have not been provided.
-  alias :_role_permissions_attributes= :role_permissions_attributes=
-
-  def role_permissions_attributes_changed? = instance_variable_defined?(:@role_permissions_attributes_before_type_cast)
-  def role_permissions_attributes=(attributes)
-    @role_permissions_attributes_before_type_cast = attributes.dup
-
-    self._role_permissions_attributes = attributes
-  end
 
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action via the resource, rather than

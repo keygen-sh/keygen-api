@@ -58,15 +58,7 @@ module Roleable
       after_initialize -> { grant_role!(name) },
         unless: -> { persisted? || role? }
 
-      # Set default permissions unless already set
-      before_create -> { self.permissions = default_permissions },
-        unless: -> { role&.role_permissions_attributes_changed? }
-
-      # Reset permissions on role change
-      before_update -> { self.permissions = default_permissions },
-        if: -> { role&.changed? }
-
-      define_roleable_dirty_tracker
+      define_roleable_callbacks
     end
 
     def has_role(name)
@@ -76,6 +68,29 @@ module Roleable
       after_initialize -> { grant_role!(name) },
         unless: :persisted?
 
+      define_roleable_callbacks
+    end
+
+    private
+
+    def define_roleable_association_and_delgate
+      include Permissible
+      include Dirtyable
+
+      has_one :role,
+        inverse_of: :resource,
+        dependent: :destroy,
+        as: :resource
+
+      accepts_nested_attributes_for :role, update_only: true
+      tracks_dirty_attributes_for :role
+
+      delegate :permissions,
+        allow_nil: true,
+        to: :role
+    end
+
+    def define_roleable_callbacks
       # Set default permissions unless already set
       before_create -> { self.permissions = default_permissions },
         unless: -> { role&.role_permissions_attributes_changed? }
@@ -83,42 +98,6 @@ module Roleable
       # Reset permissions on role change
       before_update -> { self.permissions = default_permissions },
         if: -> { role&.changed? }
-
-      define_roleable_dirty_tracker
-    end
-
-    private
-
-    def define_roleable_association_and_delgate
-      include Permissible
-
-      has_one :role,
-        inverse_of: :resource,
-        dependent: :destroy,
-        as: :resource
-
-      accepts_nested_attributes_for :role,
-        update_only: true
-
-      delegate :permissions,
-        allow_nil: true,
-        to: :role
-    end
-
-    def define_roleable_dirty_tracker
-      # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
-      #              have been provided. This adds a flag we can check. Will be nil
-      #              when nested attributes have not been provided.
-      module_eval <<-RUBY, __FILE__, __LINE__ + 1
-        alias :_role_attributes= :role_attributes=
-
-        def role_attributes_changed? = instance_variable_defined?(:@role_attributes_before_type_cast)
-        def role_attributes=(attributes)
-          @role_attributes_before_type_cast = attributes.dup
-
-          self._role_attributes = attributes
-        end
-      RUBY
     end
   end
 

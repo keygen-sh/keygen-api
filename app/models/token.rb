@@ -8,6 +8,7 @@ class Token < ApplicationRecord
   include Orderable
   include Pageable
   include Permissible
+  include Dirtyable
 
   # Default to wildcard permission but allow all
   has_permissions Permission::ALL_PERMISSIONS,
@@ -18,8 +19,8 @@ class Token < ApplicationRecord
   has_many :token_permissions,
     dependent: :delete_all
 
-  accepts_nested_attributes_for :token_permissions,
-    reject_if: :reject_associated_records_for_token_permissions
+  accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
+  tracks_dirty_attributes_for :token_permissions
 
   # Set default permissions unless already set
   before_create -> { self.permissions = default_permissions },
@@ -79,18 +80,6 @@ class Token < ApplicationRecord
   delegate :role,
     allow_nil: true,
     to: :bearer
-
-  # FIXME(ezekg) Can't find a way to determine whether or not nested attributes
-  #              have been provided. This adds a flag we can check. Will be nil
-  #              when nested attributes have not been provided.
-  alias :_token_permissions_attributes= :token_permissions_attributes=
-
-  def token_permissions_attributes_changed? = instance_variable_defined?(:@token_permissions_attributes_before_type_cast)
-  def token_permissions_attributes=(attributes)
-    @token_permissions_attributes_before_type_cast = attributes.dup
-
-    self._token_permissions_attributes = attributes
-  end
 
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action, rather than just ID. This
