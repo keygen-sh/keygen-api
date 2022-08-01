@@ -29,9 +29,6 @@ class Role < ApplicationRecord
   after_create :set_default_permissions!,
     unless: :role_permissions_attributes_changed?
 
-  before_update :reset_permissions!,
-    if: :name_changed?
-
   # NOTE(ezekg) Sanity check
   validates :resource_type,
     inclusion: { in: [User.name, Product.name, License.name] }
@@ -151,43 +148,6 @@ class Role < ApplicationRecord
 
       RolePermission.upsert_all(to_upsert, on_duplicate: :skip) if
         to_upsert.any?
-    end
-  end
-
-  # FIXME(ezekg) Replace with before_create setting role_permissions_attributes
-  #              so our bulk insert logic is all handled above.
-  def set_default_permissions!
-    actions = case name.to_sym
-              in :admin
-                Permission::ADMIN_PERMISSIONS
-              in :developer
-                Permission::ADMIN_PERMISSIONS
-              in :sales_agent
-                Permission::ADMIN_PERMISSIONS
-              in :support_agent
-                Permission::ADMIN_PERMISSIONS
-              in :read_only
-                Permission::READ_ONLY_PERMISSIONS
-              in :product
-                Permission::PRODUCT_PERMISSIONS
-              in :user
-                Permission::USER_PERMISSIONS
-              in :license
-                Permission::LICENSE_PERMISSIONS
-              end
-
-    RolePermission.insert_all!(
-      Permission.where(action: actions)
-                .pluck(:id)
-                .map {{ role_id: id, permission_id: _1 }},
-    )
-  end
-
-  def reset_permissions!
-    transaction do
-      role_permissions.delete_all
-
-      set_default_permissions!
     end
   end
 end
