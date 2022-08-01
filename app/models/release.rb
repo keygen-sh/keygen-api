@@ -654,7 +654,10 @@ class Release < ApplicationRecord
     return if
       new_record?
 
-    constraints.exists?(attrs)
+    constraints.exists?(
+      # Make sure we only select real columns, not e.g. _destroy.
+      attrs.slice(attributes.keys),
+    )
   end
 
   def enforce_release_limit_on_account!
