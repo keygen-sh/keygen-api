@@ -6,11 +6,11 @@ SLEEP_DURATION = ENV.fetch('SLEEP_DURATION') { 1 }.to_f
 Rails.logger.info "[scripts.seed_permissions_for_roles] Starting"
 
 Role.find_in_batches(batch_size: BATCH_SIZE) do |roles|
-  roles.each {
-    _1.send(:set_default_permissions!)
+  roles.each do |role|
+    role.permissions = role.default_permission_ids
 
     sleep SLEEP_DURATION / 10
-  }
+  end
 
   sleep SLEEP_DURATION
 end
