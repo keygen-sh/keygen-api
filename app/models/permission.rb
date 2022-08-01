@@ -9,6 +9,7 @@ class Permission < ApplicationRecord
   WILDCARD_PERMISSION = '*'.freeze
 
   # Default admin permissions.
+  ALL_PERMISSIONS   =
   ADMIN_PERMISSIONS = %w[
     account.billing.read
     account.billing.update
