@@ -9,6 +9,10 @@ class Token < ApplicationRecord
   include Pageable
   include Permissible
 
+  # Default to wildcard permission but allow all
+  has_permissions Permission::ALL_PERMISSIONS,
+    default: %w[*]
+
   belongs_to :account
   belongs_to :bearer, polymorphic: true
   has_many :token_permissions,
@@ -17,7 +21,8 @@ class Token < ApplicationRecord
   accepts_nested_attributes_for :token_permissions,
     reject_if: :reject_associated_records_for_token_permissions
 
-  before_create :set_default_permissions!,
+  # Set default permissions unless already set
+  before_create -> { self.permissions = default_permissions },
     unless: :token_permissions_attributes_changed?
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
@@ -313,6 +318,8 @@ class Token < ApplicationRecord
 
   private
 
+  ##
+  # reject_associated_records_for_token_permissions rejects duplicate token permissions.
   def reject_associated_records_for_token_permissions(attrs)
     return if
       new_record?
@@ -320,11 +327,33 @@ class Token < ApplicationRecord
     token_permissions.exists?(attrs)
   end
 
-  def set_default_permissions!
-    permission_id = Permission.where(action: Permission::WILDCARD_PERMISSION)
-                              .pick(:id)
+  ##
+  # autosave_associated_records_for_token_permissions bulk inserts token permissions instead
+  # of saving them sequentially, which is incredibly slow with 100+ permissions.
+  def autosave_associated_records_for_token_permissions
+    return if
+      token_permissions.empty?
 
-    # By default, a token inherits its role's permissions using a wildcard.
-    assign_attributes(token_permissions_attributes: [{ permission_id: }])
+    to_delete = token_permissions.select(&:marked_for_destruction?)
+                                 .map(&:id)
+
+    to_upsert = token_permissions.reject(&:marked_for_destruction?)
+                                 .map {{
+                                   permission_id: _1.permission_id,
+                                   token_id: id,
+                                 }}
+
+    transaction do
+      token_permissions.where(id: to_delete).delete_all if
+        to_delete.any?
+
+      # FIXME(ezekg) Can't use token_permissions.upsert_all at this point, because for
+      #              some reason token_id ends up being nil. Instead, we'll use the
+      #              class method and then call reload.
+      TokenPermission.upsert_all(to_upsert, on_duplicate: :skip) if
+        to_upsert.any?
+
+      reload
+    end
   end
 end
