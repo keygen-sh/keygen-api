@@ -479,6 +479,24 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]
   model.save!(validate: false)
 end
 
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" belongs to the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
+  model =
+    case model_name.singularize
+    when 'process'
+      @account.machine_processes.send(model_idx)
+    when 'artifact'
+      @account.release_artifacts.send(model_idx)
+    else
+      @account.send(model_name.pluralize.underscore).send(model_idx)
+    end
+
+  associated_record = @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
+  association_name  = assoc_name.singularize.underscore.to_sym
+
+  model.assign_attributes(association_name => associated_record)
+  model.save!(validate: false)
+end
+
 Given /^the (first|second|third|fourth|fifth) "license" has the following policy entitlements:$/ do |named_index, body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 

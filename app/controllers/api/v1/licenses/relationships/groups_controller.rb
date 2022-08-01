@@ -33,7 +33,9 @@ module Api::V1::Licenses::Relationships
     attr_reader :license
 
     def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
       authorize license, :show?
 
       Current.resource = license
