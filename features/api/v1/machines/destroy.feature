@@ -276,6 +276,51 @@ Feature: Delete machine
       }
       """
 
+  # Permissions
+  Scenario: License deactivates a machine without permission
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "webhook-endpoint"
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "403"
+    And the current account should have 3 "machines"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License deactivates a machine with permission
+    Given the current account is "test1"
+    And the current account has 1 "policy" with the following:
+      """
+      { "authenticationStrategy": "LICENSE" }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate", "machine.delete"] }
+      """
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "webhook-endpoint"
+    And I am a license of account "test1"
+    And I authenticate with my license key
+    When I send a DELETE request to "/accounts/test1/machines/$0"
+    Then the response status should be "204"
+    And the current account should have 2 "machines"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License deletes a machine for their license but they've hit their deactivation limit
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

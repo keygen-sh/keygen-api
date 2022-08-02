@@ -7172,6 +7172,30 @@ Feature: License validation actions
     Then the response status should be "200"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: License validates their license (without permission)
+    Given the current account is "test1"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": [] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "403"
+    And the response should contain a valid signature header for "test1"
+
+  Scenario: License validates their license (with permission)
+    Given the current account is "test1"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/validate"
+    Then the response status should be "200"
+    And the response should contain a valid signature header for "test1"
+
   Scenario: License attempts to validate another license
     Given the current account is "test1"
     And the current account has 2 "licenses"
