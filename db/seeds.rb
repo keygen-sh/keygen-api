@@ -272,10 +272,12 @@ events = %w[
 
 Permission.upsert_all(
   permissions.map { |action| { action: } },
+  record_timestamps: true,
   on_duplicate: :skip,
 )
 
 EventType.upsert_all(
   events.map { |event| { event: } },
+  record_timestamps: true,
   on_duplicate: :skip,
 )

@@ -11,7 +11,7 @@ module Roleable
       assign_attributes(role_attributes: { name: })
     end
 
-    def replace_role!(name)
+    def change_role!(name)
       errors.add :role, :not_allowed, message: 'role is missing' unless
         persisted?
 
@@ -48,6 +48,10 @@ module Roleable
     def admin?   = role? && role.admin?
     def product? = role? && role.product?
     def license? = role? && role.license?
+
+    def changed_for_autosave?
+      super || role_attributes_changed?
+    end
   end
 
   class_methods do
@@ -80,6 +84,7 @@ module Roleable
       has_one :role,
         inverse_of: :resource,
         dependent: :destroy,
+        autosave: true,
         as: :resource
 
       accepts_nested_attributes_for :role, update_only: true

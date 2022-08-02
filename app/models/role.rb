@@ -21,12 +21,18 @@ class Role < ApplicationRecord
   belongs_to :resource,
     polymorphic: true
   has_many :role_permissions,
-    dependent: :delete_all
+    dependent: :delete_all,
+    inverse_of: :role,
+    autosave: true
 
   accepts_nested_attributes_for :role_permissions, reject_if: :reject_associated_records_for_role_permissions
   tracks_dirty_attributes_for :role_permissions
 
-  # Reset permissions on role change.
+  # Set default permissions unless already set
+  before_create -> { self.permissions = default_permission_ids },
+    unless: :role_permissions_attributes_changed?
+
+  # Reset permissions on role change
   before_update -> { self.permissions = default_permission_ids },
     if: :name_changed?
 
@@ -57,21 +63,11 @@ class Role < ApplicationRecord
     return if
       ids == [nil]
 
-    role_permissions_attributes = ids.flatten
-                                     .compact
-                                     .map {{ permission_id: _1 }}
-
-    return assign_attributes(role_permissions_attributes:) unless
-      persisted?
-
-    transaction do
-      role_permissions.delete_all
-
-      return if
-        role_permissions_attributes.empty?
-
-      role_permissions.insert_all!(role_permissions_attributes)
-    end
+    assign_attributes(
+      role_permissions_attributes: ids.flatten
+                                      .compact
+                                      .map {{ permission_id: _1 }},
+    )
   end
 
   def permissions
@@ -109,6 +105,10 @@ class Role < ApplicationRecord
   def deconstruct_keys(keys) = attributes.symbolize_keys.except(keys)
   def deconstruct            = attributes.values
 
+  def changed_for_autosave?
+    super || role_permissions_attributes_changed?
+  end
+
   private
 
   ##
@@ -127,27 +127,21 @@ class Role < ApplicationRecord
   # autosave_associated_records_for_role_permissions bulk inserts role permissions instead
   # of saving them sequentially, which is incredibly slow with 100+ permissions.
   def autosave_associated_records_for_role_permissions
-    return if
-      role_permissions.empty?
-
-    to_delete = role_permissions.select(&:marked_for_destruction?)
-                                .map(&:id)
-
-    to_upsert = role_permissions.reject(&:marked_for_destruction?)
-                                .map {{
-                                  permission_id: _1.permission_id,
-                                  role_id: id,
-                                }}
+    return unless
+      role_permissions_attributes.present?
 
     transaction do
-      role_permissions.where(id: to_delete).delete_all if
-        to_delete.any?
+      role_permissions.delete_all
+
 
       # FIXME(ezekg) Can't use role_permissions.upsert_all at this point, because for
       #              some reason role_id ends up being nil. Instead, we'll use the
       #              class method and then call reload.
-      RolePermission.upsert_all(to_upsert, on_duplicate: :skip) if
-        to_upsert.any?
+      RolePermission.upsert_all(
+        role_permissions_attributes.map { _1.merge(role_id: id) },
+        record_timestamps: true,
+        on_duplicate: :skip,
+      )
 
       reload
     end
