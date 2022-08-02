@@ -3273,6 +3273,67 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  # Permissions
+  Scenario: License activates a machine without permission
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
+  Scenario: License activates a machine with permission
+    Given the current account is "test1"
+    And the current account has 1 "policies"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.create"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+
   # Expiration basis
   Scenario: License activates a machine with an activation expiration basis (not set)
     Given the current account is "test1"
