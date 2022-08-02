@@ -17,7 +17,8 @@ class Token < ApplicationRecord
   belongs_to :account
   belongs_to :bearer, polymorphic: true
   has_many :token_permissions,
-    dependent: :delete_all
+    dependent: :delete_all,
+    autosave: true
 
   accepts_nested_attributes_for :token_permissions, reject_if: :reject_associated_records_for_token_permissions
   tracks_dirty_attributes_for :token_permissions
@@ -106,20 +107,9 @@ class Token < ApplicationRecord
       return
     end
 
-    token_permissions_attributes =
-      permission_ids.map {{ permission_id: _1 }}
-
-    return assign_attributes(token_permissions_attributes:) unless
-      persisted?
-
-    transaction do
-      token_permissions.delete_all
-
-      return if
-        permission_ids.empty?
-
-      token_permissions.insert_all!(token_permissions_attributes)
-    end
+    assign_attributes(
+      token_permissions_attributes: permission_ids.map {{ permission_id: _1 }},
+    )
   end
 
   def permissions
@@ -305,6 +295,10 @@ class Token < ApplicationRecord
     end
   end
 
+  def changed_for_autosave?
+    super || token_permissions_attributes_changed?
+  end
+
   private
 
   ##
@@ -323,27 +317,20 @@ class Token < ApplicationRecord
   # autosave_associated_records_for_token_permissions bulk inserts token permissions instead
   # of saving them sequentially, which is incredibly slow with 100+ permissions.
   def autosave_associated_records_for_token_permissions
-    return if
-      token_permissions.empty?
-
-    to_delete = token_permissions.select(&:marked_for_destruction?)
-                                 .map(&:id)
-
-    to_upsert = token_permissions.reject(&:marked_for_destruction?)
-                                 .map {{
-                                   permission_id: _1.permission_id,
-                                   token_id: id,
-                                 }}
+    return unless
+      token_permissions_attributes.present?
 
     transaction do
-      token_permissions.where(id: to_delete).delete_all if
-        to_delete.any?
+      token_permissions.delete_all
 
       # FIXME(ezekg) Can't use token_permissions.upsert_all at this point, because for
       #              some reason token_id ends up being nil. Instead, we'll use the
       #              class method and then call reload.
-      TokenPermission.upsert_all(to_upsert, on_duplicate: :skip) if
-        to_upsert.any?
+      TokenPermission.upsert_all(
+        token_permissions_attributes.map { _1.merge(token_id: id) },
+        record_timestamps: true,
+        on_duplicate: :skip,
+      )
 
       reload
     end

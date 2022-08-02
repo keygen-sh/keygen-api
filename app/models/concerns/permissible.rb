@@ -33,11 +33,9 @@ module Permissible
         return
       end
 
-      if new_record?
-        assign_attributes(role_attributes: { permissions: permission_ids })
-      else
-        role.permissions = permission_ids
-      end
+      assign_attributes(
+        role_attributes: { permissions: permission_ids },
+      )
     end
 
     def can?(*actions)
