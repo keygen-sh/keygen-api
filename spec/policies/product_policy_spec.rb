@@ -10,6 +10,8 @@ describe ProductPolicy, type: :policy do
     with_scenarios %i[as_admin accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
+          without_token_permissions { forbids :index }
+
           permits :index
         end
 
@@ -22,22 +24,37 @@ describe ProductPolicy, type: :policy do
     with_scenarios %i[as_admin accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
+          without_token_permissions { forbids :show }
+
           permits :show
         end
 
         with_permissions %w[product.create] do
+          without_token_permissions { forbids :create }
+
           permits :create
         end
 
         with_permissions %w[product.update] do
+          without_token_permissions { forbids :update }
+
           permits :update
         end
 
         with_permissions %w[product.delete] do
+          without_token_permissions { forbids :destroy }
+
           permits :destroy
         end
 
         with_wildcard_permissions do
+          without_token_permissions do
+            forbids :show
+            forbids :create
+            forbids :update
+            forbids :destroy
+          end
+
           permits :show
           permits :create
           permits :update
@@ -45,6 +62,13 @@ describe ProductPolicy, type: :policy do
         end
 
         with_default_permissions do
+          without_token_permissions do
+            forbids :show
+            forbids :create
+            forbids :update
+            forbids :destroy
+          end
+
           permits :show
           permits :create
           permits :update
@@ -52,6 +76,13 @@ describe ProductPolicy, type: :policy do
         end
 
         without_permissions do
+          with_token_permissions %w[product.read product.create product.update product.delete] do
+            forbids :show
+            forbids :create
+            forbids :update
+            forbids :destroy
+          end
+
           forbids :show
           forbids :create
           forbids :update
