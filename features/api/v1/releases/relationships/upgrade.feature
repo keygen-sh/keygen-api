@@ -1844,3 +1844,98 @@ Feature: Upgrade release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/1.0.0/upgrade?product=6198261a-48b5-4445-a045-9fed4afc7735"
     Then the response status should be "404"
+
+  Scenario: License retrieves an upgrade for a product release with build tag constraint
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | LICENSED              |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version  | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0+p1 | stable  |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0+p2 | stable  |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.1+p1 | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0+p2 | stable  |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.2.0+p2 | stable   |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 2.0.0+p2 | stable   |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0%2Bp1/upgrade?constraint=1%2Bp1"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/ff04d1c4-cc04-4d19-985a-cb113827b821/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.1+p1" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0+p1",
+        "next": "1.0.1+p1"
+      }
+      """
+
+  Scenario: License retrieves an upgrade for a product release with pre tag constraint
+    Given the current account is "test1"
+    And the current account has the following "product" rows:
+      | id                                   | name       | distribution_strategy |
+      | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | Test App A | LICENSED              |
+      | 6198261a-48b5-4445-a045-9fed4afc7735 | Test App B | LICENSED              |
+    And the current account has the following "release" rows:
+      | id                                   | product_id                           | version      | channel |
+      | f53f57cb-dc3f-4b18-9d90-534038214b49 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0-beta.1 | beta    |
+      | e26e9fef-d1ce-43d3-a15c-c8fc94429709 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0-beta.2 | beta    |
+      | ff04d1c4-cc04-4d19-985a-cb113827b821 | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0-beta.3 | beta    |
+      | c8b55f91-e66f-4093-ae4d-7f3d390eae8d | 6ac37cee-0027-4cdb-ba25-ac98fa0d29b4 | 1.0.0        | stable  |
+      | 077ca1f2-6125-4a77-bdf0-3161a0fc278e | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.0        | stable  |
+      | a7fad100-04eb-418f-8af9-e5eac497ad5a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.0.1        | stable  |
+      | 80e20324-c578-4763-bbef-c9698bf0023a | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0-beta.1 | beta    |
+      | cf72bfd4-771d-4889-8132-dc6ba8b66fa9 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0-beta.2 | beta    |
+      | e314ba5d-c760-4e54-81c4-fa01af68ff66 | 6198261a-48b5-4445-a045-9fed4afc7735 | 1.1.0        | stable  |
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/1.0.0-beta.1/upgrade?constraint=1-beta"
+    Then the response status should be "200"
+    And the JSON response should be a "release" with the following relationships:
+      """
+      {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "6ac37cee-0027-4cdb-ba25-ac98fa0d29b4"
+          },
+          "links": {
+            "related": "/v1/accounts/$account/releases/ff04d1c4-cc04-4d19-985a-cb113827b821/product"
+          }
+        }
+      }
+      """
+    And the JSON response should be a "release" with the following attributes:
+      """
+      { "version": "1.0.0-beta.3" }
+      """
+    And the JSON response should contain meta which includes the following:
+      """
+      {
+        "current": "1.0.0-beta.1",
+        "next": "1.0.0-beta.3"
+      }
+      """
