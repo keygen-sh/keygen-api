@@ -570,6 +570,35 @@ Feature: License permit actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: User renews their license without permission
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "duration": $time.30.days.to_i }
+      """
+    And the current account has 1 "license" with the following:
+      """
+      {
+        "policyId": "$policies[0]",
+        "expiry": "2016-12-01T22:53:37.000Z"
+      }
+      """
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": [] }
+      """
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/renew"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin renews a license that implements a protected policy
     Given I am an admin of account "test1"
     And the current account is "test1"
