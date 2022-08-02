@@ -9,7 +9,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:bearer)  { create(:admin, account:, permissions:) }
+        let(:bearer)  { create(:admin, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -17,7 +17,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:bearer)  { create(:product, account:, permissions:) }
+        let(:bearer)  { create(:product, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -25,7 +25,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:bearer)  { create(:license, account:, permissions:) }
+        let(:bearer)  { create(:license, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -33,7 +33,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:bearer)  { create(:user, account:, permissions:) }
+        let(:bearer)  { create(:user, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -113,8 +113,9 @@ module AuthorizationHelper
     # with_role_authorization starts an authorization test for a given role.
     def with_role_authorization(role, &)
       context "with #{role} authorization" do
-        let(:context)     { authorization_context(account:, bearer:, token:) }
-        let(:permissions) { nil }
+        let(:context)            { authorization_context(account:, bearer:, token:) }
+        let(:bearer_permissions) { nil }
+        let(:token_permissions)  { nil }
 
         instance_exec(&)
       end
@@ -180,7 +181,7 @@ module AuthorizationHelper
     # with_token_authentication defines a context using token authentication.
     def with_token_authentication(&)
       context 'with token authentication' do
-        let(:token) { create(:token, account:, bearer:) }
+        let(:token) { create(:token, account:, bearer:, permissions: token_permissions) }
 
         instance_exec(&)
       end
@@ -213,7 +214,7 @@ module AuthorizationHelper
 
     def with_permissions(permissions, &)
       context "with #{permissions} permissions" do
-        let(:permissions) { permissions }
+        let(:bearer_permissions) { permissions }
 
         instance_exec(&)
       end
@@ -221,7 +222,7 @@ module AuthorizationHelper
 
     def without_permissions(&)
       context "without permissions" do
-        let(:permissions) { [] }
+        let(:bearer_permissions) { [] }
 
         instance_exec(&)
       end
@@ -229,7 +230,7 @@ module AuthorizationHelper
 
     def with_wildcard_permissions(&)
       context 'with wildcard permissions' do
-        let(:permissions) { [Permission::WILDCARD_PERMISSION] }
+        let(:bearer_permissions) { [Permission::WILDCARD_PERMISSION] }
 
         instance_exec(&)
       end
@@ -237,7 +238,23 @@ module AuthorizationHelper
 
     def with_default_permissions(&)
       context 'with default permissions' do
-        let(:permissions) { nil }
+        let(:bearer_permissions) { nil }
+
+        instance_exec(&)
+      end
+    end
+
+    def with_token_permissions(permissions, &)
+      context "with #{permissions} token permissions" do
+        let(:token_permissions) { permissions }
+
+        instance_exec(&)
+      end
+    end
+
+    def without_token_permissions(&)
+      context "without token permissions" do
+        let(:token_permissions) { [] }
 
         instance_exec(&)
       end
