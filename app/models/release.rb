@@ -504,8 +504,35 @@ class Release < ApplicationRecord
                       next scope if
                         constraint.nil?
 
-                      _, major, minor, patch, * = Semverse::Constraint.split(constraint)
+                      _, major, minor, patch, pre, build = Semverse::Constraint.split(constraint)
 
+                      # Filter pre tags if one was specified, e.g. -beta, -alpha, etc.
+                      if pre.present?
+                        pre_tags = pre.scan(SEMVER_TAG_RE)
+
+                        if pre_word = pre_tags.map { _1[1] }.compact.join('.').presence
+                          scope = scope.where(semver_pre_word: pre_word)
+                        end
+
+                        if pre_num = pre_tags.map { _1[0] }.compact.first.presence
+                          scope = scope.where(semver_pre_num: pre_num)
+                        end
+                      end
+
+                      # Filter pre tags if one was specified, e.g. +pkg1, +pkg2, etc.
+                      if build.present?
+                        build_tags = build.scan(SEMVER_TAG_RE)
+
+                        if build_word = build_tags.map { _1[1] }.compact.join('.').presence
+                          scope = scope.where(semver_build_word: build_word)
+                        end
+
+                        if build_num = build_tags.map { _1[0] }.compact.first.presence
+                          scope = scope.where(semver_build_num: build_num)
+                        end
+                      end
+
+                      # Filter based on version part.
                       case
                       when patch.present?
                         scope.where(semver_major: major, semver_minor: minor, semver_patch: patch..)
