@@ -116,5 +116,13 @@ FactoryBot.define do
       max_machines { 1 }
       floating { false }
     end
+
+    trait :unprotected do
+      protected { false }
+    end
+
+    trait :protected do
+      protected { true }
+    end
   end
 end
