@@ -46,19 +46,22 @@ module Api::V1
         end
 
         if user&.password? && user.authenticate(password)
-          raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
-            user.banned?
-
-          # FIXME(ezekg) Can't find a better way to do this since both the token
-          #              and proper authn context does not exist yet
-          Pundit.policy!(
+          policy = Pundit.policy!(
             AuthorizationContext.new(
               account: current_account,
               bearer: user,
               token: nil,
             ),
             Token,
-          ).generate?
+          )
+
+          # Raise this error first so the banned user is aware as to
+          # why token creation is failing.
+          raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
+            user.banned?
+
+          raise Keygen::Error::ForbiddenError unless
+            policy.generate?
 
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
@@ -69,14 +72,14 @@ module Api::V1
           token = TokenGeneratorService.call(
             account: current_account,
             bearer: user,
-            **kwargs
+            **kwargs,
           )
 
           if token.valid?
             BroadcastEventService.call(
               event: 'token.generated',
               account: current_account,
-              resource: token
+              resource: token,
             )
 
             return render jsonapi: token, status: :created, location: v1_account_token_url(token.account, token)
@@ -110,33 +113,35 @@ module Api::V1
 
     # PUT /tokens/1
     def regenerate
-      authorize @token
+      authorize token
 
-      @token.regenerate!
+      token.regenerate!
 
       BroadcastEventService.call(
         event: "token.regenerated",
         account: current_account,
-        resource: @token
+        resource: token,
       )
 
-      render jsonapi: @token
+      render jsonapi: token
     end
 
     # DELETE /tokens/1
     def revoke
-      authorize @token
+      authorize token
 
       BroadcastEventService.call(
         event: "token.revoked",
         account: current_account,
-        resource: @token
+        resource: token,
       )
 
-      @token.destroy_async
+      token.destroy_async
     end
 
     private
+
+    attr_reader :token
 
     def set_token
       @token = current_account.tokens.find params[:id]
