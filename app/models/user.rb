@@ -62,7 +62,7 @@ class User < ApplicationRecord
 
   # Tokens should be revoked when role is changed
   before_update -> { revoke_tokens!(except: Current.token) },
-    if: -> { role.present? && role.changed? }
+    if: -> { role&.name_changed? }
 
   validates :group,
     presence: { message: 'must exist' },
