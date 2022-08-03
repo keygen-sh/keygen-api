@@ -78,8 +78,10 @@ module Api::V1::Licenses::Relationships
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
             param :max_activations, type: :integer, optional: true
             param :max_deactivations, type: :integer, optional: true
-            param :permissions, type: :array, optional: true do
-              items type: :string
+            if current_bearer&.has_role?(:admin, :product)
+              param :permissions, type: :array, optional: true do
+                items type: :string
+              end
             end
           end
         end

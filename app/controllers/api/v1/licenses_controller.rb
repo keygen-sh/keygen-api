@@ -113,6 +113,8 @@ module Api::V1
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true
               param :max_processes, type: :integer, optional: true, allow_nil: true
+            end
+            if current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end
@@ -159,6 +161,8 @@ module Api::V1
               param :max_cores, type: :integer, optional: true, allow_nil: true
               param :max_uses, type: :integer, optional: true, allow_nil: true
               param :max_processes, type: :integer, optional: true, allow_nil: true
+            end
+            if current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end
