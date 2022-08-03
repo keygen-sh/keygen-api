@@ -97,12 +97,14 @@ module Roleable
 
     def define_roleable_callbacks
       # Set default permissions unless already set
-      before_create -> { self.permissions = default_permissions },
-        unless: -> { role&.role_permissions_attributes_changed? }
+      before_validation -> { self.permissions = default_permissions },
+        unless: -> { role&.role_permissions_attributes_changed? },
+        on: :create
 
       # Reset permissions on role change
-      before_update -> { self.permissions = default_permissions },
-        if: -> { role&.changed? }
+      before_validation -> { self.permissions = default_permissions },
+        if: -> { role&.name_changed? },
+        on: :update
     end
   end
 

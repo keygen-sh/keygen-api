@@ -29,12 +29,14 @@ class Role < ApplicationRecord
   tracks_dirty_attributes_for :role_permissions
 
   # Set default permissions unless already set
-  before_create -> { self.permissions = default_permission_ids },
-    unless: :role_permissions_attributes_changed?
+  before_validation -> { self.permissions = default_permission_ids },
+    unless: :role_permissions_attributes_changed?,
+    on: :create
 
   # Reset permissions on role change
-  before_update -> { self.permissions = default_permission_ids },
-    if: :name_changed?
+  before_validation -> { self.permissions = default_permission_ids },
+    if: :name_changed?,
+    on: :update
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,
@@ -84,7 +86,11 @@ class Role < ApplicationRecord
   end
 
   def permission_ids
-    role_permissions.collect(&:permission_id)
+    if role_permissions_attributes_changed?
+      role_permissions_attributes.collect { _1[:permission_id] }
+    else
+      role_permissions.collect(&:permission_id)
+    end
   end
 
   def rank
