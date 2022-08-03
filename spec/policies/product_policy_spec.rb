@@ -164,16 +164,8 @@ describe ProductPolicy, type: :policy do
           permits :show
         end
 
-        with_permissions %w[product.create] do
-          forbids :create
-        end
-
         with_permissions %w[product.update] do
           permits :update
-        end
-
-        with_permissions %w[product.delete] do
-          forbids :destroy
         end
 
         with_wildcard_permissions do
@@ -205,16 +197,8 @@ describe ProductPolicy, type: :policy do
           forbids :show
         end
 
-        with_permissions %w[product.create] do
-          forbids :create
-        end
-
         with_permissions %w[product.update] do
           forbids :update
-        end
-
-        with_permissions %w[product.delete] do
-          forbids :destroy
         end
 
         with_wildcard_permissions do

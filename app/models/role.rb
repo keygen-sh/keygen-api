@@ -50,6 +50,12 @@ class Role < ApplicationRecord
     inclusion: { in: LICENSE_ROLES, message: 'must be a valid license role' },
     if: -> { resource.is_a?(License) }
 
+  validates :permission_ids,
+    inclusion: {
+      in: -> role { role.allowed_permission_ids },
+      message: 'unsupported permissions',
+    }
+
   delegate :default_permissions, :default_permission_ids,
     :allowed_permissions, :allowed_permission_ids,
     allow_nil: true,
@@ -75,6 +81,10 @@ class Role < ApplicationRecord
               .where(
                 role_permissions: { role_id: id },
               )
+  end
+
+  def permission_ids
+    role_permissions.collect(&:permission_id)
   end
 
   def rank
