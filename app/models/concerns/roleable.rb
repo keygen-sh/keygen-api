@@ -15,7 +15,7 @@ module Roleable
       errors.add :role, :not_allowed, message: 'role is missing' unless
         persisted?
 
-      role.update!(name:)
+      update!(role_attributes: { name: })
     end
 
     def revoke_role!(name)

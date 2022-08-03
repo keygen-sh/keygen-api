@@ -25,12 +25,12 @@ module Permissible
       when permission_ids.size != identifiers.size
         errors.add :permissions, :not_allowed, message: 'unsupported permissions'
 
-        return
+        raise ActiveRecord::RecordInvalid, self
       # Assert the model cannot exceed their allowed permission set
       when (permission_ids - allowed_permission_ids).any?
         errors.add :permissions, :not_allowed, message: 'invalid permissions'
 
-        return
+        raise ActiveRecord::RecordInvalid, self
       end
 
       assign_attributes(
