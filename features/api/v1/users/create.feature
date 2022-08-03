@@ -16,7 +16,7 @@ Feature: Create user
     When I send a POST request to "/accounts/test1/users"
     Then the response status should be "403"
 
-  Scenario: Anonymous creates a user for an account (without role)
+  Scenario: Anonymous creates a user for an account
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the first "webhook-endpoint" has the following attributes:
@@ -49,14 +49,12 @@ Feature: Create user
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Anonymous creates a user for an account (with role)
+  Scenario: Anonymous creates a user with role
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the first "webhook-endpoint" has the following attributes:
       """
-      {
-        "subscriptions": ["user.created", "user.updated"]
-      }
+      { "subscriptions": ["user.created", "user.updated"] }
       """
     When I send a POST request to "/accounts/test1/users" with the following:
       """
@@ -80,6 +78,43 @@ Feature: Create user
       {
         "title": "Bad request",
         "detail": "Unpermitted parameters: /data/attributes/role"
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    And the current account should have 0 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Anonymous creates a user with permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the first "webhook-endpoint" has the following attributes:
+      """
+      { "subscriptions": ["user.created", "user.updated"] }
+      """
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Clark",
+            "lastName": "Kent",
+            "email": "superman@keygen.sh",
+            "password": "loislane",
+            "permissions": ["*"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
       }
       """
     And the response should contain a valid signature header for "test1"
@@ -868,6 +903,42 @@ Feature: Create user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin attempts to create another admin with custom permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Spiderman",
+            "lastName": "Parker",
+            "email": "spiderman@keygen.sh",
+            "password": "webmaster",
+            "role": "admin",
+            "permissions": [
+              "product.create",
+              "policy.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["policy.create", "product.create"]
+      }
+      """
+    And the current account should have 2 "admins"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Product creates an admin for their account
     Given the current account is "test1"
     And the current account has 1 "product"
@@ -927,6 +998,131 @@ Feature: Create user
     Then the response status should be "201"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a user with custom permissions
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Ironman",
+            "lastName": "Stark",
+            "email": "ironman@keygen.sh",
+            "password": "jarvis!!",
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "user"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
+      }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a user with unsupported permissions
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "tony@stark.industries",
+            "password": "pepperpots",
+            "permissions": [
+              "product.create"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/users/#users-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a user with invalid permissions
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "email": "tony@stark.industries",
+            "password": "pepperpots",
+            "permissions": [
+              "foo.bar"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/users/#users-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: User attempts to create an admin for their account

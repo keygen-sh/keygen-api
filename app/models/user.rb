@@ -12,7 +12,22 @@ class User < ApplicationRecord
 
   has_secure_password :password, validations: false
   has_default_role :user
-  has_permissions Permission::ADMIN_PERMISSIONS,
+  has_permissions -> user {
+      role = if user.respond_to?(:role)
+               user.role
+             else
+               nil
+             end
+
+      case role
+      in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
+        Permission::ADMIN_PERMISSIONS
+      in name: 'read_only'
+        Permission::READ_ONLY_PERMISSIONS
+      else
+        Permission::USER_PERMISSIONS
+      end
+    },
     default: -> user {
       role = if user.respond_to?(:role)
                user.role

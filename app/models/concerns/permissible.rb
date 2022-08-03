@@ -43,45 +43,61 @@ module Permissible
 
   class_methods do
     def has_permissions(permissions, default: nil)
+      resolver = -> ctx, opts {
+        case opts
+        when Proc
+          if opts.arity > 0
+            [*instance_exec(ctx, &opts)]
+          else
+            [*instance_exec(&opts)]
+          end
+        when Array
+          [*opts]
+        else
+          []
+        end
+      }
+
       # NOTE(ezekg) Using define_singleton_method and define_method here so that we
-      #             can access variables outside of the default def scope gate.
+      #             can access variables outside of the default def scope gate,
+      #             like the permissions arg and :default kwarg.
       module_eval do
         define_singleton_method :allowed_permissions do
-          [*permissions, Permission::WILDCARD_PERMISSION].freeze
-        end
+          perms = resolver.call(self, permissions)
 
-        define_singleton_method :default_permissions do
-          case default
-          when Proc
-            if default.arity > 0
-              instance_exec(self, &default)
-            else
-              instance_exec(&default)
-            end
-          when Array
-            [*default]
-          else
-            [*permissions]
-          end.freeze
+          # Wildcards are always allowed.
+          perms << Permission::WILDCARD_PERMISSION
+
+          perms.freeze
         end
 
         define_method :allowed_permissions do
-          [*permissions, Permission::WILDCARD_PERMISSION].freeze
+          perms = resolver.call(self, permissions)
+
+          # Wildcards are always allowed.
+          perms << Permission::WILDCARD_PERMISSION
+
+          perms.freeze
+        end
+
+        define_singleton_method :default_permissions do
+          perms = resolver.call(self, default)
+
+          # When no defaults are provided, default to allowed.
+          next allowed_permissions if
+            perms.empty?
+
+          perms.freeze
         end
 
         define_method :default_permissions do
-          case default
-          when Proc
-            if default.arity > 0
-              instance_exec(self, &default)
-            else
-              instance_exec(&default)
-            end
-          when Array
-            [*default]
-          else
-            [*permissions]
-          end.freeze
+          perms = resolver.call(self, default)
+
+          # When no defaults are provided, default to allowed.
+          next allowed_permissions if
+            perms.empty?
+
+          perms.freeze
         end
       end
 
