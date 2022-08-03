@@ -24,8 +24,9 @@ class Token < ApplicationRecord
   tracks_dirty_attributes_for :token_permissions
 
   # Set default permissions unless already set
-  before_create -> { self.permissions = default_permissions },
-    unless: :token_permissions_attributes_changed?
+  before_validation -> { self.permissions = default_permissions },
+    unless: :token_permissions_attributes_changed?,
+    on: :create
 
   # FIXME(ezekg) This is not going to clear a v1 token's cache since we don't
   #              store the raw token value.
@@ -139,7 +140,11 @@ class Token < ApplicationRecord
   end
 
   def permission_ids
-    token_permissions.collect(&:permission_id)
+    if token_permissions_attributes_changed?
+      token_permissions_attributes.collect { _1[:permission_id] }
+    else
+      token_permissions.collect(&:permission_id)
+    end
   end
 
   def self.cache_key(digest)
