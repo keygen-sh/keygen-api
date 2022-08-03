@@ -63,8 +63,10 @@ module Api::V1::Products::Relationships
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
-            param :permissions, type: :array, optional: true do
-              items type: :string
+            if current_bearer&.has_role?(:admin, :product)
+              param :permissions, type: :array, optional: true do
+                items type: :string
+              end
             end
           end
         end

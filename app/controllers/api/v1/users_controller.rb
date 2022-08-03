@@ -151,7 +151,7 @@ module Api::V1
             if current_bearer&.has_role?(:admin, :product)
               param :password, type: :string, optional: true, allow_nil: true
             end
-            if current_bearer&.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
+            if current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end
