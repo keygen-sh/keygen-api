@@ -104,7 +104,7 @@ class Token < ApplicationRecord
     if permission_ids.size != identifiers.size
       errors.add :permissions, :not_allowed, message: 'unsupported permissions'
 
-      return
+      raise ActiveRecord::RecordInvalid, self
     end
 
     assign_attributes(

@@ -14,10 +14,13 @@ class User < ApplicationRecord
   has_default_role :user
   has_permissions Permission::ADMIN_PERMISSIONS,
     default: -> user {
-      return [] unless
-        user.respond_to?(:role)
+      role = if user.respond_to?(:role)
+               user.role
+             else
+               nil
+             end
 
-      case user.role
+      case role
       # FIXME(ezekg) Should these be separate permissions? All but admin are being
       #              deprecated, but still may be a good idea.
       in name: 'admin' | 'developer' | 'support_agent' | 'sales_agent'
@@ -71,6 +74,14 @@ class User < ApplicationRecord
   validates :email, email: true, presence: true, length: { maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :password, length: { minimum: 6, maximum: 72.bytes }, allow_nil: true
   validates :metadata, length: { maximum: 64, message: "too many keys (exceeded limit of 64 keys)" }
+
+  validate on: :create, if: -> { id_before_type_cast.present? } do
+    errors.add :id, :invalid, message: 'must be a valid UUID' if
+      !UUID_RE.match?(id_before_type_cast)
+
+    errors.add :id, :conflict, message: 'must not conflict with another user' if
+      User.exists?(id)
+  end
 
   validate on: %i[create update] do
     next unless
