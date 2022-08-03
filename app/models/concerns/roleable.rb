@@ -61,8 +61,6 @@ module Roleable
       # Set default role for new objects unless already set
       after_initialize -> { grant_role!(name) },
         unless: -> { persisted? || role? }
-
-      define_roleable_callbacks
     end
 
     def has_role(name)
@@ -71,8 +69,6 @@ module Roleable
       # Set role for new objects
       after_initialize -> { grant_role!(name) },
         unless: :persisted?
-
-      define_roleable_callbacks
     end
 
     private
@@ -93,18 +89,6 @@ module Roleable
       delegate :permissions, :permission_ids,
         allow_nil: true,
         to: :role
-    end
-
-    def define_roleable_callbacks
-      # Set default permissions unless already set
-      before_validation -> { self.permissions = default_permissions },
-        unless: -> { role&.role_permissions_attributes_changed? },
-        on: :create
-
-      # Reset permissions on role change
-      before_validation -> { self.permissions = default_permissions },
-        if: -> { role&.name_changed? },
-        on: :update
     end
   end
 
