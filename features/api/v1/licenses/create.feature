@@ -3563,6 +3563,250 @@ Feature: Create license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product creates a license with custom permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a user license with custom permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["license.validate", "license.read"] }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read",
+              "machine.create",
+              "machine.delete",
+              "machine.read"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the current account should have 1 "license"
+    And the JSON response should be a "license" with the following attributes:
+      """
+      {
+        "permissions": [
+          "license.read",
+          "license.validate"
+        ]
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a license with unsupported permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "product.create"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/licenses/#licenses-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product creates a license with invalid permissions
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "foo.bar"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/licenses/#licenses-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User creates a license with custom permissions
+    Given the current account is "test1"
+    And the current account has 1 unprotected "policy"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "permissions": [
+              "account.read"
+            ]
+          },
+          "relationships": {
+            "policy": {
+              "data": {
+                "type": "policies",
+                "id": "$policies[0]"
+              }
+            },
+            "user": {
+              "data": {
+                "type": "users",
+                "id": "$users[1]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User creates a license using a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"

@@ -174,7 +174,8 @@ class ApplicationController < ActionController::API
         klass   = resource.class
 
         if klass.respond_to?(:reflect_on_association) &&
-           klass.reflect_on_association(path.first)
+           klass.reflect_on_association(path.first) &&
+           path.first != "role"
           # FIXME(ezekg) Matching on error message is dirty
           case
           when err == "must exist" && src.size > 1
@@ -195,6 +196,12 @@ class ApplicationController < ActionController::API
           pointer = "/data/relationships/#{src.join '/'}"
         elsif path.first == "base"
           pointer = "/data"
+        elsif path.first == "role"
+          pointer = if path.any? { _1 =~ /permissions?/ }
+                      "/data/attributes/permissions"
+                    else
+                      "/data/attributes/role"
+                    end
         elsif path.first == "id" &&
               path.size == 1
           pointer = "/data/id"
@@ -218,6 +225,8 @@ class ApplicationController < ActionController::API
           if detail.present? && !resource.is_a?(Account)
             subject =
               case attr
+              when :'role.permission_ids'
+                :permissions
               when :base
                 resource.class.name.underscore
               else
