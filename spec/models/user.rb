@@ -49,6 +49,15 @@ describe User, type: :model do
         expect(actions).to match_array user.default_permissions
         expect(role.user?).to be true
       end
+
+      it 'should revoke tokens' do
+        user   = create(:admin, account:, permissions: %w[token.generate user.read])
+        tokens = create_list(:token, 3, account:, bearer: user)
+
+        user.change_role!(:user)
+
+        expect(user.tokens.count).to eq 0
+      end
     end
   end
 
@@ -77,6 +86,15 @@ describe User, type: :model do
         actions = user.permissions.pluck(:action)
 
         expect(actions).to match_array %w[license.validate]
+      end
+
+      it 'should not revoke tokens' do
+        user   = create(:user, account:, permissions: %w[license.validate])
+        tokens = create_list(:token, 3, account:, bearer: user)
+
+        user.update!(permissions: %w[license.validate machine.create])
+
+        expect(user.tokens.count).to eq 3
       end
     end
 
