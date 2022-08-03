@@ -18,20 +18,20 @@ FactoryBot.define do
     end
 
     trait :licensed do
-      after :build do |release, evaluator|
-        release.distribution_strategy = 'LICENSED'
+      after :build do |product, evaluator|
+        product.distribution_strategy = 'LICENSED'
       end
     end
 
     trait :open do
-      after :build do |release, evaluator|
-        release.distribution_strategy = 'OPEN'
+      after :build do |product, evaluator|
+        product.distribution_strategy = 'OPEN'
       end
     end
 
     trait :closed do
-      after :build do |release, evaluator|
-        release.distribution_strategy = 'CLOSED'
+      after :build do |product, evaluator|
+        product.distribution_strategy = 'CLOSED'
       end
     end
   end
