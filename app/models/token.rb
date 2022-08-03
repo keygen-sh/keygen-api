@@ -136,7 +136,6 @@ class Token < ApplicationRecord
                 role_permissions: { role_id: role.id },
                 token_permissions: { token_id: id },
               )
-              .reorder(nil)
   end
 
   def permission_ids
