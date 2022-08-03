@@ -19,16 +19,10 @@ module Permissible
                   .pluck(:id)
                   .uniq
 
-      case
       # Invalid permissions would be ignored by default, but that doesn't
       # really provide a nice DX. We'll error instead of ignoring.
-      when permission_ids.size != identifiers.size
+      if permission_ids.size != identifiers.size
         errors.add :permissions, :not_allowed, message: 'unsupported permissions'
-
-        raise ActiveRecord::RecordInvalid, self
-      # Assert the model cannot exceed their allowed permission set
-      when (permission_ids - allowed_permission_ids).any?
-        errors.add :permissions, :not_allowed, message: 'invalid permissions'
 
         raise ActiveRecord::RecordInvalid, self
       end

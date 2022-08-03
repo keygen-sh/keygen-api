@@ -90,7 +90,7 @@ module Roleable
       accepts_nested_attributes_for :role, update_only: true
       tracks_dirty_attributes_for :role
 
-      delegate :permissions,
+      delegate :permissions, :permission_ids,
         allow_nil: true,
         to: :role
     end

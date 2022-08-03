@@ -39,6 +39,12 @@ class Token < ApplicationRecord
     scope: { by: :account_id },
     presence: true
 
+  validates :permission_ids,
+    inclusion: {
+      in: -> token { token.bearer.allowed_permission_ids },
+      message: 'unsupported permissions',
+    }
+
   validates :max_activations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
   validates :max_deactivations, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, allow_blank: true, if: :activation_token?
   validates :activations, numericality: { greater_than_or_equal_to: 0 }, if: :activation_token?
@@ -131,6 +137,10 @@ class Token < ApplicationRecord
                 token_permissions: { token_id: id },
               )
               .reorder(nil)
+  end
+
+  def permission_ids
+    token_permissions.collect(&:permission_id)
   end
 
   def self.cache_key(digest)
