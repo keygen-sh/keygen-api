@@ -13,7 +13,7 @@ describe User, type: :model do
         actions = admin.permissions.pluck(:action)
         role    = admin.role
 
-        expect(actions).to match_array admin.default_permissions
+        expect(actions).to match_array Permission::ADMIN_PERMISSIONS
         expect(role.admin?).to be true
       end
 
@@ -22,31 +22,46 @@ describe User, type: :model do
         actions = user.permissions.pluck(:action)
         role    = user.role
 
-        expect(actions).to match_array user.default_permissions
+        expect(actions).to match_array User.default_permissions
         expect(role.user?).to be true
       end
     end
 
     context 'on role change' do
-      it 'should reset permissions when upgraded to admin role' do
-        user = create(:user, account:, permissions: %w[token.generate user.read])
+      it 'should intersect permissions when upgraded to admin role' do
+        user = create(:user, account:)
         user.change_role!(:admin)
 
-        actions = user.permissions.pluck(:action)
-        role    = user.role
+        admin   = user.reload
+        actions = admin.permissions.pluck(:action)
+        role    = admin.role
 
-        expect(actions).to match_array user.default_permissions
+        expect(actions).to match_array User.default_permissions
         expect(role.admin?).to be true
       end
 
-      it 'should reset user permissions when downgraded to user role' do
-        user = create(:admin, account:, permissions: %w[token.generate user.read])
+      it 'should intersect permissions when downgraded to user role' do
+        admin = create(:admin, account:)
+        admin.change_role!(:user)
+
+        user    = admin.reload
+        actions = user.permissions.pluck(:action)
+        role    = user.role
+
+        expect(actions).to match_array User.default_permissions
+        expect(role.user?).to be true
+      end
+
+      it 'should intersect custom permissions when changing role' do
+        user = create(:user, account:, permissions: %w[license.validate license.read])
+        user.change_role!(:admin)
+        # Oops! Change back!
         user.change_role!(:user)
 
         actions = user.permissions.pluck(:action)
         role    = user.role
 
-        expect(actions).to match_array user.default_permissions
+        expect(actions).to match_array %w[license.validate license.read]
         expect(role.user?).to be true
       end
 

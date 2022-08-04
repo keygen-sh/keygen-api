@@ -34,9 +34,9 @@ module Dirtyable
       module_eval <<~RUBY, __FILE__, __LINE__ + 1
         alias :_#{relation}_attributes= :#{relation}_attributes=
 
-        attr_reader :#{relation}_attributes
 
         def #{relation}_attributes_changed? = instance_variable_defined?(:@#{relation}_attributes)
+        def #{relation}_attributes          = @#{relation}_attributes
         def #{relation}_attributes=(attributes)
           @#{relation}_attributes = attributes
 
