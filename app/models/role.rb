@@ -19,7 +19,8 @@ class Role < ApplicationRecord
    .freeze
 
   belongs_to :resource,
-    polymorphic: true
+    polymorphic: true,
+    inverse_of: :role
   has_many :role_permissions,
     dependent: :delete_all,
     inverse_of: :role,
