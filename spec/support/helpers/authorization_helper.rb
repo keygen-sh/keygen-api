@@ -67,42 +67,68 @@ module AuthorizationHelper
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:resource) { create(:product, account: other_account) }
+        let(:product) { create(:product, account: other_account) }
       else
-        let(:resource) { create(:product, account:) }
+        let(:product) { create(:product, account:) }
       end
+
+      let(:resource) { product }
     end
     alias :accessing_another_product :accessing_a_product
 
     def accessing_its_product(scenarios)
       case scenarios
       in [:as_license, *]
-        let(:resource) { bearer.product }
+        let(:product) { bearer.product }
       in [:as_user, *]
-        let(:resource) { licenses.first.product }
+        let(:product) { licenses.first.product }
       end
+
+      let(:resource) { product }
     end
     alias :accessing_their_product :accessing_its_product
 
     def accessing_products(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:resource) { [create(:product, account: other_account)] }
+        let(:products) { [create(:product, account: other_account)] }
       else
-        let(:resource) { [create(:product, account:)] }
+        let(:products) { [create(:product, account:)] }
       end
+
+      let(:resource) { products }
     end
     alias :accessing_other_products :accessing_products
 
     def accessing_its_products(scenarios)
       case scenarios
       in [:as_license, *]
-        let(:resource) { [bearer.product] }
+        let(:products) { [bearer.product] }
       in [:as_user, *]
-        let(:resource) { licenses.collect(&:product) }
+        let(:products) { licenses.collect(&:product) }
       end
+
+      let(:resource) { products }
     end
     alias :accessing_their_products :accessing_its_products
+
+    def accessing_its_tokens(scenarios)
+      case scenarios
+      in [*, :accessing_a_product | :accessing_their_product | :accessing_its_product | :accessing_another_product, *]
+        let(:resource) { create_list(:token, 3, account: product.account, bearer: product) }
+      in [*, :accessing_itself, *]
+        let(:resource) { create_list(:token, 3, account: bearer.account, bearer:) }
+      end
+    end
+
+    def accessing_its_token(scenarios)
+      case scenarios
+      in [*, :accessing_a_product | :accessing_their_product | :accessing_its_product | :accessing_another_product, *]
+        let(:resource) { create(:token, account: product.account, bearer: product) }
+      in [*, :accessing_itself, *]
+        let(:resource) { create(:token, account: bearer.account, bearer:) }
+      end
+    end
   end
 
   ##
