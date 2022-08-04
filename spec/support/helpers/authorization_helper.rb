@@ -262,19 +262,23 @@ module AuthorizationHelper
 
     ##
     # permits asserts the current bearer and token are permitted to perform
-    # the given action.
-    def permits(action)
-      it "should permit #{action}" do
-        expect(subject).to permit(action)
+    # the given actions.
+    def permits(*actions)
+      actions.flatten.each do |action|
+        it "should permit #{action}" do
+          expect(subject).to permit(action)
+        end
       end
     end
 
     ##
     # forbids asserts the current bearer and token are not permitted to perform
-    # the given action.
-    def forbids(action)
-      it "should forbid #{action}" do
-        expect(subject).to_not permit(action)
+    # the given actions.
+    def forbids(*actions)
+      actions.flatten.each do |action|
+        it "should forbid #{action}" do
+          expect(subject).to_not permit(action)
+        end
       end
     end
   end

@@ -49,37 +49,22 @@ describe ProductPolicy, type: :policy do
 
         with_wildcard_permissions do
           without_token_permissions do
-            forbids :show
-            forbids :create
-            forbids :update
-            forbids :destroy
+            forbids :show, :create, :update, :destroy
           end
 
-          permits :show
-          permits :create
-          permits :update
-          permits :destroy
+          permits :show, :create, :update, :destroy
         end
 
         with_default_permissions do
           without_token_permissions do
-            forbids :show
-            forbids :create
-            forbids :update
-            forbids :destroy
+            forbids :show, :create, :update, :destroy
           end
 
-          permits :show
-          permits :create
-          permits :update
-          permits :destroy
+          permits :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -115,24 +100,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -162,24 +138,17 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          permits :show
-          forbids :create
-          permits :update
-          forbids :destroy
+          forbids :create, :destroy
+          permits :show, :update
         end
 
         with_default_permissions do
-          permits :show
-          forbids :create
-          permits :update
-          forbids :destroy
+          forbids :create, :destroy
+          permits :show, :update
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -195,24 +164,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -248,24 +208,16 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
+          forbids :create, :update, :destroy
           permits :show
-          forbids :create
-          forbids :update
-          forbids :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
 
@@ -275,24 +227,16 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
+          forbids :create, :update, :destroy
           permits :show
-          forbids :create
-          forbids :update
-          forbids :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -326,24 +270,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
 
@@ -353,24 +288,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -396,24 +322,16 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
+          forbids :create, :update, :destroy
           permits :show
-          forbids :create
-          forbids :update
-          forbids :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -437,24 +355,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -478,24 +387,15 @@ describe ProductPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
+          forbids :show, :create, :update, :destroy
         end
       end
     end
@@ -504,42 +404,13 @@ describe ProductPolicy, type: :policy do
   without_authorization do
     with_scenarios %i[as_anonymous accessing_products] do
       without_authentication do
-        with_permissions %w[product.read] do
-          forbids :index
-        end
-
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        forbids :index
       end
     end
 
     with_scenarios %i[as_anonymous accessing_a_product] do
       without_authentication do
-        with_permissions %w[product.read] do
-          forbids :show
-        end
-
-        with_wildcard_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
-        end
-
-        with_default_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
-        end
-
-        without_permissions do
-          forbids :show
-          forbids :create
-          forbids :update
-          forbids :destroy
-        end
+        forbids :show, :create, :update, :destroy
       end
     end
   end
