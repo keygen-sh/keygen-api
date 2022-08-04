@@ -226,8 +226,8 @@ class ApplicationController < ActionController::API
           if detail.present? && !resource.is_a?(Account)
             subject =
               case attr
-              when :'role.permission_ids'
-              when :'permission_ids'
+              when :'role.permission_ids',
+                   :'permission_ids'
                 :permissions
               when :base
                 resource.class.name.underscore
