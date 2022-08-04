@@ -3,6 +3,7 @@
 class Product::TokenPolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.tokens.read
     ]
@@ -14,6 +15,7 @@ class Product::TokenPolicy < ApplicationPolicy
 
   def show?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.tokens.read
     ]
@@ -24,6 +26,7 @@ class Product::TokenPolicy < ApplicationPolicy
 
   def create?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       product.tokens.generate
     ]
