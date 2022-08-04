@@ -29,14 +29,8 @@ class Role < ApplicationRecord
   tracks_dirty_attributes_for :role_permissions
 
   # Set default permissions unless already set
-  before_validation -> { self.permissions = default_permission_ids },
-    unless: :role_permissions_attributes_changed?,
-    on: :create
-
-  # Reset permissions on role change
-  before_validation -> { self.permissions = default_permission_ids },
-    if: :name_changed?,
-    on: :update
+  before_create -> { self.permissions = default_permission_ids },
+    unless: :role_permissions_attributes_changed?
 
   # NOTE(ezekg) Sanity check
   validates :resource_type,
@@ -63,6 +57,9 @@ class Role < ApplicationRecord
     allow_nil: true,
     to: :resource
 
+  ##
+  # permissions= sets the role's permissions. It does not save automatically.
+  #
   # Instead of doing a has_many(through:), we're doing this so that we can
   # allow permissions to be attached by action via the resource, rather than
   # by ID. We don't expose permission IDs to the world. This also allows
@@ -78,6 +75,8 @@ class Role < ApplicationRecord
     )
   end
 
+  ##
+  # permissions returns an array of the role's permissions.
   def permissions
     Permission.joins(:role_permissions)
               .where(
@@ -85,12 +84,29 @@ class Role < ApplicationRecord
               )
   end
 
+  ##
+  # permission_ids returns an array of the role's permission IDs,
+  # including pending changes.
   def permission_ids
     if role_permissions_attributes_changed?
       role_permissions_attributes.collect { _1[:permission_id] }
     else
       role_permissions.collect(&:permission_id)
     end
+  end
+
+  ##
+  # name= overloads role assignment so we can reset permissions
+  # on role change.
+  def name=(...)
+    super(...)
+
+    # Reset permissions on role change, using the intersection
+    # of our current role's and the new role's defaults. This
+    # ensures privilege escalation is unlikely. Only run when
+    # role is persisted, i.e. on updates.
+    self.permissions = permission_ids & default_permission_ids if
+      persisted?
   end
 
   def rank
