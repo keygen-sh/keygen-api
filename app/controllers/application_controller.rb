@@ -196,7 +196,8 @@ class ApplicationController < ActionController::API
           pointer = "/data/relationships/#{src.join '/'}"
         elsif path.first == "base"
           pointer = "/data"
-        elsif path.first == "role"
+        elsif path.first == "permission_ids" ||
+              path.first == "role"
           pointer = if path.any? { _1 =~ /permissions?/ }
                       "/data/attributes/permissions"
                     else
@@ -226,6 +227,7 @@ class ApplicationController < ActionController::API
             subject =
               case attr
               when :'role.permission_ids'
+              when :'permission_ids'
                 :permissions
               when :base
                 resource.class.name.underscore

@@ -140,6 +140,152 @@ Feature: User tokens relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Product generates a user token with custom permissions
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product generates a user token with permissions that exceed the user's permissions
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read",
+              "machine.create",
+              "machine.delete",
+              "machine.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product generates a user token with unsupported permissions
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["product.create"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Product generates a user token with invalid permissions
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["foo.bar"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the JSON response should be an array of 1 errors
+    And the first error should have the following properties:
+      """
+      {
+          "title": "Unprocessable resource",
+          "detail": "unsupported permissions",
+          "code": "PERMISSIONS_NOT_ALLOWED",
+          "source": {
+            "pointer": "/data/attributes/permissions"
+          },
+          "links": {
+            "about": "https://keygen.sh/docs/api/tokens/#tokens-object-attrs-permissions"
+          }
+        }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: License generates a user token
     Given the current account is "test1"
     And the current account has 1 "product"

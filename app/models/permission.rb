@@ -462,7 +462,11 @@ class Permission < ApplicationRecord
     user.read
   ].freeze
 
-  # Checks if any of the given IDs are the wildcard permission.
+  # wildcard returns the wildcard permission record.
+  def self.wildcard    = find_by(action: WILDCARD_PERMISSION)
+  def self.wildcard_id = wildcard.id
+
+  # wildcard? checks if any of the given IDs are the wildcard permission.
   def self.wildcard?(*identifiers)
     return true if
       identifiers.include?(WILDCARD_PERMISSION)

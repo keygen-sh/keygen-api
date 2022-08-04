@@ -42,7 +42,7 @@ class Token < ApplicationRecord
 
   validates :permission_ids,
     inclusion: {
-      in: -> token { token.bearer.allowed_permission_ids },
+      in: -> token { token.bearer.permission_ids << Permission.wildcard_id },
       message: 'unsupported permissions',
     }
 
