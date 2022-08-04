@@ -76,13 +76,6 @@ describe ProductPolicy, type: :policy do
         end
 
         without_permissions do
-          with_token_permissions %w[product.read product.create product.update product.delete] do
-            forbids :show
-            forbids :create
-            forbids :update
-            forbids :destroy
-          end
-
           forbids :show
           forbids :create
           forbids :update
