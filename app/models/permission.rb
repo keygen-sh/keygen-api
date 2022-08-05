@@ -463,8 +463,10 @@ class Permission < ApplicationRecord
   ].freeze
 
   # wildcard returns the wildcard permission record.
-  def self.wildcard    = find_by(action: WILDCARD_PERMISSION)
-  def self.wildcard_id = wildcard.id
+  def self.wildcard = where(action: WILDCARD_PERMISSION).take
+
+  # wildcard_id returns the wildcard permission ID.
+  def self.wildcard_id = where(action: WILDCARD_PERMISSION).pick(:id)
 
   # wildcard? checks if any of the given IDs are the wildcard permission.
   def self.wildcard?(*identifiers)

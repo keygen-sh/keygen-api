@@ -62,14 +62,19 @@ describe License, type: :model do
     end
 
     context 'with invalid permissions' do
-      it 'should raise for unsupported permissions' do
-        expect { create(:license, account:, permissions: %w[foo.bar]) }.to(
-          raise_error ActiveRecord::RecordInvalid
-        )
+      allowed_permissions    = Permission::LICENSE_PERMISSIONS
+      disallowed_permissions = Permission::ALL_PERMISSIONS - allowed_permissions
+
+      disallowed_permissions.each do |permission|
+        it "should raise for #{permission} permission" do
+          expect { create(:license, account:, permissions: [permission]) }.to(
+            raise_error ActiveRecord::RecordInvalid
+          )
+        end
       end
 
-      it 'should raise for invalid permissions' do
-        expect { create(:license, account:, permissions: %w[license.create]) }.to(
+      it 'should raise for unsupported permissions' do
+        expect { create(:license, account:, permissions: %w[foo.bar]) }.to(
           raise_error ActiveRecord::RecordInvalid
         )
       end
