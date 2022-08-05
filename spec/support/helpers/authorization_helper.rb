@@ -238,6 +238,8 @@ module AuthorizationHelper
       end
     end
 
+    ##
+    # with_permissions defines a context with specific bearer permisisons.
     def with_permissions(permissions, &)
       context "with #{permissions} permissions" do
         let(:bearer_permissions) { permissions }
@@ -246,6 +248,7 @@ module AuthorizationHelper
       end
     end
 
+    # without_permissions defines a context without bearer permisisons.
     def without_permissions(&)
       context "without permissions" do
         let(:bearer_permissions) { [] }
@@ -254,6 +257,8 @@ module AuthorizationHelper
       end
     end
 
+    ##
+    # with_wildcard_permissions defines a context with wildcard bearer permisisons.
     def with_wildcard_permissions(&)
       context 'with wildcard permissions' do
         let(:bearer_permissions) { [Permission::WILDCARD_PERMISSION] }
@@ -262,6 +267,8 @@ module AuthorizationHelper
       end
     end
 
+    ##
+    # with_default_permissions defines a context with default bearer permisisons.
     def with_default_permissions(&)
       context 'with default permissions' do
         let(:bearer_permissions) { nil }
@@ -270,6 +277,8 @@ module AuthorizationHelper
       end
     end
 
+    ##
+    # with_token_permissions defines a context with specific token permisisons.
     def with_token_permissions(permissions, &)
       context "with #{permissions} token permissions" do
         let(:token_permissions) { permissions }
@@ -278,6 +287,8 @@ module AuthorizationHelper
       end
     end
 
+    ##
+    # without_token_permissions defines a context without token permisisons.
     def without_token_permissions(&)
       context "without token permissions" do
         let(:token_permissions) { [] }

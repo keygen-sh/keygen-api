@@ -130,8 +130,19 @@ describe User, type: :model do
     end
 
     context 'with invalid permissions' do
+      allowed_permissions    = Permission::USER_PERMISSIONS
+      disallowed_permissions = Permission::ALL_PERMISSIONS - allowed_permissions
+
+      disallowed_permissions.each do |permission|
+        it "should raise for #{permission} permission" do
+          expect { create(:user, account:, permissions: [permission]) }.to(
+            raise_error ActiveRecord::RecordInvalid
+          )
+        end
+      end
+
       it 'should raise for unsupported permissions' do
-        expect { create(:user, account:, permissions: %w[foo.bar]) }.to(
+        expect { create(:admin, account:, permissions: %w[foo.bar]) }.to(
           raise_error ActiveRecord::RecordInvalid
         )
       end
