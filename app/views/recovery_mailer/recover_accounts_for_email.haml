@@ -11,6 +11,11 @@
       %span= user.account.slug
       %br
       %span
+        %strong Recover:
+        %a(href="https://app.keygen.sh/recover/password?account=#{user.account.slug}&email=#{user.email}")
+          click here
+      %br
+      %span
         %strong Login:
         %a(href="https://app.keygen.sh/login?account=#{user.account.slug}")
           click here
