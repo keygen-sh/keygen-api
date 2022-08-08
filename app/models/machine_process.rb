@@ -57,6 +57,9 @@ class MachineProcess < ApplicationRecord
         next_process_count > machine.max_processes
 
       next if
+        license.allow_1_25x_overage? && next_process_count <= machine.max_processes * 1.25
+
+      next if
         license.allow_1_5x_overage? && next_process_count <= machine.max_processes * 1.5
 
       next if
@@ -67,6 +70,9 @@ class MachineProcess < ApplicationRecord
       next_process_count = license.processes.count + 1
       next unless
         next_process_count > license.max_processes
+
+      next if
+        license.allow_1_25x_overage? && next_process_count <= license.max_processes * 1.25
 
       next if
         license.allow_1_5x_overage? && next_process_count <= license.max_processes * 1.5

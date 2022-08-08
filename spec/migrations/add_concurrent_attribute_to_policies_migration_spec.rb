@@ -34,6 +34,7 @@ describe AddConcurrentAttributeToPoliciesMigration do
     migrator = RequestMigrations::Migrator.new(from: '1.1', to: '1.1')
     data     = Keygen::JSONAPI.render([
       create(:policy, :floating, overage_strategy: 'ALWAYS_ALLOW_OVERAGE', account:, product:),
+      create(:policy, :floating, overage_strategy: 'ALLOW_1_25X_OVERAGE', account:, product:),
       create(:policy, :floating, overage_strategy: 'ALLOW_1_5X_OVERAGE', account:, product:),
       create(:policy, :floating, overage_strategy: 'ALLOW_2X_OVERAGE', account:, product:),
       create(:policy, :floating, overage_strategy: 'NO_OVERAGE', account:, product:),
@@ -61,6 +62,11 @@ describe AddConcurrentAttributeToPoliciesMigration do
             concurrent: anything,
           ),
         ),
+        include(
+          attributes: include(
+            concurrent: anything,
+          ),
+        ),
       ],
     )
 
@@ -68,6 +74,11 @@ describe AddConcurrentAttributeToPoliciesMigration do
 
     expect(data).to include(
       data: [
+        include(
+          attributes: include(
+            concurrent: true,
+          ),
+        ),
         include(
           attributes: include(
             concurrent: true,

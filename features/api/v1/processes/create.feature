@@ -838,6 +838,100 @@ Feature: Spawn machine process
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALLOW_1_25X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 20
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 23 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "process" with the pid "1"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin spawns a process for a machine that has exceeded its overage limit (PER_MACHINE leasing strategy, ALLOW_1_25X_OVERAGE overage strategy)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 floating "policy"
+    And the first "policy" has the following attributes:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "leasingStrategy": "PER_MACHINE",
+        "maxProcesses": 20
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 25 "processes" for the last "machine"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/processes" with the following:
+      """
+      {
+        "data": {
+          "type": "processes",
+          "attributes": {
+            "pid": "1"
+          },
+          "relationships": {
+            "machine": {
+              "data": {
+                "type": "machines",
+                "id": "$machines[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "process count has exceeded maximum allowed for machine (20)",
+        "code": "MACHINE_PROCESS_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin spawns a process for a machine that has exceeded its limit (PER_MACHINE leasing strategy, ALLOW_1_5X_OVERAGE overage strategy)
     Given I am an admin of account "test1"
     And the current account is "test1"
