@@ -158,6 +158,7 @@ class LicenseValidationService < BaseService
     # When floating, license's machine count should not surpass what policy allows
     if license.floating? && !license.max_machines.nil? && license.machines_count > license.max_machines
       allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && license.machines_count <= license.max_machines * 1.25) ||
                       (license.allow_1_5x_overage? && license.machines_count <= license.max_machines * 1.5) ||
                       (license.allow_2x_overage? && license.machines_count <= license.max_machines * 2)
 
@@ -167,6 +168,7 @@ class LicenseValidationService < BaseService
     # Check if license has exceeded its CPU core limit
     if !license.max_cores.nil? && !license.machines_core_count.nil? && license.machines_core_count > license.max_cores
       allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && license.machines_core_count <= license.max_cores * 1.25) ||
                       (license.allow_1_5x_overage? && license.machines_core_count <= license.max_cores * 1.5) ||
                       (license.allow_2x_overage? && license.machines_core_count <= license.max_cores * 2)
 
@@ -199,6 +201,7 @@ class LicenseValidationService < BaseService
       end
 
       allow_overage = license.always_allow_overage? ||
+                      (license.allow_1_25x_overage? && process_count <= process_limit * 1.25) ||
                       (license.allow_1_5x_overage? && process_count <= process_limit * 1.5) ||
                       (license.allow_2x_overage? && process_count <= process_limit * 2)
 

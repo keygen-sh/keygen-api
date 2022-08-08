@@ -86,6 +86,7 @@ class Policy < ApplicationRecord
 
   OVERAGE_STATEGIES = %w[
     ALWAYS_ALLOW_OVERAGE
+    ALLOW_1_25X_OVERAGE
     ALLOW_1_5X_OVERAGE
     ALLOW_2X_OVERAGE
     NO_OVERAGE
@@ -173,17 +174,29 @@ class Policy < ApplicationRecord
     inclusion: { in: OVERAGE_STATEGIES, message: 'unsupported overage strategy' },
     allow_nil: true
 
-  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max machines value)' },
-    if: -> { floating? && max_machines&.odd? }
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE for node-locked policy)' },
+    if: :node_locked?
 
-  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max cores value)' },
-    if: -> { max_cores&.odd? }
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max machines value not divisible by 4)' },
+    if: -> { floating? && max_machines.to_i % 4 > 0 }
 
-  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with an odd max processes value)' },
-    if: -> { max_processes&.odd? }
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max cores value not divisible by 4)' },
+    if: -> { max_cores.to_i % 4 > 0 }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_25X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_25X_OVERAGE with a max processes value not divisible by 4)' },
+    if: -> { max_processes.to_i % 4 > 0 }
 
   validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE for node-locked policy)' },
     if: :node_locked?
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max machines value not divisible by 2)' },
+    if: -> { floating? && max_machines.to_i % 2 > 0 }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max cores value not divisible by 2)' },
+    if: -> { max_cores.to_i % 2 > 0 }
+
+  validates :overage_strategy, exclusion: { in: %w[ALLOW_1_5X_OVERAGE], message: 'incompatible overage strategy (cannot use ALLOW_1_5X_OVERAGE with a max processes value not divisible by 2)' },
+    if: -> { max_processes.to_i % 2 > 0 }
 
   validate do
     errors.add :encrypted, :not_supported, message: "cannot be encrypted and use a pool" if pool? && encrypted?
@@ -472,6 +485,10 @@ class Policy < ApplicationRecord
 
   def always_allow_overage?
     overage_strategy == 'ALWAYS_ALLOW_OVERAGE'
+  end
+
+  def allow_1_25x_overage?
+    overage_strategy == 'ALLOW_1_25X_OVERAGE'
   end
 
   def allow_1_5x_overage?

@@ -82,6 +82,9 @@ class Machine < ApplicationRecord
       next_machine_count > machine.license.max_machines
 
     next if
+      machine.license.allow_1_25x_overage? && next_machine_count <= machine.license.max_machines * 1.25
+
+    next if
       machine.license.allow_1_5x_overage? && next_machine_count <= machine.license.max_machines * 1.5
 
     next if
@@ -103,6 +106,9 @@ class Machine < ApplicationRecord
 
     next unless
       next_core_count > machine.license.max_cores
+
+    next if
+      machine.license.allow_1_25x_overage? && next_core_count <= machine.license.max_cores * 1.25
 
     next if
       machine.license.allow_1_5x_overage? && next_core_count <= machine.license.max_cores * 1.5

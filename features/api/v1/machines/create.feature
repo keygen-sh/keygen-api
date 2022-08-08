@@ -1417,6 +1417,98 @@ Feature: Create machine
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin creates a machine for a floating license that has already reached its limit (allows 1.25x overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+     And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 4,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 4 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "machine" with the fingerprint "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin creates a machine for a floating license that has exceeded its limit (allows 1.25x overages)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy" with the following:
+      """
+      {
+        "overageStrategy": "ALLOW_1_25X_OVERAGE",
+        "maxMachines": 4,
+        "floating": true,
+        "strict": true
+      }
+      """
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 5 "machines" for the last "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines" with the following:
+      """
+      {
+        "data": {
+          "type": "machines",
+          "attributes": {
+            "fingerprint": "Pm:L2:UP:ti:9Z:eJ:Ts:4k:Zv:Gn:LJ:cv:sn:dW:hw"
+          },
+          "relationships": {
+            "license": {
+              "data": {
+                "type": "licenses",
+                "id": "$licenses[0]"
+              }
+            }
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "machine count has exceeded maximum allowed by current policy (4)",
+        "code": "MACHINE_LIMIT_EXCEEDED",
+        "source": {
+          "pointer": "/data"
+        }
+      }
+      """
+    And sidekiq should have 0 "webhook" job
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin creates a machine for a floating license that has already reached its limit (allows 1.5x overages)
     Given I am an admin of account "test1"
     And the current account is "test1"
