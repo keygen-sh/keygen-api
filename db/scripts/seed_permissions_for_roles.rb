@@ -7,7 +7,7 @@ Rails.logger.info "[scripts.seed_permissions_for_roles] Starting"
 
 Role.find_in_batches(batch_size: BATCH_SIZE) do |roles|
   roles.each do |role|
-    role.permissions = role.default_permission_ids
+    role.update!(permissions: role.default_permission_ids)
 
     sleep SLEEP_DURATION / 10
   end
