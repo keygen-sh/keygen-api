@@ -381,16 +381,27 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/tokens"
+    Then the response status should be "404"
+
+   Scenario: User attempts to generate a token for their license
+    Given the current account is "test1"
+    And the current account has 2 "licenses"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "403"
 
-  Scenario: User attempts to generate a license token
+  Scenario: User attempts to generate a token for another license
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to generate a license token for another account
     Given I am an admin of account "test1"
@@ -442,7 +453,7 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License requests their tokens
     Given the current account is "test1"
@@ -460,15 +471,15 @@ Feature: Generate authentication token for license
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User requests all tokens for their license
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 3 "licenses"
-    And the current user has 3 "licenses"
     And the current account has 1 "token" for each "license"
     And I am a user of account "test1"
+    And the current user has 3 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
     Then the response status should be "403"
@@ -481,4 +492,4 @@ Feature: Generate authentication token for license
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module TokenAuthentication
+module Authentication
   extend ActiveSupport::Concern
 
   include ActionController::HttpAuthentication::Token::ControllerMethods

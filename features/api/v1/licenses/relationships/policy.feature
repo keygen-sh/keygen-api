@@ -59,7 +59,7 @@ Feature: License policy relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/policy"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the policy for a license they own
     Given the current account is "test1"
@@ -786,12 +786,12 @@ Feature: License policy relationship
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a license's policy relationship to a new policy for an unprotected policy
+  Scenario: User changes a license's policy relationship from an unprotected policy to an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -832,7 +832,7 @@ Feature: License policy relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a license's policy relationship to a new policy for a protected policy
+  Scenario: User changes a license's policy relationship from a protected policy to a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -864,7 +864,7 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes an unprotected license's policy relationship to a new protected policy
+  Scenario: User changes an unprotected license's policy relationship from an unprotected policy to a protected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -900,7 +900,7 @@ Feature: License policy relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User changes a protected license's policy relationship to a new unprotected policy
+  Scenario: User changes a protected license's policy relationship from a protected policy to an unprotected policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -986,7 +986,7 @@ Feature: License policy relationship
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

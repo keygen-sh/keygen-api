@@ -8,41 +8,39 @@ module Api::V1::Licenses::Relationships
     before_action :set_license
 
     def index
-      authorize @license, :list_entitlements?
+      entitlements = apply_pagination(apply_scopes(license.entitlements))
+      authorize! license, entitlements
 
-      @entitlements = apply_pagination(apply_scopes(@license.entitlements))
-
-      render jsonapi: @entitlements
+      render jsonapi: entitlements
     end
 
     def show
-      authorize @license, :show_entitlement?
+      entitlement = license.entitlements.find(params[:id])
+      authorize! license, entitlement
 
-      @entitlement = @license.entitlements.find(params[:id])
-
-      render jsonapi: @entitlement
+      render jsonapi: entitlement
     end
 
     def attach
-      authorize @license, :attach_entitlement?
+      authorize! license, Entitlement
 
       entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
       end
 
-      attached = @license.license_entitlements.create!(entitlements_data)
+      attached = license.license_entitlements.create!(entitlements_data)
 
       BroadcastEventService.call(
         event: 'license.entitlements.attached',
         account: current_account,
-        resource: attached
+        resource: attached,
       )
 
       render jsonapi: attached
     end
 
     def detach
-      authorize @license, :detach_entitlement?
+      authorize! license, Entitlement
 
       entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
 
@@ -50,11 +48,11 @@ module Api::V1::Licenses::Relationships
       # via the policy. This request wouldn't detach the entitlements, but since non-existing
       # license entitlement IDs are currently noops, responding with a 2xx status code is
       # confusing for the end-user, so we're going to error out early for a better DX.
-      if @license.policy_entitlements.exists?(entitlement_id: entitlement_ids)
-        policy_entitlements_ids = @license.policy_entitlements.where(entitlement_id: entitlement_ids).pluck(:entitlement_id)
+      if license.policy_entitlements.exists?(entitlement_id: entitlement_ids)
+        policy_entitlements_ids   = license.policy_entitlements.where(entitlement_id: entitlement_ids).pluck(:entitlement_id)
         forbidden_entitlement_ids = entitlement_ids & policy_entitlements_ids
-        forbidden_entitlement_id = forbidden_entitlement_ids.first
-        forbidden_idx = entitlement_ids.find_index(forbidden_entitlement_id)
+        forbidden_entitlement_id  = forbidden_entitlement_ids.first
+        forbidden_idx             = entitlement_ids.find_index(forbidden_entitlement_id)
 
         return render_forbidden(
           detail: "cannot detach entitlement '#{forbidden_entitlement_id}' (entitlement is attached through policy)",
@@ -66,13 +64,13 @@ module Api::V1::Licenses::Relationships
 
       # Ensure all entitlements exist. Again, non-existing license entitlements would be
       # a noop, but responding with a 2xx status code is a confusing DX.
-      license_entitlements = @license.license_entitlements.where(entitlement_id: entitlement_ids)
+      license_entitlements = license.license_entitlements.where(entitlement_id: entitlement_ids)
 
       if license_entitlements.size != entitlement_ids.size
         license_entitlement_ids = license_entitlements.pluck(:entitlement_id)
         invalid_entitlement_ids = entitlement_ids - license_entitlement_ids
-        invalid_entitlement_id = invalid_entitlement_ids.first
-        invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
+        invalid_entitlement_id  = invalid_entitlement_ids.first
+        invalid_idx             = entitlement_ids.find_index(invalid_entitlement_id)
 
         return render_unprocessable_entity(
           detail: "entitlement '#{invalid_entitlement_id}' relationship not found",
@@ -82,22 +80,25 @@ module Api::V1::Licenses::Relationships
         )
       end
 
-      detached = @license.license_entitlements.delete(license_entitlements)
+      detached = license.license_entitlements.delete(license_entitlements)
 
       BroadcastEventService.call(
         event: 'license.entitlements.detached',
         account: current_account,
-        resource: detached
+        resource: detached,
       )
     end
 
     private
 
-    def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
-      authorize @license, :show?
+    attr_reader :license
 
-      Current.resource = @license
+    def set_license
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
+
+      Current.resource = license
     end
 
     typed_parameters do

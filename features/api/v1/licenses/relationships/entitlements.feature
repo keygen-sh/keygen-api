@@ -81,7 +81,7 @@ Feature: License entitlements relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the entitlements for their license
     Given the current account is "test1"
@@ -106,7 +106,7 @@ Feature: License entitlements relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin retrieves an entitlement for a license
     Given I am an admin of account "test1"
@@ -157,7 +157,7 @@ Feature: License entitlements relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/entitlements/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attaches entitlements to a license
     Given I am an admin of account "test1"
@@ -350,7 +350,7 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -393,7 +393,7 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -546,7 +546,7 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License attempts to detach entitlements to themselves
     Given the current account is "test1"
@@ -582,15 +582,19 @@ Feature: License entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: User attempts to detach entitlements from a license
+  Scenario: User attempts to detach entitlements from their license
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policies" for existing "products"
     And the current account has 1 "license" for existing "policies"
     And the current account has 2 "license-entitlements" for existing "licenses"
     And the current account has 1 "user"
+    And the last "license" has the following attributes:
+      """
+      { "userId": "$users[1]" }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$0/entitlements" with the following:

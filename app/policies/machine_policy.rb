@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MachinePolicy < ApplicationPolicy
+  def machines = resource.subjects
+  def machine  = resource.subject
 
   def index?
     assert_account_scoped!
@@ -10,15 +12,15 @@ class MachinePolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
-        resource.all? { |r| r.product.id == bearer.id }) ||
+        machines.all? { _1.product.id == bearer.id }) ||
       (bearer.has_role?(:user) &&
-        resource.all? { |r| r.license.user_id == bearer.id }) ||
+        machines.all? { _1.license.user_id == bearer.id }) ||
       (bearer.has_role?(:license) &&
-        resource.all? { |r| r.license_id == bearer.id }) ||
+        machines.all? { _1.license_id == bearer.id }) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.all? { |r|
-          r.group_id? && r.group_id.in?(bearer.group_ids) ||
-          r.license.user_id == bearer.id })
+        machines.all? {
+          _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
+          _1.license.user_id == bearer.id })
   end
 
   def show?
@@ -28,11 +30,11 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.user == bearer ||
-      resource.product == bearer ||
-      resource.license == bearer ||
+      machine.user == bearer ||
+      machine.product == bearer ||
+      machine.license == bearer ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.group_id? && resource.group_id.in?(bearer.group_ids))
+        machine.group_id? && machine.group_id.in?(bearer.group_ids))
   end
 
   def create?
@@ -42,9 +44,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      ((resource.license.nil? || !resource.license.protected?) && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+      ((machine.license.nil? || !machine.license.protected?) && machine.user == bearer) ||
+      machine.product == bearer ||
+      machine.license == bearer
   end
 
   def update?
@@ -54,9 +56,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!resource.license.protected? && resource.license == bearer) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer
+      (!machine.license.protected? && machine.license == bearer) ||
+      (!machine.license.protected? && machine.user == bearer) ||
+      machine.product == bearer
   end
 
   def destroy?
@@ -66,9 +68,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+      (!machine.license.protected? && machine.user == bearer) ||
+      machine.product == bearer ||
+      machine.license == bearer
   end
 
   def checkout?
@@ -78,9 +80,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+      (!machine.license.protected? && machine.user == bearer) ||
+      machine.product == bearer ||
+      machine.license == bearer
   end
 
   def ping?
@@ -90,9 +92,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+      (!machine.license.protected? && machine.user == bearer) ||
+      machine.product == bearer ||
+      machine.license == bearer
   end
   alias_method :ping_heartbeat?, :ping?
 
@@ -103,7 +105,7 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      machine.product == bearer
   end
   alias_method :reset_heartbeat?, :reset?
 
@@ -114,9 +116,9 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+      (!machine.license.protected? && machine.user == bearer) ||
+      machine.product == bearer ||
+      machine.license == bearer
   end
 
   def change_group?
@@ -126,6 +128,6 @@ class MachinePolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      machine.product == bearer
   end
 end
