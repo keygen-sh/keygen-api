@@ -408,7 +408,7 @@ Feature: License usage actions
     And I am a license of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/actions/increment-usage"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
@@ -701,7 +701,7 @@ Feature: License usage actions
     And I am a license of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/actions/decrement-usage"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" job
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job

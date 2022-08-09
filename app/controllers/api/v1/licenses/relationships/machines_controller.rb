@@ -11,29 +11,30 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
-    # GET /licenses/1/machines
     def index
-      @machines = apply_pagination(policy_scope(apply_scopes(@license.machines)).preload(:product, :policy))
-      authorize @machines
+      machines = apply_pagination(policy_scope(apply_scopes(license.machines)).preload(:product, :policy))
+      authorize! license, machines
 
-      render jsonapi: @machines
+      render jsonapi: machines
     end
 
-    # GET /licenses/1/machines/1
     def show
-      @machine = FindByAliasService.call(scope: @license.machines, identifier: params[:id], aliases: :fingerprint)
-      authorize @machine
+      machine = FindByAliasService.call(scope: license.machines, identifier: params[:id], aliases: :fingerprint)
+      authorize! license, machine
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
     private
 
-    def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
-      authorize @license, :show?
+    attr_reader :license
 
-      Current.resource = @license
+    def set_license
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
+
+      Current.resource = license
     end
   end
 end

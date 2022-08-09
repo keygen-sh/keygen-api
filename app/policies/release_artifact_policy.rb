@@ -19,11 +19,7 @@ class ReleaseArtifactPolicy < ApplicationPolicy
 
     # FIXME(ezekg) Authorization should be moved from release policy to here
     # Delegate to release policy
-    release_policy = ReleasePolicy.new(context, resource.release)
-    return false if
-      release_policy.nil?
-
-    release_policy.download?
+    ReleasePolicy.new(context, resource.release).download?
   end
 
   def create?

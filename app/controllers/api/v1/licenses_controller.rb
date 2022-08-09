@@ -22,64 +22,60 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_license, only: [:show, :update, :destroy]
 
-    # GET /licenses
     def index
-      @licenses = apply_pagination(policy_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy))
-      authorize @licenses
+      licenses = apply_pagination(policy_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy))
+      authorize! licenses
 
-      render jsonapi: @licenses
+      render jsonapi: licenses
     end
 
-    # GET /licenses/1
     def show
-      authorize @license
+      authorize! license
 
-      render jsonapi: @license
+      render jsonapi: license
     end
 
-    # POST /licenses
     def create
-      @license = current_account.licenses.new license_params
-      authorize @license
+      license = current_account.licenses.new license_params
+      authorize! license
 
-      if @license.save
+      if license.save
         BroadcastEventService.call(
-          event: "license.created",
+          event: 'license.created',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license, status: :created, location: v1_account_license_url(@license.account, @license)
+        render jsonapi: license, status: :created, location: v1_account_license_url(license.account_id, license)
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
-    # PATCH/PUT /licenses/1
     def update
-      authorize @license
+      authorize! license
 
-      if @license.update(license_params)
+      if license.update(license_params)
         BroadcastEventService.call(
-          event: "license.updated",
+          event: 'license.updated',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license
+        render jsonapi: license
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
     # DELETE /licenses/1
     def destroy
-      authorize @license
+      authorize! license
 
       BroadcastEventService.call(
-        event: "license.deleted",
+        event: 'license.deleted',
         account: current_account,
-        resource: @license
+        resource: license,
       )
 
       @license.destroy_async
@@ -87,10 +83,12 @@ module Api::V1
 
     private
 
+    attr_reader :license
+
     def set_license
       @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
 
-      Current.resource = @license
+      Current.resource = license
     end
 
     typed_parameters format: :jsonapi do

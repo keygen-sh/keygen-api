@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
 class ApplicationPolicy
-  attr_reader :context, :resource
+  attr_accessor :resource
+  attr_reader   :context
 
   def initialize(context, resource)
+    raise Pundit::NotAuthorizedError, 'authorization context is missing' unless
+      context.is_a?(AuthorizationContext)
+
+    # Ensure we're always dealing with an authz resource.
+    resource = AuthorizationResource.new(subject: resource) unless
+      resource.is_a?(AuthorizationResource)
+
     @context  = context
     @resource = resource
   end
@@ -66,12 +74,16 @@ class ApplicationPolicy
     context.token
   end
 
-  def resource_ids
-    resource.collect(&:id)
+  def subject
+    resource.subject
+  end
+
+  def subject_ids
+    subject.collect(&:id)
   end
 
   def scope
-    Pundit.policy_scope! bearer, resource.class
+    Pundit.policy_scope! bearer, resource.subject.class
   end
 
   def assert_account_scoped!
@@ -92,7 +104,7 @@ class ApplicationPolicy
   end
 
   def assert_authenticated!
-    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is missing" if
+    raise Pundit::NotAuthorizedError, policy: self, message: "authn is missing" if
       bearer.nil?
   end
 
@@ -117,6 +129,20 @@ class ApplicationPolicy
 
     raise Pundit::NotAuthorizedError, policy: self, message: "token lacks permission to perform action" unless
       token.can?(actions)
+  end
+
+  def authorize!(claims)
+    claims.each do |resource, (*actions)|
+      policy = Pundit.policy!(context, resource)
+
+      raise Pundit::InvalidConstructorError, "circular reference in policy #{policy}" if
+        policy == self
+
+      actions.each do |action|
+        raise Pundit::NotAuthorizedError, policy:, message: "authz failed for #{resource}##{action}" unless
+          policy.send(action)
+      end
+    end
   end
 
   private

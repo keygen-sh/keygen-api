@@ -9,13 +9,13 @@ module Api::V1::Licenses::Relationships
 
     def show
       group = license.group
-      authorize group
+      authorize! license, group
 
       render jsonapi: group
     end
 
     def update
-      authorize license, :change_group?
+      authorize! license, Group
 
       license.update!(group_id: group_params[:id])
 
@@ -36,7 +36,6 @@ module Api::V1::Licenses::Relationships
       scoped_licenses = policy_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
-      authorize license, :show?
 
       Current.resource = license
     end

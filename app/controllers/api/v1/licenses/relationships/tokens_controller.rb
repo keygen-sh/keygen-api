@@ -7,9 +7,8 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
-    # POST /licenses/1/tokens
     def generate
-      authorize @license, :generate_token?
+      authorize! license, Token
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :max_activations,
@@ -20,14 +19,15 @@ module Api::V1::Licenses::Relationships
 
       token = TokenGeneratorService.call(
         account: current_account,
-        bearer: @license,
+        bearer: license,
         **kwargs
       )
+
       if token.valid?
         BroadcastEventService.call(
-          event: "token.generated",
+          event: 'token.generated',
           account: current_account,
-          resource: token
+          resource: token,
         )
 
         render jsonapi: token
@@ -38,34 +38,34 @@ module Api::V1::Licenses::Relationships
 
     # GET /licenses/1/tokens
     def index
-      authorize @license, :list_tokens?
-
       # FIXME(ezekg) Skipping the policy scope here so that products can see
       #              tokens that belong to licenses they own. Current behavior
       #              is that non-admin bearers can only see their own tokens.
       #              The scoping is happening within the main app policy.
-      @tokens = apply_pagination(apply_scopes(@license.tokens))
-      authorize @tokens
+      tokens = apply_pagination(apply_scopes(license.tokens))
+      authorize! license, tokens
 
-      render jsonapi: @tokens
+      render jsonapi: tokens
     end
 
     # GET /licenses/1/tokens/1
     def show
-      authorize @license, :show_token?
+      token = license.tokens.find params[:id]
+      authorize! license, token
 
-      @token = @license.tokens.find params[:id]
-
-      render jsonapi: @token
+      render jsonapi: token
     end
 
     private
 
-    def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id] || params[:id], aliases: :key)
-      authorize @license, :show?
+    attr_reader :license
 
-      Current.resource = @license
+    def set_license
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
+
+      Current.resource = license
     end
 
     typed_parameters format: :jsonapi do

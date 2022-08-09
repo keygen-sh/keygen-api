@@ -128,7 +128,11 @@ Rails.application.routes.draw do
     resources "licenses", constraints: { id: /[^\/]*/ } do
       scope module: "licenses/relationships" do
         resources "machines", only: [:index, :show]
-        resources "tokens", only: [:index, :show]
+        resources "tokens", only: [:index, :show] do
+          collection do
+            post "/", to: "tokens#generate"
+          end
+        end
         resource "product", only: [:show]
         resource "policy", only: [:show, :update]
         resource "group", only: [:show, :update]
@@ -138,9 +142,6 @@ Rails.application.routes.draw do
             post "/", to: "entitlements#attach", as: "attach"
             delete "/", to: "entitlements#detach", as: "detach"
           end
-        end
-        member do
-          post "tokens", to: "tokens#generate"
         end
       end
       member do
