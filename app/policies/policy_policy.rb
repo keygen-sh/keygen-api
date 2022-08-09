@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PolicyPolicy < ApplicationPolicy
+  def policies = resource.subjects
+  def policy   = resource.subject
 
   def index?
     assert_account_scoped!
@@ -10,7 +12,7 @@ class PolicyPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
-        resource.all? { |r| r.product_id == bearer.id })
+        policies.all? { _1.product_id == bearer.id })
   end
 
   def show?
@@ -20,7 +22,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def create?
@@ -30,7 +32,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def update?
@@ -40,7 +42,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def destroy?
@@ -50,7 +52,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def pop?
@@ -60,7 +62,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def attach_entitlement?
@@ -70,7 +72,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def detach_entitlement?
@@ -80,7 +82,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def list_entitlements?
@@ -90,7 +92,7 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 
   def show_entitlement?
@@ -100,6 +102,6 @@ class PolicyPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.product == bearer
+      policy.product == bearer
   end
 end

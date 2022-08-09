@@ -33,10 +33,10 @@ Feature: License product relationship
 
   Scenario: Product retrieves the product for a license
     Given the current account is "test1"
-    And the current account has 3 "licenses"
     And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
     And I am a product of account "test1"
-    And the current product has 3 "licenses"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/product"
     Then the response status should be "200"
@@ -59,16 +59,25 @@ Feature: License product relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/product"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve the product for their license
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/product"
     Then the response status should be "403"
 
-  Scenario: User attempts to retrieve the product for a license
+  Scenario: User attempts to retrieve the product for another license
     Given the current account is "test1"
     And the current account has 3 "licenses"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the product for a license of another account
     Given I am an admin of account "test2"

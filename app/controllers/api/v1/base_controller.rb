@@ -7,7 +7,8 @@ module Api::V1
     include RateLimiting
     include CurrentAccountConstraints
     include CurrentAccountScope
-    include TokenAuthentication
+    include Authentication
+    include Authorization
     include Pagination
   end
 end

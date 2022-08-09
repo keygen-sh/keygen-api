@@ -9,20 +9,20 @@ module Api::V1::Groups::Relationships
 
     def index
       owners = apply_pagination(policy_scope(apply_scopes(group.owners)))
-      authorize owners
+      authorize group, owners
 
       render jsonapi: owners
     end
 
     def show
       owner = group.owners.find(params[:id])
-      authorize owner
+      authorize group, owner
 
       render jsonapi: owner
     end
 
     def attach
-      authorize group
+      authorize group, GroupOwner
 
       owners_data = owner_params.fetch(:data).map do |owner|
         owner.merge(account_id: current_account.id)
@@ -40,7 +40,7 @@ module Api::V1::Groups::Relationships
     end
 
     def detach
-      authorize group
+      authorize group, GroupOwner
 
       user_ids = owner_params.fetch(:data).map { |e| e[:user_id] }.compact
       owners   = group.owners.where(user_id: user_ids)

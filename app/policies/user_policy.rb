@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UserPolicy < ApplicationPolicy
+  def user  = resource.subject
+  def users = resource.subject
 
   def index?
     assert_account_scoped!
@@ -10,9 +12,9 @@ class UserPolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.all? { |r|
-          r.group_id? && r.group_id.in?(bearer.group_ids) ||
-          r.id == bearer.id })
+        users.all? {
+          _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
+          _1.id == bearer.id })
   end
 
   def show?
@@ -22,9 +24,9 @@ class UserPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      resource == bearer ||
+      user == bearer ||
       (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.group_id? && resource.group_id.in?(bearer.group_ids))
+        user.group_id? && user.group_id.in?(bearer.group_ids))
   end
 
   def create?
@@ -49,7 +51,7 @@ class UserPolicy < ApplicationPolicy
       bearer.has_role?(:read_only)
 
     bearer.has_role?(:admin, :developer, :sales_agent, :product) ||
-      resource == bearer
+      user == bearer
   end
 
   def destroy?
@@ -68,7 +70,7 @@ class UserPolicy < ApplicationPolicy
       user.tokens.generate
     ]
 
-    resource.has_role?(:user) &&
+    user.has_role?(:user) &&
       bearer.has_role?(:admin, :developer, :product)
   end
 
@@ -79,7 +81,7 @@ class UserPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      resource == bearer
+      user == bearer
   end
 
   def show_token?
@@ -89,7 +91,7 @@ class UserPolicy < ApplicationPolicy
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      resource == bearer
+      user == bearer
   end
 
   def invite?
@@ -107,7 +109,7 @@ class UserPolicy < ApplicationPolicy
       user.ban
     ]
 
-    resource.has_role?(:user) &&
+    user.has_role?(:user) &&
       bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
@@ -117,7 +119,7 @@ class UserPolicy < ApplicationPolicy
       user.unban
     ]
 
-    resource.has_role?(:user) &&
+    user.has_role?(:user) &&
       bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
   end
 
@@ -128,9 +130,9 @@ class UserPolicy < ApplicationPolicy
     ]
 
     return false if
-      resource.has_role?(:read_only)
+      user.has_role?(:read_only)
 
-    resource == bearer
+    user == bearer
   end
 
   def reset_password?
@@ -140,10 +142,10 @@ class UserPolicy < ApplicationPolicy
     ]
 
     return false if
-      resource.has_role?(:user) && account.protected? && !resource.password?
+      user.has_role?(:user) && account.protected? && !user.password?
 
     return false if
-      resource.has_role?(:read_only)
+      user.has_role?(:read_only)
 
     true
   end
@@ -154,7 +156,7 @@ class UserPolicy < ApplicationPolicy
       user.read
     ]
 
-    resource == bearer
+    user == bearer
   end
 
   def change_group?
@@ -170,22 +172,22 @@ class UserPolicy < ApplicationPolicy
 
   def assert_role_ok!
     return if
-      resource.role.nil?
+      user.role.nil?
 
     # Assert that privilege escalation is not occurring by anonymous (sanity check)
-    raise Pundit::NotAuthorizedError, policy: self, message: 'anonymous is escalating privileges for the resource' if
-      bearer.nil? && resource.role.changed? && !resource.role.user?
+    raise Pundit::NotAuthorizedError, policy: self, message: 'anonymous is escalating privileges for the user' if
+      bearer.nil? && user.role.changed? && !user.role.user?
 
     return if
       bearer.nil?
 
     # Assert that privilege escalation is not occurring by a bearer (sanity check)
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is escalating privileges for the resource' if
-      (bearer.role.changed? || resource.role.changed?) &&
-      bearer.role < resource.role
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is escalating privileges for the user' if
+      (bearer.role.changed? || user.role.changed?) &&
+      bearer.role < user.role
 
-    # Assert bearer can perform this action on the resource
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer lacks privileges to the resource' if
-      bearer.role < resource.role
+    # Assert bearer can perform this action on the user
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer lacks privileges to the user' if
+      bearer.role < user.role
   end
 end

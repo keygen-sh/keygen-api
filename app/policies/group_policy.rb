@@ -1,34 +1,40 @@
 # frozen_string_literal: true
 
 class GroupPolicy < ApplicationPolicy
+  def groups = resource.subjects
+  def group  = resource.subject
+
   def index?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       group.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
-        resource.all? { |r| r.id == bearer.group_id || r.id.in?(bearer.group_ids) }) ||
+        groups.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) }) ||
       (bearer.has_role?(:license) &&
-        resource.all? { |r| r.id == bearer.group_id })
+        groups.all? { _1.id == bearer.group_id })
   end
 
   def show?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       group.read
     ]
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
       (bearer.has_role?(:user) &&
-        (resource.id == bearer.group_id || resource.id.in?(bearer.group_ids))) ||
+        (group.id == bearer.group_id || group.id.in?(bearer.group_ids))) ||
       (bearer.has_role?(:license) &&
-        resource.id == bearer.group_id)
+        group.id == bearer.group_id)
   end
 
   def create?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       group.create
     ]
@@ -38,6 +44,7 @@ class GroupPolicy < ApplicationPolicy
 
   def update?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       group.update
     ]
@@ -47,6 +54,7 @@ class GroupPolicy < ApplicationPolicy
 
   def destroy?
     assert_account_scoped!
+    assert_authenticated!
     assert_permissions! %w[
       group.delete
     ]
@@ -54,21 +62,49 @@ class GroupPolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :product)
   end
 
-  def attach?
-    assert_account_scoped!
-    assert_permissions! %w[
-      group.owners.attach
-    ]
+  class GroupOwnerPolicy < ApplicationPolicy
+    def index?
+      assert_account_scoped!
+      assert_authenticated!
+      assert_permissions! %w[
+        group.owners.read
+      ]
 
-    bearer.has_role?(:admin, :developer, :product)
-  end
+      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
+        (bearer.has_role?(:user) &&
+          group.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) })
+    end
 
-  def detach?
-    assert_account_scoped!
-    assert_permissions! %w[
-      group.owners.detach
-    ]
+    def show?
+      assert_account_scoped!
+      assert_authenticated!
+      assert_permissions! %w[
+        group.owners.read
+      ]
 
-    bearer.has_role?(:admin, :developer, :product)
+      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
+        (bearer.has_role?(:user) &&
+          (group.id == bearer.group_id || group.id.in?(bearer.group_ids)))
+    end
+
+    def attach?
+      assert_account_scoped!
+      assert_authenticated!
+      assert_permissions! %w[
+        group.owners.attach
+      ]
+
+      bearer.has_role?(:admin, :developer, :product)
+    end
+
+    def detach?
+      assert_account_scoped!
+      assert_authenticated!
+      assert_permissions! %w[
+        group.owners.detach
+      ]
+
+      bearer.has_role?(:admin, :developer, :product)
+    end
   end
 end

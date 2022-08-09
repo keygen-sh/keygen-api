@@ -7,17 +7,15 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
-    # GET /licenses/1/user
     def show
       user = license.user
-      authorize user
+      authorize! user
 
       render jsonapi: user
     end
 
-    # PUT /licenses/1/user
     def update
-      authorize license, :change_user?
+      authorize! license, license.user
 
       license.update!(user_id: user_params[:id])
 
@@ -35,8 +33,9 @@ module Api::V1::Licenses::Relationships
     attr_reader :license
 
     def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:license_id], aliases: :key)
-      authorize license, :show?
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
       Current.resource = license
     end

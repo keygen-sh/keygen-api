@@ -31,13 +31,14 @@ class ApplicationController < ActionController::API
     RequestMigrations.config.request_version_resolver.call(request)
   end
 
-  def pundit_user
+  def authorization_context
     AuthorizationContext.new(
       account: current_account,
       bearer: current_bearer,
       token: current_token,
     )
   end
+  alias :pundit_user :authorization_context
 
   private
 
