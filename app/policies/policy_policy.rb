@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PolicyPolicy < ApplicationPolicy
-  def policies = resource.subjects
+  def policies = resource.subject
   def policy   = resource.subject
 
   def index?

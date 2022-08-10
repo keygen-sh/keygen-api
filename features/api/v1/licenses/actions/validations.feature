@@ -3277,7 +3277,7 @@ Feature: License validation actions
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin validates a strict floating license that has too many machines (ALWAYS_ALLOW_OVERAGE overage strategy)
     Given I am an admin of account "test1"
@@ -7160,7 +7160,7 @@ Feature: License validation actions
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1/actions/validate"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
 
   Scenario: License validates their license
@@ -7202,7 +7202,7 @@ Feature: License validation actions
     And I am a license of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$1/actions/validate"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
 
   Scenario: Anonymous validates a license and sends a nonce

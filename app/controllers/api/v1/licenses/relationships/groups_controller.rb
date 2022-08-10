@@ -25,6 +25,7 @@ module Api::V1::Licenses::Relationships
         resource: license,
       )
 
+      # FIXME(ezekg) This should be the group
       render jsonapi: license
     end
 
