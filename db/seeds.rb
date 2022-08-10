@@ -50,6 +50,7 @@ permissions = %w[
   license.entitlements.attach
   license.entitlements.detach
   license.entitlements.read
+  license.group.read
   license.group.update
   license.policy.update
   license.read

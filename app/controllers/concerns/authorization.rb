@@ -7,36 +7,27 @@ module Authorization
     remove_possible_method :authorize
   end
 
+  ##
   # authorize! adds a layer on top of Pundit that better supports
-  # namespaced policies, e.g. ProductPolicy::TokenPolicy, and by
-  # providing context via an authorization resource.
-  def authorize!(*resources, action: "#{action_name}?")
+  # namespaced policies, e.g. Product::TokenPolicy, by providing
+  # context via an authorization resource.
+  #
+  # Provide a policy: if e.g. the subject is nillable, to prevent
+  # a 404 from being raised, while still authorizing nil.
+  def authorize!(*resources, policy: nil, action: "#{action_name}?")
     *context, subject = resources
 
     authz_resource = AuthorizationResource.new(subject:, context:)
-    policy_class   = resources.map { pundit_policy_for(_1) }
-                              .join("::")
-                              .constantize
+    policy_class   = case policy
+                     when NilClass
+                       Pundit.policy!(authorization_context, resources)
+                             .class
+                     when String
+                       policy.constantize
+                     else
+                       policy
+                     end
 
     pundit_authorize(authz_resource, action, policy_class:)
-  end
-
-  private
-
-  def pundit_policy_for(subject)
-    klass = case
-            when subject.respond_to?(:model_name)
-              subject.model_name
-            when subject.class.respond_to?(:model_name)
-              subject.class.model_name
-            when subject.is_a?(Class)
-              subject
-            when subject.is_a?(Symbol)
-              subject.to_s.camelize
-            else
-              subject.class
-            end
-
-    "#{klass}Policy"
   end
 end
