@@ -20,7 +20,7 @@ module Api::V1::Licenses::Relationships
       token = TokenGeneratorService.call(
         account: current_account,
         bearer: license,
-        **kwargs
+        **kwargs,
       )
 
       if token.valid?
@@ -36,7 +36,6 @@ module Api::V1::Licenses::Relationships
       end
     end
 
-    # GET /licenses/1/tokens
     def index
       # FIXME(ezekg) Skipping the policy scope here so that products can see
       #              tokens that belong to licenses they own. Current behavior
@@ -48,7 +47,6 @@ module Api::V1::Licenses::Relationships
       render jsonapi: tokens
     end
 
-    # GET /licenses/1/tokens/1
     def show
       token = license.tokens.find params[:id]
       authorize! license, token

@@ -113,25 +113,6 @@ class ApplicationPolicy
       token.can?(actions)
   end
 
-  def assert_types!(t)
-    case resource.subject
-    in [t, *] => s if s.all? { _1 in t }
-    in []
-    end
-  end
-
-  def assert_type!(t)
-    case resource.subject
-    in t
-    end
-  end
-
-  def assert_context!(t)
-    case resource.context
-    in t
-    end
-  end
-
   def authorize!(claims)
     claims.each do |resource, (*actions)|
       policy = Pundit.policy!(context, resource)
