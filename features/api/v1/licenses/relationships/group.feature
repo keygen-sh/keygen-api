@@ -144,7 +144,7 @@ Feature: License group relationship
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "404"
 
-  Scenario: License attempts to retrieve the group for their license
+  Scenario: License attempts to retrieve the group for their license (in group)
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "group"
@@ -158,6 +158,14 @@ Feature: License group relationship
     Then the response status should be "200"
     And the JSON response should be a "group"
 
+  Scenario: License attempts to retrieve the group for their license (no group)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "404"
+
   Scenario: Admin attempts to retrieve the group for a license of another account
     Given the current account is "test1"
     And the current account has 3 "licenses"
@@ -165,6 +173,36 @@ Feature: License group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "401"
+
+  Scenario: Admin adds a license to a group
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/licenses/$0/group" with the following:
+      """
+      {
+        "data": {
+          "type": "groups",
+          "id": "$groups[0]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "license" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/licenses/$licenses[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a license's group relationship to another group
     Given I am an admin of account "test1"
