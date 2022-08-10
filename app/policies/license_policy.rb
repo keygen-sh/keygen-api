@@ -4,10 +4,12 @@ class LicensePolicy < ApplicationPolicy
   def index?
     assert_account_scoped!
     assert_authenticated!
-    assert_types! License
     assert_permissions! %w[
       license.read
     ]
+
+    resource.subject => [License, *] | [] \
+                     => licenses
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -23,10 +25,12 @@ class LicensePolicy < ApplicationPolicy
   def show?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.read
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -39,10 +43,12 @@ class LicensePolicy < ApplicationPolicy
   def create?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.create
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((license.policy.nil? || !license.policy.protected?) && license.user == bearer) ||
@@ -52,10 +58,12 @@ class LicensePolicy < ApplicationPolicy
   def update?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.update
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -64,10 +72,12 @@ class LicensePolicy < ApplicationPolicy
   def destroy?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.delete
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -77,10 +87,12 @@ class LicensePolicy < ApplicationPolicy
   def check_in?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.check-in
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -91,10 +103,12 @@ class LicensePolicy < ApplicationPolicy
   def revoke?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.revoke
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -104,10 +118,12 @@ class LicensePolicy < ApplicationPolicy
   def renew?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.renew
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -117,10 +133,12 @@ class LicensePolicy < ApplicationPolicy
   def suspend?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.suspend
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -129,10 +147,12 @@ class LicensePolicy < ApplicationPolicy
   def reinstate?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.reinstate
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -141,11 +161,13 @@ class LicensePolicy < ApplicationPolicy
   def quick_validate_by_id?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.validate
       license.read
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -156,11 +178,13 @@ class LicensePolicy < ApplicationPolicy
   def validate_by_id?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.validate
       license.read
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -170,11 +194,13 @@ class LicensePolicy < ApplicationPolicy
 
   def validate_by_key?
     assert_account_scoped!
-    assert_type! License
     assert_permissions! %w[
       license.validate
       license.read
     ]
+
+    resource.subject => License \
+                     => license
 
     # NOTE(ezekg) We have optional authn
     return true unless
@@ -189,10 +215,12 @@ class LicensePolicy < ApplicationPolicy
   def checkout?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.check-out
     ]
+
+    resource.subject => License \
+                     => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -203,10 +231,12 @@ class LicensePolicy < ApplicationPolicy
   def me?
     assert_account_scoped!
     assert_authenticated!
-    assert_type! License
     assert_permissions! %w[
       license.read
     ]
+
+    resource.subject => License \
+                     => license
 
     license == bearer
   end
@@ -215,11 +245,12 @@ class LicensePolicy < ApplicationPolicy
     def increment?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! :usage
       assert_permissions! %w[
         license.usage.increment
       ]
+
+      resource.context => [License => license]
+      resource.subject => :usage
 
       bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
         (!license.policy.protected? && license.user == bearer) ||
@@ -230,11 +261,12 @@ class LicensePolicy < ApplicationPolicy
     def decrement?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! :usage
       assert_permissions! %w[
         license.usage.decrement
       ]
+
+      resource.context => [License => license]
+      resource.subject => :usage
 
       bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
         license.product == bearer
@@ -243,11 +275,12 @@ class LicensePolicy < ApplicationPolicy
     def reset?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! :usage
       assert_permissions! %w[
         license.usage.reset
       ]
+
+      resource.context => [License => license]
+      resource.subject => :usage
 
       bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
         license.product == bearer
@@ -262,11 +295,13 @@ class LicensePolicy < ApplicationPolicy
     def index?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_types! Token
       assert_permissions! %w[
         license.tokens.read
       ]
+
+      resource.context => [License => license]
+      resource.subject => [Token, *] | [] \
+                       => tokens
 
       authorize! license => :show?,
                  tokens  => :index
@@ -278,11 +313,13 @@ class LicensePolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Token
       assert_permissions! %w[
         license.tokens.read
       ]
+
+      resource.context => [License => license]
+      resource.subject => Token \
+                       => token
 
       authorize! license => :show?,
                  token   => :index
@@ -294,36 +331,30 @@ class LicensePolicy < ApplicationPolicy
     def generate?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Token
       assert_permissions! %w[
         license.tokens.generate
       ]
+
+      resource.context => [License => license]
+      resource.subject => Token
 
       authorize! license => :show?
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
     end
-
-    private
-
-    def license = resource.context.first
-    def tokens  = resource.subject
-    def token   = resource.subject
   end
 
   class EntitlementPolicy < ApplicationPolicy
     def index?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_types! LicenseEntitlement
       assert_permissions! %w[
         license.entitlements.read
       ]
 
-      authorize! license => :show?
+      resource.context => [License => license]
+      resource.subject => [Entitlement, *]
 
       bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
         license.user == bearer ||
@@ -334,11 +365,12 @@ class LicensePolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_type! LicenseEntitlement
-      assert_context! [License]
       assert_permissions! %w[
         license.entitlements.read
       ]
+
+      resource.context => [License => license]
+      resource.subject => Entitlement
 
       authorize! license => :show?
 
@@ -351,11 +383,12 @@ class LicensePolicy < ApplicationPolicy
     def attach?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Entitlement
       assert_permissions! %w[
         license.entitlements.attach
       ]
+
+      resource.context => [License => license]
+      resource.subject => Entitlement
 
       authorize! license => :show?
 
@@ -366,29 +399,28 @@ class LicensePolicy < ApplicationPolicy
     def detach?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Entitlement
       assert_permissions! %w[
         license.entitlements.detach
       ]
+
+      resource.context => [License => license]
+      resource.subject => Entitlement
 
       authorize! license => :show?
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
     end
-
-    private
-
-    def license = resource.context.first
   end
 
   class ProductPolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Product
+
+      resource.context => [License => license]
+      resource.subject => Policy \
+                       => policy
 
       authorize! license => :show?,
                  product => :show?
@@ -404,8 +436,10 @@ class LicensePolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Policy
+
+      resource.context => [License => license]
+      resource.subject => Policy \
+                       => policy
 
       authorize! license => :show?,
                  policy  => :show?
@@ -414,11 +448,12 @@ class LicensePolicy < ApplicationPolicy
     def update?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Policy
       assert_permissions! %w[
         license.policy.update
       ]
+
+      resource.context => [License => license]
+      resource.subject => Policy
 
       authorize! license => :show?
 
@@ -427,19 +462,16 @@ class LicensePolicy < ApplicationPolicy
         (license.product == bearer &&
           policy.product == bearer)
     end
-
-    private
-
-    def license = resource.context.first
-    def policy  = resource.subject
   end
 
   class UserPolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! User
+
+      resource.context => [License => license]
+      resource.subject => User \
+                       => user
 
       authorize! license => :show?,
                  user    => :show?
@@ -448,30 +480,28 @@ class LicensePolicy < ApplicationPolicy
     def update?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! User
       assert_permissions! %w[
         license.user.update
       ]
+
+      resource.context => [License => license]
+      resource.subject => User
 
       authorize! license => :show?
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
     end
-
-    private
-
-    def license = resource.context.first
-    def user    = resource.subject
   end
 
   class GroupPolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Group
+
+      resource.context => [License => license]
+      resource.subject => Group \
+                       => group
 
       authorize! license => :show?,
                  group   => :show?
@@ -480,30 +510,28 @@ class LicensePolicy < ApplicationPolicy
     def update?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Group
       assert_permissions! %w[
         license.group.update
       ]
+
+      resource.context => [License => license]
+      resource.subject => Group
 
       authorize! license => :show?
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
     end
-
-    private
-
-    def license = resource.context.first
-    def group   = resource.subject
   end
 
   class MachinePolicy < ApplicationPolicy
     def index?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_types! Machine
+
+      resource.context => [License => license]
+      resource.subject => [Machine, *] | [] \
+                       => machines
 
       authorize! license  => :show?,
                  machines => :index?
@@ -512,22 +540,13 @@ class LicensePolicy < ApplicationPolicy
     def show?
       assert_account_scoped!
       assert_authenticated!
-      assert_context! [License]
-      assert_type! Machine
+
+      resource.context => [License => license]
+      resource.subject => Machine \
+                       => machine
 
       authorize! license => :show?,
                  machine => :show?
     end
-
-    private
-
-    def license  = resource.context.first
-    def machines = resource.subject
-    def machine  = resource.subject
   end
-
-  private
-
-  def licenses = resource.subject
-  def license  = resource.subject
 end
