@@ -13,13 +13,14 @@ class LicenseFilePolicy < ApplicationPolicy
   # We want to assert that the bearer is allowed to read the product,
   # policy, user, group, etc.
   def permissions_for_includes
+    lic   = resource.subject
     perms = []
 
-    perms << 'license.entitlements.read' if resource.includes.include?('entitlements')
-    perms << 'group.read' if resource.includes.include?('group')
-    perms << 'user.read' if resource.includes.include?('user')
-    perms << 'product.read' if resource.includes.include?('product')
-    perms << 'policy.read' if resource.includes.include?('policy')
+    perms << 'license.entitlements.read' if lic.includes.include?('entitlements')
+    perms << 'group.read' if lic.includes.include?('group')
+    perms << 'user.read' if lic.includes.include?('user')
+    perms << 'product.read' if lic.includes.include?('product')
+    perms << 'policy.read' if lic.includes.include?('policy')
 
     perms
   end

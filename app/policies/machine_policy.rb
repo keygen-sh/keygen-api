@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MachinePolicy < ApplicationPolicy
-  def machines = resource.subjects
+  def machines = resource.subject
   def machine  = resource.subject
 
   def index?

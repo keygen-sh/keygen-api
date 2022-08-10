@@ -8,9 +8,8 @@ module Api::V1::Licenses::Actions
     before_action :authenticate_with_token, only: %i[validate_by_key]
     before_action :set_license, only: %i[quick_validate_by_id validate_by_id]
 
-    # GET /licenses/1/validate
     def quick_validate_by_id
-      authorize license
+      authorize! license
 
       valid, detail, code = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
       meta = {
@@ -28,9 +27,8 @@ module Api::V1::Licenses::Actions
       render jsonapi: license, meta: meta
     end
 
-    # POST /licenses/1/validate
     def validate_by_id
-      authorize license
+      authorize! license
 
       valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
       meta = {
@@ -64,7 +62,6 @@ module Api::V1::Licenses::Actions
       render jsonapi: license, meta: meta
     end
 
-    # POST /licenses/validate-key
     def validate_by_key
       @license = LicenseKeyLookupService.call(
         account: current_account,
@@ -77,7 +74,7 @@ module Api::V1::Licenses::Actions
 
       # We can skip authorization when the license doesn't exist
       if license.present?
-        authorize license
+        authorize! license
       else
         skip_authorization
       end
@@ -119,7 +116,11 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
+
+      Current.resource = license
     end
 
     typed_parameters do

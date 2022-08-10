@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProductPolicy < ApplicationPolicy
-  def products    = resource.subjects
+  def products    = resource.subject
   def product     = resource.subject
   def product_ids = products.collect(:id)
 

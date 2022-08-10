@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GroupPolicy < ApplicationPolicy
-  def groups = resource.subjects
+  def groups = resource.subject
   def group  = resource.subject
 
   def index?

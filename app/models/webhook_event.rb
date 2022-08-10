@@ -23,12 +23,4 @@ class WebhookEvent < ApplicationRecord
   # FIXME(ezekg) Products should only be able to read events that are
   #              associated with the given product
   scope :for_product, -> id { self }
-
-  def deconstruct
-    attributes.values
-  end
-
-  def deconstruct_keys(keys)
-    attributes.symbolize_keys
-  end
 end

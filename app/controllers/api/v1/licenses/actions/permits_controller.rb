@@ -7,111 +7,110 @@ module Api::V1::Licenses::Actions
     before_action :authenticate_with_token!
     before_action :set_license
 
-    # POST /licenses/1/check-in
     def check_in
-      authorize @license
+      authorize! license
 
-      if !@license.policy.requires_check_in?
+      if !license.policy.requires_check_in?
         render_unprocessable_entity detail: "cannot be checked in because the policy does not require it"
-      elsif @license.check_in!
+      elsif license.check_in!
         BroadcastEventService.call(
-          event: "license.checked-in",
+          event: 'license.checked-in',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license
+        render jsonapi: license
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
-    # POST /licenses/1/renew
     def renew
-      authorize @license
+      authorize! license
 
-      if @license.policy.duration.nil?
+      if license.policy.duration.nil?
         render_unprocessable_entity detail: "cannot be renewed because the policy does not have a duration"
-      elsif @license.renew!
+      elsif license.renew!
         BroadcastEventService.call(
-          event: "license.renewed",
+          event: 'license.renewed',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license
+        render jsonapi: license
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
-    # DELETE /licenses/1/revoke
     def revoke
-      authorize @license
+      authorize! license
 
       BroadcastEventService.call(
         event: "license.revoked",
         account: current_account,
-        resource: @license
+        resource: license
       )
 
-      @license.destroy_async
+      license.destroy_async
     end
 
-    # POST /licenses/1/suspend
     def suspend
-      authorize @license
+      authorize! license
 
-      if @license.suspended?
+      if license.suspended?
         render_unprocessable_entity({
-          detail: "is already suspended",
+          detail: 'is already suspended',
           source: {
-            pointer: "/data/attributes/suspended"
+            pointer: '/data/attributes/suspended'
           }
         })
-      elsif @license.suspend!
+      elsif license.suspend!
         BroadcastEventService.call(
-          event: "license.suspended",
+          event: 'license.suspended',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license
+        render jsonapi: license
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
-    # POST /licenses/1/reinstate
     def reinstate
-      authorize @license
+      authorize! license
 
-      if !@license.suspended?
+      if !license.suspended?
         render_unprocessable_entity({
-          detail: "is not suspended",
+          detail: 'is not suspended',
           source: {
-            pointer: "/data/attributes/suspended"
+            pointer: '/data/attributes/suspended'
           }
         })
-      elsif @license.reinstate!
+      elsif license.reinstate!
         BroadcastEventService.call(
-          event: "license.reinstated",
+          event: 'license.reinstated',
           account: current_account,
-          resource: @license
+          resource: license,
         )
 
-        render jsonapi: @license
+        render jsonapi: license
       else
-        render_unprocessable_resource @license
+        render_unprocessable_resource license
       end
     end
 
     private
 
-    def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
+    attr_reader :license
 
-      Current.resource = @license
+    def set_license
+      scoped_licenses = policy_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
+
+      Current.resource = license
     end
   end
 end

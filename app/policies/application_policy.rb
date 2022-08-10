@@ -62,49 +62,31 @@ class ApplicationPolicy
 
   protected
 
-  def account
-    context.account
-  end
-
-  def bearer
-    context.bearer
-  end
-
-  def token
-    context.token
-  end
-
-  def subject
-    resource.subject
-  end
-
-  def subject_ids
-    subject.collect(&:id)
-  end
-
-  def scope
-    Pundit.policy_scope! bearer, resource.subject.class
-  end
+  def scope      = Pundit.policy_scope!(context.bearer, resource.subject.class)
+  def account    = context.account
+  def account_id = account&.id
+  def bearer     = context.bearer
+  def bearer_id  = bearer&.id
+  def token      = context.token
+  def token_id   = token&.id
 
   def assert_account_scoped!
-    raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for bearer' unless
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer account is mismatched' unless
       bearer.nil? || bearer.account_id == account.id
 
-    case
-    when resource.respond_to?(:all?)
-      raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for resources' unless
-        resource.all? { |r| r.account_id == account.id }
-    when resource.respond_to?(:account_id)
-      raise Pundit::NotAuthorizedError, policy: self, message: 'account mismatch for resource' unless
-        resource.account_id == account.id
+    case resource.subject
+    in [{ account_id: _ }, *] => s
+      raise Pundit::NotAuthorizedError, policy: self, message: 'resource subject account is mismatched' unless
+        s.all? { _1.account_id == account.id }
+    in account_id:
+      raise Pundit::NotAuthorizedError, policy: self, message: 'resource subject account is mismatched' unless
+        account_id == account.id
     else
-      # NOTE(ezekg) We likely passed in the model class directly, e.g. `authorize(RequestLog)`,
-      #             so we can assume the action is scoping itself correctly.
     end
   end
 
   def assert_authenticated!
-    raise Pundit::NotAuthorizedError, policy: self, message: "authn is missing" if
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is missing' if
       bearer.nil?
   end
 
@@ -112,23 +94,42 @@ class ApplicationPolicy
     return if
       bearer.nil?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is banned" if
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is banned' if
       (bearer.user? || bearer.license?) && bearer.banned?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: "bearer is suspended" if
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is suspended' if
       bearer.license? && bearer.suspended?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: "bearer lacks permission to perform action" unless
+    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer lacks permission to perform action' unless
       bearer.can?(actions)
 
     return if
       token.nil?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: "token is expired" if
+    raise Pundit::NotAuthorizedError, policy: self, message: 'token is expired' if
       token.expired?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: "token lacks permission to perform action" unless
+    raise Pundit::NotAuthorizedError, policy: self, message: 'token lacks permission to perform action' unless
       token.can?(actions)
+  end
+
+  def assert_types!(t)
+    case resource.subject
+    in [t, *] => s if s.all? { _1 in t }
+    in []
+    end
+  end
+
+  def assert_type!(t)
+    case resource.subject
+    in t
+    end
+  end
+
+  def assert_context!(t)
+    case resource.context
+    in t
+    end
   end
 
   def authorize!(claims)
