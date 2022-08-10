@@ -8,8 +8,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => [License, *] | [] \
-                     => licenses
+    resource.subject => [License, *] | [] => licenses
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.has_role?(:product) &&
@@ -29,8 +28,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -47,8 +45,7 @@ class LicensePolicy < ApplicationPolicy
       license.create
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       ((license.policy.nil? || !license.policy.protected?) && license.user == bearer) ||
@@ -62,8 +59,7 @@ class LicensePolicy < ApplicationPolicy
       license.update
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -76,8 +72,7 @@ class LicensePolicy < ApplicationPolicy
       license.delete
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -91,8 +86,7 @@ class LicensePolicy < ApplicationPolicy
       license.check-in
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -107,8 +101,7 @@ class LicensePolicy < ApplicationPolicy
       license.revoke
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -122,8 +115,7 @@ class LicensePolicy < ApplicationPolicy
       license.renew
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -137,8 +129,7 @@ class LicensePolicy < ApplicationPolicy
       license.suspend
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -151,8 +142,7 @@ class LicensePolicy < ApplicationPolicy
       license.reinstate
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
@@ -166,8 +156,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -183,8 +172,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
@@ -199,8 +187,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     # NOTE(ezekg) We have optional authn
     return true unless
@@ -219,8 +206,7 @@ class LicensePolicy < ApplicationPolicy
       license.check-out
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       (!license.policy.protected? && license.user == bearer) ||
@@ -235,8 +221,7 @@ class LicensePolicy < ApplicationPolicy
       license.read
     ]
 
-    resource.subject => License \
-                     => license
+    resource.subject => License => license
 
     license == bearer
   end
@@ -300,11 +285,10 @@ class LicensePolicy < ApplicationPolicy
       ]
 
       resource.context => [License => license]
-      resource.subject => [Token, *] | [] \
-                       => tokens
+      resource.subject => [Token, *] | [] => tokens
 
       authorize! license => :show?,
-                 tokens  => :index
+                 tokens => :index
 
       bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
         license.product == bearer
@@ -318,11 +302,10 @@ class LicensePolicy < ApplicationPolicy
       ]
 
       resource.context => [License => license]
-      resource.subject => Token \
-                       => token
+      resource.subject => Token => token
 
       authorize! license => :show?,
-                 token   => :index
+                 token => :index
 
       bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
         license.product == bearer
@@ -419,8 +402,7 @@ class LicensePolicy < ApplicationPolicy
       assert_authenticated!
 
       resource.context => [License => license]
-      resource.subject => Policy \
-                       => policy
+      resource.subject => Policy => policy
 
       authorize! license => :show?,
                  product => :show?
@@ -438,11 +420,10 @@ class LicensePolicy < ApplicationPolicy
       assert_authenticated!
 
       resource.context => [License => license]
-      resource.subject => Policy \
-                       => policy
+      resource.subject => Policy => policy
 
       authorize! license => :show?,
-                 policy  => :show?
+                 policy => :show?
     end
 
     def update?
@@ -470,11 +451,10 @@ class LicensePolicy < ApplicationPolicy
       assert_authenticated!
 
       resource.context => [License => license]
-      resource.subject => User \
-                       => user
+      resource.subject => User | nil => user
 
       authorize! license => :show?,
-                 user    => :show?
+                 user => :show?
     end
 
     def update?
@@ -485,39 +465,10 @@ class LicensePolicy < ApplicationPolicy
       ]
 
       resource.context => [License => license]
-      resource.subject => User
-
-      authorize! license => :show?
-
-      bearer.has_role?(:admin, :developer, :sales_agent) ||
-        license.product == bearer
-    end
-  end
-
-  class GroupPolicy < ApplicationPolicy
-    def show?
-      assert_account_scoped!
-      assert_authenticated!
-
-      resource.context => [License => license]
-      resource.subject => Group \
-                       => group
+      resource.subject => User | nil => user
 
       authorize! license => :show?,
-                 group   => :show?
-    end
-
-    def update?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        license.group.update
-      ]
-
-      resource.context => [License => license]
-      resource.subject => Group
-
-      authorize! license => :show?
+                 user => :show?
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
@@ -530,8 +481,7 @@ class LicensePolicy < ApplicationPolicy
       assert_authenticated!
 
       resource.context => [License => license]
-      resource.subject => [Machine, *] | [] \
-                       => machines
+      resource.subject => [Machine, *] | [] => machines
 
       authorize! license  => :show?,
                  machines => :index?
@@ -542,8 +492,7 @@ class LicensePolicy < ApplicationPolicy
       assert_authenticated!
 
       resource.context => [License => license]
-      resource.subject => Machine \
-                       => machine
+      resource.subject => Machine => machine
 
       authorize! license => :show?,
                  machine => :show?

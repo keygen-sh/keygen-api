@@ -15,8 +15,10 @@ module Api::V1::Licenses::Relationships
     end
 
     def update
-      authorize! license, Group
+      group = current_account.groups.find_by(id: group_params[:id])
+      authorize! license, group, policy: License::GroupPolicy
 
+      # Use group ID again so that model validations are run for invalid groups
       license.update!(group_id: group_params[:id])
 
       BroadcastEventService.call(

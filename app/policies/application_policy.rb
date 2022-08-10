@@ -113,20 +113,6 @@ class ApplicationPolicy
       token.can?(actions)
   end
 
-  def authorize!(claims)
-    claims.each do |resource, (*actions)|
-      policy = Pundit.policy!(context, resource)
-
-      raise Pundit::InvalidConstructorError, "circular reference in policy #{policy}" if
-        policy == self
-
-      actions.each do |action|
-        raise Pundit::NotAuthorizedError, policy:, message: "authz failed for #{resource}##{action}" unless
-          policy.send(action)
-      end
-    end
-  end
-
   private
 
   class Scope
