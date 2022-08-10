@@ -22,7 +22,7 @@ module Api::V1::Licenses::Relationships
     end
 
     def attach
-      authorize! license, Entitlement
+      authorize! license, license.entitlements.new
 
       entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
@@ -40,7 +40,7 @@ module Api::V1::Licenses::Relationships
     end
 
     def detach
-      authorize! license, Entitlement
+      authorize! license, license.entitlements.new
 
       entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
 
