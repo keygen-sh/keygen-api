@@ -822,7 +822,7 @@ Feature: License permit actions
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/licenses/$0/actions/revoke"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the current account should have 3 "licenses"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

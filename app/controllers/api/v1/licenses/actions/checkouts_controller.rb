@@ -62,14 +62,14 @@ module Api::V1::Licenses::Actions
     end
 
     def checkout_license_file(**kwargs)
-      authorize license, :checkout?
+      authorize! license, action: :checkout?
 
       license_file = LicenseCheckoutService.call(
         account: current_account,
         license: license,
         **kwargs,
       )
-      authorize license_file, :show?
+      authorize! license_file, action: :show?
 
       license_file.validate!
 

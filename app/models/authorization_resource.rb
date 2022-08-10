@@ -30,29 +30,11 @@ class AuthorizationResource
   #   end
   #
   # This makes namespaced policies much easier to use.
-  attr_reader :context
+  attr_reader :subject,
+              :context
 
   def initialize(subject:, context: [])
     @subject = subject
     @context = context
   end
-
-  def subjects
-    raise InvalidSubjectError, 'expected many subjects' unless
-      collection?
-
-    @subject
-  end
-
-  def subject
-    raise InvalidSubjectError, 'expected one subject' if
-      collection?
-
-    @subject
-  end
-
-  private
-
-  # FIXME(ezekg) Is there a better way to do this?
-  def collection? = @subject.respond_to?(:each)
 end

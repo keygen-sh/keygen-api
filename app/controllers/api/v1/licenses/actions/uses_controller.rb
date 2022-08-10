@@ -75,6 +75,8 @@ module Api::V1::Licenses::Actions
       end
     end
 
+    private
+
     attr_reader :license
 
     def set_license

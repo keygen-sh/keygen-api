@@ -135,9 +135,6 @@ class Role < ApplicationRecord
   def product? = name.to_sym == :product
   def license? = name.to_sym == :license
 
-  def deconstruct_keys(keys) = attributes.symbolize_keys.except(keys)
-  def deconstruct            = attributes.values
-
   def changed_for_autosave?
     super || role_permissions_attributes_changed?
   end
