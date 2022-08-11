@@ -2,11 +2,9 @@
 
 module Api::V1
   class RecoveriesController < Api::V1::BaseController
+    skip_verify_authorized
 
-    # POST /recover
     def recover
-      skip_authorization
-
       case recovery_params
       in meta: { type: 'account', email: }
         mailer = RecoveryMailer.recover_accounts_for_email(email:)

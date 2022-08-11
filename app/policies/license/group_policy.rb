@@ -1,35 +1,35 @@
 # frozen_string_literal: true
 
 class License::GroupPolicy < ApplicationPolicy
+  authorize :license
+
   def show?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.group.read
-    ]
+    verify_permissions!('license.group.read')
 
-    resource.context => [License => license]
-    resource.subject => Group | nil => group
-
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      license.product == bearer ||
-      (bearer.user? &&
-        (license.user == bearer || (group.id == bearer.group_id || group.id.in?(bearer.group_ids)))) ||
-      (bearer.license? &&
-        license == bearer)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if license.product == bearer
+      allow!
+    in role: { name: 'user' } if license.user == bearer || record.id == bearer.group_id || record.id.in?(bearer.group_ids)
+      allow!
+    in role: { name: 'license' } if license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.group.update
-    ]
+    verify_permissions!('license.group.update')
 
-    resource.context => [License => license]
-    resource.subject => Group | nil => group
-
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      license.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if license.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 end

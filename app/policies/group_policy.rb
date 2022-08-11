@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class GroupPolicy < ApplicationPolicy
-  def groups = resource.subject
-  def group  = resource.subject
-
   def index?
     assert_account_scoped!
     assert_authenticated!

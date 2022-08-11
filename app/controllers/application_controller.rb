@@ -4,7 +4,7 @@ class ApplicationController < ActionController::API
   include CurrentRequestAttributes
   include DefaultHeaders
   include RateLimiting
-  include Pundit::Authorization
+  include ActionPolicy::Controller
 
   # NOTE(ezekg) Including these at the end so that they're run last
   include RequestCounter
@@ -19,26 +19,22 @@ class ApplicationController < ActionController::API
   #             can rescue from invalid version errors.
   include RequestMigrations::Controller::Migrations
 
-  after_action :verify_authorized
-
   attr_accessor :current_http_scheme
   attr_accessor :current_http_token
   attr_accessor :current_account
   attr_accessor :current_bearer
   attr_accessor :current_token
 
+  # Action policy authz contexts
+  authorize :account, through: :current_account
+  authorize :bearer,  through: :current_bearer
+  authorize :token,   through: :current_token
+
+  verify_authorized
+
   def current_api_version
     RequestMigrations.config.request_version_resolver.call(request)
   end
-
-  def authorization_context
-    AuthorizationContext.new(
-      account: current_account,
-      bearer: current_bearer,
-      token: current_token,
-    )
-  end
-  alias :pundit_user :authorization_context
 
   private
 
@@ -46,24 +42,24 @@ class ApplicationController < ActionController::API
     render json: { meta: meta.transform_keys! { |k| k.to_s.camelize :lower } }
   end
 
-  def render_no_content(opts = {})
+  def render_no_content(**kwargs)
     render status: :no_content
   end
 
-  def render_forbidden(opts = {})
-    skip_authorization
+  def render_forbidden(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Access denied",
         detail: "You do not have permission to complete the request"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :forbidden
   end
 
   def render_unauthorized(**kwargs)
-    skip_authorization
+    skip_verify_authorized!
 
     self.headers["WWW-Authenticate"] = %(Bearer realm="keygen")
     render json: {
@@ -75,20 +71,20 @@ class ApplicationController < ActionController::API
     }, status: :unauthorized
   end
 
-  def render_unprocessable_entity(opts = {})
-    skip_authorization
+  def render_unprocessable_entity(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Unprocessable entity",
         detail: "The request could not be completed"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :unprocessable_entity
   end
 
-  def render_not_found(opts = {})
-    skip_authorization
+  def render_not_found(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
@@ -96,73 +92,71 @@ class ApplicationController < ActionController::API
         title: "Not found",
         detail: "The requested resource was not found",
         code: "NOT_FOUND",
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :not_found
   end
 
-  def render_bad_request(opts = {})
-    skip_authorization
+  def render_bad_request(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Bad request",
         detail: "The request could not be completed"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :bad_request
   end
 
-  def render_conflict(opts = {})
-    skip_authorization
+  def render_conflict(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Conflict",
         detail: "The request could not be completed because of a conflict"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :conflict
   end
 
-  def render_payment_required(opts ={})
-    skip_authorization
+  def render_payment_required(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Payment required",
         detail: "The request could not be completed"
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :payment_required
   end
 
-  def render_internal_server_error(opts = {})
-    skip_authorization
+  def render_internal_server_error(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Internal server error",
         detail: "Looks like something went wrong! Our engineers have been notified. If you continue to have problems, please contact support@keygen.sh.",
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :internal_server_error
   end
 
-  def render_service_unavailable(opts = {})
-    skip_authorization
+  def render_service_unavailable(**kwargs)
+    skip_verify_authorized!
 
     render json: {
       meta: { id: request.request_id },
       errors: [{
         title: "Service unavailable",
         detail: "Our services are currently unavailable. Please see https://status.keygen.sh for our uptime status and contact support@keygen.sh with any questions."
-      }.merge(opts)]
+      }.merge(kwargs)]
     }, status: :service_unavailable
   end
 
   def render_unprocessable_resource(resource)
-    skip_authorization
-
     errors = resource.errors.to_hash.map { |attr, errs|
       details = resource.errors.details[attr]
 
@@ -345,11 +339,16 @@ class ApplicationController < ActionController::API
     end
   rescue Keygen::Error::NotFoundError,
          ActiveRecord::RecordNotFound => e
-    if e.model.present? && e.id.present?
+    if e.model.present?
       resource = e.model.underscore.humanize.downcase
-      id       = Array.wrap(e.id).first
 
-      render_not_found detail: "The requested #{resource} '#{id}' was not found"
+      if e.id.present?
+        id = Array.wrap(e.id).first
+
+        render_not_found detail: "The requested #{resource} '#{id}' was not found"
+      else
+        render_not_found detail: "The requested #{resource} was not found"
+      end
     else
       render_not_found
     end
@@ -400,12 +399,12 @@ class ApplicationController < ActionController::API
 
       render_internal_server_error
     end
-  rescue Pundit::NotDefinedError => e
-    Keygen.logger.warn { "[pundit] message=#{e.message}" }
+  rescue ActionPolicy::NotFound => e
+    Keygen.logger.warn { "[action_policy] message=#{e.message}" }
 
     render_not_found
-  rescue Pundit::NotAuthorizedError => e
-    Keygen.logger.warn { "[pundit] policy=#{e.policy.class.name.underscore} query=#{e.query} message=#{e.message}" }
+  rescue ActionPolicy::Unauthorized => e
+    Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message}" }
 
     msg = if current_bearer.present?
             'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'

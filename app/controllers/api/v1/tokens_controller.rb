@@ -12,7 +12,6 @@ module Api::V1
     before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :regenerate_current, :revoke]
     before_action :set_token, only: [:show, :regenerate, :revoke]
 
-    # GET /tokens
     def index
       @tokens = apply_pagination(policy_scope(apply_scopes(current_account.tokens)).preload(bearer: [:role]))
       authorize @tokens
@@ -20,17 +19,13 @@ module Api::V1
       render jsonapi: @tokens
     end
 
-    # GET /tokens/1
     def show
       authorize @token
 
       render jsonapi: @token
     end
 
-    # POST /tokens
     def generate
-      skip_authorization
-
       authenticate_with_http_basic do |email, password|
         user = current_account.users.find_by email: "#{email}".downcase
 
@@ -96,7 +91,6 @@ module Api::V1
       render_bad_request
     end
 
-    # PUT /tokens
     def regenerate_current
       authorize current_token, :regenerate?
 
@@ -111,7 +105,6 @@ module Api::V1
       render jsonapi: current_token
     end
 
-    # PUT /tokens/1
     def regenerate
       authorize token
 
@@ -126,7 +119,6 @@ module Api::V1
       render jsonapi: token
     end
 
-    # DELETE /tokens/1
     def revoke
       authorize token
 

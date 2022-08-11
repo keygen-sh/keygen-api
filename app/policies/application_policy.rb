@@ -1,163 +1,78 @@
 # frozen_string_literal: true
 
 class ApplicationPolicy
-  attr_accessor :resource
-  attr_reader   :context
+  include ActionPolicy::Policy::Core
+  include ActionPolicy::Policy::Authorization
+  include ActionPolicy::Policy::PreCheck
+  include ActionPolicy::Policy::Scoping
+  include ActionPolicy::Policy::Cache
+  include ActionPolicy::Policy::Reasons
+  prepend ActionPolicy::Policy::Rails::Instrumentation
 
-  def initialize(context, resource)
-    raise Pundit::NotAuthorizedError, 'authorization context is missing' unless
-      context.is_a?(AuthorizationContext)
+  pre_check :verify_account_scoped!
+  pre_check :verify_authenticated!
 
-    # Ensure we're always dealing with an authz resource.
-    resource = AuthorizationResource.new(subject: resource) unless
-      resource.is_a?(AuthorizationResource)
+  authorize :account
+  authorize :bearer, allow_nil: true
+  authorize :token,  allow_nil: true
 
-    @context  = context
-    @resource = resource
+  scope_matcher :active_record_relation, ActiveRecord::Relation
+  scope_for :active_record_relation do |relation|
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      relation
+    in role: { name: 'product' | 'user' | 'license' } if relation.respond_to?(:for_bearer)
+      relation.for_bearer(bearer.class.name, bearer.id)
+    in role: { name: 'product' } if relation.respond_to?(:for_product)
+      relation.for_product(bearer.id)
+    in role: { name: 'user' } if relation.respond_to?(:for_user)
+      relation.for_user(bearer.id)
+    in role: { name: 'license' } if relation.respond_to?(:for_license)
+      relation.for_license(bearer.id)
+    else
+      relation.none
+    end
   end
 
-  def index?
-    assert_account_scoped!
+  private
 
-    false
-  end
+  def verify_account_scoped!
+    deny! 'bearer account does not match current account' if
+      bearer.present? && bearer.account_id != account.id
 
-  def show?
-    assert_account_scoped!
-
-    false
-  end
-
-  def create?
-    assert_account_scoped!
-
-    false
-  end
-
-  def new?
-    create?
-  end
-
-  def update?
-    assert_account_scoped!
-
-    false
-  end
-
-  def edit?
-    update?
-  end
-
-  def destroy?
-    assert_account_scoped!
-
-    false
-  end
-
-  def search?
-    assert_account_scoped!
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
-  end
-
-  protected
-
-  def scope      = Pundit.policy_scope!(context.bearer, resource.subject.class)
-  def account    = context.account
-  def account_id = account&.id
-  def bearer     = context.bearer
-  def bearer_id  = bearer&.id
-  def token      = context.token
-  def token_id   = token&.id
-
-  def assert_account_scoped!
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer account is mismatched' unless
-      bearer.nil? || bearer.account_id == account.id
-
-    case resource.subject
-    in [{ account_id: _ }, *] => s
-      raise Pundit::NotAuthorizedError, policy: self, message: 'resource subject account is mismatched' unless
-        s.all? { _1.account_id == account.id }
-    in account_id:
-      raise Pundit::NotAuthorizedError, policy: self, message: 'resource subject account is mismatched' unless
-        account_id == account.id
+    case record
+    in [{ account_id: _ }, *] => r if r.any? { _1.account_id != account.id }
+      deny! "a record's account does not match current account"
+    in { account_id: } if account_id != account.id
+      deny! 'record account does not match current account'
     else
     end
   end
 
-  def assert_authenticated!
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is missing' if
-      bearer.nil?
+  def verify_authenticated!
+    deny! 'bearer is missing' if bearer.nil?
   end
 
-  def assert_permissions!(*actions)
+  def verify_permissions!(*actions)
     return if
       bearer.nil?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is banned' if
+    deny! 'bearer is banned' if
       (bearer.user? || bearer.license?) && bearer.banned?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is suspended' if
+    deny! 'bearer is suspended' if
       bearer.license? && bearer.suspended?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer lacks permission to perform action' unless
+    deny! 'bearer lacks permission to perform action' unless
       bearer.can?(actions)
 
     return if
       token.nil?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: 'token is expired' if
+    deny! 'token is expired' if
       token.expired?
 
-    raise Pundit::NotAuthorizedError, policy: self, message: 'token lacks permission to perform action' unless
+    deny! 'token lacks permission to perform action' unless
       token.can?(actions)
-  end
-
-  private
-
-  class Scope
-    attr_reader :context, :scope
-
-    def initialize(context, scope)
-      @context = context
-      @scope   = scope
-    end
-
-    def resolve
-      return scope.none if bearer.nil?
-
-      case
-      when bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
-        scope
-      when scope.respond_to?(:for_bearer) && bearer.has_role?(:product, :user, :license)
-        scope.for_bearer(bearer.class.name, bearer.id)
-      when scope.respond_to?(:for_product) && bearer.has_role?(:product)
-        scope.for_product(bearer.id)
-      when scope.respond_to?(:for_user) && bearer.has_role?(:user)
-        scope.for_user(bearer.id)
-      when scope.respond_to?(:for_license) && bearer.has_role?(:license)
-        scope.for_license(bearer.id)
-      else
-        scope.none
-      end
-    rescue NoMethodError => e
-      Keygen.logger.exception(e)
-
-      scope.none
-    end
-
-    private
-
-    def account
-      context.account
-    end
-
-    def bearer
-      context.bearer
-    end
-
-    def token
-      context.token
-    end
   end
 end
