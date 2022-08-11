@@ -48,12 +48,11 @@ module AuthorizationHelper
         let(:licenses) { create_list(:license, 2, account:, user: bearer) }
       end
     end
-    alias :with_license :with_licenses
 
     def accessing_itself(scenarios)
       case scenarios
       in [:as_admin | :as_product | :as_license | :as_user, *]
-        let(:resource) { bearer }
+        let(:resource) { authorization_resource(subject: bearer) }
       end
     end
 
@@ -72,9 +71,8 @@ module AuthorizationHelper
         let(:product) { create(:product, account:) }
       end
 
-      let(:resource) { product }
+      let(:resource) { authorization_resource(subject: product) }
     end
-    alias :accessing_another_product :accessing_a_product
 
     def accessing_its_product(scenarios)
       case scenarios
@@ -84,9 +82,8 @@ module AuthorizationHelper
         let(:product) { licenses.first.product }
       end
 
-      let(:resource) { product }
+      let(:resource) { authorization_resource(subject: product) }
     end
-    alias :accessing_their_product :accessing_its_product
 
     def accessing_products(scenarios)
       case scenarios
@@ -96,9 +93,8 @@ module AuthorizationHelper
         let(:products) { [create(:product, account:)] }
       end
 
-      let(:resource) { products }
+      let(:resource) { authorization_resource(subject: products) }
     end
-    alias :accessing_other_products :accessing_products
 
     def accessing_its_products(scenarios)
       case scenarios
@@ -108,25 +104,65 @@ module AuthorizationHelper
         let(:products) { licenses.collect(&:product) }
       end
 
-      let(:resource) { products }
+      let(:resource) { authorization_resource(subject: products) }
     end
-    alias :accessing_their_products :accessing_its_products
 
     def accessing_its_tokens(scenarios)
       case scenarios
-      in [*, :accessing_a_product | :accessing_their_product | :accessing_its_product | :accessing_another_product, *]
-        let(:resource) { create_list(:token, 3, account: product.account, bearer: product) }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:tokens)   { create_list(:token, 3, account: product.account, bearer: product) }
+        let(:resource) { authorization_resource(subject: tokens, context: [product]) }
       in [*, :accessing_itself, *]
-        let(:resource) { create_list(:token, 3, account: bearer.account, bearer:) }
+        let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
+        let(:resource) { authorization_resource(subject: tokens, context: [bearer]) }
       end
     end
 
     def accessing_its_token(scenarios)
       case scenarios
-      in [*, :accessing_a_product | :accessing_their_product | :accessing_its_product | :accessing_another_product, *]
-        let(:resource) { create(:token, account: product.account, bearer: product) }
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:_token)   { create(:token, account: product.account, bearer: product) }
+        let(:resource) { authorization_resource(subject: _token, context: [product]) }
       in [*, :accessing_itself, *]
-        let(:resource) { create(:token, account: bearer.account, bearer:) }
+        let(:_token)   { create(:token, account: bearer.account, bearer:) }
+        let(:resource) { authorization_resource(subject: _token, context: [bearer]) }
+      end
+    end
+
+    def accessing_a_license(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:license) { create(:license, account: other_account) }
+      else
+        let(:license) { create(:license, account:) }
+      end
+
+      let(:resource) { authorization_resource(subject: license) }
+    end
+
+    def accessing_its_license(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policy)  { create(:policy, account:, product: bearer)}
+        let(:license) { create(:license, account:, policy:) }
+      in [:as_user, :with_licenses, *]
+        let(:license) { licenses.first }
+      end
+
+      let(:resource) { authorization_resource(subject: license) }
+    end
+
+    def accessing_its_group(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, :accessing_a_license, *]
+        let(:group)    { create(:group, account: other_account, licenses: [license]) }
+        let(:resource) { authorization_resource(subject: group, context: [license]) }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:group)    { create(:group, account:, licenses: [license]) }
+        let(:resource) { authorization_resource(subject: group, context: [license]) }
+      in [:as_license, :accessing_itself, *]
+        let(:group)    { create(:group, account:, licenses: [bearer]) }
+        let(:resource) { authorization_resource(subject: group, context: [bearer]) }
       end
     end
   end
@@ -330,5 +366,11 @@ module AuthorizationHelper
   # authorization_context creates a new authorization context.
   def authorization_context(account:, bearer: nil, token: nil)
     AuthorizationContext.new(account:, bearer:, token:)
+  end
+
+  ##
+  # authorization_context creates a new authorization resource.
+  def authorization_resource(subject:, context: nil)
+    AuthorizationResource.new(subject:, context:)
   end
 end

@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 class ProductPolicy < ApplicationPolicy
-  def products    = resource.subject
-  def product     = resource.subject
-  def product_ids = products.collect(:id)
-
   def index?
     assert_account_scoped!
     assert_authenticated!
     assert_permissions! %w[
       product.read
     ]
+
+    resource.subject => [Product, *] | [] => products
+    product_ids = products.collect(&:id)
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.license? && products == [bearer.product]) ||
@@ -25,6 +24,8 @@ class ProductPolicy < ApplicationPolicy
       product.read
     ]
 
+    resource.subject => Product => product
+
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       (bearer.product? && product == bearer) ||
       (bearer.license? && product == bearer.product) ||
@@ -38,6 +39,8 @@ class ProductPolicy < ApplicationPolicy
       product.create
     ]
 
+    resource.subject => Product => product
+
     bearer.has_role?(:admin, :developer)
   end
 
@@ -47,6 +50,8 @@ class ProductPolicy < ApplicationPolicy
     assert_permissions! %w[
       product.update
     ]
+
+    resource.subject => Product => product
 
     bearer.has_role?(:admin, :developer) ||
       product == bearer
@@ -59,6 +64,8 @@ class ProductPolicy < ApplicationPolicy
       product.delete
     ]
 
+    resource.subject => Product => product
+
     bearer.has_role?(:admin, :developer)
   end
 
@@ -69,41 +76,8 @@ class ProductPolicy < ApplicationPolicy
       product.read
     ]
 
+    resource.subject => Product => product
+
     product == bearer
-  end
-
-  class TokenPolicy < ApplicationPolicy
-    def index?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        product.tokens.read
-      ]
-
-      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-        (bearer.has_role?(:product) &&
-          product.all? { |r| r.bearer_type == Product.name && r.bearer_id == bearer.id })
-    end
-
-    def show?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        product.tokens.read
-      ]
-
-      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-        product.bearer == bearer
-    end
-
-    def create?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        product.tokens.generate
-      ]
-
-      bearer.has_role?(:admin, :developer)
-    end
   end
 end

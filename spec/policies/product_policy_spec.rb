@@ -153,7 +153,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_product accessing_another_product] do
+    with_scenarios %i[as_product accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
           forbids :show
@@ -241,7 +241,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_license accessing_other_products] do
+    with_scenarios %i[as_license accessing_products] do
       with_license_authentication do
         with_permissions %w[product.read] do
           forbids :index
@@ -263,7 +263,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_license accessing_another_product] do
+    with_scenarios %i[as_license accessing_a_product] do
       with_license_authentication do
         with_permissions %w[product.read] do
           forbids :show
@@ -303,7 +303,7 @@ describe ProductPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[as_user with_licenses accessing_their_products] do
+    with_scenarios %i[as_user with_licenses accessing_its_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
           permits :index
@@ -315,7 +315,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_their_product] do
+    with_scenarios %i[as_user with_licenses accessing_its_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
           permits :show
@@ -336,7 +336,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_other_products] do
+    with_scenarios %i[as_user with_licenses accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
           forbids :index
@@ -348,7 +348,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_another_product] do
+    with_scenarios %i[as_user with_licenses accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
           forbids :show
