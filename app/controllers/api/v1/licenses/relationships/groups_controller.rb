@@ -7,16 +7,24 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
+    authorize :license
+
     def show
       group = license.group
-      authorize! license, group
+
+      raise Keygen::Error::NotFoundError.new(model: Group.name) if
+        group.nil?
+
+      authorize! group,
+        with: License::GroupPolicy
 
       render jsonapi: group
     end
 
     def update
       group = current_account.groups.find_by(id: group_params[:id])
-      authorize! license, group, policy: License::GroupPolicy
+      authorize! group,
+        with: License::GroupPolicy
 
       # Use group ID again so that model validations are run for invalid groups
       license.update!(group_id: group_params[:id])
@@ -27,7 +35,7 @@ module Api::V1::Licenses::Relationships
         resource: license,
       )
 
-      # FIXME(ezekg) This should be the group
+      # FIXME(ezekg) This should be the group linkage
       render jsonapi: license
     end
 
@@ -36,7 +44,7 @@ module Api::V1::Licenses::Relationships
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 

@@ -30,7 +30,7 @@ module Api::V1::Releases::Actions::V1x0
       render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
     rescue ::V1x0::ReleaseUpgradeService::InvalidChannelError => e
       render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
-    rescue Pundit::NotAuthorizedError
+    rescue ActionPolicy::Unauthorized
       render status: :no_content
     end
 
@@ -54,7 +54,7 @@ module Api::V1::Releases::Actions::V1x0
            ::V1x0::ReleaseUpgradeService::InvalidFiletypeError,
            ::V1x0::ReleaseUpgradeService::InvalidVersionError => e
       render_unprocessable_entity detail: e.message
-    rescue Pundit::NotAuthorizedError
+    rescue ActionPolicy::Unauthorized
       render status: :no_content
     end
 
@@ -111,7 +111,7 @@ module Api::V1::Releases::Actions::V1x0
         else
           # When current and next release are nil, we can skip authorization,
           # since there's nothing to assert authorization for.
-          skip_authorization
+          skip_verify_authorized!
         end
 
         render status: :no_content
