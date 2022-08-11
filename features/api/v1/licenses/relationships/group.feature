@@ -95,6 +95,15 @@ Feature: License group relationship
     When I send a GET request to "/accounts/test1/licenses/$0/group"
     Then the response status should be "404"
 
+  Scenario: User attempts to retrieve the group for a license they own (no group)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/licenses/$0/group"
+    Then the response status should be "404"
+
   Scenario: User attempts to retrieve the group for a license they own (not in group)
     Given the current account is "test1"
     And the current account has 1 "license"
@@ -110,7 +119,7 @@ Feature: License group relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "200"
 
   Scenario: User attempts to retrieve the group for a license they own (in group)
     Given the current account is "test1"

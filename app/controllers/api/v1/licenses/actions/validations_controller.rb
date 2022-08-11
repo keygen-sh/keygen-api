@@ -76,7 +76,7 @@ module Api::V1::Licenses::Actions
       if license.present?
         authorize! license
       else
-        skip_authorization
+        skip_verify_authorized!
       end
 
       valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])

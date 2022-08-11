@@ -30,7 +30,7 @@ gem 'nokogiri', '~> 1.13.6'
 gem 'stripe', '~> 5.43'
 
 # Authorization
-gem 'pundit'
+gem 'action_policy'
 
 # Cryptography
 gem 'openssl', '~> 3.0.0'

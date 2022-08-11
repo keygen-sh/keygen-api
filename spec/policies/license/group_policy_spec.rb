@@ -4,41 +4,41 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe License::GroupPolicy, type: :policy do
-  subject { described_class.new(context, resource) }
+  subject { described_class.new(record, account:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
     with_scenarios %i[as_admin accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          permits :show
+          allows :show
         end
 
         with_permissions %w[license.group.update] do
-          without_token_permissions { forbids :update }
+          without_token_permissions { denies :update }
 
-          permits :update
+          allows :update
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            forbids :show, :update
+            denies :show, :update
           end
 
-          permits :show, :update
+          allows :show, :update
         end
 
         with_default_permissions do
           without_token_permissions do
-            forbids :show, :update
+            denies :show, :update
           end
 
-          permits :show, :update
+          allows :show, :update
         end
 
         without_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
       end
     end
@@ -46,23 +46,23 @@ describe License::GroupPolicy, type: :policy do
     with_scenarios %i[as_admin accessing_another_account accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          forbids :show
+          denies :show
         end
 
         with_permissions %w[license.group.update] do
-          forbids :update
+          denies :update
         end
 
         with_wildcard_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
 
         with_default_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
 
         without_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
       end
     end
@@ -72,27 +72,27 @@ describe License::GroupPolicy, type: :policy do
     with_scenarios %i[as_product accessing_its_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          permits :show
+          allows :show
         end
 
         with_permissions %w[license.group.update] do
-          without_token_permissions { forbids :update }
+          without_token_permissions { denies :update }
 
-          permits :update
+          allows :update
         end
 
         with_wildcard_permissions do
-          permits :show, :update
+          allows :show, :update
         end
 
         with_default_permissions do
-          permits :show, :update
+          allows :show, :update
         end
 
         without_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
       end
     end
@@ -100,27 +100,27 @@ describe License::GroupPolicy, type: :policy do
     with_scenarios %i[as_product accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          forbids :show
+          denies :show
         end
 
         with_permissions %w[license.group.update] do
-          without_token_permissions { forbids :update }
+          without_token_permissions { denies :update }
 
-          forbids :update
+          denies :update
         end
 
         with_wildcard_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
 
         with_default_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
 
         without_permissions do
-          forbids :show, :update
+          denies :show, :update
         end
       end
     end
@@ -130,45 +130,45 @@ describe License::GroupPolicy, type: :policy do
     with_scenarios %i[as_license accessing_itself accessing_its_group] do
       with_license_authentication do
         with_permissions %w[license.group.read] do
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         with_default_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         without_permissions do
-          forbids :update
-          forbids :show
+          denies :update
+          denies :show
         end
       end
 
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         with_default_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         without_permissions do
-          forbids :update
-          forbids :show
+          denies :update
+          denies :show
         end
       end
     end
@@ -178,24 +178,24 @@ describe License::GroupPolicy, type: :policy do
     with_scenarios %i[as_user with_licenses accessing_its_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         with_default_permissions do
-          forbids :update
-          permits :show
+          denies :update
+          allows :show
         end
 
         without_permissions do
-          forbids :update
-          forbids :show
+          denies :update
+          denies :show
         end
       end
     end
@@ -204,7 +204,7 @@ describe License::GroupPolicy, type: :policy do
   without_authorization do
     with_scenarios %i[as_anonymous accessing_a_license accessing_its_group] do
       without_authentication do
-        forbids :show, :update
+        denies :show, :update
       end
     end
   end

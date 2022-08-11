@@ -2,13 +2,12 @@
 
 module Api::V1
   class PasswordsController < Api::V1::BaseController
+    skip_verify_authorized
+
     before_action :scope_to_current_account!
     before_action :set_user, only: [:reset_password]
 
-    # POST /passwords
     def reset_password
-      skip_authorization
-
       return unless
         user.present?
 

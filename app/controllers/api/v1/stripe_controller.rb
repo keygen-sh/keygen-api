@@ -2,11 +2,9 @@
 
 module Api::V1
   class StripeController < Api::V1::BaseController
+    skip_verify_authorized
 
-    # POST /stripe
     def receive_webhook
-      skip_authorization
-
       # Let external service know that we received the webhook
       head :accepted
 

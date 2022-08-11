@@ -10,6 +10,7 @@ module AuthorizationHelper
       in []
         let(:account) { create(:account) }
         let(:bearer)  { create(:admin, account:, permissions: bearer_permissions) }
+        let(:admin)   { bearer }
       end
     end
 
@@ -18,6 +19,7 @@ module AuthorizationHelper
       in []
         let(:account) { create(:account) }
         let(:bearer)  { create(:product, account:, permissions: bearer_permissions) }
+        let(:product) { bearer }
       end
     end
 
@@ -26,6 +28,7 @@ module AuthorizationHelper
       in []
         let(:account) { create(:account) }
         let(:bearer)  { create(:license, account:, permissions: bearer_permissions) }
+        let(:license) { bearer }
       end
     end
 
@@ -34,6 +37,7 @@ module AuthorizationHelper
       in []
         let(:account) { create(:account) }
         let(:bearer)  { create(:user, account:, permissions: bearer_permissions) }
+        let(:user)    { bearer }
       end
     end
 
@@ -52,7 +56,7 @@ module AuthorizationHelper
     def accessing_itself(scenarios)
       case scenarios
       in [:as_admin | :as_product | :as_license | :as_user, *]
-        let(:resource) { authorization_resource(subject: bearer) }
+        let(:record) { bearer }
       end
     end
 
@@ -71,7 +75,7 @@ module AuthorizationHelper
         let(:product) { create(:product, account:) }
       end
 
-      let(:resource) { authorization_resource(subject: product) }
+      let(:record) { product }
     end
 
     def accessing_its_product(scenarios)
@@ -82,7 +86,7 @@ module AuthorizationHelper
         let(:product) { licenses.first.product }
       end
 
-      let(:resource) { authorization_resource(subject: product) }
+      let(:record) { product }
     end
 
     def accessing_products(scenarios)
@@ -93,7 +97,7 @@ module AuthorizationHelper
         let(:products) { [create(:product, account:)] }
       end
 
-      let(:resource) { authorization_resource(subject: products) }
+      let(:record) { products }
     end
 
     def accessing_its_products(scenarios)
@@ -104,29 +108,29 @@ module AuthorizationHelper
         let(:products) { licenses.collect(&:product) }
       end
 
-      let(:resource) { authorization_resource(subject: products) }
+      let(:record) { products }
     end
 
     def accessing_its_tokens(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:tokens)   { create_list(:token, 3, account: product.account, bearer: product) }
-        let(:resource) { authorization_resource(subject: tokens, context: [product]) }
       in [*, :accessing_itself, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
-        let(:resource) { authorization_resource(subject: tokens, context: [bearer]) }
       end
+
+      let(:record) { tokens }
     end
 
     def accessing_its_token(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:_token)   { create(:token, account: product.account, bearer: product) }
-        let(:resource) { authorization_resource(subject: _token, context: [product]) }
+        let(:_token) { create(:token, account: product.account, bearer: product) }
       in [*, :accessing_itself, *]
-        let(:_token)   { create(:token, account: bearer.account, bearer:) }
-        let(:resource) { authorization_resource(subject: _token, context: [bearer]) }
+        let(:_token) { create(:token, account: bearer.account, bearer:) }
       end
+
+      let(:record) { _token }
     end
 
     def accessing_a_license(scenarios)
@@ -137,7 +141,7 @@ module AuthorizationHelper
         let(:license) { create(:license, account:) }
       end
 
-      let(:resource) { authorization_resource(subject: license) }
+      let(:record) { license }
     end
 
     def accessing_its_license(scenarios)
@@ -149,21 +153,20 @@ module AuthorizationHelper
         let(:license) { licenses.first }
       end
 
-      let(:resource) { authorization_resource(subject: license) }
+      let(:record) { license }
     end
 
     def accessing_its_group(scenarios)
       case scenarios
       in [*, :accessing_another_account, :accessing_a_license, *]
-        let(:group)    { create(:group, account: other_account, licenses: [license]) }
-        let(:resource) { authorization_resource(subject: group, context: [license]) }
+        let(:group) { create(:group, account: other_account, licenses: [license]) }
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:group)    { create(:group, account:, licenses: [license]) }
-        let(:resource) { authorization_resource(subject: group, context: [license]) }
+        let(:group) { create(:group, account:, licenses: [license]) }
       in [:as_license, :accessing_itself, *]
-        let(:group)    { create(:group, account:, licenses: [bearer]) }
-        let(:resource) { authorization_resource(subject: group, context: [bearer]) }
+        let(:group) { create(:group, account:, licenses: [bearer]) }
       end
+
+      let(:record) { group }
     end
   end
 
@@ -175,7 +178,7 @@ module AuthorizationHelper
     # with_role_authorization starts an authorization test for a given role.
     def with_role_authorization(role, &)
       context "with #{role} authorization" do
-        let(:context)            { authorization_context(account:, bearer:, token:) }
+        let(:context)            {{ account:, bearer:, token: }}
         let(:bearer_permissions) { nil }
         let(:token_permissions)  { nil }
 
@@ -187,7 +190,7 @@ module AuthorizationHelper
     # without_authorization starts an authorization test for an anon.
     def without_authorization(&)
       context 'without authorization' do
-        let(:context) { authorization_context(account:, bearer:, token:) }
+        let(:context) {{ account:, bearer:, token: }}
 
         instance_exec(&)
       end
@@ -334,23 +337,23 @@ module AuthorizationHelper
     end
 
     ##
-    # permits asserts the current bearer and token are permitted to perform
+    # allows asserts the current bearer and token are permitted to perform
     # the given actions.
-    def permits(*actions)
+    def allows(*actions)
       actions.flatten.each do |action|
-        it "should permit #{action}" do
-          expect(subject).to permit(action)
+        it "should allow #{action}" do
+          expect(subject).to authorize(action)
         end
       end
     end
 
     ##
-    # forbids asserts the current bearer and token are not permitted to perform
+    # denies asserts the current bearer and token are not permitted to perform
     # the given actions.
-    def forbids(*actions)
+    def denies(*actions)
       actions.flatten.each do |action|
-        it "should forbid #{action}" do
-          expect(subject).to_not permit(action)
+        it "should deny #{action}" do
+          expect(subject).to_not authorize(action)
         end
       end
     end
@@ -360,17 +363,5 @@ module AuthorizationHelper
   # included mixes in ClassMethods on include.
   def self.included(klass)
     klass.extend ClassMethods
-  end
-
-  ##
-  # authorization_context creates a new authorization context.
-  def authorization_context(account:, bearer: nil, token: nil)
-    AuthorizationContext.new(account:, bearer:, token:)
-  end
-
-  ##
-  # authorization_context creates a new authorization resource.
-  def authorization_resource(subject:, context: nil)
-    AuthorizationResource.new(subject:, context:)
   end
 end

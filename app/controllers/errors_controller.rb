@@ -3,12 +3,12 @@
 class ErrorsController < ApplicationController
   STATUS_CODES = Rack::Utils::HTTP_STATUS_CODES.transform_values { |v| v.encode('utf-8') }
 
+  skip_verify_authorized
+
   before_action :validate_accept_and_add_content_type_headers!
   before_action :set_status_code
 
   def show
-    skip_authorization
-
     self.send "render_#{status_code}"
   end
 
