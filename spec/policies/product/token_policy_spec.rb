@@ -129,7 +129,7 @@ describe Product::TokenPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_product accessing_another_product accessing_its_tokens] do
+    with_scenarios %i[as_product accessing_a_product accessing_its_tokens] do
       with_token_authentication do
         with_permissions %w[product.tokens.read] do
           forbids :index
@@ -141,7 +141,7 @@ describe Product::TokenPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_product accessing_another_product accessing_its_token] do
+    with_scenarios %i[as_product accessing_a_product accessing_its_token] do
       with_token_authentication do
         with_permissions %w[product.tokens.read] do
           forbids :show
@@ -193,7 +193,7 @@ describe Product::TokenPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[as_user with_licenses accessing_their_product accessing_its_tokens] do
+    with_scenarios %i[as_user with_licenses accessing_its_product accessing_its_tokens] do
       with_token_authentication do
         with_wildcard_permissions { forbids :index }
         with_default_permissions  { forbids :index }
@@ -201,7 +201,7 @@ describe Product::TokenPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_their_product accessing_its_token] do
+    with_scenarios %i[as_user with_licenses accessing_its_product accessing_its_token] do
       with_token_authentication do
         with_wildcard_permissions { forbids :show, :create }
         with_default_permissions  { forbids :show, :create }

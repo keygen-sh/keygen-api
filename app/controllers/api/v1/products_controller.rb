@@ -7,75 +7,72 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_product, only: [:show, :update, :destroy]
 
-    # GET /products
     def index
-      @products = apply_pagination(policy_scope(apply_scopes(current_account.products)).preload(:role))
-      authorize @products
+      products = apply_pagination(policy_scope(apply_scopes(current_account.products)).preload(:role))
+      authorize! products
 
-      render jsonapi: @products
+      render jsonapi: products
     end
 
-    # GET /products/1
     def show
-      authorize @product
+      authorize product
 
-      render jsonapi: @product
+      render jsonapi: product
     end
 
-    # POST /products
     def create
-      @product = current_account.products.new product_params
-      authorize @product
+      product = current_account.products.new product_params
+      authorize! product
 
-      if @product.save
+      if product.save
         BroadcastEventService.call(
           event: "product.created",
           account: current_account,
-          resource: @product
+          resource: product
         )
 
-        render jsonapi: @product, status: :created, location: v1_account_product_url(@product.account, @product)
+        render jsonapi: product, status: :created, location: v1_account_product_url(product.account, product)
       else
-        render_unprocessable_resource @product
+        render_unprocessable_resource product
       end
     end
 
-    # PATCH/PUT /products/1
     def update
-      authorize @product
+      authorize! product
 
-      if @product.update(product_params)
+      if product.update(product_params)
         BroadcastEventService.call(
           event: "product.updated",
           account: current_account,
-          resource: @product
+          resource: product
         )
 
-        render jsonapi: @product
+        render jsonapi: product
       else
-        render_unprocessable_resource @product
+        render_unprocessable_resource product
       end
     end
 
-    # DELETE /products/1
     def destroy
-      authorize @product
+      authorize! product
 
       BroadcastEventService.call(
         event: "product.deleted",
         account: current_account,
-        resource: @product
+        resource: product
       )
 
-      @product.destroy_async
+      product.destroy_async
     end
 
     private
 
+    attr_reader :product
+
     def set_product
       @product = current_account.products.find params[:id]
 
-      Current.resource = @product
+      Current.resource = product
     end
 
     typed_parameters format: :jsonapi do

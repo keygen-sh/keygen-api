@@ -8,7 +8,7 @@ module Api::V1::Products::Relationships
     before_action :set_product
 
     def create
-      authorize [product, Token]
+      authorize! product, Token.new
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :permissions,
@@ -32,14 +32,14 @@ module Api::V1::Products::Relationships
 
     def index
       tokens = apply_pagination(policy_scope(apply_scopes(product.tokens)))
-      authorize [product, tokens]
+      authorize! product, tokens
 
       render jsonapi: tokens
     end
 
     def show
       token = product.tokens.find params[:id]
-      authorize [product, token]
+      authorize! product, token
 
       render jsonapi: token
     end

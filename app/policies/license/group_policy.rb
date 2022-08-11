@@ -14,9 +14,9 @@ class License::GroupPolicy < ApplicationPolicy
     bearer.has_role?(:admin, :developer, :sales_agent) ||
       license.product == bearer ||
       (bearer.user? &&
-        license.user == bearer && (group.nil? || (group.id == bearer.group_id || group.id.in?(bearer.group_ids)))) ||
+        (license.user == bearer || (group.id == bearer.group_id || group.id.in?(bearer.group_ids)))) ||
       (bearer.license? &&
-        license == bearer && (group.nil? || group.id == bearer.group_id))
+        license == bearer)
   end
 
   def update?
