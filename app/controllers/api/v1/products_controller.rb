@@ -8,14 +8,14 @@ module Api::V1
     before_action :set_product, only: [:show, :update, :destroy]
 
     def index
-      products = apply_pagination(policy_scope(apply_scopes(current_account.products)).preload(:role))
+      products = apply_pagination(authorized_scope(apply_scopes(current_account.products)).preload(:role))
       authorize! products
 
       render jsonapi: products
     end
 
     def show
-      authorize product
+      authorize! product
 
       render jsonapi: product
     end

@@ -7,7 +7,7 @@ class Licenses::GroupPolicy < ApplicationPolicy
     verify_permissions!('license.group.read')
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
     in role: { name: 'product' } if license.product == bearer
       allow!

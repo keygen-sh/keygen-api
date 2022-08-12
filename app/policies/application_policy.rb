@@ -34,6 +34,19 @@ class ApplicationPolicy
     end
   end
 
+  protected
+
+  def record_ids
+    case
+    when record.respond_to?(:ids)
+      record.ids
+    when record.respond_to?(:collect)
+      record.collect(&:id)
+    else
+      []
+    end
+  end
+
   private
 
   def verify_account_scoped!
