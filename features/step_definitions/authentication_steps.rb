@@ -4,16 +4,18 @@ TOKEN_VERSIONS = %W[v1 v2 v3 #{Tokenable::ALGO_VERSION}].uniq
 
 World Rack::Test::Methods
 
-Given /^I am(?: an?)? (admin|developer|read only|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |role, id|
+Given /^I am(?: (?:an?|(the (\w+))))? (admin|developer|read only|sales agent|support agent|user|product|license) (?:of|for) account "([^\"]*)"$/ do |named_idx, role, id|
+  named_idx ||= :first
+
   account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
   @bearer =
     case role
     when "admin", "user", "read only", "developer", "sales agent", "support agent"
-      account.users.with_roles(role.parameterize.underscore).first
+      account.users.with_roles(role.parameterize.underscore).send(named_idx)
     when "product"
-      account.products.first
+      account.products.send(named_idx)
     when "license"
-      account.licenses.first
+      account.licenses.send(named_idx)
     else
       raise 'invalid role'
     end
