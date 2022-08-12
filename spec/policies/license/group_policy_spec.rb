@@ -7,7 +7,7 @@ describe License::GroupPolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[as_admin accessing_a_license accessing_its_group] do
+    with_scenarios %i[accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
           without_token_permissions { denies :show }
@@ -43,7 +43,7 @@ describe License::GroupPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_admin accessing_another_account accessing_a_license accessing_its_group] do
+    with_scenarios %i[accessing_another_account accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
           denies :show
@@ -69,7 +69,7 @@ describe License::GroupPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[as_product accessing_its_license accessing_its_group] do
+    with_scenarios %i[accessing_its_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
           without_token_permissions { denies :show }
@@ -97,7 +97,7 @@ describe License::GroupPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[as_product accessing_a_license accessing_its_group] do
+    with_scenarios %i[accessing_a_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
           without_token_permissions { denies :show }
@@ -127,7 +127,7 @@ describe License::GroupPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[as_license accessing_itself accessing_its_group] do
+    with_scenarios %i[accessing_itself accessing_its_group] do
       with_license_authentication do
         with_permissions %w[license.group.read] do
           allows :show
@@ -175,7 +175,7 @@ describe License::GroupPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[as_user with_licenses accessing_its_license accessing_its_group] do
+    with_scenarios %i[with_licenses accessing_its_license accessing_its_group] do
       with_token_authentication do
         with_permissions %w[license.group.read] do
           without_token_permissions { denies :show }
@@ -202,7 +202,7 @@ describe License::GroupPolicy, type: :policy do
   end
 
   without_authorization do
-    with_scenarios %i[as_anonymous accessing_a_license accessing_its_group] do
+    with_scenarios %i[accessing_a_license accessing_its_group] do
       without_authentication do
         denies :show, :update
       end
