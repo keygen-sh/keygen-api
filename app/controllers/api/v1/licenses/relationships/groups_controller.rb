@@ -16,7 +16,7 @@ module Api::V1::Licenses::Relationships
         group.nil?
 
       authorize! group,
-        with: License::GroupPolicy
+        with: Licenses::GroupPolicy
 
       render jsonapi: group
     end
@@ -24,7 +24,7 @@ module Api::V1::Licenses::Relationships
     def update
       group = current_account.groups.find_by(id: group_params[:id])
       authorize! group,
-        with: License::GroupPolicy
+        with: Licenses::GroupPolicy
 
       # Use group ID again so that model validations are run for invalid groups
       license.update!(group_id: group_params[:id])

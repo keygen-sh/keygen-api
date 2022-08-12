@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe License::GroupPolicy, type: :policy do
+describe Licenses::GroupPolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:, license:) }
 
   with_role_authorization :admin do
