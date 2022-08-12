@@ -4,413 +4,413 @@ require 'rails_helper'
 require 'spec_helper'
 
 describe ProductPolicy, type: :policy do
-  subject { described_class.new(context, resource) }
+  subject { described_class.new(record, account:, bearer:, token:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[as_admin accessing_products] do
+    with_scenarios %i[accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          without_token_permissions { forbids :index }
+          without_token_permissions { denies :index }
 
-          permits :index
+          allows :index
         end
 
-        with_wildcard_permissions { permits :index }
-        with_default_permissions  { permits :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { allows :index }
+        with_default_permissions  { allows :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_admin accessing_a_product] do
+    with_scenarios %i[accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          without_token_permissions { forbids :show }
+          without_token_permissions { denies :show }
 
-          permits :show
+          allows :show
         end
 
         with_permissions %w[product.create] do
-          without_token_permissions { forbids :create }
+          without_token_permissions { denies :create }
 
-          permits :create
+          allows :create
         end
 
         with_permissions %w[product.update] do
-          without_token_permissions { forbids :update }
+          without_token_permissions { denies :update }
 
-          permits :update
+          allows :update
         end
 
         with_permissions %w[product.delete] do
-          without_token_permissions { forbids :destroy }
+          without_token_permissions { denies :destroy }
 
-          permits :destroy
+          allows :destroy
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            forbids :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy
           end
 
-          permits :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy
         end
 
         with_default_permissions do
           without_token_permissions do
-            forbids :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy
           end
 
-          permits :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
 
-    with_scenarios %i[as_admin accessing_another_account accessing_products] do
+    with_scenarios %i[accessing_another_account accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_admin accessing_another_account accessing_a_product] do
+    with_scenarios %i[accessing_another_account accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_permissions %w[product.create] do
-          forbids :create
+          denies :create
         end
 
         with_permissions %w[product.update] do
-          forbids :update
+          denies :update
         end
 
         with_permissions %w[product.delete] do
-          forbids :destroy
+          denies :destroy
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
   end
 
   with_role_authorization :product do
-    with_scenarios %i[as_product accessing_products] do
+    with_scenarios %i[accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_product accessing_itself] do
+    with_scenarios %i[accessing_itself] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          permits :show
+          allows :show
         end
 
         with_permissions %w[product.update] do
-          permits :update
+          allows :update
         end
 
         with_wildcard_permissions do
-          forbids :create, :destroy
-          permits :show, :update
+          denies :create, :destroy
+          allows :show, :update
         end
 
         with_default_permissions do
-          forbids :create, :destroy
-          permits :show, :update
+          denies :create, :destroy
+          allows :show, :update
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
 
-    with_scenarios %i[as_product accessing_a_product] do
+    with_scenarios %i[accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_permissions %w[product.update] do
-          forbids :update
+          denies :update
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
   end
 
   with_role_authorization :license do
-    with_scenarios %i[as_license accessing_its_products] do
+    with_scenarios %i[accessing_its_products] do
       with_license_authentication do
         with_permissions %w[product.read] do
-          permits :index
+          allows :index
         end
 
-        with_wildcard_permissions { permits :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { allows :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
 
       with_token_authentication do
         with_permissions %w[product.read] do
-          permits :index
+          allows :index
         end
 
-        with_wildcard_permissions { permits :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { allows :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_license accessing_its_product] do
+    with_scenarios %i[accessing_its_product] do
       with_license_authentication do
         with_permissions %w[product.read] do
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :create, :update, :destroy
-          permits :show
+          denies :create, :update, :destroy
+          allows :show
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
 
       with_token_authentication do
         with_permissions %w[product.read] do
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :create, :update, :destroy
-          permits :show
+          denies :create, :update, :destroy
+          allows :show
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
 
-    with_scenarios %i[as_license accessing_products] do
+    with_scenarios %i[accessing_products] do
       with_license_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
 
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_license accessing_a_product] do
+    with_scenarios %i[accessing_a_product] do
       with_license_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
 
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
   end
 
   with_role_authorization :user do
-    with_scenarios %i[as_user with_licenses accessing_its_products] do
+    with_scenarios %i[with_licenses accessing_its_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          permits :index
+          allows :index
         end
 
-        with_wildcard_permissions { permits :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { allows :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_its_product] do
+    with_scenarios %i[with_licenses accessing_its_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          permits :show
+          allows :show
         end
 
         with_wildcard_permissions do
-          forbids :create, :update, :destroy
-          permits :show
+          denies :create, :update, :destroy
+          allows :show
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_products] do
+    with_scenarios %i[with_licenses accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_user with_licenses accessing_a_product] do
+    with_scenarios %i[with_licenses accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
 
-    with_scenarios %i[as_user accessing_products] do
+    with_scenarios %i[accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :index
+          denies :index
         end
 
-        with_wildcard_permissions { forbids :index }
-        with_default_permissions  { forbids :index }
-        without_permissions       { forbids :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
       end
     end
 
-    with_scenarios %i[as_user accessing_a_product] do
+    with_scenarios %i[accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
-          forbids :show
+          denies :show
         end
 
         with_wildcard_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         with_default_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
 
         without_permissions do
-          forbids :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy
         end
       end
     end
   end
 
   without_authorization do
-    with_scenarios %i[as_anonymous accessing_products] do
+    with_scenarios %i[accessing_products] do
       without_authentication do
-        forbids :index
+        denies :index
       end
     end
 
-    with_scenarios %i[as_anonymous accessing_a_product] do
+    with_scenarios %i[accessing_a_product] do
       without_authentication do
-        forbids :show, :create, :update, :destroy
+        denies :show, :create, :update, :destroy
       end
     end
   end

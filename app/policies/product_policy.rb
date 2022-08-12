@@ -2,82 +2,80 @@
 
 class ProductPolicy < ApplicationPolicy
   def index?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.read
-    ]
+    verify_permissions!('product.read')
 
-    resource.subject => [Product, *] | [] => products
-    product_ids = products.collect(&:id)
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.license? && products == [bearer.product]) ||
-      (bearer.user? &&
-        product_ids & bearer.product_ids == product_ids)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'user' } if record_ids & bearer.product_ids == record_ids
+      allow!
+    in role: { name: 'license' } if record == [bearer.product]
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.read
-    ]
+    verify_permissions!('product.read')
 
-    resource.subject => Product => product
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.product? && product == bearer) ||
-      (bearer.license? && product == bearer.product) ||
-      (bearer.user? && bearer.products.exists?(product.id))
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record == bearer
+      allow!
+    in role: { name: 'user' } if bearer.products.exists?(record.id)
+      allow!
+    in role: { name: 'license' } if record == bearer.product
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.create
-    ]
+    verify_permissions!('product.create')
 
-    resource.subject => Product => product
-
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.update
-    ]
+    verify_permissions!('product.update')
 
-    resource.subject => Product => product
-
-    bearer.has_role?(:admin, :developer) ||
-      product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.delete
-    ]
+    verify_permissions!('product.delete')
 
-    resource.subject => Product => product
-
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def me?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      product.read
-    ]
+    verify_permissions!('product.read')
 
-    resource.subject => Product => product
-
-    product == bearer
+    case bearer
+    in role: { name: 'product' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 end

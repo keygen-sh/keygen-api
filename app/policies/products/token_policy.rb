@@ -7,9 +7,9 @@ class Products::TokenPolicy < ApplicationPolicy
     verify_permissions!('product.tokens.read')
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' } if product == bearer && record.all? { _1.bearer_type == Product.name && _1.bearer_id == bearer.id }
+    in role: { name: 'product' } if product == bearer && record.all? { _1 in bearer_type: Product.name, bearer_id: bearer.id }
       allow!
     else
       deny!
@@ -20,7 +20,7 @@ class Products::TokenPolicy < ApplicationPolicy
     verify_permissions!('product.tokens.read')
 
     case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
     in role: { name: 'product' } if product == bearer && record.bearer == bearer
       allow!
