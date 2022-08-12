@@ -7,8 +7,26 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
+    authorize :product
+
+    def index
+      tokens = apply_pagination(authorized_scope(apply_scopes(product.tokens)))
+      authorize! tokens,
+        with: Products::TokenPolicy
+
+      render jsonapi: tokens
+    end
+
+    def show
+      token = product.tokens.find(params[:id])
+      authorize! token,
+        with: Products::TokenPolicy
+
+      render jsonapi: token
+    end
+
     def create
-      authorize! product, Token.new
+      authorize! with: Products::TokenPolicy
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :permissions,
@@ -22,24 +40,10 @@ module Api::V1::Products::Relationships
       )
 
       BroadcastEventService.call(
-        event: "token.generated",
+        event: 'token.generated',
         account: current_account,
-        resource: token
+        resource: token,
       )
-
-      render jsonapi: token
-    end
-
-    def index
-      tokens = apply_pagination(policy_scope(apply_scopes(product.tokens)))
-      authorize! product, tokens
-
-      render jsonapi: tokens
-    end
-
-    def show
-      token = product.tokens.find params[:id]
-      authorize! product, token
 
       render jsonapi: token
     end
@@ -49,8 +53,9 @@ module Api::V1::Products::Relationships
     attr_reader :product
 
     def set_product
-      @product = current_account.products.find params[:product_id] || params[:id]
-      authorize product, :show?
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
 
       Current.resource = product
     end

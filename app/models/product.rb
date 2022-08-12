@@ -89,6 +89,10 @@ class Product < ApplicationRecord
     end
   }
 
+  scope :for_product, -> id {
+    where(id:)
+  }
+
   scope :for_license, -> id {
     joins(:licenses).where(licenses: { id: })
                     .distinct
