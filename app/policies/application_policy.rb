@@ -20,7 +20,7 @@ class ApplicationPolicy
   scope_for :active_record_relation do |relation|
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
-      relation
+      relation.all
     in role: { name: 'product' | 'user' | 'license' } if relation.respond_to?(:for_bearer)
       relation.for_bearer(bearer.class.name, bearer.id)
     in role: { name: 'product' } if relation.respond_to?(:for_product)

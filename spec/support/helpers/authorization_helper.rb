@@ -3,7 +3,7 @@
 module AuthorizationHelper
   ##
   # Scenarios contains predefined scenarios to keep spec files clean and
-  # easy to write, for security's sake.
+  # easy to write (for security's sake) using pattern matching.
   module Scenarios
     ##
     # scenarios_for keeps track of scenarios by Rspec contexts.
