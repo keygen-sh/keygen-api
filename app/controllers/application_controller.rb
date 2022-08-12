@@ -404,7 +404,7 @@ class ApplicationController < ActionController::API
 
     render_not_found
   rescue ActionPolicy::Unauthorized => e
-    Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message}" }
+    Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons.reasons}" }
 
     msg = if current_bearer.present?
             'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'

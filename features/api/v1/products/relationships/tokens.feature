@@ -217,16 +217,50 @@ Feature: Generate authentication token for product
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$1/tokens"
+    Then the response status should be "404"
+
+  Scenario: License attempst to generate token for their product
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$2/tokens"
     Then the response status should be "403"
 
-  Scenario: User attempts to generate a product token
+  Scenario: License attempst to generate token for a product
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/tokens"
+    Then the response status should be "404"
+
+  Scenario: User attempts to generate token for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" is associated to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/products/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: User attempts to generate token for a product
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/products/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to generate a product token for another account
     Given I am an admin of account "test1"
@@ -271,6 +305,41 @@ Feature: Generate authentication token for product
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$2/tokens"
+    Then the response status should be "404"
+
+  Scenario: License requests tokens for their product
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$2/tokens"
+    Then the response status should be "403"
+
+  Scenario: License requests tokens for a product
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 2 "licenses"
+    And the current account has 1 "token" for each "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/tokens"
+    Then the response status should be "404"
+
+  Scenario: User requests tokens for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 2 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 3 "licenses" for the last "policy"
+    And the last "license" is associated to the last "user"
+    And I am the last user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/tokens"
     Then the response status should be "403"
 
   Scenario: User requests tokens for a product
@@ -282,4 +351,4 @@ Feature: Generate authentication token for product
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
