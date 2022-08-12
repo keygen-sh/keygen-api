@@ -5,6 +5,10 @@ module AuthorizationHelper
   # Scenarios contains predefined scenarios to keep spec files clean and
   # easy to write, for security's sake.
   module Scenarios
+    ##
+    # scenarios_for keeps track of scenarios by Rspec contexts.
+    cattr_accessor :scenarios_for, default: {}
+
     def as_admin(scenarios)
       case scenarios
       in []
@@ -178,7 +182,8 @@ module AuthorizationHelper
     # with_role_authorization starts an authorization test for a given role.
     def with_role_authorization(role, &)
       context "with #{role} authorization" do
-        let(:context)            {{ account:, bearer:, token: }}
+        using_scenario :"as_#{role}"
+
         let(:bearer_permissions) { nil }
         let(:token_permissions)  { nil }
 
@@ -190,7 +195,7 @@ module AuthorizationHelper
     # without_authorization starts an authorization test for an anon.
     def without_authorization(&)
       context 'without authorization' do
-        let(:context) {{ account:, bearer:, token: }}
+        using_scenario :as_anonymous
 
         instance_exec(&)
       end
@@ -201,27 +206,35 @@ module AuthorizationHelper
     ##
     # using_scenarios applies a set of scenarios to the current context.
     def using_scenarios(scenarios)
-      scenarios.reduce [] do |accum, scenario|
+      Scenarios.scenarios_for[id] ||= []
+
+      scenarios.each do |scenario|
         method = Scenarios.instance_method(scenario)
                           .bind(self)
 
         if method.arity > 0
-          instance_exec(accum, &method)
+          # TODO(ezekg) Build a scenario resolver, where Rspec context [1:1] inherits scenarios
+          #             from [1]. But for now, this works fine.
+          #
+          # For example, this merges scenarios for ./spec/policies/license_policy_spec.rb[1:1:2]
+          # with scenarios for ./spec/policies/license_policy_spec.rb[1:1].
+          s = Scenarios.scenarios_for.map { |k, v| v if k[..-2].in?(id[..-2]) }
+                                     .flatten
+                                     .compact
+
+          instance_exec(s, &method)
         else
           instance_exec(&method)
         end
 
-        accum << scenario
+        Scenarios.scenarios_for[id] << scenario
       end
     end
 
     ##
     # using_scenario applies a scenario to the current context.
     def using_scenario(scenario)
-      method = Scenarios.instance_method(scenario)
-                        .bind(self)
-
-      instance_exec(&method)
+      using_scenarios [scenario]
     end
 
     ##
