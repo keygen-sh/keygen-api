@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class License::GroupPolicy < ApplicationPolicy
+class Licenses::GroupPolicy < ApplicationPolicy
   authorize :license
 
   def show?
