@@ -378,7 +378,7 @@ class Release < ApplicationRecord
                                   .where.not(id:)
 
                       scope = if semver_build_num.present?
-                                # Build num no greater build num (e.g. +build.1 to +build.2)
+                                # Build num to greater build num (e.g. +build.1 to +build.2)
                                 base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:, semver_build_num:)
                                   semver_major      = :semver_major      AND
                                   semver_minor      = :semver_minor      AND
@@ -389,7 +389,7 @@ class Release < ApplicationRecord
                                   semver_build_num  > :semver_build_num
                                 SQL
                               else
-                                # No build num no build num (e.g. +build to +build.1653508117)
+                                # No build num to build num (e.g. +build to +build.1653508117)
                                 base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:)
                                   semver_major      = :semver_major      AND
                                   semver_minor      = :semver_minor      AND
@@ -414,7 +414,7 @@ class Release < ApplicationRecord
                                   SQL
                                 )
                               else
-                                # No build tag no build tag (e.g. alpha to alpha+build.1653508117)
+                                # No build tag to build tag (e.g. alpha to alpha+build.1653508117)
                                 scope.or(
                                   base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:),
                                     semver_major      = :semver_major    AND
