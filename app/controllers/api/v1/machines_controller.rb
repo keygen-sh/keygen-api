@@ -19,27 +19,24 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_machine, only: [:show, :update, :destroy]
 
-    # GET /machines
     def index
-      @machines = apply_pagination(policy_scope(apply_scopes(current_account.machines)).preload(:product, :policy))
-      authorize @machines
+      machines = apply_pagination(authorized_scope(apply_scopes(current_account.machines)).preload(:product, :policy))
+      authorize! machines
 
-      render jsonapi: @machines
+      render jsonapi: machines
     end
 
-    # GET /machines/1
     def show
-      authorize @machine
+      authorize! machine
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
-    # POST /machines
     def create
-      @machine = current_account.machines.new machine_params
-      authorize @machine
+      machine = current_account.machines.new machine_params
+      authorize! machine
 
-      if @machine.valid? && current_token&.activation_token?
+      if machine.valid? && current_token&.activation_token?
         begin
           lock = if current_token.max_activations?
                    'FOR UPDATE NOWAIT'
@@ -65,39 +62,37 @@ module Api::V1
         end
       end
 
-      if @machine.save
+      if machine.save
         BroadcastEventService.call(
           event: "machine.created",
           account: current_account,
-          resource: @machine
+          resource: machine
         )
 
-        render jsonapi: @machine, status: :created, location: v1_account_machine_url(@machine.account, @machine)
+        render jsonapi: machine, status: :created, location: v1_account_machine_url(machine.account, machine)
       else
-        render_unprocessable_resource @machine
+        render_unprocessable_resource machine
       end
     end
 
-    # PATCH/PUT /machines/1
     def update
-      authorize @machine
+      authorize! machine
 
-      if @machine.update(machine_params)
+      if machine.update(machine_params)
         BroadcastEventService.call(
           event: "machine.updated",
           account: current_account,
-          resource: @machine
+          resource: machine
         )
 
-        render jsonapi: @machine
+        render jsonapi: machine
       else
-        render_unprocessable_resource @machine
+        render_unprocessable_resource machine
       end
     end
 
-    # DELETE /machines/1
     def destroy
-      authorize @machine
+      authorize! machine
 
       if current_token&.activation_token?
         begin
@@ -128,20 +123,22 @@ module Api::V1
       BroadcastEventService.call(
         event: "machine.deleted",
         account: current_account,
-        resource: @machine
+        resource: machine
       )
 
-      @machine.destroy
+      machine.destroy
     end
 
     private
 
+    attr_reader :machine
+
     def set_machine
-      scoped_machines = policy_scope(current_account.machines)
+      scoped_machines = authorized_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
-      Current.resource = @machine
+      Current.resource = machine
     end
 
     typed_parameters format: :jsonapi do
