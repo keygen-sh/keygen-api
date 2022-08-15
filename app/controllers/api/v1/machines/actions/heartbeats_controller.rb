@@ -7,22 +7,10 @@ module Api::V1::Machines::Actions
     before_action :authenticate_with_token!
     before_action :set_machine
 
-    def reset
-      authorize machine
-
-      machine.update!(last_heartbeat_at: nil)
-
-      BroadcastEventService.call(
-        event: 'machine.heartbeat.reset',
-        account: current_account,
-        resource: machine,
-      )
-
-      render jsonapi: machine
-    end
+    authorize :machine
 
     def ping
-      authorize machine
+      authorize! with: Machines::HeartbeatPolicy
 
       if machine.dead?
         return render_unprocessable_entity(detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/heartbeatStatus' }) unless
@@ -54,12 +42,26 @@ module Api::V1::Machines::Actions
       render jsonapi: machine
     end
 
+    def reset
+      authorize! with: Machines::HeartbeatPolicy
+
+      machine.update!(last_heartbeat_at: nil)
+
+      BroadcastEventService.call(
+        event: 'machine.heartbeat.reset',
+        account: current_account,
+        resource: machine,
+      )
+
+      render jsonapi: machine
+    end
+
     private
 
     attr_reader :machine
 
     def set_machine
-      scoped_machines = policy_scope(current_account.machines)
+      scoped_machines = authorized_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
