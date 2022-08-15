@@ -18,8 +18,18 @@ class Entitlement < ApplicationRecord
   validates :code, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }, uniqueness: { case_sensitive: false, scope: :account_id }
   validates :name, presence: true, allow_blank: false, length: { minimum: 1, maximum: 255 }
 
-  # Give products the ability to read all entitlements
-  scope :for_product, -> id { self }
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: { name: 'product' }
+      self.all
+    in role: { name: 'license' }
+      self.merge(accessor.entitlements)
+    in role: { name: 'user' }
+      self.merge(accessor.entitlements)
+    else
+      self.none
+    end
+  }
 
   scope :search_id, -> (term) {
     identifier = term.to_s

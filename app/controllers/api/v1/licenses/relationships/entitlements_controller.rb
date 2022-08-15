@@ -7,22 +7,26 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
+    authorize :license
+
     def index
-      entitlements = apply_pagination(apply_scopes(license.entitlements))
-      authorize! license, entitlements
+      entitlements = apply_pagination(authorized_scope(apply_scopes(license.entitlements)))
+      authorize! entitlements,
+        with: Licenses::EntitlementPolicy
 
       render jsonapi: entitlements
     end
 
     def show
       entitlement = license.entitlements.find(params[:id])
-      authorize! license, entitlement
+      authorize! entitlement,
+        with: Licenses::EntitlementPolicy
 
       render jsonapi: entitlement
     end
 
     def attach
-      authorize! license, Entitlement.new
+      authorize! with: Licenses::EntitlementPolicy
 
       entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
@@ -40,7 +44,7 @@ module Api::V1::Licenses::Relationships
     end
 
     def detach
-      authorize! license, Entitlement.new
+      authorize! with: Licenses::EntitlementPolicy
 
       entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
 
@@ -94,7 +98,7 @@ module Api::V1::Licenses::Relationships
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
