@@ -21,8 +21,8 @@ class ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
       relation.all
-    in role: { name: 'product' | 'user' | 'license' } if relation.respond_to?(:for_bearer)
-      relation.for_bearer(bearer.class.name, bearer.id)
+    in role: { name: 'product' | 'user' | 'license' } if relation.respond_to?(:accessible_by)
+      relation.accessible_by(bearer)
     in role: { name: 'product' } if relation.respond_to?(:for_product)
       relation.for_product(bearer.id)
     in role: { name: 'user' } if relation.respond_to?(:for_user)
