@@ -180,7 +180,7 @@ module AuthorizationHelper
         let(:license_entitlements) { entitlements.map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
       in [:as_license, :accessing_itself, *]
         let(:entitlements)         { create_list(:entitlement, 3, account:) }
-        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
       end
 
       let(:record) { license_entitlements.collect(&:entitlement) }
@@ -193,10 +193,32 @@ module AuthorizationHelper
         let(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
       in [:as_license, :accessing_itself, *]
         let(:entitlement)         { create(:entitlement, account:) }
-        let(:license_entitlement) { create(:license_entitlement, account:, license:, entitlement:) }
+        let(:license_entitlement) { create(:license_entitlement, account:, license: bearer, entitlement:) }
       end
 
       let(:record) { license_entitlement.entitlement }
+    end
+
+    def accessing_its_machines(scenarios)
+      case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:machines) { create_list(:machine, 3, account: license.account, license:) }
+      in [:as_license, :accessing_itself, *]
+        let(:machines) { create_list(:machine, 3, account:, license: bearer) }
+      end
+
+      let(:record) { machines }
+    end
+
+    def accessing_its_machine(scenarios)
+      case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:machine) { create(:machine, account: license.account, license:) }
+      in [:as_license, :accessing_itself, *]
+        let(:machine) { create(:machine, account:, license: bearer) }
+      end
+
+      let(:record) { machine }
     end
   end
 

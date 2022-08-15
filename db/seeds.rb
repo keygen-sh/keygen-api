@@ -52,6 +52,7 @@ permissions = %w[
   license.entitlements.read
   license.group.read
   license.group.update
+  license.machines.read
   license.policy.update
   license.read
   license.reinstate
