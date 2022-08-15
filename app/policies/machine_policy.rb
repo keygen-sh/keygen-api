@@ -9,10 +9,13 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: { name: 'product' } if record.all? { _1.product.id == bearer.id }
       allow!
-    in role: { name: 'user' }, group_ids: [*] if record.all? { (_1.group_id? && _1.group_id.in?(bearer.group_ids)) || _1.license.user_id == bearer.id }
-      allow!
     in role: { name: 'user' } if record.all? { _1.license.user_id == bearer.id }
       allow!
+    in role: { name: 'user' } if record.any?(&:group_id?) && bearer.group_ids.any?
+      record.all? {
+        _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
+        _1.license.user_id == bearer.id
+      }
     in role: { name: 'license' } if record.all? { _1.license_id == bearer.id }
       allow!
     else
@@ -28,10 +31,10 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: { name: 'product' } if record.product == bearer
       allow!
-    in role: { name: 'user' }, group_ids: [*] if record.group_id? && record.group_id.in?(bearer.group_ids)
-      allow!
     in role: { name: 'user' } if record.user == bearer
       allow!
+    in role: { name: 'user' } if record.group_id? && bearer.group_ids.any?
+      record.group_id.in?(bearer.group_ids)
     in role: { name: 'license' } if record.license == bearer
       allow!
     else
@@ -40,96 +43,132 @@ class MachinePolicy < ApplicationPolicy
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.create
-    ]
+    verify_permissions!('machine.create')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      ((machine.license.nil? || !machine.license.protected?) && machine.user == bearer) ||
-      machine.product == bearer ||
-      machine.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license&.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.update
-    ]
+    verify_permissions!('machine.update')
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!machine.license.protected? && machine.license == bearer) ||
-      (!machine.license.protected? && machine.user == bearer) ||
-      machine.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      !record.license.protected?
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.delete
-    ]
+    verify_permissions!('machine.delete')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!machine.license.protected? && machine.user == bearer) ||
-      machine.product == bearer ||
-      machine.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def checkout?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.check-out
-    ]
+    verify_permissions!('machine.check-out')
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!machine.license.protected? && machine.user == bearer) ||
-      machine.product == bearer ||
-      machine.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def ping?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.heartbeat.ping
-    ]
+    verify_permissions!('machine.heartbeat.ping')
 
-    bearer.has_role?(:admin, :developer) ||
-      (!machine.license.protected? && machine.user == bearer) ||
-      machine.product == bearer ||
-      machine.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
   alias_method :ping_heartbeat?, :ping?
 
   def reset?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.heartbeat.reset
-    ]
+    verify_permissions!('machine.heartbeat.reset')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      machine.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
   alias_method :reset_heartbeat?, :reset?
 
   def generate_offline_proof?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.proofs.generate
-    ]
+    verify_permissions!('machine.proofs.generate')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!machine.license.protected? && machine.user == bearer) ||
-      machine.product == bearer ||
-      machine.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def change_group?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.group.update
-    ]
+    verify_permissions!('machine.group.update')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      machine.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 end
