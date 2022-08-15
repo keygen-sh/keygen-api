@@ -110,23 +110,6 @@ class MachinePolicy < ApplicationPolicy
     end
   end
 
-  def generate_offline_proof?
-    verify_permissions!('machine.proofs.generate')
-
-    case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' }
-      allow!
-    in role: { name: 'product' } if record.product == bearer
-      allow!
-    in role: { name: 'user' } if record.user == bearer
-      !record.license.protected?
-    in role: { name: 'license' } if record.license == bearer
-      allow!
-    else
-      deny!
-    end
-  end
-
   def change_group?
     verify_permissions!('machine.group.update')
 
