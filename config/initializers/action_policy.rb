@@ -8,7 +8,7 @@ Rails.application.config.action_policy.tap do |config|
 end
 
 ##
-# Monkey patches for Action Policy
+# Monkey patches for Action Policy.
 module ActionPolicy
   module Behaviour
     ##

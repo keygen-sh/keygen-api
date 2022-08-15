@@ -13,9 +13,9 @@ module Licenses
       in role: { name: 'product' } if license.product == bearer
         allow!
       in role: { name: 'user' } if license.user == bearer
-        allow!
+        allowed_to? :index?, record, with: ::MachinePolicy
       in role: { name: 'license' } if license == bearer
-        allow!
+        allowed_to? :index?, record, with: ::MachinePolicy
       else
         deny!
       end
@@ -30,9 +30,9 @@ module Licenses
       in role: { name: 'product' } if license.product == bearer
         allow!
       in role: { name: 'user' } if license.user == bearer
-        allow!
+        allowed_to? :show?, record, with: ::MachinePolicy
       in role: { name: 'license' } if license == bearer
-        allow!
+        allowed_to? :show?, record, with: ::MachinePolicy
       else
         deny!
       end

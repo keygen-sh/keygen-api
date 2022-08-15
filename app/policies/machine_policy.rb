@@ -1,40 +1,42 @@
 # frozen_string_literal: true
 
 class MachinePolicy < ApplicationPolicy
-  def machines = resource.subject
-  def machine  = resource.subject
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.read
-    ]
+    verify_permissions!('machine.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.has_role?(:product) &&
-        machines.all? { _1.product.id == bearer.id }) ||
-      (bearer.has_role?(:user) &&
-        machines.all? { _1.license.user_id == bearer.id }) ||
-      (bearer.has_role?(:license) &&
-        machines.all? { _1.license_id == bearer.id }) ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        machines.all? {
-          _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
-          _1.license.user_id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.product.id == bearer.id }
+      allow!
+    in role: { name: 'user' }, group_ids: [*] if record.all? { (_1.group_id? && _1.group_id.in?(bearer.group_ids)) || _1.license.user_id == bearer.id }
+      allow!
+    in role: { name: 'user' } if record.all? { _1.license.user_id == bearer.id }
+      allow!
+    in role: { name: 'license' } if record.all? { _1.license_id == bearer.id }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      machine.read
-    ]
+    verify_permissions!('machine.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      machine.user == bearer ||
-      machine.product == bearer ||
-      machine.license == bearer ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        machine.group_id? && machine.group_id.in?(bearer.group_ids))
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' }, group_ids: [*] if record.group_id? && record.group_id.in?(bearer.group_ids)
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      allow!
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
