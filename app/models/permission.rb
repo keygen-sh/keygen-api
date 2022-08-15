@@ -60,6 +60,7 @@ class Permission < ApplicationRecord
     license.entitlements.read
     license.group.read
     license.group.update
+    license.machines.read
     license.policy.update
     license.read
     license.reinstate
@@ -185,6 +186,7 @@ class Permission < ApplicationRecord
 
     license.entitlements.read
     license.group.read
+    license.machines.read
     license.read
     license.tokens.read
 
@@ -267,6 +269,7 @@ class Permission < ApplicationRecord
     license.entitlements.read
     license.group.read
     license.group.update
+    license.machines.read
     license.policy.update
     license.read
     license.reinstate
@@ -365,6 +368,7 @@ class Permission < ApplicationRecord
     license.entitlements.read
     license.group.read
     license.delete
+    license.machines.read
     license.policy.update
     license.read
     license.renew
@@ -431,6 +435,7 @@ class Permission < ApplicationRecord
     license.check-out
     license.entitlements.read
     license.group.read
+    license.machines.read
     license.read
     license.usage.increment
     license.validate
