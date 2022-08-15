@@ -11,15 +11,19 @@ RSpec::Matchers.define :authorize do |action|
     reasons = policy.result.reasons
     bearer  = policy.bearer
     record  = policy.record
+    model   = record.respond_to?(:first) ? record.first.model_name : record.model_name
+    id      = record.respond_to?(:collect) ? record.collect(&:id) : record.id
 
-    "#{policy.class} did not allow #{action}? on #<#{record.class}:#{record.id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."
+    "#{policy.class} did not allow #{action}? on #<#{model}:#{id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."
   end
 
   failure_message_when_negated do |policy|
     reasons = policy.result.reasons
     bearer  = policy.bearer
     record  = policy.record
+    model   = record.respond_to?(:first) ? record.first.model_name : record.model_name
+    id      = record.respond_to?(:collect) ? record.collect(&:id) : record.id
 
-    "#{policy.class} did not deny #{action}? on #<#{record.class}:#{record.id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."
+    "#{policy.class} did not deny #{action}? on #<#{model}:#{id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."
   end
 end
