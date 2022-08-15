@@ -110,38 +110,6 @@ class MachinePolicy < ApplicationPolicy
     end
   end
 
-  def ping?
-    verify_permissions!('machine.heartbeat.ping')
-
-    case bearer
-    in role: { name: 'admin' | 'developer' }
-      allow!
-    in role: { name: 'product' } if record.product == bearer
-      allow!
-    in role: { name: 'user' } if record.user == bearer
-      !record.license.protected?
-    in role: { name: 'license' } if record.license == bearer
-      allow!
-    else
-      deny!
-    end
-  end
-  alias_method :ping_heartbeat?, :ping?
-
-  def reset?
-    verify_permissions!('machine.heartbeat.reset')
-
-    case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' }
-      allow!
-    in role: { name: 'product' } if record.product == bearer
-      allow!
-    else
-      deny!
-    end
-  end
-  alias_method :reset_heartbeat?, :reset?
-
   def generate_offline_proof?
     verify_permissions!('machine.proofs.generate')
 
