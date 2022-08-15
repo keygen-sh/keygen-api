@@ -178,6 +178,23 @@ module Keygen
             }]
           }.to_json]
         ]
+      rescue RequestMigrations::UnsupportedVersionError
+        [
+          400,
+          {
+            "Content-Type" => "application/vnd.api+json",
+          },
+          [{
+            errors: [{
+              title: "Bad request",
+              detail: 'unsupported API version requested',
+              code: 'INVALID_API_VERSION',
+              links: {
+                about: 'https://keygen.sh/docs/api/versioning/',
+              },
+            }]
+          }.to_json]
+        ]
       end
     end
 
