@@ -71,6 +71,7 @@ permissions = %w[
   machine.check-out
   machine.create
   machine.delete
+  machine.group.read
   machine.group.update
   machine.heartbeat.ping
   machine.heartbeat.reset
