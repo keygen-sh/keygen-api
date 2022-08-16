@@ -11,7 +11,7 @@ RSpec::Matchers.define :authorize do |action|
     reasons = policy.result.reasons
     bearer  = policy.bearer
     record  = policy.record
-    model   = record.respond_to?(:first) ? record.first.model_name : record.model_name
+    model   = record.respond_to?(:first) ? record.first&.model_name : record.model_name
     id      = record.respond_to?(:collect) ? record.collect(&:id) : record.id
 
     "#{policy.class} did not allow #{action}? on #<#{model}:#{id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."
@@ -21,7 +21,7 @@ RSpec::Matchers.define :authorize do |action|
     reasons = policy.result.reasons
     bearer  = policy.bearer
     record  = policy.record
-    model   = record.respond_to?(:first) ? record.first.model_name : record.model_name
+    model   = record.respond_to?(:first) ? record.first&.model_name : record.model_name
     id      = record.respond_to?(:collect) ? record.collect(&:id) : record.id
 
     "#{policy.class} did not deny #{action}? on #<#{model}:#{id}> for #<#{bearer.class}:#{bearer.id}> because #{reasons.reasons}."

@@ -45,6 +45,13 @@ module AuthorizationHelper
       end
     end
 
+    def as_group_owner(scenarios)
+      case scenarios
+      in [:as_user, :accessing_a_group, *]
+        let(:group_owner) { create(:group_owner, account:, group:, user: bearer) }
+      end
+    end
+
     def as_anonymous(scenarios)
       let(:account) { create(:account) }
       let(:bearer)  { nil }
@@ -160,14 +167,27 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
+    def accessing_a_group(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:group) { create(:group, account: other_account) }
+      else
+        let(:group) { create(:group, account:) }
+      end
+
+      let(:record) { group }
+    end
+
     def accessing_its_group(scenarios)
       case scenarios
       in [*, :accessing_another_account, :accessing_a_license, *]
         let(:group) { create(:group, account: other_account, licenses: [license]) }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:group) { create(:group, account:, licenses: [license]) }
-      in [:as_license, :accessing_itself, *]
+      in [:as_license, *]
         let(:group) { create(:group, account:, licenses: [bearer]) }
+      in [:as_user, *]
+        let(:group) { create(:group, account:, users: [bearer]) }
       end
 
       let(:record) { group }
@@ -219,6 +239,17 @@ module AuthorizationHelper
       end
 
       let(:record) { machine }
+    end
+
+    def accessing_its_owners(scenarios)
+      case scenarios
+      in [*, :accessing_a_group, :as_group_owner, *]
+        let(:group_owners) { create_list(:group_owner, 3, account: group.account, group:) << group_owner }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:group_owners) { create_list(:group_owner, 3, account: group.account, group:) }
+      end
+
+      let(:record) { group_owners }
     end
   end
 
