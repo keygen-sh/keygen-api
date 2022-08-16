@@ -109,17 +109,4 @@ class MachinePolicy < ApplicationPolicy
       deny!
     end
   end
-
-  def change_group?
-    verify_permissions!('machine.group.update')
-
-    case bearer
-    in role: { name: 'admin' | 'developer' | 'sales_agent' }
-      allow!
-    in role: { name: 'product' } if record.product == bearer
-      allow!
-    else
-      deny!
-    end
-  end
 end
