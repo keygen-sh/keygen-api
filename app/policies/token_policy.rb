@@ -3,55 +3,56 @@
 class TokenPolicy < ApplicationPolicy
 
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      token.read
-    ]
+    verify_permissions!('token.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.has_role?(:product) &&
-        # FIXME(ezekg) Eager load licenses and ensure product owns it
-        resource.all? { |r| r.bearer_type == License.name || r.bearer_type == bearer.class.name && r.bearer_id == bearer.id }) ||
-      (bearer.has_role?(:user, :license) &&
-        resource.all? { |r| r.bearer_type == bearer.class.name && r.bearer_id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.bearer_type == License.name || _1.bearer_type == bearer.class.name && _1.bearer_id == bearer.id }
+      allow!
+    in role: { name: 'user' | 'license' } if record.all? { _1.bearer_type == bearer.class.name && _1.bearer_id == bearer.id }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      token.read
-    ]
+    verify_permissions!('token.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.bearer == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    else
+      record.bearer == bearer
+    end
   end
 
   def generate?
-    assert_account_scoped!
-    assert_permissions! %w[
-      token.generate
-    ]
+    verify_permissions!('token.generate')
 
-    true
+    allow!
   end
 
   def regenerate?
-    assert_account_scoped!
-    assert_permissions! %w[
-      token.regenerate
-    ]
+    verify_permissions!('token.regenerate')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.bearer == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      record.bearer == bearer
+    end
   end
 
   def revoke?
-    assert_account_scoped!
-    assert_permissions! %w[
-      token.revoke
-    ]
+    verify_permissions!('token.revoke')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.bearer == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      record.bearer == bearer
+    end
   end
 end
