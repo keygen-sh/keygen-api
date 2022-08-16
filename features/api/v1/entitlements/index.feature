@@ -162,15 +162,51 @@ Feature: List entitlements
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: User attempts to retrieve all entitlements for their account
+  Scenario: License retrieves all their entitlements (has no entitlements)
     Given the current account is "test1"
+    And the current account has 3 "entitlements"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "entitlements"
+
+  Scenario: License retrieves all their entitlements (has entitlements)
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 1 "policy-entitlement" for the last "policy"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "license-entitlements" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "entitlements"
+
+  Scenario: User retrieves all their entitlements (has no entitlements)
+    Given the current account is "test1"
+    And the current account has 3 "entitlements"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current account has 3 "entitlements"
     When I send a GET request to "/accounts/test1/entitlements"
-    Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    Then the response status should be "200"
+    And the JSON response should be an array with 0 "entitlements"
+
+  Scenario: User retrieves all their entitlements (has entitlements)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "policy"
+    And the current account has 3 "policy-entitlement" for the last "policy"
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 1 "license-entitlement" for each "license"
+    And all "licenses" belong to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/entitlements"
+    Then the response status should be "200"
+    And the JSON response should be an array with 5 "entitlements"
 
   Scenario: Product attempts to retrieves all entitlements for their account
     Given the current account is "test1"
