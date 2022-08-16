@@ -2,106 +2,65 @@
 
 class GroupPolicy < ApplicationPolicy
   def index?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      group.read
-    ]
+    verify_permissions!('group.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      (bearer.has_role?(:user) &&
-        groups.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) }) ||
-      (bearer.has_role?(:license) &&
-        groups.all? { _1.id == bearer.group_id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      allow!
+    in role: { name: 'user' } if record.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) }
+      allow!
+    in role: { name: 'license' } if record.all? { _1.id == bearer.group_id }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      group.read
-    ]
+    verify_permissions!('group.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      (bearer.has_role?(:user) &&
-        (group.id == bearer.group_id || group.id.in?(bearer.group_ids))) ||
-      (bearer.has_role?(:license) &&
-        group.id == bearer.group_id)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      allow!
+    in role: { name: 'user' } if record.id == bearer.group_id || record.id.in?(bearer.group_ids)
+      allow!
+    in role: { name: 'license' } if record.id == bearer.group_id
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      group.create
-    ]
+    verify_permissions!('group.create')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      group.update
-    ]
+    verify_permissions!('group.update')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      group.delete
-    ]
+    verify_permissions!('group.delete')
 
-    bearer.has_role?(:admin, :developer, :product)
-  end
-
-  class GroupOwnerPolicy < ApplicationPolicy
-    def index?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        group.owners.read
-      ]
-
-      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-        (bearer.has_role?(:user) &&
-          group.all? { _1.id == bearer.group_id || _1.id.in?(bearer.group_ids) })
-    end
-
-    def show?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        group.owners.read
-      ]
-
-      bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-        (bearer.has_role?(:user) &&
-          (group.id == bearer.group_id || group.id.in?(bearer.group_ids)))
-    end
-
-    def attach?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        group.owners.attach
-      ]
-
-      bearer.has_role?(:admin, :developer, :product)
-    end
-
-    def detach?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        group.owners.detach
-      ]
-
-      bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
     end
   end
 end

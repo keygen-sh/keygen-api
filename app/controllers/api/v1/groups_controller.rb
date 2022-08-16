@@ -8,21 +8,21 @@ module Api::V1
     before_action :set_group, only: [:show, :update, :destroy]
 
     def index
-      groups = apply_pagination(policy_scope(apply_scopes(current_account.groups)))
-      authorize groups
+      groups = apply_pagination(authorized_scope(apply_scopes(current_account.groups)))
+      authorize! groups
 
       render jsonapi: groups
     end
 
     def show
-      authorize group
+      authorize! group
 
       render jsonapi: group
     end
 
     def create
       group = current_account.groups.new(group_params)
-      authorize group
+      authorize! group
 
       if group.save
         BroadcastEventService.call(
@@ -38,7 +38,7 @@ module Api::V1
     end
 
     def update
-      authorize group
+      authorize! group
 
       if group.update(group_params)
         BroadcastEventService.call(
@@ -54,7 +54,7 @@ module Api::V1
     end
 
     def destroy
-      authorize group
+      authorize! group
 
       BroadcastEventService.call(
         event: 'group.deleted',
