@@ -13,9 +13,9 @@ module Licenses
       in role: { name: 'product' } if license.product == bearer
         allow!
       in role: { name: 'user' } if license.user == bearer || record.id == bearer.group_id || record.id.in?(bearer.group_ids)
-        allowed_to? :show?, record, with: ::GroupPolicy
+        allow!
       in role: { name: 'license' } if license == bearer
-        allowed_to? :show?, record, with: ::GroupPolicy
+        allow!
       else
         deny!
       end
