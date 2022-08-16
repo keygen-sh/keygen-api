@@ -7,16 +7,26 @@ module Api::V1::Machines::Relationships
     before_action :authenticate_with_token!
     before_action :set_machine
 
+    authorize :machine
+
     def show
       group = machine.group
-      authorize group
+
+      raise Keygen::Error::NotFoundError.new(model: Group.name) if
+        group.nil?
+
+      authorize! group,
+        with: Machines::GroupPolicy
 
       render jsonapi: group
     end
 
     def update
-      authorize machine, :change_group?
+      group = current_account.groups.find_by(id: group_params[:id])
+      authorize! group,
+        with: Machines::GroupPolicy
 
+      # Use group ID again so that model validations are run for invalid groups
       machine.update!(group_id: group_params[:id])
 
       BroadcastEventService.call(
@@ -25,6 +35,7 @@ module Api::V1::Machines::Relationships
         resource: machine,
       )
 
+      # FIXME(ezekg) This should be the group linkage
       render jsonapi: machine
     end
 
@@ -33,8 +44,9 @@ module Api::V1::Machines::Relationships
     attr_reader :machine
 
     def set_machine
-      @machine = FindByAliasService.call(scope: current_account.machines, identifier: params[:machine_id], aliases: :fingerprint)
-      authorize machine, :show?
+      scoped_machines = authorized_scope(current_account.machines)
+
+      @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:machine_id], aliases: :fingerprint)
 
       Current.resource = machine
     end

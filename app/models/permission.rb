@@ -79,6 +79,7 @@ class Permission < ApplicationRecord
     machine.check-out
     machine.create
     machine.delete
+    machine.group.read
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
@@ -190,6 +191,7 @@ class Permission < ApplicationRecord
     license.read
     license.tokens.read
 
+    machine.group.read
     machine.read
 
     metric.read
@@ -288,6 +290,7 @@ class Permission < ApplicationRecord
     machine.check-out
     machine.create
     machine.delete
+    machine.group.read
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
@@ -381,6 +384,7 @@ class Permission < ApplicationRecord
     machine.check-out
     machine.create
     machine.delete
+    machine.group.read
     machine.heartbeat.ping
     machine.proofs.generate
     machine.read
@@ -448,6 +452,7 @@ class Permission < ApplicationRecord
     machine.check-out
     machine.create
     machine.delete
+    machine.group.read
     machine.heartbeat.ping
     machine.proofs.generate
     machine.read
