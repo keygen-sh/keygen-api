@@ -75,17 +75,18 @@ Feature: Group owners relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an array with 4 "group-owners"
 
   Scenario: User attempts to retrieve the owners of a group (is not member)
     Given the current account is "test1"
+    And the current account has 1 "user"
     And the current account has 1 "group"
     And the current account has 3 "group-owners" for the first "group"
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the owners of a group (is member)
     Given the current account is "test1"
@@ -99,7 +100,32 @@ Feature: Group owners relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "group-owners"
+
+  Scenario: License attempts to retrieve the owners of a group (is not member)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 3 "group-owners" for the first "group"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/owners"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the owners of a group (is member)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 3 "group-owners" for the first "group"
+    And the current account has 1 "license" with the following:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/owners"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "group-owners"
 
   Scenario: Admin attempts to retrieve the owners of a group of another account
     Given the current account is "test1"
@@ -110,7 +136,7 @@ Feature: Group owners relationship
     When I send a GET request to "/accounts/test1/groups/$0/owners"
     Then the response status should be "401"
 
-  Scenario: License attempts to retrieves owners of a group
+  Scenario: License attempts to retrieve an owner of a group (is not member)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "group"
@@ -119,18 +145,66 @@ Feature: Group owners relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: License attempts to retrieves an owner of a group
+  Scenario: License attempts to retrieve an owner of a group (is member)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "group"
-    And the current account has 3 "group-owners" for the first "group"
-    And the current account has 1 "license"
+    And the current account has 1 "license" with the following:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 3 "group-owners" for the last "group"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "group-owner"
+
+  Scenario: User attempts to retrieve an owner of a group (is owner)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 1 "user"
+    And the current account has 1 "group-owner"
+    And the last "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the current account has 3 "group-owners" for the first "group"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "group-owner"
+
+  Scenario: User attempts to retrieve an owner of a group (is not member)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "group"
+    And the current account has 3 "group-owners" for the first "group"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve an owner of a group (is member)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 3 "group-owners" for the first "group"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/owners/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "group-owner"
 
   Scenario: Admin attaches owners to a group
     Given the current account is "test1"
@@ -283,7 +357,7 @@ Feature: Group owners relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -318,6 +392,21 @@ Feature: Group owners relationship
     And the current account has 1 "products"
     And the current account has 1 "group"
     And the current account has 2 "users"
+    And the current account has 2 "group-owners"
+    And the first "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And the second "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[2]"
+      }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
@@ -338,14 +427,6 @@ Feature: Group owners relationship
     And the current account has 1 "products"
     And the current account has 1 "group"
     And the current account has 2 "users"
-    And the current account has 1 "group-owner"
-    And the last "group-owner" has the following attributes:
-      """
-      {
-        "groupId": "$groups[0]",
-        "userId": "$users[1]"
-      }
-      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
@@ -356,7 +437,7 @@ Feature: Group owners relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -533,7 +614,69 @@ Feature: Group owners relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License attempts to detach owners from a group
+  Scenario: License attempts to detach owners of a group (is not member)
+    Given the current account is "test1"
+    And the current account has 1 "products"
+    And the current account has 1 "group"
+    And the current account has 2 "users"
+    And the current account has 1 "license"
+    And the current account has 1 "group-owner"
+    And the first "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/groups/$0/owners" with the following:
+      """
+      {
+        "data": [
+          { "type": "group-owners", "id": "$users[1]" }
+        ]
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to detach owners of a group (is member)
+    Given the current account is "test1"
+    And the current account has 1 "products"
+    And the current account has 1 "group"
+    And the current account has 2 "users"
+    And the current account has 1 "license"
+    And the last "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "group-owner"
+    And the first "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[1]"
+      }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
+      """
+      {
+        "data": [
+          { "type": "group-owners", "id": "$users[1]" }
+        ]
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to detach owners of a group (is owner)
     Given the current account is "test1"
     And the current account has 1 "products"
     And the current account has 1 "group"
@@ -553,14 +696,13 @@ Feature: Group owners relationship
         "userId": "$users[2]"
       }
       """
-    And the current account has 1 "license"
-    And I am a license of account "test1"
+    And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/groups/$0/owners" with the following:
+    When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "group-owners", "id": "$users[2]" }
         ]
       }
       """
@@ -569,12 +711,12 @@ Feature: Group owners relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to detach owners from a group
+  Scenario: User attempts to detach owners of a group (is not member)
     Given the current account is "test1"
     And the current account has 1 "products"
     And the current account has 1 "group"
-    And the current account has 3 "users"
-    And the current account has 2 "group-owners"
+    And the current account has 2 "users"
+    And the current account has 1 "group-owner"
     And the first "group-owner" has the following attributes:
       """
       {
@@ -582,21 +724,45 @@ Feature: Group owners relationship
         "userId": "$users[2]"
       }
       """
-    And the second "group-owner" has the following attributes:
-      """
-      {
-        "groupId": "$groups[0]",
-        "userId": "$users[3]"
-      }
-      """
-    And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/groups/$0/owners" with the following:
+    When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
       """
       {
         "data": [
-          { "type": "group-owners", "id": "$users[1]" }
+          { "type": "group-owners", "id": "$users[2]" }
+        ]
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to detach owners of a group (is member)
+    Given the current account is "test1"
+    And the current account has 1 "products"
+    And the current account has 1 "group"
+    And the current account has 2 "user"
+    And the second "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the current account has 1 "group-owner"
+    And the first "group-owner" has the following attributes:
+      """
+      {
+        "groupId": "$groups[0]",
+        "userId": "$users[2]"
+      }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/groups/$0/owners" with the following:
+      """
+      {
+        "data": [
+          { "type": "group-owners", "id": "$users[2]" }
         ]
       }
       """
