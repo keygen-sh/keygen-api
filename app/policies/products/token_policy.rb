@@ -10,8 +10,8 @@ module Products
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
-      in role: { name: 'product' } if product == bearer && record.all? { _1 in bearer_type: Product.name, bearer_id: bearer.id }
-        allow!
+      in role: { name: 'product' } if product == bearer
+        record.all? { _1 in bearer_type: ^(Product.name), bearer_id: ^(bearer.id) }
       else
         deny!
       end
