@@ -275,6 +275,13 @@ class User < ApplicationRecord
         )
   end
 
+  def group!
+    raise Keygen::Error::NotFoundError.new(model: Group.name) unless
+      group.present?
+
+    group
+  end
+
   def full_name
     return nil if first_name.nil? || last_name.nil?
 

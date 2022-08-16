@@ -367,6 +367,13 @@ class Machine < ApplicationRecord
     allow_nil: true,
     to: :policy
 
+  def group!
+    raise Keygen::Error::NotFoundError.new(model: Group.name) unless
+      group.present?
+
+    group
+  end
+
   def max_processes=(value)
     self.max_processes_override = value
   end

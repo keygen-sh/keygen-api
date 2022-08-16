@@ -504,6 +504,13 @@ class License < ApplicationRecord
         )
   end
 
+  def group!
+    raise Keygen::Error::NotFoundError.new(model: Group.name) unless
+      group.present?
+
+    group
+  end
+
   def status
     case
     when banned?
