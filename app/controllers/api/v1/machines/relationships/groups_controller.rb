@@ -10,11 +10,7 @@ module Api::V1::Machines::Relationships
     authorize :machine
 
     def show
-      group = machine.group
-
-      raise Keygen::Error::NotFoundError.new(model: Group.name) if
-        group.nil?
-
+      group = machine.group!
       authorize! group,
         with: Machines::GroupPolicy
 

@@ -149,7 +149,7 @@ Given /^the current account has the following "([^\"]*)" rows:$/ do |resource, r
   end
 end
 
-Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for(?: an)? existing "([^\"]*)"$/ do |count, trait, resource, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" (?:for|in)(?: an)? existing "([^\"]*)"$/ do |count, trait, resource, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).all.sample
     association_name = association.singularize.underscore.to_sym
@@ -158,7 +158,7 @@ Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for(?: an)? existing
   end
 end
 
-Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for (?:all|each) "([^\"]*)"$/ do |count, trait, resource, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" (?:for|in) (?:all|each) "([^\"]*)"$/ do |count, trait, resource, association|
   associated_records = @account.send(association.pluralize.underscore).all
   association_name =
       case resource.singularize
@@ -175,7 +175,7 @@ Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for (?:all|each) "([
   end
 end
 
-Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" for the (\w+) "([^\"]*)"$/ do |count, trait, resource, index, association|
+Given /^the current account has (\d+) (?:(\w+) )?"([^\"]*)" (?:for|in) the (\w+) "([^\"]*)"$/ do |count, trait, resource, index, association|
   count.to_i.times do
     associated_record = @account.send(association.pluralize.underscore).send(index)
     association_name =
@@ -479,7 +479,7 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]
   model.save!(validate: false)
 end
 
-Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" belongs to the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
+Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:belongs to|is in) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
   model =
     case model_name.singularize
     when 'process'
