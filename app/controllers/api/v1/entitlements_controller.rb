@@ -5,72 +5,76 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_entitlement, only: [:show, :update, :destroy]
+    before_action :set_entitlement, only: %i[show update destroy]
 
     def index
-      @entitlements = apply_pagination(policy_scope(apply_scopes(current_account.entitlements)))
-      authorize @entitlements
+      entitlements = apply_pagination(authorized_scope(apply_scopes(current_account.entitlements)))
+      authorize! entitlements
 
-      render jsonapi: @entitlements
+      render jsonapi: entitlements
     end
 
     def show
-      authorize @entitlement
+      authorize! entitlement
 
-      render jsonapi: @entitlement
+      render jsonapi: entitlement
     end
 
     def create
-      @entitlement = current_account.entitlements.new entitlement_params
-      authorize @entitlement
+      entitlement = current_account.entitlements.new(entitlement_params)
+      authorize! entitlement
 
-      if @entitlement.save
+      if entitlement.save
         BroadcastEventService.call(
-          event: "entitlement.created",
+          event: 'entitlement.created',
           account: current_account,
-          resource: @entitlement
+          resource: entitlement,
         )
 
-        render jsonapi: @entitlement, status: :created, location: v1_account_entitlement_url(@entitlement.account, @entitlement)
+        render jsonapi: entitlement, status: :created, location: v1_account_entitlement_url(entitlement.account, entitlement)
       else
-        render_unprocessable_resource @entitlement
+        render_unprocessable_resource entitlement
       end
     end
 
     def update
-      authorize @entitlement
+      authorize! entitlement
 
-      if @entitlement.update(entitlement_params)
+      if entitlement.update(entitlement_params)
         BroadcastEventService.call(
-          event: "entitlement.updated",
+          event: 'entitlement.updated',
           account: current_account,
-          resource: @entitlement
+          resource: entitlement,
         )
 
-        render jsonapi: @entitlement
+        render jsonapi: entitlement
       else
-        render_unprocessable_resource @entitlement
+        render_unprocessable_resource entitlement
       end
     end
 
     def destroy
-      authorize @entitlement
+      authorize! entitlement
 
       BroadcastEventService.call(
-        event: "entitlement.deleted",
+        event: 'entitlement.deleted',
         account: current_account,
-        resource: @entitlement
+        resource: entitlement,
       )
 
-      @entitlement.destroy
+      entitlement.destroy
     end
 
     private
 
-    def set_entitlement
-      @entitlement = FindByAliasService.call(scope: current_account.entitlements, identifier: params[:id], aliases: :code)
+    attr_reader :entitlement
 
-      Current.resource = @entitlement
+    def set_entitlement
+      scoped_entitlements = authorized_scope(current_account.entitlements)
+
+      @entitlement = FindByAliasService.call(scope: scoped_entitlements, identifier: params[:id], aliases: :code)
+
+      Current.resource = entitlement
     end
 
     typed_parameters format: :jsonapi do
