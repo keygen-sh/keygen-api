@@ -262,9 +262,8 @@ class User < ApplicationRecord
     end
   }
 
-  def product_ids
-    products.reorder(nil).ids
-  end
+  def entitlement_ids = entitlements.reorder(nil).ids
+  def product_ids     = products.reorder(nil).ids
 
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
