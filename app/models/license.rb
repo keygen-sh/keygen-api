@@ -492,6 +492,8 @@ class License < ApplicationRecord
               .reorder(nil)
   end
 
+  def entitlement_ids = entitlements.reorder(nil).ids
+
   def entitlements
     entl = Entitlement.where(account_id: account_id).distinct
 

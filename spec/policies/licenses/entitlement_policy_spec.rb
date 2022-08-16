@@ -9,7 +9,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -61,7 +61,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           denies :show
         end
 
@@ -91,7 +91,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -105,7 +105,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -135,7 +135,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -157,7 +157,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -193,7 +193,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
   with_role_authorization :license do
     with_scenarios %i[accessing_itself accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -207,7 +207,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_itself accessing_its_entitlement] do
       with_license_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           allows :show
         end
 
@@ -228,7 +228,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -253,7 +253,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -267,7 +267,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlement] do
       with_license_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           denies :show
         end
 
@@ -285,7 +285,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -309,7 +309,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
   with_role_authorization :user do
     with_scenarios %i[with_licenses accessing_its_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -323,7 +323,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[with_licenses accessing_its_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -348,7 +348,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlements] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -362,7 +362,7 @@ describe Licenses::EntitlementPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_entitlement] do
       with_token_authentication do
-        with_permissions %w[license.entitlements.read] do
+        with_permissions %w[license.entitlements.read entitlement.read] do
           without_token_permissions { denies :show }
 
           denies :show

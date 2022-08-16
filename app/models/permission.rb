@@ -359,6 +359,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    entitlement.read
+
     group.read
     group.owners.read
 
@@ -428,6 +430,8 @@ class Permission < ApplicationRecord
     artifact.read
 
     channel.read
+
+    entitlement.read
 
     group.owners.read
     group.read

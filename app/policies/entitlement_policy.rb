@@ -1,49 +1,62 @@
 # frozen_string_literal: true
 
 class EntitlementPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      entitlement.read
-    ]
+    verify_permissions!('entitlement.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      allow!
+    in role: { name: 'user' | 'license' } if record.all? { _1.id.in?(bearer.entitlement_ids) }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      entitlement.read
-    ]
+    verify_permissions!('entitlement.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'product' }
+      allow!
+    in role: { name: 'user' | 'license' } if record.id.in?(bearer.entitlement_ids)
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      entitlement.create
-    ]
+    verify_permissions!('entitlement.create')
 
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      entitlement.update
-    ]
+    verify_permissions!('entitlement.update')
 
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      entitlement.delete
-    ]
+    verify_permissions!('entitlement.delete')
 
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 end
