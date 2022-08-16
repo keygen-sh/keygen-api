@@ -10,11 +10,7 @@ module Api::V1::Licenses::Relationships
     authorize :license
 
     def show
-      group = license.group
-
-      raise Keygen::Error::NotFoundError.new(model: Group.name) if
-        group.nil?
-
+      group = license.group!
       authorize! group,
         with: Licenses::GroupPolicy
 

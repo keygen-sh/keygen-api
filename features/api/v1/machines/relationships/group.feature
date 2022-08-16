@@ -103,51 +103,39 @@ Feature: Machine group relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve the group for a machine they own (no group)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/group"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the group for a machine they own (not in group)
     Given the current account is "test1"
     And the current account has 1 "group"
-    And the current account has 1 "license"
-    And the current account has 1 "machine"
     And the current account has 1 "user"
-    And the last "license" has the following attributes:
-      """
-      { "userId": "$users[1]" }
-      """
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" is in the last "group"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: User attempts to retrieve the group for a machine they own (in group)
     Given the current account is "test1"
     And the current account has 1 "group"
     And the current account has 1 "user"
-    And the last "user" has the following attributes:
-      """
-      { "groupId": "$groups[0]" }
-      """
-    And the current account has 1 "license"
-    And the last "license" has the following attributes:
-      """
-      { "userId": "$users[1]" }
-      """
-    And the current account has 1 "machine"
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" is in the last "group"
+    And the last "user" is in the last "group"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
@@ -174,41 +162,37 @@ Feature: Machine group relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: License attempts to retrieve the group for their license (not in group)
+  Scenario: License attempts to retrieve the group for their license (no group)
     Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "machine"
     And the current account has 1 "group"
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
-    Then the response status should be "403"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the group for their license (not in group)
+    Given the current account is "test1"
+    And the current account has 1 "group"
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" is in the last "group"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/group"
+    Then the response status should be "200"
+    And the JSON response should be a "group"
 
   Scenario: License attempts to retrieve the group for their license (in group)
     Given the current account is "test1"
     And the current account has 1 "group"
     And the current account has 1 "license"
-    And the last "license" has the following attributes:
-      """
-      { "groupId": "$groups[0]" }
-      """
-    And the current account has 1 "machine"
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "machine" for the last "license"
+    And the last "license" is in the last "group"
+    And the last "machine" is in the last "group"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
@@ -222,6 +206,36 @@ Feature: Machine group relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/group"
     Then the response status should be "401"
+
+  Scenario: Admin adds a machine to a group
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "groups"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "machine"
+    And I use an authentication token
+    When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
+      """
+      {
+        "data": {
+          "type": "groups",
+          "id": "$groups[0]"
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "machine" with the following relationships:
+      """
+      {
+        "group": {
+          "links": { "related": "/v1/accounts/$account/machines/$machines[0]/group" },
+          "data": { "type": "groups", "id": "$groups[0]" }
+        }
+      }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
 
   Scenario: Admin changes a machine's group relationship to another group
     Given I am an admin of account "test1"
@@ -431,7 +445,7 @@ Feature: Machine group relationship
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -439,20 +453,10 @@ Feature: Machine group relationship
   Scenario: User attempts to change a machine's group relationship
     Given the current account is "test1"
     And the current account has 2 "groups"
-    And the current account has 1 "license"
-    And the current account has 1 "machine"
-    And the current account has 2 "users"
-    And the last "license" has the following attributes:
-      """
-      { "userId": "$users[1]" }
-      """
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" is in the last "group"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
@@ -471,21 +475,10 @@ Feature: Machine group relationship
 
   Scenario: User changes a machine's group relationship to another group for a machine they don't own
     Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "machine"
     And the current account has 2 "groups"
-    And the current account has 2 "users"
-    And the last "license" has the following attributes:
-      """
-      { "userId": "$users[2]" }
-      """
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "user"
+    And the current account has 1 "machine"
+    And the last "machine" is in the last "group"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
@@ -497,23 +490,17 @@ Feature: Machine group relationship
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
   Scenario: License changes a machine's group relationship to another group
     Given the current account is "test1"
-    And the current account has 1 "license"
-    And the current account has 1 "machine"
     And the current account has 2 "groups"
-    And the last "machine" has the following attributes:
-      """
-      {
-        "licenseId": "$licenses[0]",
-        "groupId": "$groups[0]"
-      }
-      """
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the last "license"
+    And the last "machine" is in the last "group"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
@@ -535,10 +522,6 @@ Feature: Machine group relationship
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "group"
     And the current account has 1 "machine"
-    And the last "machine" has the following attributes:
-      """
-      { "groupId": null }
-      """
     When I send a PUT request to "/accounts/test1/machines/$0/group" with the following:
       """
       {
