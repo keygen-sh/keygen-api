@@ -114,21 +114,7 @@ Feature: Delete entitlements
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to delete an entitlement
-    Given the current account is "test1"
-    And the current account has 1 "webhook-endpoint"
-    And the current account has 2 "entitlements"
-    And the current account has 2 "users"
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/entitlements/$0"
-    Then the response status should be "403"
-    And the current account should have 2 "entitlements"
-    And sidekiq should have 0 "webhook" jobs
-    And sidekiq should have 0 "metric" jobs
-    And sidekiq should have 1 "request-log" job
-
-  Scenario: License attempts to delete an entitlement
+  Scenario: License attempts to delete an entitlement (does not have entitlement)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "entitlements"
@@ -136,8 +122,56 @@ Feature: Delete entitlements
     And I am a license of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/entitlements/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the current account should have 2 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to delete an entitlement (does have entitlement)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "policy"
+    And the current account has 1 "policy-entitlement" for the last "policy"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "license-entitlements" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "403"
+    And the current account should have 4 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to delete an entitlement (does not have entitlement)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "entitlements"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "404"
+    And the current account should have 2 "entitlements"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to delete an entitlement (does have entitlement)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And the current account has 1 "policy"
+    And the current account has 3 "policy-entitlement" for the last "policy"
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 1 "license-entitlement" for each "license"
+    And all "licenses" belong to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/entitlements/$0"
+    Then the response status should be "403"
+    And the current account should have 5 "entitlements"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
