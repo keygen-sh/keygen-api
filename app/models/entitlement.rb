@@ -20,11 +20,9 @@ class Entitlement < ApplicationRecord
 
   scope :accessible_by, -> accessor {
     case accessor
-    in role: { name: 'product' }
+    in role: { name: 'admin' | 'product' }
       self.all
-    in role: { name: 'license' }
-      self.merge(accessor.entitlements)
-    in role: { name: 'user' }
+    in role: { name: 'user' | 'license' }
       self.merge(accessor.entitlements)
     else
       self.none

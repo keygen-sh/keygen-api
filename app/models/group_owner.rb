@@ -13,6 +13,19 @@ class GroupOwner < ApplicationRecord
     uniqueness: { message: 'already exists', scope: %i[group_id user_id] },
     scope: { by: :account_id }
 
-  # Give products the ability to read all group owners
-  scope :for_product, -> id { self }
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: { name: 'admin' | 'product' }
+      self.all
+    in role: { name: 'user' }
+      self.where(group_id: accessor.group_id)
+          .or(
+            where(group_id: accessor.group_ids),
+          )
+    in role: { name: 'license' }
+      self.where(group_id: accessor.group_id)
+    else
+      self.none
+    end
+  }
 end

@@ -429,6 +429,7 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    group.owners.read
     group.read
 
     license.check-in

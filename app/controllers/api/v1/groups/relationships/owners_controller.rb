@@ -7,22 +7,26 @@ module Api::V1::Groups::Relationships
     before_action :authenticate_with_token!
     before_action :set_group
 
+    authorize :group
+
     def index
-      owners = apply_pagination(policy_scope(apply_scopes(group.owners)))
-      authorize group, owners
+      owners = apply_pagination(authorized_scope(apply_scopes(group.owners)))
+      authorize! owners,
+        with: Groups::GroupOwnerPolicy
 
       render jsonapi: owners
     end
 
     def show
       owner = group.owners.find(params[:id])
-      authorize group, owner
+      authorize! owner,
+        with: Groups::GroupOwnerPolicy
 
       render jsonapi: owner
     end
 
     def attach
-      authorize group, GroupOwner
+      authorize! with: Groups::GroupOwnerPolicy
 
       owners_data = owner_params.fetch(:data).map do |owner|
         owner.merge(account_id: current_account.id)
@@ -40,7 +44,7 @@ module Api::V1::Groups::Relationships
     end
 
     def detach
-      authorize group, GroupOwner
+      authorize! with: Groups::GroupOwnerPolicy
 
       user_ids = owner_params.fetch(:data).map { |e| e[:user_id] }.compact
       owners   = group.owners.where(user_id: user_ids)
@@ -75,8 +79,9 @@ module Api::V1::Groups::Relationships
     attr_reader :group
 
     def set_group
-      @group = current_account.groups.find(params[:group_id])
-      authorize group, :show?
+      scoped_groups = authorized_scope(current_account.groups)
+
+      @group = scoped_groups.find(params[:group_id])
 
       Current.resource = group
     end

@@ -7,6 +7,9 @@ Rails.application.config.action_policy.tap do |config|
   config.auto_inject_into_channel          = false
 end
 
+# Lookup chain should fallback to nil policy.
+ActionPolicy::LookupChain.chain << -> * { NilClassPolicy }
+
 ##
 # Monkey patches for Action Policy.
 module ActionPolicy
