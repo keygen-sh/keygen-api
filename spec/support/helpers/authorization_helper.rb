@@ -167,6 +167,36 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
+    def accessing_groups(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:groups) { create_list(:group, 3, account: other_account) }
+      else
+        let(:groups) { create_list(:group, 3, account:) }
+      end
+
+      let(:record) { groups }
+    end
+
+    def accessing_its_groups(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, :accessing_a_license, *]
+        let(:groups) { [create(:group, account: other_account, licenses: [license])] }
+      in [*, :accessing_another_account, *]
+        let(:groups) { [create(:group, account: other_account)] }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:groups) { [create(:group, account:, licenses: [license])] }
+      in [:as_license, *]
+        let(:groups) { [create(:group, account:, licenses: [bearer])] }
+      in [:as_user, :with_licenses, *]
+        let(:groups) { [create(:group, account:, users: [bearer]), *licenses.map(&:group)] }
+      in [:as_user, *]
+        let(:groups) { [create(:group, account:, users: [bearer])] }
+      end
+
+      let(:record) { groups }
+    end
+
     def accessing_a_group(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
