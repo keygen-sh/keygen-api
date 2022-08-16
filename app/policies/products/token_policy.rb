@@ -11,7 +11,7 @@ module Products
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
       in role: { name: 'product' } if product == bearer && record.all? { _1 in bearer_type: Product.name, bearer_id: bearer.id }
-        allowed_to? :index?, record, with: ::TokenPolicy
+        allow!
       else
         deny!
       end
@@ -24,7 +24,7 @@ module Products
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
       in role: { name: 'product' } if product == bearer && record.bearer == bearer
-        allowed_to? :show?, record, with: ::TokenPolicy
+        allow!
       else
         deny!
       end
