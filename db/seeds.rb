@@ -34,6 +34,7 @@ permissions = %w[
   group.delete
   group.read
   group.update
+  group.licenses.read
   group.machines.read
   group.owners.attach
   group.owners.detach
