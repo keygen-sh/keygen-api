@@ -748,7 +748,7 @@ Then /^the response should contain a valid(?: "([^"]+)")? signature header for "
     ok = SignatureHelper.verify(
       account: account,
       method: req.request_method,
-      host: account.domain.presence || 'api.keygen.sh',
+      host: account.cname.presence || account.domain.presence || 'api.keygen.sh',
       uri: req.fullpath,
       body: res.body,
       signature_algorithm: algorithm,

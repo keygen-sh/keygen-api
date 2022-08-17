@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_23_044910) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -37,6 +37,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_23_044910) do
     t.string "domain"
     t.string "subdomain"
     t.string "api_version"
+    t.string "cname"
+    t.index ["cname"], name: "index_accounts_on_cname", unique: true
     t.index ["created_at"], name: "index_accounts_on_created_at", order: :desc
     t.index ["domain"], name: "index_accounts_on_domain", unique: true
     t.index ["id", "created_at"], name: "index_accounts_on_id_and_created_at", unique: true

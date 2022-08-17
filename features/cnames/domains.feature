@@ -3,7 +3,7 @@ Feature: Custom domains via CNAME
 
   Background:
     Given the following "accounts" exist:
-      | name     | slug         | domain                |
+      | name     | slug         | cname                 |
       | Keygen   | keygen-sh    |                       |
       | Example  | example-com  | licensing.example.com |
       | ACME     | acme-example |                       |
