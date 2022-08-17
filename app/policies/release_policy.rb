@@ -121,33 +121,42 @@ class ReleasePolicy < ApplicationPolicy
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.create
-    ]
+    verify_permissions!('release.create')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.update
-    ]
+    verify_permissions!('release.update')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.delete
-    ]
+    verify_permissions!('release.delete')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def download?
