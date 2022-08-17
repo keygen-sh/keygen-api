@@ -62,6 +62,18 @@ describe Groups::GroupOwnerPolicy, type: :policy do
     with_scenarios %i[accessing_another_account accessing_a_group accessing_its_owners] do
       with_token_authentication do
         with_permissions %w[group.owners.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_another_account accessing_a_group accessing_its_owner] do
+      with_token_authentication do
+        with_permissions %w[group.owners.read] do
           denies :show
         end
 
