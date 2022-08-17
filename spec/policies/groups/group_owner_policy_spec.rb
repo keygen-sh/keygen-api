@@ -161,7 +161,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_group accessing_its_owners] do
+    with_scenarios %i[accessing_its_group accessing_its_owner] do
       with_license_authentication do
         with_permissions %w[group.owners.read] do
           allows :show
@@ -221,7 +221,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_group accessing_its_owners] do
+    with_scenarios %i[accessing_a_group accessing_its_owner] do
       with_license_authentication do
         with_permissions %w[group.owners.read] do
           denies :show
@@ -277,7 +277,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_group as_group_owner accessing_its_owners] do
+    with_scenarios %i[accessing_a_group as_group_owner accessing_its_owner] do
       with_token_authentication do
         with_permissions %w[group.owners.read] do
           without_token_permissions { denies :show }
@@ -316,7 +316,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_group accessing_its_owners] do
+    with_scenarios %i[accessing_its_group accessing_its_owner] do
       with_token_authentication do
         with_permissions %w[group.owners.read] do
           without_token_permissions { denies :show }
@@ -355,7 +355,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_group accessing_its_owners] do
+    with_scenarios %i[accessing_a_group accessing_its_owner] do
       with_token_authentication do
         with_permissions %w[group.owners.read] do
           without_token_permissions { denies :show }
@@ -385,7 +385,7 @@ describe Groups::GroupOwnerPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_group accessing_its_owners] do
+    with_scenarios %i[accessing_a_group accessing_its_owner] do
       without_authentication do
         denies :show, :attach, :detach
       end

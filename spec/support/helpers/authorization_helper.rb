@@ -398,6 +398,17 @@ module AuthorizationHelper
 
       let(:record) { group_owners }
     end
+
+    def accessing_its_owner(scenarios)
+      case scenarios
+      in [*, :accessing_a_group, :as_group_owner, *]
+        let(:_group_owner) { create(:group_owner, account: group.account, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:_group_owner) { create(:group_owner, account: group.account, group:) }
+      end
+
+      let(:record) { _group_owner }
+    end
   end
 
   ##
