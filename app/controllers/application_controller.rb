@@ -404,15 +404,20 @@ class ApplicationController < ActionController::API
 
     render_not_found
   rescue ActionPolicy::Unauthorized => e
-    Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons.reasons}" }
+    Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
 
-    msg = if current_bearer.present?
-            'You do not have permission to complete the request (ensure the token bearer is allowed to access this resource)'
+    # FIXME(ezekg) Does Action Policy provide a better API for fetching the reason?
+    reason = e.result.reasons&.reasons&.values&.first&.first
+    detail = case
+          when reason.present?
+            "You do not have permission to complete the request (#{reason})"
+          when current_bearer.present?
+            'You do not have permission to complete the request (ensure the token or license is allowed to access this resource)'
           else
-            'You do not have permission to complete the request (ensure a token is present and valid)'
+            'You do not have permission to complete the request (ensure a token or license is present and valid)'
           end
 
-    render_forbidden detail: msg
+    render_forbidden(detail:)
   rescue RequestMigrations::UnsupportedVersionError
     render_bad_request(
       detail: 'unsupported API version requested',

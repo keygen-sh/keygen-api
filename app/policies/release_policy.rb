@@ -1,22 +1,74 @@
 # frozen_string_literal: true
 
 class ReleasePolicy < ApplicationPolicy
-  def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.read
-    ]
+  skip_pre_check :verify_authenticated!, only: %i[index? show?]
 
-    true
+  scope_for :active_record_relation do |relation|
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      relation.all
+    in role: { name: 'product' } if relation.respond_to?(:for_product)
+      relation.for_product(bearer.id)
+    in role: { name: 'user' } if relation.respond_to?(:for_user)
+      relation.for_user(bearer.id)
+              .published
+    in role: { name: 'license' } if relation.respond_to?(:for_license)
+      relation.for_license(bearer.id)
+              .published
+    else
+      relation.open.published
+    end
+  end
+
+  def index?
+    verify_permissions!('release.read')
+
+    allow! if
+      record.open_distribution? &&
+      record.constraints.none?
+
+    deny! 'authentication is required' if
+      bearer.nil?
+
+    # FIXME(ezekg) Need to verify authz for each release in a performant way
+    allow!
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.read
-    ]
+    verify_permissions!('release.read')
 
-    true
+    allow! if
+      record.open_distribution? &&
+      record.constraints.none?
+
+    deny! 'authentication is required' if
+      bearer.nil?
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if bearer.licenses.for_product(record.product).any?
+      deny! 'release distribution strategy is closed' if
+        record.closed_distribution?
+
+      licenses = bearer.licenses.preload(:product, :policy, :user)
+                                .for_product(record.product)
+
+      verify_licenses!(licenses)
+
+      allow!
+    in role: { name: 'license' } if record.product == bearer.product
+      deny! 'release distribution strategy is closed' if
+        record.closed_distribution?
+
+      verify_license!(bearer)
+
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
@@ -181,50 +233,43 @@ class ReleasePolicy < ApplicationPolicy
 
   private
 
-  def has_valid_license?(user)
-    licenses = user.licenses.preload(:product, :policy).for_product(resource.product)
+  def verify_license!(license)
+    deny! 'license is suspended' if
+      license.suspended?
 
-    licenses.any? { |l| valid_license?(l) }
+    deny! 'license is banned' if
+      license.banned?
+
+    deny! 'license is expired' if
+      license.revoke_access? && license.expired?
+
+    deny! 'release is outside license expiry window' if
+      record.created_at > license.expiry
+
+    deny! 'license is missing entitlements' if
+      record.entitlements.any? &&
+      (record.entitlements & license.entitlements).size != record.entitlements.size
+
+    true
   end
 
-  def valid_license?(license)
-    resource.product == license.product &&
-      !license.suspended? &&
-      within_expiry_window?(license) &&
-      has_entitlements?(license)
-  end
+  def verify_licenses!(licenses)
+    results = []
 
-  def within_expiry_window?(license)
-    return true if
-      license.expiry.nil?
+    licenses.each do |license|
+      # We're catching :policy_fulfilled so that we can verify all licenses,
+      # but still bubble up the deny! reason in case of a failure. In case
+      # of a valid license, this will return early.
+      catch(:policy_fulfilled) { return true if verify_license!(license) }
 
-    return true if
-      license.allow_access?
-
-    return false if
-      license.revoke_access? &&
-      license.expired?
-
-    resource.created_at < license.expiry
-  end
-
-  def has_entitlements?(license)
-    (resource.entitlements & license.entitlements).size == resource.entitlements.size
-  end
-
-  class Scope < ApplicationPolicy::Scope
-    def resolve
-      return scope.open.published if
-        bearer.nil?
-
-      @scope = case
-               when bearer.has_role?(:admin, :developer, :product)
-                 scope
-               else
-                 scope.published
-               end
-
-      super
+      results << result.value
     end
+
+    # Rethrow the :policy_fulfilled symbol, which will be handled internally
+    # by Action Policy and bubble up the last result.
+    throw :policy_fulfilled unless
+      results.any?
+
+    true
   end
 end

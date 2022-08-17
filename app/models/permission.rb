@@ -121,7 +121,6 @@ class Permission < ApplicationRecord
     release.entitlements.read
     release.create
     release.delete
-    release.download
     release.publish
     release.read
     release.update
@@ -217,7 +216,6 @@ class Permission < ApplicationRecord
 
     release.constraints.read
     release.entitlements.read
-    release.download
     release.read
     release.upgrade
 
@@ -337,7 +335,6 @@ class Permission < ApplicationRecord
     release.entitlements.read
     release.create
     release.delete
-    release.download
     release.publish
     release.read
     release.update
@@ -418,7 +415,6 @@ class Permission < ApplicationRecord
     platform.read
 
     release.constraints.read
-    release.download
     release.read
     release.upgrade
 
@@ -486,7 +482,6 @@ class Permission < ApplicationRecord
     platform.read
 
     release.constraints.read
-    release.download
     release.read
     release.upgrade
 
