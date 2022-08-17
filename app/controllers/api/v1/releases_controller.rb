@@ -24,27 +24,27 @@ module Api::V1
       # We're applying scopes and preloading after the policy scope because
       # our policy scope may include a UNION, and scopes/preloading need to
       # be applied after the UNION query has been performed.
-      releases = apply_pagination(apply_scopes(policy_scope(current_account.releases)).preload(:channel))
-      authorize releases
+      releases = apply_pagination(authorized_scope(apply_scopes(current_account.releases)).preload(:constraints, :channel))
+      authorize! releases
 
       render jsonapi: releases
     end
 
     def show
-      authorize release
+      authorize! release
 
       render jsonapi: release
     end
 
     def create
       release = current_account.releases.new(api_version: current_api_version, **release_params)
-      authorize release
+      authorize! release
 
       if release.save
         BroadcastEventService.call(
           event: 'release.created',
           account: current_account,
-          resource: release
+          resource: release,
         )
 
         render jsonapi: release, status: :created, location: v1_account_release_url(release.account_id, release)
@@ -54,13 +54,13 @@ module Api::V1
     end
 
     def update
-      authorize release
+      authorize! release
 
       if release.update(release_params)
         BroadcastEventService.call(
           event: 'release.updated',
           account: current_account,
-          resource: release
+          resource: release,
         )
 
         render jsonapi: release
@@ -70,12 +70,12 @@ module Api::V1
     end
 
     def destroy
-      authorize release
+      authorize! release
 
       BroadcastEventService.call(
         event: 'release.deleted',
         account: current_account,
-        resource: release
+        resource: release,
       )
 
       release.destroy_async
@@ -86,7 +86,7 @@ module Api::V1
     attr_reader :release
 
     def set_release
-      scoped_releases = apply_scopes(policy_scope(current_account.releases))
+      scoped_releases = authorized_scope(apply_scopes(current_account.releases))
 
       @release = FindByAliasService.call(
         scope: scoped_releases,

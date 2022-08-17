@@ -114,7 +114,6 @@ permissions = %w[
   release.entitlements.read
   release.create
   release.delete
-  release.download
   release.publish
   release.read
   release.update
