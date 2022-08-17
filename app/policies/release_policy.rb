@@ -35,7 +35,8 @@ class ReleasePolicy < ApplicationPolicy
       allow!
     in role: { name: 'product' } if record.all? { _1.product == bearer }
       allow!
-    in role: { name: 'user' } if record.all? { _1.product_id.in?(bearer.product_ids) || _1.open_distribution? && _1.constraints.none? }
+    in role: { name: 'user' } if record.all? { _1.open_distribution? && _1.constraints.none? ||
+                                               _1.product_id.in?(bearer.product_ids) }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed_distribution?)
 
@@ -52,7 +53,8 @@ class ReleasePolicy < ApplicationPolicy
       end
 
       allow!
-    in role: { name: 'license' } if record.all? { _1.product == bearer.product || _1.open_distribution? && _1.constraints.none? }
+    in role: { name: 'license' } if record.all? { _1.open_distribution? && _1.constraints.none? ||
+                                                  _1.product == bearer.product }
       deny! 'release distribution strategy is closed' if
         record.any?(&:closed_distribution?)
 
