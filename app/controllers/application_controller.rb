@@ -407,6 +407,7 @@ class ApplicationController < ActionController::API
     Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
 
     # FIXME(ezekg) Does Action Policy provide a better API for fetching the reason?
+    # FIXME(ezekg) Filter out symbols, which may indicate an action.
     reason = e.result.reasons&.reasons&.values&.first&.first
     detail = case
           when reason.present?

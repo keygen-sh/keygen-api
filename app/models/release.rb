@@ -373,180 +373,186 @@ class Release < ApplicationRecord
   end
 
   def upgrade!(channel: nil, constraint: nil)
-    product.releases.for_channel(channel.presence || self.channel)
-                    .order_by_version
-                    .published
-                    .then { |scope|
-                      base = scope.where.not(version:)
-                                  .where.not(id:)
+    release = product.releases
+      .for_channel(channel.presence || self.channel)
+      .order_by_version
+      .published
+      .then { |scope|
+        base = scope.where.not(version:)
+                    .where.not(id:)
 
-                      scope = if semver_build_num.present?
-                                # Build num to greater build num (e.g. +build.1 to +build.2)
-                                base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:, semver_build_num:)
-                                  semver_major      = :semver_major      AND
-                                  semver_minor      = :semver_minor      AND
-                                  semver_patch      = :semver_patch      AND
-                                  semver_pre_word   = :semver_pre_word   AND
-                                  semver_pre_num    = :semver_pre_num    AND
-                                  semver_build_word = :semver_build_word AND
-                                  semver_build_num  > :semver_build_num
-                                SQL
-                              else
-                                # No build num to build num (e.g. +build to +build.1653508117)
-                                base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:)
-                                  semver_major      = :semver_major      AND
-                                  semver_minor      = :semver_minor      AND
-                                  semver_patch      = :semver_patch      AND
-                                  semver_pre_word   = :semver_pre_word   AND
-                                  semver_pre_num    = :semver_pre_num    AND
-                                  semver_build_word = :semver_build_word AND
-                                  semver_build_num IS NOT NULL
-                                SQL
-                              end
+        scope = if semver_build_num.present?
+                  # Build num to greater build num (e.g. +build.1 to +build.2)
+                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:, semver_build_num:)
+                    semver_major      = :semver_major      AND
+                    semver_minor      = :semver_minor      AND
+                    semver_patch      = :semver_patch      AND
+                    semver_pre_word   = :semver_pre_word   AND
+                    semver_pre_num    = :semver_pre_num    AND
+                    semver_build_word = :semver_build_word AND
+                    semver_build_num  > :semver_build_num
+                  SQL
+                else
+                  # No build num to build num (e.g. +build to +build.1653508117)
+                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:)
+                    semver_major      = :semver_major      AND
+                    semver_minor      = :semver_minor      AND
+                    semver_patch      = :semver_patch      AND
+                    semver_pre_word   = :semver_pre_word   AND
+                    semver_pre_num    = :semver_pre_num    AND
+                    semver_build_word = :semver_build_word AND
+                    semver_build_num IS NOT NULL
+                  SQL
+                end
 
-                      scope = if semver_build_word.present?
-                                # Build tag to greater build tag (e.g. +1 to +2)
-                                scope.or(
-                                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:),
-                                    semver_major      = :semver_major      AND
-                                    semver_minor      = :semver_minor      AND
-                                    semver_patch      = :semver_patch      AND
-                                    semver_pre_word   = :semver_pre_word   AND
-                                    semver_pre_num    = :semver_pre_num    AND
-                                    semver_build_word > :semver_build_word
-                                  SQL
-                                )
-                              else
-                                # No build tag to build tag (e.g. alpha to alpha+build.1653508117)
-                                scope.or(
-                                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:),
-                                    semver_major      = :semver_major    AND
-                                    semver_minor      = :semver_minor    AND
-                                    semver_patch      = :semver_patch    AND
-                                    semver_pre_word   = :semver_pre_word AND
-                                    semver_pre_num    = :semver_pre_num  AND
-                                    semver_build_word IS NOT NULL
-                                  SQL
-                                )
-                              end
+        scope = if semver_build_word.present?
+                  # Build tag to greater build tag (e.g. +1 to +2)
+                  scope.or(
+                    base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:, semver_build_word:),
+                      semver_major      = :semver_major      AND
+                      semver_minor      = :semver_minor      AND
+                      semver_patch      = :semver_patch      AND
+                      semver_pre_word   = :semver_pre_word   AND
+                      semver_pre_num    = :semver_pre_num    AND
+                      semver_build_word > :semver_build_word
+                    SQL
+                  )
+                else
+                  # No build tag to build tag (e.g. alpha to alpha+build.1653508117)
+                  scope.or(
+                    base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:),
+                      semver_major      = :semver_major    AND
+                      semver_minor      = :semver_minor    AND
+                      semver_patch      = :semver_patch    AND
+                      semver_pre_word   = :semver_pre_word AND
+                      semver_pre_num    = :semver_pre_num  AND
+                      semver_build_word IS NOT NULL
+                    SQL
+                  )
+                end
 
-                      scope = if semver_pre_num.present?
-                                # Pre num to greater pre num (e.g. alpha.1 to alpha.2)
-                                scope.or(
-                                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:),
-                                    semver_major    = :semver_major    AND
-                                    semver_minor    = :semver_minor    AND
-                                    semver_patch    = :semver_patch    AND
-                                    semver_pre_word = :semver_pre_word AND
-                                    semver_pre_num  > :semver_pre_num
-                                  SQL
-                                )
-                              else
-                                # No pre num to pre num (e.g. beta to beta.1)
-                                scope.or(
-                                  base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:),
-                                    semver_major    = :semver_major    AND
-                                    semver_minor    = :semver_minor    AND
-                                    semver_patch    = :semver_patch    AND
-                                    semver_pre_word = :semver_pre_word AND
-                                    semver_pre_num IS NOT NULL
-                                  SQL
-                                )
-                              end
+        scope = if semver_pre_num.present?
+                  # Pre num to greater pre num (e.g. alpha.1 to alpha.2)
+                  scope.or(
+                    base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:, semver_pre_num:),
+                      semver_major    = :semver_major    AND
+                      semver_minor    = :semver_minor    AND
+                      semver_patch    = :semver_patch    AND
+                      semver_pre_word = :semver_pre_word AND
+                      semver_pre_num  > :semver_pre_num
+                    SQL
+                  )
+                else
+                  # No pre num to pre num (e.g. beta to beta.1)
+                  scope.or(
+                    base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:),
+                      semver_major    = :semver_major    AND
+                      semver_minor    = :semver_minor    AND
+                      semver_patch    = :semver_patch    AND
+                      semver_pre_word = :semver_pre_word AND
+                      semver_pre_num IS NOT NULL
+                    SQL
+                  )
+                end
 
-                      if semver_pre_word.present?
-                        # Pre tag to greater pre tag (e.g. alpha to beta)
-                        scope = scope.or(
-                          base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:),
-                            semver_major    = :semver_major    AND
-                            semver_minor    = :semver_minor    AND
-                            semver_patch    = :semver_patch    AND
-                            semver_pre_word > :semver_pre_word
-                          SQL
-                        )
+        if semver_pre_word.present?
+          # Pre tag to greater pre tag (e.g. alpha to beta)
+          scope = scope.or(
+            base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:, semver_pre_word:),
+              semver_major    = :semver_major    AND
+              semver_minor    = :semver_minor    AND
+              semver_patch    = :semver_patch    AND
+              semver_pre_word > :semver_pre_word
+            SQL
+          )
 
-                        # Pre tag to no pre tag (e.g. 1.0.0-alpha to 1.0.0)
-                        scope = scope.or(
-                          base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:),
-                            semver_major    = :semver_major AND
-                            semver_minor    = :semver_minor AND
-                            semver_patch    = :semver_patch AND
-                            semver_pre_word IS NULL         AND
-                            semver_pre_num  IS NULL
-                          SQL
-                        )
-                      end
+          # Pre tag to no pre tag (e.g. 1.0.0-alpha to 1.0.0)
+          scope = scope.or(
+            base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:),
+              semver_major    = :semver_major AND
+              semver_minor    = :semver_minor AND
+              semver_patch    = :semver_patch AND
+              semver_pre_word IS NULL         AND
+              semver_pre_num  IS NULL
+            SQL
+          )
+        end
 
-                      # Patch to greater patch (e.g. 1.0.2 to 1.0.3)
-                      scope = scope.or(
-                        base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:),
-                          semver_major = :semver_major AND
-                          semver_minor = :semver_minor AND
-                          semver_patch > :semver_patch
-                        SQL
-                      )
+        # Patch to greater patch (e.g. 1.0.2 to 1.0.3)
+        scope = scope.or(
+          base.where(<<~SQL.squish, semver_major:, semver_minor:, semver_patch:),
+            semver_major = :semver_major AND
+            semver_minor = :semver_minor AND
+            semver_patch > :semver_patch
+          SQL
+        )
 
-                      # Minor to greater minor (e.g. 1.0.3 to 1.1.0)
-                      scope = scope.or(
-                        base.where(<<~SQL.squish, semver_major:, semver_minor:),
-                          semver_major = :semver_major AND
-                          semver_minor > :semver_minor
-                        SQL
-                      )
+        # Minor to greater minor (e.g. 1.0.3 to 1.1.0)
+        scope = scope.or(
+          base.where(<<~SQL.squish, semver_major:, semver_minor:),
+            semver_major = :semver_major AND
+            semver_minor > :semver_minor
+          SQL
+        )
 
-                      # Major to greater major (e.g. 1.1.0 to 2.0.0)
-                      scope = scope.or(
-                        base.where(<<~SQL.squish, semver_major:),
-                          semver_major > :semver_major
-                        SQL
-                      )
+        # Major to greater major (e.g. 1.1.0 to 2.0.0)
+        scope = scope.or(
+          base.where(<<~SQL.squish, semver_major:),
+            semver_major > :semver_major
+          SQL
+        )
 
-                      scope
-                    }
-                    .then { |scope|
-                      next scope if
-                        constraint.nil?
+        scope
+      }
+      .then { |scope|
+        next scope if
+          constraint.nil?
 
-                      _, major, minor, patch, pre, build = Semverse::Constraint.split(constraint)
+        _, major, minor, patch, pre, build = Semverse::Constraint.split(constraint)
 
-                      # Filter pre tags if one was specified, e.g. -beta, -alpha, etc.
-                      if pre.present?
-                        pre_tags = pre.scan(SEMVER_TAG_RE)
+        # Filter pre tags if one was specified, e.g. -beta, -alpha, etc.
+        if pre.present?
+          pre_tags = pre.scan(SEMVER_TAG_RE)
 
-                        if pre_word = pre_tags.map { _1[1] }.compact.join('.').presence
-                          scope = scope.where(semver_pre_word: pre_word)
-                        end
+          if pre_word = pre_tags.map { _1[1] }.compact.join('.').presence
+            scope = scope.where(semver_pre_word: pre_word)
+          end
 
-                        if pre_num = pre_tags.map { _1[0] }.compact.first.presence
-                          scope = scope.where(semver_pre_num: pre_num)
-                        end
-                      end
+          if pre_num = pre_tags.map { _1[0] }.compact.first.presence
+            scope = scope.where(semver_pre_num: pre_num)
+          end
+        end
 
-                      # Filter pre tags if one was specified, e.g. +pkg1, +pkg2, etc.
-                      if build.present?
-                        build_tags = build.scan(SEMVER_TAG_RE)
+        # Filter pre tags if one was specified, e.g. +pkg1, +pkg2, etc.
+        if build.present?
+          build_tags = build.scan(SEMVER_TAG_RE)
 
-                        if build_word = build_tags.map { _1[1] }.compact.join('.').presence
-                          scope = scope.where(semver_build_word: build_word)
-                        end
+          if build_word = build_tags.map { _1[1] }.compact.join('.').presence
+            scope = scope.where(semver_build_word: build_word)
+          end
 
-                        if build_num = build_tags.map { _1[0] }.compact.first.presence
-                          scope = scope.where(semver_build_num: build_num)
-                        end
-                      end
+          if build_num = build_tags.map { _1[0] }.compact.first.presence
+            scope = scope.where(semver_build_num: build_num)
+          end
+        end
 
-                      # Filter based on version part.
-                      case
-                      when patch.present?
-                        scope.where(semver_major: major, semver_minor: minor, semver_patch: patch..)
-                      when minor.present?
-                        scope.where(semver_major: major, semver_minor: minor..)
-                      when major.present?
-                        scope.where(semver_major: major)
-                      end
-                    }
-                    .limit(1)
-                    .take
+        # Filter based on version part.
+        case
+        when patch.present?
+          scope.where(semver_major: major, semver_minor: minor, semver_patch: patch..)
+        when minor.present?
+          scope.where(semver_major: major, semver_minor: minor..)
+        when major.present?
+          scope.where(semver_major: major)
+        end
+      }
+      .limit(1)
+      .take
+
+    raise Keygen::Error::NotFoundError.new(model: Release.name, message: 'upgrade not available') if
+      release.nil?
+
+    release
   end
 
   def publish!
