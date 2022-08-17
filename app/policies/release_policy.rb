@@ -16,7 +16,8 @@ class ReleasePolicy < ApplicationPolicy
       relation.for_license(bearer.id)
               .published
     else
-      relation.open.published
+      relation.open
+              .published
     end
   end
 
@@ -24,14 +25,48 @@ class ReleasePolicy < ApplicationPolicy
     verify_permissions!('release.read')
 
     allow! if
-      record.open_distribution? &&
-      record.constraints.none?
+      record.all? { _1.open_distribution? && _1.constraints.none? }
 
     deny! 'authentication is required' if
       bearer.nil?
 
-    # FIXME(ezekg) Need to verify authz for each release in a performant way
-    allow!
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.product == bearer }
+      allow!
+    in role: { name: 'user' } if record.all? { _1.product_id.in?(bearer.product_ids) || _1.open_distribution? && _1.constraints.none? }
+      deny! 'release distribution strategy is closed' if
+        record.any?(&:closed_distribution?)
+
+      licenses = bearer.licenses.preload(:product, :policy, :user)
+                                .for_product(
+                                  record.collect(&:product_id),
+                                )
+
+      record.each do |release|
+        verify_licenses_for_release!(
+          licenses:,
+          release:,
+        )
+      end
+
+      allow!
+    in role: { name: 'license' } if record.all? { _1.product == bearer.product || _1.open_distribution? && _1.constraints.none? }
+      deny! 'release distribution strategy is closed' if
+        record.any?(&:closed_distribution?)
+
+      record.each do |release|
+        verify_license_for_release!(
+          license: bearer,
+          release:,
+        )
+      end
+
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
@@ -56,14 +91,20 @@ class ReleasePolicy < ApplicationPolicy
       licenses = bearer.licenses.preload(:product, :policy, :user)
                                 .for_product(record.product)
 
-      verify_licenses!(licenses)
+      verify_licenses_for_release!(
+        licenses: licenses,
+        release: record,
+      )
 
       allow!
     in role: { name: 'license' } if record.product == bearer.product
       deny! 'release distribution strategy is closed' if
         record.closed_distribution?
 
-      verify_license!(bearer)
+      verify_license_for_release!(
+        license: bearer,
+        release: record,
+      )
 
       allow!
     else
@@ -233,7 +274,7 @@ class ReleasePolicy < ApplicationPolicy
 
   private
 
-  def verify_license!(license)
+  def verify_license_for_release!(license:, release:)
     deny! 'license is suspended' if
       license.suspended?
 
@@ -244,23 +285,23 @@ class ReleasePolicy < ApplicationPolicy
       license.revoke_access? && license.expired?
 
     deny! 'release is outside license expiry window' if
-      record.created_at > license.expiry
+      release.created_at > license.expiry
 
     deny! 'license is missing entitlements' if
-      record.entitlements.any? &&
-      (record.entitlements & license.entitlements).size != record.entitlements.size
+      release.entitlements.any? &&
+      (release.entitlements & license.entitlements).size != release.entitlements.size
 
     true
   end
 
-  def verify_licenses!(licenses)
+  def verify_licenses_for_release!(licenses:, release:)
     results = []
 
     licenses.each do |license|
       # We're catching :policy_fulfilled so that we can verify all licenses,
       # but still bubble up the deny! reason in case of a failure. In case
       # of a valid license, this will return early.
-      catch(:policy_fulfilled) { return true if verify_license!(license) }
+      catch(:policy_fulfilled) { return true if verify_license_for_release!(license:, release:) }
 
       results << result.value
     end
