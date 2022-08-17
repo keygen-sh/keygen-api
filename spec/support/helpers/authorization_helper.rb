@@ -173,7 +173,7 @@ module AuthorizationHelper
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:, group:) }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:license) { create(:license, account:, group:) }
+        let(:license) { create(:license, account: group.account, group:) }
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }
@@ -204,7 +204,7 @@ module AuthorizationHelper
         let(:user)    { create(:user, account:, group:) }
         let(:license) { create(:license, account:, policy:, user:) }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:user) { create(:user, account:, group:) }
+        let(:user) { create(:user, account: group.account, group:) }
       end
 
       let(:record) { user }
@@ -374,7 +374,7 @@ module AuthorizationHelper
         let(:license) { create(:license, account:, policy:) }
         let(:machine) { create(:machine, account:, license:, group:) }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:machine) { create(:machine, account:, group:) }
+        let(:machine) { create(:machine, account: group.account, group:) }
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }

@@ -54,6 +54,18 @@ describe Groups::UserPolicy, type: :policy do
     with_scenarios %i[accessing_another_account accessing_a_group accessing_its_users] do
       with_token_authentication do
         with_permissions %w[group.users.read] do
+          denies :index
+        end
+
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
+        without_permissions       { denies :index }
+      end
+    end
+
+    with_scenarios %i[accessing_another_account accessing_a_group accessing_its_user] do
+      with_token_authentication do
+        with_permissions %w[group.users.read] do
           denies :show
         end
 
