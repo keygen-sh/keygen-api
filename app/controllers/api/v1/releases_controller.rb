@@ -24,7 +24,7 @@ module Api::V1
       # We're applying scopes and preloading after the policy scope because
       # our policy scope may include a UNION, and scopes/preloading need to
       # be applied after the UNION query has been performed.
-      releases = apply_pagination(authorized_scope(apply_scopes(current_account.releases)).preload(:constraints, :channel))
+      releases = apply_pagination(authorized_scope(apply_scopes(current_account.releases)).preload(:product, :channel, :constraints, :entitlements))
       authorize! releases
 
       render jsonapi: releases
