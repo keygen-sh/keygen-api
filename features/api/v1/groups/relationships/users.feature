@@ -144,7 +144,7 @@ Feature: Group users relationship
     Then the response status should be "200"
     And the JSON response should be an array with 2 "users"
 
-  Scenario: User retrieves all users for their group (is not member)
+  Scenario: User retrieves all users for a group (is not member)
     Given the current account is "test1"
     And the current account has 2 "groups"
     And the current account has 7 "users"
@@ -163,7 +163,7 @@ Feature: Group users relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$1/users"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves all users for their group (is member)
     Given the current account is "test1"
@@ -184,31 +184,6 @@ Feature: Group users relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$1/users"
-    Then the response status should be "403"
-
-  Scenario: User retrieves all users for a group
-    Given the current account is "test1"
-    And the current account has 2 "groups"
-    And the current account has 7 "users"
-    And the first "user" has the following attributes:
-      """
-      { "groupId": "$groups[0]" }
-      """
-    And the second "user" has the following attributes:
-      """
-      { "groupId": "$groups[1]" }
-      """
-    And the third "user" has the following attributes:
-      """
-      { "groupId": "$groups[0]" }
-      """
-    And the fourth "user" has the following attributes:
-      """
-      { "groupId": "$groups[1]" }
-      """
-    And I am a user of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/groups/$0/users"
     Then the response status should be "403"
 
   Scenario: License retrieves all users for a group
@@ -232,6 +207,32 @@ Feature: Group users relationship
       { "groupId": "$groups[1]" }
       """
     And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/users"
+    Then the response status should be "404"
+
+  Scenario: License retrieves all users for their group
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 7 "users"
+    And the first "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the second "user" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the third "user" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "user" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the current account has 1 "license" in the first "group"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/users"

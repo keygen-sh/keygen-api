@@ -13,48 +13,44 @@ module Api::V1
     has_scope(:active, :boolean) { |c, s, v| s.assigned(v) }
 
     before_action :scope_to_current_account!
-    before_action :require_active_subscription!, only: [:index, :create, :destroy]
-    before_action :authenticate_with_token!, only: [:index, :show, :update, :destroy]
-    before_action :authenticate_with_token, only: [:create]
-    before_action :set_user, only: [:show, :update, :destroy]
+    before_action :require_active_subscription!, only: %i[index create destroy]
+    before_action :authenticate_with_token!, only: %i[index show update destroy]
+    before_action :authenticate_with_token, only: %i[create]
+    before_action :set_user, only: %i[show update destroy]
 
-    # GET /users
     def index
       # We're applying scopes and preloading after the policy scope because
       # our policy scope may include a UNION, and scopes/preloading need to
       # be applied after the UNION query has been performed.
-      @users = apply_pagination(policy_scope(apply_scopes(current_account.users)).preload(:role))
-      authorize @users
+      users = apply_pagination(authorized_scope(apply_scopes(current_account.users)).preload(:role))
+      authorize! users
 
-      render jsonapi: @users
+      render jsonapi: users
     end
 
-    # GET /users/1
     def show
-      authorize @user
+      authorize! user
 
-      render jsonapi: @user
+      render jsonapi: user
     end
 
-    # POST /users
     def create
-      @user = current_account.users.new user_params
-      authorize @user
+      user = current_account.users.new user_params
+      authorize! user
 
-      if @user.save
+      if user.save
         BroadcastEventService.call(
-          event: "user.created",
+          event: 'user.created',
           account: current_account,
-          resource: @user
+          resource: user,
         )
 
-        render jsonapi: @user, status: :created, location: v1_account_user_url(@user.account, @user)
+        render jsonapi: user, status: :created, location: v1_account_user_url(user.account, user)
       else
-        render_unprocessable_resource @user
+        render_unprocessable_resource user
       end
     end
 
-    # PATCH/PUT /users/1
     def update
       # NOTE(ezekg) Wrapping in a transaction to cover any possible database side-effects
       #             of the attrs assignment, e.g. setting the IDs of an association.
@@ -63,7 +59,7 @@ module Api::V1
 
         # NOTE(ezekg) We're authorizing after assigning attrs to catch any unpermitted
         #             role changes, i.e. privilege escalation.
-        authorize user
+        authorize! user
 
         user.save!
       end
@@ -77,21 +73,16 @@ module Api::V1
       render jsonapi: user
     end
 
-    # DELETE /users/1
     def destroy
-      authorize @user
+      authorize! user
 
-      if @user.destroy_async
-        BroadcastEventService.call(
-          event: "user.deleted",
-          account: current_account,
-          resource: @user
-        )
+      BroadcastEventService.call(
+        event: 'user.deleted',
+        account: current_account,
+        resource: user,
+      )
 
-        head :no_content
-      else
-        render_unprocessable_resource @user
-      end
+      user.destroy_async
     end
 
     private
@@ -99,9 +90,11 @@ module Api::V1
     attr_reader :user
 
     def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id].downcase, aliases: :email)
+      scoped_users = authorized_scope(current_account.users)
 
-      Current.resource = @user
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id].downcase, aliases: :email)
+
+      Current.resource = user
     end
 
     typed_parameters format: :jsonapi do
