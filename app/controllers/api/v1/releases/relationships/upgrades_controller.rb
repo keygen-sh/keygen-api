@@ -10,11 +10,11 @@ module Api::V1::Releases::Relationships
     before_action :set_release
 
     def show
-      authorize release, :download?
+      authorize! release, to: :upgrade?
 
       kwargs  = upgrade_query.symbolize_keys.slice(:constraint, :channel)
       upgrade = release.upgrade!(**kwargs)
-      authorize upgrade, :download?
+      authorize! upgrade
 
       meta = {
         current: release.version,
@@ -42,7 +42,7 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = apply_scopes(policy_scope(current_account.releases))
+      scoped_releases = apply_scopes(authorized_scope(current_account.releases))
 
       @release = FindByAliasService.call(
         scope: scoped_releases,

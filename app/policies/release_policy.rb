@@ -159,74 +159,49 @@ class ReleasePolicy < ApplicationPolicy
     end
   end
 
-  def download?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.download
-      release.read
-    ]
-
-    # We don't need to authenticate if product is open distribution, as long as the
-    # release doesn't have any entitlement constraints.
-    return true if
-      resource.product.open_distribution? &&
-      resource.constraints.none?
-
-    # Otherwise, we require authentication.
-    return false if
-      bearer.nil?
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.product == bearer ||
-      (
-        !resource.product.closed_distribution? && (
-          # Assert current bearer is a user of the product that has a non-expired/suspended
-          # license or that the bearer is itself a license for the product that is valid,
-          # and then assert that the license satisfies all entitlement constraints.
-          (bearer.has_role?(:user) && has_valid_license?(bearer)) ||
-          (bearer.has_role?(:license) && valid_license?(bearer))
-        )
-      )
-  end
-
   def upgrade?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.upgrade
-      release.read
-    ]
+    verify_permissions!('release.upgrade')
 
-    download?
+    allowed_to?(:show?)
   end
 
   def upload?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.upload
-    ]
+    verify_permissions!('release.upload')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def publish?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.publish
-    ]
+    verify_permissions!('release.publish')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def yank?
-    assert_account_scoped!
-    assert_permissions! %w[
-      release.yank
-    ]
+    verify_permissions!('release.yank')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def list_entitlements?
