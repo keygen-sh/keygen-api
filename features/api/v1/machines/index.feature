@@ -491,7 +491,7 @@ Feature: List machines
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "machines"
+    And the JSON response should be an array with 1 "machine"
 
   Scenario: User attempts to retrieve all machines for their account
     Given the current account is "test1"

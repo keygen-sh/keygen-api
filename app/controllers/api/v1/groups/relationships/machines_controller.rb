@@ -7,16 +7,20 @@ module Api::V1::Groups::Relationships
     before_action :authenticate_with_token!
     before_action :set_group
 
+    authorize :group
+
     def index
-      machines = apply_pagination(policy_scope(apply_scopes(group.machines)).preload(:product, :policy))
-      authorize machines
+      machines = apply_pagination(authorized_scope(apply_scopes(group.machines), with: Groups::MachinePolicy).preload(:product, :policy, :license, :user))
+      authorize! machines,
+        with: Groups::MachinePolicy
 
       render jsonapi: machines
     end
 
     def show
       machine = FindByAliasService.call(scope: group.machines, identifier: params[:id], aliases: :fingerprint)
-      authorize machine
+      authorize! machine,
+        with: Groups::MachinePolicy
 
       render jsonapi: machine
     end
@@ -26,8 +30,9 @@ module Api::V1::Groups::Relationships
     attr_reader :group
 
     def set_group
-      @group = current_account.groups.find(params[:group_id])
-      authorize group, :show?
+      scoped_groups = authorized_scope(current_account.groups)
+
+      @group = scoped_groups.find(params[:group_id])
 
       Current.resource = group
     end

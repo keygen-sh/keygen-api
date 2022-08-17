@@ -172,8 +172,7 @@ Feature: Group machines relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
-    Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    Then the response status should be "403"
 
   Scenario: User retrieves all machines for a group
     Given the current account is "test1"
@@ -199,7 +198,7 @@ Feature: Group machines relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves all machines for their group
     Given the current account is "test1"
@@ -235,8 +234,7 @@ Feature: Group machines relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$1/machines"
-    Then the response status should be "200"
-    And the JSON response should be an array with 1 "machine"
+    Then the response status should be "403"
 
   Scenario: License retrieves all machines for a group
     Given the current account is "test1"
@@ -261,7 +259,7 @@ Feature: Group machines relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/machines"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Anonymous retrieves all machines for a group
     Given the current account is "test1"
