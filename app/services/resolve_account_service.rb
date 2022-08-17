@@ -38,10 +38,11 @@ class ResolveAccountService < BaseService
     raise Keygen::Error::InvalidAccountDomainError, 'domain is invalid' if
       domain.match?(ACCOUNT_SCOPE_INVALID_DOMAIN_RE)
 
-    cache_key = Account.cache_key(domain)
+    cache_key = Account.cache_key("cname:#{domain}")
 
     Rails.cache.fetch(cache_key, skip_nil: true, expires_in: ACCOUNT_SCOPE_CACHE_TTL) do
-      FindByAliasService.call(scope: Account, identifier: domain, aliases: :domain)
+      # FIXME(ezekg) Remove domain column after all customers are migrated to cname
+      FindByAliasService.call(scope: Account, identifier: domain, aliases: %i[cname domain])
     end
   end
 
