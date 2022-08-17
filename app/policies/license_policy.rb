@@ -2,40 +2,35 @@
 
 class LicensePolicy < ApplicationPolicy
   def index?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.read
-    ]
+    verify_permissions!('license.read')
 
-    resource.subject => [License, *] | [] => licenses
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.has_role?(:product) &&
-        licenses.all? { _1.policy.product_id == bearer.id }) ||
-      (bearer.has_role?(:user) &&
-        licenses.all? { _1.user_id == bearer.id }) ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        licenses.all? {
-          _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
-          _1.user_id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.product == bearer }
+      allow!
+    in role: { name: 'user' } if record.all? { _1.user == bearer }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.read
-    ]
+    verify_permissions!('license.read')
 
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      license.user == bearer ||
-      license.product == bearer ||
-      license == bearer ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        license.group_id? && license.group_id.in?(bearer.group_ids))
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      allow!
+    in role: { name: 'license' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?

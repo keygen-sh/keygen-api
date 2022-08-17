@@ -166,8 +166,7 @@ Feature: Group licenses relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
-    Then the response status should be "200"
-    And the JSON response should be an array with 1 "license"
+    Then the response status should be "403"
 
   Scenario: User retrieves all licenses for a group
     Given the current account is "test1"
@@ -191,6 +190,31 @@ Feature: Group licenses relationship
       { "groupId": "$groups[1]" }
       """
     And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/groups/$0/licenses"
+    Then the response status should be "404"
+
+  Scenario: License retrieves all licenses for their group
+    Given the current account is "test1"
+    And the current account has 2 "groups"
+    And the current account has 7 "licenses"
+    And the first "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "groupId": "$groups[0]" }
+      """
+    And the fourth "license" has the following attributes:
+      """
+      { "groupId": "$groups[1]" }
+      """
+    And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/groups/$0/licenses"
     Then the response status should be "403"
@@ -217,8 +241,8 @@ Feature: Group licenses relationship
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/groups/$0/licenses"
-    Then the response status should be "403"
+    When I send a GET request to "/accounts/test1/groups/$1/licenses"
+    Then the response status should be "404"
 
   Scenario: Anonymous retrieves all licenses for a group
     Given the current account is "test1"
