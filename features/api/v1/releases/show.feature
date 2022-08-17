@@ -385,6 +385,10 @@ Feature: Show release
     And the current account has 1 "release" for the first "product"
     And the current account has 1 "policy" for the first "product"
     And the current account has 1 "license" for the first "policy"
+    And the first "release" has the following attributes:
+      """
+      { "createdAt": "$time.3.months.ago" }
+      """
     And the first "license" has the following attributes:
       """
       { "expiry": "$time.2.months.ago" }
@@ -393,6 +397,25 @@ Feature: Show release
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
+
+  Scenario: License retrieves an LICENSED release with an expiry outside window
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 1 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.week.ago" }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "403"
 
   Scenario: User retrieves a LICENSED release without a license for it
     Given the current account is "test1"
@@ -424,6 +447,84 @@ Feature: Show release
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves a LICENSED release with multiple licenses for it (mixed validity)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.year.ago" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 3 "licenses"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "200"
+
+  Scenario: User retrieves a LICENSED release with multiple licenses for it (all invalid)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "license" for the first "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.year.ago" }
+      """
+    And the second "license" has the following attributes:
+      """
+      { "expiry": "$time.3.days.ago" }
+      """
+    And the third "license" has the following attributes:
+      """
+      { "suspended": true }
+      """
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 3 "licenses"
+    When I send a GET request to "/accounts/test1/releases/$0"
+    Then the response status should be "403"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (release is outside license expiry window)"
+      }
+      """
+
+  Scenario: User retrieves a LICENSED release with multiple licenses for it (all valid)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the first "product" has the following attributes:
+      """
+      { "distributionStrategy": "LICENSED" }
+      """
+    And the current account has 1 "release" for the first "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 3 "license" for the first "policy"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 3 "licenses"
     When I send a GET request to "/accounts/test1/releases/$0"
     Then the response status should be "200"
 

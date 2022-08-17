@@ -63,18 +63,12 @@ class ApplicationPolicy
   end
 
   def verify_authenticated!
-    deny! 'bearer is missing' if bearer.nil?
+    deny! 'authentication is required' if bearer.nil?
   end
 
   def verify_permissions!(*actions)
     return if
       bearer.nil?
-
-    deny! 'bearer is banned' if
-      (bearer.user? || bearer.license?) && bearer.banned?
-
-    deny! 'bearer is suspended' if
-      bearer.license? && bearer.suspended?
 
     deny! 'bearer lacks permission to perform action' unless
       bearer.can?(actions)
