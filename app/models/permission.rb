@@ -8,9 +8,8 @@ class Permission < ApplicationRecord
   # The action name of the wildcard permission.
   WILDCARD_PERMISSION = '*'.freeze
 
-  # Default admin permissions.
-  ALL_PERMISSIONS   =
-  ADMIN_PERMISSIONS = %w[
+  # Available permissions.
+  ALL_PERMISSIONS = %w[
     account.billing.read
     account.billing.update
     account.plan.read
@@ -42,6 +41,7 @@ class Permission < ApplicationRecord
     group.delete
     group.read
     group.update
+    group.licenses.read
     group.machines.read
     group.owners.attach
     group.owners.detach
@@ -163,7 +163,11 @@ class Permission < ApplicationRecord
     webhook-event.retry
   ].freeze
 
-  # Default readonly permissions.
+  # Available admin permissions.
+  ADMIN_PERMISSIONS = ALL_PERMISSIONS.dup
+                                     .freeze
+
+  # Available readonly permissions.
   READ_ONLY_PERMISSIONS =%w[
     account.billing.read
     account.plan.read
@@ -182,6 +186,7 @@ class Permission < ApplicationRecord
     event-log.read
 
     group.read
+    group.licenses.read
     group.machines.read
     group.owners.read
 
@@ -234,7 +239,7 @@ class Permission < ApplicationRecord
     webhook-event.read
   ]
 
-  # Default product permissions.
+  # Available product permissions.
   PRODUCT_PERMISSIONS = %w[
     account.read
 
@@ -255,6 +260,7 @@ class Permission < ApplicationRecord
     group.delete
     group.read
     group.update
+    group.licenses.read
     group.machines.read
     group.owners.attach
     group.owners.detach
@@ -354,7 +360,7 @@ class Permission < ApplicationRecord
     webhook-event.read
   ].freeze
 
-  # Default user permissions.
+  # Available user permissions.
   USER_PERMISSIONS = %w[
     account.read
 
@@ -368,6 +374,7 @@ class Permission < ApplicationRecord
     entitlement.read
 
     group.read
+    group.licenses.read
     group.machines.read
     group.owners.read
 
@@ -428,7 +435,7 @@ class Permission < ApplicationRecord
     user.tokens.read
   ].freeze
 
-  # Default license permissions.
+  # Available license permissions.
   LICENSE_PERMISSIONS = %w[
     account.read
 

@@ -7,16 +7,20 @@ module Api::V1::Groups::Relationships
     before_action :authenticate_with_token!
     before_action :set_group
 
+    authorize :group
+
     def index
-      licenses = apply_pagination(policy_scope(apply_scopes(group.licenses)).preload(:role, :user, :policy))
-      authorize licenses
+      licenses = apply_pagination(authorized_scope(apply_scopes(group.licenses), with: Groups::LicensePolicy).preload(:role, :user, :policy, :product))
+      authorize! licenses,
+        with: Groups::LicensePolicy
 
       render jsonapi: licenses
     end
 
     def show
       license = FindByAliasService.call(scope: group.licenses, identifier: params[:id], aliases: :key)
-      authorize license
+      authorize! license,
+        with: Groups::LicensePolicy
 
       render jsonapi: license
     end
@@ -26,8 +30,9 @@ module Api::V1::Groups::Relationships
     attr_reader :group
 
     def set_group
-      @group = current_account.groups.find(params[:group_id])
-      authorize group, :show?
+      scoped_groups = authorized_scope(current_account.groups)
+
+      @group = scoped_groups.find(params[:group_id])
 
       Current.resource = group
     end

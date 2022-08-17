@@ -155,8 +155,25 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
+    def accessing_its_licenses(scenarios)
+      case scenarios
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)   { create(:policy, account:, product: bearer) }
+        let(:licenses) { create_list(:license, 3, account:, policy:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:licenses) { create_list(:license, 3, account: group.account, group:) }
+      end
+
+      let(:record) { licenses }
+    end
+
     def accessing_its_license(scenarios)
       case scenarios
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)  { create(:policy, account:, product: bearer) }
+        let(:license) { create(:license, account:, policy:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:license) { create(:license, account:, group:) }
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }

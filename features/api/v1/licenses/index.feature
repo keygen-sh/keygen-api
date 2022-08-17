@@ -1728,7 +1728,7 @@ Feature: List license
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "licenses"
+    And the JSON response should be an array with 1 "license"
 
   Scenario: User retrieves all licenses for their account filtered by metadata ID
     Given the current account is "test1"

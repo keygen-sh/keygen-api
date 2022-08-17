@@ -504,7 +504,7 @@ Feature: Show license
     And I use an authentication token
     And the current account has 1 "license"
     When I send a GET request to "/accounts/test1/licenses/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve a license for another account
     Given I am an admin of account "test2"
@@ -529,7 +529,7 @@ Feature: Show license
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/licenses/$1"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin retrieves a license with a correct machine core count
     Given I am an admin of account "test1"

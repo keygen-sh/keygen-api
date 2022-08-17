@@ -20,10 +20,10 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_license, only: [:show, :update, :destroy]
+    before_action :set_license, only: %i[show update destroy]
 
     def index
-      licenses = apply_pagination(policy_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy))
+      licenses = apply_pagination(authorized_scope(apply_scopes(current_account.licenses)).preload(:role, :user, :policy, :product))
       authorize! licenses
 
       render jsonapi: licenses
@@ -36,7 +36,7 @@ module Api::V1
     end
 
     def create
-      license = current_account.licenses.new license_params
+      license = current_account.licenses.new(license_params)
       authorize! license
 
       if license.save
@@ -68,7 +68,6 @@ module Api::V1
       end
     end
 
-    # DELETE /licenses/1
     def destroy
       authorize! license
 
@@ -86,7 +85,9 @@ module Api::V1
     attr_reader :license
 
     def set_license
-      @license = FindByAliasService.call(scope: current_account.licenses, identifier: params[:id], aliases: :key)
+      scoped_licenses = authorized_scope(current_account.licenses)
+
+      @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
       Current.resource = license
     end
