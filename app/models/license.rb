@@ -420,21 +420,12 @@ class License < ApplicationRecord
   }
   scope :for_policy, -> (id) { where policy: id }
   scope :for_user, -> user {
-    scope = case user
-            when User
-              where(user_id: user.id)
-            else
-              search_user(user)
-            end
-
-    return scope if
-      user.is_a?(String) && !UUID_RE.match?(user)
-
-    # Should also include the user's owned licenses through a group
-    scope.union(
-           for_owner(user)
-         )
-         .distinct
+    case user
+    when User
+      where(user:)
+    else
+      search_user(user)
+    end
   }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
   scope :for_product, -> (id) { joins(:policy).where policies: { product_id: id } }
