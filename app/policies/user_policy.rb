@@ -1,32 +1,32 @@
 # frozen_string_literal: true
 
 class UserPolicy < ApplicationPolicy
-  def user  = resource.subject
-  def users = resource.subject
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.read
-    ]
+    verify_permissions!('user.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        users.all? {
-          _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
-          _1.id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.read
-    ]
+    verify_permissions!('user.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      user == bearer ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        user.group_id? && user.group_id.in?(bearer.group_ids))
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' }
+      allow!
+    in role: { name: 'user' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?

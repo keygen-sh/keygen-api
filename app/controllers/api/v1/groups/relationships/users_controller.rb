@@ -7,16 +7,20 @@ module Api::V1::Groups::Relationships
     before_action :authenticate_with_token!
     before_action :set_group
 
+    authorize :group
+
     def index
-      users = apply_pagination(policy_scope(apply_scopes(group.users)).preload(:role))
-      authorize users
+      users = apply_pagination(authorized_scope(apply_scopes(group.users), with: Groups::UserPolicy).preload(:role))
+      authorize! users,
+        with: Groups::UserPolicy
 
       render jsonapi: users
     end
 
     def show
       user = FindByAliasService.call(scope: group.users, identifier: params[:id], aliases: :email)
-      authorize user
+      authorize! user,
+        with: Groups::UserPolicy
 
       render jsonapi: user
     end
@@ -26,8 +30,9 @@ module Api::V1::Groups::Relationships
     attr_reader :group
 
     def set_group
-      @group = current_account.groups.find(params[:group_id])
-      authorize group, :show?
+      scoped_groups = authorized_scope(current_account.groups)
+
+      @group = scoped_groups.find(params[:group_id])
 
       Current.resource = group
     end
