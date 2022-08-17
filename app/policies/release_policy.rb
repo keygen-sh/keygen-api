@@ -46,6 +46,9 @@ class ReleasePolicy < ApplicationPolicy
                                 )
 
       record.each do |release|
+        next if release.open_distribution? &&
+                release.constraints.none?
+
         verify_licenses_for_release!(
           licenses:,
           release:,
@@ -59,6 +62,9 @@ class ReleasePolicy < ApplicationPolicy
         record.any?(&:closed_distribution?)
 
       record.each do |release|
+        next if release.open_distribution? &&
+                release.constraints.none?
+
         verify_license_for_release!(
           license: bearer,
           release:,
