@@ -275,6 +275,8 @@ class User < ApplicationRecord
         )
   end
 
+  def group_ids? = group_ids.any?
+
   def group!
     raise Keygen::Error::NotFoundError.new(model: Group.name) unless
       group.present?

@@ -7,16 +7,11 @@ class MachinePolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' } if record.all? { _1.product.id == bearer.id }
+    in role: { name: 'product' } if record.all? { _1.product == bearer }
       allow!
-    in role: { name: 'user' } if record.all? { _1.license.user_id == bearer.id }
+    in role: { name: 'user' } if record.all? { _1.user == bearer }
       allow!
-    in role: { name: 'user' } if record.any?(&:group_id?) && bearer.group_ids.any?
-      record.all? {
-        _1.group_id? && _1.group_id.in?(bearer.group_ids) ||
-        _1.license.user_id == bearer.id
-      }
-    in role: { name: 'license' } if record.all? { _1.license_id == bearer.id }
+    in role: { name: 'license' } if record.all? { _1.license == bearer }
       allow!
     else
       deny!
@@ -33,8 +28,6 @@ class MachinePolicy < ApplicationPolicy
       allow!
     in role: { name: 'user' } if record.user == bearer
       allow!
-    in role: { name: 'user' } if record.group_id? && bearer.group_ids.any?
-      record.group_id.in?(bearer.group_ids)
     in role: { name: 'license' } if record.license == bearer
       allow!
     else

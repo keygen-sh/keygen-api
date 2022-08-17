@@ -48,7 +48,7 @@ module AuthorizationHelper
     def as_group_owner(scenarios)
       case scenarios
       in [:as_user, :accessing_a_group, *]
-        let(:group_owner) { create(:group_owner, account:, group:, user: bearer) }
+        let!(:group_owner) { create(:group_owner, account:, group:, user: bearer) }
       end
     end
 
@@ -303,6 +303,12 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:machines) { create_list(:machine, 3, account: license.account, license:) }
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)   { create(:policy, account:, product: bearer) }
+        let(:license)  { create(:license, account:, policy:) }
+        let(:machines) { create_list(:machine, 3, account:, license:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:machines) { create_list(:machine, 3, account: group.account, group:) }
       in [:as_product, *]
         let(:policy)   { create(:policy, account:, product: bearer) }
         let(:license)  { create(:license, account:, policy:) }
@@ -320,6 +326,12 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:machine) { create(:machine, account: license.account, license:) }
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)  { create(:policy, account:, product: bearer) }
+        let(:license) { create(:license, account:, policy:) }
+        let(:machine) { create(:machine, account:, license:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:machine) { create(:machine, account:, group:) }
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }

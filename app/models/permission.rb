@@ -42,6 +42,7 @@ class Permission < ApplicationRecord
     group.delete
     group.read
     group.update
+    group.machines.read
     group.owners.attach
     group.owners.detach
     group.owners.read
@@ -181,6 +182,7 @@ class Permission < ApplicationRecord
     event-log.read
 
     group.read
+    group.machines.read
     group.owners.read
 
     key.read
@@ -253,6 +255,7 @@ class Permission < ApplicationRecord
     group.delete
     group.read
     group.update
+    group.machines.read
     group.owners.attach
     group.owners.detach
     group.owners.read
@@ -365,6 +368,7 @@ class Permission < ApplicationRecord
     entitlement.read
 
     group.read
+    group.machines.read
     group.owners.read
 
     license.check-in
