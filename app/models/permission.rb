@@ -46,6 +46,7 @@ class Permission < ApplicationRecord
     group.owners.attach
     group.owners.detach
     group.owners.read
+    group.users.read
 
     key.create
     key.delete
@@ -189,6 +190,7 @@ class Permission < ApplicationRecord
     group.licenses.read
     group.machines.read
     group.owners.read
+    group.users.read
 
     key.read
 
@@ -265,6 +267,7 @@ class Permission < ApplicationRecord
     group.owners.attach
     group.owners.detach
     group.owners.read
+    group.users.read
 
     key.create
     key.delete
@@ -377,6 +380,7 @@ class Permission < ApplicationRecord
     group.licenses.read
     group.machines.read
     group.owners.read
+    group.users.read
 
     license.check-in
     license.check-out

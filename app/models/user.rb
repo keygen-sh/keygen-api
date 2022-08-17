@@ -218,10 +218,25 @@ class User < ApplicationRecord
       self.none
     end
   }
-  scope :for_product, -> (id) { joins(licenses: [:policy]).where policies: { product_id: id } }
+
+  # Give products the ability to read all groups
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: { name: 'admin' | 'product' }
+      self.all
+    in role: { name: 'user' }
+      self.for_user(accessor.id)
+    in role: { name: 'license' }
+      self.for_license(accessor.id)
+    else
+      self.none
+    end
+  }
+
+  scope :for_product, -> (id) { joins(licenses: :policy).where policies: { product_id: id } }
   scope :for_license, -> (id) { joins(:licenses).where licenses: id }
   scope :for_owner, -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user, -> (id) { where(id: id).union(for_owner(id)).distinct }
+  scope :for_user, -> id { where(id:) }
   scope :for_group, -> id { where(group: id) }
   scope :administrators, -> { with_roles(:admin, :developer, :read_only, :sales_agent, :support_agent) }
   scope :admins, -> { with_role(:admin) }
