@@ -15,8 +15,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:admin)   { create(:admin, account:, permissions: bearer_permissions) }
-        let(:bearer)  { admin }
+        let(:bearer)  { create(:admin, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -24,8 +23,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:product) { create(:product, account:, permissions: bearer_permissions) }
-        let(:bearer)  { product }
+        let(:bearer)  { create(:product, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -33,11 +31,9 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:product) { create(:product, account:) }
-        let(:policy)  { create(:policy, account:, product:) }
+        let(:policy)  { create(:policy, account:) }
         let(:expiry)  { nil }
-        let(:license) { create(:license, account:, policy:, expiry:, permissions: bearer_permissions) }
-        let(:bearer)  { license }
+        let(:bearer)  { create(:license, account:, policy:, expiry:, permissions: bearer_permissions) }
       end
     end
 
@@ -45,8 +41,7 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:user)    { create(:user, account:, permissions: bearer_permissions) }
-        let(:bearer)  { user }
+        let(:bearer)  { create(:user, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -76,11 +71,9 @@ module AuthorizationHelper
     def is_allowed_access(scenarios)
       case scenarios
       in [:as_license, :is_expired, *]
-        let(:product) { create(:product, account:) }
-        let(:policy)  { create(:policy, account:, product:, expiration_strategy: 'ALLOW_ACCESS') }
+        let(:policy) { create(:policy, account:, expiration_strategy: 'ALLOW_ACCESS') }
       in [:as_user, :is_licensed, :is_expired, *]
-        let(:product) { create(:product, account:) }
-        let(:policy)  { create(:policy, account:, product:, expiration_strategy: 'ALLOW_ACCESS') }
+        let(:policy) { create(:policy, account:, expiration_strategy: 'ALLOW_ACCESS') }
       end
     end
 
@@ -96,10 +89,8 @@ module AuthorizationHelper
     def is_licensed(scenarios)
       case scenarios
       in [:as_user, *]
-        let(:product)  { create(:product, account:) }
-        let(:policy)   { create(:policy, account:, product:) }
         let(:expiry)   { nil }
-        let(:licenses) { create_list(:license, 2, account:, expiry:, policy:, user: bearer) }
+        let(:licenses) { create_list(:license, 2, account:, expiry:, user: bearer) }
         let(:license)  { licenses.first }
       end
     end
@@ -119,7 +110,17 @@ module AuthorizationHelper
     # accessing_* matchers
     def accessing_itself(scenarios)
       case scenarios
-      in [:as_admin | :as_product | :as_license | :as_user, *]
+      in [:as_admin, *]
+        let(:user)   { bearer }
+        let(:record) { bearer }
+      in [:as_product, *]
+        let(:product) { bearer }
+        let(:record)  { bearer }
+      in [:as_license, *]
+        let(:license) { bearer }
+        let(:record)  { bearer }
+      in [:as_user, *]
+        let(:user)   { bearer }
         let(:record) { bearer }
       end
     end
@@ -146,7 +147,7 @@ module AuthorizationHelper
       case scenarios
       in [:as_license, *]
         let(:product) { bearer.product }
-      in [:as_user, *]
+      in [:as_user, :is_licensed, *]
         let(:product) { license.product }
       end
 
@@ -503,7 +504,7 @@ module AuthorizationHelper
       in [:as_product, *]
         let(:release) { create(:release, account:, product: bearer) }
       in [:as_license, :is_expired, :is_within_access_window, *]
-        let(:release) { create(:release, account:, product: bearer.product, created_at: license.expiry - 1.day) }
+        let(:release) { create(:release, account:, product: bearer.product, created_at: bearer.expiry - 1.day) }
       in [:as_license, *]
         let(:release) { create(:release, account:, product: bearer.product) }
       in [:as_user, :is_licensed, :is_expired, :is_within_access_window, *]
