@@ -519,6 +519,60 @@ describe ReleasePolicy, type: :policy do
       end
     end
 
+    with_scenarios %i[is_expired is_allowed_access accessing_its_release] do
+      with_license_authentication do
+        with_permissions %w[release.upgrade release.read] do
+          allows :upgrade
+        end
+
+        with_permissions %w[release.read] do
+          allows :show
+        end
+
+        with_wildcard_permissions do
+          denies :create, :update, :destroy
+          allows :show, :upgrade
+        end
+
+        with_default_permissions do
+          denies :create, :update, :destroy
+          allows :show, :upgrade
+        end
+
+        without_permissions do
+          denies :show, :upgrade, :create, :update, :destroy
+        end
+      end
+
+      with_token_authentication do
+        with_permissions %w[release.upgrade release.read] do
+          without_token_permissions { denies :upgrade }
+
+          allows :upgrade
+        end
+
+        with_permissions %w[release.read] do
+          without_token_permissions { denies :show }
+
+          allows :show
+        end
+
+        with_wildcard_permissions do
+          denies :create, :update, :destroy
+          allows :show, :upgrade
+        end
+
+        with_default_permissions do
+          denies :create, :update, :destroy
+          allows :show, :upgrade
+        end
+
+        without_permissions do
+          denies :show, :upgrade, :create, :update, :destroy
+        end
+      end
+    end
+
     with_scenarios %i[accessing_releases] do
       with_license_authentication do
         with_permissions %w[release.read] do
