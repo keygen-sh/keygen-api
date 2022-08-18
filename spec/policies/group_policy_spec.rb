@@ -305,7 +305,7 @@ describe GroupPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[with_licenses accessing_its_groups] do
+    with_scenarios %i[is_licensed accessing_its_groups] do
       with_token_authentication do
         with_permissions %w[group.read] do
           allows :index
@@ -317,7 +317,7 @@ describe GroupPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[with_licenses accessing_its_group] do
+    with_scenarios %i[is_licensed accessing_its_group] do
       with_token_authentication do
         with_permissions %w[group.read] do
           allows :show

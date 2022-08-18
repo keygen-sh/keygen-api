@@ -303,7 +303,7 @@ describe ProductPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[with_licenses accessing_its_products] do
+    with_scenarios %i[is_licensed accessing_its_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
           allows :index
@@ -315,7 +315,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[with_licenses accessing_its_product] do
+    with_scenarios %i[is_licensed accessing_its_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
           allows :show
@@ -336,7 +336,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[with_licenses accessing_products] do
+    with_scenarios %i[is_licensed accessing_products] do
       with_token_authentication do
         with_permissions %w[product.read] do
           denies :index
@@ -348,7 +348,7 @@ describe ProductPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[with_licenses accessing_a_product] do
+    with_scenarios %i[is_licensed accessing_a_product] do
       with_token_authentication do
         with_permissions %w[product.read] do
           denies :show
