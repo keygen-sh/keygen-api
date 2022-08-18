@@ -555,6 +555,12 @@ class Release < ApplicationRecord
     release
   end
 
+  def upgrade(...)
+    upgrade!(...)
+  rescue Keygen::Error::NotFoundError
+    nil
+  end
+
   def publish!
     update!(status: 'PUBLISHED')
   end
