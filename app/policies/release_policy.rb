@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePolicy < ApplicationPolicy
-  skip_pre_check :verify_authenticated!, only: %i[index? show?]
+  skip_pre_check :verify_authenticated!, only: %i[index? show? upgrade?]
 
   scope_for :active_record_relation do |relation|
     case bearer
@@ -162,7 +162,7 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allowed_to?(:show?)
+    allowed_to?(:show?, inline_reasons: true)
   end
 
   def upload?
@@ -276,7 +276,8 @@ class ReleasePolicy < ApplicationPolicy
     deny! 'license is expired' if
       license.revoke_access? && license.expired?
 
-    deny! 'release is outside license expiry window' if
+    deny! 'license expiry falls outside of access window' if
+      license.expires? && !license.allow_access? &&
       release.created_at > license.expiry
 
     deny! 'license is missing entitlements' if

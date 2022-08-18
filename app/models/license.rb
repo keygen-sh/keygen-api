@@ -502,6 +502,8 @@ class License < ApplicationRecord
     group
   end
 
+  def expires? = expiry?
+
   def status
     case
     when banned?
