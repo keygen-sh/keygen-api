@@ -42,9 +42,7 @@ describe Release, type: :model do
       subject { create(:release, :published, product:, account:) }
 
       it 'should not upgrade' do
-        upgrade = subject.upgrade!
-
-        expect(upgrade).to be_nil
+        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -83,9 +81,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        upgrade = subject.upgrade!
-
-        expect(upgrade).to be_nil
+        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -97,9 +93,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        upgrade = subject.upgrade!
-
-        expect(upgrade).to be_nil
+        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -111,9 +105,7 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade' do
-        upgrade = subject.upgrade!
-
-        expect(upgrade).to be_nil
+        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
       end
     end
 
@@ -425,9 +417,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0', product:, account:) }
 
           it 'should not upgrade to the latest version' do
-            upgrade = subject.upgrade!
-
-            expect(upgrade).to be_nil
+            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -435,9 +425,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-rc.1', product:, account:) }
 
           it 'should not upgrade to the rc release' do
-            upgrade = subject.upgrade!
-
-            expect(upgrade).to be_nil
+            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -445,9 +433,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-beta.1', product:, account:) }
 
           it 'should not upgrade to the beta release' do
-            upgrade = subject.upgrade!
-
-            expect(upgrade).to be_nil
+            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -455,9 +441,7 @@ describe Release, type: :model do
           before { create(:release, :published, version: '3.1.0-alpha.1', product:, account:) }
 
           it 'should not upgrade to the alpha release' do
-            upgrade = subject.upgrade!
-
-            expect(upgrade).to be_nil
+            expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
           end
         end
 
@@ -511,9 +495,94 @@ describe Release, type: :model do
       end
 
       it 'should not upgrade to the same version' do
-        upgrade = subject.upgrade!
+        expect { subject.upgrade! }.to raise_error Keygen::Error::NotFoundError
+      end
+    end
+  end
+
+  describe '#upgrade' do
+    context 'when there is no upgrade available' do
+      subject { create(:release, :published, version: '2.0.1', product:, account:) }
+
+      before do
+        versions = %w[
+          1.0.0-beta
+          1.0.0-beta.2
+          1.0.0-beta+exp.sha.6
+          1.0.0-alpha.beta
+          1.0.0+20130313144700
+          1.0.0-alpha
+          1.0.0-beta.11
+          1.0.0-alpha.1
+          1.0.0
+          1.0.0+21AF26D3
+          1.0.0-beta+exp.sha.5114f85
+          1.0.0-rc.1
+          1.0.0-alpha+001
+          1.0.1
+          1.1.3
+          1.9.42
+          2.0.0
+          2.0.0-alpha.1
+          2.0.0-alpha.2
+          2.0.0-alpha.3
+          2.0.0-beta.1
+          2.0.0-rc.1
+          2.1.0-beta.1
+          2.1.0-rc.1
+        ]
+
+        versions.each { create(:release, :published, version: _1, product:, account:) }
+      end
+
+      it 'should not upgrade' do
+        upgrade = subject.upgrade
 
         expect(upgrade).to be_nil
+      end
+    end
+
+    context 'when there is a an upgrade available' do
+      subject { create(:release, :published, version: '2.0.1', product:, account:) }
+
+      before do
+        versions = %w[
+          1.0.0-beta
+          1.0.0-beta.2
+          1.0.0-beta+exp.sha.6
+          1.1.0-alpha.beta
+          1.1.0+20130313144700
+          1.1.0-alpha
+          1.1.0-beta.11
+          1.1.0-alpha.1
+          1.1.0
+          1.1.0+21AF26D3
+          1.1.0-beta+exp.sha.5114f85
+          1.1.0-rc.1
+          1.1.0-alpha+001
+          1.1.1
+          1.1.3
+          1.1.21
+          2.0.1
+          2.0.2
+          2.1.0
+          2.1.2-alpha.1
+          2.1.9-rc.1
+          2.1.9
+          2.9.0
+          2.11.0-beta.1
+          3.0.0
+          3.0.2
+        ]
+
+        versions.each { create(:release, :published, version: _1, product:, account:) }
+      end
+
+      it 'should upgrade' do
+        upgrade = subject.upgrade
+        assert upgrade
+
+        expect(upgrade.version).to eq '3.0.2'
       end
     end
   end
