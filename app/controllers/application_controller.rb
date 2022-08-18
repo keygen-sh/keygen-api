@@ -407,16 +407,33 @@ class ApplicationController < ActionController::API
     Keygen.logger.warn { "[action_policy] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
 
     # FIXME(ezekg) Does Action Policy provide a better API for fetching the reason?
-    # FIXME(ezekg) Filter out symbols, which may indicate an action.
-    reason = e.result.reasons&.reasons&.values&.first&.first
-    detail = case
-          when reason.present?
-            "You do not have permission to complete the request (#{reason})"
-          when current_bearer.present?
-            'You do not have permission to complete the request (ensure the token or license is allowed to access this resource)'
-          else
-            'You do not have permission to complete the request (ensure a token or license is present and valid)'
+    reasons = [].tap do |accum|
+      e.result.reasons.details.each do |policy, rules|
+        case rules
+        in [Symbol, *]
+          # We should always use inline_reasons: when calling allowed_to?().
+          # Consider symbol reasons a bug, as they are noncommunicative.
+          Keygen.logger.warn { "[action_policy] policy=#{policy} symbol=#{_1}" }
+        in [String, *]
+          rules.each { accum << _1 }
+        in [Hash, *]
+          rules.each do |rule|
+            rule.values.each { accum << _1 }
           end
+        end
+      end
+    rescue => e
+      Keygen.logger.exception(e)
+    end
+
+    detail = case
+             when reasons.any?
+               "You do not have permission to complete the request (#{reasons.first})"
+             when current_bearer.present?
+               'You do not have permission to complete the request (ensure the token or license is allowed to access this resource)'
+             else
+               'You do not have permission to complete the request (ensure a token or license is present and valid)'
+             end
 
     render_forbidden(detail:)
   rescue RequestMigrations::UnsupportedVersionError
