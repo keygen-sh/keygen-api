@@ -1,70 +1,83 @@
 # frozen_string_literal: true
 
 class ReleaseArtifactPolicy < ApplicationPolicy
-  def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      artifact.read
-    ]
+  skip_pre_check :verify_authenticated!, only: %i[index? show?]
 
-    true
+  scope_for :active_record_relation do |relation|
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      relation.all
+    in role: { name: 'product' } if relation.respond_to?(:for_product)
+      relation.for_product(bearer.id)
+    in role: { name: 'user' } if relation.respond_to?(:for_user)
+      relation.for_user(bearer.id)
+              .published
+              .uploaded
+    in role: { name: 'license' } if relation.respond_to?(:for_license)
+      relation.for_license(bearer.id)
+              .published
+              .uploaded
+    else
+      relation.open
+              .published
+              .uploaded
+    end
+  end
+
+  def index?
+    verify_permissions!('artifact.read')
+
+    # Delegate to release policy
+    allowed_to? :index?, record.collect(&:release),
+      inline_reasons: true,
+      with: ReleasePolicy
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      artifact.download
-      artifact.read
-    ]
+    verify_permissions!('artifact.download', 'artifact.read')
 
-    # FIXME(ezekg) Authorization should be moved from release policy to here
     # Delegate to release policy
-    ReleasePolicy.new(context, resource.release).download?
+    allowed_to? :show?, record.release,
+      inline_reasons: true,
+      with: ReleasePolicy
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      artifact.create
-    ]
+    verify_permissions!('artifact.create')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      artifact.update
-    ]
+    verify_permissions!('artifact.update')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      artifact.delete
-    ]
+    verify_permissions!('artifact.delete')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
-  end
-
-  class Scope < ReleasePolicy::Scope
-    def resolve
-      return scope.open.published.uploaded if
-        bearer.nil?
-
-      @scope = case
-               when bearer.has_role?(:admin, :developer, :product)
-                 scope
-               else
-                 scope.published.uploaded
-               end
-
-      super
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
     end
   end
 end

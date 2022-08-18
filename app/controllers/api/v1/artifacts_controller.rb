@@ -20,14 +20,14 @@ module Api::V1
       # We're applying scopes after the policy scope because our policy scope
       # may include a UNION, and scopes/preloading need to be applied after
       # the UNION query has been performed. E.g. for LIMIT.
-      artifacts = apply_pagination(apply_scopes(policy_scope(current_account.release_artifacts)).preload(:platform, :arch, :filetype))
-      authorize artifacts
+      artifacts = apply_pagination(authorized_scope(apply_scopes(current_account.release_artifacts)).preload(:platform, :arch, :filetype, release: %i[product entitlements constraints]))
+      authorize! artifacts
 
       render jsonapi: artifacts
     end
 
     def show
-      authorize artifact
+      authorize! artifact
 
       # Respond early if the artifact has not been uploaded or if the
       # client prefers no-download
@@ -52,7 +52,7 @@ module Api::V1
 
     def create
       artifact = current_account.release_artifacts.new(artifact_params)
-      authorize artifact
+      authorize! artifact
 
       artifact.save!
 
@@ -72,7 +72,7 @@ module Api::V1
     end
 
     def update
-      authorize artifact
+      authorize! artifact
 
       artifact.update!(artifact_params)
 
@@ -86,7 +86,7 @@ module Api::V1
     end
 
     def destroy
-      authorize artifact
+      authorize! artifact
 
       artifact.yank!
 
@@ -102,7 +102,7 @@ module Api::V1
     attr_reader :artifact
 
     def set_artifact
-      scoped_artifacts = apply_scopes(policy_scope(current_account.release_artifacts))
+      scoped_artifacts = authorized_scope(apply_scopes(current_account.release_artifacts))
 
       # NOTE(ezekg) Fetch the latest version of the artifact since we have no
       #             other qualifiers outside of a :filename alias.

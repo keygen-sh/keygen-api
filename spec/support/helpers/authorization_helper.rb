@@ -487,8 +487,6 @@ module AuthorizationHelper
 
     def accessing_its_releases(scenarios)
       case scenarios
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:releases) { create_list(:release, 3, account: license.account) }
       in [:as_product, *]
         let(:releases) { create_list(:release, 3, account:, product: bearer) }
       in [:as_license, *]
@@ -502,8 +500,6 @@ module AuthorizationHelper
 
     def accessing_its_release(scenarios)
       case scenarios
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:release) { create(:release, account: license.account) }
       in [:as_product, *]
         let(:release) { create(:release, account:, product: bearer) }
       in [:as_license, :is_expired, :is_within_access_window, *]
@@ -517,6 +513,60 @@ module AuthorizationHelper
       end
 
       let(:record) { release }
+    end
+
+    def accessing_artifacts(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:artifacts) { create_list(:release_artifact, 3, account: other_account) }
+      else
+        let(:artifacts) { create_list(:release_artifact, 3, account:) }
+      end
+
+      let(:record) { artifacts }
+    end
+
+    def accessing_an_artifact(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:artifact) { create(:release_artifact, account: other_account) }
+      else
+        let(:artifact) { create(:release_artifact, account:) }
+      end
+
+      let(:record) { artifact }
+    end
+
+    def accessing_its_artifacts(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:releases)  { create_list(:release, 3, account:, product: bearer) }
+        let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
+      in [:as_license, *]
+        let(:releases)  { create_list(:release, 3, account:, product: bearer.product) }
+        let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
+      in [:as_user, :is_licensed, *]
+        let(:releases)  { licenses.map { create(:release, account:, product: _1.product) } }
+        let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
+      end
+
+      let(:record) { artifacts }
+    end
+
+    def accessing_its_artifact(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:release)  { create(:release, account:, product: bearer) }
+        let(:artifact) { create(:release_artifact, account:, release:) }
+      in [:as_license, *]
+        let(:release)  { create(:release, account:, product: bearer.product) }
+        let(:artifact) { create(:release_artifact, account:, release:) }
+      in [:as_user, :is_licensed, *]
+        let(:release)  { create(:release, account:, product: license.product) }
+        let(:artifact) { create(:release_artifact, account:, release:) }
+      end
+
+      let(:record) { artifact }
     end
 
     ##
