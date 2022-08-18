@@ -9,6 +9,8 @@ module AuthorizationHelper
     # scenarios_for keeps track of scenarios by Rspec contexts.
     cattr_accessor :scenarios_for, default: {}
 
+    ##
+    # as_* matchers
     def as_admin(scenarios)
       case scenarios
       in []
@@ -31,7 +33,8 @@ module AuthorizationHelper
       case scenarios
       in []
         let(:account) { create(:account) }
-        let(:bearer)  { create(:license, account:, permissions: bearer_permissions) }
+        let(:expiry)  { nil }
+        let(:bearer)  { create(:license, account:, expiry:, permissions: bearer_permissions) }
         let(:license) { bearer }
       end
     end
@@ -57,13 +60,48 @@ module AuthorizationHelper
       let(:bearer)  { nil }
     end
 
-    def with_licenses(scenarios)
+    ##
+    # is_* matchers
+    def is_expired(scenarios)
       case scenarios
-      in [:as_user, *]
-        let(:licenses) { create_list(:license, 2, account:, user: bearer) }
+      in [:as_license, *]
+        let(:expiry) { 1.year.ago }
+      in [:as_user, :is_licensed, *]
+        let(:expiry) { 1.year.ago }
       end
     end
 
+    def is_within_access_window(scenarios)
+      case scenarios
+      in [:as_license, :is_expired, *]
+        # noop
+      in [:as_user, :is_licensed, :is_expired, *]
+        # noop
+      end
+    end
+
+    def is_licensed(scenarios)
+      case scenarios
+      in [:as_user, *]
+        let(:expiry)   { nil }
+        let(:licenses) { create_list(:license, 2, account:, expiry:, user: bearer) }
+        let(:license)  { licenses.first }
+      end
+    end
+
+    def is_entitled(scenarios)
+      case scenarios
+      in [:as_license, *]
+        let(:entitlements)          { create_list(:entitlement, 3, account:) }
+        let!(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
+      in [:as_user, :is_licensed, *]
+        let(:entitlements)          { create_list(:entitlement, 3, account:) }
+        let!(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+      end
+    end
+
+    ##
+    # accessing_* matchers
     def accessing_itself(scenarios)
       case scenarios
       in [:as_admin | :as_product | :as_license | :as_user, *]
@@ -94,7 +132,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:product) { bearer.product }
       in [:as_user, *]
-        let(:product) { licenses.first.product }
+        let(:product) { license.product }
       end
 
       let(:record) { product }
@@ -177,7 +215,7 @@ module AuthorizationHelper
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }
-      in [:as_user, :with_licenses, *]
+      in [:as_user, :is_licensed, *]
         let(:license) { licenses.first }
       end
 
@@ -240,7 +278,7 @@ module AuthorizationHelper
         let(:groups) { [create(:group, account: license.account, licenses: [license])] }
       in [:as_license, *]
         let(:groups) { [create(:group, account:, licenses: [bearer])] }
-      in [:as_user, :with_licenses, *]
+      in [:as_user, :is_licensed, *]
         let(:groups) { [create(:group, account:, users: [bearer]), *licenses.map(&:group)] }
       in [:as_user, *]
         let(:groups) { [create(:group, account:, users: [bearer])] }
@@ -296,9 +334,9 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:entitlements)         { create_list(:entitlement, 3, account:) }
         let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
-      in [:as_user, :with_licenses, *]
+      in [:as_user, :is_licensed, *]
         let(:entitlements)         { create_list(:entitlement, 3, account:) }
-        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: licenses.first, entitlement: _1) } }
+        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license:, entitlement: _1) } }
       end
 
       let(:record) { license_entitlements.collect(&:entitlement) }
@@ -312,9 +350,9 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:entitlement)         { create(:entitlement, account:) }
         let(:license_entitlement) { create(:license_entitlement, account:, license: bearer, entitlement:) }
-      in [:as_user, :with_licenses, *]
+      in [:as_user, :is_licensed, *]
         let(:entitlement)         { create(:entitlement, account:) }
-        let(:license_entitlement) { create(:license_entitlement, account:, license: licenses.first, entitlement:) }
+        let(:license_entitlement) { create(:license_entitlement, account:, license:, entitlement:) }
       end
 
       let(:record) { license_entitlement.entitlement }
@@ -358,8 +396,8 @@ module AuthorizationHelper
         let(:machines) { create_list(:machine, 3, account:, license:) }
       in [:as_license, *]
         let(:machines) { create_list(:machine, 3, account:, license: bearer) }
-      in [:as_user, :with_licenses, *]
-        let(:machines) { create_list(:machine, 3, account:, license: licenses.first) }
+      in [:as_user, :is_licensed, *]
+        let(:machines) { create_list(:machine, 3, account:, license:) }
       end
 
       let(:record) { machines }
@@ -381,8 +419,8 @@ module AuthorizationHelper
         let(:machine) { create(:machine, account:, license:) }
       in [:as_license, *]
         let(:machine) { create(:machine, account:, license: bearer) }
-      in [:as_user, :with_licenses, *]
-        let(:machine) { create(:machine, account:, license: licenses.first) }
+      in [:as_user, :is_licensed, *]
+        let(:machine) { create(:machine, account:, license:) }
       end
 
       let(:record) { machine }
@@ -408,6 +446,73 @@ module AuthorizationHelper
       end
 
       let(:record) { _group_owner }
+    end
+
+    def accessing_releases(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:releases) { create_list(:release, 3, account: other_account) }
+      else
+        let(:releases) { create_list(:release, 3, account:) }
+      end
+
+      let(:record) { releases }
+    end
+
+    def accessing_a_release(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:release) { create(:release, account: other_account) }
+      else
+        let(:release) { create(:release, account:) }
+      end
+
+      let(:record) { release }
+    end
+
+    def accessing_its_releases(scenarios)
+      case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:releases) { create_list(:release, 3, account: license.account) }
+      in [:as_product, *]
+        let(:releases) { create_list(:release, 3, account:, product: bearer) }
+      in [:as_license, *]
+        let(:releases) { create_list(:release, 3, account:, product: bearer.product) }
+      in [:as_user, :is_licensed, *]
+        let(:releases) { licenses.map { create(:release, account:, product: _1.product) } }
+      end
+
+      let(:record) { releases }
+    end
+
+    def accessing_its_release(scenarios)
+      case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:release) { create(:release, account: license.account) }
+      in [:as_product, *]
+        let(:release) { create(:release, account:, product: bearer) }
+      in [:as_license, :is_expired, :is_within_access_window, *]
+        let(:release) { create(:release, account:, product: bearer.product, created_at: license.expiry - 1.day) }
+      in [:as_license, *]
+        let(:release) { create(:release, account:, product: bearer.product) }
+      in [:as_user, :is_licensed, :is_expired, :is_within_access_window, *]
+        let(:release) { create(:release, account:, product: license.product, created_at: license.expiry - 1.day) }
+      in [:as_user, :is_licensed, *]
+        let(:release) { create(:release, account:, product: license.product) }
+      end
+
+      let(:record) { release }
+    end
+
+    ##
+    # with_* matchers
+    def with_constraints(scenarios)
+      case scenarios
+      in [*, :is_entitled, :accessing_its_release | :accessing_a_release, *]
+        let!(:constraints) { entitlements.map { create(:release_entitlement_constraint, account: release.account, entitlement: _1, release:) } }
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let!(:constraints) { create_list(:release_entitlement_constraint, 3, account: release.account, release:) }
+      end
     end
   end
 
