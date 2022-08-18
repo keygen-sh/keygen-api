@@ -162,7 +162,8 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allowed_to?(:show?, inline_reasons: true)
+    allowed_to? :show?,
+      inline_reasons: true
   end
 
   def upload?

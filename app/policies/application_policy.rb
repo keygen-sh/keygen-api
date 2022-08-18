@@ -36,6 +36,8 @@ class ApplicationPolicy
 
   protected
 
+  def whatami = bearer.role.name.humanize(capitalize: false)
+
   def record_ids
     case
     when record.respond_to?(:ids)
@@ -50,7 +52,7 @@ class ApplicationPolicy
   private
 
   def verify_account_scoped!
-    deny! 'bearer account does not match current account' if
+    deny! "#{whatami} account does not match current account" if
       bearer.present? && bearer.account_id != account.id
 
     case record
@@ -70,7 +72,7 @@ class ApplicationPolicy
     return if
       bearer.nil?
 
-    deny! 'bearer lacks permission to perform action' unless
+    deny! "#{whatami} lacks permission to perform action" unless
       bearer.can?(actions)
 
     return if
