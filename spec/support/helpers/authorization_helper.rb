@@ -803,8 +803,9 @@ module AuthorizationHelper
     ##
     # pp prints all let() vars that are defined in the current context, and also
     # prints vars when accessed, for debugging purposes. This ONLY prints vars
-    # defined in the current context, not parent or child contexts.
-    def pp(except: nil, only: nil)
+    # defined in the current context, not parent or child contexts. Using
+    # :verbose will also print the var's value when accessed.
+    def pp(except: nil, only: nil, verbose: false)
       mod = RSpec::Core::MemoizedHelpers.module_for(self)
 
       mod.instance_methods.each do |var|
@@ -817,9 +818,15 @@ module AuthorizationHelper
         meth = mod.instance_method(var)
 
         mod.define_method var do
-          $stderr.puts "[pp] get=#{var}"
+          val = meth.bind(self).call
 
-          meth.bind(self).call
+          if verbose
+            $stderr.puts "[pp] get=#{var} val=#{val.inspect}"
+          else
+            $stderr.puts "[pp] get=#{var}"
+          end
+
+          val
         end
       end
     end
