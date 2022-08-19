@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :account do
+    slug { [Faker::Internet.domain_name.parameterize, SecureRandom.hex(4)].join('-') }
     name { Faker::Company.name }
-    slug { Faker::Internet.domain_name.parameterize }
 
     billing { nil }
     plan
