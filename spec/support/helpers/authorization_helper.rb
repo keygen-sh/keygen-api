@@ -799,23 +799,28 @@ module AuthorizationHelper
         end
       end
     end
-  end
 
-  ##
-  # pp dumps current RSpec let() vars for debugging purposes.
-  def pp(vars = nil)
-    mod = RSpec::Core::MemoizedHelpers.module_for(self)
+    ##
+    # pp prints all let() vars that are defined in the current context, and also
+    # prints vars when accessed, for debugging purposes. This ONLY prints vars
+    # defined in the current context, not parent or child contexts.
+    def pp(except: nil, only: nil)
+      mod = RSpec::Core::MemoizedHelpers.module_for(self)
 
-    mod.instance_methods.each do |var|
-      next unless
-        var.nil? || var.in?(vars)
+      mod.instance_methods.each do |var|
+        next if
+          except.present? && var.in?(Array(except)) ||
+          only.present? && !var.in?(Array(only))
 
-      _var = mod.instance_method(var)
+        $stderr.puts "[pp] set=#{var}"
 
-      mod.define_method var do
-        puts(var:)
+        meth = mod.instance_method(var)
 
-        _var.bind(self).call
+        mod.define_method var do
+          $stderr.puts "[pp] get=#{var}"
+
+          meth.bind(self).call
+        end
       end
     end
   end
