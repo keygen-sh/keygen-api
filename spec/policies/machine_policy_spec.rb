@@ -47,24 +47,30 @@ describe MachinePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          without_token_permissions { denies :checkout }
+
+          allows :checkout
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -99,16 +105,20 @@ describe MachinePolicy, type: :policy do
           denies :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          denies :checkout
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -155,24 +165,30 @@ describe MachinePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          without_token_permissions { denies :checkout }
+
+          allows :checkout
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -207,16 +223,20 @@ describe MachinePolicy, type: :policy do
           denies :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          denies :checkout
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -263,16 +283,20 @@ describe MachinePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          allows :checkout
+        end
+
         with_wildcard_permissions do
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
 
@@ -301,24 +325,30 @@ describe MachinePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          without_token_permissions { denies :checkout }
+
+          allows :checkout
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -351,16 +381,32 @@ describe MachinePolicy, type: :policy do
           denies :show
         end
 
+        with_permissions %w[machine.create] do
+          denies :create
+        end
+
+        with_permissions %w[machine.update] do
+          denies :update
+        end
+
+        with_permissions %w[machine.delete] do
+          denies :destroy
+        end
+
+        with_permissions %w[machine.check-out] do
+          denies :checkout
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
 
@@ -369,16 +415,32 @@ describe MachinePolicy, type: :policy do
           denies :show
         end
 
+        with_permissions %w[machine.create] do
+          denies :create
+        end
+
+        with_permissions %w[machine.update] do
+          denies :update
+        end
+
+        with_permissions %w[machine.delete] do
+          denies :destroy
+        end
+
+        with_permissions %w[machine.check-out] do
+          denies :checkout
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -423,24 +485,30 @@ describe MachinePolicy, type: :policy do
           allows :destroy
         end
 
+        with_permissions %w[machine.check-out] do
+          without_token_permissions { denies :checkout }
+
+          allows :checkout
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy
+            denies :show, :create, :update, :destroy, :checkout
           end
 
-          allows :show, :create, :update, :destroy
+          allows :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -464,15 +532,15 @@ describe MachinePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -495,16 +563,32 @@ describe MachinePolicy, type: :policy do
           denies :show
         end
 
+        with_permissions %w[machine.create] do
+          denies :create
+        end
+
+        with_permissions %w[machine.update] do
+          denies :update
+        end
+
+        with_permissions %w[machine.delete] do
+          denies :destroy
+        end
+
+        with_permissions %w[machine.check-out] do
+          denies :checkout
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy
+          denies :show, :create, :update, :destroy, :checkout
         end
       end
     end
@@ -519,7 +603,7 @@ describe MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine] do
       without_authentication do
-        denies :show, :create, :update, :destroy
+        denies :show, :create, :update, :destroy, :checkout
       end
     end
   end
