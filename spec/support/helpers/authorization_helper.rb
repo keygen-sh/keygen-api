@@ -781,6 +781,25 @@ module AuthorizationHelper
   end
 
   ##
+  # pp dumps current RSpec let() vars for debugging purposes.
+  def pp(vars = nil)
+    mod = RSpec::Core::MemoizedHelpers.module_for(self)
+
+    mod.instance_methods.each do |var|
+      next unless
+        var.nil? || var.in?(vars)
+
+      _var = mod.instance_method(var)
+
+      mod.define_method var do
+        puts(var:)
+
+        _var.bind(self).call
+      end
+    end
+  end
+
+  ##
   # included mixes in ClassMethods on include.
   def self.included(klass)
     klass.extend ClassMethods
