@@ -163,7 +163,7 @@ describe EntitlementPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[accessing_its_entitlements] do
+    with_scenarios %i[is_entitled accessing_its_entitlements] do
       with_license_authentication do
         with_permissions %w[entitlement.read] do
           allows :index
@@ -185,7 +185,7 @@ describe EntitlementPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_entitlement] do
+    with_scenarios %i[is_entitled accessing_its_entitlement] do
       with_license_authentication do
         with_permissions %w[entitlement.read] do
           allows :show
@@ -289,7 +289,7 @@ describe EntitlementPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_entitlements] do
+    with_scenarios %i[is_licensed is_entitled accessing_its_entitlements] do
       with_token_authentication do
         with_permissions %w[entitlement.read] do
           allows :index
@@ -301,7 +301,7 @@ describe EntitlementPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[is_licensed accessing_its_entitlement] do
+    with_scenarios %i[is_licensed is_entitled accessing_its_entitlement] do
       with_token_authentication do
         with_permissions %w[entitlement.read] do
           allows :show

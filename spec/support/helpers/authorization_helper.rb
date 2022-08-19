@@ -10,7 +10,7 @@ module AuthorizationHelper
     cattr_accessor :scenarios_for, default: {}
 
     ##
-    # as_* matchers
+    # as_* matchers for defining the current :bearer.
     def as_admin(scenarios)
       case scenarios
       in []
@@ -58,7 +58,10 @@ module AuthorizationHelper
     end
 
     ##
-    # is_* matchers
+    # is_* matchers for mutating the current :bearer state or its relations. Typically,
+    # these will set let() vars that are used by the :bearer, but they can also define
+    # new relations, such as with %i[as_user is_licensed]. Common to use let!() to
+    # define vars that may or may not be accessed directly.
     def is_expired(scenarios)
       case scenarios
       in [:as_license, *]
@@ -98,16 +101,24 @@ module AuthorizationHelper
     def is_entitled(scenarios)
       case scenarios
       in [:as_license, *]
-        let(:entitlements)          { create_list(:entitlement, 3, account:) }
-        let!(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
+        let(:entitlements)          { create_list(:entitlement, 6, account:) }
+        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
+        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account:, policy: bearer.policy, entitlement: _1) } }
       in [:as_user, :is_licensed, *]
-        let(:entitlements)          { create_list(:entitlement, 3, account:) }
-        let!(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+        let(:entitlements)          { create_list(:entitlement, 6, account:) }
+        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account:, policy: license.policy, entitlement: _1) } }
       end
     end
 
     ##
-    # accessing_* matchers
+    # accessing_* matchers for defining records and setting the current :record.
+    # Typically, these will set the :record, as well as a named record, e.g.
+    # a :license when accessing a license. The named record can be used in further
+    # scenarios, such as with nested resources. E.g.:
+    #
+    #   %i[accessing_a_license accessing_its_entitlements]
+    #
     def accessing_itself(scenarios)
       case scenarios
       in [:as_admin, *]
@@ -344,18 +355,16 @@ module AuthorizationHelper
 
     def accessing_its_entitlements(scenarios)
       case scenarios
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:entitlements)         { create_list(:entitlement, 3, account: license.account) }
-        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
-      in [:as_license, *]
-        let(:entitlements)         { create_list(:entitlement, 3, account:) }
-        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license: bearer, entitlement: _1) } }
-      in [:as_user, :is_licensed, *]
-        let(:entitlements)         { create_list(:entitlement, 3, account:) }
-        let(:license_entitlements) { entitlements.map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+      in [*, :accessing_its_license | :accessing_a_license, :with_entitlements, *]
+        # noop
+      in [:as_license, :is_entitled, *]
+        # noop
+      in [:as_user, :is_licensed, :is_entitled, *]
+        # noop
       end
 
-      let(:record) { license_entitlements.collect(&:entitlement) }
+      let(:record) { license_entitlements.collect(&:entitlement) +
+                     policy_entitlements.collect(&:entitlement) }
     end
 
     def accessing_its_entitlement(scenarios)
@@ -363,12 +372,12 @@ module AuthorizationHelper
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:entitlement)         { create(:entitlement, account: license.account) }
         let(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
-      in [:as_license, *]
-        let(:entitlement)         { create(:entitlement, account:) }
-        let(:license_entitlement) { create(:license_entitlement, account:, license: bearer, entitlement:) }
-      in [:as_user, :is_licensed, *]
-        let(:entitlement)         { create(:entitlement, account:) }
-        let(:license_entitlement) { create(:license_entitlement, account:, license:, entitlement:) }
+      in [:as_license, :is_entitled, *]
+        let(:entitlement)         { entitlements.first }
+        let(:license_entitlement) { license_entitlements.first }
+      in [:as_user, :is_licensed, :is_entitled, *]
+        let(:entitlement)         { entitlements.first }
+        let(:license_entitlement) { license_entitlements.first }
       end
 
       let(:record) { license_entitlement.entitlement }
@@ -571,7 +580,19 @@ module AuthorizationHelper
     end
 
     ##
-    # with_* matchers
+    # with_* scenarios for mutating the state of and relations for the current :record.
+    # Typically, these will act upon an existing named record, e.g. :license. Also
+    # common for these scenarios to use let!(), since the vars may not be accessed
+    # directly, e.g. such as for :with_entitlements and :with_constrants.
+    def with_entitlements(scenarios)
+      case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:entitlements)          { create_list(:entitlement, 6, account:) }
+        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account:, license:, entitlement: _1) } }
+        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account:, policy: license.policy, entitlement: _1) } }
+      end
+    end
+
     def with_constraints(scenarios)
       case scenarios
       in [*, :is_entitled, :accessing_its_release | :accessing_a_release, *]
