@@ -70,6 +70,7 @@ RSpec.configure do |config|
 
   # Setup Sidekiq, Stripe, etc.
   config.before :each do
+    DatabaseCleaner.start
     RequestMigrations::Testing.setup!
     Sidekiq::Testing.fake!
     StripeHelper.start
@@ -78,7 +79,7 @@ RSpec.configure do |config|
   # Teardown Stripe, clean database, etc.
   config.after :each do
     RequestMigrations::Testing.teardown!
-    DatabaseCleaner.clean
     StripeHelper.stop
+    DatabaseCleaner.clean
   end
 end

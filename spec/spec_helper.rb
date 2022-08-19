@@ -49,9 +49,14 @@ RSpec.configure do |config|
   # bottom of slow tests. May help indicate when a factory is hitting
   # the database too often.
   config.before :each, :debug_factory_runs do |example|
-    ActiveSupport::Notifications.subscribe 'factory_bot.run_factory' do |name, start_at, finish_at, id, payload|
-      $stderr.puts "FactoryBot: #{payload[:strategy]}(:#{payload[:name]})"
+    ActiveSupport::Notifications.subscribe 'factory_bot.run_factory' do |name, start, finish, id, payload|
+      $stderr.puts "[#{name}] #{payload[:strategy]}(:#{payload[:name]})"
     end
+  end
+
+  # Clean up our subscription so that it doesn't leak to other examples.
+  config.after :each, :debug_factory_runs do |example|
+    ActiveSupport::Notifications.unsubscribe 'factory_bot.run_factory'
   end
 
   # This option will default to `:apply_to_host_groups` in RSpec 4 (and will
