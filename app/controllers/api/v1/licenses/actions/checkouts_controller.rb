@@ -7,6 +7,8 @@ module Api::V1::Licenses::Actions
     before_action :authenticate_with_token!
     before_action :set_license
 
+    authorize :license
+
     def show
       kwargs = checkout_query.symbolize_keys
                              .slice(
@@ -54,7 +56,7 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
@@ -62,14 +64,16 @@ module Api::V1::Licenses::Actions
     end
 
     def checkout_license_file(**kwargs)
-      authorize! license, action: :checkout?
+      authorize! license,
+        to: :checkout?
 
       license_file = LicenseCheckoutService.call(
         account: current_account,
         license: license,
         **kwargs,
       )
-      authorize! license_file, action: :show?
+      authorize! license_file,
+        to: :show?
 
       license_file.validate!
 

@@ -996,7 +996,7 @@ Feature: Machine checkout actions
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout without permissions (POST)
+  Scenario: License performs a machine checkout without checkout permissions (POST)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
@@ -1006,13 +1006,13 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=policy"
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License performs a machine checkout without permissions (GET)
+  Scenario: License performs a machine checkout without checkout permissions (GET)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
@@ -1022,10 +1022,76 @@ Feature: Machine checkout actions
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=product"
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout without include permissions (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "license.read", "license.validate"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout without include permissions (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "license.read", "license.validate"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout with permissions (POST)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "license.read", "license.policy.read", "license.entitlements.read"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/machines/$0/actions/check-out?include=license.policy,license.entitlements"
+    Then the response status should be "200"
+    And the JSON response should be a "machine-file"
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License performs a machine checkout with permissions (GET)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "license" with the following:
+      """
+      { "permissions": ["machine.check-out", "license.read", "license.product.read"] }
+      """
+    And the current account has 1 "machine" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/actions/check-out?include=license.product"
+    Then the response status should be "200"
+    And the response should be a "MACHINE" certificate
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
   Scenario: License performs a machine checkout for another machine (POST)
