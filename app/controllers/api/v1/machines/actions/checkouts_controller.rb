@@ -7,6 +7,8 @@ module Api::V1::Machines::Actions
     before_action :authenticate_with_token!
     before_action :set_machine
 
+    authorize :machine
+
     def show
       kwargs = checkout_query.symbolize_keys
                              .slice(
@@ -54,7 +56,7 @@ module Api::V1::Machines::Actions
     attr_reader :machine
 
     def set_machine
-      scoped_machines = policy_scope(current_account.machines)
+      scoped_machines = authorized_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:id], aliases: :fingerprint)
 
@@ -62,14 +64,16 @@ module Api::V1::Machines::Actions
     end
 
     def checkout_machine_file(**kwargs)
-      authorize machine, :checkout?
+      authorize! machine,
+        to: :checkout?
 
       machine_file = MachineCheckoutService.call(
         account: current_account,
         machine: machine,
         **kwargs,
       )
-      authorize machine_file, :show?
+      authorize! machine_file,
+        to: :show?
 
       machine_file.validate!
 

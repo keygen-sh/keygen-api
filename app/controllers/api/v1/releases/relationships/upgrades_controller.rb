@@ -10,7 +10,8 @@ module Api::V1::Releases::Relationships
     before_action :set_release
 
     def show
-      authorize! release, to: :upgrade?
+      authorize! release,
+        to: :upgrade?
 
       kwargs  = upgrade_query.symbolize_keys.slice(:constraint, :channel)
       upgrade = release.upgrade!(**kwargs)

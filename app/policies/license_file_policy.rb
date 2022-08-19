@@ -2,10 +2,20 @@
 
 class LicenseFilePolicy < ApplicationPolicy
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[license.read] + permissions_for_includes
+    verify_permissions!('license.read', *permissions_for_includes)
 
-    true
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      allow!
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   private
@@ -13,14 +23,13 @@ class LicenseFilePolicy < ApplicationPolicy
   # We want to assert that the bearer is allowed to read the product,
   # policy, user, group, etc.
   def permissions_for_includes
-    lic   = resource.subject
     perms = []
 
-    perms << 'license.entitlements.read' if lic.includes.include?('entitlements')
-    perms << 'group.read' if lic.includes.include?('group')
-    perms << 'user.read' if lic.includes.include?('user')
-    perms << 'product.read' if lic.includes.include?('product')
-    perms << 'policy.read' if lic.includes.include?('policy')
+    perms << 'license.entitlements.read' if record.includes.include?('entitlements')
+    perms << 'license.group.read'        if record.includes.include?('group')
+    perms << 'license.user.read'         if record.includes.include?('user')
+    perms << 'license.product.read'      if record.includes.include?('product')
+    perms << 'license.policy.read'       if record.includes.include?('policy')
 
     perms
   end

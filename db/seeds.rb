@@ -56,7 +56,9 @@ permissions = %w[
   license.group.read
   license.group.update
   license.machines.read
+  license.policy.read
   license.policy.update
+  license.product.read
   license.read
   license.reinstate
   license.renew
@@ -69,6 +71,7 @@ permissions = %w[
   license.usage.increment
   license.usage.reset
   license.user.update
+  license.user.read
   license.validate
 
   machine.check-out
