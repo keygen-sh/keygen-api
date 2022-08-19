@@ -15,7 +15,7 @@ require 'sidekiq/testing'
 require 'request_migrations/testing'
 
 # Truncate database tables after each test.
-DatabaseCleaner.strategy = :truncation, { except: %w[permissions event_types] }
+DatabaseCleaner.strategy = :transaction
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
