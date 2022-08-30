@@ -947,7 +947,7 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=product"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -962,7 +962,7 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=policy"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -977,7 +977,7 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=product"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -992,7 +992,7 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=policy"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -1007,7 +1007,7 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=product"
+    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?include=product"
     Then the response status should be "200"
     And the JSON response should be a "license-file"
     And sidekiq should have 1 "webhook" job
@@ -1023,9 +1023,9 @@ Feature: License checkout actions
       """
     And I am a license of account "test1"
     And I use an authentication token
-    When I send a POST request to "/accounts/test1/licenses/$0/actions/check-out?includes=policy"
+    When I send a GET request to "/accounts/test1/licenses/$0/actions/check-out?include=policy"
     Then the response status should be "200"
-    And the response should be a "MACHINE" certificate
+    And the response should be a "LICENSE" certificate
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
