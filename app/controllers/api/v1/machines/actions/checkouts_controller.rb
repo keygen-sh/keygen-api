@@ -65,7 +65,7 @@ module Api::V1::Machines::Actions
 
     def checkout_machine_file(**kwargs)
       authorize! machine,
-        to: :checkout?
+        to: :check_out?
 
       machine_file = MachineCheckoutService.call(
         account: current_account,

@@ -86,7 +86,7 @@ class MachinePolicy < ApplicationPolicy
     end
   end
 
-  def checkout?
+  def check_out?
     verify_permissions!('machine.check-out')
 
     case bearer

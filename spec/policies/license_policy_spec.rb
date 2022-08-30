@@ -48,29 +48,35 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          without_token_permissions { denies :check_in }
+
+          allows :check_in
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -106,19 +112,23 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          denies :checkout
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -166,29 +176,35 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          without_token_permissions { denies :check_in }
+
+          allows :check_in
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -224,19 +240,23 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          denies :checkout
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -250,21 +270,25 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          allows :checkout
+          allows :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          allows :check_in
         end
 
         with_wildcard_permissions do
+          allows :show, :check_out, :check_in
           denies :create, :update, :destroy
-          allows :show, :checkout
         end
 
         with_default_permissions do
+          allows :show, :check_out, :check_in
           denies :create, :update, :destroy
-          allows :show, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
 
@@ -276,31 +300,37 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          without_token_permissions { denies :check_in }
+
+          allows :check_in
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
+          allows :show, :check_out, :check_in
           denies :create, :update, :destroy
-          allows :show, :checkout
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
+          allows :show, :check_out, :check_in
           denies :create, :update, :destroy
-          allows :show, :checkout
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -334,19 +364,23 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          denies :checkout
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
 
@@ -356,19 +390,23 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          denies :checkout
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -408,31 +446,37 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          without_token_permissions { denies :check_in }
+
+          allows :check_in
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :destroy, :checkout
+          allows :show, :create, :destroy, :check_out, :check_in
           denies :update
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out, :check_in
           end
 
-          allows :show, :create, :destroy, :checkout
+          allows :show, :create, :destroy, :check_out, :check_in
           denies :update
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -455,16 +499,24 @@ describe LicensePolicy, type: :policy do
           denies :show
         end
 
+        with_permissions %w[license.check-out] do
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -496,19 +548,23 @@ describe LicensePolicy, type: :policy do
         end
 
         with_permissions %w[license.check-out] do
-          denies :checkout
+          denies :check_out
+        end
+
+        with_permissions %w[license.check-in] do
+          denies :check_in
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out, :check_in
         end
       end
     end
@@ -523,7 +579,7 @@ describe LicensePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license] do
       without_authentication do
-        denies :show, :create, :update, :destroy, :checkout
+        denies :show, :create, :update, :destroy, :check_out, :check_in
       end
     end
   end

@@ -65,7 +65,7 @@ module Api::V1::Licenses::Actions
 
     def checkout_license_file(**kwargs)
       authorize! license,
-        to: :checkout?
+        to: :check_out?
 
       license_file = LicenseCheckoutService.call(
         account: current_account,
