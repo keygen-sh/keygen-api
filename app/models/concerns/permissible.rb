@@ -33,9 +33,14 @@ module Permissible
     end
 
     def can?(*actions)
-      permissions.exists?(
-        action: actions.flatten << Permission::WILDCARD_PERMISSION,
-      )
+      expected = actions.flatten
+      actual   = permissions.where(action: [*expected, Permission::WILDCARD_PERMISSION])
+                            .pluck(:action)
+
+      return true if
+        actual.include?(Permission::WILDCARD_PERMISSION)
+
+      actual.size == expected.size
     end
 
     def cannot?(...) = !can?(...)
