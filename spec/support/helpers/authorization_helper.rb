@@ -579,6 +579,52 @@ module AuthorizationHelper
       let(:record) { artifact }
     end
 
+    def accessing_licenses(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:licenses) { create_list(:license, 3, account: other_account) }
+      else
+        let(:licenses) { create_list(:license, 3, account:) }
+      end
+
+      let(:record) { licenses }
+    end
+
+    def accessing_a_license(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:license) { create(:license, account: other_account) }
+      else
+        let(:license) { create(:license, account:) }
+      end
+
+      let(:record) { license }
+    end
+
+    def accessing_its_licenses(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policy)   { create(:policy, account:, product: bearer) }
+        let(:licenses) { create_list(:license, 3, account:, policy:) }
+      in [:as_user, :is_licensed, *]
+        # noop
+      end
+
+      let(:record) { licenses }
+    end
+
+    def accessing_its_license(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policy)  { create(:policy, account:, product: bearer) }
+        let(:license) { create(:license, account:, policy:) }
+      in [:as_user, :is_licensed, *]
+        # noop
+      end
+
+      let(:record) { license }
+    end
+
     ##
     # with_* scenarios for mutating the state of and relations for the current :record.
     # Typically, these will act upon an existing named record, e.g. :license. Also
