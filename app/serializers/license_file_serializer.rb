@@ -4,6 +4,7 @@ class LicenseFileSerializer < BaseSerializer
   type 'license-files'
 
   attribute :certificate
+  attribute :includes
   attribute :ttl
   attribute :expiry do
     @object.expires_at

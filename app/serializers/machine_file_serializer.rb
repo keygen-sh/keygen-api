@@ -4,6 +4,7 @@ class MachineFileSerializer < BaseSerializer
   type 'machine-files'
 
   attribute :certificate
+  attribute :includes
   attribute :ttl
   attribute :expiry do
     @object.expires_at
