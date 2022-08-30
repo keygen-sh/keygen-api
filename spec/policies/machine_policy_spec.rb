@@ -48,29 +48,29 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -106,19 +106,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          denies :checkout
+          denies :check_out
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -166,29 +166,29 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -224,19 +224,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          denies :checkout
+          denies :check_out
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -284,19 +284,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          allows :checkout
+          allows :check_out
         end
 
         with_wildcard_permissions do
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
 
@@ -326,29 +326,29 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -394,19 +394,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          denies :checkout
+          denies :check_out
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
 
@@ -428,19 +428,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          denies :checkout
+          denies :check_out
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -486,29 +486,29 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          without_token_permissions { denies :checkout }
+          without_token_permissions { denies :check_out }
 
-          allows :checkout
+          allows :check_out
         end
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :checkout
+            denies :show, :create, :update, :destroy, :check_out
           end
 
-          allows :show, :create, :update, :destroy, :checkout
+          allows :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -532,15 +532,15 @@ describe MachinePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -576,19 +576,19 @@ describe MachinePolicy, type: :policy do
         end
 
         with_permissions %w[machine.check-out] do
-          denies :checkout
+          denies :check_out
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :checkout
+          denies :show, :create, :update, :destroy, :check_out
         end
       end
     end
@@ -603,7 +603,7 @@ describe MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine] do
       without_authentication do
-        denies :show, :create, :update, :destroy, :checkout
+        denies :show, :create, :update, :destroy, :check_out
       end
     end
   end

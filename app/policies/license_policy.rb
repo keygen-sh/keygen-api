@@ -76,7 +76,7 @@ class LicensePolicy < ApplicationPolicy
     end
   end
 
-  def checkout?
+  def check_out?
     verify_permissions!('license.check-out')
 
     case bearer
@@ -94,18 +94,20 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def check_in?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.check-in
-    ]
+    verify_permissions!('license.check-in')
 
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!license.policy.protected? && license.user == bearer) ||
-      license.product == bearer ||
-      license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.policy.protected?
+    in role: { name: 'license' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def revoke?
