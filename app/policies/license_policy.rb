@@ -34,44 +34,63 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def create?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.create
-    ]
+    verify_permissions!('license.create')
 
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      ((license.policy.nil? || !license.policy.protected?) && license.user == bearer) ||
-      (license.product.nil? || license.product == bearer)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.policy&.protected?
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.update
-    ]
+    verify_permissions!('license.update')
 
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      license.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.delete
-    ]
+    verify_permissions!('license.delete')
 
-    resource.subject => License => license
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.policy.protected?
+    else
+      deny!
+    end
+  end
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!license.policy.protected? && license.user == bearer) ||
-      license.product == bearer
+  def checkout?
+    verify_permissions!('license.check-out')
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.policy.protected?
+    in role: { name: 'license' } if record == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def check_in?
@@ -190,21 +209,6 @@ class LicensePolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
       license.user == bearer ||
-      license.product == bearer ||
-      license == bearer
-  end
-
-  def checkout?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.check-out
-    ]
-
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      (!license.policy.protected? && license.user == bearer) ||
       license.product == bearer ||
       license == bearer
   end
