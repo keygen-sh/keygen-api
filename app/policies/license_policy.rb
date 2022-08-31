@@ -134,7 +134,7 @@ class LicensePolicy < ApplicationPolicy
     #              to deprecate this behavior in favor of using license
     #              key authentication.
     allow! if
-      bearer.nil?
+      bearer.nil? || record.nil?
 
     allowed_to?(:validate?, inline_reasons: true)
   end
