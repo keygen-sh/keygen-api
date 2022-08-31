@@ -65,24 +65,48 @@ describe LicensePolicy, type: :policy do
           allows :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          without_token_permissions { denies :revoke }
+
+          allows :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          without_token_permissions { denies :renew }
+
+          allows :renew
+        end
+
+        with_permissions %w[license.suspend] do
+          without_token_permissions { denies :suspend }
+
+          allows :suspend
+        end
+
+        with_permissions %w[license.reinstate] do
+          without_token_permissions { denies :reinstate }
+
+          allows :reinstate
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -129,16 +153,32 @@ describe LicensePolicy, type: :policy do
           denies :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          denies :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          denies :renew
+        end
+
+        with_permissions %w[license.suspend] do
+          denies :suspend
+        end
+
+        with_permissions %w[license.reinstate] do
+          denies :reinstate
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -203,24 +243,48 @@ describe LicensePolicy, type: :policy do
           allows :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          without_token_permissions { denies :revoke }
+
+          allows :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          without_token_permissions { denies :renew }
+
+          allows :renew
+        end
+
+        with_permissions %w[license.suspend] do
+          without_token_permissions { denies :suspend }
+
+          allows :suspend
+        end
+
+        with_permissions %w[license.reinstate] do
+          without_token_permissions { denies :reinstate }
+
+          allows :reinstate
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          allows :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -267,16 +331,32 @@ describe LicensePolicy, type: :policy do
           denies :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          denies :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          denies :renew
+        end
+
+        with_permissions %w[license.suspend] do
+          denies :suspend
+        end
+
+        with_permissions %w[license.reinstate] do
+          denies :reinstate
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -302,17 +382,17 @@ describe LicensePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
+          denies :create, :update, :destroy, :revoke, :renew, :suspend, :reinstate
           allows :show, :validate, :check_out, :check_in
-          denies :create, :update, :destroy
         end
 
         with_default_permissions do
+          denies :create, :update, :destroy, :revoke, :renew, :suspend, :reinstate
           allows :show, :validate, :check_out, :check_in
-          denies :create, :update, :destroy
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :check_out
+          denies :show, :create, :update, :destroy, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
 
@@ -343,24 +423,24 @@ describe LicensePolicy, type: :policy do
 
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
+          denies :create, :update, :destroy, :revoke, :renew, :suspend, :reinstate
           allows :show, :validate, :check_out, :check_in
-          denies :create, :update, :destroy
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
+          denies :create, :update, :destroy, :revoke, :renew, :suspend, :reinstate
           allows :show, :validate, :check_out, :check_in
-          denies :create, :update, :destroy
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -406,15 +486,15 @@ describe LicensePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
 
@@ -436,15 +516,15 @@ describe LicensePolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -501,26 +581,38 @@ describe LicensePolicy, type: :policy do
           allows :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          without_token_permissions { denies :revoke }
+
+          allows :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          without_token_permissions { denies :renew }
+
+          allows :renew
+        end
+
         with_wildcard_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :destroy, :validate, :check_out, :check_in
-          denies :update
+          allows :show, :create, :destroy, :validate, :check_out, :check_in, :revoke, :renew
+          denies :update, :suspend, :reinstate
         end
 
         with_default_permissions do
           without_token_permissions do
-            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+            denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
           end
 
-          allows :show, :create, :destroy, :validate, :check_out, :check_in
-          denies :update
+          allows :show, :create, :destroy, :validate, :check_out, :check_in, :revoke, :renew
+          denies :update, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -555,16 +647,24 @@ describe LicensePolicy, type: :policy do
           denies :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          denies :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          denies :renew
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -607,16 +707,24 @@ describe LicensePolicy, type: :policy do
           denies :check_in
         end
 
+        with_permissions %w[license.revoke] do
+          denies :revoke
+        end
+
+        with_permissions %w[license.renew] do
+          denies :renew
+        end
+
         with_wildcard_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         with_default_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
 
         without_permissions do
-          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+          denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         end
       end
     end
@@ -631,7 +739,7 @@ describe LicensePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license] do
       without_authentication do
-        denies :show, :create, :update, :destroy, :validate, :check_out, :check_in
+        denies :show, :create, :update, :destroy, :validate, :check_out, :check_in, :revoke, :renew, :suspend, :reinstate
         allows :validate_key
       end
     end
