@@ -131,11 +131,7 @@ Rails.application.routes.draw do
     resources "licenses", constraints: { id: /[^\/]*/ } do
       scope module: "licenses/relationships" do
         resources "machines", only: [:index, :show]
-        resources "tokens", only: [:index, :show] do
-          collection do
-            post "/", to: "tokens#generate"
-          end
-        end
+        resources "tokens", only: %i[index show create]
         resource "product", only: [:show]
         resource "policy", only: [:show, :update]
         resource "group", only: [:show, :update]
