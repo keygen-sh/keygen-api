@@ -18,6 +18,7 @@ class TypedParameters
   end
   class UnpermittedParametersError < StandardError; end
   class InvalidRequestError < StandardError; end
+  class InvalidActionError < StandardError; end
   class Boolean; end
 
   TRUTHY_VALUES = [true, 1, "1", "true", "TRUE"].freeze
@@ -224,6 +225,9 @@ class TypedParameters
     end
 
     def on(action, &block)
+      raise InvalidActionError, "action ##{action} does not exist for #{controller}" unless
+        controller.respond_to?(action)
+
       handlers.merge! action => block
     end
 
