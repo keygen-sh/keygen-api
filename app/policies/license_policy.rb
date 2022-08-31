@@ -206,56 +206,6 @@ class LicensePolicy < ApplicationPolicy
     end
   end
 
-  class UsagePolicy < ApplicationPolicy
-    def increment?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        license.usage.increment
-      ]
-
-      resource.context => [License => license]
-      resource.subject => :usage
-
-      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-        (!license.policy.protected? && license.user == bearer) ||
-        license.product == bearer ||
-        license == bearer
-    end
-
-    def decrement?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        license.usage.decrement
-      ]
-
-      resource.context => [License => license]
-      resource.subject => :usage
-
-      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-        license.product == bearer
-    end
-
-    def reset?
-      assert_account_scoped!
-      assert_authenticated!
-      assert_permissions! %w[
-        license.usage.reset
-      ]
-
-      resource.context => [License => license]
-      resource.subject => :usage
-
-      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-        license.product == bearer
-    end
-
-    private
-
-    def license = resource.context.first
-  end
-
   class TokenPolicy < ApplicationPolicy
     def index?
       assert_account_scoped!
@@ -384,30 +334,6 @@ class LicensePolicy < ApplicationPolicy
 
       bearer.has_role?(:admin, :developer, :sales_agent) ||
         license.product == bearer
-    end
-  end
-
-  class MachinePolicy < ApplicationPolicy
-    def index?
-      assert_account_scoped!
-      assert_authenticated!
-
-      resource.context => [License => license]
-      resource.subject => [Machine, *] | [] => machines
-
-      authorize! license  => :show?,
-                 machines => :index?
-    end
-
-    def show?
-      assert_account_scoped!
-      assert_authenticated!
-
-      resource.context => [License => license]
-      resource.subject => Machine => machine
-
-      authorize! license => :show?,
-                 machine => :show?
     end
   end
 end
