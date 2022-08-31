@@ -47,7 +47,7 @@ describe LicensePolicy, type: :policy do
           allows :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           without_token_permissions { denies :validate, :validate_key }
 
           allows :validate, :validate_key
@@ -117,7 +117,7 @@ describe LicensePolicy, type: :policy do
           denies :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
@@ -185,7 +185,7 @@ describe LicensePolicy, type: :policy do
           allows :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           without_token_permissions { denies :validate, :validate_key }
 
           allows :validate, :validate_key
@@ -255,7 +255,7 @@ describe LicensePolicy, type: :policy do
           denies :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
@@ -289,7 +289,7 @@ describe LicensePolicy, type: :policy do
           allows :show
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           allows :validate, :validate_key
         end
 
@@ -323,7 +323,7 @@ describe LicensePolicy, type: :policy do
           allows :show
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           without_token_permissions { denies :validate, :validate_key }
 
           allows :validate, :validate_key
@@ -393,7 +393,7 @@ describe LicensePolicy, type: :policy do
           denies :show
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
@@ -423,7 +423,7 @@ describe LicensePolicy, type: :policy do
           denies :show
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
@@ -483,7 +483,7 @@ describe LicensePolicy, type: :policy do
           allows :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           without_token_permissions { denies :validate, :validate_key }
 
           allows :validate, :validate_key
@@ -543,7 +543,7 @@ describe LicensePolicy, type: :policy do
           denies :show
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
@@ -595,7 +595,7 @@ describe LicensePolicy, type: :policy do
           denies :destroy
         end
 
-        with_permissions %w[license.validate license.read] do
+        with_permissions %w[license.validate] do
           denies :validate, :validate_key
         end
 
