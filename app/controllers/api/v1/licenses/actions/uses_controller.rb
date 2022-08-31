@@ -7,8 +7,11 @@ module Api::V1::Licenses::Actions
     before_action :authenticate_with_token!
     before_action :set_license
 
+    authorize :license
+
     def increment
-      authorize! license, :usage
+      authorize! license,
+        with: Licenses::UsagePolicy
 
       license.with_lock 'FOR UPDATE NOWAIT' do
         license.increment :uses, increment_param
@@ -30,11 +33,13 @@ module Api::V1::Licenses::Actions
       render_conflict detail: 'failed to increment due to another conflicting update',
                       source: { pointer: '/data/attributes/uses' }
     rescue ActiveModel::RangeError
-      render_bad_request detail: 'integer is too large', source: { pointer: '/meta/increment' }
+      render_bad_request detail: 'integer is too large',
+                         source: { pointer: '/meta/increment' }
     end
 
     def decrement
-      authorize! license, :usage
+      authorize! license,
+        with: Licenses::UsagePolicy
 
       license.with_lock 'FOR UPDATE NOWAIT' do
         license.decrement :uses, decrement_param
@@ -56,11 +61,13 @@ module Api::V1::Licenses::Actions
       render_conflict detail: 'failed to increment due to another conflicting update',
                       source: { pointer: '/data/attributes/uses' }
     rescue ActiveModel::RangeError
-      render_bad_request detail: 'integer is too large', source: { pointer: '/meta/decrement' }
+      render_bad_request detail: 'integer is too large',
+                         source: { pointer: '/meta/decrement' }
     end
 
     def reset
-      authorize! license, :usage
+      authorize! license,
+        with: Licenses::UsagePolicy
 
       if license.update(uses: 0)
         BroadcastEventService.call(
@@ -80,7 +87,7 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
