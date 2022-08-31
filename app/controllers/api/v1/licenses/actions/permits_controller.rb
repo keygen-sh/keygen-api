@@ -11,7 +11,7 @@ module Api::V1::Licenses::Actions
       authorize! license
 
       if !license.policy.requires_check_in?
-        render_unprocessable_entity detail: "cannot be checked in because the policy does not require it"
+        render_unprocessable_entity detail: 'cannot be checked in because the policy does not require it'
       elsif license.check_in!
         BroadcastEventService.call(
           event: 'license.checked-in',
@@ -29,7 +29,7 @@ module Api::V1::Licenses::Actions
       authorize! license
 
       if license.policy.duration.nil?
-        render_unprocessable_entity detail: "cannot be renewed because the policy does not have a duration"
+        render_unprocessable_entity detail: 'cannot be renewed because the policy does not have a duration'
       elsif license.renew!
         BroadcastEventService.call(
           event: 'license.renewed',
@@ -47,9 +47,9 @@ module Api::V1::Licenses::Actions
       authorize! license
 
       BroadcastEventService.call(
-        event: "license.revoked",
+        event: 'license.revoked',
         account: current_account,
-        resource: license
+        resource: license,
       )
 
       license.destroy_async
@@ -59,12 +59,10 @@ module Api::V1::Licenses::Actions
       authorize! license
 
       if license.suspended?
-        render_unprocessable_entity({
+        render_unprocessable_entity(
+          source: { pointer: '/data/attributes/suspended' },
           detail: 'is already suspended',
-          source: {
-            pointer: '/data/attributes/suspended'
-          }
-        })
+        )
       elsif license.suspend!
         BroadcastEventService.call(
           event: 'license.suspended',
@@ -82,12 +80,10 @@ module Api::V1::Licenses::Actions
       authorize! license
 
       if !license.suspended?
-        render_unprocessable_entity({
+        render_unprocessable_entity(
+          source: { pointer: '/data/attributes/suspended' },
           detail: 'is not suspended',
-          source: {
-            pointer: '/data/attributes/suspended'
-          }
-        })
+        )
       elsif license.reinstate!
         BroadcastEventService.call(
           event: 'license.reinstated',
@@ -106,7 +102,7 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
