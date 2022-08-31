@@ -191,6 +191,8 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:tokens)   { create_list(:token, 3, account: product.account, bearer: product) }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:tokens)   { create_list(:token, 3, account: license.account, bearer: license) }
       in [*, :accessing_itself, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
       end
@@ -202,6 +204,8 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:_token) { create(:token, account: product.account, bearer: product) }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:_token) { create(:token, account: license.account, bearer: license) }
       in [*, :accessing_itself, *]
         let(:_token) { create(:token, account: bearer.account, bearer:) }
       end
