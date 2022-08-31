@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class LicensePolicy < ApplicationPolicy
+  skip_pre_check :verify_authenticated!, only: %i[validate? validate_key?]
+
   def index?
     verify_permissions!('license.read')
 
@@ -110,6 +112,33 @@ class LicensePolicy < ApplicationPolicy
     end
   end
 
+  def validate?
+    verify_permissions!('license.validate', 'license.read')
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      allow!
+    in role: { name: 'license' } if record == bearer
+      allow!
+    else
+      deny!
+    end
+  end
+
+  def validate_key?
+    # FIXME(ezekg) We allow validation without authentication. I'd like
+    #              to deprecate this behavior in favor of using license
+    #              key authentication.
+    allow! if
+      bearer.nil?
+
+    allowed_to?(:validate?, inline_reasons: true)
+  end
+
   def revoke?
     assert_account_scoped!
     assert_authenticated!
@@ -162,57 +191,6 @@ class LicensePolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
       license.product == bearer
-  end
-
-  def quick_validate_by_id?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.validate
-      license.read
-    ]
-
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      license.user == bearer ||
-      license.product == bearer ||
-      license == bearer
-  end
-
-  def validate_by_id?
-    assert_account_scoped!
-    assert_authenticated!
-    assert_permissions! %w[
-      license.validate
-      license.read
-    ]
-
-    resource.subject => License => license
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      license.user == bearer ||
-      license.product == bearer ||
-      license == bearer
-  end
-
-  def validate_by_key?
-    assert_account_scoped!
-    assert_permissions! %w[
-      license.validate
-      license.read
-    ]
-
-    resource.subject => License => license
-
-    # NOTE(ezekg) We have optional authn
-    return true unless
-      bearer.present?
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      license.user == bearer ||
-      license.product == bearer ||
-      license == bearer
   end
 
   def me?
