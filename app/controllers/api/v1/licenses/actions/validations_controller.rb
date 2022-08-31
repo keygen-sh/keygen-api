@@ -9,8 +9,11 @@ module Api::V1::Licenses::Actions
     before_action :set_license, only: %i[quick_validate_by_id validate_by_id]
 
     def quick_validate_by_id
-      authorize! license
+      authorize! license,
+        to: :validate?
 
+      # FIXME(ezekg) Skipping :touch on origin is not a good idea, since
+      #              the origin header can be set by anybody.
       valid, detail, code = LicenseValidationService.call(license: license, scope: false, skip_touch: request.headers['origin'] == 'https://app.keygen.sh')
       meta = {
         ts: Time.current, # Included so customer has a signed ts to utilize elsewhere
@@ -28,7 +31,8 @@ module Api::V1::Licenses::Actions
     end
 
     def validate_by_id
-      authorize! license
+      authorize! license,
+        to: :validate?
 
       valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params.dig(:meta, :scope))
       meta = {
@@ -72,12 +76,9 @@ module Api::V1::Licenses::Actions
                           validation_params[:meta][:encrypted] == true
       )
 
-      # We can skip authorization when the license doesn't exist
-      if license.present?
-        authorize! license
-      else
-        skip_verify_authorized!
-      end
+      authorize! license,
+        with: LicensePolicy,
+        to: :validate_key?
 
       valid, detail, code = LicenseValidationService.call(license: license, scope: validation_params[:meta][:scope])
       meta = {
@@ -116,7 +117,7 @@ module Api::V1::Licenses::Actions
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:id], aliases: :key)
 
