@@ -105,15 +105,58 @@ Feature: Delete user
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
+  Scenario: License attempts to delete their user
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "webhook-endpoint"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$1"
+    Then the response status should be "404"
+    And the JSON response should be an array of 1 error
+    And the current account should have 1 "user"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to delete another user
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "webhook-endpoint"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$2"
+    Then the response status should be "404"
+    And the JSON response should be an array of 1 error
+    And the current account should have 2 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
   Scenario: User attempts to delete themself
     Given the current account is "test1"
     And the current account has 3 "users"
     And the current account has 1 "webhook-endpoint"
     And I am a user of account "test1"
-    And I send and accept JSON
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$current"
+    When I send a DELETE request to "/accounts/test1/users/$1"
     Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "users"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to delete another user
+    Given the current account is "test1"
+    And the current account has 3 "users"
+    And the current account has 1 "webhook-endpoint"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/users/$3"
+    Then the response status should be "404"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "users"
     And sidekiq should have 0 "webhook" jobs
@@ -126,7 +169,7 @@ Feature: Delete user
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "admin"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$current"
+    When I send a DELETE request to "/accounts/test1/users/$0"
     Then the response status should be "204"
     And the current account should have 1 "admin"
     And sidekiq should have 1 "webhook" job
@@ -137,7 +180,7 @@ Feature: Delete user
     Given I am an admin of account "test1"
     And the current account is "test1"
     And I use an authentication token
-    When I send a DELETE request to "/accounts/test1/users/$current"
+    When I send a DELETE request to "/accounts/test1/users/$0"
     Then the response status should be "422"
     And the current account should have 1 "admin"
     And the first error should have the following properties:
@@ -145,9 +188,9 @@ Feature: Delete user
         {
           "title": "Unprocessable resource",
           "detail": "account must have at least 1 admin user",
+          "code": "ACCOUNT_ADMINS_REQUIRED",
           "source": {
             "pointer": "/data/relationships/account"
-          },
-          "code": "ACCOUNT_ADMINS_REQUIRED"
+          }
         }
       """

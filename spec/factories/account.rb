@@ -12,5 +12,13 @@ FactoryBot.define do
       account.billing = build(:billing, account: account)
       account.users << build(:admin, account: account)
     end
+
+    trait :unprotected do
+      protected { false }
+    end
+
+    trait :protected do
+      protected { true }
+    end
   end
 end

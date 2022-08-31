@@ -76,13 +76,19 @@ module Api::V1
     def destroy
       authorize! user
 
-      BroadcastEventService.call(
-        event: 'user.deleted',
-        account: current_account,
-        resource: user,
-      )
+      # NOTE(ezekg) Using a condition here because destroy async may return
+      #             false if the user an admin and a minimum has been hit.
+      if user.destroy_async
+        BroadcastEventService.call(
+          event: 'user.deleted',
+          account: current_account,
+          resource: user,
+        )
 
-      user.destroy_async
+        head :no_content
+      else
+        render_unprocessable_resource user
+      end
     end
 
     private
