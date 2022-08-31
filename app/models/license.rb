@@ -16,6 +16,7 @@ class License < ApplicationRecord
       account.read
       product.read
       policy.read
+      user.read
     ]
 
   belongs_to :account

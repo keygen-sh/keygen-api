@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class UserPolicy < ApplicationPolicy
+  skip_pre_check :verify_authenticated!, only: %i[create?]
+
   def index?
     verify_permissions!('user.read')
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' }
+    in role: { name: 'product' } if record.all?(&:user?)
       allow!
     else
       deny!
@@ -20,7 +22,41 @@ class UserPolicy < ApplicationPolicy
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' }
+    in role: { name: 'product' } if record.user?
+      allow!
+    in role: { name: 'user' } if record == bearer
+      allow!
+    in role: { name: 'license' } if record == bearer.user
+      allow!
+    else
+      deny!
+    end
+  end
+
+  def create?
+    verify_permissions!('user.create')
+    verify_role!(record)
+
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.user?
+      allow!
+    in nil
+      !account.protected?
+    else
+      deny!
+    end
+  end
+
+  def update?
+    verify_permissions!('user.update')
+    verify_role!(record)
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.user?
       allow!
     in role: { name: 'user' } if record == bearer
       allow!
@@ -29,39 +65,92 @@ class UserPolicy < ApplicationPolicy
     end
   end
 
-  def create?
-    assert_account_scoped!
-    assert_role_ok!
-    assert_permissions! %w[
-      user.create
-    ]
+  def destroy?
+    verify_permissions!('user.delete')
+    verify_role!(record)
 
-    (bearer.present? && bearer.has_role?(:admin, :developer, :product)) ||
-      !account.protected?
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
-  def update?
+  def invite?
+    verify_permissions!('user.invite')
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    else
+      deny!
+    end
+  end
+
+  def ban?
+    verify_permissions!('user.ban')
+
+    deny! 'must have a user role' unless
+      record.user?
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' }
+      allow!
+    else
+      deny!
+    end
+  end
+
+  def unban?
+    verify_permissions!('user.unban')
+
+    deny! 'must have a user role' unless
+      record.user?
+
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' }
+      allow!
+    else
+      deny!
+    end
+  end
+
+  def me?
+    verify_permissions!('user.read')
+
+    record == bearer
+  end
+
+  def update_password?
     assert_account_scoped!
-    assert_role_ok!
     assert_permissions! %w[
-      user.update
+      user.password.update
     ]
 
     return false if
-      bearer.has_role?(:read_only)
+      user.has_role?(:read_only)
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :product) ||
-      user == bearer
+    user == bearer
   end
 
-  def destroy?
+  def reset_password?
     assert_account_scoped!
-    assert_role_ok!
     assert_permissions! %w[
-      user.delete
+      user.password.reset
     ]
 
-    bearer.has_role?(:admin, :developer)
+    return false if
+      user.has_role?(:user) && account.protected? && !user.password?
+
+    return false if
+      user.has_role?(:read_only)
+
+    true
   end
 
   def generate_token?
@@ -94,71 +183,6 @@ class UserPolicy < ApplicationPolicy
       user == bearer
   end
 
-  def invite?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.invite
-    ]
-
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent)
-  end
-
-  def ban?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.ban
-    ]
-
-    user.has_role?(:user) &&
-      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-  end
-
-  def unban?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.unban
-    ]
-
-    user.has_role?(:user) &&
-      bearer.has_role?(:admin, :developer, :sales_agent, :support_agent, :product)
-  end
-
-  def update_password?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.password.update
-    ]
-
-    return false if
-      user.has_role?(:read_only)
-
-    user == bearer
-  end
-
-  def reset_password?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.password.reset
-    ]
-
-    return false if
-      user.has_role?(:user) && account.protected? && !user.password?
-
-    return false if
-      user.has_role?(:read_only)
-
-    true
-  end
-
-  def me?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.read
-    ]
-
-    user == bearer
-  end
-
   def change_group?
     assert_account_scoped!
     assert_permissions! %w[
@@ -170,24 +194,24 @@ class UserPolicy < ApplicationPolicy
 
   private
 
-  def assert_role_ok!
+  def verify_role!(user)
     return if
-      user.role.nil?
+      user.nil? || user.role.nil?
 
     # Assert that privilege escalation is not occurring by anonymous (sanity check)
-    raise Pundit::NotAuthorizedError, policy: self, message: 'anonymous is escalating privileges for the user' if
+    deny! 'anonymous is attempting to escalate privileges for the user' if
       bearer.nil? && user.role.changed? && !user.role.user?
 
     return if
       bearer.nil?
 
     # Assert that privilege escalation is not occurring by a bearer (sanity check)
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer is escalating privileges for the user' if
+    deny! "#{whatami} is attempting to escalate privileges for the user" if
       (bearer.role.changed? || user.role.changed?) &&
       bearer.role < user.role
 
     # Assert bearer can perform this action on the user
-    raise Pundit::NotAuthorizedError, policy: self, message: 'bearer lacks privileges to the user' if
+    deny! "#{whatami} lacks privileges to perform action on user" if
       bearer.role < user.role
   end
 end

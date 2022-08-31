@@ -358,7 +358,6 @@ class Permission < ApplicationRecord
 
     user.ban
     user.create
-    user.delete
     user.group.update
     user.read
     user.tokens.generate

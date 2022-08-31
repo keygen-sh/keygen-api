@@ -30,10 +30,11 @@ module AuthorizationHelper
     def as_license(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account) }
-        let(:policy)  { create(:policy, account:) }
-        let(:expiry)  { nil }
-        let(:bearer)  { create(:license, account:, policy:, expiry:, permissions: bearer_permissions) }
+        let(:account)      { create(:account) }
+        let(:policy)       { create(:policy, account:) }
+        let(:license_user) { nil }
+        let(:expiry)       { nil }
+        let(:bearer)       { create(:license, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
       end
     end
 
@@ -213,44 +214,48 @@ module AuthorizationHelper
       let(:record) { _token }
     end
 
-    def accessing_a_license(scenarios)
+    def accessing_admins(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:license) { create(:license, account: other_account) }
+        let(:admins) { create_list(:admin, 3, account: other_account) }
       else
-        let(:license) { create(:license, account:) }
+        let(:admins) { create_list(:admin, 3, account:) }
       end
 
-      let(:record) { license }
+      let(:record) { admins }
     end
 
-    def accessing_its_licenses(scenarios)
+    def accessing_an_admin(scenarios)
       case scenarios
-      in [:as_product, :accessing_a_group, *]
-        let(:policy)   { create(:policy, account:, product: bearer) }
-        let(:licenses) { create_list(:license, 3, account:, policy:, group:) }
-      in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:licenses) { create_list(:license, 3, account: group.account, group:) }
+      in [*, :accessing_another_account, *]
+        let(:admin) { create(:admin, account: other_account) }
+      else
+        let(:admin) { create(:admin, account:) }
       end
 
-      let(:record) { licenses }
+      let(:record) { admin }
     end
 
-    def accessing_its_license(scenarios)
+    def accessing_users(scenarios)
       case scenarios
-      in [:as_product, :accessing_a_group, *]
-        let(:policy)  { create(:policy, account:, product: bearer) }
-        let(:license) { create(:license, account:, policy:, group:) }
-      in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:license) { create(:license, account: group.account, group:) }
-      in [:as_product, *]
-        let(:policy)  { create(:policy, account:, product: bearer) }
-        let(:license) { create(:license, account:, policy:) }
-      in [:as_user, :is_licensed, *]
-        let(:license) { licenses.first }
+      in [*, :accessing_another_account, *]
+        let(:users) { create_list(:user, 3, account: other_account) }
+      else
+        let(:users) { create_list(:user, 3, account:) }
       end
 
-      let(:record) { license }
+      let(:record) { users }
+    end
+
+    def accessing_a_user(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:user) { create(:user, account: other_account) }
+      else
+        let(:user) { create(:user, account:) }
+      end
+
+      let(:record) { user }
     end
 
     def accessing_its_users(scenarios)
@@ -261,6 +266,10 @@ module AuthorizationHelper
         let!(:licenses) { users.map { create(:license, account:, policy:, user: _1) } }
       in [*, :accessing_its_group | :accessing_a_group, *]
         let(:users) { create_list(:user, 3, account: group.account, group:) }
+      in [:as_product, *]
+        let(:policy)    { create(:policy, account:, product: bearer) }
+        let(:users)     { create_list(:user, 3, account:) }
+        let!(:licenses) { users.map { create(:license, account:, policy:, user: _1) } }
       end
 
       let(:record) { users }
@@ -274,6 +283,12 @@ module AuthorizationHelper
         let(:license) { create(:license, account:, policy:, user:) }
       in [*, :accessing_its_group | :accessing_a_group, *]
         let(:user) { create(:user, account: group.account, group:) }
+      in [:as_product, *]
+        let(:policy)   { create(:policy, account:, product: bearer) }
+        let(:user)     { create(:user, account:) }
+        let!(:license) { create(:license, account:, policy:, user:) }
+      in [:as_license, :with_user, *]
+        let(:user) { bearer.user }
       end
 
       let(:record) { user }
@@ -607,6 +622,11 @@ module AuthorizationHelper
 
     def accessing_its_licenses(scenarios)
       case scenarios
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)   { create(:policy, account:, product: bearer) }
+        let(:licenses) { create_list(:license, 3, account:, policy:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:licenses) { create_list(:license, 3, account: group.account, group:) }
       in [:as_product, *]
         let(:policy)   { create(:policy, account:, product: bearer) }
         let(:licenses) { create_list(:license, 3, account:, policy:) }
@@ -619,6 +639,11 @@ module AuthorizationHelper
 
     def accessing_its_license(scenarios)
       case scenarios
+      in [:as_product, :accessing_a_group, *]
+        let(:policy)  { create(:policy, account:, product: bearer) }
+        let(:license) { create(:license, account:, policy:, group:) }
+      in [*, :accessing_its_group | :accessing_a_group, *]
+        let(:license) { create(:license, account: group.account, group:) }
       in [:as_product, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:license) { create(:license, account:, policy:) }
@@ -637,9 +662,9 @@ module AuthorizationHelper
     def with_entitlements(scenarios)
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:entitlements)          { create_list(:entitlement, 6, account:) }
-        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account:, license:, entitlement: _1) } }
-        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account:, policy: license.policy, entitlement: _1) } }
+        let(:entitlements)          { create_list(:entitlement, 6, account: license.account) }
+        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
+        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account: license.account, policy: license.policy, entitlement: _1) } }
       end
     end
 
@@ -649,6 +674,13 @@ module AuthorizationHelper
         let!(:constraints) { entitlements.map { create(:release_entitlement_constraint, account: release.account, entitlement: _1, release:) } }
       in [*, :accessing_its_release | :accessing_a_release, *]
         let!(:constraints) { create_list(:release_entitlement_constraint, 3, account: release.account, release:) }
+      end
+    end
+
+    def with_user(scenarios)
+      case scenarios
+      in [:as_license, *]
+        let(:license_user) { create(:user, account:) }
       end
     end
   end
@@ -823,6 +855,26 @@ module AuthorizationHelper
     def without_token_permissions(&)
       context "without token permissions" do
         let(:token_permissions) { [] }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_account_protection enables account protection.
+    def with_account_protection(&)
+      context "with account protection" do
+        let(:account) { create(:account, :protected) }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # without_account_protection disables account protection.
+    def without_account_protection(&)
+      context "without account protection" do
+        let(:account) { create(:account, :unprotected) }
 
         instance_exec(&)
       end
