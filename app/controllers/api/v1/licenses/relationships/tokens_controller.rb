@@ -7,8 +7,26 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
-    def generate
-      authorize! license, Token
+    authorize :license
+
+    def index
+      tokens = apply_pagination(authorized_scope(apply_scopes(license.tokens)))
+      authorize! tokens,
+        with: Licenses::TokenPolicy
+
+      render jsonapi: tokens
+    end
+
+    def show
+      token = license.tokens.find(params[:id])
+      authorize! token,
+        with: Licenses::TokenPolicy
+
+      render jsonapi: token
+    end
+
+    def create
+      authorize! with: Licenses::TokenPolicy
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :max_activations,
@@ -36,30 +54,12 @@ module Api::V1::Licenses::Relationships
       end
     end
 
-    def index
-      # FIXME(ezekg) Skipping the policy scope here so that products can see
-      #              tokens that belong to licenses they own. Current behavior
-      #              is that non-admin bearers can only see their own tokens.
-      #              The scoping is happening within the main app policy.
-      tokens = apply_pagination(apply_scopes(license.tokens))
-      authorize! license, tokens
-
-      render jsonapi: tokens
-    end
-
-    def show
-      token = license.tokens.find params[:id]
-      authorize! license, token
-
-      render jsonapi: token
-    end
-
     private
 
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
@@ -69,7 +69,7 @@ module Api::V1::Licenses::Relationships
     typed_parameters format: :jsonapi do
       options strict: true
 
-      on :generate do
+      on :create do
         param :data, type: :hash, optional: true do
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do

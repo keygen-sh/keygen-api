@@ -65,6 +65,31 @@ class Token < ApplicationRecord
     token.errors.add :deactivations, :limit_exceeded, message: "exceeds maximum allowed (#{token.max_deactivations})"
   end
 
+  scope :accessible_by, -> accessor {
+    case accessor
+    in role: { name: 'admin' }
+      self.all
+    in role: { name: 'product' }
+      self.for_product(accessor.id)
+          .or(
+            where(bearer: accessor.licenses.reorder(nil)),
+          )
+          .or(
+            where(bearer: accessor.users.reorder(nil)),
+          )
+    in role: { name: 'user' }
+      self.for_user(accessor.id)
+    in role: { name: 'license' }
+      self.for_license(accessor.id)
+    else
+      self.none
+    end
+  }
+
+  scope :for_product, -> id { for_bearer_type(Product.name).for_bearer_id(id) }
+  scope :for_license, -> id { for_bearer_type(License.name).for_bearer_id(id) }
+  scope :for_user,    -> id { for_bearer_type(User.name).for_bearer_id(id) }
+
   scope :for_bearer, -> type, id {
     for_bearer_type(type).for_bearer_id(id)
   }
