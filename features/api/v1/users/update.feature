@@ -1116,7 +1116,7 @@ Feature: Update user
        }
      }
      """
-   Then the response status should be "400"
+   Then the response status should be "404"
    And sidekiq should have 0 "webhook" jobs
    And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

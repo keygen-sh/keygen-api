@@ -153,14 +153,41 @@ Feature: Show user
     Then the response status should be "200"
     And the JSON response should be a "user"
 
-   Scenario: License retrieves their user
+  Scenario: License retrieves their user (with permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["user.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
+
+   Scenario: License retrieves their user (without permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1"
+    Then the response status should be "403"
+
+  Scenario: License retrieves their user (default permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user"
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$1"
-    Then the response status should be "404"
+    Then the response status should be "403"
 
   Scenario: License retrieves a user
     Given the current account is "test1"
