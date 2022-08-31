@@ -113,7 +113,7 @@ class LicensePolicy < ApplicationPolicy
   end
 
   def validate?
-    verify_permissions!('license.validate', 'license.read')
+    verify_permissions!('license.validate')
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
