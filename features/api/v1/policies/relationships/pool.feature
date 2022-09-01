@@ -57,6 +57,19 @@ Feature: Policy pool relationship
     Then the response status should be "200"
     And the JSON response should be a "key"
 
+  Scenario: Admin retrieves the pool of an unpooled policy
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "policy"
+    And all "policies" have the following attributes:
+      """
+      { "usePool": false }
+      """
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/pool"
+    Then the response status should be "200"
+    And the JSON response should be an empty array
+
   Scenario: Admin retrieves a key from the pool of an unpooled policy
     Given I am an admin of account "test1"
     And the current account is "test1"
@@ -65,16 +78,10 @@ Feature: Policy pool relationship
       """
       { "usePool": false }
       """
-    And the current account has 5 "keys"
-    And all "keys" have the following attributes:
-      """
-      {
-        "policyId": "$policies[0]"
-      }
-      """
+    And the current account has 1 "key"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool/$0"
-    Then the response status should be "422"
+    Then the response status should be "404"
 
   Scenario: Product retrieves the pool for a policy
     Given the current account is "test1"
@@ -122,7 +129,25 @@ Feature: Policy pool relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
-    Then the response status should be "403"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the pool for a policy
+    Given the current account is "test1"
+    And the current account has 3 "policies"
+    And all "policies" have the following attributes:
+      """
+      { "usePool": true }
+      """
+    And the current account has 3 "keys"
+    And all "keys" have the following attributes:
+      """
+      { "policyId": "$policies[0]" }
+      """
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/pool"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the pool for a policy
     Given the current account is "test1"
@@ -134,15 +159,13 @@ Feature: Policy pool relationship
     And the current account has 3 "keys"
     And all "keys" have the following attributes:
       """
-      {
-        "policyId": "$policies[0]"
-      }
+      { "policyId": "$policies[0]" }
       """
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/pool"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the pool for a policy of another account
     Given I am an admin of account "test2"
@@ -266,13 +289,25 @@ Feature: Policy pool relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"
+    Then the response status should be "404"
+
+  Scenario: License attempts to pop a key from a pool for a policy
+    Given the current account is "test1"
+    And the current account has 3 "policies"
+    And the current account has 3 "keys"
+    And the current account has 1 "license" for the first "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/policies/$0/pool"
     Then the response status should be "403"
 
   Scenario: User attempts to pop a key from a pool for a policy
     Given the current account is "test1"
     And the current account has 3 "policies"
     And the current account has 3 "keys"
+    And the current account has 1 "license" for the first "policy"
     And the current account has 1 "user"
+    And the last "license" belongs to the last "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/policies/$0/pool"

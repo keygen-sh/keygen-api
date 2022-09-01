@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Policy < ApplicationRecord
+  class UnsupportedPoolError < StandardError; end
+  class EmptyPoolError < StandardError; end
+
   include Limitable
   include Orderable
   include Pageable
@@ -523,12 +526,23 @@ class Policy < ApplicationRecord
   end
 
   def pop!
-    return nil if pool.empty?
-    key = pool.first.destroy
-    return key
+    raise UnsupportedPoolError, 'policy does not support pool' unless
+      pool?
+
+    raise EmptyPoolError, 'policy pool is empty' if
+      pool.empty?
+
+    pool.first.destroy
   rescue ActiveRecord::StaleObjectError
     reload
     retry
+  end
+
+  def pop
+    pop!
+  rescue UnsupportedPoolError,
+         EmptyPoolError
+    nil
   end
 
   private
