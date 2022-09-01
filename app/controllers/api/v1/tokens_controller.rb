@@ -5,24 +5,24 @@ module Api::V1
     include ActionController::HttpAuthentication::Basic::ControllerMethods
     include ActionController::HttpAuthentication::Token::ControllerMethods
 
-    has_scope(:bearer, type: :hash, using: [:type, :id]) { |_, s, (t, id)| s.for_bearer(t, id) }
+    has_scope(:bearer, type: :hash, using: %i[type id]) { |c, s, (t, id)| s.for_bearer(t, id) }
 
     before_action :scope_to_current_account!
-    before_action :require_active_subscription!, only: [:index]
-    before_action :authenticate_with_token!, only: [:index, :show, :regenerate, :regenerate_current, :revoke]
-    before_action :set_token, only: [:show, :regenerate, :revoke]
+    before_action :require_active_subscription!, only: %i[index regenerate regenerate_current]
+    before_action :authenticate_with_token!, except: %i[generate]
+    before_action :set_token, only: %i[show regenerate revoke]
 
     def index
-      @tokens = apply_pagination(policy_scope(apply_scopes(current_account.tokens)).preload(bearer: [:role]))
-      authorize @tokens
+      tokens = apply_pagination(authorized_scope(apply_scopes(current_account.tokens)).preload(bearer: %i[role]))
+      authorize! tokens
 
-      render jsonapi: @tokens
+      render jsonapi: tokens
     end
 
     def show
-      authorize @token
+      authorize! token
 
-      render jsonapi: @token
+      render jsonapi: token
     end
 
     def generate
@@ -41,22 +41,7 @@ module Api::V1
         end
 
         if user&.password? && user.authenticate(password)
-          policy = Pundit.policy!(
-            AuthorizationContext.new(
-              account: current_account,
-              bearer: user,
-              token: nil,
-            ),
-            Token,
-          )
-
-          # Raise this error first so the banned user is aware as to
-          # why token creation is failing.
-          raise Keygen::Error::ForbiddenError.new(code: 'USER_BANNED', detail: 'User is banned') if
-            user.banned?
-
-          raise Keygen::Error::ForbiddenError unless
-            policy.generate?
+          authorize! with: TokenPolicy, context: { bearer: user }
 
           kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
           if !kwargs.key?(:expiry)
@@ -91,8 +76,13 @@ module Api::V1
       render_bad_request
     end
 
+    # FIXME(ezekg) Deprecate this route.
     def regenerate_current
-      authorize current_token, :regenerate?
+      raise Keygen::Error::NotFoundError.new(model: Token.name) unless
+        current_token.present?
+
+      authorize! current_token,
+        to: :regenerate?
 
       current_token.regenerate!
 
@@ -106,12 +96,12 @@ module Api::V1
     end
 
     def regenerate
-      authorize token
+      authorize! token
 
       token.regenerate!
 
       BroadcastEventService.call(
-        event: "token.regenerated",
+        event: 'token.regenerated',
         account: current_account,
         resource: token,
       )
@@ -120,10 +110,10 @@ module Api::V1
     end
 
     def revoke
-      authorize token
+      authorize! token
 
       BroadcastEventService.call(
-        event: "token.revoked",
+        event: 'token.revoked',
         account: current_account,
         resource: token,
       )
@@ -136,7 +126,11 @@ module Api::V1
     attr_reader :token
 
     def set_token
-      @token = current_account.tokens.find params[:id]
+      scoped_tokens = authorized_scope(current_account.tokens)
+
+      @token = scoped_tokens.find(params[:id])
+
+      Current.resource = token
     end
 
     typed_parameters format: :jsonapi do
