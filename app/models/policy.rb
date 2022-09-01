@@ -98,6 +98,7 @@ class Policy < ApplicationRecord
   belongs_to :account
   belongs_to :product
   has_many :licenses, dependent: :destroy
+  has_many :users, -> { distinct.reorder(created_at: DEFAULT_SORT_ORDER) }, through: :licenses
   has_many :machines, through: :licenses
   has_many :pool, class_name: "Key", dependent: :destroy
   has_many :policy_entitlements, dependent: :delete_all
@@ -282,7 +283,16 @@ class Policy < ApplicationRecord
     )
   }
 
-  scope :for_product, -> (id) { where product: id }
+  scope :for_product, -> id { where product_id: id }
+  scope :for_license, -> id {
+    joins(:licenses).where(licenses: { id: })
+                    .distinct
+  }
+
+  scope :for_user, -> id {
+    joins(:users).where(users: { id: })
+                 .distinct
+  }
 
   def pool?
     use_pool
