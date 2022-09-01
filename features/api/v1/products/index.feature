@@ -162,17 +162,7 @@ Feature: List products
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: User attempts to retrieve all products for their account
-    Given the current account is "test1"
-    And the current account has 1 "user"
-    And I am a user of account "test1"
-    And I use an authentication token
-    And the current account has 3 "products"
-    When I send a GET request to "/accounts/test1/products"
-    Then the response status should be "403"
-    And the JSON response should be an array of 1 error
-
-  Scenario: Product attempts to retrieves all products for their account
+  Scenario: Product attempts to retrieves all products
     Given the current account is "test1"
     And the current account has 3 "products"
     And I am a product of account "test1"
@@ -180,3 +170,117 @@ Feature: List products
     When I send a GET request to "/accounts/test1/products"
     Then the response status should be "403"
     And the JSON response should be an array of 1 error
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their products (default permissions)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And I am the last license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their products (explicit permission)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["product.read"] }
+      """
+    And I am the last license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "product"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their products (no permission)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am the last license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve all products
+    Given the current account is "test1"
+    And the current account has 5 "policies"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their products (default permissions)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the first "license" belongs to the last "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+   Scenario: User attempts to retrieve their products (explicit permission)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["product.read"] }
+      """
+    And the first "license" belongs to the last "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "products"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their products (no permission)
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 3 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And the first "license" belongs to the last "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve all products
+    Given the current account is "test1"
+    And the current account has 5 "products"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job

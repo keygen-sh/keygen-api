@@ -105,3 +105,123 @@ Feature: Show policy
     When I send a GET request to "/accounts/test1/policies/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: License attempts to retrieve their policy (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their policy (explicit permission)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "policy"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their policy (no permission)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve a policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "policies"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$1"
+    Then the response status should be "404"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policy (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the first "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+   Scenario: User attempts to retrieve their policy (explicit permission)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "policy"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policy (no permission)
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve a policy
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 2 "policies"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$1"
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
