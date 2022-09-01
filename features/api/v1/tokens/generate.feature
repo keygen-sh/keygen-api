@@ -469,8 +469,7 @@ Feature: Generate authentication token
       """
       {
         "title": "Access denied",
-        "detail": "User is banned",
-        "code": "USER_BANNED"
+        "detail": "You do not have permission to complete the request (user is banned)"
       }
       """
     And sidekiq should have 0 "webhook" jobs

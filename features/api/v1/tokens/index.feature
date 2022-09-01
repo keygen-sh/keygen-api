@@ -87,6 +87,34 @@ Feature: List authentication tokens
     Then the response status should be "200"
     And the JSON response should be an array of 1 "token"
 
+  Scenario: Product requests all tokens for a specific license
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 2 "tokens" for each "license"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?bearer[type]=license&bearer[id]=$licenses[0]"
+    Then the response status should be "200"
+    And the JSON response should be an array of 2 "tokens"
+
+  Scenario: Product requests all tokens for a specific user
+    Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 1 "policy" for the first "product"
+    And the current account has 2 "licenses" for the last "policy"
+    And the current account has 2 "users"
+    And the current account has 2 "tokens" for each "user"
+    And the last "license" is associated to the last "user"
+    And I am a product of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/tokens?bearer[type]=user&bearer[id]=$users[2]"
+    Then the response status should be "200"
+    And the JSON response should be an array of 2 "tokens"
+
   Scenario: License requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 3 "products"
