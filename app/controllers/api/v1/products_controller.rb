@@ -21,7 +21,7 @@ module Api::V1
     end
 
     def create
-      product = current_account.products.new product_params
+      product = current_account.products.new(product_params)
       authorize! product
 
       if product.save
@@ -70,7 +70,9 @@ module Api::V1
     attr_reader :product
 
     def set_product
-      @product = current_account.products.find params[:id]
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:id])
 
       Current.resource = product
     end

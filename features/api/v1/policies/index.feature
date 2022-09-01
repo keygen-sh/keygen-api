@@ -157,12 +157,116 @@ Feature: List policies
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
 
-  Scenario: User attempts to retrieve all policies for their account
+  Scenario: License attempts to retrieve their policies (default permissions)
     Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "policies" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their policies (explicit permission)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "policies" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And I am the last license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "policy"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve their policies (no permission)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "policies" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am the last license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve all policies
+    Given the current account is "test1"
+    And the current account has 5 "policies"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policies (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 3 "policies" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 1 "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+   Scenario: User attempts to retrieve their policies (explicit permission)
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 4 "policies" for each "product"
+    And the current account has 2 "license" for each "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["policy.read"] }
+      """
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
+    And the third "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "policies"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve their policies (no permission)
+    Given the current account is "test1"
+    And the current account has 2 "products"
+    And the current account has 4 "policies" for each "product"
+    And the current account has 1 "license" for each "policy"
+    And the current account has 1 "user"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies"
+    Then the response status should be "403"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve all policies
+    Given the current account is "test1"
+    And the current account has 5 "policies"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
-    And the current account has 3 "policies"
     When I send a GET request to "/accounts/test1/policies"
     Then the response status should be "403"
-    And the JSON response should be an array of 1 error
+    And sidekiq should have 1 "request-log" job
+
