@@ -188,6 +188,54 @@ module AuthorizationHelper
       let(:record) { products }
     end
 
+    def accessing_policies(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:policies) { create_list(:policy, 3, account: other_account) }
+      else
+        let(:policies) { create_list(:policy, 3, account:) }
+      end
+
+      let(:record) { policies }
+    end
+
+    def accessing_a_policy(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:_policy) { create(:policy, account: other_account) }
+      else
+        let(:_policy) { create(:policy, account:) }
+      end
+
+      let(:record) { _policy }
+    end
+
+    def accessing_its_policies(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policies) { create_list(:policy, 3, account: bearer.account, product: bearer) }
+      in [:as_license, *]
+        let(:policies) { [bearer.policy] }
+      in [:as_user, :is_licensed, *]
+        let(:policies) { licenses.collect(&:policy) }
+      end
+
+      let(:record) { policies }
+    end
+
+    def accessing_its_policy(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:_policy) { create(:policy, account: bearer.account, product: bearer) }
+      in [:as_license, *]
+        let(:_policy) { bearer.policy }
+      in [:as_user, :is_licensed, *]
+        let(:_policy) { license.policy }
+      end
+
+      let(:record) { _policy }
+    end
+
     def accessing_tokens(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
