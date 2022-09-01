@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
 class TokenPolicy < ApplicationPolicy
-
   def index?
     verify_permissions!('token.read')
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
       allow!
-    in role: { name: 'product' } if record.all? { _1.bearer_type == License.name || _1.bearer_type == bearer.class.name && _1.bearer_id == bearer.id }
-      allow!
-    in role: { name: 'user' | 'license' } if record.all? { _1.bearer_type == bearer.class.name && _1.bearer_id == bearer.id }
-      allow!
+    in role: { name: 'product' }
+      record.all? { _1 in { bearer_type: ^(Product.name), bearer_id: ^(bearer.id) } |
+                          { bearer_type: ^(License.name) | ^(User.name) } }
+    in role: { name: 'license' }
+      record.all? { _1 in { bearer_type: ^(License.name), bearer_id: ^(bearer.id) } }
+    in role: { name: 'user' }
+      record.all? { _1 in { bearer_type: ^(User.name), bearer_id: ^(bearer.id) } }
     else
       deny!
     end
@@ -31,7 +33,17 @@ class TokenPolicy < ApplicationPolicy
   def generate?
     verify_permissions!('token.generate')
 
-    allow!
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'user' }
+      deny! 'user is banned' if
+        bearer.banned?
+
+      allow!
+    else
+      deny!
+    end
   end
 
   def regenerate?

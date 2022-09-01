@@ -188,6 +188,28 @@ module AuthorizationHelper
       let(:record) { products }
     end
 
+    def accessing_tokens(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:tokens) { create_list(:token, 3, account: other_account) }
+      else
+        let(:tokens) { create_list(:token, 3, account:) }
+      end
+
+      let(:record) { tokens }
+    end
+
+    def accessing_a_token(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:_token) { create(:token, account: other_account) }
+      else
+        let(:_token) { create(:token, account:) }
+      end
+
+      let(:record) { _token }
+    end
+
     def accessing_its_tokens(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
@@ -195,6 +217,8 @@ module AuthorizationHelper
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:tokens)   { create_list(:token, 3, account: license.account, bearer: license) }
       in [*, :accessing_itself, *]
+        let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
+      in [:as_admin | :as_product | :as_license | :as_user, *]
         let(:tokens)   { create_list(:token, 3, account: bearer.account, bearer:) }
       end
 
@@ -208,6 +232,8 @@ module AuthorizationHelper
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:_token) { create(:token, account: license.account, bearer: license) }
       in [*, :accessing_itself, *]
+        let(:_token) { create(:token, account: bearer.account, bearer:) }
+      in [:as_admin | :as_product | :as_license | :as_user, *]
         let(:_token) { create(:token, account: bearer.account, bearer:) }
       end
 
@@ -771,6 +797,16 @@ module AuthorizationHelper
     def with_token_authentication(&)
       context 'with token authentication' do
         let(:token) { create(:token, account:, bearer:, permissions: token_permissions) }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_basic_authentication defines a context using basic authentication.
+    def with_basic_authentication(&)
+      context 'with basic authentication' do
+        let(:token) { nil }
 
         instance_exec(&)
       end

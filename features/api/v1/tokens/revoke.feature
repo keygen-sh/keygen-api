@@ -62,7 +62,7 @@ Feature: Revoke authentication token
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$3"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Product attempts to revoke a user's token
     Given the current account is "test1"
@@ -71,4 +71,4 @@ Feature: Revoke authentication token
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/tokens/$4"
-    Then the response status should be "403"
+    Then the response status should be "404"
