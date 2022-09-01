@@ -7,77 +7,76 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_policy, only: [:show, :update, :destroy]
+    before_action :set_policy, only: %i[show update destroy]
 
-    # GET /policies
     def index
-      @policies = apply_pagination(policy_scope(apply_scopes(current_account.policies)))
-      authorize @policies
+      policies = apply_pagination(authorized_scope(apply_scopes(current_account.policies)))
+      authorize! policies
 
-      render jsonapi: @policies
+      render jsonapi: policies
     end
 
-    # GET /policies/1
     def show
-      authorize @policy
+      authorize! policy
 
-      render jsonapi: @policy
+      render jsonapi: policy
     end
 
-    # POST /policies
     def create
-      @policy = current_account.policies.new(api_version: current_api_version, **policy_params)
-      authorize @policy
+      policy = current_account.policies.new(api_version: current_api_version, **policy_params)
+      authorize! policy
 
-      if @policy.save
+      if policy.save
         BroadcastEventService.call(
-          event: "policy.created",
+          event: 'policy.created',
           account: current_account,
-          resource: @policy
+          resource: policy,
         )
 
-        render jsonapi: @policy, status: :created, location: v1_account_policy_url(@policy.account, @policy)
+        render jsonapi: policy, status: :created, location: v1_account_policy_url(policy.account, policy)
       else
-        render_unprocessable_resource @policy
+        render_unprocessable_resource policy
       end
     end
 
-    # PATCH/PUT /policies/1
     def update
-      authorize @policy
+      authorize! policy
 
-      if @policy.update(policy_params)
+      if policy.update(policy_params)
         BroadcastEventService.call(
-          event: "policy.updated",
+          event: 'policy.updated',
           account: current_account,
-          resource: @policy
+          resource: policy,
         )
 
-        render jsonapi: @policy
+        render jsonapi: policy
       else
-        render_unprocessable_resource @policy
+        render_unprocessable_resource policy
       end
     end
 
-    # DELETE /policies/1
     def destroy
-      authorize @policy
+      authorize! policy
 
       BroadcastEventService.call(
-        event: "policy.deleted",
+        event: 'policy.deleted',
         account: current_account,
-        resource: @policy
+        resource: policy,
       )
 
-      @policy.destroy_async
+      policy.destroy_async
     end
 
     private
 
-    def set_policy
-      @policy = current_account.policies.find params[:id]
+    attr_reader :policy
 
-      Current.resource = @policy
+    def set_policy
+      scoped_policies = authorized_scope(current_account.policies)
+
+      @policy = scoped_policies.find(params[:id])
+
+      Current.resource = policy
     end
 
     typed_parameters format: :jsonapi do
