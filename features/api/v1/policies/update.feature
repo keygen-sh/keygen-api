@@ -474,7 +474,7 @@ Feature: Update policy
     And the current account has 1 "license" for the last "policy"
     And the current account has 1 "user"
     And the last "license" belongs to the last "user"
-    And I am a license of account "test1"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$0" with the following:
       """
@@ -492,13 +492,13 @@ Feature: Update policy
     And sidekiq should have 0 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License attempts to update a policy
+  Scenario: User attempts to update a policy
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 2 "policies"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user"
-    And I am a license of account "test1"
+    And I am a user of account "test1"
     And I use an authentication token
     When I send a PATCH request to "/accounts/test1/policies/$1" with the following:
       """
