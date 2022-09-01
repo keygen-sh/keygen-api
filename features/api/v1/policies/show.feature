@@ -95,7 +95,7 @@ Feature: Show policy
     And I use an authentication token
     And the current account has 1 "policy"
     When I send a GET request to "/accounts/test1/policies/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve a policy for another account
     Given I am an admin of account "test2"
