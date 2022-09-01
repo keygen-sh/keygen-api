@@ -99,6 +99,7 @@ class Permission < ApplicationRecord
     policy.entitlements.attach
     policy.entitlements.detach
     policy.entitlements.read
+    policy.pool.read
     policy.pool.pop
     policy.read
     policy.update
@@ -322,6 +323,7 @@ class Permission < ApplicationRecord
     policy.entitlements.attach
     policy.entitlements.detach
     policy.entitlements.read
+    policy.pool.read
     policy.pool.pop
     policy.read
     policy.update

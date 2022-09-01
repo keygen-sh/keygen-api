@@ -5,52 +5,59 @@ module Api::V1::Policies::Relationships
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_policy, only: [:index, :show, :pop]
+    before_action :set_policy, only: %i[index show pop]
 
-    # GET /policies/1/pool
+    authorize :policy
+
     def index
-      @pool = apply_pagination(policy_scope(apply_scopes(@policy.pool)).preload(:product))
-      authorize @pool
+      keys = apply_pagination(authorized_scope(apply_scopes(policy.pool)).preload(:product))
+      authorize! keys,
+        with: Policies::PoolPolicy
 
-      render jsonapi: @pool
+      render jsonapi: keys
     end
 
-    # GET /policies/1/pool/1
     def show
-      @pool = @policy.pool.find params[:id]
-      authorize @pool
+      key = policy.pool.find(params[:id])
+      authorize! key,
+        with: Policies::PoolPolicy
 
-      render jsonapi: @pool
+      render jsonapi: key
     end
 
-    # DELETE /policies/1/pool
     def pop
-      if key = @policy.pop!
-        BroadcastEventService.call(
-          event: "policy.pool.popped",
-          account: current_account,
-          resource: key
-        )
+      authorize! with: Policies::PoolPolicy
+      key = policy.pop!
 
-        render jsonapi: key
-      else
-        render_unprocessable_entity detail: "pool is empty",
-          source: { pointer: "/data/relationships/pool" }
-      end
+      BroadcastEventService.call(
+        event: 'policy.pool.popped',
+        account: current_account,
+        resource: key,
+      )
+
+      render jsonapi: key
+    rescue Policy::UnsupportedPoolError
+      render_unprocessable_entity(
+        source: { pointer: '/data/relationships/pool' },
+        detail: 'pool is not supported',
+      )
+    rescue Policy::EmptyPoolError
+      render_unprocessable_entity(
+        source: { pointer: '/data/relationships/pool' },
+        detail: 'pool is empty',
+      )
     end
 
     private
 
+    attr_reader :policy
+
     def set_policy
-      @policy = current_account.policies.find params[:policy_id]
-      authorize @policy, :show?
+      scoped_policies = authorized_scope(current_account.policies)
 
-      if !@policy.pool?
-        render_unprocessable_entity detail: "policy does not use a pool",
-          source: { pointer: "/data/attributes/usePool" } and return
-      end
+      @policy = scoped_policies.find(params[:policy_id])
 
-      Current.resource = @policy
+      Current.resource = policy
     end
   end
 end
