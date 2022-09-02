@@ -7,53 +7,55 @@ module Api::V1::Policies::Relationships
     before_action :authenticate_with_token!
     before_action :set_policy
 
+    authorize :policy
+
     def index
-      authorize @policy, :list_entitlements?
+      entitlements = apply_pagination(authorized_scope(apply_scopes(policy.entitlements)))
+      authorize! entitlements,
+        with: Policies::EntitlementPolicy
 
-      @entitlements = apply_pagination(apply_scopes(@policy.entitlements))
-
-      render jsonapi: @entitlements
+      render jsonapi: entitlements
     end
 
     def show
-      authorize @policy, :show_entitlement?
+      entitlement = policy.entitlements.find(params[:id])
+      authorize! entitlement,
+        with: Policies::EntitlementPolicy
 
-      @entitlement = @policy.entitlements.find(params[:id])
-
-      render jsonapi: @entitlement
+      render jsonapi: entitlement
     end
 
     def attach
-      authorize @policy, :attach_entitlement?
+      authorize! with: Policies::EntitlementPolicy
 
       entitlements_data = entitlement_params.fetch(:data).map do |entitlement|
         entitlement.merge(account_id: current_account.id)
       end
 
-      attached = @policy.policy_entitlements.create!(entitlements_data)
+      attached = policy.policy_entitlements.create!(entitlements_data)
 
       BroadcastEventService.call(
         event: 'policy.entitlements.attached',
         account: current_account,
-        resource: attached
+        resource: attached,
       )
 
       render jsonapi: attached
     end
 
     def detach
-      authorize @policy, :detach_entitlement?
+      authorize! with: Policies::EntitlementPolicy
 
-      entitlement_ids = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
-      policy_entitlements = @policy.policy_entitlements.where(entitlement_id: entitlement_ids)
+      entitlement_ids     = entitlement_params.fetch(:data).map { |e| e[:entitlement_id] }.compact
+      policy_entitlements = policy.policy_entitlements.where(entitlement_id: entitlement_ids)
 
       # Ensure all entitlements exist. Deleting non-existing policy entitlements would be
       # a noop, but responding with a 2xx status code is a confusing DX.
       if policy_entitlements.size != entitlement_ids.size
-        policy_entitlement_ids = policy_entitlements.pluck(:entitlement_id)
+        policy_entitlement_ids  = policy_entitlements.pluck(:entitlement_id)
         invalid_entitlement_ids = entitlement_ids - policy_entitlement_ids
-        invalid_entitlement_id = invalid_entitlement_ids.first
-        invalid_idx = entitlement_ids.find_index(invalid_entitlement_id)
+        invalid_entitlement_id  = invalid_entitlement_ids.first
+        invalid_idx             = entitlement_ids.find_index(invalid_entitlement_id)
 
         return render_unprocessable_entity(
           detail: "entitlement '#{invalid_entitlement_id}' relationship not found",
@@ -63,22 +65,25 @@ module Api::V1::Policies::Relationships
         )
       end
 
-      detached = @policy.policy_entitlements.delete(policy_entitlements)
+      detached = policy.policy_entitlements.delete(policy_entitlements)
 
       BroadcastEventService.call(
         event: 'policy.entitlements.detached',
         account: current_account,
-        resource: detached
+        resource: detached,
       )
     end
 
     private
 
-    def set_policy
-      @policy = current_account.policies.find params[:policy_id]
-      authorize @policy, :show?
+    attr_reader :policy
 
-      Current.resource = @policy
+    def set_policy
+      scoped_policies = authorized_scope(current_account.policies)
+
+      @policy = scoped_policies.find(params[:policy_id])
+
+      Current.resource = policy
     end
 
     typed_parameters do
