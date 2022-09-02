@@ -71,7 +71,7 @@ Feature: Policy entitlements relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the entitlements for a policy
     Given the current account is "test1"
@@ -81,7 +81,7 @@ Feature: Policy entitlements relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/entitlements"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the entitlements for a policy of another account
     Given I am an admin of account "test2"
@@ -262,7 +262,7 @@ Feature: Policy entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -304,7 +304,7 @@ Feature: Policy entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -430,7 +430,7 @@ Feature: Policy entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -472,7 +472,7 @@ Feature: Policy entitlements relationship
         ]
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
