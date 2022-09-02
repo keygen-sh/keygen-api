@@ -544,62 +544,62 @@ module AuthorizationHelper
       let(:record) { machine }
     end
 
-    def accessing_processes(scenarios)
+    def accessing_machine_processes(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:processes) { create_list(:process, 3, account: other_account) }
+        let(:machine_processes) { create_list(:process, 3, account: other_account) }
       else
-        let(:processes) { create_list(:process, 3, account:) }
+        let(:machine_processes) { create_list(:process, 3, account:) }
       end
 
-      let(:record) { processes }
+      let(:record) { machine_processes }
     end
 
-    def accessing_a_process(scenarios)
+    def accessing_a_machine_process(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:process) { create(:process, account: other_account) }
+        let(:machine_process) { create(:process, account: other_account) }
       else
-        let(:process) { create(:process, account:) }
+        let(:machine_process) { create(:process, account:) }
       end
 
-      let(:record) { process }
+      let(:record) { machine_process }
     end
 
-    def accessing_its_processes(scenarios)
+    def accessing_its_machine_processes(scenarios)
       case scenarios
       in [:as_product, *]
-        let(:policy)    { create(:policy, account:, product: bearer) }
-        let(:license)   { create(:license, account:, policy:) }
-        let(:machine)   { create(:machine, account:, license:) }
-        let(:processes) { create_list(:process, 3, account:, machine:) }
+        let(:policy)            { create(:policy, account:, product: bearer) }
+        let(:license)           { create(:license, account:, policy:) }
+        let(:machine)           { create(:machine, account:, license:) }
+        let(:machine_processes) { create_list(:machine_process, 3, account:, machine:) }
       in [:as_license, *]
-        let(:machine)   { create(:machine, account:, license: bearer) }
-        let(:processes) { create_list(:process, 3, account:, machine:) }
+        let(:machine)           { create(:machine, account:, license: bearer) }
+        let(:machine_processes) { create_list(:process, 3, account:, machine:) }
       in [:as_user, :is_licensed, *]
-        let(:machine)   { create(:machine, account:, license:) }
-        let(:processes) { create_list(:process, 3, account:, machine:) }
+        let(:machine)           { create(:machine, account:, license:) }
+        let(:machine_processes) { create_list(:process, 3, account:, machine:) }
       end
 
-      let(:record) { processes }
+      let(:record) { machine_processes }
     end
 
-    def accessing_its_process(scenarios)
+    def accessing_its_machine_process(scenarios)
       case scenarios
       in [:as_product, *]
-        let(:policy)  { create(:policy, account:, product: bearer) }
-        let(:license) { create(:license, account:, policy:) }
-        let(:machine) { create(:machine, account:, license:) }
-        let(:process) { create(:process, account:, machine:) }
+        let(:policy)          { create(:policy, account:, product: bearer) }
+        let(:license)         { create(:license, account:, policy:) }
+        let(:machine)         { create(:machine, account:, license:) }
+        let(:machine_process) { create(:process, account:, machine:) }
       in [:as_license, *]
-        let(:machine) { create(:machine, account:, license: bearer) }
-        let(:process) { create(:process, account:, machine:) }
+        let(:machine)         { create(:machine, account:, license: bearer) }
+        let(:machine_process) { create(:process, account:, machine:) }
       in [:as_user, :is_licensed, *]
-        let(:machine) { create(:machine, account:, license:) }
-        let(:process) { create(:process, account:, machine:) }
+        let(:machine)         { create(:machine, account:, license:) }
+        let(:machine_process) { create(:process, account:, machine:) }
       end
 
-      let(:record) { process }
+      let(:record) { machine_process }
     end
 
     def accessing_its_owners(scenarios)
