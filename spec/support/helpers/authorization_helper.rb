@@ -463,6 +463,8 @@ module AuthorizationHelper
       in [:as_user, :is_licensed, :is_entitled, *]
         # noop
       end
+
+      let(:record) { entitlements }
     end
 
     def accessing_its_entitlement(scenarios)
