@@ -7,9 +7,12 @@ module Api::V1::Licenses::Relationships
     before_action :authenticate_with_token!
     before_action :set_license
 
+    authorize :license
+
     def show
       product = license.product
-      authorize! license, product
+      authorize! product,
+        with: Licenses::ProductPolicy
 
       render jsonapi: product
     end
@@ -19,7 +22,7 @@ module Api::V1::Licenses::Relationships
     attr_reader :license
 
     def set_license
-      scoped_licenses = policy_scope(current_account.licenses)
+      scoped_licenses = authorized_scope(current_account.licenses)
 
       @license = FindByAliasService.call(scope: scoped_licenses, identifier: params[:license_id], aliases: :key)
 
