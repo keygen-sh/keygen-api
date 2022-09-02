@@ -353,6 +353,8 @@ module AuthorizationHelper
 
     def accessing_its_user(scenarios)
       case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:user) { license.user }
       in [:as_product, :accessing_a_group, *]
         let(:policy)  { create(:policy, account:, product: bearer) }
         let(:user)    { create(:user, account:, group:) }
@@ -744,11 +746,13 @@ module AuthorizationHelper
     end
 
     def accessing_a_license(scenarios)
+      let(:license_user) { nil }
+
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:license) { create(:license, account: other_account) }
+        let(:license) { create(:license, user: license_user, account: other_account) }
       else
-        let(:license) { create(:license, account:) }
+        let(:license) { create(:license, user: license_user, account:) }
       end
 
       let(:record) { license }
@@ -813,6 +817,10 @@ module AuthorizationHelper
 
     def with_user(scenarios)
       case scenarios
+      in [*, :accessing_another_account, :accessing_a_license, *]
+        let(:license_user) { create(:user, account: other_account) }
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:license_user) { create(:user, account:) }
       in [:as_license, *]
         let(:license_user) { create(:user, account:) }
       end

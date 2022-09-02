@@ -52,14 +52,23 @@ class ApplicationPolicy
   private
 
   def verify_account_scoped!
-    deny! "#{whatami} account does not match current account" if
-      bearer.present? && bearer.account_id != account.id
+    deny! "#{whatami} account does not match account context" if
+        bearer.present? && bearer.account_id != account.id
+
+    authorization_context.except(:account, :bearer, :token)
+                         .each do |context, model|
+      next unless
+        model.respond_to?(:account_id)
+
+      deny! "#{whatami} account does not match #{context.to_s.humanize.downcase} context" if
+        bearer.present? && bearer.account_id != model.account_id
+    end
 
     case record
     in [{ account_id: _ }, *] => r if r.any? { _1.account_id != account.id }
-      deny! "a record's account does not match current account"
+      deny! "a record's account does not match account context"
     in { account_id: } if account_id != account.id
-      deny! 'record account does not match current account'
+      deny! 'record account does not match account context'
     else
     end
   end
