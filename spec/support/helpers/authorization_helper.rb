@@ -456,30 +456,30 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, :with_entitlements, *]
         # noop
+      in [*, :accessing_its_policy | :accessing_a_policy, :with_entitlements, *]
+        # noop
       in [:as_license, :is_entitled, *]
         # noop
       in [:as_user, :is_licensed, :is_entitled, *]
         # noop
       end
-
-      let(:record) { license_entitlements.collect(&:entitlement) +
-                     policy_entitlements.collect(&:entitlement) }
     end
 
     def accessing_its_entitlement(scenarios)
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:entitlement)         { create(:entitlement, account: license.account) }
-        let(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
+        let(:entitlement)          { create(:entitlement, account: license.account) }
+        let!(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:entitlement)         { create(:entitlement, account: _policy.account) }
+        let!(:policy_entitlement) { create(:policy_entitlement, account: _policy.account, policy: _policy, entitlement:) }
       in [:as_license, :is_entitled, *]
-        let(:entitlement)         { entitlements.first }
-        let(:license_entitlement) { license_entitlements.first }
+        let(:entitlement) { entitlements.first }
       in [:as_user, :is_licensed, :is_entitled, *]
-        let(:entitlement)         { entitlements.first }
-        let(:license_entitlement) { license_entitlements.first }
+        let(:entitlement) { entitlements.first }
       end
 
-      let(:record) { license_entitlement.entitlement }
+      let(:record) { entitlement }
     end
 
     def accessing_machines(scenarios)
@@ -803,8 +803,12 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:entitlements)          { create_list(:entitlement, 6, account: license.account) }
-        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
         let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account: license.account, policy: license.policy, entitlement: _1) } }
+        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:entitlements)          { create_list(:entitlement, 3, account: _policy.account) }
+        let!(:policy_entitlements)  { entitlements.map { create(:policy_entitlement, account: _policy.account, policy: _policy, entitlement: _1) } }
+        let!(:license_entitlements) { [] }
       end
     end
 
