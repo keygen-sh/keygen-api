@@ -84,11 +84,8 @@ Feature: Process heartbeat actions
       """
       {
         "title": "Unprocessable entity",
-        "detail": "is dead",
         "code": "PROCESS_HEARTBEAT_DEAD",
-        "source": {
-          "pointer": "/data/attributes/status"
-        }
+        "detail": "is dead"
       }
       """
     And sidekiq should have 0 "process-heartbeat" jobs
@@ -164,11 +161,8 @@ Feature: Process heartbeat actions
       """
       {
         "title": "Unprocessable entity",
-        "detail": "is dead",
         "code": "PROCESS_HEARTBEAT_DEAD",
-        "source": {
-          "pointer": "/data/attributes/status"
-        }
+        "detail": "is dead"
       }
       """
     And sidekiq should have 0 "process-heartbeat" jobs

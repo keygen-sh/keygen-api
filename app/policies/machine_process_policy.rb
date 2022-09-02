@@ -2,81 +2,87 @@
 
 class MachineProcessPolicy < ApplicationPolicy
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.read
-    ]
+    verify_permissions!('process.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.has_role?(:product) &&
-        resource.all? { |r| r.product.id == bearer.id }) ||
-      (bearer.has_role?(:user) &&
-        resource.all? { |r| r.license.user_id == bearer.id }) ||
-      (bearer.has_role?(:license) &&
-        resource.all? { |r| r.license.id == bearer.id }) ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.all? { |r|
-          r.group.present? && r.group.id.in?(bearer.group_ids) ||
-          r.license.user_id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.product == bearer }
+      allow!
+    in role: { name: 'user' } if record.all? { _1.user == bearer }
+      allow!
+    in role: { name: 'license' } if record.all? { _1.license == bearer }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.read
-    ]
+    verify_permissions!('process.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.user == bearer ||
-      resource.product == bearer ||
-      resource.license == bearer ||
-      (bearer.has_role?(:user) && bearer.group_ids.any? &&
-        resource.group.present? && resource.group.id.in?(bearer.group_ids))
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      allow!
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.create
-    ]
+    verify_permissions!('process.create')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      ((resource.license.nil? || !resource.license.protected?) && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license&.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.update
-    ]
+    verify_permissions!('process.update')
 
-    bearer.has_role?(:admin, :developer, :sales_agent, :support_agent) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.delete
-    ]
+    verify_permissions!('process.delete')
 
-    bearer.has_role?(:admin, :developer, :sales_agent) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
-  end
-
-  def ping?
-    assert_account_scoped!
-    assert_permissions! %w[
-      process.heartbeat.ping
-    ]
-
-    bearer.has_role?(:admin, :developer) ||
-      (!resource.license.protected? && resource.user == bearer) ||
-      resource.product == bearer ||
-      resource.license == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    in role: { name: 'user' } if record.user == bearer
+      !record.license.protected?
+    in role: { name: 'license' } if record.license == bearer
+      allow!
+    else
+      deny!
+    end
   end
 end

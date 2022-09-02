@@ -7,50 +7,51 @@ module Api::V1::Processes::Actions
     before_action :authenticate_with_token!
     before_action :set_process
 
+    authorize :machine_process
+
     def ping
-      authorize @process
+      authorize! with: MachineProcesses::HeartbeatPolicy
 
-      if @process.dead?
-        return render_unprocessable_entity(detail: 'is dead', code: 'PROCESS_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/status' }) unless
-          @process.resurrect_dead? && !@process.resurrection_period_passed?
-
-        @process.resurrect!
+      if machine_process.dead?
+        machine_process.resurrect!
 
         BroadcastEventService.call(
           event: 'process.heartbeat.resurrected',
           account: current_account,
-          resource: @process,
+          resource: machine_process,
         )
       else
-        @process.ping!
+        machine_process.ping!
 
         BroadcastEventService.call(
           event: 'process.heartbeat.ping',
           account: current_account,
-          resource: @process,
+          resource: machine_process,
         )
       end
 
       # Queue up heartbeat worker which will handle deactivating dead processes
       ProcessHeartbeatWorker.perform_in(
-        @process.interval + MachineProcess::HEARTBEAT_DRIFT,
-        @process.id,
+        machine_process.interval + MachineProcess::HEARTBEAT_DRIFT,
+        machine_process.id,
       )
 
-      render jsonapi: @process
+      render jsonapi: machine_process
+    rescue MachineProcess::ResurrectionUnsupportedError,
+           MachineProcess::ResurrectionExpiredError
+      render_unprocessable_entity detail: 'is dead', code: 'PROCESS_HEARTBEAT_DEAD'
     end
 
     private
 
+    attr_reader :machine_process
+
     def set_process
-      scoped_processes = policy_scope(current_account.machine_processes)
+      scoped_processes = authorized_scope(current_account.machine_processes)
 
-      # FIXME(ezekg) We're using an instance variable here instead of an
-      #              attr_reader because Rails has an internal process
-      #              method that conflicts.
-      @process = scoped_processes.find(params[:id])
+      @machine_process = scoped_processes.find(params[:id])
 
-      Current.resource = @process
+      Current.resource = machine_process
     end
   end
 end
