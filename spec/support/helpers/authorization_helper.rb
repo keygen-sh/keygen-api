@@ -544,6 +544,64 @@ module AuthorizationHelper
       let(:record) { machine }
     end
 
+    def accessing_processes(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:processes) { create_list(:process, 3, account: other_account) }
+      else
+        let(:processes) { create_list(:process, 3, account:) }
+      end
+
+      let(:record) { processes }
+    end
+
+    def accessing_a_process(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:process) { create(:process, account: other_account) }
+      else
+        let(:process) { create(:process, account:) }
+      end
+
+      let(:record) { process }
+    end
+
+    def accessing_its_processes(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policy)    { create(:policy, account:, product: bearer) }
+        let(:license)   { create(:license, account:, policy:) }
+        let(:machine)   { create(:machine, account:, license:) }
+        let(:processes) { create_list(:process, 3, account:, machine:) }
+      in [:as_license, *]
+        let(:machine)   { create(:machine, account:, license: bearer) }
+        let(:processes) { create_list(:process, 3, account:, machine:) }
+      in [:as_user, :is_licensed, *]
+        let(:machine)   { create(:machine, account:, license:) }
+        let(:processes) { create_list(:process, 3, account:, machine:) }
+      end
+
+      let(:record) { processes }
+    end
+
+    def accessing_its_process(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:policy)  { create(:policy, account:, product: bearer) }
+        let(:license) { create(:license, account:, policy:) }
+        let(:machine) { create(:machine, account:, license:) }
+        let(:process) { create(:process, account:, machine:) }
+      in [:as_license, *]
+        let(:machine) { create(:machine, account:, license: bearer) }
+        let(:process) { create(:process, account:, machine:) }
+      in [:as_user, :is_licensed, *]
+        let(:machine) { create(:machine, account:, license:) }
+        let(:process) { create(:process, account:, machine:) }
+      end
+
+      let(:record) { process }
+    end
+
     def accessing_its_owners(scenarios)
       case scenarios
       in [*, :accessing_a_group, :as_group_owner, *]

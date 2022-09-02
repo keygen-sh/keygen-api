@@ -13,9 +13,6 @@ module Api::V1::Machines::Actions
       authorize! with: Machines::HeartbeatPolicy
 
       if machine.dead?
-        return render_unprocessable_entity(detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD', source: { pointer: '/data/attributes/heartbeatStatus' }) unless
-          machine.policy.resurrect_dead? && !machine.resurrection_period_passed?
-
         machine.resurrect!
 
         BroadcastEventService.call(
@@ -40,6 +37,9 @@ module Api::V1::Machines::Actions
       )
 
       render jsonapi: machine
+    rescue Machine::ResurrectionUnsupportedError,
+           Machine::ResurrectionExpiredError
+      render_unprocessable_entity detail: 'is dead', code: 'MACHINE_HEARTBEAT_DEAD'
     end
 
     def reset
