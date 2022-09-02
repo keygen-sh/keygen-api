@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Machine < ApplicationRecord
+  class ResurrectionUnsupportedError < StandardError; end
+  class ResurrectionExpiredError < StandardError; end
+
   include Envented::Callbacks
   include Limitable
   include Orderable
@@ -396,6 +399,12 @@ class Machine < ApplicationRecord
   end
 
   def resurrect!
+    raise ResurrectionUnsupportedError, 'resurrection is not supported' unless
+      resurrect_dead?
+
+    raise ResurrectionExpiredError, 'resurrection period has expired' if
+      resurrection_period_passed?
+
     update!(last_heartbeat_at: Time.current, last_death_event_sent_at: nil)
 
     self.heartbeat_status_override = :RESURRECTED

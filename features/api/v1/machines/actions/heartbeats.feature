@@ -188,11 +188,8 @@ Feature: Machine heartbeat actions
       """
       {
         "title": "Unprocessable entity",
-        "detail": "is dead",
         "code": "MACHINE_HEARTBEAT_DEAD",
-        "source": {
-          "pointer": "/data/attributes/heartbeatStatus"
-        }
+        "detail": "is dead"
       }
       """
     And sidekiq should have 0 "machine-heartbeat" jobs
@@ -272,11 +269,8 @@ Feature: Machine heartbeat actions
       """
       {
         "title": "Unprocessable entity",
-        "detail": "is dead",
         "code": "MACHINE_HEARTBEAT_DEAD",
-        "source": {
-          "pointer": "/data/attributes/heartbeatStatus"
-        }
+        "detail": "is dead"
       }
       """
     And sidekiq should have 0 "machine-heartbeat" jobs

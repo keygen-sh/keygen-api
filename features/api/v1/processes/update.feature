@@ -216,7 +216,7 @@ Feature: Update machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: License updates a process
+  Scenario: License updates a process's metadata
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license"
@@ -238,7 +238,7 @@ Feature: Update machine process
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -271,7 +271,7 @@ Feature: Update machine process
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User updates a process
+  Scenario: User updates a process's metadata
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "user"
@@ -294,7 +294,7 @@ Feature: Update machine process
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "400"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs

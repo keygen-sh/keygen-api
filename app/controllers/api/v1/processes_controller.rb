@@ -11,82 +11,84 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_process, only: %i[show update destroy]
+    before_action :set_machine_process, only: %i[show update destroy]
 
     def index
-      @processes = apply_pagination(policy_scope(apply_scopes(current_account.machine_processes)).preload(:machine, :license, :policy, :product, :group))
-      authorize @processes
+      machine_processes = apply_pagination(authorized_scope(apply_scopes(current_account.machine_processes)).preload(:machine, :license, :policy, :product, :group))
+      authorize! machine_processes
 
-      render jsonapi: @processes
+      render jsonapi: machine_processes
     end
 
     def show
-      authorize @process
+      authorize! machine_process
 
-      render jsonapi: @process
+      render jsonapi: machine_process
     end
 
     def create
-      @process = current_account.machine_processes.new(process_params)
-      authorize @process
+      machine_process = current_account.machine_processes.new(process_params)
+      authorize! machine_process
 
-      if @process.save
+      if machine_process.save
         ProcessHeartbeatWorker.perform_in(
-          @process.interval + MachineProcess::HEARTBEAT_DRIFT,
-          @process.id,
+          machine_process.interval + MachineProcess::HEARTBEAT_DRIFT,
+          machine_process.id,
         )
 
         BroadcastEventService.call(
           event: 'process.created',
           account: current_account,
-          resource: @process,
+          resource: machine_process,
         )
 
-        render jsonapi: @process, status: :created, location: v1_account_process_url(@process.account, @process)
+        render jsonapi: machine_process, status: :created, location: v1_account_process_url(machine_process.account, machine_process)
       else
-        render_unprocessable_resource(@process)
+        render_unprocessable_resource(machine_process)
       end
     end
 
     def update
-      authorize @process
+      authorize! machine_process
 
-      if @process.update(process_params)
+      if machine_process.update(process_params)
         BroadcastEventService.call(
           event: 'process.updated',
           account: current_account,
-          resource: @process,
+          resource: machine_process,
         )
 
-        render jsonapi: @process
+        render jsonapi: machine_process
       else
-        render_unprocessable_resource(@process)
+        render_unprocessable_resource(machine_process)
       end
     end
 
     def destroy
-      authorize @process
+      authorize! machine_process
 
       BroadcastEventService.call(
         event: 'process.deleted',
         account: current_account,
-        resource: @process,
+        resource: machine_process,
       )
 
-      @process.destroy
+      machine_process.destroy
     end
 
     private
 
-    def set_process
-      scoped_processes = policy_scope(current_account.machine_processes)
+    attr_reader :machine_process
+
+    def set_machine_process
+      scoped_processes = authorized_scope(current_account.machine_processes)
 
       # FIXME(ezekg) We're using an instance variable here instead of an
       #              attr_reader because Rails has an internal process
       #              method that conflicts.
-      @process = scoped_processes.find(params[:id])
+      @machine_process = scoped_processes.find(params[:id])
 
-      Current.resource = @process
+      Current.resource = machine_process
     end
 
     typed_parameters format: :jsonapi do
