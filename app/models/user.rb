@@ -45,6 +45,8 @@ class User < ApplicationRecord
       else
         # NOTE(ezekg) Removing these from defaults for backwards compatibility
         Permission::USER_PERMISSIONS - %w[
+          license.product.read
+          license.policy.read
           account.read
           product.read
           policy.read

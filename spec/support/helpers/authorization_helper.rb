@@ -225,6 +225,8 @@ module AuthorizationHelper
 
     def accessing_its_policy(scenarios)
       case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:_policy) { license.policy }
       in [:as_product, *]
         let(:_policy) { create(:policy, account: bearer.account, product: bearer) }
       in [:as_license, *]
