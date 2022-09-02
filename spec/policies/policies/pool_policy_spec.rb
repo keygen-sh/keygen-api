@@ -7,7 +7,7 @@ describe Policies::PoolPolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:, policy: _policy) }
 
   with_role_authorization :admin do
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           without_token_permissions { denies :index }
@@ -21,7 +21,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           without_token_permissions { denies :show }
@@ -59,7 +59,7 @@ describe Policies::PoolPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_its_policy] do
+    with_scenarios %i[accessing_its_policy accessing_its_pooled_keys] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           allows :index
@@ -71,7 +71,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_policy] do
+    with_scenarios %i[accessing_its_policy accessing_its_pooled_key] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           without_token_permissions { denies :show }
@@ -107,7 +107,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           denies :index
@@ -119,7 +119,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
       with_token_authentication do
         with_permissions %w[policy.pool.read] do
           denies :show
@@ -145,7 +145,7 @@ describe Policies::PoolPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[accessing_its_policy] do
+    with_scenarios %i[accessing_its_policy accessing_its_pooled_keys] do
       with_license_authentication do
         with_wildcard_permissions { denies :index }
         with_default_permissions  { denies :index }
@@ -159,7 +159,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_policy] do
+    with_scenarios %i[accessing_its_policy accessing_its_pooled_key] do
       with_license_authentication do
         with_wildcard_permissions { denies :show, :pop }
         with_default_permissions  { denies :show, :pop }
@@ -175,7 +175,7 @@ describe Policies::PoolPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_policy] do
+    with_scenarios %i[is_licensed accessing_its_policy accessing_its_pooled_keys] do
       with_token_authentication do
         with_wildcard_permissions { denies :index }
         with_default_permissions  { denies :index }
@@ -183,7 +183,7 @@ describe Policies::PoolPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[is_licensed accessing_its_policy] do
+    with_scenarios %i[is_licensed accessing_its_policy accessing_its_pooled_key] do
       with_token_authentication do
         with_wildcard_permissions { denies :show, :pop }
         with_default_permissions  { denies :show, :pop }
@@ -193,13 +193,13 @@ describe Policies::PoolPolicy, type: :policy do
   end
 
   without_authorization do
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
       without_authentication do
         denies :index
       end
     end
 
-    with_scenarios %i[accessing_a_policy] do
+    with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
       without_authentication do
         denies :show, :pop
       end

@@ -794,6 +794,32 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
+    def accessing_its_pooled_keys(scenarios)
+      case scenarios
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:pooled_keys) {
+          _policy.update!(use_pool: true)
+
+          create_list(:key, 3, account: _policy.account, policy: _policy)
+        }
+      end
+
+      let(:record) { pooled_keys }
+    end
+
+    def accessing_its_pooled_key(scenarios)
+      case scenarios
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:pooled_key) {
+          _policy.update!(use_pool: true)
+
+          create(:key, account: _policy.account, policy: _policy)
+        }
+      end
+
+      let(:record) { pooled_key }
+    end
+
     ##
     # with_* scenarios for mutating the state of and relations for the current :record.
     # Typically, these will act upon an existing named record, e.g. :license. Also
