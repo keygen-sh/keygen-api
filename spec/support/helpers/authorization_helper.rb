@@ -157,6 +157,8 @@ module AuthorizationHelper
 
     def accessing_its_product(scenarios)
       case scenarios
+      in [*, :accessing_its_license | :accessing_a_license, *]
+        let(:product) { license.product }
       in [:as_license, *]
         let(:product) { bearer.product }
       in [:as_user, :is_licensed, *]
