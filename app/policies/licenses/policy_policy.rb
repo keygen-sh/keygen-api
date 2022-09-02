@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Licenses
-  class GroupPolicy < ApplicationPolicy
+  class PolicyPolicy < ApplicationPolicy
     authorize :license
 
     def show?
-      verify_permissions!('license.group.read')
+      verify_permissions!('license.policy.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -22,13 +22,15 @@ module Licenses
     end
 
     def update?
-      verify_permissions!('license.group.update')
+      verify_permissions!('license.policy.update')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
         allow!
-      in role: { name: 'product' } if license.product == bearer
+      in role: { name: 'product' } if license.product == bearer && record&.product == bearer
         allow!
+      in role: { name: 'user' } if license.user == bearer
+        !license.protected? && !record&.protected?
       else
         deny!
       end
