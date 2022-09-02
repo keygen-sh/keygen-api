@@ -11,7 +11,7 @@ module Policies
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
       in role: { name: 'product' } if policy.product == bearer
-        allow!
+        record.all? { _1.product == bearer }
       else
         deny!
       end
@@ -24,7 +24,7 @@ module Policies
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
       in role: { name: 'product' } if policy.product == bearer
-        allow!
+        record.product == bearer
       else
         deny!
       end
