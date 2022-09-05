@@ -76,13 +76,7 @@ Feature: Account subscription actions
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/pause-subscription"
-    Then the response status should be "200"
-    And the JSON response should be meta with the following:
-      """
-      {
-        "status": "paused"
-      }
-      """
+    Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -93,13 +87,7 @@ Feature: Account subscription actions
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/resume-subscription"
-    Then the response status should be "200"
-    And the JSON response should be meta with the following:
-      """
-      {
-        "status": "resumed"
-      }
-      """
+    Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -110,13 +98,7 @@ Feature: Account subscription actions
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/cancel-subscription"
-    Then the response status should be "200"
-    And the JSON response should be meta with the following:
-      """
-      {
-        "status": "canceling"
-      }
-      """
+    Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs
@@ -127,13 +109,7 @@ Feature: Account subscription actions
     And the account "test1" has 1 "webhook-endpoint"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/actions/renew-subscription"
-    Then the response status should be "200"
-    And the JSON response should be meta with the following:
-      """
-      {
-        "status": "renewed"
-      }
-      """
+    Then the response status should be "204"
     And sidekiq should have 1 "webhook" job
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 0 "request-log" jobs

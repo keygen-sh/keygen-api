@@ -144,6 +144,24 @@ module AuthorizationHelper
       end
     end
 
+    def accessing_an_account(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:_account) { create(:account) }
+      end
+
+      let(:record) { _account }
+    end
+
+    def accessing_its_account(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user, *]
+        # noop
+      end
+
+      let(:record) { account }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
