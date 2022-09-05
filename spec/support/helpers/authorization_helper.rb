@@ -202,6 +202,8 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_pooled_key | :accessing_a_pooled_key, *]
         let(:product) { pooled_key.product }
+      in [*, :accessing_its_machine | :accessing_a_machine, *]
+        let(:product) { machine.product }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:product) { license.product }
       in [:as_license, *]

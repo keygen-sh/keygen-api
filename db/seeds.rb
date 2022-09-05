@@ -85,6 +85,7 @@ permissions = %w[
   machine.heartbeat.ping
   machine.heartbeat.reset
   machine.processes.read
+  machine.product.read
   machine.proofs.generate
   machine.update
   machine.read

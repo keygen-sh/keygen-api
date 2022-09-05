@@ -47,6 +47,7 @@ class User < ApplicationRecord
         Permission::USER_PERMISSIONS - %w[
           license.product.read
           license.policy.read
+          machine.product.read
           account.read
           product.read
           policy.read
