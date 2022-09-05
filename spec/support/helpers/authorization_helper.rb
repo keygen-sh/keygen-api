@@ -270,6 +270,8 @@ module AuthorizationHelper
 
     def accessing_its_policy(scenarios)
       case scenarios
+      in [*, :accessing_its_pooled_key | :accessing_a_pooled_key, *]
+        let(:_policy) { pooled_key.policy }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:_policy) { license.policy }
       in [:as_product, *]
@@ -845,6 +847,17 @@ module AuthorizationHelper
       let(:record) { license }
     end
 
+    def accessing_a_pooled_key(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:pooled_key) { create(:key, account: other_account) }
+      else
+        let(:pooled_key) { create(:key, account:) }
+      end
+
+      let(:record) { pooled_key }
+    end
+
     def accessing_its_pooled_keys(scenarios)
       case scenarios
       in [*, :accessing_its_policy | :accessing_a_policy, *]
@@ -866,6 +879,9 @@ module AuthorizationHelper
 
           create(:key, account: _policy.account, policy: _policy)
         }
+      in [:as_product, *]
+        let(:policy)     { create(:policy, :pooled, account:, product: bearer) }
+        let(:pooled_key) { create(:key, account:, policy:) }
       end
 
       let(:record) { pooled_key }
