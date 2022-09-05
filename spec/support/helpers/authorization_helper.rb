@@ -162,6 +162,15 @@ module AuthorizationHelper
       let(:record) { account }
     end
 
+    def accessing_billing(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:billing) { create(:billing, account:) }
+      end
+
+      let(:record) { billing }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
