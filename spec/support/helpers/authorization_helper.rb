@@ -245,7 +245,13 @@ module AuthorizationHelper
       in [*, :accessing_another_account, *]
         let(:tokens) { create_list(:token, 3, account: other_account) }
       else
-        let(:tokens) { create_list(:token, 3, account:) }
+        let(:tokens) {
+          [
+            create(:token, account:, bearer: create(:product, account:)),
+            create(:token, account:, bearer: create(:license, account:)),
+            create(:token, account:, bearer: create(:user, account:)),
+          ]
+        }
       end
 
       let(:record) { tokens }
