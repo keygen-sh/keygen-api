@@ -6,9 +6,8 @@ module Api::V1::Analytics::Actions
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 
-    # GET /analytics/actions/count
     def count
-      authorize :analytics, :read?
+      authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:count), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
         active_licensed_users = current_account.active_licensed_user_count
@@ -32,7 +31,7 @@ module Api::V1::Analytics::Actions
     end
 
     def top_licenses_by_volume
-      authorize :analytics, :read?
+      authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_licenses_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
         conn = ActiveRecord::Base.connection
@@ -72,7 +71,7 @@ module Api::V1::Analytics::Actions
     end
 
     def top_urls_by_volume
-      authorize :analytics, :read?
+      authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_urls_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
         conn = ActiveRecord::Base.connection
@@ -114,7 +113,7 @@ module Api::V1::Analytics::Actions
     end
 
     def top_ips_by_volume
-      authorize :analytics, :read?
+      authorize! to: :show?, with: Accounts::AnalyticsPolicy
 
       json = Rails.cache.fetch(cache_key_for(:top_ips_by_volume), expires_in: 10.minutes, race_condition_ttl: 1.minute) do
         conn = ActiveRecord::Base.connection
