@@ -9,18 +9,22 @@ module Api::V1::Machines::Relationships
     before_action :authenticate_with_token!
     before_action :set_machine
 
-    def index
-      processes = apply_pagination(policy_scope(apply_scopes(machine.processes)).preload(:machine, :license, :policy, :product, :group))
-      authorize processes
+    authorize :machine
 
-      render jsonapi: processes
+    def index
+      machine_processes = apply_pagination(authorized_scope(apply_scopes(machine.processes)).preload(:machine, :license, :policy, :product, :group))
+      authorize! machine_processes,
+        with: Machines::MachineProcessPolicy
+
+      render jsonapi: machine_processes
     end
 
     def show
-      process = machine.processes.find(params[:id])
-      authorize process
+      machine_process = machine.processes.find(params[:id])
+      authorize! machine_process,
+        with: Machines::MachineProcessPolicy
 
-      render jsonapi: process
+      render jsonapi: machine_process
     end
 
     private
@@ -28,10 +32,9 @@ module Api::V1::Machines::Relationships
     attr_reader :machine
 
     def set_machine
-      scoped_machines = policy_scope(current_account.machines)
+      scoped_machines = authorized_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:machine_id], aliases: :fingerprint)
-      authorize machine, :show?
 
       Current.resource = machine
     end
