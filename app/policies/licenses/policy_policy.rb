@@ -27,8 +27,8 @@ module Licenses
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' }
         allow!
-      in role: { name: 'product' } if license.product == bearer && record&.product == bearer
-        allow!
+      in role: { name: 'product' } if license.product == bearer
+        record&.product == bearer
       in role: { name: 'user' } if license.user == bearer
         !license.protected? && !record&.protected?
       else

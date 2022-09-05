@@ -7,21 +7,26 @@ module Api::V1::Keys::Relationships
     before_action :authenticate_with_token!
     before_action :set_key
 
-    # GET /keys/1/policy
-    def show
-      @policy = @key.policy
-      authorize @policy
+    authorize :key
 
-      render jsonapi: @policy
+    def show
+      policy = key.policy
+      authorize! policy,
+        with: Keys::PolicyPolicy
+
+      render jsonapi: policy
     end
 
     private
 
-    def set_key
-      @key = current_account.keys.find params[:key_id]
-      authorize @key, :show?
+    attr_reader :key
 
-      Current.resource = @key
+    def set_key
+      scoped_keys = authorized_scope(current_account.keys)
+
+      @key = scoped_keys.find(params[:key_id])
+
+      Current.resource = key
     end
   end
 end
