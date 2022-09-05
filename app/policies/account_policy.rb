@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AccountPolicy < ApplicationPolicy
-
   def index?
     false
   end
@@ -28,45 +27,5 @@ class AccountPolicy < ApplicationPolicy
 
   def destroy?
     false
-  end
-
-  def manage?
-    assert_permissions! %w[
-      account.subscription.update
-    ]
-
-    bearer.has_role?(:admin)
-  end
-
-  def pause?
-    assert_permissions! %w[
-      account.subscription.update
-    ]
-
-    bearer.has_role?(:admin)
-  end
-
-  def resume?
-    assert_permissions! %w[
-      account.subscription.update
-    ]
-
-    bearer.has_role?(:admin)
-  end
-
-  def cancel?
-    assert_permissions! %w[
-      account.subscription.update
-    ]
-
-    bearer.has_role?(:admin)
-  end
-
-  def renew?
-    assert_permissions! %w[
-      account.subscription.update
-    ]
-
-    bearer.has_role?(:admin)
   end
 end

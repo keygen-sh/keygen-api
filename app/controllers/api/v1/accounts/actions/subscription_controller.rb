@@ -4,98 +4,82 @@ module Api::V1::Accounts::Actions
   class SubscriptionController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
-    before_action :set_account
 
     def manage
-      authorize @account
+      authorize! with: Accounts::SubscriptionPolicy
 
-      session = Billings::CreateBillingPortalSessionService.call(customer: @account.billing.customer_id)
-
+      session = Billings::CreateBillingPortalSessionService.call(customer: current_account.billing.customer_id)
       if session
         headers['Location'] = session.url
 
         render_meta url: session.url
       else
-        render_unprocessable_entity detail: "failed to generate a subscription management session"
+        render_unprocessable_entity detail: 'failed to generate a subscription management session'
       end
     end
 
-    # POST /accounts/1/actions/pause-subscription
     def pause
-      authorize @account
+      authorize! with: Accounts::SubscriptionPolicy
 
-      if @account.pause_subscription!
+      if current_account.pause_subscription!
         BroadcastEventService.call(
-          event: "account.subscription.paused",
-          account: @account,
-          resource: @account
+          event: 'account.subscription.paused',
+          account: current_account,
+          resource: current_account,
         )
 
-        render_meta status: "paused"
+        render_no_content
       else
-        render_unprocessable_entity detail: "failed to pause #{@account.billing.state} subscription", source: {
-          pointer: "/data/relationships/billing" }
+        render_unprocessable_entity detail: "failed to pause #{current_account.billing.state} subscription"
       end
     end
 
-    # POST /accounts/1/actions/resume-subscription
     def resume
-      authorize @account
+      authorize! with: Accounts::SubscriptionPolicy
 
-      if @account.resume_subscription!
+      if current_account.resume_subscription!
         BroadcastEventService.call(
-          event: "account.subscription.resumed",
-          account: @account,
-          resource: @account
+          event: 'account.subscription.resumed',
+          account: current_account,
+          resource: current_account,
         )
 
-        render_meta status: "resumed"
+        render_no_content
       else
-        render_unprocessable_entity detail: "failed to resume #{@account.billing.state} subscription", source: {
-          pointer: "/data/relationships/billing" }
+        render_unprocessable_entity detail: "failed to resume #{current_account.billing.state} subscription"
       end
     end
 
-    # POST /accounts/1/actions/cancel-subscription
     def cancel
-      authorize @account
+      authorize! with: Accounts::SubscriptionPolicy
 
-      if @account.cancel_subscription_at_period_end!
+      if current_account.cancel_subscription_at_period_end!
         BroadcastEventService.call(
-          event: "account.subscription.canceled",
-          account: @account,
-          resource: @account
+          event: 'account.subscription.canceled',
+          account: current_account,
+          resource: current_account,
         )
 
-        render_meta status: "canceling"
+        render_no_content
       else
-        render_unprocessable_entity detail: "failed to cancel #{@account.billing.state} subscription", source: {
-          pointer: "/data/relationships/billing" }
+        render_unprocessable_entity detail: "failed to cancel #{current_account.billing.state} subscription"
       end
     end
 
-    # POST /accounts/1/actions/renew-subscription
     def renew
-      authorize @account
+      authorize! with: Accounts::SubscriptionPolicy
 
-      if @account.renew_subscription!
+      if current_account.renew_subscription!
         BroadcastEventService.call(
-          event: "account.subscription.renewed",
-          account: @account,
-          resource: @account
+          event: 'account.subscription.renewed',
+          account: current_account,
+          resource: current_account,
         )
 
-        render_meta status: "renewed"
+        render_no_content
       else
-        render_unprocessable_entity detail: "failed to renew #{@account.billing.state} subscription", source: {
-          pointer: "/data/relationships/billing" }
+        render_unprocessable_entity detail: "failed to renew #{current_account.billing.state} subscription"
       end
-    end
-
-    private
-
-    def set_account
-      @account = @current_account
     end
   end
 end
