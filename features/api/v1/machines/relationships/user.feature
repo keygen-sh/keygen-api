@@ -123,7 +123,7 @@ Feature: Machine user relationship
     When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "404"
 
-  Scenario: License attempts to retrieve their user
+  Scenario: License attempts to retrieve their user (default permission)
     Given the current account is "test1"
     And the current account has 2 "users"
     And the current account has 1 "license" for the first "user"
@@ -133,6 +133,22 @@ Feature: Machine user relationship
     And I use an authentication token
     When I send a GET request to "/accounts/test1/machines/$0/user"
     Then the response status should be "403"
+
+  Scenario: License attempts to retrieve their user (has permission)
+    Given the current account is "test1"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for the first "user"
+    And the current account has 1 "license" for the second "user"
+    And the current account has 2 "machines" for the first "license"
+    And the first "license" has the following attributes:
+      """
+      { "permissions": ["machine.user.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/machines/$0/user"
+    Then the response status should be "200"
+    And the JSON response should be a "user"
 
   Scenario: License attempts to retrieve the user for a different license
     Given the current account is "test1"

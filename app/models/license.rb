@@ -17,6 +17,7 @@ class License < ApplicationRecord
       license.policy.read
       license.user.read
       machine.product.read
+      machine.user.read
       account.read
       product.read
       policy.read
