@@ -629,11 +629,13 @@ module AuthorizationHelper
 
     def accessing_its_machine_processes(scenarios)
       case scenarios
+      in [*, :accessing_its_machine | :accessing_a_machine, *]
+        let(:machine_processes) { create_list(:process, 3, account: machine.account, machine:) }
       in [:as_product, *]
         let(:policy)            { create(:policy, account:, product: bearer) }
         let(:license)           { create(:license, account:, policy:) }
         let(:machine)           { create(:machine, account:, license:) }
-        let(:machine_processes) { create_list(:machine_process, 3, account:, machine:) }
+        let(:machine_processes) { create_list(:process, 3, account:, machine:) }
       in [:as_license, *]
         let(:machine)           { create(:machine, account:, license: bearer) }
         let(:machine_processes) { create_list(:process, 3, account:, machine:) }
@@ -647,6 +649,8 @@ module AuthorizationHelper
 
     def accessing_its_machine_process(scenarios)
       case scenarios
+      in [*, :accessing_its_machine | :accessing_a_machine, *]
+        let(:machine_process) { create(:process, account: machine.account, machine:) }
       in [:as_product, *]
         let(:policy)          { create(:policy, account:, product: bearer) }
         let(:license)         { create(:license, account:, policy:) }
