@@ -26,7 +26,7 @@ module Api::V1::Machines::Relationships
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:machine_id], aliases: :fingerprint)
 
-      Current.resource = @machine
+      Current.resource = machine
     end
   end
 end

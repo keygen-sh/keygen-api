@@ -7,23 +7,26 @@ module Api::V1::Machines::Relationships
     before_action :authenticate_with_token!
     before_action :set_machine
 
-    # GET /machines/1/license
-    def show
-      @license = @machine.license
-      authorize @license
+    authorize :machine
 
-      render jsonapi: @license
+    def show
+      license = machine.license
+      authorize! license,
+        with: Machines::LicensePolicy
+
+      render jsonapi: license
     end
 
     private
 
+    attr_reader :machine
+
     def set_machine
-      scoped_machines = policy_scope(current_account.machines)
+      scoped_machines = authorized_scope(current_account.machines)
 
       @machine = FindByAliasService.call(scope: scoped_machines, identifier: params[:machine_id], aliases: :fingerprint)
-      authorize @machine, :show?
 
-      Current.resource = @machine
+      Current.resource = machine
     end
   end
 end
