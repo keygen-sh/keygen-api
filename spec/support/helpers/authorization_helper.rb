@@ -410,6 +410,8 @@ module AuthorizationHelper
 
     def accessing_its_user(scenarios)
       case scenarios
+      in [*, :accessing_its_machine | :accessing_a_machine, *]
+        let(:user) { machine.user }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:user) { license.user }
       in [:as_product, :accessing_a_group, *]

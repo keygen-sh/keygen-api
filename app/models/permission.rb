@@ -95,6 +95,7 @@ class Permission < ApplicationRecord
     machine.product.read
     machine.proofs.generate
     machine.update
+    machine.user.read
     machine.read
 
     metric.read
@@ -218,6 +219,7 @@ class Permission < ApplicationRecord
     machine.processes.read
     machine.product.read
     machine.read
+    machine.user.read
 
     metric.read
 
@@ -330,6 +332,7 @@ class Permission < ApplicationRecord
     machine.product.read
     machine.proofs.generate
     machine.update
+    machine.user.read
     machine.read
 
     policy.create
@@ -430,6 +433,7 @@ class Permission < ApplicationRecord
     machine.proofs.generate
     machine.read
     machine.update
+    machine.user.read
 
     policy.read
 
@@ -502,6 +506,7 @@ class Permission < ApplicationRecord
     machine.proofs.generate
     machine.read
     machine.update
+    machine.user.read
 
     policy.read
 
