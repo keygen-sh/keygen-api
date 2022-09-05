@@ -45,6 +45,7 @@ permissions = %w[
   key.create
   key.delete
   key.policy.read
+  key.product.read
   key.read
   key.update
 

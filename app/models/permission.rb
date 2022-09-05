@@ -52,6 +52,7 @@ class Permission < ApplicationRecord
     key.create
     key.delete
     key.policy.read
+    key.product.read
     key.read
     key.update
 
@@ -200,6 +201,7 @@ class Permission < ApplicationRecord
 
     key.read
     key.policy.read
+    key.product.read
 
     license.entitlements.read
     license.group.read
@@ -281,6 +283,7 @@ class Permission < ApplicationRecord
     key.create
     key.delete
     key.policy.read
+    key.product.read
     key.read
     key.update
 
