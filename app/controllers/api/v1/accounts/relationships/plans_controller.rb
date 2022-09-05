@@ -4,67 +4,53 @@ module Api::V1::Accounts::Relationships
   class PlansController < Api::V1::BaseController
     before_action :scope_to_current_account!
     before_action :authenticate_with_token!
-    before_action :set_account
 
-    # GET /accounts/1/plan
     def show
-      authorize @account
-      @plan = @account.plan
+      plan = current_account.plan
+      authorize! plan,
+        with: Accounts::PlanPolicy
 
-      render jsonapi: @plan
+      render jsonapi: plan
     end
 
-    # PUT /accounts/1/plan
     def update
-      authorize @account
+      plan = Plan.find(plan_params[:id])
+      authorize! plan,
+        with: Accounts::PlanPolicy
 
-      @plan = Plan.find plan_params[:id]
-
-      status = if @account.billing.canceled?
+      status = if current_account.billing.canceled?
                  Billings::CreateSubscriptionService.call(
-                   customer: @account.billing.customer_id,
-                   plan: @plan.plan_id,
-                   trial_end: 'now'
+                   customer: current_account.billing.customer_id,
+                   plan: plan.plan_id,
+                   trial_end: 'now',
                  )
                else
                  Billings::UpdateSubscriptionService.call(
-                   subscription: @account.billing.subscription_id,
-                   plan: @plan.plan_id
+                   subscription: current_account.billing.subscription_id,
+                   plan: plan.plan_id,
                  )
                end
 
       if status
-        if @account.billing.update(state: :pending) &&
-           @account.update(plan: @plan)
+        if current_account.billing.update(state: :pending) &&
+           current_account.update(plan:)
           BroadcastEventService.call(
-            event: "account.plan.updated",
-            account: @account,
-            resource: @plan
+            event: 'account.plan.updated',
+            account: current_account,
+            resource: plan,
           )
 
-          render jsonapi: @plan
+          render jsonapi: plan
         else
-          render_unprocessable_resource @account
+          render_unprocessable_resource current_account
         end
       else
-        if @account.billing.card.nil?
-          render_unprocessable_entity(
-            detail: "failed to update plan because a payment method is missing",
-            source: { pointer: "/data/relationships/billing" }
-          )
+        if current_account.billing.card.present?
+          render_unprocessable_entity detail: "failed to update #{current_account.billing.state} plan because of a billing issue (check payment method)"
         else
-          render_unprocessable_entity(
-            detail: "failed to update #{@account.billing.state} plan because of a billing issue (check payment method)",
-            source: { pointer: "/data/relationships/billing" }
-          )
+          render_unprocessable_entity detail: "failed to update plan because a payment method is missing"
         end
       end
-    end
-
-    private
-
-    def set_account
-      @account = @current_account
     end
 
     typed_parameters format: :jsonapi do

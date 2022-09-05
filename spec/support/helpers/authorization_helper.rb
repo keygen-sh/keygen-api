@@ -171,6 +171,15 @@ module AuthorizationHelper
       let(:record) { billing }
     end
 
+    def accessing_plan(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        # noop
+      end
+
+      let(:record) { account.plan }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
