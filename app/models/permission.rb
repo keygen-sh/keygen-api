@@ -10,6 +10,7 @@ class Permission < ApplicationRecord
 
   # Available permissions.
   ALL_PERMISSIONS = %w[
+    account.analytics.read
     account.billing.read
     account.billing.update
     account.plan.read
@@ -173,6 +174,7 @@ class Permission < ApplicationRecord
 
   # Available readonly permissions.
   READ_ONLY_PERMISSIONS =%w[
+    account.analytics.read
     account.billing.read
     account.plan.read
     account.read

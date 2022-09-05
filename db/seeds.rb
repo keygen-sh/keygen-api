@@ -3,6 +3,7 @@
 permissions = %w[
   *
 
+  account.analytics.read
   account.billing.read
   account.billing.update
   account.plan.read

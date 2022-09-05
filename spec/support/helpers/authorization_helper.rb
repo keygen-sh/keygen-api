@@ -180,6 +180,13 @@ module AuthorizationHelper
       let(:record) { account.plan }
     end
 
+    def accessing_analytics(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        # noop
+      end
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
