@@ -6,32 +6,28 @@ module Api::V1::Accounts::Relationships
     before_action :authenticate_with_token!
     before_action :set_billing
 
-    # GET /accounts/1/billing
     def show
-      render_not_found and return unless @billing
+      authorize! billing,
+        with: Accounts::BillingPolicy
 
-      authorize @billing
-
-      render jsonapi: @billing
+      render jsonapi: billing
     end
 
-    # PATCH /accounts/1/billing
     def update
-      render_not_found and return unless @billing
-
-      authorize @billing
+      authorize! billing,
+        with: Accounts::BillingPolicy
 
       status = Billings::UpdateCustomerService.call(
-        customer: @billing.customer_id,
+        customer: billing.customer_id,
         token: billing_params[:token],
-        coupon: billing_params[:coupon]
+        coupon: billing_params[:coupon],
       )
 
       if status
         BroadcastEventService.call(
-          event: "account.billing.updated",
-          account: @account,
-          resource: @billing
+          event: 'account.billing.updated',
+          account: current_account,
+          resource: billing,
         )
 
         head :accepted
@@ -42,9 +38,10 @@ module Api::V1::Accounts::Relationships
 
     private
 
+    attr_reader :billing
+
     def set_billing
-      @account = @current_account
-      @billing = @account&.billing
+      @billing = current_account.billing
     end
 
     typed_parameters format: :jsonapi do
