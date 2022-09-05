@@ -87,8 +87,9 @@ permissions = %w[
   machine.processes.read
   machine.product.read
   machine.proofs.generate
-  machine.update
   machine.read
+  machine.update
+  machine.user.read
 
   metric.read
 
