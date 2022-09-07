@@ -5,17 +5,17 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_arch, only: [:show]
+    before_action :set_arch, only: %i[show]
 
     def index
-      arches = apply_pagination(apply_scopes(policy_scope(current_account.release_arches.with_releases)))
-      authorize arches
+      arches = apply_pagination(authorized_scope(apply_scopes(current_account.release_arches.with_releases)))
+      authorize! arches
 
       render jsonapi: arches
     end
 
     def show
-      authorize arch
+      authorize! arch
 
       render jsonapi: arch
     end
@@ -25,7 +25,7 @@ module Api::V1
     attr_reader :arch
 
     def set_arch
-      scoped_arches = policy_scope(current_account.release_arches)
+      scoped_arches = authorized_scope(current_account.release_arches)
 
       @arch = scoped_arches.find(params[:id])
 
