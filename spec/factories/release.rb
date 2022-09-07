@@ -14,7 +14,7 @@ FactoryBot.define do
     after :build do |release, evaluator|
       release.account  ||= evaluator.account.presence
       release.product  ||= evaluator.product.presence || build(:product, account: release.account)
-      release.channel  ||= evaluator.channel.presence || build(:channel, account: release.account)
+      release.channel  ||= evaluator.channel.presence || build(:channel, key: 'stable', account: release.account)
 
       # Add build tag so that there's no chance for collisions
       release.version ||=
