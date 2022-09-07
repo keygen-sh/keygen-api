@@ -922,6 +922,28 @@ module AuthorizationHelper
       let(:record) { pooled_key }
     end
 
+    def accessing_channels(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:channels) { create_list(:channel, 3, account: other_account) }
+      else
+        let(:channels) { create_list(:channel, 3, account:) }
+      end
+
+      let(:record) { channels }
+    end
+
+    def accessing_a_channel(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:channel) { create(:channel, account: other_account) }
+      else
+        let(:channel) { create(:channel, account:) }
+      end
+
+      let(:record) { channel }
+    end
+
     ##
     # with_* scenarios for mutating the state of and relations for the current :record.
     # Typically, these will act upon an existing named record, e.g. :license. Also
