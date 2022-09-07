@@ -5,7 +5,7 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token
-    before_action :set_platform, only: [:show]
+    before_action :set_platform, only: %i[show]
 
     def index
       platforms = apply_pagination(authorized_scope(apply_scopes(current_account.release_platforms.with_releases)))
