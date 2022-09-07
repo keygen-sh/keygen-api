@@ -966,6 +966,28 @@ module AuthorizationHelper
       let(:record) { platform }
     end
 
+    def accessing_arches(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:arches) { create_list(:arch, 3, account: other_account) }
+      else
+        let(:arches) { create_list(:arch, 3, account:) }
+      end
+
+      let(:record) { arches }
+    end
+
+    def accessing_an_arch(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:arch) { create(:arch, account: other_account) }
+      else
+        let(:arch) { create(:arch, account:) }
+      end
+
+      let(:record) { arch }
+    end
+
     ##
     # with_* scenarios for mutating the state of and relations for the current :record.
     # Typically, these will act upon an existing named record, e.g. :license. Also
