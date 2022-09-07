@@ -15,9 +15,9 @@ FactoryBot.define do
     after :build do |artifact, evaluator|
       artifact.account  ||= evaluator.account.presence
       artifact.release  ||= evaluator.release.presence || build(:release, account: artifact.account)
-      artifact.platform ||= evaluator.platform.presence || build(:platform, account: artifact.account)
-      artifact.arch     ||= evaluator.arch.presence || build(:arch, account: artifact.account)
-      artifact.filetype ||= evaluator.filetype.presence || build(:filetype, account: artifact.account)
+      artifact.platform ||= evaluator.platform.presence || build(:platform, key: 'darwin', account: artifact.account)
+      artifact.arch     ||= evaluator.arch.presence || build(:arch, key: 'amd64', account: artifact.account)
+      artifact.filetype ||= evaluator.filetype.presence || build(:filetype, key: 'dmg', account: artifact.account)
 
       # Add dependant attributes after associations are set in stone
       artifact.filename ||=

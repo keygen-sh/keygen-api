@@ -944,6 +944,28 @@ module AuthorizationHelper
       let(:record) { channel }
     end
 
+    def accessing_platforms(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:platforms) { create_list(:platform, 3, account: other_account) }
+      else
+        let(:platforms) { create_list(:platform, 3, account:) }
+      end
+
+      let(:record) { platforms }
+    end
+
+    def accessing_a_platform(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:platform) { create(:platform, account: other_account) }
+      else
+        let(:platform) { create(:platform, account:) }
+      end
+
+      let(:record) { platform }
+    end
+
     ##
     # with_* scenarios for mutating the state of and relations for the current :record.
     # Typically, these will act upon an existing named record, e.g. :license. Also
