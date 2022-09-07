@@ -8,9 +8,8 @@ module Api::V1::Metrics::Actions
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 
-    # GET /metrics/actions/count
     def count
-      authorize Metric
+      authorize! to: :show?, with: MetricPolicy
 
       event_params = params[:metrics]
       event_type_ids = []
@@ -39,6 +38,7 @@ module Api::V1::Metrics::Actions
         start_date = Date.current - 13.days
         end_date   = Date.current
 
+        # FIXME(ezekg) How do you use prepared statements with this type of query?
         sql =
           if event_type_ids.any?
             <<~SQL

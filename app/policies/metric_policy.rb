@@ -1,31 +1,25 @@
 # frozen_string_literal: true
 
 class MetricPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      metric.read
-    ]
+    verify_permissions!('metric.read')
 
-    bearer.has_role?(:admin, :developer, :read_only)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      metric.read
-    ]
+    verify_permissions!('metric.read')
 
-    bearer.has_role?(:admin, :developer, :read_only)
-  end
-
-  def count?
-    assert_account_scoped!
-    assert_permissions! %w[
-      metric.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 end
