@@ -2,8 +2,7 @@
 
 FactoryBot.define do
   factory :release_platform, aliases: %i[platform] do
-    name { 'macOS' }
-    key { 'darwin' }
+    sequence :key, %w[darwin linux windows].cycle
 
     account { nil }
 

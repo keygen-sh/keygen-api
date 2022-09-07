@@ -8,14 +8,14 @@ module Api::V1
     before_action :set_platform, only: [:show]
 
     def index
-      platforms = apply_pagination(apply_scopes(policy_scope(current_account.release_platforms.with_releases)))
-      authorize platforms
+      platforms = apply_pagination(authorized_scope(apply_scopes(current_account.release_platforms.with_releases)))
+      authorize! platforms
 
       render jsonapi: platforms
     end
 
     def show
-      authorize platform
+      authorize! platform
 
       render jsonapi: platform
     end
@@ -25,9 +25,9 @@ module Api::V1
     attr_reader :platform
 
     def set_platform
-      scoped_platforms = policy_scope(current_account.release_platforms)
+      scoped_platforms = authorized_scope(current_account.release_platforms)
 
-      @platform = scoped_platforms.find params[:id]
+      @platform = scoped_platforms.find(params[:id])
 
       Current.resource = platform
     end

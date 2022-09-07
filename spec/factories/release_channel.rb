@@ -3,7 +3,6 @@
 FactoryBot.define do
   factory :release_channel, aliases: %i[channel] do
     sequence :key, %w[stable rc beta alpha dev].cycle
-    name { key.capitalize }
 
     after :build do |channel, evaluator|
       channel.account ||= evaluator.account.presence

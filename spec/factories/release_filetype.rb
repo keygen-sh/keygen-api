@@ -2,8 +2,7 @@
 
 FactoryBot.define do
   factory :release_filetype, aliases: %i[filetype] do
-    name { 'DMG' }
-    key { 'dmg' }
+    sequence :key, %w[dmg exe zip tar.gz appimage].cycle
 
     account { nil }
 
