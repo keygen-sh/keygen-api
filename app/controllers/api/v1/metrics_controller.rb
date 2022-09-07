@@ -9,35 +9,38 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_metric, only: [:show]
+    before_action :set_metric, only: %i[show]
 
-    # GET /metrics
     def index
-      authorize Metric
+      authorize! with: MetricPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        metrics = apply_pagination(policy_scope(apply_scopes(current_account.metrics)).preload(:event_type))
-        data = Keygen::JSONAPI::Renderer.new.render(metrics)
+        metrics = apply_pagination(authorized_scope(apply_scopes(current_account.metrics)).preload(:event_type))
+        data    = Keygen::JSONAPI::Renderer.new.render(metrics)
 
-        data.tap do |d|
-          d[:links] = pagination_links(metrics)
-        end
+        data.tap { _1[:links] = pagination_links(metrics) }
       end
 
       render json: json
     end
 
-    # GET /metrics/1
     def show
-      authorize @metric
+      authorize! metric,
+        with: MetricPolicy
 
-      render jsonapi: @metric
+      render jsonapi: metric
     end
 
     private
 
+    attr_reader :metric
+
     def set_metric
-      @metric = current_account.metrics.find params[:id]
+      scoped_metrics = authorized_scope(current_account.metrics)
+
+      @metric = scoped_metrics.find(params[:id])
+
+      Current.resource = metric
     end
 
     def cache_key
