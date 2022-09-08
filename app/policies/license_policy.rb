@@ -136,7 +136,7 @@ class LicensePolicy < ApplicationPolicy
     allow! if
       bearer.nil? || record.nil?
 
-    allowed_to?(:validate?, inline_reasons: true)
+    allow? :validate, inline_reasons: true
   end
 
   def revoke?

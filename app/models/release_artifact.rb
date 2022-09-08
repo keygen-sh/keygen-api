@@ -203,8 +203,8 @@ class ReleaseArtifact < ApplicationRecord
   }
 
   scope :licensed, -> { joins(:product).where(product: { distribution_strategy: ['LICENSED', nil] }) }
-  scope :open, -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
-  scope :closed, -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
+  scope :open,     -> { joins(:product).where(product: { distribution_strategy: 'OPEN' }) }
+  scope :closed,   -> { joins(:product).where(product: { distribution_strategy: 'CLOSED' }) }
 
   scope :with_statuses, -> *statuses { where(status: statuses.flatten.map { _1.to_s.upcase }) }
   scope :with_status,   -> status { where(status: status.to_s.upcase) }

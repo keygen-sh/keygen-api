@@ -51,6 +51,9 @@ class ApplicationPolicy
 
   private
 
+  # Short and easier to remember/use alias.
+  def allow?(rule, *args, **kwargs) = allowed_to?(:"#{rule}?", *args, **kwargs)
+
   def verify_account_scoped!
     deny! "#{whatami} account does not match account context" if
         bearer.present? && bearer.account_id != account.id
@@ -92,5 +95,49 @@ class ApplicationPolicy
 
     deny! 'token lacks permission to perform action' unless
       token.can?(actions)
+  end
+
+  def verify_license_for_release!(license:, release:)
+    deny! 'license is suspended' if
+      license.suspended?
+
+    deny! 'license is banned' if
+      license.banned?
+
+    deny! 'license is expired' if
+      license.revoke_access? && license.expired?
+
+    deny! 'license expiry falls outside of access window' if
+      license.expires? && !license.allow_access? &&
+      release.created_at > license.expiry
+
+    deny! 'license is missing entitlements' if
+      release.entitlements.any? &&
+      (release.entitlements & license.entitlements).size != release.entitlements.size
+  end
+
+  def verify_licenses_for_release!(licenses:, release:)
+    results = []
+
+    licenses.each do |license|
+      # We're catching :policy_fulfilled so that we can verify all licenses,
+      # but still bubble up the deny! reason in case of a failure. In case
+      # of a valid license, this will return early.
+      catch(:policy_fulfilled) do
+        verify_license_for_release!(license:, release:)
+
+        return
+      end
+
+      results << result.value
+    end
+
+    # Return early if any results are truthy.
+    return if
+      results.any?
+
+    # Otherwise, rethrow the :policy_fulfilled symbol, which will be handled
+    # internally by Action Policy and bubble up the last result reason.
+    throw :policy_fulfilled
   end
 end
