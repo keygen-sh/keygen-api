@@ -110,6 +110,8 @@ permissions = %w[
   process.read
   process.update
 
+  product.artifacts.read
+  product.releases.read
   product.arches.read
   product.channels.read
   product.platforms.read

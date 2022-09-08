@@ -100,8 +100,8 @@ class ReleasePolicy < ApplicationPolicy
                                 .for_product(record.product)
 
       verify_licenses_for_release!(
-        licenses: licenses,
         release: record,
+        licenses:,
       )
 
       allow!
@@ -118,6 +118,10 @@ class ReleasePolicy < ApplicationPolicy
     else
       deny!
     end
+  end
+
+  def download?
+    allow? :show, inline_reasons: true
   end
 
   def create?
@@ -162,8 +166,7 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allowed_to? :show?,
-      inline_reasons: true
+    allow? :show, inline_reasons: true
   end
 
   def upload?
@@ -263,48 +266,5 @@ class ReleasePolicy < ApplicationPolicy
 
     bearer.has_role?(:admin, :developer) ||
       resource.product == bearer
-  end
-
-  private
-
-  def verify_license_for_release!(license:, release:)
-    deny! 'license is suspended' if
-      license.suspended?
-
-    deny! 'license is banned' if
-      license.banned?
-
-    deny! 'license is expired' if
-      license.revoke_access? && license.expired?
-
-    deny! 'license expiry falls outside of access window' if
-      license.expires? && !license.allow_access? &&
-      release.created_at > license.expiry
-
-    deny! 'license is missing entitlements' if
-      release.entitlements.any? &&
-      (release.entitlements & license.entitlements).size != release.entitlements.size
-
-    true
-  end
-
-  def verify_licenses_for_release!(licenses:, release:)
-    results = []
-
-    licenses.each do |license|
-      # We're catching :policy_fulfilled so that we can verify all licenses,
-      # but still bubble up the deny! reason in case of a failure. In case
-      # of a valid license, this will return early.
-      catch(:policy_fulfilled) { return true if verify_license_for_release!(license:, release:) }
-
-      results << result.value
-    end
-
-    # Rethrow the :policy_fulfilled symbol, which will be handled internally
-    # by Action Policy and bubble up the last result.
-    throw :policy_fulfilled unless
-      results.any?
-
-    true
   end
 end

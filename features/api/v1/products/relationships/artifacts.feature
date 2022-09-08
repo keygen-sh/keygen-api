@@ -204,7 +204,7 @@ Feature: Product artifacts relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the artifacts for a product (licensed)
     Given the current account is "test1"
@@ -212,8 +212,27 @@ Feature: Product artifacts relationship
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 1 "artifact" for an existing "release"
+    And the current account has 3 "releases" for an existing "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a user of account "test1"
+    And the current user has 1 "license"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: User attempts to retrieve the artifacts for a product (licensed, expired)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.week.ago" }
+      """
+    And the current account has 3 "releases" for an existing "product"
+    And the current account has 1 "artifact" for each "release"
     And I am a user of account "test1"
     And the current user has 1 "license"
     And I use an authentication token
@@ -231,13 +250,30 @@ Feature: Product artifacts relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: License attempts to retrieve the artifacts for their product
+  Scenario: License attempts to retrieve the artifacts for their product (valid)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
+    And the current account has 3 "releases" for the first "product"
+    And the current account has 1 "artifact" for each "release"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/artifacts"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "artifacts"
+
+  Scenario: License attempts to retrieve the artifacts for their product (expired)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the first "license" has the following attributes:
+      """
+      { "expiry": "$time.1.week.ago" }
+      """
     And the current account has 3 "releases" for the first "product"
     And the current account has 1 "artifact" for each "release"
     And I am a license of account "test1"
@@ -254,7 +290,7 @@ Feature: Product artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the artifacts for a product of another account
     Given the current account is "test1"
@@ -362,7 +398,7 @@ Feature: Product artifacts relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves an artifact without a license for it
     Given the current account is "test1"
@@ -372,7 +408,7 @@ Feature: Product artifacts relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User retrieves an artifact with a license for it
     Given the current account is "test1"
@@ -395,7 +431,7 @@ Feature: Product artifacts relationship
     And I use an authentication token
     And the current user has 1 "license"
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "303"
 
   Scenario: License retrieves an artifact of a different product
     Given the current account is "test1"
@@ -405,7 +441,7 @@ Feature: Product artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License retrieves an artifact of their product
     Given the current account is "test1"
@@ -417,7 +453,7 @@ Feature: Product artifacts relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/artifacts/$0"
-    Then the response status should be "403"
+    Then the response status should be "303"
 
   Scenario: Anonymous retrieves an artifact
     Given the current account is "test1"

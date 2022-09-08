@@ -117,6 +117,8 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.artifacts.read
+    product.releases.read
     product.arches.read
     product.channels.read
     product.platforms.read
@@ -233,6 +235,8 @@ class Permission < ApplicationRecord
 
     process.read
 
+    product.artifacts.read
+    product.releases.read
     product.arches.read
     product.channels.read
     product.platforms.read
@@ -360,6 +364,8 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.artifacts.read
+    product.releases.read
     product.arches.read
     product.channels.read
     product.platforms.read
@@ -456,6 +462,8 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.artifacts.read
+    product.releases.read
     product.arches.read
     product.channels.read
     product.platforms.read
@@ -533,6 +541,8 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.artifacts.read
+    product.releases.read
     product.arches.read
     product.channels.read
     product.platforms.read
