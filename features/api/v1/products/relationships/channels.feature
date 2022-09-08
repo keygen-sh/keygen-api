@@ -195,7 +195,7 @@ Feature: Product channels relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/channels"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the channels for a product (licensed)
     Given the current account is "test1"
@@ -209,7 +209,8 @@ Feature: Product channels relationship
     And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "channel"
 
   Scenario: User attempts to retrieve the channels for a product (unlicensed)
     Given the current account is "test1"
@@ -222,7 +223,7 @@ Feature: Product channels relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License attempts to retrieve the channels for their product
     Given the current account is "test1"
@@ -234,7 +235,8 @@ Feature: Product channels relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
-    Then the response status should be "403"
+    Then the response status should be "200"
+    And the JSON response should be an array with 1 "channel"
 
   Scenario: License attempts to retrieve the channels for a different product
    Given the current account is "test1"
@@ -245,7 +247,7 @@ Feature: Product channels relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/channels"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the channels for a product of another account
     Given the current account is "test1"

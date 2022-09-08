@@ -7,16 +7,20 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
+    authorize :product
+
     def index
-      arches = apply_pagination(policy_scope(apply_scopes(product.release_arches)))
-      authorize arches
+      arches = apply_pagination(authorized_scope(apply_scopes(product.release_arches)))
+      authorize! arches,
+        with: Products::ReleaseArchPolicy
 
       render jsonapi: arches
     end
 
     def show
       arch = product.release_arches.find(params[:id])
-      authorize arch
+      authorize! arch,
+        with: Products::ReleaseArchPolicy
 
       render jsonapi: arch
     end
@@ -26,8 +30,9 @@ module Api::V1::Products::Relationships
     attr_reader :product
 
     def set_product
-      @product = current_account.products.find(params[:product_id])
-      authorize product, :show?
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
 
       Current.resource = product
     end
