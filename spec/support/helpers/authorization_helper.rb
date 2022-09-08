@@ -962,6 +962,36 @@ module AuthorizationHelper
       let(:record) { channel }
     end
 
+    def accessing_its_channels(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)   { create(:release, account:, product:) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:channels)  { artifacts.collect(&:channel) }
+      in [:as_product, :accessing_itself]
+        let(:release)   { create(:release, account:, product: bearer) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:channels)  { artifacts.collect(&:channel) }
+      end
+
+      let(:record) { channels }
+    end
+
+    def accessing_its_channel(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)  { create(:release, account:, product:) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:channel)  { artifact.channel }
+      in [:as_product, :accessing_itself]
+        let(:release)  { create(:release, account:, product: bearer) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:channel)  { artifact.channel }
+      end
+
+      let(:record) { channel }
+    end
+
     def accessing_platforms(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
@@ -984,6 +1014,36 @@ module AuthorizationHelper
       let(:record) { platform }
     end
 
+    def accessing_its_platforms(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)   { create(:release, account:, product:) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:platforms) { artifacts.collect(&:platform) }
+      in [:as_product, :accessing_itself]
+        let(:release)   { create(:release, account:, product: bearer) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:platforms) { artifacts.collect(&:platform) }
+      end
+
+      let(:record) { platforms }
+    end
+
+    def accessing_its_platform(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)  { create(:release, account:, product:) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:platform) { artifact.platform }
+      in [:as_product, :accessing_itself]
+        let(:release)  { create(:release, account:, product: bearer) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:platform) { artifact.platform }
+      end
+
+      let(:record) { platform }
+    end
+
     def accessing_arches(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
@@ -1001,6 +1061,36 @@ module AuthorizationHelper
         let(:arch) { create(:arch, account: other_account) }
       else
         let(:arch) { create(:arch, account:) }
+      end
+
+      let(:record) { arch }
+    end
+
+    def accessing_its_arches(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)   { create(:release, account:, product:) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:arches)    { artifacts.collect(&:arch) }
+      in [:as_product, :accessing_itself]
+        let(:release)   { create(:release, account:, product: bearer) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+        let(:arches)    { artifacts.collect(&:arch) }
+      end
+
+      let(:record) { arches }
+    end
+
+    def accessing_its_arch(scenarios)
+      case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)  { create(:release, account:, product:) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:arch)     { artifact.arch }
+      in [:as_product, :accessing_itself]
+        let(:release)  { create(:release, account:, product: bearer) }
+        let(:artifact) { create(:artifact, account:, release:) }
+        let(:arch)     { artifact.arch }
       end
 
       let(:record) { arch }

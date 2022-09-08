@@ -7,16 +7,20 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
+    authorize :product
+
     def index
-      platforms = apply_pagination(policy_scope(apply_scopes(product.release_platforms)))
-      authorize platforms
+      platforms = apply_pagination(authorized_scope(apply_scopes(product.release_platforms)))
+      authorize! platforms,
+        with: Products::ReleasePlatformPolicy
 
       render jsonapi: platforms
     end
 
     def show
-      platform = product.release_platforms.find params[:id]
-      authorize platform
+      platform = product.release_platforms.find(params[:id])
+      authorize! platform,
+        with: Products::ReleasePlatformPolicy
 
       render jsonapi: platform
     end
@@ -26,8 +30,9 @@ module Api::V1::Products::Relationships
     attr_reader :product
 
     def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize product, :show?
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
 
       Current.resource = product
     end
