@@ -117,6 +117,9 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.arches.read
+    product.channels.read
+    product.platforms.read
     product.create
     product.delete
     product.read
@@ -230,6 +233,9 @@ class Permission < ApplicationRecord
 
     process.read
 
+    product.arches.read
+    product.channels.read
+    product.platforms.read
     product.read
     product.tokens.read
 
@@ -354,6 +360,9 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.arches.read
+    product.channels.read
+    product.platforms.read
     product.read
     product.update
     product.tokens.read
@@ -447,6 +456,9 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.arches.read
+    product.channels.read
+    product.platforms.read
     product.read
 
     platform.read
@@ -521,6 +533,9 @@ class Permission < ApplicationRecord
     process.read
     process.update
 
+    product.arches.read
+    product.channels.read
+    product.platforms.read
     product.read
 
     platform.read
