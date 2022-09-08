@@ -27,19 +27,13 @@ class ReleaseArtifactPolicy < ApplicationPolicy
   def index?
     verify_permissions!('artifact.read')
 
-    # Delegate to release policy
-    allowed_to? :index?, record.collect(&:release),
-      inline_reasons: true,
-      with: ReleasePolicy
+    allow? :index, record.collect(&:release), with: ::ReleasePolicy, inline_reasons: true
   end
 
   def show?
     verify_permissions!('artifact.download', 'artifact.read')
 
-    # Delegate to release policy
-    allowed_to? :show?, record.release,
-      inline_reasons: true,
-      with: ReleasePolicy
+    allow? :download, record.release, with: ::ReleasePolicy, inline_reasons: true
   end
 
   def create?

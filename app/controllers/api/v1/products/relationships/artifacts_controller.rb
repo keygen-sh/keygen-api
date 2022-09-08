@@ -14,15 +14,19 @@ module Api::V1::Products::Relationships
     before_action :set_product, only: %i[index show]
     before_action :set_artifact, only: %i[show]
 
+    authorize :product
+
     def index
-      artifacts = apply_pagination(policy_scope(apply_scopes(product.release_artifacts)).preload(:platform, :arch, :filetype))
-      authorize artifacts
+      artifacts = apply_pagination(authorized_scope(apply_scopes(product.release_artifacts)).preload(:platform, :arch, :filetype))
+      authorize! artifacts,
+        with: Products::ReleaseArtifactPolicy
 
       render jsonapi: artifacts
     end
 
     def show
-      authorize artifact
+      authorize! artifact,
+        with: Products::ReleaseArtifactPolicy
 
       # Respond early if the artifact has not been uploaded or if the
       # client prefers no-download
@@ -50,14 +54,15 @@ module Api::V1::Products::Relationships
                 :artifact
 
     def set_product
-      @product = current_account.products.find(params[:product_id])
-      authorize product, :show?
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
 
       Current.resource = product
     end
 
     def set_artifact
-      scoped_artifacts = apply_scopes(policy_scope(product.release_artifacts))
+      scoped_artifacts = authorized_scope(apply_scopes(product.release_artifacts))
 
       @artifact = FindByAliasService.call(
         scope: scoped_artifacts.order_by_version,

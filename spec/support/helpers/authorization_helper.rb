@@ -798,6 +798,12 @@ module AuthorizationHelper
 
     def accessing_its_artifacts(scenarios)
       case scenarios
+       in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)   { create(:release, account:, product:) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
+      in [:as_product, :accessing_itself]
+        let(:release)   { create(:release, account:, product: bearer) }
+        let(:artifacts) { create_list(:artifact, 3, account:, release:) }
       in [:as_product, *]
         let(:releases)  { create_list(:release, 3, account:, product: bearer) }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
@@ -814,6 +820,12 @@ module AuthorizationHelper
 
     def accessing_its_artifact(scenarios)
       case scenarios
+      in [*, :accessing_its_product | :accessing_a_product, *]
+        let(:release)  { create(:release, account:, product:) }
+        let(:artifact) { create(:artifact, account:, release:) }
+      in [:as_product, :accessing_itself]
+        let(:release)  { create(:release, account:, product: bearer) }
+        let(:artifact) { create(:artifact, account:, release:) }
       in [:as_product, *]
         let(:release)  { create(:release, account:, product: bearer) }
         let(:artifact) { create(:release_artifact, account:, release:) }

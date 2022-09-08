@@ -394,20 +394,22 @@ Feature: List release artifacts
     Then the response status should be "200"
     And the JSON response should be an array of 0 "artifacts"
 
-  Scenario: User attempts to retrieve the artifacts for a product (licensed)
+  Scenario: User attempts to retrieve the artifacts for their products (licensed)
     Given the current account is "test1"
+    And the current account has 3 "products"
+    And the current account has 1 "policy" for each "product"
+    And the current account has 2 "licenses" for the first "policy"
+    And the current account has 1 "license" for the second "policy"
+    And the current account has 2 "releases" for each "product"
+    And the current account has 2 "artifacts" for each "release"
     And the current account has 1 "user"
-    And the current account has 1 "product"
-    And the current account has 1 "policy" for the last "product"
-    And the current account has 1 "license" for the last "policy"
-    And the current account has 2 "releases" for the last "product"
-    And the current account has 2 "artifacts" for existing "releases"
+    And the first "license" belongs to the last "user"
+    And the second "license" belongs to the last "user"
     And I am a user of account "test1"
-    And the current user has 1 "license"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/artifacts"
     Then the response status should be "200"
-    And the JSON response should be an array of 2 "artifacts"
+    And the JSON response should be an array of 4 "artifacts"
 
   Scenario: User attempts to retrieve the artifacts for a product (unlicensed)
     Given the current account is "test1"
