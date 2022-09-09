@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleasePolicy < ApplicationPolicy
-  skip_pre_check :verify_authenticated!, only: %i[index? show? upgrade?]
+  skip_pre_check :verify_authenticated!, only: %i[index? show? download? upgrade?]
 
   scope_for :active_record_relation do |relation|
     case bearer

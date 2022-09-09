@@ -2,6 +2,8 @@
 
 module Products
   class ReleaseChannelPolicy < ApplicationPolicy
+    skip_pre_check :verify_authenticated!, only: %i[index? show?]
+
     authorize :product
 
     def index?
@@ -17,7 +19,7 @@ module Products
       in role: { name: 'license' } if product == bearer.product
         allow!
       else
-        deny!
+        product.open_distribution?
       end
     end
 
@@ -34,7 +36,7 @@ module Products
       in role: { name: 'license' } if product == bearer.product
         allow!
       else
-        deny!
+        product.open_distribution?
       end
     end
   end
