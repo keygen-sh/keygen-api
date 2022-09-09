@@ -2,6 +2,8 @@
 
 module Products
   class ReleaseArtifactPolicy < ApplicationPolicy
+    skip_pre_check :verify_authenticated!, only: %i[index? show?]
+
     authorize :product
 
     def index?
@@ -17,7 +19,7 @@ module Products
       in role: { name: 'license' } if product == bearer.product
         allow? :index, record, with: ::ReleaseArtifactPolicy, inline_reasons: true
       else
-        deny!
+        product.open_distribution? && record.none?(&:constraints?)
       end
     end
 
@@ -34,7 +36,7 @@ module Products
       in role: { name: 'license' } if product == bearer.product
         allow? :show, record, with: ::ReleaseArtifactPolicy, inline_reasons: true
       else
-        deny!
+        product.open_distribution? && record.constraints.none?
       end
     end
   end

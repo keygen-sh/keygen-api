@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReleaseArtifactPolicy < ApplicationPolicy
-  skip_pre_check :verify_authenticated!, only: %i[index? show?]
+  skip_pre_check :verify_authenticated!, only: %i[index? show? download?]
 
   scope_for :active_record_relation do |relation|
     case bearer

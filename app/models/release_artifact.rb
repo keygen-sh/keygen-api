@@ -43,6 +43,8 @@ class ReleaseArtifact < ApplicationRecord
     through: :product
   has_many :licenses,
     through: :product
+  has_many :constraints,
+    through: :release
 
   accepts_nested_attributes_for :filetype
   accepts_nested_attributes_for :platform
@@ -216,6 +218,10 @@ class ReleaseArtifact < ApplicationRecord
   scope :draft,     -> { joins(:release).where(releases: { status: 'DRAFT' }) }
   scope :published, -> { joins(:release).where(releases: { status: 'PUBLISHED' }) }
   scope :yanked,    -> { joins(:release).where(releases: { status: 'YANKED' }) }
+
+  def constraints?
+    constraints.any?
+  end
 
   def s3_object_key
     "artifacts/#{account_id}/#{release_id}/#{filename}"
