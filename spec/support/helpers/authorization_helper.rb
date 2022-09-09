@@ -906,7 +906,7 @@ module AuthorizationHelper
           create(:license, account:, policy:)
         }
       in [:as_user, :is_licensed, *]
-        # noop
+        let(:license) { licenses.first }
       end
 
       let(:record) { license }
