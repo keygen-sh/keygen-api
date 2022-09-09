@@ -147,6 +147,44 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_product accessing_its_artifact] do
       with_license_authentication do
+        with_release_traits %i[old] do
+          with_bearer_traits %i[expired restrict_access_expiration_strategy] do
+            allows :show
+          end
+
+          with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+            denies :show
+          end
+
+          with_bearer_traits %i[expired allow_access_expiration_strategy] do
+            allows :show
+          end
+        end
+
+        with_release_traits %i[with_constraints] do
+          with_bearer_traits %i[with_entitlements] do
+            allows :show
+          end
+
+          denies :show
+        end
+
+        with_bearer_traits %i[expired restrict_access_expiration_strategy] do
+          denies :show
+        end
+
+        with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+          denies :show
+        end
+
+        with_bearer_traits %i[expired allow_access_expiration_strategy] do
+          allows :show
+        end
+
+        with_bearer_traits %i[expired] do
+          denies :show
+        end
+
         with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
           allows :show
         end
@@ -162,18 +200,6 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
         without_permissions do
           denies :show
         end
-
-        # with_record_trait :constrained do
-        #   with_bearer_trait :entitled do
-        #     allows :show
-        #   end
-
-        #   denies :show
-        # end
-
-        # with_bearer_trait :expired do
-        #   allows :show
-        # end
       end
 
       with_token_authentication do

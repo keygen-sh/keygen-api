@@ -124,5 +124,17 @@ FactoryBot.define do
     trait :protected do
       protected { true }
     end
+
+    trait :restrict_access_expiration_strategy do
+      expiration_strategy { 'RESTRICT_ACCESS' }
+    end
+
+    trait :revoke_access_expiration_strategy do
+      expiration_strategy { 'REVOKE_ACCESS' }
+    end
+
+    trait :allow_access_expiration_strategy do
+      expiration_strategy { 'ALLOW_ACCESS' }
+    end
   end
 end

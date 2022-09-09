@@ -55,5 +55,17 @@ FactoryBot.define do
         release.status    = 'YANKED'
       end
     end
+
+    trait :old do
+      after :build do |release, evaluator|
+        release.created_at = 1.year.ago
+      end
+    end
+
+    trait :with_constraints do
+      after :create do |release|
+        create_list(:release_entitlement_constraint, 5, account: release.account, release:)
+      end
+    end
   end
 end

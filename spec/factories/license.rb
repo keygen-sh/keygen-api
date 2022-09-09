@@ -96,10 +96,34 @@ FactoryBot.define do
       end
     end
 
+    trait :restrict_access_expiration_strategy do
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :restrict_access_expiration_strategy, account: license.account)
+      end
+    end
+
+    trait :revoke_access_expiration_strategy do
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :revoke_access_expiration_strategy, account: license.account)
+      end
+    end
+
+    trait :allow_access_expiration_strategy do
+      after :build do |license, evaluator|
+        license.policy = build(:policy, :allow_access_expiration_strategy, account: license.account)
+      end
+    end
+
     trait :userless do |license|
       # FIXME(ezekg) This kind of acts as a sentinel value to not create a user
       #              in the factory's create hook (above)
       user { false }
+    end
+
+    trait :expired do
+      after :build do |license|
+        license.expiry = 1.month.ago
+      end
     end
 
     trait :protected do |license|
@@ -108,6 +132,12 @@ FactoryBot.define do
 
     trait :unprotected do |license|
       protected { false }
+    end
+
+    trait :with_entitlements do
+      after :create do |license|
+        create_list(:license_entitlement, 5, account: license.account, license:)
+      end
     end
   end
 end

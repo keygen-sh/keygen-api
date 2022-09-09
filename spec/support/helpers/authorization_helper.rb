@@ -14,35 +14,35 @@ module AuthorizationHelper
     def as_admin(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account) }
-        let(:bearer)  { create(:admin, account:, permissions: bearer_permissions) }
+        let(:account) { create(:account, *account_traits) }
+        let(:bearer)  { create(:admin, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
     def as_product(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account) }
-        let(:bearer)  { create(:product, account:, permissions: bearer_permissions) }
+        let(:account) { create(:account, *account_traits) }
+        let(:bearer)  { create(:product, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
     def as_license(scenarios)
       case scenarios
       in []
-        let(:account)      { create(:account) }
+        let(:account)      { create(:account, *account_traits) }
         let(:policy)       { create(:policy, account:) }
         let(:license_user) { nil }
         let(:expiry)       { nil }
-        let(:bearer)       { create(:license, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
+        let(:bearer)       { create(:license, *bearer_traits, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
       end
     end
 
     def as_user(scenarios)
       case scenarios
       in []
-        let(:account) { create(:account) }
-        let(:bearer)  { create(:user, account:, permissions: bearer_permissions) }
+        let(:account) { create(:account, *account_traits) }
+        let(:bearer)  { create(:user, *bearer_traits, account:, permissions: bearer_permissions) }
       end
     end
 
@@ -54,7 +54,7 @@ module AuthorizationHelper
     end
 
     def as_anonymous(scenarios)
-      let(:account) { create(:account) }
+      let(:account) { create(:account, *account_traits) }
       let(:bearer)  { nil }
     end
 
@@ -736,9 +736,9 @@ module AuthorizationHelper
     def accessing_a_release(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:release) { create(:release, account: other_account) }
+        let(:release) { create(:release, *release_traits, account: other_account) }
       else
-        let(:release) { create(:release, account:) }
+        let(:release) { create(:release, *release_traits, account:) }
       end
 
       let(:record) { release }
@@ -751,7 +751,7 @@ module AuthorizationHelper
       in [:as_license, *]
         let(:releases) { create_list(:release, 3, account:, product: bearer.product) }
       in [:as_user, :is_licensed, *]
-        let(:releases) { licenses.map { create(:release, account:, product: _1.product) } }
+        let(:releases) { licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
       end
 
       let(:record) { releases }
@@ -760,15 +760,15 @@ module AuthorizationHelper
     def accessing_its_release(scenarios)
       case scenarios
       in [:as_product, *]
-        let(:release) { create(:release, account:, product: bearer) }
+        let(:release) { create(:release, *release_traits, account:, product: bearer) }
       in [:as_license, :is_expired, :is_within_access_window, *]
-        let(:release) { create(:release, account:, product: bearer.product, created_at: bearer.expiry - 1.day) }
+        let(:release) { create(:release, *release_traits, account:, product: bearer.product, created_at: bearer.expiry - 1.day) }
       in [:as_license, *]
-        let(:release) { create(:release, account:, product: bearer.product) }
+        let(:release) { create(:release, *release_traits, account:, product: bearer.product) }
       in [:as_user, :is_licensed, :is_expired, :is_within_access_window, *]
-        let(:release) { create(:release, account:, product: licenses.first.product, created_at: license.expiry - 1.day) }
+        let(:release) { create(:release, *release_traits, account:, product: licenses.first.product, created_at: license.expiry - 1.day) }
       in [:as_user, :is_licensed, *]
-        let(:release) { create(:release, account:, product: licenses.first.product) }
+        let(:release) { create(:release, *release_traits, account:, product: licenses.first.product) }
       end
 
       let(:record) { release }
@@ -799,10 +799,10 @@ module AuthorizationHelper
     def accessing_its_artifacts(scenarios)
       case scenarios
        in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)   { create(:release, account:, product:) }
+        let(:release)   { create(:release, *release_traits, account:, product:) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
       in [:as_product, :accessing_itself]
-        let(:release)   { create(:release, account:, product: bearer) }
+        let(:release)   { create(:release, *release_traits, account:, product: bearer) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
       in [:as_product, *]
         let(:releases)  { create_list(:release, 3, account:, product: bearer) }
@@ -811,7 +811,7 @@ module AuthorizationHelper
         let(:releases)  { create_list(:release, 3, account:, product: bearer.product) }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
       in [:as_user, :is_licensed, *]
-        let(:releases)  { licenses.map { create(:release, account:, product: _1.product) } }
+        let(:releases)  { licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
       end
 
@@ -821,19 +821,19 @@ module AuthorizationHelper
     def accessing_its_artifact(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)  { create(:release, account:, product:) }
+        let(:release)  { create(:release, *release_traits, account:, product:) }
         let(:artifact) { create(:artifact, account:, release:) }
       in [:as_product, :accessing_itself]
-        let(:release)  { create(:release, account:, product: bearer) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
         let(:artifact) { create(:artifact, account:, release:) }
       in [:as_product, *]
-        let(:release)  { create(:release, account:, product: bearer) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
         let(:artifact) { create(:release_artifact, account:, release:) }
       in [:as_license, *]
-        let(:release)  { create(:release, account:, product: bearer.product) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer.product) }
         let(:artifact) { create(:release_artifact, account:, release:) }
       in [:as_user, :is_licensed, *]
-        let(:release)  { create(:release, account:, product: licenses.first.product) }
+        let(:release)  { create(:release, *release_traits, account:, product: licenses.first.product) }
         let(:artifact) { create(:release_artifact, account:, release:) }
       end
 
@@ -977,11 +977,11 @@ module AuthorizationHelper
     def accessing_its_channels(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)   { create(:release, account:, product:) }
+        let(:release)   { create(:release, *release_traits, account:, product:) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:channels)  { artifacts.collect(&:channel) }
       in [:as_product, :accessing_itself]
-        let(:release)   { create(:release, account:, product: bearer) }
+        let(:release)   { create(:release, *release_traits, account:, product: bearer) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:channels)  { artifacts.collect(&:channel) }
       end
@@ -992,11 +992,11 @@ module AuthorizationHelper
     def accessing_its_channel(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)  { create(:release, account:, product:) }
+        let(:release)  { create(:release, *release_traits, account:, product:) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:channel)  { artifact.channel }
       in [:as_product, :accessing_itself]
-        let(:release)  { create(:release, account:, product: bearer) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:channel)  { artifact.channel }
       end
@@ -1029,11 +1029,11 @@ module AuthorizationHelper
     def accessing_its_platforms(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)   { create(:release, account:, product:) }
+        let(:release)   { create(:release, *release_traits, account:, product:) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:platforms) { artifacts.collect(&:platform) }
       in [:as_product, :accessing_itself]
-        let(:release)   { create(:release, account:, product: bearer) }
+        let(:release)   { create(:release, *release_traits, account:, product: bearer) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:platforms) { artifacts.collect(&:platform) }
       end
@@ -1044,11 +1044,11 @@ module AuthorizationHelper
     def accessing_its_platform(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)  { create(:release, account:, product:) }
+        let(:release)  { create(:release, *release_traits, account:, product:) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:platform) { artifact.platform }
       in [:as_product, :accessing_itself]
-        let(:release)  { create(:release, account:, product: bearer) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:platform) { artifact.platform }
       end
@@ -1081,11 +1081,11 @@ module AuthorizationHelper
     def accessing_its_arches(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)   { create(:release, account:, product:) }
+        let(:release)   { create(:release, *release_traits, account:, product:) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:arches)    { artifacts.collect(&:arch) }
       in [:as_product, :accessing_itself]
-        let(:release)   { create(:release, account:, product: bearer) }
+        let(:release)   { create(:release, *release_traits, account:, product: bearer) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
         let(:arches)    { artifacts.collect(&:arch) }
       end
@@ -1096,11 +1096,11 @@ module AuthorizationHelper
     def accessing_its_arch(scenarios)
       case scenarios
       in [*, :accessing_its_product | :accessing_a_product, *]
-        let(:release)  { create(:release, account:, product:) }
+        let(:release)  { create(:release, *release_traits, account:, product:) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:arch)     { artifact.arch }
       in [:as_product, :accessing_itself]
-        let(:release)  { create(:release, account:, product: bearer) }
+        let(:release)  { create(:release, *release_traits, account:, product: bearer) }
         let(:artifact) { create(:artifact, account:, release:) }
         let(:arch)     { artifact.arch }
       end
@@ -1159,6 +1159,9 @@ module AuthorizationHelper
 
         let(:bearer_permissions) { nil }
         let(:token_permissions)  { nil }
+        let(:account_traits)     { [] }
+        let(:bearer_traits)      { [] }
+        let(:release_traits)     { [] }
 
         instance_exec(&)
       end
@@ -1169,6 +1172,10 @@ module AuthorizationHelper
     def without_authorization(&)
       context 'without authorization' do
         using_scenario :as_anonymous
+
+        let(:account_traits) { [] }
+        let(:bearer_traits)  { [] }
+        let(:release_traits) { [] }
 
         instance_exec(&)
       end
@@ -1215,6 +1222,7 @@ module AuthorizationHelper
     def with_scenarios(scenarios, &)
       context "using #{scenarios} scenarios" do
         using_scenarios(scenarios)
+
         instance_exec(&)
       end
     end
@@ -1224,6 +1232,7 @@ module AuthorizationHelper
     def with_scenario(scenario, &)
       context "using #{scenario} scenario" do
         using_scenario(scenario)
+
         instance_exec(&)
       end
     end
@@ -1333,11 +1342,39 @@ module AuthorizationHelper
     end
 
     ##
+    # with_account_traits defines traits on the account context.
+    def with_account_traits(traits, &)
+      context "with account #{traits} traits" do
+        let(:account_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_bearer_traits defines traits on the bearer context.
+    def with_bearer_traits(traits, &)
+      context "with bearer #{traits} traits" do
+        let(:bearer_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
+    # with_release_traits defines traits on the release context.
+    def with_release_traits(traits, &)
+      context "with release #{traits} traits" do
+        let(:release_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
     # with_account_protection enables account protection.
     def with_account_protection(&)
-      context "with account protection" do
-        let(:account) { create(:account, :protected) }
-
+      with_account_traits %i[protected] do
         instance_exec(&)
       end
     end
@@ -1345,9 +1382,7 @@ module AuthorizationHelper
     ##
     # without_account_protection disables account protection.
     def without_account_protection(&)
-      context "without account protection" do
-        let(:account) { create(:account, :unprotected) }
-
+      with_account_traits %i[unprotected] do
         instance_exec(&)
       end
     end
