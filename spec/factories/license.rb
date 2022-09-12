@@ -139,5 +139,11 @@ FactoryBot.define do
         create_list(:license_entitlement, 5, account: license.account, license:)
       end
     end
+
+    trait :with_user do
+      after :create do |license|
+        license.update(user: build(:user, account: license.account))
+      end
+    end
   end
 end
