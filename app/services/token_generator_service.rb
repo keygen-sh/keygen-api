@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class TokenGeneratorService < BaseService
-  def initialize(account:, bearer:, expiry: nil, max_activations: nil, max_deactivations: nil, permissions: nil)
+  def initialize(account:, bearer:, expiry: nil, name: nil, max_activations: nil, max_deactivations: nil, permissions: nil)
     raise ArgumentError, 'account is missing' if
       account.nil?
 
@@ -11,6 +11,7 @@ class TokenGeneratorService < BaseService
     @account           = account
     @bearer            = bearer
     @expiry            = expiry
+    @name              = name
     @permissions       = permissions
     @max_activations   = max_activations
     @max_deactivations = max_deactivations
@@ -18,7 +19,7 @@ class TokenGeneratorService < BaseService
 
   def call
     kwargs = { max_activations:, max_deactivations:, permissions: }.reject { _2.nil? }
-    token = account.tokens.create!(bearer:, expiry:, **kwargs)
+    token = account.tokens.create!(bearer:, expiry:, name:, **kwargs)
 
     token.generate!
 
@@ -30,6 +31,7 @@ class TokenGeneratorService < BaseService
   attr_reader :account,
               :bearer,
               :expiry,
+              :name,
               :max_activations,
               :max_deactivations,
               :permissions

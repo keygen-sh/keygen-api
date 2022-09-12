@@ -33,6 +33,7 @@ module Api::V1::Licenses::Relationships
         :max_deactivations,
         :permissions,
         :expiry,
+        :name,
       )
 
       token = TokenGeneratorService.call(
@@ -74,6 +75,7 @@ module Api::V1::Licenses::Relationships
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+            param :name, type: :string, allow_nil: true, optional: true
             param :max_activations, type: :integer, optional: true
             param :max_deactivations, type: :integer, optional: true
             if current_bearer&.has_role?(:admin, :product)
