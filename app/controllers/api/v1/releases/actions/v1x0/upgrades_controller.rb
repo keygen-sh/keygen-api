@@ -7,6 +7,11 @@ module Api::V1::Releases::Actions::V1x0
     before_action :authenticate_with_token
     before_action :set_release, only: %i[check_for_upgrade_by_id]
 
+    skip_verify_authorized only: %i[
+      check_for_upgrade_by_query
+      check_for_upgrade_by_id
+    ]
+
     def check_for_upgrade_by_query
       kwargs = upgrade_query.to_h.symbolize_keys.slice(
         :product,
@@ -30,7 +35,9 @@ module Api::V1::Releases::Actions::V1x0
       render_bad_request detail: e.message, code: :UPGRADE_CONSTRAINT_INVALID, source: { parameter: :constraint }
     rescue ::V1x0::ReleaseUpgradeService::InvalidChannelError => e
       render_bad_request detail: e.message, code: :UPGRADE_CHANNEL_INVALID, source: { parameter: :channel }
-    rescue ActionPolicy::Unauthorized
+    rescue ActionPolicy::Unauthorized => e
+      Keygen.logger.warn { "[releases.check_for_upgrade_by_query] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
+
       render status: :no_content
     end
 
@@ -54,7 +61,9 @@ module Api::V1::Releases::Actions::V1x0
            ::V1x0::ReleaseUpgradeService::InvalidFiletypeError,
            ::V1x0::ReleaseUpgradeService::InvalidVersionError => e
       render_unprocessable_entity detail: e.message
-    rescue ActionPolicy::Unauthorized
+    rescue ActionPolicy::Unauthorized => e
+      Keygen.logger.warn { "[releases.check_for_upgrade_by_id] policy=#{e.policy} rule=#{e.rule} message=#{e.message} reasons=#{e.result.reasons&.reasons}" }
+
       render status: :no_content
     end
 
@@ -63,7 +72,7 @@ module Api::V1::Releases::Actions::V1x0
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = scoped_releases.find(params[:id])
 
@@ -78,10 +87,16 @@ module Api::V1::Releases::Actions::V1x0
         **kwargs,
       )
 
+      authorize! upgrade.current_release,
+        with: Releases::V1x0::DownloadPolicy,
+        to: :upgrade?
+
       Keygen.logger.debug "[releases.check_for_upgrade] Upgrade: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version}"
 
       if upgrade.next_release.present?
-        authorize upgrade.next_release, :download?
+        authorize! upgrade.next_release,
+          with: Releases::V1x0::DownloadPolicy,
+          to: :download?
 
         download = ::V1x0::ReleaseDownloadService.call(
           account: current_account,
@@ -106,13 +121,7 @@ module Api::V1::Releases::Actions::V1x0
 
         render jsonapi: download.artifact, meta: meta, status: :see_other, location: download.redirect_url
       else
-        if upgrade.current_release.present?
-          authorize upgrade.current_release, :download?
-        else
-          # When current and next release are nil, we can skip authorization,
-          # since there's nothing to assert authorization for.
-          skip_verify_authorized!
-        end
+        Keygen.logger.debug "[releases.check_for_upgrade] No upgrades found: account=#{current_account.id} current_release=#{upgrade.current_release&.id} current_version=#{upgrade.current_version} next_release=#{upgrade.next_release&.id} next_version=#{upgrade.next_version}"
 
         render status: :no_content
       end

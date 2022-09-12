@@ -137,11 +137,14 @@ permissions = %w[
   release.constraints.detach
   release.constraints.read
   release.entitlements.read
+  release.artifacts.read
+  release.product.read
   release.create
   release.delete
   release.publish
   release.read
   release.update
+  release.download
   release.upgrade
   release.upload
   release.yank

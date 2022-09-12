@@ -7,9 +7,12 @@ module Api::V1::Releases::Relationships
     before_action :authenticate_with_token!
     before_action :set_release
 
+    authorize :release
+
     def show
       product = release.product
-      authorize product
+      authorize! product,
+        with: Releases::ProductPolicy
 
       render jsonapi: product
     end
@@ -19,7 +22,7 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = FindByAliasService.call(scope: scoped_releases, identifier: params[:release_id], aliases: %i[version tag])
 

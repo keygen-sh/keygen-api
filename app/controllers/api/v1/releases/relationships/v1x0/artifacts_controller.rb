@@ -9,7 +9,9 @@ module Api::V1::Releases::Relationships::V1x0
     before_action :set_release
 
     def show
-      authorize release, :download?
+      authorize! release,
+        with: Releases::V1x0::DownloadPolicy,
+        to: :download?
 
       download = ::V1x0::ReleaseDownloadService.call(
         account: current_account,
@@ -35,7 +37,9 @@ module Api::V1::Releases::Relationships::V1x0
     end
 
     def create
-      authorize release, :upload?
+      authorize! release,
+        with: Releases::V1x0::UploadPolicy,
+        to: :upload?
 
       upload = ::V1x0::ReleaseUploadService.call(
         account: current_account,
@@ -55,7 +59,9 @@ module Api::V1::Releases::Relationships::V1x0
     end
 
     def destroy
-      authorize release, :yank?
+      authorize! release,
+        with: Releases::V1x0::YankPolicy,
+        to: :yank?
 
       ::V1x0::ReleaseYankService.call(account: current_account, release: release)
 
@@ -74,7 +80,7 @@ module Api::V1::Releases::Relationships::V1x0
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = scoped_releases.find(params[:release_id])
 

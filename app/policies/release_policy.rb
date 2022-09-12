@@ -121,7 +121,7 @@ class ReleasePolicy < ApplicationPolicy
   end
 
   def download?
-    allow? :show, inline_reasons: true
+    allow? :show
   end
 
   def create?
@@ -166,7 +166,7 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allow? :show, inline_reasons: true
+    allow? :show
   end
 
   def upload?
