@@ -49,7 +49,7 @@ Feature: Process machine relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User attempts to retrieve the machine for a process they own
     Given the current account is "test1"
@@ -70,7 +70,7 @@ Feature: Process machine relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/machine"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License attempts to retrieves the machine of a process
     Given the current account is "test1"
@@ -90,7 +90,7 @@ Feature: Process machine relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$1/machine"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Anonymous attempts to retrieve a processes's license
     Given the current account is "test1"
