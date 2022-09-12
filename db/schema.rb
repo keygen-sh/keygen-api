@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_12_134350) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_stat_statements"
@@ -617,6 +617,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_17_183308) do
     t.integer "max_deactivations"
     t.integer "activations", default: 0
     t.integer "deactivations", default: 0
+    t.string "name"
     t.index ["account_id", "created_at"], name: "index_tokens_on_account_id_and_created_at"
     t.index ["bearer_id", "bearer_type", "created_at"], name: "index_tokens_on_bearer_id_and_bearer_type_and_created_at"
     t.index ["created_at"], name: "index_tokens_on_created_at", order: :desc

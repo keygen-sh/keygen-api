@@ -40,6 +40,32 @@ Feature: Generate authentication token for license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a named license token
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Client Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Client Token" }
+      """
+    And sidekiq should have 3 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin generates a license token with a max activation count
     Given I am an admin of account "test1"
     And the current account is "test1"
