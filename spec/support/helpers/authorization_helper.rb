@@ -284,6 +284,8 @@ module AuthorizationHelper
         let(:policies) { [bearer.policy] }
       in [:as_user, :is_licensed, *]
         let(:policies) { licenses.collect(&:policy) }
+      in [:as_user, *]
+        let(:_policy) { bearer.licenses.collect(&:policy) }
       end
 
       let(:record) { policies }
@@ -301,6 +303,8 @@ module AuthorizationHelper
         let(:_policy) { bearer.policy }
       in [:as_user, :is_licensed, *]
         let(:_policy) { licenses.first.policy }
+      in [:as_user, *]
+        let(:_policy) { bearer.licenses.first.policy }
       end
 
       let(:record) { _policy }
@@ -866,6 +870,8 @@ module AuthorizationHelper
 
     def accessing_its_licenses(scenarios)
       case scenarios
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:licenses) { create_list(:license, 3, account: _policy.account, policy: _policy) }
       in [:as_product, :accessing_a_group, *]
         let(:licenses) {
           policy = create(:policy, account:, product: bearer)
@@ -889,6 +895,8 @@ module AuthorizationHelper
 
     def accessing_its_license(scenarios)
       case scenarios
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:license) { create(:license, account: _policy.account, policy: _policy) }
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:license) { machine.license }
       in [:as_product, :accessing_a_group, *]
@@ -1370,6 +1378,18 @@ module AuthorizationHelper
         instance_exec(&)
       end
     end
+
+    ##
+    # with_account_trait defines a trait on the account context.
+    def with_account_trait(trait, &) = with_account_traits(*trait, &)
+
+    ##
+    # with_bearer_trait defines a trait on the bearer context.
+    def with_bearer_trait(trait, &) = with_bearer_traits(*trait, &)
+
+    ##
+    # with_release_trait defines a trait on the release context.
+    def with_release_trait(trait, &) = with_release_traits(*trait, &)
 
     ##
     # with_account_protection enables account protection.
