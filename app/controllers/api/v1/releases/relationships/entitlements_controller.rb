@@ -7,16 +7,20 @@ module Api::V1::Releases::Relationships
     before_action :authenticate_with_token!
     before_action :set_release
 
-    def index
-      authorize release, :list_entitlements?
+    authorize :release
 
-      entitlements = apply_pagination(apply_scopes(release.entitlements))
+    def index
+      authorize! release,
+        with: Releases::EntitlementPolicy
+
+      entitlements = apply_pagination(authorized_scope(apply_scopes(release.entitlements)))
 
       render jsonapi: entitlements
     end
 
     def show
-      authorize release, :show_entitlement?
+      authorize! release,
+        with: Releases::EntitlementPolicy
 
       entitlement = release.entitlements.find(params[:id])
 
@@ -28,10 +32,9 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = FindByAliasService.call(scope: scoped_releases, identifier: params[:release_id], aliases: %i[version tag])
-      authorize release, :show?
 
       Current.resource = release
     end

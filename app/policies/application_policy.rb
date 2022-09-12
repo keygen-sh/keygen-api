@@ -52,7 +52,7 @@ class ApplicationPolicy
   private
 
   # Short and easier to remember/use alias.
-  def allow?(rule, *args, **kwargs) = allowed_to?(:"#{rule}?", *args, **kwargs)
+  def allow?(rule, *args, **kwargs) = allowed_to?(:"#{rule}?", *args, inline_reasons: true, **kwargs)
 
   def verify_account_scoped!
     deny! "#{whatami} account does not match account context" if

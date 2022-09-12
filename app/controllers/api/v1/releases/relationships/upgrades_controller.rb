@@ -43,7 +43,7 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = apply_scopes(authorized_scope(current_account.releases))
+      scoped_releases = authorized_scope(apply_scopes(current_account.releases))
 
       @release = FindByAliasService.call(
         scope: scoped_releases,

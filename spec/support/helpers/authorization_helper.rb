@@ -217,6 +217,8 @@ module AuthorizationHelper
 
     def accessing_its_product(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:product) { release.product }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:product) { machine_process.product }
       in [*, :accessing_its_pooled_key | :accessing_a_pooled_key, *]
@@ -558,6 +560,12 @@ module AuthorizationHelper
 
     def accessing_its_entitlements(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:entitlements) {
+          constraints = create_list(:release_entitlement_constraint, 3, account: release.account, release:)
+
+          constraints.map(&:entitlement)
+        }
       in [*, :accessing_its_license | :accessing_a_license, :with_entitlements, *]
         # noop
       in [*, :accessing_its_policy | :accessing_a_policy, :with_entitlements, *]
@@ -573,6 +581,12 @@ module AuthorizationHelper
 
     def accessing_its_entitlement(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:entitlement) {
+          constraint = create(:release_entitlement_constraint, account: release.account, release:)
+
+          constraint.entitlement
+        }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:entitlement)          { create(:entitlement, account: license.account) }
         let!(:license_entitlement) { create(:license_entitlement, account: license.account, license:, entitlement:) }
@@ -806,6 +820,8 @@ module AuthorizationHelper
         let(:releases) { create_list(:release, 3, *release_traits, account:, product: bearer.product) }
       in [:as_user, :is_licensed, *]
         let(:releases) { licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+      in [:as_user, *]
+        let(:releases) { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
       end
 
       let(:record) { releases }
@@ -825,6 +841,8 @@ module AuthorizationHelper
         let(:release) { create(:release, *release_traits, account:, product: licenses.first.product, created_at: license.expiry - 1.day) }
       in [:as_user, :is_licensed, *]
         let(:release) { create(:release, *release_traits, account:, product: licenses.first.product) }
+      in [:as_user, *]
+        let(:release) { create(:release, *release_traits, account:, product: bearer.licenses.first.product) }
       end
 
       let(:record) { release }
@@ -854,6 +872,8 @@ module AuthorizationHelper
 
     def accessing_its_artifacts(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:artifacts) { create_list(:artifact, 3, account: release.account, release:) }
        in [*, :accessing_its_product | :accessing_a_product, *]
         let(:release)   { create(:release, *release_traits, account:, product:) }
         let(:artifacts) { create_list(:artifact, 3, account:, release:) }
@@ -869,6 +889,9 @@ module AuthorizationHelper
       in [:as_user, :is_licensed, *]
         let(:releases)  { licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
+      in [:as_user, *]
+        let(:releases)  { beaerr.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+        let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
       end
 
       let(:record) { artifacts }
@@ -876,6 +899,8 @@ module AuthorizationHelper
 
     def accessing_its_artifact(scenarios)
       case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:artifact) { create(:artifact, account: release.account, release:) }
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:release)  { create(:release, *release_traits, account:, product:) }
         let(:artifact) { create(:artifact, account:, release:) }
@@ -891,9 +916,30 @@ module AuthorizationHelper
       in [:as_user, :is_licensed, *]
         let(:release)  { create(:release, *release_traits, account:, product: licenses.first.product) }
         let(:artifact) { create(:release_artifact, account:, release:) }
+      in [:as_user, *]
+        let(:release)  { create(:release, *release_traits, account:, product: bearer.licenses.first.product) }
+        let(:artifact) { create(:release_artifact, account:, release:) }
       end
 
       let(:record) { artifact }
+    end
+
+    def accessing_its_constraints(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:constraints) { create_list(:release_entitlement_constraint, 3, account: release.account, release:) }
+      end
+
+      let(:record) { constraints }
+    end
+
+    def accessing_its_constraint(scenarios)
+      case scenarios
+      in [*, :accessing_its_release | :accessing_a_release, *]
+        let(:constraint) { create(:release_entitlement_constraint, account: release.account, release:) }
+      end
+
+      let(:record) { constraint }
     end
 
     def accessing_licenses(scenarios)
