@@ -49,14 +49,45 @@ Feature: Process product relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: User attempts to retrieve the product for a process they own
+  Scenario: User attempts to retrieve the product for a process they own (default permission)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "license" for the last "user"
     And the current account has 1 "machine" for the last "license"
     And the current account has 3 "processes" for the last "machine"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0/product"
+    Then the response status should be "403"
+
+  Scenario: User attempts to retrieve the product for a process they own (has permission)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "processes" for the last "machine"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["process.product.read"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$0/product"
+    Then the response status should be "200"
+    And the JSON response should be a "product"
+
+  Scenario: User attempts to retrieve the product for a process they own (no permission)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And the current account has 1 "machine" for the last "license"
+    And the current account has 3 "processes" for the last "machine"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": [] }
+      """
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
@@ -69,13 +100,42 @@ Feature: Process product relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$0/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: License attempts to retrieves the product of a process
+  Scenario: License attempts to retrieves the product of a process (default permission)
     Given the current account is "test1"
     And the current account has 1 "license"
     And the current account has 1 "machine" for the first "license"
     And the current account has 2 "processes" for the first "machine"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$1/product"
+    Then the response status should be "403"
+
+  Scenario: License attempts to retrieves the product of a process (has permission)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the first "license"
+    And the current account has 2 "processes" for the first "machine"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["process.product.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/processes/$1/product"
+    Then the response status should be "200"
+    And the JSON response should be a "product"
+
+  Scenario: License attempts to retrieves the product of a process (no permission)
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And the current account has 1 "machine" for the first "license"
+    And the current account has 2 "processes" for the first "machine"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": [] }
+      """
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$1/product"
@@ -88,7 +148,7 @@ Feature: Process product relationship
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes/$1/product"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Anonymous attempts to retrieve a processes's license
     Given the current account is "test1"

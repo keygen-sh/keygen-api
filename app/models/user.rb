@@ -48,6 +48,7 @@ class User < ApplicationRecord
           license.product.read
           license.policy.read
           machine.product.read
+          process.product.read
           account.read
           product.read
           policy.read

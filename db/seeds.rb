@@ -109,6 +109,9 @@ permissions = %w[
   process.create
   process.delete
   process.heartbeat.ping
+  process.license.read
+  process.machine.read
+  process.product.read
   process.read
   process.update
 
