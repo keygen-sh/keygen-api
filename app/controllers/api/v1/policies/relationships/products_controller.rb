@@ -7,21 +7,26 @@ module Api::V1::Policies::Relationships
     before_action :authenticate_with_token!
     before_action :set_policy
 
-    # GET /policys/1/product
-    def show
-      @product = @policy.product
-      authorize @product
+    authorize :policy
 
-      render jsonapi: @product
+    def show
+      product = policy.product
+      authorize! product,
+        with: Policies::ProductPolicy
+
+      render jsonapi: product
     end
 
     private
 
-    def set_policy
-      @policy = current_account.policies.find params[:policy_id]
-      authorize @policy, :show?
+    attr_reader :policy
 
-      Current.resource = @policy
+    def set_policy
+      scoped_policies = authorized_scope(current_account.policies)
+
+      @policy = scoped_policies.find(params[:policy_id])
+
+      Current.resource = policy
     end
   end
 end
