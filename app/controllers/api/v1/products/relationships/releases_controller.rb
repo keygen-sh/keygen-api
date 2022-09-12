@@ -13,16 +13,20 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
+    authorize :product
+
     def index
-      releases = apply_pagination(policy_scope(apply_scopes(product.releases)).preload(:channel))
-      authorize releases
+      releases = apply_pagination(authorized_scope(apply_scopes(product.releases)).preload(:channel))
+      authorize! releases,
+        with: Products::ReleasePolicy
 
       render jsonapi: releases
     end
 
     def show
       release = FindByAliasService.call(scope: product.releases, identifier: params[:id], aliases: %i[version tag])
-      authorize release
+      authorize! release,
+        with: Products::ReleasePolicy
 
       render jsonapi: release
     end
@@ -32,8 +36,9 @@ module Api::V1::Products::Relationships
     attr_reader :product
 
     def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize product, :show?
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
 
       Current.resource = product
     end

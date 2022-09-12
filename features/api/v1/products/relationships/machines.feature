@@ -134,31 +134,54 @@ Feature: Product machines relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$1/machines"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the machines for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/machines"
+    Then the response status should be "403"
+
+  Scenario: License attempts to retrieve the machines for a product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "user"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/machines"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve the machines for their product
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
+    And the current account has 1 "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/products/$0/machines"
     Then the response status should be "403"
 
   Scenario: User attempts to retrieve the machines for a product
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
-    And the current account has 3 "machines"
-    And all "machines" have the following attributes:
-      """
-      { "licenseId": "$licenses[0]" }
-      """
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the current account has 3 "machines" for the last "license"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/products/$0/machines"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the machines for a product of another account
     Given I am an admin of account "test2"

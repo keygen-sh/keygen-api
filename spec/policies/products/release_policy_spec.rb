@@ -3,13 +3,13 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe Products::ReleaseArtifactPolicy, type: :policy do
+describe Products::ReleasePolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:, product:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[accessing_a_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_a_product accessing_its_releases] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -21,9 +21,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifact] do
+    with_scenarios %i[accessing_a_product accessing_its_release] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -49,9 +49,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_itself accessing_its_artifacts] do
+    with_scenarios %i[accessing_itself accessing_its_releases] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -63,9 +63,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_itself accessing_its_artifact] do
+    with_scenarios %i[accessing_itself accessing_its_release] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -89,9 +89,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_a_product accessing_its_releases] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :show
         end
 
@@ -101,9 +101,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifact] do
+    with_scenarios %i[accessing_a_product accessing_its_release] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :show
         end
 
@@ -123,9 +123,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[accessing_its_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_its_product accessing_its_releases] do
       with_license_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           allows :index
         end
 
@@ -135,7 +135,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           allows :index
         end
 
@@ -145,7 +145,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_its_product accessing_its_artifact] do
+    with_scenarios %i[accessing_its_product accessing_its_release] do
       with_license_authentication do
         with_release_traits %i[old] do
           with_bearer_traits %i[expired restrict_access_expiration_strategy] do
@@ -185,7 +185,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
           denies :show
         end
 
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           allows :show
         end
 
@@ -203,7 +203,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -227,9 +227,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_a_product accessing_its_releases] do
       with_license_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :index
         end
 
@@ -239,7 +239,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :index
         end
 
@@ -249,9 +249,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifact] do
+    with_scenarios %i[accessing_a_product accessing_its_release] do
       with_license_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :show
         end
 
@@ -269,7 +269,7 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :show
         end
 
@@ -290,9 +290,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
 
   with_role_authorization :user do
     with_bearer_trait :with_licenses do
-      with_scenarios %i[accessing_its_product accessing_its_artifacts] do
+      with_scenarios %i[accessing_its_product accessing_its_releases] do
         with_token_authentication do
-          with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+          with_permissions %w[product.releases.read release.read] do
             allows :index
           end
 
@@ -302,9 +302,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
         end
       end
 
-      with_scenarios %i[accessing_its_product accessing_its_artifact] do
+      with_scenarios %i[accessing_its_product accessing_its_release] do
         with_token_authentication do
-          with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+          with_permissions %w[product.releases.read release.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -329,9 +329,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_a_product accessing_its_releases] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :index
         end
 
@@ -341,9 +341,9 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifact] do
+    with_scenarios %i[accessing_a_product accessing_its_release] do
       with_token_authentication do
-        with_permissions %w[product.artifacts.read artifact.read artifact.download release.read] do
+        with_permissions %w[product.releases.read release.read] do
           denies :show
         end
 
@@ -363,13 +363,13 @@ describe Products::ReleaseArtifactPolicy, type: :policy do
   end
 
   without_authorization do
-    with_scenarios %i[accessing_a_product accessing_its_artifacts] do
+    with_scenarios %i[accessing_a_product accessing_its_releases] do
       without_authentication do
         denies :index
       end
     end
 
-    with_scenarios %i[accessing_a_product accessing_its_artifact] do
+    with_scenarios %i[accessing_a_product accessing_its_release] do
       without_authentication do
         denies :show
       end
