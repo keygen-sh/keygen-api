@@ -7,16 +7,20 @@ module Api::V1::Releases::Relationships
     before_action :authenticate_with_token!
     before_action :set_release
 
-    def index
-      authorize release, :list_constraints?
+    authorize :release
 
-      constraints = apply_pagination(apply_scopes(release.constraints))
+    def index
+      authorize! release,
+        with: Releases::EntitlementConstraintPolicy
+
+      constraints = apply_pagination(authorized_scope(apply_scopes(release.constraints)))
 
       render jsonapi: constraints
     end
 
     def show
-      authorize release, :show_constraint?
+      authorize! release,
+        with: Releases::EntitlementConstraintPolicy
 
       constraint = release.constraints.find(params[:id])
 
@@ -24,7 +28,7 @@ module Api::V1::Releases::Relationships
     end
 
     def attach
-      authorize release, :attach_constraints?
+      authorize! with: Releases::EntitlementConstraintPolicy
 
       constraints_data = constraint_params
         .uniq { |constraint| constraint[:entitlement_id] }
@@ -44,7 +48,7 @@ module Api::V1::Releases::Relationships
     end
 
     def detach
-      authorize release, :detach_constraints?
+      authorize! with: Releases::EntitlementConstraintPolicy
 
       constraint_ids = constraint_params.collect { |e| e[:id] }.compact
       constraints = release.constraints.where(id: constraint_ids)
@@ -79,10 +83,9 @@ module Api::V1::Releases::Relationships
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = FindByAliasService.call(scope: scoped_releases, identifier: params[:release_id], aliases: %i[version tag])
-      authorize release, :show?
 
       Current.resource = release
     end

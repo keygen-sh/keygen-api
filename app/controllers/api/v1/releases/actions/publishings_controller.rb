@@ -6,7 +6,7 @@ module Api::V1::Releases::Actions
     before_action :set_release
 
     def publish
-      authorize release
+      authorize! release
 
       release.publish!
 
@@ -20,7 +20,7 @@ module Api::V1::Releases::Actions
     end
 
     def yank
-      authorize release
+      authorize! release
 
       release.yank!
 
@@ -38,7 +38,7 @@ module Api::V1::Releases::Actions
     attr_reader :release
 
     def set_release
-      scoped_releases = policy_scope(current_account.releases)
+      scoped_releases = authorized_scope(current_account.releases)
 
       @release = FindByAliasService.call(
         scope: scoped_releases,

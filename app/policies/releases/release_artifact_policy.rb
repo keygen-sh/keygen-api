@@ -1,42 +1,42 @@
 # frozen_string_literal: true
 
-module Products
+module Releases
   class ReleaseArtifactPolicy < ApplicationPolicy
     skip_pre_check :verify_authenticated!, only: %i[index? show?]
 
-    authorize :product
+    authorize :release
 
     def index?
-      verify_permissions!('product.artifacts.read')
+      verify_permissions!('release.artifacts.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
-      in role: { name: 'product' } if product == bearer
+      in role: { name: 'product' } if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(product.id)
+      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
         allow? :index, record, with: ::ReleaseArtifactPolicy
-      in role: { name: 'license' } if product == bearer.product
+      in role: { name: 'license' } if release.product == bearer.product
         allow? :index, record, with: ::ReleaseArtifactPolicy
       else
-        product.open_distribution? && record.none?(&:constraints?)
+        release.open_distribution? && release.none?(&:constraints?)
       end
     end
 
     def show?
-      verify_permissions!('product.artifacts.read')
+      verify_permissions!('release.artifacts.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
         allow!
-      in role: { name: 'product' } if product == bearer
+      in role: { name: 'product' } if release.product == bearer
         allow!
-      in role: { name: 'user' } if bearer.products.exists?(product.id)
+      in role: { name: 'user' } if bearer.products.exists?(release.product.id)
         allow? :show, record, with: ::ReleaseArtifactPolicy
-      in role: { name: 'license' } if product == bearer.product
+      in role: { name: 'license' } if release.product == bearer.product
         allow? :show, record, with: ::ReleaseArtifactPolicy
       else
-        product.open_distribution? && record.constraints.none?
+        release.open_distribution? && release.constraints.none?
       end
     end
   end

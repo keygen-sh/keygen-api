@@ -144,11 +144,15 @@ class Permission < ApplicationRecord
     release.constraints.detach
     release.constraints.read
     release.entitlements.read
+    release.artifacts.read
+    release.product.read
+    release.entitlements.read
     release.create
     release.delete
     release.publish
     release.read
     release.update
+    release.download
     release.upgrade
     release.upload
     release.yank
@@ -262,7 +266,10 @@ class Permission < ApplicationRecord
 
     release.constraints.read
     release.entitlements.read
+    release.artifacts.read
+    release.product.read
     release.read
+    release.download
     release.upgrade
 
     request-log.read
@@ -403,11 +410,14 @@ class Permission < ApplicationRecord
     release.constraints.detach
     release.constraints.read
     release.entitlements.read
+    release.artifacts.read
+    release.product.read
     release.create
     release.delete
     release.publish
     release.read
     release.update
+    release.download
     release.upgrade
     release.upload
     release.yank
@@ -499,7 +509,11 @@ class Permission < ApplicationRecord
     platform.read
 
     release.constraints.read
+    release.entitlements.read
+    release.artifacts.read
+    release.product.read
     release.read
+    release.download
     release.upgrade
 
     second-factor.create
@@ -581,7 +595,11 @@ class Permission < ApplicationRecord
     platform.read
 
     release.constraints.read
+    release.entitlements.read
+    release.artifacts.read
+    release.product.read
     release.read
+    release.download
     release.upgrade
 
     token.regenerate
