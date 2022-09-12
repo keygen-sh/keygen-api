@@ -99,6 +99,7 @@ permissions = %w[
   policy.entitlements.attach
   policy.entitlements.detach
   policy.entitlements.read
+  policy.licenses.read
   policy.pool.read
   policy.pool.pop
   policy.read

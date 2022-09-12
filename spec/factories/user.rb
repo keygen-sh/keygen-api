@@ -32,5 +32,11 @@ FactoryBot.define do
     factory :read_only do
       role { build(:role, :read_only) }
     end
+
+    trait :with_licenses do
+      after :create do |user|
+        create_list(:license, 3, account: user.account, user:)
+      end
+    end
   end
 end
