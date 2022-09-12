@@ -43,7 +43,7 @@ module Api::V1
         if user&.password? && user.authenticate(password)
           authorize! with: TokenPolicy, context: { bearer: user }
 
-          kwargs = token_params.to_h.symbolize_keys.slice(:expiry)
+          kwargs = token_params.to_h.symbolize_keys.slice(:expiry, :name)
           if !kwargs.key?(:expiry)
             # NOTE(ezekg) Admin tokens do not expire by default
             kwargs[:expiry] = user.has_role?(:user) ? Time.current + Token::TOKEN_DURATION : nil
@@ -141,6 +141,7 @@ module Api::V1
           param :type, type: :string, inclusion: %w[token tokens]
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
+            param :name, type: :string, allow_nil: true, optional: true
           end
         end
         param :meta, type: :hash, optional: true do

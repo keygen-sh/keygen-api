@@ -38,6 +38,35 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a named token
+    Given the current account is "test1"
+    And the current account has 4 "webhook-endpoints"
+    And I am an admin of account "test1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Client Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "201"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Client Token" }
+      """
+    And sidekiq should have 4 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin generates a new token with custom permissions
     Given the current account is "test1"
     And the current account has 4 "webhook-endpoints"

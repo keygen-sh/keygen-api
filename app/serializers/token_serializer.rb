@@ -8,6 +8,7 @@ class TokenSerializer < BaseSerializer
     @object.raw
   end
   attribute :expiry
+  attribute :name
   attribute :max_activations, if: -> { @object.activation_token? }
   attribute :activations, if: -> { @object.activation_token? }
   attribute :max_deactivations, if: -> { @object.activation_token? }

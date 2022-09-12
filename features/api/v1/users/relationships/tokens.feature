@@ -65,6 +65,33 @@ Feature: User tokens relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
+  Scenario: Admin generates a named user token
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "user"
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "tokens",
+          "attributes": {
+            "name": "Client Token"
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "token" with a token
+    And the JSON response should be a "token" with the following attributes:
+      """
+      { "name": "Client Token" }
+      """
+    And sidekiq should have 1 "webhook" job
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
   Scenario: Admin generates a user token with a custom expiry (present)
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
