@@ -93,21 +93,47 @@ Feature: Policy licenses relationship
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve the licenses for their policy
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses"
+    Then the response status should be "403"
+
+  Scenario: License attempts to retrieve the licenses for a policy
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 1 "license"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve the licenses for their policy
+    Given the current account is "test1"
+    And the current account has 1 "policy"
+    And the current account has 3 "licenses" for the last "policy"
+    And the current account has 1 "user"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/policies/$0/licenses"
     Then the response status should be "403"
 
   Scenario: User attempts to retrieve the licenses for a policy
     Given the current account is "test1"
     And the current account has 1 "policy"
-    And the current account has 3 "licenses"
-    And all "licenses" have the following attributes:
-      """
-      { "policyId": "$policies[0]" }
-      """
+    And the current account has 3 "licenses" for the last "policy"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/policies/$0/licenses"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Admin attempts to retrieve the licenses for a policy of another account
     Given I am an admin of account "test2"

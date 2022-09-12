@@ -106,6 +106,7 @@ class Permission < ApplicationRecord
     policy.entitlements.attach
     policy.entitlements.detach
     policy.entitlements.read
+    policy.licenses.read
     policy.pool.read
     policy.pool.pop
     policy.read
@@ -231,6 +232,7 @@ class Permission < ApplicationRecord
     metric.read
 
     policy.entitlements.read
+    policy.licenses.read
     policy.read
 
     process.read
@@ -353,6 +355,7 @@ class Permission < ApplicationRecord
     policy.entitlements.attach
     policy.entitlements.detach
     policy.entitlements.read
+    policy.licenses.read
     policy.pool.read
     policy.pool.pop
     policy.read
