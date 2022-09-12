@@ -5,7 +5,7 @@ module Api::V1::Processes::Actions
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_process
+    before_action :set_machine_process
 
     authorize :machine_process
 
@@ -46,10 +46,10 @@ module Api::V1::Processes::Actions
 
     attr_reader :machine_process
 
-    def set_process
-      scoped_processes = authorized_scope(current_account.machine_processes)
+    def set_machine_process
+      scoped_machine_processes = authorized_scope(current_account.machine_processes)
 
-      @machine_process = scoped_processes.find(params[:id])
+      @machine_process = scoped_machine_processes.find(params[:id])
 
       Current.resource = machine_process
     end
