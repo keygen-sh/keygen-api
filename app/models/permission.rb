@@ -127,6 +127,10 @@ class Permission < ApplicationRecord
     product.arches.read
     product.channels.read
     product.platforms.read
+    product.policies.read
+    product.licenses.read
+    product.users.read
+    product.machines.read
     product.create
     product.delete
     product.read
@@ -247,6 +251,10 @@ class Permission < ApplicationRecord
     product.arches.read
     product.channels.read
     product.platforms.read
+    product.policies.read
+    product.licenses.read
+    product.users.read
+    product.machines.read
     product.read
     product.tokens.read
 
@@ -381,6 +389,10 @@ class Permission < ApplicationRecord
     product.arches.read
     product.channels.read
     product.platforms.read
+    product.policies.read
+    product.licenses.read
+    product.users.read
+    product.machines.read
     product.read
     product.update
     product.tokens.read

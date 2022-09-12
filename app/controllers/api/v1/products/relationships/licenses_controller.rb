@@ -11,29 +11,34 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
-    # GET /products/1/licenses
-    def index
-      @licenses = apply_pagination(policy_scope(apply_scopes(@product.licenses)).preload(:role, :user, :policy))
-      authorize @licenses
+    authorize :product
 
-      render jsonapi: @licenses
+    def index
+      licenses = apply_pagination(authorized_scope(apply_scopes(product.licenses)).preload(:role, :user, :policy))
+      authorize! licenses,
+        with: Products::LicensePolicy
+
+      render jsonapi: licenses
     end
 
-    # GET /products/1/licenses/1
     def show
-      @license = FindByAliasService.call(scope: @product.licenses, identifier: params[:id], aliases: :key)
-      authorize @license
+      license = FindByAliasService.call(scope: product.licenses, identifier: params[:id], aliases: :key)
+      authorize! license,
+        with: Products::LicensePolicy
 
-      render jsonapi: @license
+      render jsonapi: license
     end
 
     private
 
-    def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize @product, :show?
+    attr_reader :product
 
-      Current.resource = @product
+    def set_product
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
+
+      Current.resource = product
     end
   end
 end

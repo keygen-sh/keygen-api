@@ -11,29 +11,34 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
-    # GET /products/1/machines
-    def index
-      @machines = apply_pagination(policy_scope(apply_scopes(@product.machines)).preload(:product, :policy))
-      authorize @machines
+    authorize :product
 
-      render jsonapi: @machines
+    def index
+      machines = apply_pagination(authorized_scope(apply_scopes(product.machines)).preload(:product, :policy))
+      authorize! machines,
+        with: Products::MachinePolicy
+
+      render jsonapi: machines
     end
 
-    # GET /products/1/machines/1
     def show
-      @machine = FindByAliasService.call(scope: @product.machines, identifier: params[:id], aliases: :fingerprint)
-      authorize @machine
+      machine = FindByAliasService.call(scope: product.machines, identifier: params[:id], aliases: :fingerprint)
+      authorize! machine,
+        with: Products::MachinePolicy
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
     private
 
-    def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize @product, :show?
+    attr_reader :product
 
-      Current.resource = @product
+    def set_product
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
+
+      Current.resource = product
     end
   end
 end

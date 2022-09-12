@@ -120,6 +120,10 @@ permissions = %w[
   product.arches.read
   product.channels.read
   product.platforms.read
+  product.policies.read
+  product.licenses.read
+  product.users.read
+  product.machines.read
   product.create
   product.delete
   product.read

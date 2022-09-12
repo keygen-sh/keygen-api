@@ -9,29 +9,34 @@ module Api::V1::Products::Relationships
     before_action :authenticate_with_token!
     before_action :set_product
 
-    # GET /products/1/users
-    def index
-      @users = apply_pagination(policy_scope(apply_scopes(@product.users)).preload(:role))
-      authorize @users
+    authorize :product
 
-      render jsonapi: @users
+    def index
+      users = apply_pagination(authorized_scope(apply_scopes(product.users)).preload(:role))
+      authorize! users,
+        with: Products::UserPolicy
+
+      render jsonapi: users
     end
 
-    # GET /products/1/users/1
     def show
-      @user = FindByAliasService.call(scope: @product.users, identifier: params[:id], aliases: :email)
-      authorize @user
+      user = FindByAliasService.call(scope: product.users, identifier: params[:id], aliases: :email)
+      authorize! user,
+        with: Products::UserPolicy
 
-      render jsonapi: @user
+      render jsonapi: user
     end
 
     private
 
-    def set_product
-      @product = current_account.products.find params[:product_id]
-      authorize @product, :show?
+    attr_reader :product
 
-      Current.resource = @product
+    def set_product
+      scoped_products = authorized_scope(current_account.products)
+
+      @product = scoped_products.find(params[:product_id])
+
+      Current.resource = product
     end
   end
 end
