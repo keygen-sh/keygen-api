@@ -2,57 +2,57 @@
 
 module Api::V1
   class AccountsController < Api::V1::BaseController
-    before_action :scope_to_current_account!, only: [:show, :update, :destroy]
-    before_action :authenticate_with_token!, only: [:show, :update, :destroy]
-    before_action :set_account, only: [:show, :update, :destroy]
+    before_action :scope_to_current_account!, only: %i[show update destroy]
+    before_action :authenticate_with_token!, only: %i[show update destroy]
+    before_action :set_account, only: %i[show update destroy]
 
-    # GET /accounts/1
     def show
-      authorize @account
+      authorize! account
 
-      render jsonapi: @account
+      render jsonapi: account
     end
 
-    # POST /accounts
     def create
-      @account = Account.new account_params.merge(referral_id: account_meta[:referral])
-      authorize @account
+      account = Account.new account_params.merge(referral_id: account_meta[:referral])
+      authorize! account
 
-      if @account.save
-        render jsonapi: @account, status: :created, location: v1_account_url(@account)
+      if account.save
+        render jsonapi: account, status: :created, location: v1_account_url(account)
       else
-        render_unprocessable_resource @account
+        render_unprocessable_resource account
       end
     end
 
-    # PATCH/PUT /accounts/1
     def update
-      authorize @account
+      authorize! account
 
-      if @account.update(account_params)
+      if account.update(account_params)
         BroadcastEventService.call(
-          event: "account.updated",
-          account: @account,
-          resource: @account
+          event: 'account.updated',
+          account: account,
+          resource: account,
         )
 
-        render jsonapi: @account
+        render jsonapi: account
       else
-        render_unprocessable_resource @account
+        render_unprocessable_resource account
       end
     end
 
-    # DELETE /accounts/1
     def destroy
-      authorize @account
+      authorize! account
 
-      @account.destroy_async
+      account.destroy_async
     end
 
     private
 
+    attr_reader :account
+
     def set_account
-      @account = @current_account
+      @account = current_account
+
+      Resource.current = account
     end
 
     typed_parameters format: :jsonapi do

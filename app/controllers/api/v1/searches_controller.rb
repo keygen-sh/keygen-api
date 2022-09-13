@@ -22,7 +22,6 @@ module Api::V1
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
 
-    # POST /search
     def search
       query, type = search_meta.fetch_values('query', 'type')
       op          = search_meta.fetch('op') { :AND }.to_sym
@@ -43,7 +42,8 @@ module Api::V1
       raise UnsupportedSearchTypeError unless
         current_account.associated_to?(type.underscore.pluralize)
 
-      authorize model
+      authorize! model,
+        with: SearchPolicy
 
       res = model.where(account: current_account)
 
@@ -114,7 +114,8 @@ module Api::V1
       end
 
       search_results = apply_pagination(authorized_scope(apply_scopes(res)))
-      authorize! search_results, to: :index?
+      authorize! search_results,
+        to: :index?
 
       render jsonapi: search_results
     rescue UnsupportedSearchTypeError

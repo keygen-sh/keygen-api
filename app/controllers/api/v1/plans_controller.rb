@@ -2,11 +2,10 @@
 
 module Api::V1
   class PlansController < Api::V1::BaseController
-    before_action :set_plan, only: [:show]
+    before_action :set_plan, only: %i[show]
 
-    # GET /plans
     def index
-      authorize Plan
+      authorize! with: PlanPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.hour, race_condition_ttl: 1.minute) do
         plans = apply_pagination(apply_scopes(Plan.visible).reorder('price ASC NULLS FIRST'))
@@ -18,17 +17,21 @@ module Api::V1
       render json: json
     end
 
-    # GET /plans/1
     def show
-      authorize @plan
+      authorize! plan,
+        with: PlanPolicy
 
-      render jsonapi: @plan
+      render jsonapi: plan
     end
 
     private
 
+    attr_reader :plan
+
     def set_plan
       @plan = Plan.find params[:id]
+
+      Current.resource = plan
     end
 
     def cache_key
