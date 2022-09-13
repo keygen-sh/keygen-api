@@ -151,11 +151,6 @@ permissions = %w[
 
   request-log.read
 
-  second-factor.create
-  second-factor.delete
-  second-factor.read
-  second-factor.update
-
   token.generate
   token.regenerate
   token.read
@@ -164,7 +159,15 @@ permissions = %w[
   user.ban
   user.create
   user.delete
+  user.second-factors.create
+  user.second-factors.delete
+  user.second-factors.update
+  user.second-factors.read
+  user.licenses.read
+  user.machines.read
+  user.product.read
   user.group.update
+  user.group.read
   user.invite
   user.password.update
   user.password.reset

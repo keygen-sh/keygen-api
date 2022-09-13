@@ -159,11 +159,6 @@ class Permission < ApplicationRecord
 
     request-log.read
 
-    second-factor.create
-    second-factor.delete
-    second-factor.read
-    second-factor.update
-
     token.generate
     token.regenerate
     token.read
@@ -172,7 +167,15 @@ class Permission < ApplicationRecord
     user.ban
     user.create
     user.delete
+    user.second-factors.create
+    user.second-factors.delete
+    user.second-factors.update
+    user.second-factors.read
+    user.licenses.read
+    user.machines.read
+    user.product.read
     user.group.update
+    user.group.read
     user.invite
     user.password.update
     user.password.reset
@@ -274,14 +277,14 @@ class Permission < ApplicationRecord
 
     request-log.read
 
-    second-factor.create
-    second-factor.delete
-    second-factor.read
-    second-factor.update
-
     token.generate
     token.read
 
+    user.second-factors.read
+    user.licenses.read
+    user.machines.read
+    user.product.read
+    user.group.read
     user.password.update
     user.password.reset
     user.read
@@ -429,7 +432,11 @@ class Permission < ApplicationRecord
 
     user.ban
     user.create
+    user.licenses.read
+    user.machines.read
+    user.product.read
     user.group.update
+    user.group.read
     user.read
     user.tokens.generate
     user.tokens.read
@@ -516,16 +523,19 @@ class Permission < ApplicationRecord
     release.download
     release.upgrade
 
-    second-factor.create
-    second-factor.delete
-    second-factor.read
-    second-factor.update
-
     token.generate
     token.regenerate
     token.revoke
     token.read
 
+    user.second-factors.create
+    user.second-factors.delete
+    user.second-factors.update
+    user.second-factors.read
+    user.licenses.read
+    user.machines.read
+    user.product.read
+    user.group.read
     user.password.update
     user.password.reset
     user.read

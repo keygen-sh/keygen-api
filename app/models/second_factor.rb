@@ -16,11 +16,11 @@ class SecondFactor < ApplicationRecord
   validates :user,
     scope: { by: :account_id }
 
-  scope :enabled, -> { where(enabled: true) }
+  scope :enabled,  -> { where(enabled: true) }
   scope :disabled, -> { where(enabled: false) }
 
-  scope :for_product, -> (id) { joins(user: { licenses: :policy }).where policies: { product_id: id } }
-  scope :for_user, -> (id) { where user: id }
+  scope :for_product, -> id { joins(user: { licenses: :policy }).where policies: { product_id: id } }
+  scope :for_user,    -> id { where user: { id: } }
 
   def uri
     return nil if enabled?
