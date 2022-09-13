@@ -1,31 +1,27 @@
 # frozen_string_literal: true
 
 class RequestLogPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      request-log.read
-    ]
+    verify_permissions!('request-log.read')
 
-    bearer.has_role?(:admin, :developer, :read_only)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      request-log.read
-    ]
+    verify_permissions!('request-log.read')
 
-    bearer.has_role?(:admin, :developer, :read_only)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 
-  def count?
-    assert_account_scoped!
-    assert_permissions! %w[
-      request-log.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only)
-  end
+  def count? = allow? :show
 end

@@ -6,7 +6,7 @@ module Api::V1::RequestLogs::Actions
     before_action :authenticate_with_token!
 
     def count
-      authorize RequestLog
+      authorize! with: RequestLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 10.minutes, race_condition_ttl: 1.minute) do
         conn       = ActiveRecord::Base.connection
