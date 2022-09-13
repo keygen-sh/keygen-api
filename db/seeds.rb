@@ -166,7 +166,7 @@ permissions = %w[
   user.machines.read
   user.password.reset
   user.password.update
-  user.product.read
+  user.products.read
   user.read
   user.second-factors.create
   user.second-factors.delete

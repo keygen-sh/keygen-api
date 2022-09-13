@@ -173,7 +173,7 @@ class Permission < ApplicationRecord
     user.machines.read
     user.password.reset
     user.password.update
-    user.product.read
+    user.products.read
     user.read
     user.second-factors.create
     user.second-factors.delete
@@ -284,7 +284,7 @@ class Permission < ApplicationRecord
     user.machines.read
     user.password.reset
     user.password.update
-    user.product.read
+    user.products.read
     user.read
     user.second-factors.read
     user.tokens.read
@@ -434,7 +434,7 @@ class Permission < ApplicationRecord
     user.group.update
     user.licenses.read
     user.machines.read
-    user.product.read
+    user.products.read
     user.read
     user.tokens.generate
     user.tokens.read
@@ -536,7 +536,7 @@ class Permission < ApplicationRecord
     user.machines.read
     user.password.reset
     user.password.update
-    user.product.read
+    user.products.read
     user.read
     user.second-factors.create
     user.second-factors.delete
