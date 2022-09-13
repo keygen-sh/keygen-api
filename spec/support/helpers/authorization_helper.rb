@@ -222,6 +222,42 @@ module AuthorizationHelper
       let(:record) { request_log }
     end
 
+    def accessing_webhook_endpoints(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:webhook_endpoints) { create_list(:webhook_endpoint, 3, account:) }
+      end
+
+      let(:record) { webhook_endpoints }
+    end
+
+    def accessing_a_webhook_endpoint(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:webhook_endpoint) { create(:webhook_endpoint, account:) }
+      end
+
+      let(:record) { webhook_endpoint }
+    end
+
+    def accessing_webhook_events(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:webhook_events) { create_list(:webhook_event, 3, account:) }
+      end
+
+      let(:record) { webhook_events }
+    end
+
+    def accessing_a_webhook_event(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:webhook_event) { create(:webhook_event, account:) }
+      end
+
+      let(:record) { webhook_event }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]

@@ -50,3 +50,27 @@ Feature: Show webhook endpoint
     When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
     Then the response status should be "401"
     And the JSON response should be an array of 1 error
+
+  Scenario: License retrieves a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
+    Then the response status should be "404"
+
+  Scenario: User retrieves a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
+    Then the response status should be "404"
+
+  Scenario: Anonymous retrieves a webhook endpoint for an account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    When I send a GET request to "/accounts/test1/webhook-endpoints/$0"
+    Then the response status should be "401"
