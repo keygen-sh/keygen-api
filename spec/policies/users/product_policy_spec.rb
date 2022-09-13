@@ -6,7 +6,7 @@ require 'spec_helper'
 describe Users::ProductPolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:, user:) }
 
-  with_role_authorization :admin accessing_its_product
+  with_role_authorization :admin do
     with_scenarios %i[accessing_a_user accessing_its_products] do
       with_token_authentication do
         with_permissions %w[user.products.read] do
@@ -124,13 +124,11 @@ describe Users::ProductPolicy, type: :policy do
     with_scenarios %i[accessing_a_user accessing_its_products] do
       with_token_authentication do
         with_permissions %w[user.products.read] do
-          without_token_permissions { denies :index }
-
-          allows :index
+          denies :index
         end
 
-        with_wildcard_permissions { allows :index }
-        with_default_permissions  { allows :index }
+        with_wildcard_permissions { denies :index }
+        with_default_permissions  { denies :index }
         without_permissions       { denies :index }
       end
     end
@@ -138,8 +136,6 @@ describe Users::ProductPolicy, type: :policy do
     with_scenarios %i[accessing_a_user accessing_its_product] do
       with_token_authentication do
         with_permissions %w[user.products.read] do
-          without_token_permissions { denies :show }
-
           denies :show
         end
 
@@ -219,38 +215,40 @@ describe Users::ProductPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[accessing_itself accessing_its_products] do
-      with_token_authentication do
-        with_permissions %w[user.products.read] do
-          without_token_permissions { denies :index }
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_itself accessing_its_products] do
+        with_token_authentication do
+          with_permissions %w[user.products.read] do
+            without_token_permissions { denies :index }
 
-          allows :index
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
         end
-
-        with_wildcard_permissions { allows :index }
-        with_default_permissions  { allows :index }
-        without_permissions       { denies :index }
       end
-    end
 
-    with_scenarios %i[accessing_itself accessing_its_product] do
-      with_token_authentication do
-        with_permissions %w[user.products.read] do
-          without_token_permissions { denies :show }
+      with_scenarios %i[accessing_itself accessing_its_product] do
+        with_token_authentication do
+          with_permissions %w[user.products.read] do
+            without_token_permissions { denies :show }
 
-          allows :show
-        end
+            allows :show
+          end
 
-        with_wildcard_permissions do
-          allows :show
-        end
+          with_wildcard_permissions do
+            allows :show
+          end
 
-        with_default_permissions do
-          denies :show
-        end
+          with_default_permissions do
+            denies :show
+          end
 
-        without_permissions do
-          denies :show
+          without_permissions do
+            denies :show
+          end
         end
       end
     end

@@ -292,6 +292,12 @@ module AuthorizationHelper
         let(:product) { machine.product }
       in [*, :accessing_its_license | :accessing_a_license, *]
         let(:product) { license.product }
+      in [*, :accessing_its_user | :accessing_a_user, *]
+        let(:product) {
+          license = user.licenses.first || create(:license, account: user.account, user:)
+
+          license.product
+        }
       in [:as_license, *]
         let(:product) { bearer.product }
       in [:as_user, :is_licensed, *]
@@ -316,10 +322,18 @@ module AuthorizationHelper
 
     def accessing_its_products(scenarios)
       case scenarios
+      in [*, :accessing_its_user | :accessing_a_user, *]
+        let(:products) {
+          licenses = user.licenses.presence || create_list(:license, 3, account: user.account, user:)
+
+          licenses.collect(&:product)
+        }
       in [:as_license, *]
         let(:products) { [bearer.product] }
-      in [:as_user, *]
+      in [:as_user, :is_licensed, *]
         let(:products) { licenses.collect(&:product) }
+      in [:as_user, *]
+        let(:products) { bearer.licenses.collect(&:product) }
       end
 
       let(:record) { products }
@@ -523,12 +537,14 @@ module AuthorizationHelper
           licenses.collect(&:user)
         }
       in [:as_product, :accessing_a_group, *]
-        policy = create(:policy, account:, product: bearer)
+        let(:users) {
+          policy = create(:policy, account:, product: bearer)
           users  = create_list(:user, 3, account:, group:)
 
           users.each { create(:license, account:, policy:, user: _1) }
 
           users
+        }
       in [*, :accessing_its_group | :accessing_a_group, *]
         let(:users) { create_list(:user, 3, account: group.account, group:) }
       in [:as_product, *]

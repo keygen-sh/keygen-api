@@ -52,6 +52,7 @@ class User < ApplicationRecord
           release.entitlements.read
           release.constraints.read
           release.product.read
+          user.products.read
           account.read
           product.read
           policy.read
