@@ -267,260 +267,44 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_release] do
       with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
+        with_release_traits %i[old] do
+          with_bearer_traits %i[expired restrict_access_expiration_strategy] do
+            allows :show, :upgrade
+          end
+
+          with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+            denies :show, :upgrade
+          end
+
+          with_bearer_traits %i[expired allow_access_expiration_strategy] do
+            allows :show, :upgrade
+          end
         end
 
-        with_permissions %w[release.read] do
-          allows :show
+        with_release_traits %i[with_constraints] do
+          with_bearer_traits %i[with_entitlements] do
+            allows :show, :upgrade
+          end
+
+          denies :show, :upgrade
         end
 
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
+        with_bearer_traits %i[expired restrict_access_expiration_strategy] do
+          denies :show, :upgrade
+        end
+
+        with_bearer_traits %i[expired revoke_access_expiration_strategy] do
+          denies :show, :upgrade
+        end
+
+        with_bearer_traits %i[expired allow_access_expiration_strategy] do
           allows :show, :upgrade
         end
 
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
+        with_bearer_traits %i[expired] do
+          denies :show, :upgrade
         end
 
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          without_token_permissions { denies :upgrade }
-
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          without_token_permissions { denies :show }
-
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[accessing_its_release with_constraints] do
-      with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :show
-        end
-
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_entitled accessing_its_release with_constraints] do
-      with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          without_token_permissions { denies :upgrade }
-
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          without_token_permissions { denies :show }
-
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_expired accessing_its_release] do
-      with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :show
-        end
-
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_expired is_within_access_window accessing_its_release] do
-      with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          without_token_permissions { denies :upgrade }
-
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          without_token_permissions { denies :show }
-
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_expired is_allowed_access accessing_its_release] do
-      with_license_authentication do
         with_permissions %w[release.upgrade release.read] do
           allows :upgrade
         end
@@ -643,176 +427,78 @@ describe ReleasePolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_releases] do
-      with_token_authentication do
-        with_permissions %w[release.read] do
-          allows :index
-        end
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_its_releases] do
+        with_token_authentication do
+          with_permissions %w[release.read] do
+            allows :index
+          end
 
-        with_wildcard_permissions { allows :index }
-        with_default_permissions  { allows :index }
-        without_permissions       { denies :index }
-      end
-    end
-
-    with_scenarios %i[is_licensed accessing_its_release] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
         end
       end
-    end
 
-    with_scenarios %i[is_licensed accessing_its_release with_constraints] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :upgrade
-        end
+      with_scenarios %i[accessing_its_release] do
+        with_token_authentication do
+          with_permissions %w[release.upgrade release.read] do
+            allows :upgrade
+          end
 
-        with_permissions %w[release.read] do
-          denies :show
-        end
+          with_permissions %w[release.read] do
+            allows :show
+          end
 
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
+          with_wildcard_permissions do
+            denies :create, :update, :destroy
+            allows :show, :upgrade
+          end
 
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
+          with_default_permissions do
+            denies :create, :update, :destroy
+            allows :show, :upgrade
+          end
 
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_licensed is_entitled accessing_its_release with_constraints] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          allows :show
-        end
-
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          without_permissions do
+            denies :show, :upgrade, :create, :update, :destroy
+          end
         end
       end
-    end
 
-    with_scenarios %i[is_licensed is_expired accessing_its_release] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :upgrade
-        end
+      with_scenarios %i[accessing_releases] do
+        with_token_authentication do
+          with_permissions %w[release.read] do
+            denies :index
+          end
 
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
         end
       end
-    end
 
-    with_scenarios %i[is_licensed is_expired is_within_access_window accessing_its_release] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          allows :upgrade
-        end
+      with_scenarios %i[accessing_a_release] do
+        with_token_authentication do
+          with_permissions %w[release.upgrade release.read] do
+            denies :upgrade
+          end
 
-        with_permissions %w[release.read] do
-          allows :show
-        end
+          with_permissions %w[release.read] do
+            denies :show
+          end
 
-        with_wildcard_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
+          with_wildcard_permissions do
+            denies :show, :upgrade, :create, :update, :destroy
+          end
 
-        with_default_permissions do
-          denies :create, :update, :destroy
-          allows :show, :upgrade
-        end
+          with_default_permissions do
+            denies :show, :upgrade, :create, :update, :destroy
+          end
 
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-      end
-    end
-
-    with_scenarios %i[is_licensed accessing_releases] do
-      with_token_authentication do
-        with_permissions %w[release.read] do
-          denies :index
-        end
-
-        with_wildcard_permissions { denies :index }
-        with_default_permissions  { denies :index }
-        without_permissions       { denies :index }
-      end
-    end
-
-    with_scenarios %i[is_licensed accessing_a_release] do
-      with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
-          denies :upgrade
-        end
-
-        with_permissions %w[release.read] do
-          denies :show
-        end
-
-        with_wildcard_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        with_default_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
-        end
-
-        without_permissions do
-          denies :show, :upgrade, :create, :update, :destroy
+          without_permissions do
+            denies :show, :upgrade, :create, :update, :destroy
+          end
         end
       end
     end
