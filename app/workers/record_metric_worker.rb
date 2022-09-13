@@ -19,8 +19,14 @@ class RecordMetricWorker
     return if
       account.nil?
 
-    resource = if resource_type.present?
-                 resource_type.classify.constantize.find_by(account_id: account.id, id: resource_id)
+    # Skip metric recording for non-owned models
+    klass = resource_type.classify.constantize
+
+    return unless
+      klass.attribute_method?(:account_id)
+
+    resource = if klass.present?
+                 klass.find_by(account_id: account.id, id: resource_id)
                else
                  nil
                end
