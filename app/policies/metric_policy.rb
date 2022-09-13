@@ -22,4 +22,6 @@ class MetricPolicy < ApplicationPolicy
       deny!
     end
   end
+
+  def count? = allow? :show
 end
