@@ -181,7 +181,30 @@ Feature: Update key
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to update a key for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 3 "keys"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/keys/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "keys",
+          "attributes": {
+            "key": "rNxgJ2niG2eQkiJLWwmvHDimWVpm4L"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -204,7 +227,7 @@ Feature: Update key
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

@@ -75,7 +75,7 @@ module Api::V1
     def set_key
       scoped_keys = authorized_scope(current_account.keys)
 
-      key = scoped_keys.find(params[:id])
+      @key = scoped_keys.find(params[:id])
 
       Current.resource = key
     end
