@@ -7,15 +7,19 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
+    authorize :user
+
     def show
       group = user.group
-      authorize group
+      authorize! group,
+        with: Users::GroupPolicy
 
       render jsonapi: group
     end
 
     def update
-      authorize user, :change_group?
+      authorize! user,
+        with: Users::GroupPolicy
 
       user.update!(group_id: group_params[:id])
 
@@ -33,8 +37,9 @@ module Api::V1::Users::Relationships
     attr_reader :user
 
     def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize user, :show?
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
 
       Current.resource = user
     end

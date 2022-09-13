@@ -129,24 +129,50 @@ Feature: User licenses relationship
     Then the response status should be "200"
     And the JSON response should be an array of 1 "license"
 
+  Scenario: License attempts to retrieve the licenses for another user
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 2 "users"
+    And the current account has 1 "license" for each "user"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$2/licenses"
+    Then the response status should be "404"
+
+  Scenario: License attempts to retrieve their user's licenses
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/licenses"
+    Then the response status should be "403"
+
   Scenario: User attempts to retrieve the licenses for another user
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "policy"
-    And the first "policy" has the following attributes:
-      """
-      { "productId": "$products[0]" }
-      """
+    And the current account has 1 "policy" for the last "product"
     And the current account has 2 "users"
-    And the current account has 1 "license"
-    And the first "license" has the following attributes:
-      """
-      { "userId": "$users[2]", "policyId": "$policies[0]" }
-      """
+    And the current account has 1 "license" for each "user"
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$2/licenses"
-    Then the response status should be "403"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve their licenses
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "user"
+    And the current account has 2 "license" for the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$1/licenses"
+    Then the response status should be "200"
+    And the JSON response should be an array with 2 "licenses"
 
   Scenario: Anonymous attempts to retrieve licenses for a user
     Given the current account is "test1"

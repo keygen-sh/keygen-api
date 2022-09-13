@@ -7,99 +7,104 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
-     # GET /users/1/second-factors
+    authorize :user
+
     def index
-      @second_factors = apply_pagination(policy_scope(apply_scopes(@user.second_factors)))
-      authorize @second_factors
+      second_factors = apply_pagination(authorized_scope(apply_scopes(user.second_factors)))
+      authorize! second_factors,
+        with: Users::SecondFactorPolicy
 
-      render jsonapi: @second_factors
+      render jsonapi: second_factors
     end
 
-    # GET /users/1/second-factors/1
     def show
-      @second_factor = @user.second_factors.find params[:id]
-      authorize @second_factor
+      second_factor = user.second_factors.find(params[:id])
+      authorize! second_factor,
+        with: Users::SecondFactorPolicy
 
-      render jsonapi: @second_factor
+      render jsonapi: second_factor
     end
 
-    # POST /users/1/second-factors
     def create
-      @second_factor = @user.second_factors.new account: current_account
-      authorize @second_factor
+      second_factor = user.second_factors.new(account: current_account)
+      authorize! second_factor,
+        with: Users::SecondFactorPolicy
 
-      if @user.second_factor_enabled?
-        if !@user.verify_second_factor(second_factor_meta[:otp])
+      if user.second_factor_enabled?
+        if !user.verify_second_factor(second_factor_meta[:otp])
           render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
         end
       else
-        if !@user.authenticate(second_factor_meta[:password])
+        if !user.authenticate(second_factor_meta[:password])
           render_unauthorized detail: 'password must be valid', code: 'PASSWORD_INVALID', source: { pointer: '/meta/password' } and return
         end
       end
 
-      if @second_factor.save
+      if second_factor.save
         BroadcastEventService.call(
           event: 'second-factor.created',
           account: current_account,
-          resource: @second_factor
+          resource: second_factor
         )
 
-        render jsonapi: @second_factor, status: :created, location: v1_account_user_second_factor_url(@second_factor.account, @second_factor.user, @second_factor)
+        render jsonapi: second_factor, status: :created, location: v1_account_user_second_factor_url(second_factor.account, second_factor.user, second_factor)
       else
-        render_unprocessable_resource @second_factor
+        render_unprocessable_resource second_factor
       end
     end
 
-    # PATCH/PUT /users/1/second-factors/1
     def update
-      @second_factor = @user.second_factors.find params[:id]
-      authorize @second_factor
+      second_factor = user.second_factors.find(params[:id])
+      authorize! second_factor,
+        with: Users::SecondFactorPolicy
 
       # Verify this particular second factor (which may not be enabled yet)
-      if !@second_factor.verify(second_factor_meta[:otp])
+      if !second_factor.verify(second_factor_meta[:otp])
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
-      if @second_factor.update(second_factor_params)
+      if second_factor.update(second_factor_params)
         BroadcastEventService.call(
-          event: @second_factor.enabled? ? 'second-factor.enabled' : 'second-factor.disabled',
+          event: second_factor.enabled? ? 'second-factor.enabled' : 'second-factor.disabled',
           account: current_account,
-          resource: @second_factor
+          resource: second_factor
         )
 
-        render jsonapi: @second_factor
+        render jsonapi: second_factor
       else
-        render_unprocessable_resource @second_factor
+        render_unprocessable_resource second_factor
       end
     end
 
-    # DELETE /users/1/second-factors/1
     def destroy
-      @second_factor = @user.second_factors.find params[:id]
-      authorize @second_factor
+      second_factor = user.second_factors.find(params[:id])
+      authorize! second_factor,
+        with: Users::SecondFactorPolicy
 
       # Verify user's second factor if currently enabled
-      if @user.second_factor_enabled? && !@user.verify_second_factor(second_factor_meta[:otp])
+      if user.second_factor_enabled? && !user.verify_second_factor(second_factor_meta[:otp])
         render_unauthorized detail: 'second factor must be valid', code: 'OTP_INVALID', source: { pointer: '/meta/otp' } and return
       end
 
       BroadcastEventService.call(
         event: 'second-factor.deleted',
         account: current_account,
-        resource: @second_factor
+        resource: second_factor
       )
 
-      @second_factor.destroy
+      second_factor.destroy
     end
 
     private
 
-    def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize @user, :show?
+    attr_reader :user
 
-      Current.resource = @user
+    def set_user
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
+
+      Current.resource = user
     end
 
     typed_parameters format: :jsonapi do

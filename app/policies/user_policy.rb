@@ -126,45 +126,6 @@ class UserPolicy < ApplicationPolicy
     record == bearer
   end
 
-  def generate_token?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.tokens.generate
-    ]
-
-    user.has_role?(:user) &&
-      bearer.has_role?(:admin, :developer, :product)
-  end
-
-  def list_tokens?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.tokens.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      user == bearer
-  end
-
-  def show_token?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.tokens.read
-    ]
-
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent, :product) ||
-      user == bearer
-  end
-
-  def change_group?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.group.update
-    ]
-
-    bearer.has_role?(:admin, :developer, :sales_agent, :product)
-  end
-
   private
 
   def verify_role!(user)

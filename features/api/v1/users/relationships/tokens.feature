@@ -380,6 +380,30 @@ Feature: User tokens relationship
     When I send a GET request to "/accounts/test1/users/$5/tokens"
     Then the response status should be "200"
 
+  Scenario: License requests tokens for their user
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 1 "license" for each "user"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "403"
+
+  Scenario: License requests tokens for a user
+    Given the current account is "test1"
+    And the current account has 4 "products"
+    And the current account has 1 "token" for each "product"
+    And the current account has 6 "users"
+    And the current account has 1 "token" for each "user"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/users/$0/tokens"
+    Then the response status should be "404"
+
   Scenario: User requests their tokens while authenticated
     Given the current account is "test1"
     And the current account has 4 "products"
@@ -401,7 +425,7 @@ Feature: User tokens relationship
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/tokens"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: Anonymous requests a user's tokens
     Given the current account is "test1"
