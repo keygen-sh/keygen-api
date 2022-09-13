@@ -34,7 +34,7 @@ class ApplicationPolicy
     end
   end
 
-  protected
+  private
 
   def whatami = bearer.role.name.humanize(capitalize: false)
 
@@ -49,7 +49,8 @@ class ApplicationPolicy
     end
   end
 
-  private
+  def authenticated?   = bearer.present?
+  def unauthenticated? = !authenticated?
 
   # Short and easier to remember/use alias.
   def allow?(rule, *args, **kwargs) = allowed_to?(:"#{rule}?", *args, inline_reasons: true, **kwargs)
