@@ -491,7 +491,7 @@ module AuthorizationHelper
         let(:policy)   { create(:policy, account:, product: bearer) }
         let(:user)     { create(:user, account:) }
         let!(:license) { create(:license, account:, policy:, user:) }
-      in [:as_license, :with_user, *]
+      in [:as_license, *]
         let(:user) { bearer.user }
       end
 

@@ -3,12 +3,14 @@
 module Api::V1::Users::Actions
   class PasswordController < Api::V1::BaseController
     before_action :scope_to_current_account!
-    before_action :authenticate_with_token!, only: [:update_password]
-    before_action :set_user, only: [:update_password, :reset_password]
+    before_action :authenticate_with_token!, only: %i[update]
+    before_action :set_user, only: %i[update reset]
 
-    # POST /users/1/update-password
-    def update_password
-      authorize user
+    authorize :user
+
+    def update
+      authorize! user,
+        with: Users::PasswordPolicy
 
       if user.password? && user.authenticate(password_meta[:old_password])
         if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
@@ -19,29 +21,29 @@ module Api::V1::Users::Actions
           render_unprocessable_resource user
         end
       else
-        render_unauthorized detail: "is not valid", source: {
-          pointer: "/meta/oldPassword" }
+        render_unauthorized source: { pointer: '/meta/oldPassword' },
+                            detail: 'is not valid'
       end
     end
 
-    # POST /users/1/reset-password
-    def reset_password
-      authorize user
+    def reset
+      authorize! user,
+        with: Users::PasswordPolicy
 
-      if user.compare_hashed_token(:password_reset_token, password_meta[:password_reset_token])
-        return render_unauthorized(detail: "is expired", source: { pointer: "/meta/passwordResetToken" }) if
-          user.password_reset_sent_at < 24.hours.ago
+      # Raise 404 so that we don't leak user information since we're
+      # not scoping with authorized_scope() for this action.
+      raise Keygen::Error::NotFoundError.new(model: User.name, id: params[:id]) unless
+        user.compare_hashed_token(:password_reset_token, password_meta[:password_reset_token])
 
-        if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
-          user.revoke_tokens!
+      return render_unauthorized(detail: 'is expired', source: { pointer: '/meta/passwordResetToken' }) if
+        user.password_reset_sent_at < 24.hours.ago
 
-          render jsonapi: user
-        else
-          render_unprocessable_resource user
-        end
+      if user.update(password: password_meta[:new_password], password_reset_token: nil, password_reset_sent_at: nil)
+        user.revoke_tokens!
+
+        render jsonapi: user
       else
-        render_unauthorized detail: "is not valid", source: {
-          pointer: "/meta/passwordResetToken" }
+        render_unprocessable_resource user
       end
     end
 
@@ -50,7 +52,17 @@ module Api::V1::Users::Actions
     attr_reader :user
 
     def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id], aliases: :email)
+      # Since our reset tokens are hashed, we can't do a lookup on token. So
+      # first, we need to query the unscoped user, then compare the token.
+      # On invalid token, we'll raise a 404 to prevent user enumeration.
+      scoped_users = case action_name.to_sym
+                     when :update
+                       authorized_scope(current_account.users)
+                     else
+                       current_account.users
+                     end
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id], aliases: :email)
 
       Current.resource = user
     end
@@ -58,14 +70,14 @@ module Api::V1::Users::Actions
     typed_parameters do
       options strict: true
 
-      on :update_password do
+      on :update do
         param :meta, type: :hash do
           param :old_password, type: :string
           param :new_password, type: :string
         end
       end
 
-      on :reset_password do
+      on :reset do
         param :meta, type: :hash do
           param :password_reset_token, type: :string
           param :new_password, type: :string

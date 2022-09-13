@@ -84,7 +84,7 @@ Feature: User ban actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License bans themself
     Given the current account is "test1"
@@ -111,7 +111,7 @@ Feature: User ban actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$2/actions/ban"
     And the response should contain a valid signature header for "test1"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User bans themself
     Given the current account is "test1"
@@ -187,7 +187,7 @@ Feature: User ban actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$1/actions/ban"
     And the response should contain a valid signature header for "test1"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: License unbans themself
     Given the current account is "test1"
@@ -222,7 +222,7 @@ Feature: User ban actions
     And I use an authentication token
     When I send a POST request to "/accounts/test1/users/$2/actions/unban"
     And the response should contain a valid signature header for "test1"
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User unbans themself
     Given the current account is "test1"
