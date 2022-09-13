@@ -33,6 +33,10 @@ FactoryBot.define do
       role { build(:role, :read_only) }
     end
 
+    trait :passwordless do
+      password { nil }
+    end
+
     trait :with_licenses do
       after :create do |user|
         create_list(:license, 3, account: user.account, user:)

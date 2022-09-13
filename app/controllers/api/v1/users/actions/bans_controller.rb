@@ -7,7 +7,7 @@ module Api::V1::Users::Actions
     before_action :set_user
 
     def ban
-      authorize user
+      authorize! user
 
       user.ban!
 
@@ -21,7 +21,7 @@ module Api::V1::Users::Actions
     end
 
     def unban
-      authorize user
+      authorize! user
 
       user.unban!
 
@@ -39,7 +39,9 @@ module Api::V1::Users::Actions
     attr_reader :user
 
     def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:id], aliases: :email)
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:id], aliases: :email)
 
       Current.resource = user
     end

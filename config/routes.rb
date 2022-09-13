@@ -55,7 +55,7 @@ Rails.application.routes.draw do
     get    "tokens/:id", to: "tokens#show", as: :token
     delete "tokens/:id", to: "tokens#revoke"
 
-    post "passwords", to: "passwords#reset_password"
+    post "passwords", to: "passwords#reset"
     get  "profile", to: "profiles#show"
     get  "me", to: "profiles#me"
 
@@ -118,8 +118,8 @@ Rails.application.routes.draw do
       end
       member do
         scope "actions", module: "users/actions" do
-          post "update-password", to: "password#update_password"
-          post "reset-password", to: "password#reset_password"
+          post "update-password", to: "password#update"
+          post "reset-password", to: "password#reset"
           post "ban", to: "bans#ban"
           post "unban", to: "bans#unban"
         end

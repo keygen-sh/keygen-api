@@ -16,6 +16,7 @@ Feature: User password actions
     When I send a POST request to "/accounts/test1/users/$current/actions/update-password"
     Then the response status should not be "403"
 
+  # Update
   Scenario: User updates their password
     Given the current account is "test1"
     And the current account has 1 "user"
@@ -136,7 +137,7 @@ Feature: User password actions
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
 
   Scenario: User of another account attempts to update password for another user
     Given the current account is "test1"
@@ -188,13 +189,50 @@ Feature: User password actions
     And the response should contain a valid signature header for "test1"
     Then the response status should be "403"
 
+  Scenario: License attempts to updates their user's password
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/actions/update-password" with the following:
+      """
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "password2"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "403"
+
+  Scenario: License attempts to updates a user's password
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/users/$1/actions/update-password" with the following:
+      """
+      {
+        "meta": {
+          "oldPassword": "password",
+          "newPassword": "password2"
+        }
+      }
+      """
+    And the response should contain a valid signature header for "test1"
+    Then the response status should be "404"
+
+  # Reset
   Scenario: User resets their password
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 3 "tokens" for the last "user"
     And I am a user of account "test1"
     And I have a password reset token
-    When I send a POST request to "/accounts/test1/users/$current/actions/reset-password" with the following:
+    When I send a POST request to "/accounts/test1/users/$1/actions/reset-password" with the following:
       """
       {
         "meta": {
