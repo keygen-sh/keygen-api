@@ -136,7 +136,7 @@ FactoryBot.define do
 
     trait :with_entitlements do
       after :create do |license|
-        create_list(:license_entitlement, 5, account: license.account, license:)
+        create_list(:license_entitlement, 6, account: license.account, license:)
       end
     end
 

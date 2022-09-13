@@ -10,7 +10,7 @@ FactoryBot.define do
     # constrain a release with 5 entitlements via the :with_constraints
     # trait, and subsequently entitle a license with the same 5
     # entitlements via the :with_entitlements trait.
-    sequence :code, %w[ALPHA BRAVO CHARLIE DELTA ECHO].cycle
+    sequence :code, %w[ALPHA BRAVO CHARLIE DELTA ECHO FOXTROT].cycle
     name { code.humanize }
   end
 end
