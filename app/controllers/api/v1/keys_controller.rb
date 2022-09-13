@@ -8,77 +8,76 @@ module Api::V1
     before_action :scope_to_current_account!
     before_action :require_active_subscription!
     before_action :authenticate_with_token!
-    before_action :set_key, only: [:show, :update, :destroy]
+    before_action :set_key, only: %i[show update destroy]
 
-    # GET /keys
     def index
-      @keys = apply_pagination(policy_scope(apply_scopes(current_account.keys)).preload(:product))
-      authorize @keys
+      keys = apply_pagination(authorized_scope(apply_scopes(current_account.keys)).preload(:product))
+      authorize! keys
 
-      render jsonapi: @keys
+      render jsonapi: keys
     end
 
-    # GET /keys/1
     def show
-      authorize @key
+      authorize! key
 
-      render jsonapi: @key
+      render jsonapi: key
     end
 
-    # POST /keys
     def create
-      @key = current_account.keys.new key_params
-      authorize @key
+      key = current_account.keys.new(key_params)
+      authorize! key
 
-      if @key.save
+      if key.save
         BroadcastEventService.call(
-          event: "key.created",
+          event: 'key.created',
           account: current_account,
-          resource: @key
+          resource: key,
         )
 
-        render jsonapi: @key, status: :created, location: v1_account_key_url(@key.account, @key)
+        render jsonapi: key, status: :created, location: v1_account_key_url(key.account, key)
       else
-        render_unprocessable_resource @key
+        render_unprocessable_resource key
       end
     end
 
-    # PATCH/PUT /keys/1
     def update
-      authorize @key
+      authorize! key
 
-      if @key.update(key_params)
+      if key.update(key_params)
         BroadcastEventService.call(
-          event: "key.updated",
+          event: 'key.updated',
           account: current_account,
-          resource: @key
+          resource: key,
         )
 
-        render jsonapi: @key
+        render jsonapi: key
       else
-        render_unprocessable_resource @key
+        render_unprocessable_resource key
       end
     end
 
-    # DELETE /keys/1
     def destroy
-      authorize @key
+      authorize! key
 
       BroadcastEventService.call(
-        event: "key.deleted",
+        event: 'key.deleted',
         account: current_account,
-        resource: @key
+        resource: key,
       )
 
-      @key.destroy_async
+      key.destroy_async
     end
 
     private
 
-    def set_key
-      @key = current_account.keys.find params[:id]
+    attr_reader :key
 
-      Current.resource = @key
+    def set_key
+      scoped_keys = authorized_scope(current_account.keys)
+
+      key = scoped_keys.find(params[:id])
+
+      Current.resource = key
     end
 
     typed_parameters format: :jsonapi do

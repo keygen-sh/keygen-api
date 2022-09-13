@@ -1198,6 +1198,70 @@ module AuthorizationHelper
       let(:record) { pooled_key }
     end
 
+    def accessing_its_pooled_key(scenarios)
+      case scenarios
+      in [*, :accessing_its_policy | :accessing_a_policy, *]
+        let(:pooled_key) {
+          _policy.update!(use_pool: true)
+
+          create(:key, account: _policy.account, policy: _policy)
+        }
+      in [:as_product, *]
+        let(:policy)     { create(:policy, :pooled, account:, product: bearer) }
+        let(:pooled_key) { create(:key, account:, policy:) }
+      end
+
+      let(:record) { pooled_key }
+    end
+
+    def accessing_its_keys(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:keys) {
+          policy = create(:policy, :pooled, account:, product: bearer)
+
+          create_list(:key, 3, account:, policy:)
+        }
+      end
+
+      let(:record) { keys }
+    end
+
+    def accessing_its_key(scenarios)
+      case scenarios
+      in [:as_product, *]
+        let(:key) {
+          policy = create(:policy, :pooled, account:, product: bearer)
+
+          create(:key, account:, policy:)
+        }
+      end
+
+      let(:record) { key }
+    end
+
+    def accessing_keys(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:keys) { create_list(:key, 3, account: other_account) }
+      else
+        let(:keys) { create_list(:key, 3, account:) }
+      end
+
+      let(:record) { keys }
+    end
+
+    def accessing_a_key(scenarios)
+      case scenarios
+      in [*, :accessing_another_account, *]
+        let(:key) { create(:key, account: other_account) }
+      else
+        let(:key) { create(:key, account:) }
+      end
+
+      let(:record) { key }
+    end
+
     def accessing_channels(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
