@@ -17,12 +17,11 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_request_log, only: [:show]
 
-    # GET /request-logs
     def index
-      authorize RequestLog
+      authorize! with: RequestLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        request_logs = apply_pagination(policy_scope(apply_scopes(current_account.request_logs)).without_blobs)
+        request_logs = apply_pagination(authorized_scope(apply_scopes(current_account.request_logs)).without_blobs)
         data = Keygen::JSONAPI::Renderer.new.render(request_logs)
 
         data.tap do |d|
@@ -33,17 +32,22 @@ module Api::V1
       render json: json
     end
 
-    # GET /request-logs/1
     def show
-      authorize @request_log
+      authorize! with: RequestLogPolicy
 
-      render jsonapi: @request_log
+      render jsonapi: request_log
     end
 
     private
 
+    attr_reader :request_log
+
     def set_request_log
-      @request_log = current_account.request_logs.find params[:id]
+      scoped_request_logs = authorized_scope(current_account.request_logs)
+
+      @request_log = scoped_request_logs.find(params[:id])
+
+      Current.resource = request_log
     end
 
     def cache_key

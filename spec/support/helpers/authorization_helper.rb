@@ -204,6 +204,24 @@ module AuthorizationHelper
       let(:record) { metric }
     end
 
+    def accessing_request_logs(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:request_logs) { create_list(:request_log, 3, account:) }
+      end
+
+      let(:record) { request_logs }
+    end
+
+    def accessing_a_request_log(scenarios)
+      case scenarios
+      in [:as_admin | :as_product | :as_license | :as_user | :as_anonymous, *]
+        let(:request_log) { create(:request_log, account:) }
+      end
+
+      let(:record) { request_log }
+    end
+
     def accessing_a_product(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]

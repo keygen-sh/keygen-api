@@ -3,13 +3,13 @@
 require 'rails_helper'
 require 'spec_helper'
 
-describe MetricPolicy, type: :policy do
+describe RequestLogPolicy, type: :policy do
   subject { described_class.new(record, account:, bearer:, token:) }
 
   with_role_authorization :admin do
-    with_scenarios %i[accessing_metrics] do
+    with_scenarios %i[accessing_request_logs] do
       with_token_authentication do
-        with_permissions %w[metric.read] do
+        with_permissions %w[request-log.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -21,9 +21,9 @@ describe MetricPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_metric] do
+    with_scenarios %i[accessing_a_request_log] do
       with_token_authentication do
-        with_permissions %w[metric.read] do
+        with_permissions %w[request-log.read] do
           without_token_permissions { denies :show, :count }
 
           allows :show, :count
@@ -49,7 +49,7 @@ describe MetricPolicy, type: :policy do
   end
 
   with_role_authorization :product do
-    with_scenarios %i[accessing_metrics] do
+    with_scenarios %i[accessing_request_logs] do
       with_token_authentication do
         with_wildcard_permissions { denies :index }
         with_default_permissions  { denies :index }
@@ -57,7 +57,7 @@ describe MetricPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_metric] do
+    with_scenarios %i[accessing_a_request_log] do
       with_token_authentication do
         with_wildcard_permissions do
           without_token_permissions { denies :show, :count }
@@ -79,7 +79,7 @@ describe MetricPolicy, type: :policy do
   end
 
   with_role_authorization :license do
-    with_scenarios %i[accessing_metrics] do
+    with_scenarios %i[accessing_request_logs] do
       with_license_authentication do
         with_wildcard_permissions { denies :index }
         with_default_permissions  { denies :index }
@@ -93,7 +93,7 @@ describe MetricPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_metric] do
+    with_scenarios %i[accessing_a_request_log] do
       with_license_authentication do
         with_wildcard_permissions do
           denies :show, :count
@@ -125,7 +125,7 @@ describe MetricPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[accessing_metrics] do
+    with_scenarios %i[accessing_request_logs] do
       with_token_authentication do
         with_wildcard_permissions { denies :index }
         with_default_permissions  { denies :index }
@@ -133,7 +133,7 @@ describe MetricPolicy, type: :policy do
       end
     end
 
-    with_scenarios %i[accessing_a_metric] do
+    with_scenarios %i[accessing_a_request_log] do
       with_token_authentication do
         with_wildcard_permissions do
           denies :show, :count
@@ -151,11 +151,11 @@ describe MetricPolicy, type: :policy do
   end
 
   without_authorization do
-    with_scenarios %i[accessing_metrics] do
+    with_scenarios %i[accessing_request_logs] do
       without_authentication { denies :index }
     end
 
-    with_scenarios %i[accessing_a_metric] do
+    with_scenarios %i[accessing_a_request_log] do
       without_authentication { denies :show, :count }
     end
   end

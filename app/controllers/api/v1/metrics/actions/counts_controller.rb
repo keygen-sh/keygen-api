@@ -9,7 +9,7 @@ module Api::V1::Metrics::Actions
     before_action :authenticate_with_token!
 
     def count
-      authorize! to: :show?, with: MetricPolicy
+      authorize! with: MetricPolicy
 
       event_params = params[:metrics]
       event_type_ids = []
