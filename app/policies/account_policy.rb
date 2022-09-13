@@ -1,31 +1,36 @@
 # frozen_string_literal: true
 
 class AccountPolicy < ApplicationPolicy
+  skip_pre_check :verify_authenticated!, only: %i[create?]
+
   def index?
-    false
+    deny!
   end
 
   def show?
-    assert_permissions! %w[
-      account.read
-    ]
+    verify_permissions!('account.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent)
+    record == bearer.account
   end
 
   def create?
-    true
+    deny! unless unauthenticated?
+
+    allow!
   end
 
   def update?
-    assert_permissions! %w[
-      account.update
-    ]
+    verify_permissions!('account.update')
 
-    bearer.has_role?(:admin, :developer)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      record == bearer.account
+    else
+      deny!
+    end
   end
 
   def destroy?
-    false
+    deny!
   end
 end

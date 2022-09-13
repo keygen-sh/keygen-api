@@ -12,13 +12,13 @@ module Api::V1
     before_action :require_active_subscription!
     before_action :require_ent_subscription!
     before_action :authenticate_with_token!
-    before_action :set_event_log, only: [:show]
+    before_action :set_event_log, only: %i[show]
 
     def index
-      authorize EventLog
+      authorize! with: EventLogPolicy
 
       json = Rails.cache.fetch(cache_key, expires_in: 1.minute, race_condition_ttl: 30.seconds) do
-        event_logs = apply_pagination(policy_scope(apply_scopes(current_account.event_logs)).preload(:event_type))
+        event_logs = apply_pagination(authorized_scope(apply_scopes(current_account.event_logs)).preload(:event_type))
         data = Keygen::JSONAPI::Renderer.new.render(event_logs)
 
         data.tap do |d|
@@ -30,15 +30,22 @@ module Api::V1
     end
 
     def show
-      authorize @event_log
+      authorize! event_log,
+        with: EventLogPolicy
 
-      render jsonapi: @event_log
+      render jsonapi: event_log
     end
 
     private
 
+    attr_reader :event_log
+
     def set_event_log
-      @event_log = current_account.event_logs.find params[:id]
+      scoped_logs = authorized_scope(current_account.event_logs)
+
+      @event_log = scoped_logs.find(params[:id])
+
+      Current.resource = event_log
     end
 
     def cache_key

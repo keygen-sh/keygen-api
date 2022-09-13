@@ -1,40 +1,33 @@
 # frozen_string_literal: true
 
 class EventLogPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      event-log.read
-    ]
+    verify_permissions!('event-log.read')
 
-    return false unless
+    deny! unless
       account.ent_tier?
 
-    bearer.has_role?(:admin, :developer, :read_only)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      event-log.read
-    ]
+    verify_permissions!('event-log.read')
 
-    return false unless
+    deny! unless
       account.ent_tier?
 
-    bearer.has_role?(:admin, :developer, :read_only)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' }
+      allow!
+    else
+      deny!
+    end
   end
 
-  def count?
-    assert_account_scoped!
-    assert_permissions! %w[
-      event-log.read
-    ]
-
-    return false unless
-      account.ent_tier?
-
-    bearer.has_role?(:admin, :developer, :read_only)
-  end
+  def count? = allow? :show
 end
