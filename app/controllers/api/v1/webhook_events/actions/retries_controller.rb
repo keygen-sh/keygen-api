@@ -7,21 +7,26 @@ module Api::V1::WebhookEvents::Actions
     before_action :authenticate_with_token!
     before_action :set_event
 
-    # POST /webhook-events/1/retry
     def retry
-      authorize @event
+      authorize! event
 
-      if event = RetryWebhookEventService.call(event: @event)
-        render jsonapi: event, status: :created, location: v1_account_webhook_event_url(event.account, event)
+      if e = RetryWebhookEventService.call(event:)
+        render jsonapi: e, status: :created, location: v1_account_webhook_event_url(e.account, e)
       else
-        render_unprocessable_entity detail: "webhook event failed to retry"
+        render_unprocessable_entity detail: 'webhook event failed to retry'
       end
     end
 
     private
 
+    attr_reader :event
+
     def set_event
-      @event = current_account.webhook_events.find params[:id]
+      scoped_events = authorized_scope(current_account.webhook_events)
+
+      @event = scoped_events.find(params[:id])
+
+      Current.resource = event
     end
   end
 end

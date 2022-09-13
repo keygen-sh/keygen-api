@@ -27,6 +27,17 @@ Feature: Delete webhook endpoint
     And the current account should have 2 "webhook-endpoints"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: License attempts to delete a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/webhook-endpoints/$1"
+    Then the response status should be "404"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhook-endpoints"
+
   Scenario: User attempts to delete a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
@@ -34,11 +45,11 @@ Feature: Delete webhook endpoint
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-endpoints/$1"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "webhook-endpoints"
 
-  Scenario: Anonymous user attempts to delete a webhook endpoint for their account
+  Scenario: Anonymous user attempts to delete a webhook endpoint for an account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     When I send a DELETE request to "/accounts/test1/webhook-endpoints/$1"

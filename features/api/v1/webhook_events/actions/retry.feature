@@ -81,18 +81,32 @@ Feature: Retry webhook events
     And the JSON response should be an array of 1 error
     And the current account should have 3 "webhook-events"
 
+  Scenario: License retries a webhook event for their account
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "webhook-events"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "404"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: User retries a webhook event for their account
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
     And the current account has 1 "webhook-endpoint"
-    And the first "webhook-endpoint" has the following attributes:
-      """
-      { "url": "https://example.com/webhooks" }
-      """
     And the current account has 3 "webhook-events"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "webhook-events"
+
+  Scenario: Anonymous retries a webhook event for an account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-events"
+    When I send a POST request to "/accounts/test1/webhook-events/$0/actions/retry"
+    Then the response status should be "401"

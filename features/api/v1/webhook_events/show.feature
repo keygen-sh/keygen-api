@@ -61,6 +61,15 @@ Feature: Show webhook event
     Then the response status should be "200"
     And the JSON response should be a "webhook-event"
 
+  Scenario: License retrieves a webhook event for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-events"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/webhook-events/$0"
+    Then the response status should be "404"
+
   Scenario: User retrieves a webhook event for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
@@ -68,4 +77,10 @@ Feature: Show webhook event
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/webhook-events/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
+
+  Scenario: Anonymous retrieves a webhook event for an account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-events"
+    When I send a GET request to "/accounts/test1/webhook-events/$0"
+    Then the response status should be "401"
