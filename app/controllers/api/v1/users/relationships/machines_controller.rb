@@ -11,29 +11,34 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
-    # GET /users/1/machines
-    def index
-      @machines = apply_pagination(policy_scope(apply_scopes(@user.machines)).preload(:product, :policy))
-      authorize @machines
+    authorize :user
 
-      render jsonapi: @machines
+    def index
+      machines = apply_pagination(authorized_scope(apply_scopes(user.machines)).preload(:product, :policy, :license, :user))
+      authorize! machines,
+        with: Users::MachinePolicy
+
+      render jsonapi: machines
     end
 
-    # GET /users/1/machines/1
     def show
-      @machine = FindByAliasService.call(scope: @user.machines, identifier: params[:id], aliases: :fingerprint)
-      authorize @machine
+      machine = FindByAliasService.call(scope: user.machines, identifier: params[:id], aliases: :fingerprint)
+      authorize! machine,
+        with: Users::MachinePolicy
 
-      render jsonapi: @machine
+      render jsonapi: machine
     end
 
     private
 
-    def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize @user, :show?
+    attr_reader :user
 
-      Current.resource = @user
+    def set_user
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
+
+      Current.resource = user
     end
   end
 end

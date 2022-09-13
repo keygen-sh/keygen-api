@@ -7,26 +7,26 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
-    def index
-      authorize user, :list_tokens?
+    authorize :user
 
-      tokens = apply_pagination(policy_scope(apply_scopes(user.tokens)))
-      authorize tokens
+    def index
+      tokens = apply_pagination(authorized_scope(apply_scopes(user.tokens)))
+      authorize! tokens,
+        with: Users::TokenPolicy
 
       render jsonapi: tokens
     end
 
     def show
-      authorize user, :show_token?
-
       token = user.tokens.find params[:id]
-      authorize token
+      authorize! token,
+        with: Users::TokenPolicy
 
       render jsonapi: token
     end
 
     def create
-      authorize user, :generate_token?
+      authorize! with: Users::TokenPolicy
 
       kwargs = token_params.to_h.symbolize_keys.slice(
         :permissions,
@@ -59,8 +59,9 @@ module Api::V1::Users::Relationships
     attr_reader :user
 
     def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize user, :show?
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
 
       Current.resource = user
     end

@@ -11,29 +11,34 @@ module Api::V1::Users::Relationships
     before_action :authenticate_with_token!
     before_action :set_user
 
-    # GET /users/1/licenses
-    def index
-      @licenses = apply_pagination(policy_scope(apply_scopes(@user.licenses)).preload(:role, :policy, :user))
-      authorize @licenses
+    authorize :user
 
-      render jsonapi: @licenses
+    def index
+      licenses = apply_pagination(authorized_scope(apply_scopes(user.licenses)).preload(:role, :user, :policy, :product))
+      authorize! licenses,
+        with: Users::LicensePolicy
+
+      render jsonapi: licenses
     end
 
-    # GET /users/1/licenses/1
     def show
-      @license = FindByAliasService.call(scope: @user.licenses, identifier: params[:id], aliases: :key)
-      authorize @license
+      license = FindByAliasService.call(scope: user.licenses, identifier: params[:id], aliases: :key)
+      authorize! license,
+        with: Users::LicensePolicy
 
-      render jsonapi: @license
+      render jsonapi: license
     end
 
     private
 
-    def set_user
-      @user = FindByAliasService.call(scope: current_account.users, identifier: params[:user_id], aliases: :email)
-      authorize @user, :show?
+    attr_reader :user
 
-      Current.resource = @user
+    def set_user
+      scoped_users = authorized_scope(current_account.users)
+
+      @user = FindByAliasService.call(scope: scoped_users, identifier: params[:user_id], aliases: :email)
+
+      Current.resource = user
     end
   end
 end
