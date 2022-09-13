@@ -428,6 +428,24 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "422"
 
+  Scenario: License attempts to create a webhook endpoint
+    Given the current account is "test1"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+
   Scenario: User attempts to create a webhook endpoint
     Given the current account is "test1"
     And the current account has 1 "user"
@@ -446,7 +464,7 @@ Feature: Create webhook endpoint
       """
     Then the response status should be "403"
 
-  Scenario: Unauthenticated user attempts to create a webhook endpoint
+  Scenario: Anonymous attempts to create a webhook endpoint
     Given the current account is "test1"
     When I send a POST request to "/accounts/test1/webhook-endpoints" with the following:
       """

@@ -27,6 +27,17 @@ Feature: Delete webhook event
     And the current account should have 2 "webhook-events"
     And the response should contain a valid signature header for "test1"
 
+  Scenario: License attempts to delete a webhook event for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-events"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/webhook-events/$1"
+    Then the response status should be "404"
+    And the JSON response should be an array of 1 error
+    And the current account should have 3 "webhook-events"
+
   Scenario: User attempts to delete a webhook event for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-events"
@@ -34,7 +45,7 @@ Feature: Delete webhook event
     And I am a user of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/webhook-events/$1"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the JSON response should be an array of 1 error
     And the current account should have 3 "webhook-events"
 

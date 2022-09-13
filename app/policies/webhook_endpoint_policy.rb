@@ -1,49 +1,58 @@
 # frozen_string_literal: true
 
 class WebhookEndpointPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-endpoint.read
-    ]
+    verify_permissions!('webhook-endpoint.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-endpoint.read
-    ]
+    verify_permissions!('webhook-endpoint.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-endpoint.create
-    ]
+    verify_permissions!('webhook-endpoint.create')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-endpoint.update
-    ]
+    verify_permissions!('webhook-endpoint.update')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-endpoint.delete
-    ]
+    verify_permissions!('webhook-endpoint.delete')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 end

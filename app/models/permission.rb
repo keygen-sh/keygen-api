@@ -443,6 +443,11 @@ class Permission < ApplicationRecord
     user.unban
     user.update
 
+    webhook-endpoint.create
+    webhook-endpoint.update
+    webhook-endpoint.delete
+    webhook-endpoint.read
+
     webhook-event.read
   ].freeze
 

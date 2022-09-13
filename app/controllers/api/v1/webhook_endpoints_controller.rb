@@ -7,55 +7,57 @@ module Api::V1
     before_action :authenticate_with_token!
     before_action :set_endpoint, only: [:show, :update, :destroy]
 
-    # GET /webhook-endpoints
     def index
-      @endpoints = apply_pagination(policy_scope(apply_scopes(current_account.webhook_endpoints)))
-      authorize @endpoints
+      endpoints = apply_pagination(authorized_scope(apply_scopes(current_account.webhook_endpoints)))
+      authorize! endpoints
 
-      render jsonapi: @endpoints
+      render jsonapi: endpoints
     end
 
-    # GET /webhook-endpoints/1
     def show
-      authorize @endpoint
+      authorize! endpoint
 
-      render jsonapi: @endpoint
+      render jsonapi: endpoint
     end
 
     # POST /webhook-endpoints
     def create
-      @endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, **webhook_endpoint_params)
-      authorize @endpoint
+      endpoint = current_account.webhook_endpoints.new(api_version: current_api_version, **webhook_endpoint_params)
+      authorize! endpoint
 
-      if @endpoint.save
-        render jsonapi: @endpoint, status: :created, location: v1_account_webhook_endpoint_url(@endpoint.account, @endpoint)
+      if endpoint.save
+        render jsonapi: endpoint, status: :created, location: v1_account_webhook_endpoint_url(endpoint.account, endpoint)
       else
-        render_unprocessable_resource @endpoint
+        render_unprocessable_resource endpoint
       end
     end
 
-    # PATCH/PUT /webhook-endpoints/1
     def update
-      authorize @endpoint
+      authorize! endpoint
 
-      if @endpoint.update(webhook_endpoint_params)
-        render jsonapi: @endpoint
+      if endpoint.update(webhook_endpoint_params)
+        render jsonapi: endpoint
       else
-        render_unprocessable_resource @endpoint
+        render_unprocessable_resource endpoint
       end
     end
 
-    # DELETE /webhook-endpoints/1
     def destroy
-      authorize @endpoint
+      authorize! endpoint
 
-      @endpoint.destroy_async
+      endpoint.destroy_async
     end
 
     private
 
+    attr_reader :endpoint
+
     def set_endpoint
-      @endpoint = current_account.webhook_endpoints.find params[:id]
+      scoped_endpoints = authorized_scope(current_account.webhook_endpoints)
+
+      @endpoint = scoped_endpoints.find(params[:id])
+
+      Current.resource = endpoint
     end
 
     typed_parameters format: :jsonapi do

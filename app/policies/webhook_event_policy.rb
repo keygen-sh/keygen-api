@@ -1,40 +1,47 @@
 # frozen_string_literal: true
 
 class WebhookEventPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-event.read
-    ]
+    verify_permissions!('webhook-event.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-event.read
-    ]
+    verify_permissions!('webhook-event.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'product' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-event.delete
-    ]
+    verify_permissions!('webhook-event.delete')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 
   def retry?
-    assert_account_scoped!
-    assert_permissions! %w[
-      webhook-event.retry
-    ]
+    verify_permissions!('webhook-event.retry')
 
-    bearer.has_role?(:admin, :developer, :product)
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    else
+      deny!
+    end
   end
 end

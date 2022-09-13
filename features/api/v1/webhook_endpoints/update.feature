@@ -163,6 +163,25 @@ Feature: Update webhook endpoint
       }
       """
 
+  Scenario: License attempts to update a webhook endpoint for their account
+    Given the current account is "test1"
+    And the current account has 3 "webhook-endpoints"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "webhook-endpoint",
+          "attributes": {
+            "url": "https://example.com"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+
   Scenario: User attempts to update a webhook endpoint for their account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
@@ -180,9 +199,9 @@ Feature: Update webhook endpoint
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
 
-  Scenario: Anonymous user attempts to update a webhook endpoint for their account
+  Scenario: Anonymous user attempts to update a webhook endpoint for an account
     Given the current account is "test1"
     And the current account has 3 "webhook-endpoints"
     When I send a PATCH request to "/accounts/test1/webhook-endpoints/$0" with the following:
