@@ -1,55 +1,68 @@
 # frozen_string_literal: true
 
 class KeyPolicy < ApplicationPolicy
-
   def index?
-    assert_account_scoped!
-    assert_permissions! %w[
-      key.read
-    ]
+    verify_permissions!('key.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      (bearer.has_role?(:product) &&
-        resource.all? { |r| r.product.id == bearer.id })
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.all? { _1.product == bearer }
+      allow!
+    else
+      deny!
+    end
   end
 
   def show?
-    assert_account_scoped!
-    assert_permissions! %w[
-      key.read
-    ]
+    verify_permissions!('key.read')
 
-    bearer.has_role?(:admin, :developer, :read_only, :sales_agent, :support_agent) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' | 'read_only' | 'sales_agent' | 'support_agent' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def create?
-    assert_account_scoped!
-    assert_permissions! %w[
-      key.create
-    ]
+    verify_permissions!('key.create')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def update?
-    assert_account_scoped!
-    assert_permissions! %w[
-      key.update
-    ]
+    verify_permissions!('key.update')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 
   def destroy?
-    assert_account_scoped!
-    assert_permissions! %w[
-      key.delete
-    ]
+    verify_permissions!('key.delete')
 
-    bearer.has_role?(:admin, :developer) ||
-      resource.product == bearer
+    case bearer
+    in role: { name: 'admin' | 'developer' }
+      allow!
+    in role: { name: 'product' } if record.product == bearer
+      allow!
+    else
+      deny!
+    end
   end
 end
