@@ -8,13 +8,13 @@ describe BroadcastEventService do
   let(:endpoint) { create(:webhook_endpoint, account: account) }
   let(:resource) { create(:license, account: account) }
 
-  def create_webhook_event!(account, resource)
+  def create_webhook_event!(account, resource, event: 'license.created')
     throw if endpoint.nil?
 
     BroadcastEventService.call(
-      event: 'license.created',
-      account: account,
-      resource: resource
+      account:,
+      resource:,
+      event:,
     )
 
     event = account.webhook_events.last
@@ -27,9 +27,9 @@ describe BroadcastEventService do
 
     BroadcastEventService.call(
       event: 'license.validation.succeeded',
-      account: account,
-      resource: resource,
-      meta: meta
+      account:,
+      resource:,
+      meta:,
     )
 
     event = account.webhook_events.last
@@ -275,7 +275,7 @@ describe BroadcastEventService do
     it 'the account payload should not contain private keys' do
       resource = create(:account)
 
-      event = create_webhook_event!(account, resource)
+      event = create_webhook_event!(account, resource, event: 'test.account.created')
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
       meta = payload.fetch('meta', {})
@@ -290,7 +290,7 @@ describe BroadcastEventService do
     it 'the token payload should not contain one-time secret token' do
       resource = create(:token, account: account)
 
-      event = create_webhook_event!(account, resource)
+      event = create_webhook_event!(account, resource, event: 'token.created')
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
@@ -300,7 +300,7 @@ describe BroadcastEventService do
     it 'the second factor payload should not contain one-time secret uri' do
       resource = create(:second_factor, account: account)
 
-      event = create_webhook_event!(account, resource)
+      event = create_webhook_event!(account, resource, event: 'second-factor.created')
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
@@ -310,7 +310,7 @@ describe BroadcastEventService do
     it 'the user payload should not contain password' do
       resource = create(:user, account: account)
 
-      event = create_webhook_event!(account, resource)
+      event = create_webhook_event!(account, resource, event: 'user.created')
       payload = JSON.parse(event.payload)
       attrs = payload.dig('data', 'attributes')
 
