@@ -113,8 +113,8 @@ module Api::V1
         end
       end
 
-      search_results = apply_pagination(policy_scope(apply_scopes(res)))
-      authorize search_results, :index?
+      search_results = apply_pagination(authorized_scope(apply_scopes(res)))
+      authorize! search_results, to: :index?
 
       render jsonapi: search_results
     rescue UnsupportedSearchTypeError
