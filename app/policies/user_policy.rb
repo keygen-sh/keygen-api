@@ -126,33 +126,6 @@ class UserPolicy < ApplicationPolicy
     record == bearer
   end
 
-  def update_password?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.password.update
-    ]
-
-    return false if
-      user.has_role?(:read_only)
-
-    user == bearer
-  end
-
-  def reset_password?
-    assert_account_scoped!
-    assert_permissions! %w[
-      user.password.reset
-    ]
-
-    return false if
-      user.has_role?(:user) && account.protected? && !user.password?
-
-    return false if
-      user.has_role?(:read_only)
-
-    true
-  end
-
   def generate_token?
     assert_account_scoped!
     assert_permissions! %w[

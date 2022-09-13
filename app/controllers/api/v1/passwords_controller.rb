@@ -5,9 +5,9 @@ module Api::V1
     skip_verify_authorized
 
     before_action :scope_to_current_account!
-    before_action :set_user, only: [:reset_password]
+    before_action :set_user, only: [:reset]
 
-    def reset_password
+    def reset
       return unless
         user.present?
 
@@ -40,7 +40,7 @@ module Api::V1
     typed_parameters do
       options strict: true
 
-      on :reset_password do
+      on :reset do
         param :meta, type: :hash do
           param :deliver, type: :boolean, optional: true
           param :email, type: :string
