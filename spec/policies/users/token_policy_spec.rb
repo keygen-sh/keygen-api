@@ -32,7 +32,7 @@ describe Users::TokenPolicy, type: :policy do
         with_permissions %w[user.tokens.generate] do
           without_token_permissions { denies :create }
 
-          allows :create
+          denies :create
         end
 
         with_wildcard_permissions do
@@ -40,7 +40,8 @@ describe Users::TokenPolicy, type: :policy do
             denies :show, :create
           end
 
-          allows :show, :create
+          denies :create
+          allows :show
         end
 
         with_default_permissions do
@@ -48,7 +49,8 @@ describe Users::TokenPolicy, type: :policy do
             denies :show, :create
           end
 
-          allows :show, :create
+          denies :create
+          allows :show
         end
 
         without_permissions do
