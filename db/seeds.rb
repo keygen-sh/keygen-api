@@ -33,13 +33,13 @@ permissions = %w[
 
   group.create
   group.delete
-  group.read
-  group.update
   group.licenses.read
   group.machines.read
   group.owners.attach
   group.owners.detach
   group.owners.read
+  group.read
+  group.update
   group.users.read
 
   key.create
@@ -73,8 +73,8 @@ permissions = %w[
   license.usage.decrement
   license.usage.increment
   license.usage.reset
-  license.user.update
   license.user.read
+  license.user.update
   license.validate
 
   machine.check-out
@@ -94,15 +94,17 @@ permissions = %w[
 
   metric.read
 
+  platform.read
+
   policy.create
   policy.delete
   policy.entitlements.attach
   policy.entitlements.detach
   policy.entitlements.read
   policy.licenses.read
-  policy.product.read
-  policy.pool.read
   policy.pool.pop
+  policy.pool.read
+  policy.product.read
   policy.read
   policy.update
 
@@ -115,36 +117,34 @@ permissions = %w[
   process.read
   process.update
 
-  product.artifacts.read
-  product.releases.read
   product.arches.read
+  product.artifacts.read
   product.channels.read
-  product.platforms.read
-  product.policies.read
-  product.licenses.read
-  product.users.read
-  product.machines.read
   product.create
   product.delete
+  product.licenses.read
+  product.machines.read
+  product.platforms.read
+  product.policies.read
   product.read
+  product.releases.read
   product.tokens.generate
   product.tokens.read
   product.update
+  product.users.read
 
-  platform.read
-
+  release.artifacts.read
   release.constraints.attach
   release.constraints.detach
   release.constraints.read
-  release.entitlements.read
-  release.artifacts.read
-  release.product.read
   release.create
   release.delete
+  release.download
+  release.entitlements.read
+  release.product.read
   release.publish
   release.read
   release.update
-  release.download
   release.upgrade
   release.upload
   release.yank
@@ -152,26 +152,26 @@ permissions = %w[
   request-log.read
 
   token.generate
-  token.regenerate
   token.read
+  token.regenerate
   token.revoke
 
   user.ban
   user.create
   user.delete
-  user.second-factors.create
-  user.second-factors.delete
-  user.second-factors.update
-  user.second-factors.read
+  user.group.read
+  user.group.update
+  user.invite
   user.licenses.read
   user.machines.read
-  user.product.read
-  user.group.update
-  user.group.read
-  user.invite
-  user.password.update
   user.password.reset
+  user.password.update
+  user.product.read
   user.read
+  user.second-factors.create
+  user.second-factors.delete
+  user.second-factors.read
+  user.second-factors.update
   user.tokens.generate
   user.tokens.read
   user.unban
