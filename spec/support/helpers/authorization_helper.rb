@@ -1013,7 +1013,7 @@ module AuthorizationHelper
         let(:releases)  { licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
       in [:as_user, *]
-        let(:releases)  { beaerr.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
+        let(:releases)  { bearer.licenses.map { create(:release, *release_traits, account:, product: _1.product) } }
         let(:artifacts) { releases.map { create(:release_artifact, account:, release: _1) } }
       end
 
