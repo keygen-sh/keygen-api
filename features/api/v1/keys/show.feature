@@ -63,7 +63,27 @@ Feature: Show key
     And I use an authentication token
     And the current account has 1 "key"
     When I send a GET request to "/accounts/test1/keys/$0"
-    Then the response status should be "403"
+    Then the response status should be "404"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to retrieve a key
+    Given the current account is "test1"
+    And the current account has 1 "key"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/keys/$0"
+    Then the response status should be "404"
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to retrieve a key
+    Given the current account is "test1"
+    And the current account has 1 "key"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/keys/$0"
+    Then the response status should be "404"
     And sidekiq should have 1 "request-log" job
 
   Scenario: Admin attempts to retrieve a key for another account
