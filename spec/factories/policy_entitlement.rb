@@ -2,6 +2,9 @@
 
 FactoryBot.define do
   factory :policy_entitlement do
+    # Prevent duplicates due to cyclic entitlement codes.
+    initialize_with { PolicyEntitlement.find_or_initialize_by(entitlement_id: entitlement&.id, policy_id: policy&.id) }
+
     account { nil }
     entitlement { nil }
     policy { nil }
