@@ -2,6 +2,9 @@
 
 FactoryBot.define do
   factory :license_entitlement do
+    # Prevent duplicates due to cyclic entitlement codes.
+    initialize_with { LicenseEntitlement.find_or_initialize_by(entitlement_id: entitlement&.id, license_id: license&.id) }
+
     account { nil }
     entitlement { nil }
     license { nil }
