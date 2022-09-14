@@ -136,5 +136,11 @@ FactoryBot.define do
     trait :allow_access_expiration_strategy do
       expiration_strategy { 'ALLOW_ACCESS' }
     end
+
+    trait :with_entitlements do
+      after :create do |policy|
+        create_list(:policy_entitlement, 6, account: policy.account, policy:)
+      end
+    end
   end
 end
