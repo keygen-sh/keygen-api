@@ -364,7 +364,103 @@ Feature: Update product
         }
       }
       """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to update the platforms for their product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["Oof"]
+          }
+        }
+      }
+      """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to update the platforms for a product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["Oof"]
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update the platforms for their product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" belongs to the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["Oof"]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update the platforms for a product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/products/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "products",
+          "attributes": {
+            "platforms": ["Oof"]
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

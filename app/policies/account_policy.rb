@@ -3,6 +3,8 @@
 class AccountPolicy < ApplicationPolicy
   skip_pre_check :verify_authenticated!, only: %i[create?]
 
+  authorize :account, allow_nil: true
+
   def index?
     deny!
   end

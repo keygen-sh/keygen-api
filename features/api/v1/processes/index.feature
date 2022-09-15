@@ -386,7 +386,7 @@ Feature: List machine processes
     And I use an authentication token
     When I send a GET request to "/accounts/test1/processes"
     Then the response status should be "200"
-    And the JSON response should be an array with 4 "processes"
+    And the JSON response should be an array with 0 "processes"
 
   Scenario: User attempts to retrieve all processes for their account
     Given the current account is "test1"

@@ -30,8 +30,8 @@ Feature: Release constraints relationship
   Scenario: Product retrieves the constraints for a release
     Given the current account is "test1"
     And the current account has 1 "product"
-    And the current account has 1 "release" for existing "products"
-    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for the last "release"
     And I am a product of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"

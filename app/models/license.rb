@@ -825,11 +825,11 @@ class License < ApplicationRecord
   end
 
   def generate_pooled_key!
-    if item = policy.pop!
-      self.key = item.key
-    else
-      errors.add :policy, :pool_empty, message: "pool is empty"
-    end
+    pooled_key = policy.pop!
+
+    self.key = pooled_key.key
+  rescue Policy::EmptyPoolError
+    errors.add :policy, :pool_empty, message: "pool is empty"
   end
 
   def generate_legacy_encrypted_key!

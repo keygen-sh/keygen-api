@@ -139,7 +139,7 @@ FactoryBot.define do
 
     trait :with_entitlements do
       after :create do |policy|
-        create_list(:policy_entitlement, 6, account: policy.account, policy:)
+        create_list(:policy_entitlement, 10, account: policy.account, policy:)
       end
     end
   end

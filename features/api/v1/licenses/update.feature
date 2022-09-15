@@ -740,13 +740,57 @@ Feature: Update license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the response should contain a valid signature header for "test1"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to update a license for their account
+  Scenario: License attempts to update themself
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "x"
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: License attempts to update another license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "x"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update their license
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 3 "licenses"
@@ -766,6 +810,29 @@ Feature: Update license
       }
       """
     Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to update a license
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 3 "licenses"
+    And the current account has 1 "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/licenses/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "licenses",
+          "attributes": {
+            "key": "x"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
@@ -948,7 +1015,7 @@ Feature: Update license
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product attempts to update a license expiry for another product
+  Scenario: Product attempts to update the expiry of a license for another product
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "product"
@@ -966,7 +1033,7 @@ Feature: Update license
         }
       }
       """
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

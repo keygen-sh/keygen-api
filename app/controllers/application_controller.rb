@@ -430,7 +430,7 @@ class ApplicationController < ActionController::API
              when reasons.any?
                "You do not have permission to complete the request (#{reasons.first})"
              when current_bearer.present?
-               'You do not have permission to complete the request (ensure the token or license is allowed to access this resource)'
+               'You do not have permission to complete the request (ensure the token or license is allowed to access all resources)'
              else
                'You do not have permission to complete the request (ensure a token or license is present and valid)'
              end
