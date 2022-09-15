@@ -10,6 +10,7 @@ describe TypedParameters do
   def request(params = {}, action = :create)
     OpenStruct.new(
       action_name: action,
+      "#{action}": nil,
       params: params,
       request: OpenStruct.new(
         raw_post: JSON.generate(params),
