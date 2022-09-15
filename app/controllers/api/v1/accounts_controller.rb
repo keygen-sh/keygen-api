@@ -52,7 +52,7 @@ module Api::V1
     def set_account
       @account = current_account
 
-      Resource.current = account
+      Current.resource = account
     end
 
     typed_parameters format: :jsonapi do

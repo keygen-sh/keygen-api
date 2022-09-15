@@ -8,7 +8,9 @@ module Users
       verify_permissions!('user.second-factors.read')
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
+      in role: { name: 'admin' }
+        allow!
+      in role: { name: 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
         record.all? { _1.user_id == bearer.id }
       else
         deny!
@@ -19,7 +21,9 @@ module Users
       verify_permissions!('user.second-factors.read')
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
+      in role: { name: 'admin' }
+        allow!
+      in role: { name: 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
         record.user_id == bearer.id
       else
         deny!
@@ -34,7 +38,9 @@ module Users
         bearer.has_role?(:read_only)
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
+      in role: { name: 'admin' }
+        allow!
+      in role: { name: 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
         record.user_id == bearer.id
       else
         deny!
@@ -49,7 +55,9 @@ module Users
         bearer.has_role?(:read_only)
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
+      in role: { name: 'admin' }
+        allow!
+      in role: { name: 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
         record.user_id == bearer.id
       else
         deny!
@@ -64,7 +72,9 @@ module Users
         bearer.has_role?(:read_only)
 
       case bearer
-      in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
+      in role: { name: 'admin' }
+        allow!
+      in role: { name: 'developer' | 'sales_agent' | 'support_agent' | 'read_only' | 'user' }
         record.user_id == bearer.id
       else
         deny!

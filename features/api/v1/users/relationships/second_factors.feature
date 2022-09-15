@@ -148,7 +148,7 @@ Feature: Manage second factors for user
     And I am a user of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/users/$0/second-factors"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

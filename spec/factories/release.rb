@@ -64,7 +64,7 @@ FactoryBot.define do
 
     trait :with_constraints do
       after :create do |release|
-        create_list(:release_entitlement_constraint, 6, account: release.account, release:)
+        create_list(:release_entitlement_constraint, 10, account: release.account, release:)
       end
     end
   end

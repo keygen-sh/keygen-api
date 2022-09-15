@@ -120,7 +120,7 @@ Feature: Delete product
     And I am a product of account "test1"
     And I use an authentication token
     When I send a DELETE request to "/accounts/test1/products/$1"
-    Then the response status should be "403"
+    Then the response status should be "404"
     And the current account should have 3 "products"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
@@ -137,6 +137,16 @@ Feature: Delete product
     When I send a DELETE request to "/accounts/test1/products/$0"
     Then the response status should be "403"
 
+  Scenario: License attempts to delete a product
+    Given the current account is "test1"
+    And the current account has 2 "webhook-endpoints"
+    And the current account has 1 "product"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/products/$0"
+    Then the response status should be "404"
+
   Scenario: User attempts to delete a one of their products
     Given the current account is "test1"
     And the current account has 1 "webhook-endpoint"
@@ -149,6 +159,17 @@ Feature: Delete product
     And the current user has 1 "license"
     When I send a DELETE request to "/accounts/test1/products/$0"
     Then the response status should be "403"
+
+  Scenario: User attempts to delete a product
+    Given the current account is "test1"
+    And the current account has 1 "webhook-endpoint"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And the current account has 1 "license" for the last "user"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a DELETE request to "/accounts/test1/products/$0"
+    Then the response status should be "404"
 
   Scenario: Anonymous attempts to delete a product
     Given the current account is "test1"

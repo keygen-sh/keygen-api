@@ -3986,18 +3986,7 @@ Feature: Create license
         }
       }
       """
-    Then the response status should be "422"
-    And the first error should have the following properties:
-      """
-      {
-        "title": "Unprocessable resource",
-        "detail": "must exist",
-        "code": "POLICY_NOT_FOUND",
-        "source": {
-          "pointer": "/data/relationships/policy"
-        }
-      }
-      """
+    Then the response status should be "403"
     And sidekiq should have 0 "webhook" jobs
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job

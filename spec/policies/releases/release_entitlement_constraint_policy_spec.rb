@@ -29,20 +29,32 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
           allows :show
         end
 
-        with_wildcard_permissions do
-          without_token_permissions { denies :show }
+        with_permissions %w[release.constraints.attach] do
+          without_token_permissions { denies :attach }
 
-          allows :show
+          allows :attach
+        end
+
+        with_permissions %w[release.constraints.detach] do
+          without_token_permissions { denies :detach }
+
+          allows :detach
+        end
+
+        with_wildcard_permissions do
+          without_token_permissions { denies :show, :attach, :detach }
+
+          allows :show, :attach, :detach
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show }
+          without_token_permissions { denies :show, :attach, :detach }
 
-          allows :show
+          allows :show, :attach, :detach
         end
 
         without_permissions do
-          denies :show
+          denies :show, :attach, :detach
         end
       end
     end
@@ -71,20 +83,32 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
           allows :show
         end
 
-        with_wildcard_permissions do
-          without_token_permissions { denies :show }
+        with_permissions %w[release.constraints.attach] do
+          without_token_permissions { denies :attach }
 
-          allows :show
+          allows :attach
+        end
+
+        with_permissions %w[release.constraints.detach] do
+          without_token_permissions { denies :detach }
+
+          allows :detach
+        end
+
+        with_wildcard_permissions do
+          without_token_permissions { denies :show, :attach, :detach }
+
+          allows :show, :attach, :detach
         end
 
         with_default_permissions do
-          without_token_permissions { denies :show }
+          without_token_permissions { denies :show, :attach, :detach }
 
-          allows :show
+          allows :show, :attach, :detach
         end
 
         without_permissions do
-          denies :show
+          denies :show, :attach, :detach
         end
       end
     end
@@ -107,16 +131,24 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
           denies :show
         end
 
+        with_permissions %w[release.constraints.attach] do
+          denies :attach
+        end
+
+        with_permissions %w[release.constraints.detach] do
+          denies :detach
+        end
+
         with_wildcard_permissions do
-          denies :show
+          denies :show, :attach, :detach
         end
 
         with_default_permissions do
-          denies :show
+          denies :show, :attach, :detach
         end
 
         without_permissions do
-          denies :show
+          denies :show, :attach, :detach
         end
       end
     end
@@ -158,9 +190,13 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
           allows :show
         end
 
-        with_wildcard_permissions { allows :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions do
+          denies :attach, :detach
+          allows :show
+        end
+
+        with_default_permissions  { denies :show, :attach, :detach }
+        without_permissions       { denies :show, :attach, :detach }
       end
 
       with_token_authentication do
@@ -171,13 +207,14 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
         end
 
         with_wildcard_permissions do
-          without_token_permissions { denies :show }
+          without_token_permissions { denies :show, :attach, :detach }
 
+          denies :attach, :detach
           allows :show
         end
 
-        with_default_permissions { denies :show }
-        without_permissions      { denies :show }
+        with_default_permissions { denies :show, :attach, :detach }
+        without_permissions      { denies :show, :attach, :detach }
       end
     end
 
@@ -197,15 +234,15 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release accessing_its_constraint] do
       with_license_authentication do
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions { denies :show, :attach, :detach }
+        with_default_permissions  { denies :show, :attach, :detach }
+        without_permissions       { denies :show, :attach, :detach }
       end
 
       with_token_authentication do
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions { denies :show, :attach, :detach }
+        with_default_permissions  { denies :show, :attach, :detach }
+        without_permissions       { denies :show, :attach, :detach }
       end
     end
   end
@@ -234,9 +271,14 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
             allows :show
           end
 
-          with_wildcard_permissions { allows :show }
-          with_default_permissions  { denies :show }
-          without_permissions       { denies :show }
+          with_wildcard_permissions do
+            without_token_permissions { denies :show, :attach, :detach }
+
+            denies :attach, :detach
+            allows :show
+          end
+          with_default_permissions  { denies :show, :attach, :detach }
+          without_permissions       { denies :show, :attach, :detach }
         end
       end
     end
@@ -255,9 +297,9 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release accessing_its_constraint] do
       with_token_authentication do
-        with_wildcard_permissions { denies :show }
-        with_default_permissions  { denies :show }
-        without_permissions       { denies :show }
+        with_wildcard_permissions { denies :show, :attach, :detach }
+        with_default_permissions  { denies :show, :attach, :detach }
+        without_permissions       { denies :show, :attach, :detach }
       end
     end
   end
@@ -268,7 +310,7 @@ describe Releases::ReleaseEntitlementConstraintPolicy, type: :policy do
     end
 
     with_scenarios %i[accessing_a_release accessing_its_constraint] do
-      without_authentication { denies :show }
+      without_authentication { denies :show, :attach, :detach }
     end
   end
 end
