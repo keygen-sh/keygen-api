@@ -37,5 +37,31 @@ module Releases
         deny!
       end
     end
+
+    def attach?
+      verify_permissions!('release.constraints.attach')
+
+      case bearer
+      in role: { name: 'admin' | 'developer' }
+        allow!
+      in role: { name: 'product' } if release.product == bearer
+        allow!
+      else
+        deny!
+      end
+    end
+
+    def detach?
+      verify_permissions!('release.constraints.detach')
+
+      case bearer
+      in role: { name: 'admin' | 'developer' }
+        allow!
+      in role: { name: 'product' } if release.product == bearer
+        allow!
+      else
+        deny!
+      end
+    end
   end
 end

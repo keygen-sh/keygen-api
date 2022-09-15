@@ -69,7 +69,7 @@ Feature: List entitlements
   Scenario: Admin retrieves a paginated list of entitlements
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?page[number]=1&page[size]=5"
     Then the response status should be "200"
@@ -79,10 +79,10 @@ Feature: List entitlements
       {
         "self": "/v1/accounts/test1/entitlements?page[number]=1&page[size]=5",
         "next": "/v1/accounts/test1/entitlements?page[number]=2&page[size]=5",
-        "last": "/v1/accounts/test1/entitlements?page[number]=4&page[size]=5",
+        "last": "/v1/accounts/test1/entitlements?page[number]=2&page[size]=5",
         "meta": {
-          "pages": 4,
-          "count": 20
+          "pages": 2,
+          "count": 10
         }
       }
       """
@@ -90,7 +90,7 @@ Feature: List entitlements
   Scenario: Admin retrieves a paginated list of entitlements with a page size that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?page[number]=1&page[size]=250"
     Then the response status should be "400"
@@ -106,7 +106,7 @@ Feature: List entitlements
   Scenario: Admin retrieves a paginated list of entitlements with an invalid page number
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?page[number]=-1&page[size]=10"
     Then the response status should be "400"
@@ -114,7 +114,7 @@ Feature: List entitlements
   Scenario: Admin retrieves all entitlements without a limit for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements"
     Then the response status should be "200"
@@ -132,16 +132,16 @@ Feature: List entitlements
   Scenario: Admin retrieves all entitlements with a high limit for their account
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
-    When I send a GET request to "/accounts/test1/entitlements?limit=20"
+    When I send a GET request to "/accounts/test1/entitlements?limit=10"
     Then the response status should be "200"
-    And the JSON response should be an array with 20 "entitlements"
+    And the JSON response should be an array with 10 "entitlements"
 
   Scenario: Admin retrieves all entitlements with a limit that is too high
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?limit=900"
     Then the response status should be "400"
@@ -149,7 +149,7 @@ Feature: List entitlements
   Scenario: Admin retrieves all entitlements with a limit that is too low
     Given I am an admin of account "test1"
     And the current account is "test1"
-    And the current account has 20 "entitlements"
+    And the current account has 10 "entitlements"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/entitlements?limit=-10"
     Then the response status should be "400"

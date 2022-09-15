@@ -507,7 +507,7 @@ Feature: Show release
       """
       {
         "title": "Access denied",
-        "detail": "You do not have permission to complete the request (release is outside license expiry window)"
+        "detail": "You do not have permission to complete the request (license expiry falls outside of access window)"
       }
       """
 

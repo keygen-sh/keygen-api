@@ -10,25 +10,23 @@ module Api::V1::Releases::Relationships
     authorize :release
 
     def index
-      authorize! release,
-        with: Releases::EntitlementConstraintPolicy
-
       constraints = apply_pagination(authorized_scope(apply_scopes(release.constraints)))
+      authorize! constraints,
+        with: Releases::ReleaseEntitlementConstraintPolicy
 
       render jsonapi: constraints
     end
 
     def show
-      authorize! release,
-        with: Releases::EntitlementConstraintPolicy
-
       constraint = release.constraints.find(params[:id])
+      authorize! constraint,
+        with: Releases::ReleaseEntitlementConstraintPolicy
 
       render jsonapi: constraint
     end
 
     def attach
-      authorize! with: Releases::EntitlementConstraintPolicy
+      authorize! with: Releases::ReleaseEntitlementConstraintPolicy
 
       constraints_data = constraint_params
         .uniq { |constraint| constraint[:entitlement_id] }
@@ -48,7 +46,7 @@ module Api::V1::Releases::Relationships
     end
 
     def detach
-      authorize! with: Releases::EntitlementConstraintPolicy
+      authorize! with: Releases::ReleaseEntitlementConstraintPolicy
 
       constraint_ids = constraint_params.collect { |e| e[:id] }.compact
       constraints = release.constraints.where(id: constraint_ids)

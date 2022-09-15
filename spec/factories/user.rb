@@ -45,7 +45,7 @@ FactoryBot.define do
 
     trait :with_entitlements do
       after :create do |user|
-        licenses = user.licenses.presence || create_list(:license, 3, account: user.account, user:)
+        licenses = user.licenses.presence || create_list(:license, 5, account: user.account, user:)
 
         licenses.each do |license|
           create_list(:license_entitlement, 2, account: license.account, license:)

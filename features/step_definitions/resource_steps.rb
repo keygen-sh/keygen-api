@@ -497,6 +497,29 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "(
   model.save!(validate: false)
 end
 
+Given /^the (first|last) (\d+) "([^\"]*)" (?:belong to|is in) the (\w+) "([^\"]*)"$/ do |direction, count, model_name, assoc_idx, assoc_name|
+  models =
+    case model_name.singularize
+    when 'process'
+      @account.machine_processes
+    when 'artifact'
+      @account.release_artifacts
+    else
+      @account.send(model_name.pluralize.underscore)
+    end
+
+  models = models.reorder(created_at: direction == 'first' ? :asc : :desc)
+                 .limit(count)
+
+  associated_record = @account.send(assoc_name.pluralize.underscore).send(assoc_idx)
+  association_name  = assoc_name.singularize.underscore.to_sym
+
+  models.each do |model|
+    model.assign_attributes(association_name => associated_record)
+    model.save!(validate: false)
+  end
+end
+
 Given /^all "([^\"]*)" belong to the (\w+) "([^\"]*)"$/ do |model_name, assoc_idx, assoc_name|
   models =
     case model_name.singularize

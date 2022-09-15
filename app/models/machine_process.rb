@@ -90,14 +90,7 @@ class MachineProcess < ApplicationRecord
   scope :for_product, -> product { joins(license: :product).where(products: product) }
   scope :for_license, -> license { joins(:license).where(licenses: license) }
   scope :for_machine, -> machine { where(machine: machine) }
-  scope :for_owner,   -> id { joins(group: :owners).where(group: { group_owners: { user_id: id } }) }
-  scope :for_user,    -> id {
-    joins(:license).where(licenses: { user_id: id })
-      .union(
-        for_owner(id)
-      )
-      .distinct
-  }
+  scope :for_user,    -> id { joins(:license).where(licenses: { user_id: id }) }
 
   scope :alive, -> {
     joins(license: :policy).where(<<~SQL.squish, Time.current, HEARTBEAT_TTL)
