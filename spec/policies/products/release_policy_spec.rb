@@ -147,7 +147,7 @@ describe Products::ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_product accessing_its_release] do
       with_license_authentication do
-        with_release_traits %i[old] do
+        with_release_traits %i[created_last_year] do
           with_bearer_traits %i[expired restrict_access_expiration_strategy] do
             allows :show
           end

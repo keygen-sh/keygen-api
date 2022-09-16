@@ -43,15 +43,19 @@ FactoryBot.define do
       end
     end
 
-    trait :with_entitlements do
+    trait :with_expired_licenses do
       after :create do |user|
-        licenses = user.licenses.presence || create_list(:license, 5, account: user.account, user:)
+        create_list(:license, 3, :expired, account: user.account, user:)
+      end
+    end
+
+    trait :with_entitled_licenses do
+      after :create do |user|
+        licenses = create_list(:license, 3, account: user.account, user:)
 
         licenses.each do |license|
-          create_list(:license_entitlement, 2, account: license.account, license:)
+          create_list(:license_entitlement, 10, account: license.account, license:)
         end
-
-        user.licenses.reload
       end
     end
   end
