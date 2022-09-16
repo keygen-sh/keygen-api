@@ -34,7 +34,7 @@ module AuthorizationHelper
         let(:policy)       { create(:policy, *policy_traits, account:) }
         let(:license_user) { nil }
         let(:expiry)       { nil }
-        let(:bearer)       { create(:license, *bearer_traits, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
+        let(:bearer)       { create(:license, *license_traits, *bearer_traits, account:, policy:, user: license_user, expiry:, permissions: bearer_permissions) }
       end
     end
 
@@ -94,7 +94,7 @@ module AuthorizationHelper
       case scenarios
       in [:as_user, *]
         let(:expiry)   { nil }
-        let(:licenses) { create_list(:license, 2, account:, expiry:, user: bearer) }
+        let(:licenses) { create_list(:license, 3, *license_traits, account:, expiry:, user: bearer) }
       end
     end
 
@@ -281,7 +281,7 @@ module AuthorizationHelper
         let(:product) { license.product }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:product) {
-          license = user.licenses.first || create(:license, account: user.account, user:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           license.product
         }
@@ -311,7 +311,7 @@ module AuthorizationHelper
       case scenarios
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:products) {
-          licenses = user.licenses.presence || create_list(:license, 3, account: user.account, user:)
+          licenses = user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, user:)
 
           licenses.collect(&:product)
         }
@@ -394,7 +394,7 @@ module AuthorizationHelper
         let(:tokens) {
           [
             create(:token, account:, bearer: create(:product, account:)),
-            create(:token, account:, bearer: create(:license, account:)),
+            create(:token, account:, bearer: create(:license, *license_traits, account:)),
             create(:token, account:, bearer: create(:user, account:)),
           ]
         }
@@ -519,7 +519,7 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:users) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
-          licenses = create_list(:license, 3, :with_user, account: policy.account, policy:)
+          licenses = create_list(:license, 3, *license_traits, :with_user, account: policy.account, policy:)
 
           licenses.collect(&:user)
         }
@@ -528,7 +528,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, account:, group:)
 
-          users.each { create(:license, account:, policy:, user: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
           users
         }
@@ -539,7 +539,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           users  = create_list(:user, 3, account:)
 
-          users.each { create(:license, account:, policy:, user: _1) }
+          users.each { create(:license, *license_traits, account:, policy:, user: _1) }
 
           users
         }
@@ -553,7 +553,7 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:user) {
           policy  = create(:policy, *policy_traits, account: product.account, product:)
-          license = create(:license, :with_user, account: policy.account, policy:)
+          license = create(:license, *license_traits, :with_user, account: policy.account, policy:)
 
           license.user
         }
@@ -568,7 +568,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           user   = create(:user, account:, group:)
 
-          create(:license, account:, policy:, user:)
+          create(:license, *license_traits, account:, policy:, user:)
 
           user
         }
@@ -579,7 +579,7 @@ module AuthorizationHelper
           policy = create(:policy, *policy_traits, account:, product: bearer)
           user   = create(:user, account:)
 
-          create(:license, account:, policy:, user:)
+          create(:license, *license_traits, account:, policy:, user:)
 
           user
         }
@@ -739,7 +739,7 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:machines) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
-          license = create(:license, account: policy.account, policy:)
+          license = create(:license, *license_traits, account: policy.account, policy:)
 
           create_list(:machine, 3, account: license.account, license:)
         }
@@ -747,14 +747,14 @@ module AuthorizationHelper
         let(:machines) { create_list(:machine, 3, account: license.account, license:) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:machines) {
-          license = user.licenses.first || create(:license, account: user.account, user:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           create_list(:machine, 3, account: license.account, license:)
         }
       in [:as_product, :accessing_a_group, *]
         let(:machines) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
-          license = create(:license, account:, policy:)
+          license = create(:license, *license_traits, account:, policy:)
 
           create_list(:machine, 3, account:, license:, group:)
         }
@@ -763,7 +763,7 @@ module AuthorizationHelper
       in [:as_product, *]
         let(:machines) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
-          license = create(:license, account:, policy:)
+          license = create(:license, *license_traits, account:, policy:)
 
           create_list(:machine, 3, account:, license:)
         }
@@ -783,7 +783,7 @@ module AuthorizationHelper
       in [*, :accessing_its_product | :accessing_a_product, *]
         let(:machine) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
-          license = create(:license, account: policy.account, policy:)
+          license = create(:license, *license_traits, account: policy.account, policy:)
 
           create(:machine, account: license.account, license:)
         }
@@ -793,14 +793,14 @@ module AuthorizationHelper
         let(:machine) { create(:machine, account: license.account, license:) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:machine) {
-          license = user.licenses.first || create(:license, account: user.account, user:)
+          license = user.licenses.first || create(:license, *license_traits, account: user.account, user:)
 
           create(:machine, account: license.account, license:)
         }
       in [:as_product, :accessing_a_group, *]
         let(:machine) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
-          license = create(:license, account:, policy:)
+          license = create(:license, *license_traits, account:, policy:)
 
           create(:machine, account:, license:, group:)
         }
@@ -809,7 +809,7 @@ module AuthorizationHelper
       in [:as_product, *]
         let(:machine) {
           policy  = create(:policy, *policy_traits, account:, product: bearer)
-          license = create(:license, account:, policy:)
+          license = create(:license, *license_traits, account:, policy:)
 
           create(:machine, account:, license:)
         }
@@ -852,7 +852,7 @@ module AuthorizationHelper
         let(:machine_processes) { create_list(:process, 3, account: machine.account, machine:) }
       in [:as_product, *]
         let(:_policy)            { create(:policy, *policy_traits, account:, product: bearer) }
-        let(:_license)           { create(:license, account:, policy: _policy) }
+        let(:_license)           { create(:license, *license_traits, account:, policy: _policy) }
         let(:_machine)           { create(:machine, account:, license: _license) }
         let(:machine_processes) { create_list(:process, 3, account:, machine: _machine) }
       in [:as_license, *]
@@ -875,7 +875,7 @@ module AuthorizationHelper
         let(:machine_process) { create(:process, account: machine.account, machine:) }
       in [:as_product, *]
         let(:_policy)          { create(:policy, *policy_traits, account:, product: bearer) }
-        let(:_license)         { create(:license, account:, policy: _policy) }
+        let(:_license)         { create(:license, *license_traits, account:, policy: _policy) }
         let(:_machine)         { create(:machine, account:, license: _license) }
         let(:machine_process) { create(:process, account:, machine: _machine) }
       in [:as_license, *]
@@ -1071,9 +1071,9 @@ module AuthorizationHelper
     def accessing_licenses(scenarios)
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:licenses) { create_list(:license, 3, account: other_account) }
+        let(:licenses) { create_list(:license, 3, *license_traits, account: other_account) }
       else
-        let(:licenses) { create_list(:license, 3, account:) }
+        let(:licenses) { create_list(:license, 3, *license_traits, account:) }
       end
 
       let(:record) { licenses }
@@ -1084,9 +1084,9 @@ module AuthorizationHelper
 
       case scenarios
       in [*, :accessing_another_account, *]
-        let(:license) { create(:license, user: license_user, account: other_account) }
+        let(:license) { create(:license, *license_traits, user: license_user, account: other_account) }
       else
-        let(:license) { create(:license, user: license_user, account:) }
+        let(:license) { create(:license, *license_traits, user: license_user, account:) }
       end
 
       let(:record) { license }
@@ -1098,27 +1098,27 @@ module AuthorizationHelper
         let(:licenses) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
 
-          create_list(:license, 3, account: policy.account, policy:)
+          create_list(:license, 3, *license_traits, account: policy.account, policy:)
         }
       in [*, :accessing_its_policy | :accessing_a_policy, *]
-        let(:licenses) { create_list(:license, 3, account: _policy.account, policy: _policy) }
+        let(:licenses) { create_list(:license, 3, *license_traits, account: _policy.account, policy: _policy) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:licenses) {
-          user.licenses.presence || create_list(:license, 3, account: user.account, user:)
+          user.licenses.presence || create_list(:license, 3, *license_traits, account: user.account, user:)
         }
       in [:as_product, :accessing_a_group, *]
         let(:licenses) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
 
-          create_list(:license, 3, account:, policy:, group:)
+          create_list(:license, 3, *license_traits, account:, policy:, group:)
         }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:licenses) { create_list(:license, 3, account: group.account, group:) }
+        let(:licenses) { create_list(:license, 3, *license_traits, account: group.account, group:) }
       in [:as_product, *]
         let(:licenses) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
 
-          create_list(:license, 3, account:, policy:)
+          create_list(:license, 3, *license_traits, account:, policy:)
         }
       in [:as_user, :is_licensed, *]
         # noop
@@ -1135,15 +1135,15 @@ module AuthorizationHelper
         let(:license) {
           policy = create(:policy, *policy_traits, account: product.account, product:)
 
-          create(:license, account: policy.account, policy:)
+          create(:license, *license_traits, account: policy.account, policy:)
         }
       in [*, :accessing_its_machine_process | :accessing_a_machine_process, *]
         let(:license) { machine_process.license }
       in [*, :accessing_its_policy | :accessing_a_policy, *]
-        let(:license) { create(:license, account: _policy.account, policy: _policy) }
+        let(:license) { create(:license, *license_traits, account: _policy.account, policy: _policy) }
       in [*, :accessing_its_user | :accessing_a_user, *]
         let(:license) {
-          user.licenses.first || create(:license, account: user.account, user:)
+          user.licenses.first || create(:license, *license_traits, account: user.account, user:)
         }
       in [*, :accessing_its_machine | :accessing_a_machine, *]
         let(:license) { machine.license }
@@ -1151,15 +1151,15 @@ module AuthorizationHelper
         let(:license) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
 
-          create(:license, account:, policy:, group:)
+          create(:license, *license_traits, account:, policy:, group:)
         }
       in [*, :accessing_its_group | :accessing_a_group, *]
-        let(:license) { create(:license, account: group.account, group:) }
+        let(:license) { create(:license, *license_traits, account: group.account, group:) }
       in [:as_product, *]
         let(:license) {
           policy = create(:policy, *policy_traits, account:, product: bearer)
 
-          create(:license, account:, policy:)
+          create(:license, *license_traits, account:, policy:)
         }
       in [:as_user, :is_licensed, *]
         let(:license) { licenses.first }
@@ -1429,44 +1429,6 @@ module AuthorizationHelper
 
       let(:record) { arch }
     end
-
-    ##
-    # with_* scenarios for mutating the state of and relations for the current :record.
-    # Typically, these will act upon an existing named record, e.g. :license. Also
-    # common for these scenarios to use let!(), since the vars may not be accessed
-    # directly, e.g. such as for :with_entitlements and :with_constrants.
-    def with_entitlements(scenarios)
-      case scenarios
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:entitlements)          { create_list(:entitlement, 6, account: license.account) }
-        let!(:policy_entitlements)  { entitlements[3..].map { create(:policy_entitlement, account: license.account, policy: license.policy, entitlement: _1) } }
-        let!(:license_entitlements) { entitlements[..2].map { create(:license_entitlement, account: license.account, license:, entitlement: _1) } }
-      in [*, :accessing_its_policy | :accessing_a_policy, *]
-        let(:entitlements)          { create_list(:entitlement, 3, account: _policy.account) }
-        let!(:policy_entitlements)  { entitlements.map { create(:policy_entitlement, account: _policy.account, policy: _policy, entitlement: _1) } }
-        let!(:license_entitlements) { [] }
-      end
-    end
-
-    def with_constraints(scenarios)
-      case scenarios
-      in [*, :accessing_its_release | :accessing_a_release, *]
-        let!(:constraints) { entitlements.map { create(:release_entitlement_constraint, account: release.account, entitlement: _1, release:) } }
-      in [*, :accessing_its_release | :accessing_a_release, *]
-        let!(:constraints) { create_list(:release_entitlement_constraint, 3, account: release.account, release:) }
-      end
-    end
-
-    def with_user(scenarios)
-      case scenarios
-      in [*, :accessing_another_account, :accessing_a_license, *]
-        let(:license_user) { create(:user, account: other_account) }
-      in [*, :accessing_its_license | :accessing_a_license, *]
-        let(:license_user) { create(:user, account:) }
-      in [:as_license, *]
-        let(:license_user) { create(:user, account:) }
-      end
-    end
   end
 
   ##
@@ -1485,6 +1447,7 @@ module AuthorizationHelper
         let(:bearer_traits)      { [] }
         let(:release_traits)     { [] }
         let(:policy_traits)      { [] }
+        let(:license_traits)     { [] }
 
         instance_exec(&)
       end
@@ -1500,6 +1463,7 @@ module AuthorizationHelper
         let(:bearer_traits)  { [] }
         let(:release_traits) { [] }
         let(:policy_traits)  { [] }
+        let(:license_traits) { [] }
 
         instance_exec(&)
       end
@@ -1706,6 +1670,16 @@ module AuthorizationHelper
     end
 
     ##
+    # with_license_traits defines traits on the license context.
+    def with_license_traits(traits, &)
+      context "with license #{traits} traits" do
+        let(:license_traits) { traits }
+
+        instance_exec(&)
+      end
+    end
+
+    ##
     # with_account_trait defines a trait on the account context.
     def with_account_trait(trait, &) = with_account_traits(*trait, &)
 
@@ -1720,6 +1694,10 @@ module AuthorizationHelper
     ##
     # with_policy_trait defines a trait on the policy context.
     def with_policy_trait(trait, &) = with_policy_traits(*trait, &)
+
+    ##
+    # with_license_trait defines a trait on the license context.
+    def with_license_trait(trait, &) = with_license_traits(*trait, &)
 
     ##
     # with_account_protection enables account protection.

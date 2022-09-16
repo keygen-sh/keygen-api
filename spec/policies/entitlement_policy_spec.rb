@@ -291,7 +291,7 @@ describe EntitlementPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_bearer_traits %i[with_entitlements] do
+    with_bearer_traits %i[with_entitled_licenses] do
       with_scenarios %i[accessing_its_entitlements] do
         with_token_authentication do
           with_permissions %w[entitlement.read] do

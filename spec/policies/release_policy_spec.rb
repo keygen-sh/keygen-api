@@ -267,7 +267,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_release] do
       with_license_authentication do
-        with_release_traits %i[old] do
+        with_release_traits %i[created_last_year] do
           with_bearer_traits %i[expired restrict_access_expiration_strategy] do
             allows :show, :upgrade
           end
@@ -498,6 +498,28 @@ describe ReleasePolicy, type: :policy do
 
           without_permissions do
             denies :show, :upgrade, :create, :update, :destroy
+          end
+        end
+      end
+    end
+
+    with_scenarios %i[accessing_its_release] do
+      with_token_authentication do
+        with_bearer_trait :with_expired_licenses do
+          with_release_trait :created_last_year do
+            allows :show, :upgrade
+          end
+
+          denies :show, :upgrade
+        end
+
+        with_release_trait :with_constraints do
+          with_bearer_trait :with_entitled_licenses do
+            allows :show, :upgrade
+          end
+
+          with_bearer_trait :with_licenses do
+            denies :show, :upgrade
           end
         end
       end
