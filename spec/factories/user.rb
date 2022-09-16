@@ -58,5 +58,17 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :with_grouped_licenses do
+      after :create do |user|
+        create_list(:license, 3, :with_group, account: user.account, user:)
+      end
+    end
+
+    trait :with_group do
+      after :create do |user|
+        user.update(group: build(:group, account: user.account))
+      end
+    end
   end
 end

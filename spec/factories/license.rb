@@ -145,5 +145,11 @@ FactoryBot.define do
         license.update(user: build(:user, account: license.account))
       end
     end
+
+    trait :with_group do
+      after :create do |license|
+        license.update(group: build(:group, account: license.account))
+      end
+    end
   end
 end
