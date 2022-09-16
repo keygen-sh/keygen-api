@@ -78,7 +78,7 @@ class ApplicationPolicy
   end
 
   def verify_authenticated!
-    deny! 'authentication is required' if bearer.nil?
+    deny! 'authentication is required' if unauthenticated?
   end
 
   def verify_permissions!(*actions)
