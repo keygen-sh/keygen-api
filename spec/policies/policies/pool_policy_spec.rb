@@ -175,19 +175,21 @@ describe Policies::PoolPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_policy accessing_its_pooled_keys] do
-      with_token_authentication do
-        with_wildcard_permissions { denies :index }
-        with_default_permissions  { denies :index }
-        without_permissions       { denies :index }
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_its_policy accessing_its_pooled_keys] do
+        with_token_authentication do
+          with_wildcard_permissions { denies :index }
+          with_default_permissions  { denies :index }
+          without_permissions       { denies :index }
+        end
       end
-    end
 
-    with_scenarios %i[is_licensed accessing_its_policy accessing_its_pooled_key] do
-      with_token_authentication do
-        with_wildcard_permissions { denies :show, :pop }
-        with_default_permissions  { denies :show, :pop }
-        without_permissions       { denies :show, :pop }
+      with_scenarios %i[accessing_its_policy accessing_its_pooled_key] do
+        with_token_authentication do
+          with_wildcard_permissions { denies :show, :pop }
+          with_default_permissions  { denies :show, :pop }
+          without_permissions       { denies :show, :pop }
+        end
       end
     end
   end

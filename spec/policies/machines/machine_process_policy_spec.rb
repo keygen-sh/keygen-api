@@ -257,38 +257,40 @@ describe Machines::MachineProcessPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_machine accessing_its_machine_processes] do
-      with_token_authentication do
-        with_permissions %w[machine.processes.read] do
-          without_token_permissions { denies :index }
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_its_machine accessing_its_machine_processes] do
+        with_token_authentication do
+          with_permissions %w[machine.processes.read] do
+            without_token_permissions { denies :index }
 
-          allows :index
+            allows :index
+          end
+
+          with_wildcard_permissions { allows :index }
+          with_default_permissions  { allows :index }
+          without_permissions       { denies :index }
         end
-
-        with_wildcard_permissions { allows :index }
-        with_default_permissions  { allows :index }
-        without_permissions       { denies :index }
       end
-    end
 
-    with_scenarios %i[is_licensed accessing_its_machine accessing_its_machine_process] do
-      with_token_authentication do
-        with_permissions %w[machine.processes.read] do
-          without_token_permissions { denies :show }
+      with_scenarios %i[accessing_its_machine accessing_its_machine_process] do
+        with_token_authentication do
+          with_permissions %w[machine.processes.read] do
+            without_token_permissions { denies :show }
 
-          allows :show
-        end
+            allows :show
+          end
 
-        with_wildcard_permissions do
-          allows :show
-        end
+          with_wildcard_permissions do
+            allows :show
+          end
 
-        with_default_permissions do
-          allows :show
-        end
+          with_default_permissions do
+            allows :show
+          end
 
-        without_permissions do
-          denies :show
+          without_permissions do
+            denies :show
+          end
         end
       end
     end
