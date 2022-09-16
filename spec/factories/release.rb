@@ -56,7 +56,7 @@ FactoryBot.define do
       end
     end
 
-    trait :old do
+    trait :created_last_year do
       after :build do |release, evaluator|
         release.created_at = 1.year.ago
       end
