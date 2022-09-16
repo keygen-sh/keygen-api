@@ -211,31 +211,33 @@ describe Licenses::PolicyPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_license accessing_its_policy] do
-      with_token_authentication do
-        with_permissions %w[license.policy.read] do
-          without_token_permissions { denies :show }
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_its_license accessing_its_policy] do
+        with_token_authentication do
+          with_permissions %w[license.policy.read] do
+            without_token_permissions { denies :show }
 
-          allows :show
-        end
+            allows :show
+          end
 
-        with_permissions %w[license.policy.update] do
-          without_token_permissions { denies :update }
+          with_permissions %w[license.policy.update] do
+            without_token_permissions { denies :update }
 
-          allows :update
-        end
+            allows :update
+          end
 
-        with_wildcard_permissions do
-          allows :show, :update
-        end
+          with_wildcard_permissions do
+            allows :show, :update
+          end
 
-        with_default_permissions do
-          allows :update
-          denies :show
-        end
+          with_default_permissions do
+            allows :update
+            denies :show
+          end
 
-        without_permissions do
-          denies :show, :update
+          without_permissions do
+            denies :show, :update
+          end
         end
       end
     end

@@ -199,32 +199,34 @@ describe MachineProcesses::HeartbeatPolicy, type: :policy do
   end
 
   with_role_authorization :user do
-    with_scenarios %i[is_licensed accessing_its_machine_process] do
-      with_token_authentication do
-        with_permissions %w[process.heartbeat.ping] do
-          without_token_permissions { denies :ping }
+    with_bearer_trait :with_licenses do
+      with_scenarios %i[accessing_its_machine_process] do
+        with_token_authentication do
+          with_permissions %w[process.heartbeat.ping] do
+            without_token_permissions { denies :ping }
 
-          allows :ping
-        end
-
-        with_wildcard_permissions do
-          without_token_permissions do
-            denies :ping
+            allows :ping
           end
 
-          allows :ping
-        end
+          with_wildcard_permissions do
+            without_token_permissions do
+              denies :ping
+            end
 
-        with_default_permissions do
-          without_token_permissions do
-            denies :ping
+            allows :ping
           end
 
-          allows :ping
-        end
+          with_default_permissions do
+            without_token_permissions do
+              denies :ping
+            end
 
-        without_permissions do
-          denies :ping
+            allows :ping
+          end
+
+          without_permissions do
+            denies :ping
+          end
         end
       end
     end
