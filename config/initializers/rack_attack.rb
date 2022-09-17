@@ -89,6 +89,7 @@ req_limit_proc = lambda do |base_req_limit|
     when token.starts_with?('admin-'),
          token.starts_with?('admi-'),
          token.starts_with?('prod-'),
+         token.starts_with?('sales-'),
          token.starts_with?('dev-')
       base_req_limit * 5
     when token.starts_with?('activ-'),
