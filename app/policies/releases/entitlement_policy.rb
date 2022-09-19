@@ -4,6 +4,14 @@ module Releases
   class EntitlementPolicy < ApplicationPolicy
     authorize :release
 
+    scope_for :active_record_relation do |relation|
+      # NOTE(ezekg) We don't want to scope this resource to the current bearer, since
+      #             e.g. a release's constraints may not 100% intersect with a license's
+      #             entitlements. We still want the unknown entitlements to be shown,
+      #             granted the license has permission to read the entitlements.
+      relation.all
+    end
+
     def index?
       verify_permissions!('release.entitlements.read')
 
