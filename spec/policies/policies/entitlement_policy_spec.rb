@@ -10,7 +10,7 @@ describe Policies::EntitlementPolicy, type: :policy do
     with_policy_traits %i[with_entitlements] do
       with_scenarios %i[accessing_a_policy accessing_its_entitlements] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :index }
 
             allows :index
@@ -24,7 +24,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
       with_scenarios %i[accessing_a_policy accessing_its_entitlement] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -62,7 +62,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
       with_scenarios %i[accessing_another_account accessing_a_policy accessing_its_entitlement] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             denies :show
           end
 
@@ -94,7 +94,7 @@ describe Policies::EntitlementPolicy, type: :policy do
     with_policy_traits %i[with_entitlements] do
       with_scenarios %i[accessing_its_policy accessing_its_entitlements] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :index }
 
             allows :index
@@ -108,7 +108,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
       with_scenarios %i[accessing_its_policy accessing_its_entitlement] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -138,7 +138,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
       with_scenarios %i[accessing_a_policy accessing_its_entitlements] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :index }
 
             denies :index
@@ -160,7 +160,7 @@ describe Policies::EntitlementPolicy, type: :policy do
 
       with_scenarios %i[accessing_a_policy accessing_its_entitlement] do
         with_token_authentication do
-          with_permissions %w[policy.entitlements.read] do
+          with_permissions %w[entitlement.read] do
             without_token_permissions { denies :show }
 
             denies :show

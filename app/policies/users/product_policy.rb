@@ -5,7 +5,7 @@ module Users
     authorize :user
 
     def index?
-      verify_permissions!('user.products.read')
+      verify_permissions!('product.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -20,7 +20,7 @@ module Users
     end
 
     def show?
-      verify_permissions!('user.products.read')
+      verify_permissions!('product.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

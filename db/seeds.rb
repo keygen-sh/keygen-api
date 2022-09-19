@@ -24,6 +24,8 @@ permissions = %w[
 
   channel.read
 
+  constraint.read
+
   entitlement.create
   entitlement.delete
   entitlement.read
@@ -44,8 +46,6 @@ permissions = %w[
 
   key.create
   key.delete
-  key.policy.read
-  key.product.read
   key.read
   key.update
 
@@ -55,42 +55,30 @@ permissions = %w[
   license.delete
   license.entitlements.attach
   license.entitlements.detach
-  license.entitlements.read
-  license.group.read
   license.group.update
-  license.machines.read
-  license.policy.read
   license.policy.update
-  license.product.read
   license.read
   license.reinstate
   license.renew
   license.revoke
   license.suspend
   license.tokens.generate
-  license.tokens.read
   license.update
   license.usage.decrement
   license.usage.increment
   license.usage.reset
-  license.user.read
   license.user.update
   license.validate
 
   machine.check-out
   machine.create
   machine.delete
-  machine.group.read
   machine.group.update
   machine.heartbeat.ping
   machine.heartbeat.reset
-  machine.license.read
-  machine.processes.read
-  machine.product.read
   machine.proofs.generate
   machine.read
   machine.update
-  machine.user.read
 
   metric.read
 
@@ -100,48 +88,27 @@ permissions = %w[
   policy.delete
   policy.entitlements.attach
   policy.entitlements.detach
-  policy.entitlements.read
-  policy.licenses.read
   policy.pool.pop
-  policy.pool.read
-  policy.product.read
   policy.read
   policy.update
 
   process.create
   process.delete
   process.heartbeat.ping
-  process.license.read
-  process.machine.read
-  process.product.read
   process.read
   process.update
 
-  product.arches.read
-  product.artifacts.read
-  product.channels.read
   product.create
   product.delete
-  product.licenses.read
-  product.machines.read
-  product.platforms.read
-  product.policies.read
   product.read
-  product.releases.read
   product.tokens.generate
-  product.tokens.read
   product.update
-  product.users.read
 
-  release.artifacts.read
   release.constraints.attach
   release.constraints.detach
-  release.constraints.read
   release.create
   release.delete
   release.download
-  release.entitlements.read
-  release.product.read
   release.publish
   release.read
   release.update
@@ -159,21 +126,16 @@ permissions = %w[
   user.ban
   user.create
   user.delete
-  user.group.read
   user.group.update
   user.invite
-  user.licenses.read
-  user.machines.read
   user.password.reset
   user.password.update
-  user.products.read
   user.read
   user.second-factors.create
   user.second-factors.delete
   user.second-factors.read
   user.second-factors.update
   user.tokens.generate
-  user.tokens.read
   user.unban
   user.update
 

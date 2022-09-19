@@ -25,11 +25,11 @@ class LicenseFilePolicy < ApplicationPolicy
   def permissions_for_includes
     perms = []
 
-    perms << 'license.entitlements.read' if record.includes.include?('entitlements')
-    perms << 'license.group.read'        if record.includes.include?('group')
-    perms << 'license.user.read'         if record.includes.include?('user')
-    perms << 'license.product.read'      if record.includes.include?('product')
-    perms << 'license.policy.read'       if record.includes.include?('policy')
+    perms << 'entitlement.read' if record.includes.include?('entitlements')
+    perms << 'group.read'       if record.includes.include?('group')
+    perms << 'user.read'        if record.includes.include?('user')
+    perms << 'product.read'     if record.includes.include?('product')
+    perms << 'policy.read'      if record.includes.include?('policy')
 
     perms
   end

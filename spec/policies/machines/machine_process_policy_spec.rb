@@ -9,7 +9,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_process] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -53,7 +53,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_machine accessing_its_machine_process] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           denies :show
         end
 
@@ -75,7 +75,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -89,7 +89,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_machine accessing_its_machine_process] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -111,7 +111,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -125,7 +125,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_process] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -149,7 +149,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
   with_role_authorization :license do
     with_scenarios %i[accessing_its_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -163,7 +163,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_machine accessing_its_machine_process] do
       with_license_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           allows :show
         end
 
@@ -181,7 +181,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -203,7 +203,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -217,7 +217,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_process] do
       with_license_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           denies :show
         end
 
@@ -235,7 +235,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -260,7 +260,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
     with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_machine accessing_its_machine_processes] do
         with_token_authentication do
-          with_permissions %w[machine.processes.read] do
+          with_permissions %w[process.read] do
             without_token_permissions { denies :index }
 
             allows :index
@@ -274,7 +274,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
       with_scenarios %i[accessing_its_machine accessing_its_machine_process] do
         with_token_authentication do
-          with_permissions %w[machine.processes.read] do
+          with_permissions %w[process.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -297,7 +297,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_processes] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -311,7 +311,7 @@ describe Machines::MachineProcessPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_machine accessing_its_machine_process] do
       with_token_authentication do
-        with_permissions %w[machine.processes.read] do
+        with_permissions %w[process.read] do
           without_token_permissions { denies :show }
 
           denies :show

@@ -9,7 +9,7 @@ describe Products::MachinePolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_product accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Products::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -49,7 +49,7 @@ describe Products::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_product accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           denies :show
         end
 
@@ -63,7 +63,7 @@ describe Products::MachinePolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_itself accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -77,7 +77,7 @@ describe Products::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_itself accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -103,7 +103,7 @@ describe Products::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -117,7 +117,7 @@ describe Products::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[product.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show

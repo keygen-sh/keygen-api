@@ -5,7 +5,7 @@ module Licenses
     authorize :license
 
     def index?
-      verify_permissions!('license.tokens.read')
+      verify_permissions!('token.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -18,7 +18,7 @@ module Licenses
     end
 
     def show?
-      verify_permissions!('license.tokens.read')
+      verify_permissions!('token.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

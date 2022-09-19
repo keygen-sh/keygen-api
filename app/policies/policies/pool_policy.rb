@@ -5,7 +5,7 @@ module Policies
     authorize :policy
 
     def index?
-      verify_permissions!('policy.pool.read')
+      verify_permissions!('key.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -18,7 +18,7 @@ module Policies
     end
 
     def show?
-      verify_permissions!('policy.pool.read')
+      verify_permissions!('key.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

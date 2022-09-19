@@ -9,7 +9,7 @@ describe Licenses::TokenPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_license accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Licenses::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -59,7 +59,7 @@ describe Licenses::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_license accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           denies :show
         end
 
@@ -85,7 +85,7 @@ describe Licenses::TokenPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_license accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -99,7 +99,7 @@ describe Licenses::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_license accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -127,7 +127,7 @@ describe Licenses::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -141,7 +141,7 @@ describe Licenses::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[license.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           denies :show

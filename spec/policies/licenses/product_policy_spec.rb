@@ -9,7 +9,7 @@ describe Licenses::ProductPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_license accessing_its_product] do
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -39,7 +39,7 @@ describe Licenses::ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_license accessing_its_product] do
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           denies :show
         end
 
@@ -61,7 +61,7 @@ describe Licenses::ProductPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_license accessing_its_product] do
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -83,7 +83,7 @@ describe Licenses::ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_product] do
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -107,7 +107,7 @@ describe Licenses::ProductPolicy, type: :policy do
   with_role_authorization :license do
     with_scenarios %i[accessing_itself accessing_its_product] do
       with_license_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           allows :show
         end
 
@@ -125,7 +125,7 @@ describe Licenses::ProductPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -147,7 +147,7 @@ describe Licenses::ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_product] do
       with_license_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           denies :show
         end
 
@@ -165,7 +165,7 @@ describe Licenses::ProductPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -190,7 +190,7 @@ describe Licenses::ProductPolicy, type: :policy do
     with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_its_license accessing_its_product] do
         with_token_authentication do
-          with_permissions %w[license.product.read] do
+          with_permissions %w[product.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -213,7 +213,7 @@ describe Licenses::ProductPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_license accessing_its_product] do
       with_token_authentication do
-        with_permissions %w[license.product.read] do
+        with_permissions %w[product.read] do
           without_token_permissions { denies :show }
 
           denies :show
