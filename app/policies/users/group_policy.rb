@@ -5,7 +5,7 @@ module Users
     authorize :user
 
     def show?
-      verify_permissions!('user.group.read')
+      verify_permissions!('group.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

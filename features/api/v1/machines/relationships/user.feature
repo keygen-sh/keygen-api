@@ -142,7 +142,7 @@ Feature: Machine user relationship
     And the current account has 2 "machines" for the first "license"
     And the first "license" has the following attributes:
       """
-      { "permissions": ["machine.user.read"] }
+      { "permissions": ["user.read"] }
       """
     And I am a license of account "test1"
     And I use an authentication token

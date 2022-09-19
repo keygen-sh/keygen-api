@@ -7,7 +7,7 @@ module Releases
     authorize :release
 
     def index?
-      verify_permissions!('release.artifacts.read')
+      verify_permissions!('artifact.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -24,7 +24,7 @@ module Releases
     end
 
     def show?
-      verify_permissions!('release.artifacts.read')
+      verify_permissions!('artifact.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

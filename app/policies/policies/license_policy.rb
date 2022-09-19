@@ -5,7 +5,7 @@ module Policies
     authorize :policy
 
     def index?
-      verify_permissions!('policy.licenses.read')
+      verify_permissions!('license.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -18,7 +18,7 @@ module Policies
     end
 
     def show?
-      verify_permissions!('policy.licenses.read')
+      verify_permissions!('license.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

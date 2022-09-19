@@ -1003,7 +1003,7 @@ Feature: License checkout actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.check-out", "license.read", "license.product.read"] }
+      { "permissions": ["license.check-out", "license.read", "product.read"] }
       """
     And I am a license of account "test1"
     And I use an authentication token
@@ -1019,7 +1019,7 @@ Feature: License checkout actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["license.check-out", "license.read", "license.policy.read"] }
+      { "permissions": ["license.check-out", "license.read", "policy.read"] }
       """
     And I am a license of account "test1"
     And I use an authentication token

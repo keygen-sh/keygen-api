@@ -13,7 +13,7 @@ module Releases
     end
 
     def index?
-      verify_permissions!('release.entitlements.read')
+      verify_permissions!('entitlement.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -30,7 +30,7 @@ module Releases
     end
 
     def show?
-      verify_permissions!('release.entitlements.read')
+      verify_permissions!('entitlement.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

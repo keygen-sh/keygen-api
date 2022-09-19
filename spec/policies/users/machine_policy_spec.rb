@@ -9,7 +9,7 @@ describe Users::MachinePolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_user accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -53,7 +53,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_user accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           denies :show
         end
 
@@ -75,7 +75,7 @@ describe Users::MachinePolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_user accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -89,7 +89,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_user accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -111,7 +111,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -125,7 +125,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show
@@ -198,7 +198,7 @@ describe Users::MachinePolicy, type: :policy do
     with_bearer_trait :with_licenses do
       with_scenarios %i[accessing_itself accessing_its_machines] do
         with_token_authentication do
-          with_permissions %w[user.machines.read] do
+          with_permissions %w[machine.read] do
             without_token_permissions { denies :index }
 
             allows :index
@@ -212,7 +212,7 @@ describe Users::MachinePolicy, type: :policy do
 
       with_scenarios %i[accessing_itself accessing_its_machine] do
         with_token_authentication do
-          with_permissions %w[user.machines.read] do
+          with_permissions %w[machine.read] do
             without_token_permissions { denies :show }
 
             allows :show
@@ -235,7 +235,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_machines] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :index }
 
           denies :index
@@ -249,7 +249,7 @@ describe Users::MachinePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_machine] do
       with_token_authentication do
-        with_permissions %w[user.machines.read] do
+        with_permissions %w[machine.read] do
           without_token_permissions { denies :show }
 
           denies :show

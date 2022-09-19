@@ -1065,7 +1065,7 @@ Feature: Machine checkout actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.policy.read", "license.entitlements.read"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "policy.read", "entitlement.read"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"
@@ -1082,7 +1082,7 @@ Feature: Machine checkout actions
     And the current account has 1 "webhook-endpoint"
     And the current account has 1 "license" with the following:
       """
-      { "permissions": ["machine.check-out", "machine.read", "license.read", "license.product.read"] }
+      { "permissions": ["machine.check-out", "machine.read", "license.read", "product.read"] }
       """
     And the current account has 1 "machine" for the last "license"
     And I am a license of account "test1"

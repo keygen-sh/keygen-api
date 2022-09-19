@@ -5,7 +5,7 @@ module Machines
     authorize :machine
 
     def show?
-      verify_permissions!('machine.product.read')
+      verify_permissions!('product.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

@@ -9,7 +9,7 @@ describe Users::TokenPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_itself accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_itself accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -61,7 +61,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -75,7 +75,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -111,7 +111,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_user accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           denies :show
         end
 
@@ -137,7 +137,7 @@ describe Users::TokenPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_user accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -151,7 +151,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_user accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -179,7 +179,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -193,7 +193,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -303,7 +303,7 @@ describe Users::TokenPolicy, type: :policy do
   with_role_authorization :user do
     with_scenarios %i[accessing_itself accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -317,7 +317,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_itself accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -341,7 +341,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           denies :index
         end
 
@@ -353,7 +353,7 @@ describe Users::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_user accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[user.tokens.read] do
+        with_permissions %w[token.read] do
           denies :show
         end
 

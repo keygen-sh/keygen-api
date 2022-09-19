@@ -5,7 +5,7 @@ module MachineProcesses
     authorize :machine_process
 
     def show?
-      verify_permissions!('process.license.read')
+      verify_permissions!('license.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
