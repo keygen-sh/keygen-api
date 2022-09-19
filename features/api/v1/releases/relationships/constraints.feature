@@ -79,13 +79,46 @@ Feature: Release constraints relationship
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "404"
 
-  Scenario: License attempts to retrieve the constraints for a release of their product
+  Scenario: License attempts to retrieve the constraints for a release of their product (default permissions)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "release" for an existing "product"
     And the current account has 3 "release-entitlement-constraints" for existing "releases"
     And the current account has 1 "policy" for an existing "product"
     And the current account has 1 "license" for an existing "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "403"
+
+  Scenario: License attempts to retrieve the constraints for a release of their product (has permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["release.constraints.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "constraints"
+
+  Scenario: License attempts to retrieve the constraints for a release of their product (no permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
     And I am a license of account "test1"
     And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
@@ -115,28 +148,7 @@ Feature: Release constraints relationship
     When I send a GET request to "/accounts/test1/releases/$0/constraints"
     Then the response status should be "403"
 
-  Scenario: Admin attempts to retrieve the constraints for a release of another account
-    Given I am an admin of account "test2"
-    And the current account is "test1"
-    And the current account has 1 "release"
-    And the current account has 3 "release-entitlement-constraints" for existing "releases"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/constraints"
-    Then the response status should be "401"
-
-  Scenario: License attempts to retrieve a constraint for a release of their product
-    Given the current account is "test1"
-    And the current account has 1 "product"
-    And the current account has 1 "release" for an existing "product"
-    And the current account has 3 "release-entitlement-constraints" for existing "releases"
-    And the current account has 1 "policy" for an existing "product"
-    And the current account has 1 "license" for an existing "policy"
-    And I am a license of account "test1"
-    And I use an authentication token
-    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
-    Then the response status should be "403"
-
-  Scenario: User attempts to retrieve a constraint for a release they do have a license for
+  Scenario: User attempts to retrieve the constraints for a release they do have a license for (default permissions)
     Given the current account is "test1"
     And the current account has 1 "user"
     And the current account has 1 "product"
@@ -147,8 +159,174 @@ Feature: Release constraints relationship
     And I am a user of account "test1"
     And I use an authentication token
     And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "403"
+
+  Scenario: User attempts to retrieve the constraints for a release they do have a license for (has permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["release.constraints.read"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "200"
+    And the JSON response should be an array with 3 "constraints"
+
+  Scenario: User attempts to retrieve the constraints for a release they do have a license for (no permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for an existing "product"
+    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And the current account has 1 "policy" for an existing "product"
+    And the current account has 1 "license" for an existing "policy"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "403"
+
+  Scenario: Admin attempts to retrieve the constraints for a release of another account
+    Given I am an admin of account "test2"
+    And the current account is "test1"
+    And the current account has 1 "release"
+    And the current account has 3 "release-entitlement-constraints" for existing "releases"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints"
+    Then the response status should be "401"
+
+  Scenario: License attempts to retrieve a constraint for a release of their product (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for the last "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a license of account "test1"
+    And I use an authentication token
     When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
     Then the response status should be "403"
+
+  Scenario: License attempts to retrieve a constraint for a release of their product (has permission)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["release.constraints.read"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "constraint"
+
+  Scenario: License attempts to retrieve a constraint for a release of their product (no permissions)
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "403"
+
+  Scenario: License attempts to retrieve a constraint for a product release
+    Given the current account is "test1"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "license"
+    And I am a license of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "404"
+
+  Scenario: User attempts to retrieve a constraint for a release they do have a license for (default permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "403"
+
+  Scenario: User attempts to retrieve a constraint for a release they do have a license for (has permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["release.constraints.read"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "200"
+    And the JSON response should be a "constraint"
+
+  Scenario: User attempts to retrieve a constraint for a release they do have a license for (no permissions)
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And the last "user" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a user of account "test1"
+    And I use an authentication token
+    And the current user has 1 "license"
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "403"
+
+  Scenario: User attempts to retrieve a constraint for a release they don't have a license for
+    Given the current account is "test1"
+    And the current account has 1 "user"
+    And the current account has 1 "product"
+    And the current account has 1 "release" for the last "product"
+    And the current account has 3 "release-entitlement-constraints" for each "release"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 1 "license" for the last "policy"
+    And I am a user of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/releases/$0/constraints/$0"
+    Then the response status should be "404"
 
   Scenario: Admin attaches constraints to a release
     Given I am an admin of account "test1"

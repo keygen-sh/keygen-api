@@ -10,19 +10,17 @@ module Api::V1::Releases::Relationships
     authorize :release
 
     def index
-      authorize! release,
+      entitlements = apply_pagination(authorized_scope(apply_scopes(release.entitlements), with: Releases::EntitlementPolicy))
+      authorize! entitlements,
         with: Releases::EntitlementPolicy
-
-      entitlements = apply_pagination(authorized_scope(apply_scopes(release.entitlements)))
 
       render jsonapi: entitlements
     end
 
     def show
-      authorize! release,
-        with: Releases::EntitlementPolicy
-
       entitlement = release.entitlements.find(params[:id])
+      authorize! entitlement,
+        with: Releases::EntitlementPolicy
 
       render jsonapi: entitlement
     end
