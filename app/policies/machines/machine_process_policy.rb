@@ -5,7 +5,7 @@ module Machines
     authorize :machine
 
     def index?
-      verify_permissions!('machine.processes.read')
+      verify_permissions!('process.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }
@@ -22,7 +22,7 @@ module Machines
     end
 
     def show?
-      verify_permissions!('machine.processes.read')
+      verify_permissions!('process.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

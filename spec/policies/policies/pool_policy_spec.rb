@@ -9,7 +9,7 @@ describe Policies::PoolPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Policies::PoolPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -61,7 +61,7 @@ describe Policies::PoolPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_policy accessing_its_pooled_keys] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           allows :index
         end
 
@@ -73,7 +73,7 @@ describe Policies::PoolPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_policy accessing_its_pooled_key] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -109,7 +109,7 @@ describe Policies::PoolPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_policy accessing_its_pooled_keys] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           denies :index
         end
 
@@ -121,7 +121,7 @@ describe Policies::PoolPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_policy accessing_its_pooled_key] do
       with_token_authentication do
-        with_permissions %w[policy.pool.read] do
+        with_permissions %w[key.read] do
           denies :show
         end
 

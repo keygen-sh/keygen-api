@@ -9,7 +9,7 @@ describe Products::TokenPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_product accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :index }
 
           allows :index
@@ -23,7 +23,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -59,7 +59,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_product accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           denies :index
         end
 
@@ -71,7 +71,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_product accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           denies :show
         end
 
@@ -97,7 +97,7 @@ describe Products::TokenPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_itself accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           allows :index
         end
 
@@ -109,7 +109,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_itself accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           allows :show
         end
 
@@ -131,7 +131,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_tokens] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           denies :index
         end
 
@@ -143,7 +143,7 @@ describe Products::TokenPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_product accessing_its_token] do
       with_token_authentication do
-        with_permissions %w[product.tokens.read] do
+        with_permissions %w[token.read] do
           denies :show
         end
 

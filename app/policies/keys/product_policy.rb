@@ -5,7 +5,7 @@ module Keys
     authorize :key
 
     def show?
-      verify_permissions!('key.product.read')
+      verify_permissions!('product.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

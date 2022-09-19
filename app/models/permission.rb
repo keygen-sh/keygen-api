@@ -31,6 +31,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    constraint.read
+
     entitlement.create
     entitlement.delete
     entitlement.read
@@ -51,8 +53,6 @@ class Permission < ApplicationRecord
 
     key.create
     key.delete
-    key.policy.read
-    key.product.read
     key.read
     key.update
 
@@ -62,93 +62,60 @@ class Permission < ApplicationRecord
     license.delete
     license.entitlements.attach
     license.entitlements.detach
-    license.entitlements.read
-    license.group.read
     license.group.update
-    license.machines.read
-    license.policy.read
     license.policy.update
-    license.product.read
     license.read
     license.reinstate
     license.renew
     license.revoke
     license.suspend
     license.tokens.generate
-    license.tokens.read
     license.update
     license.usage.decrement
     license.usage.increment
     license.usage.reset
-    license.user.read
     license.user.update
     license.validate
 
     machine.check-out
     machine.create
     machine.delete
-    machine.group.read
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
-    machine.license.read
-    machine.processes.read
-    machine.product.read
     machine.proofs.generate
     machine.read
     machine.update
-    machine.user.read
 
     metric.read
 
     platform.read
+
     policy.create
     policy.delete
     policy.entitlements.attach
     policy.entitlements.detach
-    policy.entitlements.read
-    policy.licenses.read
     policy.pool.pop
-    policy.pool.read
-    policy.product.read
     policy.read
     policy.update
 
     process.create
     process.delete
     process.heartbeat.ping
-    process.license.read
-    process.machine.read
-    process.product.read
     process.read
     process.update
 
-    product.arches.read
-    product.artifacts.read
-    product.channels.read
     product.create
     product.delete
-    product.licenses.read
-    product.machines.read
-    product.platforms.read
-    product.policies.read
     product.read
-    product.releases.read
     product.tokens.generate
-    product.tokens.read
     product.update
-    product.users.read
 
-    release.artifacts.read
     release.constraints.attach
     release.constraints.detach
-    release.constraints.read
     release.create
     release.delete
     release.download
-    release.entitlements.read
-    release.entitlements.read
-    release.product.read
     release.publish
     release.read
     release.update
@@ -166,21 +133,16 @@ class Permission < ApplicationRecord
     user.ban
     user.create
     user.delete
-    user.group.read
     user.group.update
     user.invite
-    user.licenses.read
-    user.machines.read
     user.password.reset
     user.password.update
-    user.products.read
     user.read
     user.second-factors.create
     user.second-factors.delete
     user.second-factors.read
     user.second-factors.update
     user.tokens.generate
-    user.tokens.read
     user.unban
     user.update
 
@@ -213,6 +175,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    constraint.read
+
     entitlement.read
 
     event-log.read
@@ -223,54 +187,23 @@ class Permission < ApplicationRecord
     group.read
     group.users.read
 
-    key.policy.read
-    key.product.read
     key.read
 
-    license.entitlements.read
-    license.group.read
-    license.machines.read
-    license.policy.read
-    license.product.read
     license.read
-    license.tokens.read
-    license.user.read
 
-    machine.group.read
-    machine.license.read
-    machine.processes.read
-    machine.product.read
     machine.read
-    machine.user.read
 
     metric.read
 
     platform.read
 
-    policy.entitlements.read
-    policy.licenses.read
-    policy.product.read
     policy.read
 
     process.read
 
-    product.arches.read
-    product.artifacts.read
-    product.channels.read
-    product.licenses.read
-    product.machines.read
-    product.platforms.read
-    product.policies.read
     product.read
-    product.releases.read
-    product.tokens.read
-    product.users.read
 
-    release.artifacts.read
-    release.constraints.read
     release.download
-    release.entitlements.read
-    release.product.read
     release.read
     release.upgrade
 
@@ -279,15 +212,10 @@ class Permission < ApplicationRecord
     token.generate
     token.read
 
-    user.group.read
-    user.licenses.read
-    user.machines.read
     user.password.reset
     user.password.update
-    user.products.read
     user.read
     user.second-factors.read
-    user.tokens.read
 
     webhook-endpoint.read
     webhook-event.read
@@ -308,6 +236,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    constraint.read
+
     entitlement.read
 
     group.create
@@ -323,8 +253,6 @@ class Permission < ApplicationRecord
 
     key.create
     key.delete
-    key.policy.read
-    key.product.read
     key.read
     key.update
 
@@ -334,42 +262,30 @@ class Permission < ApplicationRecord
     license.delete
     license.entitlements.attach
     license.entitlements.detach
-    license.entitlements.read
-    license.group.read
     license.group.update
-    license.machines.read
-    license.policy.read
     license.policy.update
-    license.product.read
     license.read
     license.reinstate
     license.renew
     license.revoke
     license.suspend
     license.tokens.generate
-    license.tokens.read
     license.update
     license.usage.decrement
     license.usage.increment
     license.usage.reset
-    license.user.read
     license.user.update
     license.validate
 
     machine.check-out
     machine.create
     machine.delete
-    machine.group.read
     machine.group.update
     machine.heartbeat.ping
     machine.heartbeat.reset
-    machine.license.read
-    machine.processes.read
-    machine.product.read
     machine.proofs.generate
     machine.read
     machine.update
-    machine.user.read
 
     platform.read
 
@@ -377,45 +293,24 @@ class Permission < ApplicationRecord
     policy.delete
     policy.entitlements.attach
     policy.entitlements.detach
-    policy.entitlements.read
-    policy.licenses.read
     policy.pool.pop
-    policy.pool.read
-    policy.product.read
     policy.read
     policy.update
 
     process.create
     process.delete
     process.heartbeat.ping
-    process.license.read
-    process.machine.read
-    process.product.read
     process.read
     process.update
 
-    product.arches.read
-    product.artifacts.read
-    product.channels.read
-    product.licenses.read
-    product.machines.read
-    product.platforms.read
-    product.policies.read
     product.read
-    product.releases.read
-    product.tokens.read
     product.update
-    product.users.read
 
-    release.artifacts.read
     release.constraints.attach
     release.constraints.detach
-    release.constraints.read
     release.create
     release.delete
     release.download
-    release.entitlements.read
-    release.product.read
     release.publish
     release.read
     release.update
@@ -430,14 +325,9 @@ class Permission < ApplicationRecord
 
     user.ban
     user.create
-    user.group.read
     user.group.update
-    user.licenses.read
-    user.machines.read
-    user.products.read
     user.read
     user.tokens.generate
-    user.tokens.read
     user.unban
     user.update
 
@@ -460,6 +350,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    constraint.read
+
     entitlement.read
 
     group.licenses.read
@@ -472,31 +364,20 @@ class Permission < ApplicationRecord
     license.check-out
     license.create
     license.delete
-    license.entitlements.read
-    license.group.read
-    license.machines.read
-    license.policy.read
     license.policy.update
-    license.product.read
     license.read
     license.renew
     license.revoke
     license.usage.increment
-    license.user.read
     license.validate
 
     machine.check-out
     machine.create
     machine.delete
-    machine.group.read
     machine.heartbeat.ping
-    machine.license.read
-    machine.processes.read
-    machine.product.read
     machine.proofs.generate
     machine.read
     machine.update
-    machine.user.read
 
     platform.read
 
@@ -505,24 +386,12 @@ class Permission < ApplicationRecord
     process.create
     process.delete
     process.heartbeat.ping
-    process.license.read
-    process.machine.read
-    process.product.read
     process.read
     process.update
 
-    product.arches.read
-    product.artifacts.read
-    product.channels.read
-    product.platforms.read
     product.read
-    product.releases.read
 
-    release.artifacts.read
-    release.constraints.read
     release.download
-    release.entitlements.read
-    release.product.read
     release.read
     release.upgrade
 
@@ -531,18 +400,13 @@ class Permission < ApplicationRecord
     token.regenerate
     token.revoke
 
-    user.group.read
-    user.licenses.read
-    user.machines.read
     user.password.reset
     user.password.update
-    user.products.read
     user.read
     user.second-factors.create
     user.second-factors.delete
     user.second-factors.read
     user.second-factors.update
-    user.tokens.read
     user.update
   ].freeze
 
@@ -557,6 +421,8 @@ class Permission < ApplicationRecord
 
     channel.read
 
+    constraint.read
+
     entitlement.read
 
     group.owners.read
@@ -564,28 +430,17 @@ class Permission < ApplicationRecord
 
     license.check-in
     license.check-out
-    license.entitlements.read
-    license.group.read
-    license.machines.read
-    license.policy.read
-    license.product.read
     license.read
     license.usage.increment
-    license.user.read
     license.validate
 
     machine.check-out
     machine.create
     machine.delete
-    machine.group.read
     machine.heartbeat.ping
-    machine.license.read
-    machine.processes.read
-    machine.product.read
     machine.proofs.generate
     machine.read
     machine.update
-    machine.user.read
 
     platform.read
 
@@ -594,24 +449,12 @@ class Permission < ApplicationRecord
     process.create
     process.delete
     process.heartbeat.ping
-    process.license.read
-    process.machine.read
-    process.product.read
     process.read
     process.update
 
-    product.arches.read
-    product.artifacts.read
-    product.channels.read
-    product.platforms.read
     product.read
-    product.releases.read
 
-    release.artifacts.read
-    release.constraints.read
     release.download
-    release.entitlements.read
-    release.product.read
     release.read
     release.upgrade
 

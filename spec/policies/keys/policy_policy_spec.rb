@@ -9,7 +9,7 @@ describe Keys::PolicyPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_a_pooled_key accessing_its_policy] do
       with_token_authentication do
-        with_permissions %w[key.policy.read] do
+        with_permissions %w[policy.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -35,7 +35,7 @@ describe Keys::PolicyPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_pooled_key accessing_its_policy] do
       with_token_authentication do
-        with_permissions %w[key.policy.read] do
+        with_permissions %w[policy.read] do
           denies :show
         end
 
@@ -57,7 +57,7 @@ describe Keys::PolicyPolicy, type: :policy do
   with_role_authorization :product do
     with_scenarios %i[accessing_its_pooled_key accessing_its_policy] do
       with_token_authentication do
-        with_permissions %w[key.policy.read] do
+        with_permissions %w[policy.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -83,7 +83,7 @@ describe Keys::PolicyPolicy, type: :policy do
 
     with_scenarios %i[accessing_a_pooled_key accessing_its_policy] do
       with_token_authentication do
-        with_permissions %w[key.policy.read] do
+        with_permissions %w[policy.read] do
           without_token_permissions { denies :show }
 
           denies :show

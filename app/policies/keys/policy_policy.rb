@@ -5,7 +5,7 @@ module Keys
     authorize :key
 
     def show?
-      verify_permissions!('key.policy.read')
+      verify_permissions!('policy.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

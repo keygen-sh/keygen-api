@@ -5,7 +5,7 @@ module Licenses
     authorize :license
 
     def show?
-      verify_permissions!('license.user.read')
+      verify_permissions!('user.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

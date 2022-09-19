@@ -70,7 +70,7 @@ Feature: Process product relationship
     And the current account has 3 "processes" for the last "machine"
     And the last "user" has the following attributes:
       """
-      { "permissions": ["process.product.read"] }
+      { "permissions": ["product.read"] }
       """
     And I am a user of account "test1"
     And I use an authentication token
@@ -119,7 +119,7 @@ Feature: Process product relationship
     And the current account has 2 "processes" for the first "machine"
     And the last "license" has the following attributes:
       """
-      { "permissions": ["process.product.read"] }
+      { "permissions": ["product.read"] }
       """
     And I am a license of account "test1"
     And I use an authentication token

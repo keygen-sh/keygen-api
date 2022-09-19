@@ -5,7 +5,7 @@ module Policies
     authorize :policy
 
     def show?
-      verify_permissions!('policy.product.read')
+      verify_permissions!('product.read')
 
       case bearer
       in role: { name: 'admin' | 'developer' | 'sales_agent' | 'support_agent' | 'read_only' }

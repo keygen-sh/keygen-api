@@ -25,12 +25,12 @@ class MachineFilePolicy < ApplicationPolicy
   def permissions_for_includes
     perms = []
 
-    perms << 'license.entitlements.read' if record.includes.include?('license.entitlements')
-    perms << 'license.user.read'         if record.includes.include?('license.user')
-    perms << 'license.product.read'      if record.includes.include?('license.product')
-    perms << 'license.policy.read'       if record.includes.include?('license.policy')
-    perms << 'license.read'              if record.includes.include?('license')
-    perms << 'machine.group.read'        if record.includes.include?('group')
+    perms << 'entitlement.read' if record.includes.include?('license.entitlements')
+    perms << 'user.read'        if record.includes.include?('license.user')
+    perms << 'product.read'     if record.includes.include?('license.product')
+    perms << 'policy.read'      if record.includes.include?('license.policy')
+    perms << 'license.read'     if record.includes.include?('license')
+    perms << 'group.read'       if record.includes.include?('group')
 
     perms
   end
