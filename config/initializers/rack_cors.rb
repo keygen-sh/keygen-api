@@ -13,6 +13,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     resource '*',
       headers: :any,
       methods: :any,
+      max_age: 1.day.to_i,
       expose: %w[
         keygen-accept-signature
         keygen-signature
