@@ -120,10 +120,6 @@ class ReleasePolicy < ApplicationPolicy
     end
   end
 
-  def download?
-    allow? :show
-  end
-
   def create?
     verify_permissions!('release.create')
 
@@ -166,7 +162,7 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allow? :show
+    allow? :show, record, skip_permissions_check: true
   end
 
   def upload?

@@ -23,7 +23,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_an_artifact] do
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -83,7 +83,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_an_artifact] do
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           denies :show
         end
 
@@ -131,7 +131,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_artifact] do
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -191,7 +191,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_an_artifact] do
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           denies :show
         end
 
@@ -247,7 +247,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_its_artifact] do
       with_license_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           allows :show
         end
 
@@ -267,7 +267,7 @@ describe ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           without_token_permissions { denies :show }
 
           allows :show
@@ -313,7 +313,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_an_artifact] do
       with_license_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           denies :show
         end
 
@@ -331,7 +331,7 @@ describe ReleaseArtifactPolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           denies :show
         end
 
@@ -366,7 +366,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
       with_scenarios %i[accessing_its_artifact] do
         with_token_authentication do
-          with_permissions %w[artifact.download artifact.read release.read] do
+          with_permissions %w[artifact.read] do
             allows :show
           end
 
@@ -400,7 +400,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
       with_scenarios %i[accessing_an_artifact] do
         with_token_authentication do
-          with_permissions %w[artifact.download artifact.read release.read] do
+          with_permissions %w[artifact.read] do
             denies :show
           end
 
@@ -433,7 +433,7 @@ describe ReleaseArtifactPolicy, type: :policy do
 
     with_scenarios %i[accessing_an_artifact] do
       with_token_authentication do
-        with_permissions %w[artifact.download artifact.read release.read] do
+        with_permissions %w[artifact.read] do
           denies :show
         end
 

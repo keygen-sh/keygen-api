@@ -15,9 +15,9 @@ module Releases::V1x0
       in role: { name: 'product' } if record.product == bearer
         allow!
       in role: { name: 'user' }
-        allow? :download, record, with: ::ReleasePolicy
+        allow? :show, record, skip_permissions_check: true, with: ::ReleasePolicy
       in role: { name: 'license' }
-        allow? :download, record, with: ::ReleasePolicy
+        allow? :show, record, skip_permissions_check: true, with: ::ReleasePolicy
       else
         record.open_distribution? && record.constraints.none?
       end
@@ -35,9 +35,9 @@ module Releases::V1x0
       in role: { name: 'product' } if record.product == bearer
         allow!
       in role: { name: 'user' }
-        allow? :upgrade, record, with: ::ReleasePolicy
+        allow? :upgrade, record, skip_permissions_check: true, with: ::ReleasePolicy
       in role: { name: 'license' }
-        allow? :upgrade, record, with: ::ReleasePolicy
+        allow? :upgrade, record, skip_permissions_check: true, with: ::ReleasePolicy
       else
         record.open_distribution? && record.constraints.none?
       end
