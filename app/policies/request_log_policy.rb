@@ -23,5 +23,5 @@ class RequestLogPolicy < ApplicationPolicy
     end
   end
 
-  def count? = allow? :show
+  def count? = allow? :show, record
 end

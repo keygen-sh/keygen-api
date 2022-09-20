@@ -9,6 +9,8 @@ class ApplicationPolicy
   include ActionPolicy::Policy::Reasons
   prepend ActionPolicy::Policy::Rails::Instrumentation
 
+  attr_accessor :skip_permissions_check
+
   pre_check :verify_account_scoped!
   pre_check :verify_authenticated!
 
@@ -34,6 +36,8 @@ class ApplicationPolicy
     end
   end
 
+  def skip_permissions_check? = !!skip_permissions_check
+
   private
 
   def whatami = bearer.role.name.humanize(capitalize: false)
@@ -52,8 +56,18 @@ class ApplicationPolicy
   def authenticated?   = bearer.present?
   def unauthenticated? = !authenticated?
 
-  # Short and easier to remember/use alias.
-  def allow?(rule, *args, **kwargs) = allowed_to?(:"#{rule}?", *args, inline_reasons: true, **kwargs)
+  # Short and easier to remember/use alias. Also makes record arg required.
+  def allow?(rule, record, *args, **kwargs) = allowed_to?(:"#{rule}?", record, *args, **kwargs)
+
+  # Overriding policy_for() to add custom options/keywords, such as the option to skip
+  # permissions checks for nested policy checks via :skip_permissions_check.
+  def policy_for(skip_permissions_check: false, **kwargs)
+    policy = super(**kwargs)
+
+    policy&.skip_permissions_check = skip_permissions_check
+
+    policy
+  end
 
   def verify_account_scoped!
     deny! "#{whatami} account does not match account context" if
@@ -82,6 +96,9 @@ class ApplicationPolicy
   end
 
   def verify_permissions!(*actions)
+    return if
+      skip_permissions_check?
+
     return if
       bearer.nil?
 

@@ -15,9 +15,9 @@ module Products
       in role: { name: 'product' } if product == bearer
         allow!
       in role: { name: 'user' } if bearer.products.exists?(product.id)
-        allow? :index, record, with: ::ReleasePolicy
+        allow? :index, record, skip_permissions_check: true, with: ::ReleasePolicy
       in role: { name: 'license' } if product == bearer.product
-        allow? :index, record, with: ::ReleasePolicy
+        allow? :index, record, skip_permissions_check: true, with: ::ReleasePolicy
       else
         product.open_distribution? && record.none?(&:constraints?)
       end
@@ -32,9 +32,9 @@ module Products
       in role: { name: 'product' } if product == bearer
         allow!
       in role: { name: 'user' } if bearer.products.exists?(product.id)
-        allow? :show, record, with: ::ReleasePolicy
+        allow? :show, record, skip_permissions_check: true, with: ::ReleasePolicy
       in role: { name: 'license' } if product == bearer.product
-        allow? :show, record, with: ::ReleasePolicy
+        allow? :show, record, skip_permissions_check: true, with: ::ReleasePolicy
       else
         product.open_distribution? && record.constraints.none?
       end
