@@ -17,10 +17,8 @@ permissions = %w[
 
   artifact.create
   artifact.delete
-  artifact.download
   artifact.read
   artifact.update
-  artifact.upload
 
   channel.read
 

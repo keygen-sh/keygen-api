@@ -24,10 +24,8 @@ class Permission < ApplicationRecord
 
     artifact.create
     artifact.delete
-    artifact.download
     artifact.read
     artifact.update
-    artifact.upload
 
     channel.read
 
@@ -170,7 +168,6 @@ class Permission < ApplicationRecord
 
     arch.read
 
-    artifact.download
     artifact.read
 
     channel.read
@@ -229,10 +226,8 @@ class Permission < ApplicationRecord
 
     artifact.create
     artifact.delete
-    artifact.download
     artifact.read
     artifact.update
-    artifact.upload
 
     channel.read
 
@@ -344,8 +339,6 @@ class Permission < ApplicationRecord
 
     arch.read
 
-    artifact.download
-
     artifact.read
 
     channel.read
@@ -416,7 +409,6 @@ class Permission < ApplicationRecord
 
     arch.read
 
-    artifact.download
     artifact.read
 
     channel.read

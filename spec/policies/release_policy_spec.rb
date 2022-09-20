@@ -23,7 +23,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release] do
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           without_token_permissions { denies :upgrade }
 
           allows :upgrade
@@ -89,7 +89,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_another_account accessing_a_release] do
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           denies :upgrade
         end
 
@@ -141,7 +141,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_its_release] do
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           without_token_permissions { denies :upgrade }
 
           allows :upgrade
@@ -207,7 +207,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release] do
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           denies :upgrade
         end
 
@@ -305,7 +305,7 @@ describe ReleasePolicy, type: :policy do
           denies :show, :upgrade
         end
 
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           allows :upgrade
         end
 
@@ -329,7 +329,7 @@ describe ReleasePolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           without_token_permissions { denies :upgrade }
 
           allows :upgrade
@@ -381,7 +381,7 @@ describe ReleasePolicy, type: :policy do
 
     with_scenarios %i[accessing_a_release] do
       with_license_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           denies :upgrade
         end
 
@@ -403,7 +403,7 @@ describe ReleasePolicy, type: :policy do
       end
 
       with_token_authentication do
-        with_permissions %w[release.upgrade release.read] do
+        with_permissions %w[release.upgrade] do
           denies :upgrade
         end
 
@@ -442,7 +442,7 @@ describe ReleasePolicy, type: :policy do
 
       with_scenarios %i[accessing_its_release] do
         with_token_authentication do
-          with_permissions %w[release.upgrade release.read] do
+          with_permissions %w[release.upgrade] do
             allows :upgrade
           end
 
@@ -480,7 +480,7 @@ describe ReleasePolicy, type: :policy do
 
       with_scenarios %i[accessing_a_release] do
         with_token_authentication do
-          with_permissions %w[release.upgrade release.read] do
+          with_permissions %w[release.upgrade] do
             denies :upgrade
           end
 
