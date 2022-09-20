@@ -474,9 +474,28 @@ Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth) "([^\"]
       @account.send(resource.pluralize.underscore).send(named_idx)
     end
 
-  model.assign_attributes(metadata: metadata)
+  model.assign_attributes(metadata:)
 
   model.save!(validate: false)
+end
+
+Given /^the (first|second|third|fourth|fifth|last) "([^\"]*)" has the following permissions:$/ do |named_idx, resource, body|
+  body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
+
+  permissions = JSON.parse(body)
+  model       =
+    case resource.singularize
+    when "plan"
+      Plan.send(named_idx)
+    when "process"
+      @account.machine_processes.send(named_idx)
+    when "artifact"
+      @account.release_artifacts.send(named_idx)
+    else
+      @account.send(resource.pluralize.underscore).send(named_idx)
+    end
+
+  model.update!(permissions:)
 end
 
 Given /^the (first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|last) "([^\"]*)" (?:belongs to|is in) the (\w+) "([^\"]*)"$/ do |model_idx, model_name, assoc_idx, assoc_name|
