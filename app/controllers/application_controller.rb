@@ -321,7 +321,7 @@ class ApplicationController < ActionController::API
     # Add additional properties based on code
     case e.code
     when 'LICENSE_NOT_ALLOWED',
-        'LICENSE_INVALID'
+         'LICENSE_INVALID'
       kwargs[:links] = { about: 'https://keygen.sh/docs/api/authentication/#license-authentication' }
     when 'TOKEN_NOT_ALLOWED',
          'TOKEN_INVALID'
