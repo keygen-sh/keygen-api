@@ -38,6 +38,13 @@ class ApplicationController < ActionController::API
 
   private
 
+  # NOTE(ezekg) Remove memoization of authorization context. This allows us
+  #             to use authorized_scope() before authorize!() in controllers
+  #             for nested resources, e.g. /v1/releases/:id/artifacts.
+  #
+  # See: https://github.com/palkan/action_policy/issues/217
+  def authorization_context = build_authorization_context
+
   def render_meta(meta)
     render json: { meta: meta.transform_keys! { |k| k.to_s.camelize :lower } }
   end
