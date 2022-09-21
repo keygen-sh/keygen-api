@@ -120,7 +120,7 @@ module Api::V1
                 [:role_attributes, { name: v.underscore }]
               }
             end
-            if current_bearer&.has_role?(:admin, :product)
+            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end
@@ -150,7 +150,7 @@ module Api::V1
             if current_bearer&.has_role?(:admin, :product)
               param :password, type: :string, optional: true, allow_nil: true
             end
-            if current_bearer&.has_role?(:admin, :product)
+            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end

@@ -7,7 +7,7 @@ class ProductSerializer < BaseSerializer
   attribute :distribution_strategy
   attribute :url
   attribute :platforms
-  attribute :permissions do
+  attribute :permissions, if: -> { @object.account.ent? } do
     @object.permissions.collect(&:action)
                        .sort
   end

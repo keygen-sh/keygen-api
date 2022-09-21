@@ -14,7 +14,7 @@ module CurrentAccountConstraints
       )
       return false
     when !CURRENT_ACCOUNT_IGNORED_ORIGINS.include?(request.headers['origin']) &&
-         current_account.trialing_or_free_tier? &&
+         current_account.trialing_or_free? &&
          current_account.daily_request_limit_exceeded?
       render_payment_required(
         title: "Daily API request limit reached",
@@ -26,7 +26,7 @@ module CurrentAccountConstraints
 
   def require_paid_subscription!
     case
-    when !current_account.paid_tier?
+    when !current_account.paid?
       render_forbidden(
         title: "Account does not have a paid subscription",
         detail: "must have a paid subscription to access this resource"
@@ -38,7 +38,7 @@ module CurrentAccountConstraints
 
   def require_ent_subscription!
     case
-    when !current_account.ent_tier?
+    when !current_account.ent?
       render_forbidden(
         title: "Account does not have an Ent subscription",
         detail: "must have a paid subscription on an Ent tier to access this resource"
