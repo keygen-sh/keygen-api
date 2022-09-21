@@ -91,7 +91,7 @@ module Api::V1
             param :platforms, type: :array, optional: true, allow_nil: true do
               items type: :string
             end
-            if current_bearer&.has_role?(:admin, :developer)
+            if current_account.ent? && current_bearer&.has_role?(:admin, :developer)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end
@@ -112,7 +112,7 @@ module Api::V1
             param :platforms, type: :array, optional: true, allow_nil: true do
               items type: :string
             end
-            if current_bearer&.has_role?(:admin, :developer)
+            if current_account.ent? && current_bearer&.has_role?(:admin, :developer)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end

@@ -23,7 +23,7 @@ class PlaintextMailer < ApplicationMailer
 
   def trial_ending_soon_without_payment_method(account:)
     return if
-      account.free_tier?
+      account.free?
 
     admin = account.admins.last
 
@@ -46,7 +46,7 @@ class PlaintextMailer < ApplicationMailer
 
   def trial_ending_soon_with_payment_method(account:)
     return if
-      account.free_tier?
+      account.free?
 
     admin = account.admins.last
 
@@ -67,7 +67,7 @@ class PlaintextMailer < ApplicationMailer
 
   def first_payment_succeeded(account:)
     return if
-      account.ent_tier?
+      account.ent?
 
     admin = account.admins.last
     call_to_actions = [
@@ -97,7 +97,7 @@ class PlaintextMailer < ApplicationMailer
 
   def prompt_for_testimonial(account:)
     return if
-      account.ent_tier?
+      account.ent?
 
     admin = account.admins.last
 
@@ -126,7 +126,7 @@ class PlaintextMailer < ApplicationMailer
 
   def prompt_for_review(account:)
     return if
-      account.ent_tier?
+      account.ent?
 
     admin = account.admins.last
 
@@ -177,7 +177,7 @@ class PlaintextMailer < ApplicationMailer
 
   def price_increase_notice(account:)
     return if
-      account.ent_tier?
+      account.ent?
 
     account.admins.each do |admin|
       mail(
@@ -225,7 +225,7 @@ class PlaintextMailer < ApplicationMailer
 
   def price_increase_reminder(account:)
     return if
-      account.ent_tier?
+      account.ent?
 
     account.admins.each do |admin|
       mail(

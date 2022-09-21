@@ -676,7 +676,7 @@ class Release < ApplicationRecord
   end
 
   def enforce_release_limit_on_account!
-    return unless account.trialing_or_free_tier?
+    return unless account.trialing_or_free?
 
     release_count = account.releases.count
 

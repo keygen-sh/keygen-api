@@ -17,7 +17,7 @@ class RequestLimitsReportWorker
     Account.includes(:billing, :plan).where(billings: { state: active_states }).find_each do |account|
       request_count = account.request_logs.where(created_at: (start_date..end_date)).count
       if request_count == 0
-        next unless account.trialing_or_free_tier? &&
+        next unless account.trialing_or_free? &&
                     account.created_at > 3.months.ago &&
                     account.created_at < 1.week.ago
 
@@ -78,7 +78,7 @@ class RequestLimitsReportWorker
         license_limit_exceeded = (active_licensed_user_count > license_limit * 1.1) rescue false
         should_send_license_limit_notification =
           (account.last_license_limit_exceeded_sent_at.nil? || account.last_license_limit_exceeded_sent_at < 1.week.ago) &&
-          ((account.trialing_or_free_tier? && license_limit_reached) || (account.paid_tier? && license_limit_exceeded))
+          ((account.trialing_or_free? && license_limit_reached) || (account.paid? && license_limit_exceeded))
 
         if should_send_license_limit_notification
           account.touch(:last_license_limit_exceeded_sent_at)

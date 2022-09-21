@@ -927,7 +927,7 @@ class License < ApplicationRecord
   end
 
   def enforce_license_limit_on_account!
-    return unless account.trialing_or_free_tier?
+    return unless account.trialing_or_free?
 
     active_licensed_user_count = account.active_licensed_user_count
     active_licensed_user_limit =
