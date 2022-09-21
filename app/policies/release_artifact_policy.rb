@@ -27,13 +27,13 @@ class ReleaseArtifactPolicy < ApplicationPolicy
   def index?
     verify_permissions!('artifact.read')
 
-    allow? :index, record.collect(&:release), skip_permissions_check: true, with: ::ReleasePolicy
+    allow? :index, record.collect(&:release), skip_verify_permissions: true, with: ::ReleasePolicy
   end
 
   def show?
     verify_permissions!('artifact.read')
 
-    allow? :show, record.release, skip_permissions_check: true, with: ::ReleasePolicy
+    allow? :show, record.release, skip_verify_permissions: true, with: ::ReleasePolicy
   end
 
   def create?

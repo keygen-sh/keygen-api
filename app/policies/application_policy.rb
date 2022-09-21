@@ -9,8 +9,6 @@ class ApplicationPolicy
   include ActionPolicy::Policy::Reasons
   prepend ActionPolicy::Policy::Rails::Instrumentation
 
-  attr_accessor :skip_permissions_check
-
   pre_check :verify_account_scoped!
   pre_check :verify_authenticated!
 
@@ -36,7 +34,8 @@ class ApplicationPolicy
     end
   end
 
-  def skip_permissions_check? = !!skip_permissions_check
+  def skip_verify_permissions! = @skip_verify_permissions = true
+  def skip_verify_permissions? = !!@skip_verify_permissions
 
   private
 
@@ -60,11 +59,12 @@ class ApplicationPolicy
   def allow?(rule, record, *args, **kwargs) = allowed_to?(:"#{rule}?", record, *args, **kwargs)
 
   # Overriding policy_for() to add custom options/keywords, such as the option to skip
-  # permissions checks for nested policy checks via :skip_permissions_check.
-  def policy_for(skip_permissions_check: false, **kwargs)
+  # permissions checks for nested policy checks via :skip_verify_permissions.
+  def policy_for(skip_verify_permissions: false, **kwargs)
     policy = super(**kwargs)
 
-    policy&.skip_permissions_check = skip_permissions_check
+    policy&.skip_verify_permissions! if
+      skip_verify_permissions
 
     policy
   end
@@ -97,7 +97,7 @@ class ApplicationPolicy
 
   def verify_permissions!(*actions)
     return if
-      skip_permissions_check?
+      skip_verify_permissions?
 
     return if
       bearer.nil?

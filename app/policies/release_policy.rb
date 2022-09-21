@@ -162,7 +162,7 @@ class ReleasePolicy < ApplicationPolicy
   def upgrade?
     verify_permissions!('release.upgrade')
 
-    allow? :show, record, skip_permissions_check: true
+    allow? :show, record, skip_verify_permissions: true
   end
 
   def upload?
