@@ -220,27 +220,27 @@ class Account < ApplicationRecord
     total_licensed_users
   end
 
-  def trialing_or_free_tier?
+  def trialing_or_free?
     return true if billing.nil?
 
     return (billing.trialing? && billing.card.nil?) ||
             plan.free?
   end
 
-  def free_tier?
+  def free?
     return false if billing.nil?
 
     plan.free?
   end
 
-  def paid_tier?
+  def paid?
     return false if billing.nil?
 
     return (billing.active? || billing.card.present?) &&
            plan.paid?
   end
 
-  def ent_tier?
+  def ent?
     return false if billing.nil?
 
     return plan.ent?

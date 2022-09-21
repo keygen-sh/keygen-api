@@ -70,7 +70,7 @@ module Api::V1::Products::Relationships
           param :attributes, type: :hash do
             param :expiry, type: :datetime, allow_nil: true, optional: true, coerce: true
             param :name, type: :string, allow_nil: true, optional: true
-            if current_bearer&.has_role?(:admin, :product)
+            if current_account.ent? && current_bearer&.has_role?(:admin, :product)
               param :permissions, type: :array, optional: true do
                 items type: :string
               end

@@ -5,7 +5,7 @@ class EventLogPolicy < ApplicationPolicy
     verify_permissions!('event-log.read')
 
     deny! unless
-      account.ent_tier?
+      account.ent?
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' }
@@ -19,7 +19,7 @@ class EventLogPolicy < ApplicationPolicy
     verify_permissions!('event-log.read')
 
     deny! unless
-      account.ent_tier?
+      account.ent?
 
     case bearer
     in role: { name: 'admin' | 'developer' | 'read_only' }
