@@ -22,11 +22,14 @@ class RequestLog < ApplicationRecord
     select(self.attribute_names - %w[request_body response_body response_signature])
   }
 
+  scope :yesterday, -> { where(created_at: Date.yesterday.all_day) }
+  scope :today,     -> { where(created_at: Date.today.all_day) }
+
   scope :for_current_period, -> {
     date_start = 2.weeks.ago.beginning_of_day
-    date_end = Time.current
+    date_end   = Time.current
 
-    where created_at: (date_start..date_end)
+    where(created_at: date_start..date_end)
   }
 
   scope :for_event_type, -> event {

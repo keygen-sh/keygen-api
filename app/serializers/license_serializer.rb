@@ -47,7 +47,7 @@ class LicenseSerializer < BaseSerializer
   attribute :next_check_in do
     @object.next_check_in_at
   end
-  attribute :permissions, if: -> { @object.account.ent? } do
+  attribute :permissions, if: -> { @account.ent? } do
     @object.permissions.collect(&:action)
                        .sort
   end
