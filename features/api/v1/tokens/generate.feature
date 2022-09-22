@@ -1,11 +1,15 @@
 @api/v1
 Feature: Generate authentication token
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be accessible when account is disabled
@@ -67,7 +71,7 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Admin generates a new token with custom permissions
+  Scenario: Admin generates a new token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 4 "webhook-endpoints"
     And I am an admin of account "test1"
@@ -76,6 +80,38 @@ Feature: Generate authentication token
       { "Authorization": "Basic \"$users[0].email:password\"" }
       """
     When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: Admin generates a new token with custom permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 4 "webhook-endpoints"
+    And I am an admin of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[0].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens" with the following:
       """
       {
         "data": {
@@ -311,7 +347,7 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User generates a new token with inherited permissions
+  Scenario: User generates a new token with inherited permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "user" with the following:
       """
@@ -324,6 +360,24 @@ Feature: Generate authentication token
       """
     When I send a POST request to "/accounts/test1/tokens"
     Then the response status should be "201"
+    And the JSON response should be a "token" without a "permissions" attribute
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 1 "metric" job
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User generates a new token with inherited permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["token.generate"] }
+      """
+    And I am a user of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens"
+    Then the response status should be "201"
     And the JSON response should be a "token" with the following attributes:
       """
       { "permissions": ["token.generate"] }
@@ -332,7 +386,7 @@ Feature: Generate authentication token
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token without permission
+  Scenario: User attempts to generate a new token without permission (standard tier)
     Given the current account is "test1"
     And the current account has 1 "user" with the following:
       """
@@ -349,7 +403,24 @@ Feature: Generate authentication token
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: User attempts to generate a new token with custom permissions
+  Scenario: User attempts to generate a new token without permission (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": [] }
+      """
+    And I am a user of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens"
+    Then the response status should be "403"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "user"
     And I am a user of account "test1"
@@ -358,6 +429,38 @@ Feature: Generate authentication token
       { "Authorization": "Basic \"$users[1].email:password\"" }
       """
     When I send a POST request to "/accounts/test1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["user.create"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 1 "request-log" job
+
+  Scenario: User attempts to generate a new token with custom permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "user"
+    And I am a user of account "ent1"
+    And I send the following headers:
+      """
+      { "Authorization": "Basic \"$users[1].email:password\"" }
+      """
+    When I send a POST request to "/accounts/ent1/tokens" with the following:
       """
       {
         "data": {

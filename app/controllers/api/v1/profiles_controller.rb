@@ -16,7 +16,7 @@ module Api::V1
 
       # FIXME(ezekg) Move JSONAPI rendering into a service so that it's easier to
       #              switch to Netflix's JSONAPI lib, and also less verbose.
-      renderer        = Keygen::JSONAPI::Renderer.new
+      renderer        = Keygen::JSONAPI::Renderer.new(account: current_account, bearer: current_bearer, token: current_token)
       rendered_bearer = renderer.render(current_bearer)
 
       if current_token.present?
