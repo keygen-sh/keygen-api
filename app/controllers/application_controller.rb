@@ -32,6 +32,15 @@ class ApplicationController < ActionController::API
 
   verify_authorized
 
+  def jsonapi_expose
+    {
+      url_helpers: Rails.application.routes.url_helpers,
+      account: current_account,
+      bearer: current_bearer,
+      token: current_token,
+    }
+  end
+
   def current_api_version
     RequestMigrations.config.request_version_resolver.call(request)
   end

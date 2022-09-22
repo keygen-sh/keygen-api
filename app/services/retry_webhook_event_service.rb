@@ -21,7 +21,7 @@ class RetryWebhookEventService < BaseService
       status: 'DELIVERING',
     )
 
-    payload = Keygen::JSONAPI::Renderer.new(context: :webhook).render(new_event).to_json
+    payload = Keygen::JSONAPI::Renderer.new(account:, context: :webhook).render(new_event).to_json
 
     jid = WebhookWorker.perform_async(
       account.id,

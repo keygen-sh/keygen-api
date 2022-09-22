@@ -13,7 +13,7 @@ class AbstractCheckoutService < BaseService
     rsa-sha256
   ]
 
-  def initialize(encrypt:, ttl:, include:)
+  def initialize(account:, encrypt:, ttl:, include:)
     raise InvalidPrivateKeyError, 'private key is missing' unless
       private_key.present?
 
@@ -26,7 +26,7 @@ class AbstractCheckoutService < BaseService
     raise InvalidTTLError, 'must be greater than or equal to 3600 (1 hour)' if
       ttl.present? && ttl < 1.hour
 
-    @renderer    = Keygen::JSONAPI::Renderer.new(context: :checkout)
+    @renderer    = Keygen::JSONAPI::Renderer.new(account:, context: :checkout)
     @encrypted   = encrypt
     @ttl         = ttl
     @includes    = include
