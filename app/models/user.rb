@@ -52,7 +52,7 @@ class User < ApplicationRecord
       end
     }
 
-  belongs_to :account
+  belongs_to :account, inverse_of: :users
   belongs_to :group,
     optional: true
   has_many :second_factors, dependent: :destroy
@@ -71,8 +71,8 @@ class User < ApplicationRecord
   has_many :groups,
     through: :group_owners
 
-  before_destroy :enforce_admin_minimum_on_account!
-  before_update :enforce_admin_minimum_on_account!, if: -> { role.present? && role.changed? }
+  before_destroy :enforce_admin_minimums_on_account!
+  before_update :enforce_admin_minimums_on_account!, if: -> { role.present? && role.changed? }
 
   before_save -> { self.email = email.downcase.strip }
 
@@ -393,17 +393,27 @@ class User < ApplicationRecord
     super
   end
 
-  def enforce_admin_minimum_on_account!
-    return if !has_role?(:admin) && !was_role?(:admin)
+  def enforce_admin_minimums_on_account!
+    return if
+      !has_role?(:admin) && !was_role?(:admin)
 
     admin_count = account.admins.count
 
-    # Count is not accounting for the current role changes
-    if !has_role?(:admin) && was_role?(:admin)
+    # Real count is not including any of the current role changes,
+    # so we'll adjust the number based on the current change.
+    case
+    when !has_role?(:admin) && was_role?(:admin)
       admin_count -= 1
+    when has_role?(:admin) && !was_role?(:admin)
+      admin_count += 1
     end
 
-    if admin_count < MINIMUM_ADMIN_COUNT
+    case
+    when admin_count == MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed?
+      errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
+
+      throw :abort
+    when admin_count < MINIMUM_ADMIN_COUNT
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
       throw :abort

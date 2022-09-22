@@ -28,6 +28,13 @@ module Roleable
       role.destroy!
     end
 
+    def role_changed?
+      return false if
+        role.nil?
+
+      role.name.to_s != role.name_was.to_s
+    end
+
     def has_role?(*names)
       return false if
         role.nil?
@@ -38,7 +45,7 @@ module Roleable
 
     def was_role?(name)
       return false if
-        role.nil? || !role.name_changed?
+        role.nil?
 
       name.to_s == role.name_was.to_s
     end
@@ -87,6 +94,7 @@ module Roleable
       tracks_dirty_attributes_for :role
 
       delegate :permissions, :permission_ids,
+        :role_permissions_attributes_changed?,
         allow_nil: true,
         to: :role
     end
