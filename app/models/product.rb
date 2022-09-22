@@ -103,6 +103,10 @@ class Product < ApplicationRecord
                  .distinct
   }
 
+  scope :open,     -> { where(distribution_strategy: 'OPEN') }
+  scope :licensed, -> { where(distribution_strategy: 'LICENSED') }
+  scope :closed,   -> { where(distribution_strategy: 'CLOSED') }
+
   def licensed_distribution?
     # NOTE(ezekg) Backwards compat
     return true if

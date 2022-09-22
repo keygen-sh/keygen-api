@@ -5,13 +5,16 @@ require 'jsonapi/serializable/renderer'
 module Keygen
   module JSONAPI
     class Renderer < ::JSONAPI::Serializable::Renderer
-      def initialize(context: nil)
+      def initialize(account: nil, bearer: nil, token: nil, context: nil)
         @renderer = ::JSONAPI::Renderer.new
         @default_options = {
           class: -> klass { "#{klass}Serializer".safe_constantize },
           expose: {
             url_helpers: ::Rails.application.routes.url_helpers,
-            context: context&.to_sym,
+            context:,
+            account:,
+            bearer:,
+            token:,
           }
         }
       end
