@@ -1,11 +1,15 @@
 @api/v1
 Feature: Generate authentication token for license
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -244,7 +248,7 @@ Feature: Generate authentication token for license
     Then the response status should be "200"
     And the JSON response should be a "token" with a nil expiry
 
-  Scenario: Product generates a license token with custom permissions
+  Scenario: Product generates a license token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -252,6 +256,37 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.read",
+              "license.validate"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a license token with custom permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses/$0/tokens" with the following:
       """
       {
         "data": {
@@ -276,7 +311,7 @@ Feature: Generate authentication token for license
       }
       """
 
-  Scenario: Product generates a license token with permissions that exceed the license's permissions
+  Scenario: Product generates a license token with permissions that exceed the license's permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -288,6 +323,44 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read",
+              "machine.create",
+              "machine.delete",
+              "machine.read"
+            ]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a license token with permissions that exceed the license's permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And the first "license" has the following attributes:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses/$0/tokens" with the following:
       """
       {
         "data": {
@@ -324,7 +397,7 @@ Feature: Generate authentication token for license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a license token with unsupported permissions
+  Scenario: Product generates a license token with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -332,6 +405,34 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["license.create"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a license token with unsupported permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses/$0/tokens" with the following:
       """
       {
         "data": {
@@ -362,7 +463,7 @@ Feature: Generate authentication token for license
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a license token with invalid permissions
+  Scenario: Product generates a license token with invalid permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "policy" for the last "product"
@@ -370,6 +471,34 @@ Feature: Generate authentication token for license
     And I am a product of account "test1"
     And I use an authentication token
     When I send a POST request to "/accounts/test1/licenses/$0/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["foo.bar"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a license token with invalid permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "policy" for the last "product"
+    And the current account has 3 "licenses" for the last "policy"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/licenses/$0/tokens" with the following:
       """
       {
         "data": {
