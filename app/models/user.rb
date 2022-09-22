@@ -397,7 +397,8 @@ class User < ApplicationRecord
     return if
       !has_role?(:admin) && !was_role?(:admin)
 
-    admin_count = account.admins.count
+    other_admins = account.admins.preload(role: %i[role_permissions]).where.not(id:)
+    admin_count  = other_admins.size + 1
 
     # Real count is not including any of the current role changes,
     # so we'll adjust the number based on the current change.
@@ -409,11 +410,16 @@ class User < ApplicationRecord
     end
 
     case
-    when admin_count == MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed?
+    # When other admins: do not allow their permissions to be changed if no other admin has a full permission set.
+    # When sole admin: do not allow their permissions to be changed.
+    when admin_count > MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed? && other_admins.none? { _1.can?(*Permission::ADMIN_PERMISSIONS) } ||
+         admin_count == MINIMUM_ADMIN_COUNT && role_permissions_attributes_changed? && !role_changed?
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user with a full permission set"
 
       throw :abort
-    when admin_count < MINIMUM_ADMIN_COUNT
+    # When no admins, do not allow the last admin to be destroyed or their role to be changed.
+    when admin_count < MINIMUM_ADMIN_COUNT && marked_for_destruction? ||
+         admin_count < MINIMUM_ADMIN_COUNT && role_changed?
       errors.add :account, :admins_required, message: "account must have at least #{MINIMUM_ADMIN_COUNT} admin user"
 
       throw :abort
