@@ -1058,7 +1058,40 @@ Feature: Update user
       }
       """
 
-  Scenario: Admin updates their permissions (other admins)
+  Scenario: Admin updates their permissions (other admins without full permissions)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 1 "admin"
+    And the last "admin" has the following permissions:
+      """
+      ["user.read", "license.read", "machine.read"]
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "account must have at least 1 admin user with a full permission set",
+        "source": {
+          "pointer": "/data/relationships/account"
+        },
+        "code": "ACCOUNT_ADMINS_REQUIRED"
+      }
+      """
+
+  Scenario: Admin updates their permissions (other admins with full permissions)
     Given I am an admin of account "ent1"
     And the current account is "ent1"
     And the current account has 2 "admins"
