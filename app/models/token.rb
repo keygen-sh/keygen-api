@@ -339,6 +339,10 @@ class Token < ApplicationRecord
     super || token_permissions_attributes_changed?
   end
 
+  def changed?
+    super || token_permissions_attributes_changed?
+  end
+
   private
 
   ##

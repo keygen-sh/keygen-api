@@ -1,11 +1,15 @@
 @api/v1
 Feature: Update user
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be accessible when account is disabled
@@ -643,14 +647,14 @@ Feature: Update user
     Then the response status should be "422"
     And the first error should have the following properties:
       """
-        {
-          "title": "Unprocessable resource",
-          "detail": "account must have at least 1 admin user",
-          "source": {
-            "pointer": "/data/relationships/account"
-          },
-          "code": "ACCOUNT_ADMINS_REQUIRED"
-        }
+      {
+        "title": "Unprocessable resource",
+        "detail": "account must have at least 1 admin user",
+        "source": {
+          "pointer": "/data/relationships/account"
+        },
+        "code": "ACCOUNT_ADMINS_REQUIRED"
+      }
       """
     And the current user should have 1 "token"
 
@@ -949,6 +953,135 @@ Feature: Update user
       }
       """
     Then the response status should be "422"
+
+  Scenario: Admin updates a user's permissions (standard tier)
+    Given I am an admin of account "test1"
+    And the current account is "test1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/test1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "400"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Admin updates a user's permissions (ent tier)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 1 "user"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["license.validate"],
+        "role": "user"
+      }
+      """
+
+  Scenario: Admin updates an admin's permissions (ent tier)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 2 "admins"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["license.read", "machine.read"],
+        "role": "admin"
+      }
+      """
+
+  Scenario: Admin updates their permissions (no other admins)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "422"
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Unprocessable resource",
+        "detail": "account must have at least 1 admin user with a full permission set",
+        "source": {
+          "pointer": "/data/relationships/account"
+        },
+        "code": "ACCOUNT_ADMINS_REQUIRED"
+      }
+      """
+
+  Scenario: Admin updates their permissions (other admins)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 2 "admins"
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$0" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["license.read", "machine.read"],
+        "role": "admin"
+      }
+      """
 
   Scenario: Product updates a users metadata
     Given the current account is "test1"
