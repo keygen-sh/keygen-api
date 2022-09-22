@@ -1,11 +1,15 @@
 @api/v1
 Feature: User tokens relationship
-
   Background:
-    Given the following "accounts" exist:
-      | Name    | Slug  |
-      | Test 1  | test1 |
-      | Test 2  | test2 |
+    Given the following "plan" rows exist:
+      | id                                   | name       |
+      | 9b96c003-85fa-40e8-a9ed-580491cd5d79 | Standard 1 |
+      | 44c7918c-80ab-4a13-a831-a2c46cda85c6 | Ent 1      |
+    Given the following "account" rows exist:
+      | name   | slug  | plan_id                              |
+      | Test 1 | test1 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Test 2 | test2 | 9b96c003-85fa-40e8-a9ed-580491cd5d79 |
+      | Ent 1  | ent1  | 44c7918c-80ab-4a13-a831-a2c46cda85c6 |
     And I send and accept JSON
 
   Scenario: Endpoint should be inaccessible when account is disabled
@@ -167,7 +171,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a user token with custom permissions
+  Scenario: Product generates a user token with custom permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "user"
@@ -184,7 +188,36 @@ Feature: User tokens relationship
         }
       }
       """
+    Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a user token with custom permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["license.validate"]
+          }
+        }
+      }
+      """
     Then the response status should be "200"
+    And the response should contain a valid signature header for "ent1"
     And the JSON response should be a "token" with the following attributes:
       """
       { "permissions": ["license.validate"] }
@@ -193,7 +226,7 @@ Feature: User tokens relationship
     And sidekiq should have 1 "metric" job
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a user token with permissions that exceed the user's permissions
+  Scenario: Product generates a user token with permissions that exceed the user's permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "user" with the following:
@@ -219,7 +252,45 @@ Feature: User tokens relationship
         }
       }
       """
+    Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a user token with permissions that exceed the user's permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "user" with the following:
+      """
+      { "permissions": ["license.validate"] }
+      """
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": [
+              "license.validate",
+              "license.read",
+              "machine.create",
+              "machine.delete",
+              "machine.read"
+            ]
+          }
+        }
+      }
+      """
     Then the response status should be "422"
+    And the response should contain a valid signature header for "ent1"
     And the JSON response should be an array of 1 errors
     And the first error should have the following properties:
       """
@@ -239,7 +310,7 @@ Feature: User tokens relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a user token with unsupported permissions
+  Scenario: Product generates a user token with unsupported permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "user"
@@ -256,7 +327,36 @@ Feature: User tokens relationship
         }
       }
       """
+    Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a user token with unsupported permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["product.create"]
+          }
+        }
+      }
+      """
     Then the response status should be "422"
+    And the response should contain a valid signature header for "ent1"
     And the JSON response should be an array of 1 errors
     And the first error should have the following properties:
       """
@@ -276,7 +376,8 @@ Feature: User tokens relationship
     And sidekiq should have 0 "metric" jobs
     And sidekiq should have 1 "request-log" job
 
-  Scenario: Product generates a user token with invalid permissions
+
+  Scenario: Product generates a user token with invalid permissions (standard tier)
     Given the current account is "test1"
     And the current account has 1 "product"
     And the current account has 1 "user"
@@ -293,7 +394,36 @@ Feature: User tokens relationship
         }
       }
       """
+    Then the response status should be "400"
+    And the response should contain a valid signature header for "test1"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Bad request",
+        "detail": "Unpermitted parameters: /data/attributes/permissions"
+      }
+      """
+
+  Scenario: Product generates a user token with invalid permissions (ent tier)
+    Given the current account is "ent1"
+    And the current account has 1 "product"
+    And the current account has 1 "user"
+    And I am a product of account "ent1"
+    And I use an authentication token
+    When I send a POST request to "/accounts/ent1/users/$1/tokens" with the following:
+      """
+      {
+        "data": {
+          "type": "token",
+          "attributes": {
+            "permissions": ["foo.bar"]
+          }
+        }
+      }
+      """
     Then the response status should be "422"
+    And the response should contain a valid signature header for "ent1"
     And the JSON response should be an array of 1 errors
     And the first error should have the following properties:
       """

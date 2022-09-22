@@ -37,8 +37,8 @@ describe BroadcastEventService do
     event
   end
 
-  def jsonapi_render(model, options = {})
-    Keygen::JSONAPI::Renderer.new.render(model, options).to_json
+  def jsonapi_render(model, account:, **options)
+    Keygen::JSONAPI::Renderer.new(account:).render(model, options).to_json
   end
 
   before do
@@ -88,7 +88,7 @@ describe BroadcastEventService do
   end
 
   it 'the event payload should contain a snapshot of the resource' do
-    payload = jsonapi_render(resource)
+    payload = jsonapi_render(resource, account:)
     event = create_webhook_event!(account, resource)
 
     expect(event.payload).to eq payload
@@ -102,7 +102,7 @@ describe BroadcastEventService do
       constant: 'EXPIRED',
     }
 
-    payload = jsonapi_render(resource, meta: meta)
+    payload = jsonapi_render(resource, account:, meta:)
     event = create_validation_webhook_event!(account, resource, meta)
 
     expect(event.payload).to eq payload
@@ -146,7 +146,7 @@ describe BroadcastEventService do
     }
 
     event = create_webhook_event!(account, resource)
-    body = jsonapi_render(event)
+    body = jsonapi_render(event, account:)
     url = endpoint.url
 
     expect(WebhookWorker::Request).to have_received(:post).with(
