@@ -139,6 +139,10 @@ class Role < ApplicationRecord
     super || role_permissions_attributes_changed?
   end
 
+  def changed?
+    super || role_permissions_attributes_changed?
+  end
+
   private
 
   ##
