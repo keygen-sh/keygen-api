@@ -9,8 +9,8 @@ FactoryBot.define do
     plan
 
     after :build do |account|
-      account.billing = build(:billing, account: account)
-      account.users << build(:admin, account: account)
+      account.billing = build(:billing, account:)
+      account.users << build(:admin, account:)
     end
 
     trait :unprotected do

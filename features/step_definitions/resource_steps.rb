@@ -86,6 +86,12 @@ Given /^the account "([^\"]*)" has (\d+) "([^\"]*)"$/ do |id, count, resource|
   end
 end
 
+Given /^the account "([^\"]*)" has its billing uninitialized$/ do |id|
+  account = FindByAliasService.call(scope: Account, identifier: id, aliases: :slug)
+
+  account.billing&.delete
+end
+
 Given /^the current account has the following attributes:$/ do |body|
   body = parse_placeholders(body, account: @account, bearer: @bearer, crypt: @crypt)
 

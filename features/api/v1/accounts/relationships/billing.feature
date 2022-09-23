@@ -13,7 +13,15 @@ Feature: Account billing relationship
     When I send a GET request to "/accounts/test1/billing"
     Then the response status should not be "403"
 
-  Scenario: Admin retrieves the billing info for their account
+  Scenario: Admin retrieves the billing info for their account (not initialized)
+    Given the account "test1" has its billing uninitialized
+    And I am an admin of account "test1"
+    And I use an authentication token
+    When I send a GET request to "/accounts/test1/billing"
+    Then the response status should be "404"
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin retrieves the billing info for their account (initialized)
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And I use an authentication token
@@ -75,7 +83,29 @@ Feature: Account billing relationship
     Then the response status should be "401"
     And sidekiq should have 0 "request-log" jobs
 
-  Scenario: Admin updates the billing info for their account
+  Scenario: Admin updates the billing info for their account (not initialized)
+    Given the account "test1" has its billing uninitialized
+    And I am an admin of account "test1"
+    And the account "test1" has 1 "webhook-endpoint"
+    And I use an authentication token
+    And I have a valid payment token
+    When I send a PATCH request to "/accounts/test1/billing" with the following:
+      """
+      {
+        "data": {
+          "type": "billings",
+          "attributes": {
+            "token": "some_token"
+          }
+        }
+      }
+      """
+    Then the response status should be "404"
+    And sidekiq should have 0 "webhook" jobs
+    And sidekiq should have 0 "metric" jobs
+    And sidekiq should have 0 "request-log" jobs
+
+  Scenario: Admin updates the billing info for their account (initialized)
     Given the account "test1" is subscribed
     And I am an admin of account "test1"
     And the account "test1" has 1 "webhook-endpoint"
