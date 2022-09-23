@@ -1081,6 +1081,65 @@ Feature: Update user
       }
       """
 
+  Scenario: Admin updates an admin's permissions (has admin.* permissions)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["admin.update", "user.update"]
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "200"
+    And the JSON response should be a "user" with the following attributes:
+      """
+      {
+        "permissions": ["license.read", "machine.read"],
+        "role": "admin"
+      }
+      """
+
+  Scenario: Admin updates an admin's permissions (no admin.* permissions)
+    Given I am an admin of account "ent1"
+    And the current account is "ent1"
+    And the current account has 2 "admins"
+    And the first "admin" has the following permissions:
+      """
+      ["user.update"]
+      """
+    And I use an authentication token
+    When I send a PATCH request to "/accounts/ent1/users/$1" with the following:
+      """
+      {
+        "data": {
+          "type": "users",
+          "attributes": {
+            "permissions": ["license.read", "machine.read"]
+          }
+        }
+      }
+      """
+    Then the response status should be "403"
+    And the JSON response should be an array of 1 error
+    And the first error should have the following properties:
+      """
+      {
+        "title": "Access denied",
+        "detail": "You do not have permission to complete the request (admin lacks permission to perform action)"
+      }
+      """
+
   Scenario: Admin updates their permissions (no other admins)
     Given I am an admin of account "ent1"
     And the current account is "ent1"

@@ -9,10 +9,14 @@ describe UserPolicy, type: :policy do
   with_role_authorization :admin do
     with_scenarios %i[accessing_admins] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[admin.read user.read] do
           without_token_permissions { denies :index }
 
           allows :index
+        end
+
+        with_permissions %w[user.read] do
+          denies :index
         end
 
         with_wildcard_permissions { allows :index }
@@ -23,34 +27,54 @@ describe UserPolicy, type: :policy do
 
     with_scenarios %i[accessing_an_admin] do
       with_token_authentication do
-        with_permissions %w[user.read] do
+        with_permissions %w[admin.read user.read] do
           without_token_permissions { denies :show }
 
           allows :show
         end
 
-        with_permissions %w[user.create] do
+        with_permissions %w[user.read] do
+          denies :show
+        end
+
+        with_permissions %w[admin.create user.create] do
           without_token_permissions { denies :create }
 
           allows :create
         end
 
-        with_permissions %w[user.update] do
+        with_permissions %w[user.create] do
+          denies :create
+        end
+
+        with_permissions %w[admin.update user.update] do
           without_token_permissions { denies :update }
 
           allows :update
         end
 
-        with_permissions %w[user.delete] do
+        with_permissions %w[user.update] do
+          denies :update
+        end
+
+        with_permissions %w[admin.delete user.delete] do
           without_token_permissions { denies :destroy }
 
           allows :destroy
         end
 
-        with_permissions %w[user.invite] do
+        with_permissions %w[user.delete] do
+          denies :destroy
+        end
+
+        with_permissions %w[admin.invite user.invite] do
           without_token_permissions { denies :invite }
 
           allows :invite
+        end
+
+        with_permissions %w[user.invite] do
+          denies :invite
         end
 
         with_permissions %w[user.ban] do
